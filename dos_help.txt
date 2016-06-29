@@ -1,0 +1,316 @@
+   Version date: 2015 Jun 6
+
+   The parameters shown in this software are basically the same as those
+shown in the Windows software,  as described at
+
+http://www.projectpluto.com/find_orb.htm
+
+   Commands are very different,  because they are all keyboard based (but
+you can do a few minor things with the mouse;  see end of this text.)
+
+?      (Or any other unrecognized key) Shows this file (dos_help.txt).
+
+   ORBIT-FITTING COMMANDS:
+
+r      Reset R1 and R2,  for use in the method of Herget.  Results in being
+       prompted to type in new values for both.  By default, units are AU,
+       but one can append 'km';  e.g.,  '.01 500000km' or '10000km 20000km'
+       are interpreted logically.  Enter one value,  and R1=R2 is assumed.
+e      Reset the epoch.  Results in being prompted to enter a new epoch.
+       This can be simply a JD ("2451000.5") or a year/month/day ("2004
+       10 2").  Or you can enter,  say,  "+20" to advance the epoch 20
+       days,  or "-40" to set it back 40 days,  etc.  Or "now" to set the
+       epoch to today,  or "now-7" to set it to a week ago.
+v      Find Va'isa'la' orbit.  You'll be prompted to enter a perihelion
+         (or aphelion) distance;  it will then find a 'best fit' orbit with
+         that apsis distance at the center of the arc.
+l      Set a Limited orbit (e.g,  "e=.1",  "q=12.4",  "a=2.3,e=.15").
+h      Take one step using the method of Herget.
+f      Take one "full step" using the method of least squares.
+g      Determine orbit with method of Gauss.  (There may be alternative
+         solutions;  hit 'g' again to cycle through them.)
+|      Determine a Monte Carlo variant orbit.  Find_Orb will continue
+         generating variants until you hit another key to stop it.  Observe
+         the changes in the orbital elements,  and you get an idea of the
+         level of uncertainty.  (Elements will also be stored in 'mpcorb.dat'.)
+:      'Linearizes' the orbit,  as described at:
+         http://www.projectpluto.com/vaisala.htm#linearized
+#      Uses a downhill simplex method,  as described at
+         http://www.projectpluto.com/herget.htm#simplex
+/      Uses a downhill 'superplex' method,  as described at the above URL.
+Backspace   Undo the last orbit-fitting command.
+F12    Find a circular orbit connecting the first and last positions.  Hit
+         this repeatedly,  and Find_Orb will iterate through possible
+         solutions.  If the arc is long enough,  there may be multiple-orbit
+         solutions,  including many spurious retrograde ones.  (Or there may
+         be no circular orbits at all.)
+
+   INTEGRATION MODEL COMMANDS (perturbers, non-grav effects):
+
+1...9  Toggle inclusion of Mercury...Pluto as a perturbing object.
+0      Toggle inclusion of the Moon as a perturbing object.
+!      If all perturbers are off,  turns main planets on; otherwise,
+            shuts off all perturbers at once.
+a      Toggle inclusion of up to 300 asteroids.  (See documentation for
+         details,  including on how to limit/increase asteroid use.)  NOTE
+         that this can slow things down a bit and appears to rarely matter.
+*      Toggle inclusion of the effects of solar radiation pressure (SRP).
+         Turn this on,  and on the next "full step",  Find_Orb will do a
+         _seven_-parameter fit,  with the area/mass ratio solved for as an
+         added variable.
+^      Toggle on comet parameters A1 and A2.  Turn this on,  and on the next
+         'full step',  Find_Orb will do an _eight_-parameter fit,  with A1
+         and A2 solved for as added variables.  Hit it again,  and A3 will be
+         included for a nine-parameter fit.  Yet again,  and you're back to
+         not using comet parameters (i.e.,  a three-way cycle).
+
+      OBSERVATION TOGGLING/WEIGHTING/SEARCHING:
+
+F1 or Alt-U
+       Toggle all observations prior to the currently-selected one.
+F2     Toggle all observations after the currently-selected one.
+F3     Toggle all observations for the currently-selected observatory.  This
+         lets you,  say,  "shut off all 703 observations."
+F4     Find previous observation from the current observatory.
+F5     Find following observation from the current observatory.  Both of these
+         functions wrap around at the start/end of the list of observations.
+F6     Find preceding excluded observation.
+F7     Find following excluded observation.  Again,  these both wrap around.
+Shift-F8   Enter a three-character MPC code,  and the next observation made
+           from that code will be searched for.  Or,  enter a date/time and
+           the first observation made after that date/time will be sought.
+F9     Find the first included observation in the arc.
+F10    Find the last included observation in the arc.
+%      Reset uncertainty of a particular observation.  Enter,  e.g.,  '.3'
+            to reset the positional uncertainty to 0.3 arcseconds;  'm.2'
+            to reset the photometric uncertainty to 0.2 magnitudes;  or
+            't4' to reset the uncertainty in timing to four seconds.
+
+            ON-SCREEN DISPLAY:
+
+p      Show orbital elements with an extra digit of precision.
+P      Show orbital elements with one less digit of precision.
+Shift-F7    Toggle between the 'pure' MPC-formatted eight-line elements,  with
+         P and Q vectors;  and Find_Orb's slightly revised format,  with
+         uncertainties (if available),  P and Q,  and extra MOID data.
++      Choose center object for orbital elements.  By default,  Find_Orb
+         determines the planet with the greatest influence on the object (at
+         the time of epoch) and the elements are relative to that object,  so
+         you can get geocentric,  Jovicentric,  etc. elements.  Use '+' to
+         a particular central object (which can be the barycenter of the
+         solar system).
+i      Toggles the 'information' about the currently-selected observation
+         (reference,  observing station,  magnitude/motion of the object).
+         This data takes up three lines;  when shut off,  three more lines
+         of residuals are shown.
+j      Toggles the two lines showing which perturbers are included,  R1 and R2,
+         orbital restrictions,  and the step size.  When shut off,  two
+         more lines of residuals are shown.
+o      Toggles display of the orbital elements.  You normally wouldn't want
+         to shut them off,  but if you do,  ten more lines of residuals are
+         shown.  Combine with the above 'i' and 'j' commands,  and you can
+         get a full-screen display of observations/residuals.
+;      Toggles display of the "residual legend",  which explains what the
+         assorted data in the residual area mean.
+c      (WATCOM-compiled under DOS version only) Select a different text
+         mode from the default 80x25 one.  Modes include 100x50, 132x60,
+         etc.  Not all modes may work with your video card.
+-      Cycles display of the list of observatories among three options:
+         just data for the observatory for the currently-selected observation;
+         use about a third of the observation area for observatory data;
+         or use most of that area for observatory data.
+
+        RESIDUAL-RELATED COMMANDS:
+
+Cursor keys :  move up/down one observation,  or a "page" up/down
+       at a time;  'Home' to first obs, 'End' to last.
+-      Toggles display of the list of observatory codes.
+x      Toggle the inclusion of the currently selected observation.
+{      Filter all observations according to residual level.
+}      Cycles between 'normal' residuals (given to 0.01 arcsec precision),
+         'precise' residuals (0.001 arcsec precision),  and 'super-precise'
+         residuals (values under a milliarcsecond are shown as micro, nano,
+         pico,  etc.)  No one will normally use this;  I did so to verify
+         the level of roundoff/integration error in the software.
+k      Cycle from long residual format to short (such as MPC uses),  to
+         showing the original 80-byte observation record,  back to the
+         long residual format.
+b      When in "usual" one-obs-per-line residual formats,  toggles
+         between decimal day display and HH:MM:SS display.
+d      Show resiDuals in current format & save to file 'residual.txt'
+t      Toggle between "usual" residuals in RA and dec,  and residuals in
+       time and cross-track distance.
+=      Toggle between "usual" residuals,  and display of total angular
+       residual and magnitude residuals.
+w      Find Worst (highest-residuals) observation.
+@      Toggle off display of residuals outside the currently-used arc
+         of observations.  By default,  Find_Orb will compute those
+         residuals;  if the observations are quite far from the actually
+         used arc,  that can take a while.  Toggling them off can help
+         speed things up a bit.
+(     Compute residuals for _all_ observations.  By default,  the Herget,
+         Vaisala, and Gauss methods don't bother computing residuals for
+         observations not within the currently-set arc.  This speeds up
+         the program,  but does require you to hit this key if,  for some
+         reason,  you want to know those residuals.
+]     Toggles display of 'deltas':  except in the short MPC format,
+         differences between the currently-selected observation and
+         the others,  in time,  RA, and dec,  will be shown.  Useful
+         to get a quick how-far-is-this- obs-from-that-one, in time or
+         position.
+
+      EPHEMERIS-RELATED COMMANDS:
+
+m      Make an ephemeris.  You get a menu asking for a starting date/time,
+          step size,  and number of steps.  You can also set the observing
+          location (by MPC code) and have a little control over what
+          ends up in the ephemeris  Ephemeris-specific help is available
+          from within this menu.
+
+   MISCELLANEOUS COMMANDS:
+
+)      Show a user-selected text file.  I added this because I'm sometimes
+         in the midst of solving an object and would like to look at some
+         file or another,  without needing to exit or start a new console.
+n      Select a different object from the input file of astrometry.
+`      (that's a backward-quote-mark!) Toggles between N(uclear) and T(otal)
+         comet magnitudes.  When a full-step is done,  you'll see that
+         'M(N)' becomes 'M(T)',  or vice versa.
+s      Save orbital elements to a file.  (Whatever elements are shown
+         on-screen are also stored in the file 'elements.txt'.  This
+         command really just copies 'elements.txt' to a file of your choice.)
+[      Show covariance and correlation matrices from last 'full step',
+         plus an attempt to extract the largest eigenvalue of the former
+         in hopes of computing uncertainty info. This data is stored in
+         the file 'covar.txt';  this command really just displays that file.
+q      Exit the program
+
+   COMMANDS NOBODY SHOULD HAVE TO USE (mostly for my testing purposes,  or
+         not really working yet)
+
+z      Reset the integration step size,  in days.  (No longer relevant,
+         except when using the testing-only symplectic integrator.)
+$      Reset integration tolerance (default is 1e-11).  Used for testing
+         how good the integrator is.
+y      Show details of the last Gauss orbit computation.
+z      Integrate current orbit forward,  then back,  a certain number of
+         days,  and compare to original result.  Used when I suspect the
+         integrator's not quite as precise as it might be,  and to evaluate
+         what integration tolerance should be used.
+"      Shows details of Curses mouse commands (these differ from one platform
+         to the next,  and I needed a way to puzzle them out),  and info on
+         the DE file currently in use.
+~      Remove duplicate observations.
+.      Show flavor of Curses and DE version in use.
+,      Show 'debug.txt' (log of debug messages).
+'      Switch to an alternative,  non-standard 'mpcorb' format, one that can
+         handle parabolic, hyperbolic,  and long-period orbits.  If you really
+         want to know, see comments for elements_in_mpcorb_format() in
+         elem_out.cpp.
+\      Shift all observations from a given observatory by a given time offset.
+         Used when I was trying to puzzle out some timing errors from a
+         specific observatory for a specific object.
+Alt-D  Reset debug level.
+Shift-F6   Reset atmospheric drag (doesn't work yet)
+&      Attempt to find precoveries within a list of plates (doesn't work yet)
+
+Mouse actions:
+
+   Click on any of the "menu" items on the top line to get that action
+   Click on the R1, R2 display to be prompted to enter a new R1 and R2
+   Click on a planet abbreviation to toggle its use as a perturber
+   Click on an observation to select it;  double-click it to toggle it
+   Click on the "residual legend" to cycle the residual format
+   Click on the epoch to enter a new epoch.
+   Click on the list of observatories to toggle that list.  The observatory
+      for the current observation will always be listed.
+   Click on scroll bar at right edge (in 'help',  or in ephemerides,  or
+      next to the observations in the main screen) to... well... scroll.
+   Turning a mouse wheel may scroll within the list of residuals or within
+      the file you're looking at (depends on the platform;  mouse support
+      is a little sketchy in some flavors of Curses.)
+
+The following table was shamelessly copied from:
+
+http://www.minorplanetcenter.net/iau/lists/Sizes.html
+
+It lists the diameters of minor planets corresponding to the given values of
+the absolute magnitude, H.  The diameter is to be read as kilometers when H
+is in the "H(km)" column,  meters in the "H(m)" column,  and millimeters in
+the "H(mm)" column.  For example, H = 8.0 corresponds to a diameter of 65 to
+150 km, whereas H = 23.0 corresponds to a diameter of 65 to 150 m.
+
+Conversion of H to a diameter for a specific object requires knowledge of
+the object's albedo.  This quantity is not known for most objects, so the
+diameters listed here are given for albedoes of 0.50,  0.25,  and 0.05.
+Most objects have albedos in this range.  If a specific object has an
+albedo less than 0.05, the diameter will be larger than the upper limit
+listed here (possibly up to infinity,  if you imagine an extremely black
+"Stealth Asteroid").  If the albedo is greater than 0.50, the diameter will
+be smaller than the lower limit given here (possibly as low as sqrt(.5) of
+that lower limit,  if the object is icy and has essentially a 100%
+albedo... but no lower than that;  you can't reflect more than 100%.)
+
+      Table: Probable diameter ranges for various
+              H values and albedo values.
+
+           H(km)          Albedo          H(m)   H(mm)
+                   0.50    0.25    0.05
+           -2.0    4700 -  6700 - 14900    13.0  28.0
+           -1.5    3700 -  5300 - 11800    13.5  28.5
+           -1.0    3000 -  4200 -  9400    14.0  29.0
+           -0.5    2400 -  3300 -  7500    14.5  29.5
+            0.0    1900 -  2600 -  5900    15.0  30.0
+            0.5    1500 -  2100 -  4700    15.5  30.5
+            1.0    1200 -  1700 -  3700    16.0  31.0
+            1.5     940 -  1300 -  3000    16.5  31.5
+            2.0     750 -  1050 -  2400    17.0  32.0
+            2.5     590 -   840 -  1900    17.5  32.5
+            3.0     470 -   670 -  1500    18.0  33.0
+            3.5     370 -   530 -  1200    18.5  33.5
+            4.0     300 -   420 -   940    19.0  34.0
+            4.5     240 -   330 -   740    19.5  34.5
+            5.0     190 -   260 -   590    20.0  35.0
+            5.5     150 -   210 -   470    20.5  35.5
+            6.0     120 -   170 -   370    21.0  36.0
+            6.5      95 -   130 -   300    21.5  36.5
+            7.0      75 -   110 -   240    22.0  37.0
+            7.5      60 -    85 -   190    22.5  37.5
+            8.0      45 -    65 -   150    23.0  38.0
+            8.5      40 -    50 -   120    23.5  38.5
+            9.0      30 -    40 -    95    24.0  39.0
+            9.5      25 -    35 -    75    24.5  39.5
+           10.0      19 -    25 -    60    25.0  40.0
+           10.5      15 -    20 -    50    25.5  40.5
+           11.0      12 -    17 -    37    26.0  41.0
+           11.5       9 -    13 -    30    26.5  41.5
+           12.0       7 -    11 -    24    27.0  42.0
+           12.5       6 -     8 -    19    27.5  42.5
+           13.0       5 -     7 -    15    28.0  43.0
+           13.5       4 -     5 -    12    28.5  43.5
+           14.0       3 -     4 -     9    29.0  44.0
+           14.5       2 -     3 -     7    29.5  44.5
+           15.0       2 -     3 -     6    30.0  45.0
+           15.5       1 -     2 -     5    30.5  45.5
+           16.0       1 -     2 -     4    31.0  46.0
+           16.5       1 -     1 -     3    31.5  46.5
+           17.0       1 -     1 -     2    32.0  47.0
+           17.5       1 -     1 -     2    32.5  47.5
+
+   Important note:  residuals are O-C ("observed minus computed"),  so
+positive y residuals mean the object was observed to be _north_ of
+prediction, positive x _east_ of prediction.
+
+New moon dates for the next few years :
+
+ 3 Dec 2013    23 Oct 2014    13 Sep 2015     2 Aug 2016
+ 1 Jan 2014    22 Nov 2014    13 Oct 2015     1 Sep 2016
+30 Jan 2014    22 Dec 2014    11 Nov 2015     1 Oct 2016
+ 1 Mar 2014    20 Jan 2015    11 Dec 2015    30 Oct 2016
+30 Mar 2014    18 Feb 2015    10 Jan 2016    29 Nov 2016
+29 Apr 2014    20 Mar 2015     8 Feb 2016    29 Dec 2016
+28 May 2014    18 Apr 2015     9 Mar 2016    28 Jan 2017
+27 Jun 2014    18 May 2015     7 Apr 2016    26 Feb 2017
+26 Jul 2014    16 Jun 2015     6 May 2016    28 Mar 2017
+25 Aug 2014    16 Jul 2015     5 Jun 2016    26 Apr 2017
+24 Sep 2014    14 Aug 2015     4 Jul 2016    25 May 2017

@@ -1,0 +1,113 @@
+# Des commentaires peuvent être ajoutés en mettant un '#' au début de la ligne.
+# FIND_ORB a trois boîtes de dialogue: la boîte principale "main", la boîte A Propos "about",
+# et la boîte éphéméride "ephemeris".  Pour chacune, le titre de la fenêtre est donné, puis,
+# une série de ligne donnant la traduction du texte.  Les numéros au début de chaque ligne
+# sont des numéros d'identification du texte traduit
+# 'ffind_8b.txt' is the 8-bit (Windows 1252) version of this,  made via
+# iconv -f UTF-8 -t WINDOWS-1252 ffindorb.txt > ffind_8b.txt
+
+# main
+99000   FIND_ORB Logiciel de Détermination d'Orbites
+99105   Méth. &Herget
+99106   Complète &F
+99108   Merc.
+99109   Vénus
+99110   Terre
+99111   Mars
+99112   Jupi
+99113   Satu
+99114   Uran
+99115   Nept
+99116   Plut
+99117   Lune
+99118   Astéroids
+99129   Enrg. Elément&S
+99136   &Automatique
+99137   Enrg. &Résidus...
+99138   &Ephéméride...
+99142   &Ouvrir...
+99148   A Propos de...
+99149   R2:
+99150   UA
+99151   UA
+99153   R1:
+99174   Eléments Orbitaux:
+99156   Epoque
+99157   Perturbations:
+99140   Gauss
+99141   Pire observation
+99143   Filtrer observations
+99139   Monte Carlo...
+99144   Paramètres
+99145   &Inverser Obs
+99146   &Poids
+99180   Tous les Perturbateurs
+99001   Quitter
+
+# about
+98000   A Propos de FIND_ORB
+98153   FIND_ORB Logiciel de Détermination d'Orbites
+98149   Copyright freeware de Project Pluto (C)1997-2014
+98150   Des mises à jour et des informations sur les autres
+98152   logiciels d'astronomie peuvent être trouvées à:
+98155   http://www.projectpluto.com
+98179   Version
+
+# ephem
+97000   Calculer l'éphéméride
+97147   Exec. &G
+97129   Enrg. &S
+97153   Jour
+97151   Nb. pas
+97152   Taille pas
+97154   Latitude ou Code
+97155   Longitude
+
+# settings
+96000   Paramètres
+96153   Contraintes:
+96149   Référence:
+96150   Monte Carlo bruit:
+96151   Max résidu filtré:
+96152   Elément précision:
+96173   &Héliocentrique seulement
+96001   OK
+96002   Cancel
+
+# messages
+1       Pas d'orbite à améliorer!
+2       Pas de résidus à sauver!
+3       Pas d'orbite pour créer une Ephéméride!
+4       Methode de Gauss en faute!
+5       Pas de changement!
+6       Ephéméride doit contenir au moins une entrée!
+7       Pas non spécifié!
+8       Mois doit être entre 1 et 12!
+9       Jour doit être entre 1 et %d!
+10      Pas d'observations chargées depuis ce fichier!
+11      Fichier non trouvé!
+12      Latitude doit commencer par 'N' ou 'S'!
+13      Longitude doit commencer par 'E' ou 'W'!
+14      Date incorrecte!
+15      %d of %d obs
+16      From %d obs
+17      ; mean résidu %s
+18      Find_Orb -- Orbit Determination
+19      Weighting of posns/mags/times is
+20      All preceding observations toggled
+21      All Perturbers On
+22      All Perturbers Off
+
+# months
+1000    Jan
+1001    Fév
+1002    Mar
+1003    Avr
+1004    Mai
+1005    Jun
+1006    Jul
+1007    Aou
+1008    Sep
+1009    Oct
+1010    Nov
+1011    Déc

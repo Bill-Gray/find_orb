@@ -1,0 +1,30 @@
+?              help
+f              Full
+h              Herget
+m              epheM
+v              Vaisa
+d              resiD
+g              Gauss
+l              constr
+n              New
+q              Quit
+e              Epoch
+!              all_perts
+u              Undo
+*              SRP
++              HelioOnly
+-              Obs'ories
+x              ToggObs
+k              ResidFmt
+=              MagResids
+w              Worst
+^              CometParams
+#              Simplex
+/              Superplex
+:              Linearize
+|              MonteCarlo
+[              CovarData
+`              CmtMags
+)              ReadFile
+End
+   Comments can be added freely after the above 'End' line.

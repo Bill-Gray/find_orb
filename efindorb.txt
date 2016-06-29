@@ -1,0 +1,148 @@
+# Comments can be added by putting a '#' at the start of a line.
+# FIND_ORB has three dialog boxes:  the "main" box,  the "about" box,
+# and the "ephemeris" box.  For each,  the window title is given,  then
+# a set of lines providing translated text.  The numbers at the start of
+# each line are ID numbers for the text being translated.
+# See 'ffindorb.txt',  'ifindorb.txt',  etc. for French,  Italian,  etc.
+# versions of this file.
+
+# main
+99000   FIND_ORB Orbit Determination Software
+99105   &Herget step
+99106   &Full step
+99108   Mercury
+99109   Venus
+99110   Earth
+99111   Mars
+99112   Jupiter
+99113   Saturn
+99114   Uranus
+99115   Neptune
+99116   Pluto
+99117   Moon
+99118   Asteroids
+99129   Sa&ve elements
+99136   &Auto-Solve
+99137   Save &Residuals...
+99138   &Ephemeris...
+99142   &Open...
+99148   About...
+99149   R2:
+99150   AU
+99151   AU
+99153   R1:
+99174   Orbital elements:
+99156   Epoch
+99157   Perturbers:
+99140   &Gauss
+99141   Worst o&bs
+99143   F&ilter obs
+99139   &Monte Carlo...
+99144   &Settings
+99145   &Toggle Obs
+99146   Set Sigma(s)
+99180   All Perturbers On
+99001   Exit
+
+# about
+98000   About FIND_ORB
+98153   FIND_ORB Orbital Determination Software
+98149   GPL'ed software by Project Pluto (C)1997-2014
+98150   Updates and information about other astronomy
+98152   software can be found at:
+98155   http://www.projectpluto.com
+98179   Version
+
+# ephem
+97000   Make Ephemeris
+97001   &Done
+97129   &Save
+97147   &Go
+97148   &Pseudo-MPEC
+97149   Paste to &Clipboard
+97150   &Now
+97151   # steps:
+97152   Stepsize
+97153   Start:
+97154   Latitude
+97155   Longitude
+97175   Show &Motion details
+97176   Show &Alt/az
+97182   &Radial velocity
+97183   &Phase angle
+97184   S&eparate motions
+97185   Phase angle &bisector
+97186   &Heliocentric ecliptic
+97187   &Topocentric ecliptic
+97188   Ro&und to nearest step
+97189   Ground track
+97192   S&uppress unobserables
+97193   &Visibility indicators
+97194   Ephem u&ncertainty
+97195   Human-readable output
+97196   Speed
+97199   Latitude
+97200   &Observables
+97201   State &vectors
+97202   Car&tesian coords
+97203   MP&CORB elements
+97204   &8-line elements
+97205   C&lose approaches
+97206   MPC code
+96999   Suppress output below mag:
+
+# settings
+96000   Settings
+96149   Reference:
+96150   Monte Carlo noise:
+96151   Max filtered residual:
+96152   Element precision:
+96153   Constraints:
+96173   &Heliocentric orbits only
+96001   OK
+96002   Cancel
+
+# ephemeris
+
+# messages
+1       No orbit to improve!
+2       No residuals to save!
+3       No orbit to make an ephemeris!
+4       Method of Gauss failed!
+5       No changes made!
+6       Ephemeris must contain at least one entry!
+7       No step size specified!
+8       Month must be from 1 to 12!
+9       Day must be from 1 to %d!
+10      No observations loaded from that file!
+11      File not found!
+12      Latitude must start with an 'N' or 'S'!
+13      Longitude must start with an 'E' or 'W'!
+14      Invalid date!
+15      %d of %d observations
+16      From %d observations
+17      ; mean residual %s
+18      Find_Orb -- Orbit Determination
+19      Weighting of posns/mags/times is
+20      All preceding observations toggled
+21      All Perturbers On
+22      All Perturbers Off
+
+900     English
+901     French
+902     Italian
+903     Russian
+
+# months
+1000    January
+1001    February
+1002    March
+1003    April
+1004    May
+1005    June
+1006    July
+1007    August
+1008    September
+1009    October
+1010    November
+1011    December

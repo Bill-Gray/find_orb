@@ -1,0 +1,186 @@
+; Used in the xref_designation() function in 'mpc_obs.cpp'.  The idea
+; is that if you've an object listed under two different designations,
+; you can tell Find_Orb to replace one designation with another.  For
+; example,  the satellite Jupiter XVII = Jupiter 17 = Callirrhoe was
+; originally given the designation S/1999 J 1.  The first line below
+; maps that original designation to the permanent J17 one.
+;   In practice,  this has been used almost exclusively to handle the
+; nomenclature changes for natural satellites.  But it can also be useful
+; in testing linkages.  Suppose you're thinking that J75X99X = K08Z41Z.
+; Just add the line '    J75X99X    K08Z41Z',  and the observations of
+; the two will be loaded as if they were one object,  and you can try to
+; link them.
+;   Any line starting with ';' is a comment,  and you can add text freely
+; after the two designations/line... at present,  that's mostly used to
+; give a more complete/human-readable description of the object.
+;
+    SJ99J010 J017S        Callirrhoe
+    SJ75J010 J018S        Themisto
+    SK00J010 J018S        Themisto
+    SK00J080 J019S        Magaclite
+    SK00J090 J020S        Taygete
+    SK00J100 J021S        Chaldene
+    SK00J050 J022S        Harpalyke
+    SK00J020 J023S        Kalyke
+    SK00J030 J024S        Iocaste
+    SK00J040 J025S        Erinome
+    SK00J060 J026S        Isonoe
+    SK00J070 J027S        Praxidike
+;
+;From IAUC 8177:
+;
+    SK01J010 J028S        Autonoe
+    SK01J020 J029S        Thyone
+    SK01J030 J030S        Hermippe
+    SK01J110 J031S        Aitne
+    SK01J040 J032S        Eurydome
+    SK01J070 J033S        Euanthe
+    SK01J100 J034S        Euporie
+    SK01J090 J035S        Orthosie
+    SK01J050 J036S        Sponde
+    SK01J080 J037S        Kale
+    SK01J060 J038S        Pasithee
+;
+    SK00S010 S019S        Ymir
+    SK00S020 S020S        Paaliaq
+    SK00S040 S021S        Tarvos
+    SK00S060 S022S        Ijiraq
+    SK00S120 S023S        Suttung
+    SK00S050 S024S        Kiviuq
+    SK00S090 S025S        Mundilfari
+    SK00S110 S026S        Albiorix
+    SK00S080 S027S        Skadi
+    SK00S100 S028S        Erriapo
+    SK00S030 S029S        Siarnaq
+    SK00S070 S030S        Thrym
+;
+    SK03S010 S031S        Narvi
+;
+    SJ97U010 U016S        Caliban
+    SJ97U020 U017S        Sycorax
+    SJ99U010 U019S        Setebos
+    SJ99U020 U020S        Stephano
+    SJ99U030 U018S        Prospero
+    SK01U010 U021S        Trinculo
+
+; From IAUC 8502,  30 Mar 2005:
+
+    SK03J080 J039S        Hegemone
+    SK03J210 J040S        Mneme
+    SK03J070 J041S        Aoede
+    SK03J220 J042S        Thelxinoe
+    SK02J010 J043S        Arche
+    SK03J110 J044S        Kallichore
+    SK03J060 J045S        Helike
+    SK03J200 J046S        Carpo
+    SK03J010 J047S        Eukelade
+    SK03J130 J048S        Cyllene
+
+;   McNaught find from 26 Aug 2004:
+     4H42B88 1965-058A
+     4I034AB 2002-048A
+     WJ2B5AC 2002-048A    2002-048A = NORAD 27540 = Integral
+
+INTEGRAL     2002-048A    2002-048A = NORAD 27540 = Integral
+;  More McNaught finds:
+     5E4EA48 1999-066A
+     5K522D0 1999-066A
+
+    SK04S020 S033S        Saturn XXXIII = Pallene = S/2004 S 2
+    SK04S050 S034S        Saturn XXXIV = Polydeuces = S/2004 S 5
+    SK05S010 S035S        Saturn XXXV = Daphnis = S/2005 S 1
+    SK04S100 S036S        Saturn XXXVI = Aegir = S/2004 S 10
+    SK04S110 S037S        Saturn XXXVII = Bebhionn = S/2004 S 11
+    SK04S150 S038S        Saturn XXXVIII = Bergelmir = S/2004 S 15
+    SK04S180 S039S        Saturn XXXIX = Bestla = S/2004 S 18
+    SK04S090 S040S        Saturn XL = Farbauti = S/2004 S 9
+    SK04S160 S041S        Saturn XLI = Fenrir = S/2004 S 16
+    SK04S080 S042S        Saturn XLII = Fornjot = S/2004 S 8
+    SK04S140 S043S        Saturn XLIII = Hati = S/2004 S 14
+    SK04S190 S044S        Saturn XLIV = Hyrokkin = S/2004 S 19
+    SK06S020 S045S        Saturn XLV = Kari = S/2006 S 2
+    SK06S050 S046S        Saturn XLVI = Loge = S/2006 S 5
+    SK06S080 S047S        Saturn XLVII = Skoll = S/2006 S 8
+    SK06S070 S048S        Saturn XLVIII = Surtur = S/2006 S 7
+    SK07S040 S049S        Saturn XLIX = Anthe = S/2007 S 4
+    SK06S060 S050S        Saturn L = Jarnsaxa = S/2006 S 6
+    SK06S040 S051S        Saturn LI = Greip = S/2006 S 4
+    SK07S010 S052S        Saturn LII = Tarqeq = S/2007 S 1
+
+    SK02N010 N009S        Neptune IX = S/2002 N1 = Halimede
+    SK03N010 N010S        Neptune X = S/2003 N1 = Psamathe
+    SK02N020 N011S        Neptune XI = S/2002 N2 = Sao
+    SK02N030 N012S        Neptune XII = S/2002 N3 = Laomedeia
+    SK02N040 N013S        Neptune XIII = S/2002 N4 = Neso
+    SK03J140 J049S        Jupiter XLIX = S/2003 J 14 = Kore
+    SK03J170 J050S        Jupiter L = S/2003 J 17 = Herse
+    SK03J170 J050S        Jupiter L = S/2003 J 17 = Herse
+    SK10J010 J051S        Jupiter LI = S/2010 J 1
+    SK10J020 J052S        Jupiter LII = S/2010 J 2
+    SK00J110 J023S        Jupiter LIII = S/2000 J 11 = Dia
+    SK01U030 U022S        Uranus XXII = Francisco = S/2001 U 3
+    SK01U030 U022S        Uranus XXII = Francisco = S/2001 U 3
+    SK03U030 U023S        Uranus XXIII = Margaret = S/2003 U 3
+    SK03U030 U023S        Uranus XXIII = Margaret = S/2003 U 3
+    SK01U020 U024S        Uranus XXIV = Ferdinand = S/2001 U 2
+    SK01U020 U024S        Uranus XXIV = Ferdinand = S/2001 U 2
+    SK02N010 N009S        Neptune IX = S/2002 N1 = Halimede
+    SK03N010 N010S        Neptune X = S/2003 N1 = Psamathe
+    SK02N020 N011S        Neptune XI = S/2002 N2 = Sao
+    SK02N030 N012S        Neptune XII = S/2002 N3 = Laomedeia
+    SK02N040 N013S        Neptune XIII = S/2002 N4 = Neso
+
+;  When Herschel/Planck launched in May 2009,  there was some initial
+; confusion as to which object was which.  So five of them got temporary
+; designations HPO1 through HPO5.
+HPO1         2009-026D    Sylda
+HPO2         2009-026A    Herschel
+Herschel     2009-026A    Herschel
+Planck       2009-026B    Planck
+HPO3         2009-026C    Booster
+HPO4         2009-026E    object5
+HPO5         2009-026F    object6 (the accelerating one)
+
+     Pluto   D4340        Pluto = (134340)
+     GAIA    2013-074A    Gaia
+     WE0913A 2015-007B    WE0913A = DSCOVR object = 2015-007B = NORAD 40391
+WE0913A      2015-007B    WE0913A = DSCOVR object = 2015-007B = NORAD 40391
+     WT1CD40 2015-007B    WE0913A = DSCOVR object = 2015-007B = NORAD 40391
+     9U01FF6      WT1190F WT1190F = UDA34A3 = UW8551D = 9U01FF6
+     UDA34A3      WT1190F WT1190F = UDA34A3 = UW8551D = 9U01FF6
+     UW8551D      WT1190F WT1190F = UDA34A3 = UW8551D = 9U01FF6
+SPEKTR-R     2011-037A    Spektr-R
+     UE2A938 1972-073A    UE2A938 = IMP7 = 1972-073A
+IMP7         1972-073A    UE2A938 = IMP7 = 1972-073A
+IMP-7        1972-073A    UE2A938 = IMP7 = 1972-073A
+IMP8         1973-078A    IMP-8 = NORAD 06893
+     TA29DCF 2011-037B    2011-037B = TA29DCF = Spektr-R Booster
+     WF839BF 2015-011A    2015-011A = WF839BF = MMS 1
+     WF839C0 2015-011D    2015-011D = WF839C0 = MMS 4
+     WF839C1 2015-011B    2015-011B = WF839C1 = MMS 2
+     WF839C2 2015-011C    2015-011C = WF839C2 = MMS 3
+     WF839C3 2015-011E    2015-011E = WF839C3 = MMS obj
+     WF839C4 2015-011F    2015-011F = WF839C4 = MMS obj
+     6J6231C 1992-044A    Geotail = NORAD 22049
+     6J13FB2 1992-044A    Geotail = NORAD 22049
+     Geotail 1992-044A    Geotail = NORAD 22049
+     WF0AEDA 2009-068B    2009-068B = NORAD 36109 = WF0AEDA = WGS 3 rk = S509590
+     S509590 2009-068B    2009-068B = NORAD 36109 = WF0AEDA = WGS 3 rk = S509590
+     8UB56DA 2008-051A    TR93D0F = IBEX = NORAD 33401
+     TR93D0F 2008-051A    TR93D0F = IBEX = NORAD 33401
+     9W13082 2007-004C    Themis-C
+CXO          1999-040B    Chandra
+     WB31C9F 1976-023C    WB31C9F = XC83E0D = SOLRAD 11A
+     6N070E8 1976-023C    WB31C9F = XC83E0D = SOLRAD 11A
+     6N070E7 1976-023C    WB31C9F = XC83E0D = SOLRAD 11A
+     XC83E0D 1976-023C    WB31C9F = XC83E0D = SOLRAD 11A
+
+     M70pEPX ExoMars1     ExoMars hardware
+     M70pF8A ExoMars1     ExoMars hardware
+     M70pGbh ExoMars1     ExoMars hardware
+     WJ2AD07      S509356
+     S509433      S509474 1999-066A = XMM-Newton = NORAD 25989 = S509474 = S509433
+1999-066A         S509474 1999-066A = XMM-Newton = NORAD 25989 = S509474 = S509433
+     S509434 2013-041B    2013-041B = NORAD 39224 = WGS 6 Rk
+     S509558 2013-041B    2013-041B = NORAD 39224 = WGS 6 Rk
+     UU0E325      UV18B9C 1967-040A = NORAD 02765 = UU0E325 = UV18B9C = Vela 7

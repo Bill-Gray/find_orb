@@ -1,0 +1,28 @@
+
+   The format of these orbits is that of the Minor Planet Center's
+MPCORB dataset. Each object's elements are stored on a single line,
+the format of which is described at:
+
+          http://www.minorplanetcenter.org/iau/info/MPOrbitFormat.html
+
+   Note that certain parameters such as the number of oppositions and
+internal MPC data are replaced in the following with spaces or asterisks.
+Also note that this is a lousy format for objects with large semimajor
+axes,  because the precision of the mean anomaly drops.  Also,  this
+format cannot handle parabolic or hyperbolic orbits at all.  To get around
+this,  Find_Orb can create MPCORB.DAT-like files in which the mean anomaly
+and mean motion are replaced with the integer and fractional parts,
+respectively,  of the JD of periapsis;  and the semimajor axis is replaced
+by the perihelion distance.  (At some point,  non-heliocentric orbits
+could also be supported.)  Unfortunately, this is not readable with most
+existing software.
+
+   Also,  be advised that more verbose elements,  including such data
+as state vectors and MOIDs with all major planets (and JD of periapsis
+and perihelion distance)  are written to the file 'state.txt' in something
+resembling the MPC's eight-line format.
+
+A brief header is given below:
+
+Des'n     H     G   Epoch     M        Peri.      Node       Incl.       e            n           a        Reference #Obs #Opp    Arc    rms  Perts   Computer
+----------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -1,0 +1,116 @@
+#   Comments can be added freely as lines starting with '#'
+#
+#   'sigma.txt' is the replacement for 'weights.txt',  and renders it
+# obsolete.  It is similar to 'weights.txt',  but extends its capabilities.
+#
+#   'sigma.txt' allows you to set up rules describing the default
+# uncertainties in position,  time,  and magnitude for astrometric data.
+# The idea is that you can tell Find_Orb that all observations from a
+# given observatory over a given time span and magnitude range have,
+# by your estimate,  specific uncertainties in those three quantities.
+#
+#   The resulting uncertainties are simply default values,  used when
+# there's no other way to know the uncertainty.  If you use the
+# AstDyS/NEODyS .rwo format,  the data have astrometric uncertainties
+# given with each observation.  And Find_Orb provides ways to specify
+# uncertainties via special keywords within the observations.  See
+#
+# http://www.projectpluto.com/find_orb.htm#weight
+#
+#  for details.
+#
+#   This is a revised version of what used to be 'weight.txt'.  That
+# file was quite similar,  except that instead of storing uncertainties,
+# weights were stored.  These basically just boiled down to 1/sigma_posn,
+# with sigma_posn expressed in arcseconds.  Also,  only sigmas for
+# position could be defined;  'sigma.txt' adds sigmas for magnitude
+# and time as well;  and allows you to specify a project code as well.
+#
+#   Find_Orb looks through this file from top to bottom.  Non-comment
+# lines give an observatory code,  an optional program code,  and a date
+# range and magnitude range.  (The ranges can be blank,  to specify "any
+# date" and/or "any magnitude",  or to indicate that there is no lower
+# or upper limit on that range.)  The idea is that such a line defines
+# what the sigmas are for any observation from that code,  taken within
+# that date range,  and within that magnitude range.
+#
+#   When Find_Orb finds a line describing the observation in question,
+# it extracts any non-blank sigmas.  It keeps going,  possibly to
+# the bottom of the file,  until sigmas have been found for all
+# three quantities. That's why there is a final line that will
+# assign sigmas to _any_ observation that hasn't already been handled.
+#
+#    Comments can be added at the end of each line.  I've just listed
+# the station names in that slot.
+#
+#   Some comments on how to assign sigmas are at the bottom of this text.
+# I've noticed that the following stations get unusually good astrometry.
+# These uncertainties roughly reflect how well I've seen them do :
+#
+#Obs P  <--start-> <--end -->           Pos   Mag  Time
+#COD C  yyyy mm dd yyyy mm dd mag1 mag2 sig   sig  sig    Comment
+ 689                                    .1                Flagstaff
+ 673                                    .1                Table Mountain
+ 422                                    .3                Loomberah
+ 413                                    .3                Siding Spring
+ E12                                    .25               Siding Spring #2
+ 568 2                                  .1          .2    David Tholen et. al., Mauna Kea
+ 568 ~                                  .1          .2    TNO survey folks, Mauna Kea
+ J95                                    .2          .2    Great Shefford
+ J75                                    .2          .1    La Sagra
+#   (J95) and Tholen at (568) have demonstrated,  via observations of
+# artsats,  that they really have gotten timing right.  (J75) has had
+# cause to observe very fast-moving artsats;  their actual time sigma
+# is probably quite a bit better than the above .1 second.
+#
+#    SOHO and STEREO,  though,  were not intended to do astrometry and
+# produce noisy data.  (Each has multiple instruments,  and we really
+# should take that into account at some point...)
+ 249                                    10                SOHO
+ C49                                    10                STEREO-A
+ C50                                    10                STEREO-B
+# MPC appears to be weighting (C51) WISE data lightly,  which appears to
+# be... well... wise:
+ C51                                     1                WISE
+# ...but Hipparcos and HST get incredibly good astrometry:
+ 248                                    .01               Hipparcos
+ 250                                    .01               HST
+# The radar folks don't really have 'uncertainties' in RA/dec or mag;
+# they aren't measuring those quantities.  The quantities they _do_
+# measure -- round-trip time and Doppler shift -- have sigmas given
+# for them,  provided along with the data;  we don't need to specify
+# them in 'sigma.txt'.  The only thing we need to specify is the
+# uncertainty in the timing.  That sigma really should be effectively
+# zero.  We can't actually do that,  but a nanosecond is good enough.
+ 251                                     7         1e-9   Arecibo
+ 252                                     7         1e-9   Goldstone DSS 13, Fort Irwin
+ 253                                     7         1e-9   Goldstone DSS 13, Fort Irwin
+ 254                                     7         1e-9   Haystack, Westford
+ 255                                     7         1e-9   Evpatoria
+ 256                                     7         1e-9   Green Bank
+ 257                                     7         1e-9   Goldstone DSS 25, Fort Irwin
+ 259                                     7         1e-9   EISCAT Tromso UHF
+#  You MUST have some final "catchall" lines that assign sigmas to all
+# observations not otherwise catalogued.  Here,  we'll say that if the
+# observation predates 1993,  we'll assume a sigma of 3",  no matter
+# which observatory it came from.  (Older observations are usually
+# photographic,  and reduced with older catalogues such as the SAO;
+# the assumption that they're just a little bit dodgy is usually right.)
+                   1993 01 01            3
+# ...which will just leave everything after that date,  and we'll
+# assume a default sigma for those (more "modern" CCD obs) of a half
+# arcsecond,  half a magnitude,  and one second.  This is the "catch-all"
+# line mentioned above,  to assign uncertainties to anything not already
+# found.  It's also used if you have turned off weighting (i.e.,  all
+# observations are to be treated equally,  with identical uncertainties).
+                                        .5     .5    1    Default
+#
+# HOW TO ASSIGN SIGMAS:  I don't really know of a simple way to do this.
+# The above numbers reflect what I've observed in the data,  and are
+# better than no sigmas at all,  but they are somewhat ad hoc.
+#
+#   One _can_ analyze data from an individual observatory and get a feel
+# for what their RMS residuals are and base the sigmas on that.  It helps
+# if the observatory in question gets a _lot_ of data,  to get some
+# meaningful statistics.  .rwo files give uncertainties assigned in
+# this manner.

@@ -1,0 +1,164 @@
+   Comments and blank lines may be added freely.  (Anything beginning
+   with a space is a comment.)  If a line is uncommented,  it's probably
+   controlled via the user interface.
+
+   The default version of this file is stored in 'environ.def'.
+
+   Windows Find_Orb ignores the following 'CONSOLE_OPTS' line.  For the
+   console flavor of Find_Orb,  this line gives the default MPC code for
+   ephems, which items are shown on-screen, residual display format, and
+   whether all,  some,  or only one MPC code(s) are displayed.
+CONSOLE_OPTS=500 15 3 1
+
+   The 'settings' give the comet magnitude type used (defaults to 'N', or
+   'nuclear');  the format used for orbital elements;  the precision used
+   in orbital elements (defaults to five places for angular elements);  the
+   ephemeris output options,  in a complicated form;  the maximum residual
+   filtered,  in arcseconds (defaults to 2);  and the Gaussian "noise"
+   added,  in sigmas,  when running Monte Carlo orbits.
+SETTINGS=N,4,5,66560,2.000000,1.000000
+DEFAULTS=N4
+EPHEM_START=+0
+EPHEM_STEPS=100 1
+REFERENCE=Find_Orb
+EPHEM_LON=W 69.900
+EPHEM_LAT=N 44.010
+EPHEM_MPC_CODE=1 500
+
+   'filtering' gives the assumed probability that an observation is a blunder
+   (defaults to 2%);  the over-observing time span (defaults to one day);  the
+   "ceiling" on over-observing (defaults to five observations);  and a number
+   which is 1 if "filtering" uses blunder management,  or 0 if we are doing
+   traditional rejection based on an observation having residuals greater
+   than N sigmas,  with N specified in 'settings' (see above).  By default,
+   blunder management is used (see the Find_Orb Web page for a description of
+   blunder management and over-observing parameters).
+FILTERING=2.000 1.000000 5 1
+
+   Observations sent via e-mail frequently end up with spaces added
+   or removed.  Find_Orb will (usually) parse such observations anyway.
+   Remove or comment out the following line,  and Find_Orb will switch
+   to being "strict" about lines being exactly 80 characters long,  etc.
+FIX_OBSERVATIONS=1
+
+   By default,  ephemerides can cover the range -1000 to +3000.  If you want
+   to go beyond that,  alter the following line.
+TIME_RANGE=-1000,3000
+
+   MPC has requested that NEOCP data not be redistributed.  So in
+   pseudo-MPECs,  NEOCP observations are "redacted" (blacked out and the
+   data replaced with garbage).  The following observers have kindly given
+   permission for their NEOCP observations to be redistributed in
+   "unredacted" form.  (Contact me if you're willing to be added to this
+   list.)
+GREENLIT=703 G58 G96 H41 H43 H45 I52 I93 J95
+
+   We default to assuming that no object will have an observed arc greater
+   than 200 years,  and that if it _is_ longer than that,  it's a mistake.
+   This is a pretty good assumption,  though some comets and four asteroids
+   do have longer observed arcs than this,  possibly requiring you to
+   adjust the following line.
+MAX_OBSERVATION_SPAN=200
+
+   For radar stations,  power (in watts), temp in K, gain, altitude limit
+   in degrees,  and an arbitrary "radar constant" are needed.  So far,  the
+   only radar stations for which I have those data are (251) Arecibo and
+   (253) Goldstone.
+RADAR_251=900000,25,10,70.5,1.5e-11
+RADAR_253=430000,17,.94,20,1e-11
+
+   'Settings2' gives five parameters.  The first is 1 if observation weighting
+   is used and 0 if it is not.  Next,  the 'faint limit' on ephemerides (by
+   default,  ephemerides are not listed if the object is fainter than mag 22).
+   The next value is always 0 unless reset by hand;  it determines the use of
+   an "alternative MPCORB" format (one allowing for parabolic and hyperbolic
+   orbits and avoiding loss-of-precision issues) that I doubt I'll persuade
+   anyone to adopt.  The fourth number indicates a central object for orbital
+   elements,  if one isn't allowing automatic selection of elements.  By default,
+   the central object is 3,  i.e.,  the earth.
+      The final number is 1 if FCCT14 astrometric debiasing is applied,  and 0
+   if it is not. FCCT14 removes (most of) the star catalog position/proper
+   motion biases,  using tables from Farnocchia,  Chesley,  Chamberlin,
+   Tholen, _Icarus_ 245 (2015) 94-111,
+   http://adsabs.harvard.edu/abs/2015Icar..245...94F  .  See
+   http://www.projectpluto.com/bias.htm for more information.
+SETTINGS2=1 22.00 0 3 0
+
+   Most JPL filenames can be automatically detected via the list in
+   'jpl_eph.txt'.  But if it's in a different folder or an odd name,  you
+   can add the path to one of the following,  depending on whether you're
+   on Windows or Linux.  (LINUX_JPL_FILENAME is also used for OS/X.)
+LINUX_JPL_FILENAME=
+JPL_FILENAME=
+
+   By default,  when you tick the 'Comet non-gravs' box in the Settings
+   dialog,  the forces are modelled using the "standard" comet
+   non-gravitational model devised by Marsden and Sekanina.  Their
+   model assumes the force will have an "outward" (away from the sun)
+   and "along-orbit" component,  with that force having a somewhat
+   complex relationship to distance from the sun,  approximating
+   the complex way in which outgassing occurs at different temperatures.
+   Change 2009BD=0 to 2009BD=1 to switch to a simpler model in
+   which those forces vary simply as the inverse square of distance
+   from the sun.  (Similar to the usual solar radiation pressure model
+   used for artificial satellites,  except adding in an along-orbit
+   counterpart.)  This inverse-square,  but otherwise cometlike, model
+   is a good fit to the Yarkovsky/YORP non-gravs for some rocky
+   objects, such as (101955) Bennu and 2009 BD;  and for similar
+   non-grav forces on some artificial satellites.
+2009BD=0
+
+   When Find_Orb loads up a short arc,  it uses "statistical ranging"
+   (SR),  and defaults to trying 100 possible orbits at a mix of
+   distances and radial velocities to characterize the possible orbits
+   for the object.  You can raise or lower that number here.
+MAX_SR_ORBITS=100
+
+   By default,  if asteroid perturbers are turned on,  Pallas is included
+   if it is within 10 AU of our target object.  This 'asteroid threshhold'
+   is scaled by the square root of the perturbing asteroid's mass;  for
+   example,  an asteroid with a quarter the mass of Pallas would only
+   be included if it were within 5 AU.  This helps to assure that the tiny
+   contributions of most of the 300 asteroids do not have to be computed.
+   If you think you have a case where they _do_ matter,  increase the
+   following setting.  If you think you're unnecessarily including asteroid
+   perturbations that cannot possibly matter,  decrease it.
+ASTEROID_THRESH=10
+
+   By default,  we consider all 300 asteroids listed in BC-405.  You can
+   get a good speed-up by cutting this down,  at the risk of maybe ignoring
+   some tiny rock that just happens to pull your target around more than
+   you expected.
+BC405_ASTEROIDS=300
+
+   By default,  planet-centric orbits are shown referenced to the planet
+   equators.  Set the following to 1 to force _all_ orbits,  not just
+   heliocentric ones,  to be referred to the J2000 ecliptic.
+ECLIPTIC_ORBITS_ONLY=0
+
+   By default,  Find_Orb includes,  for objects close to the earth,  the
+   geopotential terms (spherical harmonics) up to l=6.  You can modify the
+   following quantity to change this.  Note that at present,  the maximum
+   is l=19.  (See http://www.projectpluto.com/force.htm for details.)  (I've
+   since shut off these geoterms,  though J2,  J3,  and J4 are still in.
+   I'm not entirely convinced the higher-order terms are being used properly.)
+GEO_TERMS=0
+
+   By default,  Find_Orb will look for an orbit covering,  at most,  20
+   years (7300 days) of observations.  This is simply for speed reasons,
+   and you can toggle additional observations once the object is loaded
+   and extend the orbit.   You can adjust the initial parameter here.
+AUTO_ARC_LEN=7300
+
+   VECTOR_OPTS gives three values controlling state vector and Cartesian
+   coordinate ephemerides.  The first value can be zero (the default) for
+   equatorial J2000 vectors,  or one for ecliptic J2000.  (I may add
+   mean and/or apparent coordinates at some point,  and perhaps body
+   plane coordinates.)  The second value is a multiplier for length.
+   Lengths default to being in AU,  with this multiplier being 1.
+   Set it to 149597870.7 (the number of kilometers in one AU) to switch
+   to kilometers,  or to 23454.7800299146773197201 to switch the distance
+   unit to Earth radii (this assumes the equatorial radius of 6378.140 km.)
+   The final value gives the time unit:  1=days (default),  24=hours,
+   1440=minutes, 86400=seconds.
+VECTOR_OPTS=0,1,1

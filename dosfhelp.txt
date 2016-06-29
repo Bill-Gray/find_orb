@@ -1,0 +1,57 @@
+   Les paramŠtres affich‚s par ce logiciel sont en gros les mˆmes que ceux
+affich‚s par la version Windows, telle que d‚crite dans
+
+http://www.projectpluto.com/ffind_orb.htm
+
+   Les commandes sont trŠs diff‚rentes, car elles sont bas‚es uniquement sur
+le clavier:
+
+r      Changement de R1 et R2,pour utilisation dans la m‚thode de Herget.
+         Il en r‚sulte une invite … modifier les deux valeurs.
+e      Changement de l'‚poque. Il en r‚sulte une invite … modifier la valeur
+    du Jour Julien de l'‚poque.
+z      Changement du pas d'int‚gration, en jours.
+c      Commute la contrainte 'orbite com‚taire seulement' (e=1) en "ComplŠte".
+l      Set a Limited orbit (e.g,  "e=.1",  "q=12.4",  "a=2.3,e=.15")
+h      Effectue une it‚ration en utilisant la m‚thodede Herget.
+f      Effectue une it‚ration en "ComplŠte" par la m‚thode des moindres carr‚s.
+g      Determine orbit with method of Gauss.  (There may be alternative
+       solutions;  hit 'g' again to cycle through them.)
+m      Calcule l'‚ph‚m‚ride.
+o      Enregistre les ‚l‚ments orbitaux dans un fichier.
+v      Cherche une orbite de V„is„l„.
+esc    Quitter
+1...9  Commute la prise en compte de Mercure...Pluton comme objet perturbateur.
+0      Commute la prise en compte de la Lune comme objet perturbateur.
+
+   Residual-related commands:
+
+a      Move down one observation.
+q      Move up one observation.
+x      Commute la prise en compte de l'observation s‚lectionn‚e.
+i      Show some details about the currently-selected observation on the
+         top two lines;  hit again to show alternative details
+k      Toggle from long residual format to short (such as MPC uses).
+d      Affiche les r‚sidus (format long, un r‚sidu par ligne) & les enregistre
+       dans un fichier.
+D      Affiche les r‚sidus (format court, 3 r‚sidus par ligne) & les enregistre
+       dans un fichier.
+w      Find Worst (highest-residuals) observation.
+Cursor keys (DOS only):  move up/down one observation,  or a "page" up/down
+       at a time;  'Home' to first obs, 'End' to last.
+
+
+   Tappez 'esc' pour revenir au programme, n'importe quelle autre touche pour
+   plus d'aide:
+
+   L'option 'm' (Calculer l'‚ph‚m‚ride) vous demandera de fournir la date/
+heure de d‚part, la taille du pas, et le nombre de pas. Alors il affiche
+l'‚ph‚m‚ride, tout en l'enregistrant dans le fichier 'ephemeri.dat'.
+
+   Les options 'd' et 'D' (Afficher les r‚sidus) enregistrent ‚galement le
+   texte affich‚ dans  le fichier 'residual.dat'.
+
+   L'option 'v' demande la distance aph‚lie/p‚rih‚lie, puis cherche l'orbite
+qui "s'adapte au mieux" avec cette distance des apsides au centre de l'arc
+observ‚.
+

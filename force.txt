@@ -1,0 +1,107 @@
+Find_Orb's force model
+
+Newtonian part :
+
+   The sun is always included as a perturber.  Depending on which check
+boxes you've ticked,  planets and the moon may be included as perturbers.
+
+   If you tick the earth but not the moon,  Find_Orb computes the position
+and mass of the earth-moon barycenter.  As a result,  including the moon
+as a separate perturber usually doesn't matter all that much.
+
+   For points within 0.03 AU of Saturn and Jupiter,  the effects of the
+satellites of each of those planets is included separately.  Beyond that
+distance,  the masses are "thrown in" to their primaries.
+
+   Planets not ticked as perturbers are "thrown in" to the sun,  if
+you are outside the orbit of that planet.  The process is a gradual one,
+to avoid discontinuities:  if you are more than 120% of the planet's
+mean semimajor axis from the sun,  the entire mass is thrown in.  If
+you're less than 100%,  no mass is thrown in.  In between,  we ramp up
+the mass linearly.  See the 'include_thrown_in_planets()' function.
+
+   Up to 300 asteroids can be included.  Doing so can result in very
+slow integrations.  Editing 'environ.dat' and resetting the BC405_ASTEROIDS
+and/or ASTEROID_THRESH parameters can help a lot,  in the (usual) situations
+where you are willing to ignore distant asteroids.
+
+General relativity :
+
+   GR is included only for the sun.  The method used is described at
+
+http://www.projectpluto.com/relativi.htm#better
+
+   At present,  this first-order approximation is more than ample.  But
+if Gaia truly produces results as wondrous as claimed,  some smaller
+effects will be noticeable.  GR from planets and second-order terms
+may have to be included.
+
+Non-spherical planets :
+
+   The equatorial "bulge" (J2) terms,  and the smaller J3 and J4 zonal
+terms,  are included for the Earth,  Mars,  and all four gas giants.
+So far,  this has been sufficient.  But if I start dealing with lower
+orbiting earth satellites,  that situation will change:  higher-order
+terms and spherical harmonics will be required.
+
+Solar radiation pressure
+
+   At present,  SRP is treated as a simple radial force proportional
+to the sun's gravity.  In other words,  a sufficiently "fluffy",
+high area/mass object would cancel out the sun's gravity and travel in
+a straight line relative to the sun (except for planetary
+perturbations,  of course.)
+
+Comet parameters
+
+   By default,  the comet parameters A1 and A2 (or A1,  A2,  and A3)
+follow the standard Marsden-Sekanina model.  In this model,  there
+is almost no cometary force at 2.6 AU or more from the sun (because
+almost no outgassing occurs),  and then immense forces close to the
+sun as the comet boils away.
+
+   For rocks,  one can edit 'environ.dat' and adjust the 2009BD
+parameter to have the force dependence be a simple inverse square one.
+That matches the physics for rocks such as 2009 BD and 101955 Bennu,
+where there is an A1 outward force similar to SRP and an A2 tangential
+force that is accelerating or decreasing the object's speed (i.e.,
+increasing or decreasing the object's orbital period/semimajor axis).
+
+Atmospheric drag
+
+   This has only recently (October 2015) been added,  and is somewhat
+experimental.  Only the earth's atmosphere is currently modelled,
+though it would not be too difficult to add those of Mars,  Saturn,
+Venus,  and Titan.  Drag only exists if SRP has been turned on.  If
+the object has been tracked for long enough that Find_Orb can determine
+its area/mass ratio,  that AMR is used in computing ephemerides for
+the object's passage through the atmosphere.
+
+   For meteors,  one can turn on SRP and do a seven-parameter fit.
+The AMR will then be determined from the object's observed deceleration.
+If you have no idea what the AMR might be from observations,  you can
+enter a constraint such as "A=0.006" (m^2/kg),  do a full step,  and
+then compute ephemerides based on that assumed AMR.
+
+Discontinuities (short version:  there aren't any)
+
+   Some care was taken in the force model to ensure that the accelerations
+and their derivatives would be both finite and continuous.  The real problem
+in that department was situations where objects pass inside of planets.  In
+the real world,  this causes a very abrupt discontinuity,  i.e.,  an impact.
+But in the initial stages of orbit determination,  it can make sense to compute
+orbits passing inside planets.  Also,  abrupt discontinuities would be something
+of a headache for numerical integration.
+
+   The solution was this.  Accelerations are computed in their 'normal' manner
+and left unchanged for distances greater than 90% of the planet radius.
+Within about 60% of the remainder,  accelerations are zero;  i.e.,  there is
+a "bubble" inside each object within which the planet exerts no force at all.
+
+   Between those limits,  accelerations are multiplied by a factor computed
+in the compute_accel_multiplier() function.  This factor is equal to one at
+the 90% limit,  and zero at the inner "bubble" limit.  Its derivative at
+both points is zero,  i.e.,  both this function and its derivative are
+continuous across the outer and inner limits.  It is computed as a cubic spline.
+Thus,  instead of having accelerations climb to infinity as you approach a
+planet center,  they instead reach a peak,  then drop smoothly to zero.

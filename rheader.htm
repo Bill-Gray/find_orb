@@ -1,0 +1,49 @@
+# Header for pseudo-MPECs.  You can customize this without much trouble.
+# '$Name$' will be replaced with the object name; '$Tg$' with the time the
+# pseudo-MPEC was generated; $Incl$ with the inclination in degrees,  and
+# so on.
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<HTML>
+<HEAD>
+   <TITLE> Pseudo-MPEC for $Name$ </TITLE>
+   <META http-equiv=Content-Type content="text/html; charset=utf-8">
+   <style type="text/css">
+   .neocp {color:black; background-color:black; text-decoration:blink;}
+   </style>
+</HEAD>
+<BODY>
+
+<P><b>  "Pseudo-MPEC" for $Name$ </b></p>
+<p><i> Created $Tg$ UT using <a href="http://www.projectpluto.com/find_orb.htm">Find_Orb</a></i></p>
+$Error      # The server flavor of Find_Orb inserts error messages here.
+<ul>
+<li> <a href="#ast_xx"> астрометрия </a> </li>
+<li> <a href="#stations"> Observing stations </a> </li>
+<li> <a href="#elements_xx"> Элементы орбиты </a> </li>
+<li> <a href="#residuals_xx"> Residuals </a> </li>
+<li> <a href="#eph_xx"> Эфемерида </a> </li>
+# helio_only 1
+<li> <a href="http://skyview.gsfc.nasa.gov/cgi-bin/skymorph/mobssel.pl?target=&amp;NEAT=on&amp;OE_EPOCH=$EpJD$&amp;OE_EC=$ecc$&amp;OE_QR=$q$&amp;OE_TP=$T$&amp;OE_OM=$Node$&amp;OE_W=$Peri$&amp;OE_IN=$Incl$&amp;OE_H=$H$"> Click here to search NEAT images for this object using Skymorph </a> </li>
+<li> <a href="http://skyview.gsfc.nasa.gov/cgi-bin/skymorph/mobssel.pl?target=&amp;DSS2=on&amp;OE_EPOCH=$EpJD$&amp;OE_EC=$ecc$&amp;OE_QR=$q$&amp;OE_TP=$T$&amp;OE_OM=$Node$&amp;OE_W=$Peri$&amp;OE_IN=$Incl$&amp;OE_H=$H$"> Click here to search DSS2 images for this object using Skymorph </a> </li>
+<li> <a href="http://skyview.gsfc.nasa.gov/cgi-bin/skymorph/mobssel.pl?target=&amp;Spacewatch=on&amp;OE_EPOCH=$EpJD$&amp;OE_EC=$ecc$&amp;OE_QR=$q$&amp;OE_TP=$T$&amp;OE_OM=$Node$&amp;OE_W=$Peri$&amp;OE_IN=$Incl$&amp;OE_H=$H$"> Click here to search Spacewatch images for this object using Skymorph </a> </li>
+# helio_only 0
+</ul>
+# helio_only 1
+<FORM METHOD="POST" ACTION="http://www.astroarts.com/simulation/cometary-orbit.php">
+<p>
+    <INPUT TYPE="hidden" NAME="NAME" VALUE="$Name$">
+    <INPUT TYPE="hidden" NAME="TYEAR" VALUE="$Ty$">
+    <INPUT TYPE="hidden" NAME="TMONTH" VALUE="$Tm$">
+    <INPUT TYPE="hidden" NAME="TDAY" VALUE="$Td$">
+    <INPUT TYPE="hidden" NAME="PERI" VALUE="$Peri$">
+    <INPUT TYPE="hidden" NAME="E"    VALUE="$ecc$">
+    <INPUT TYPE="hidden" NAME="NODE" VALUE="$Node$">
+    <INPUT TYPE="hidden" NAME="Q"     VALUE="$q$">
+    <INPUT TYPE="hidden" NAME="INCL"  VALUE="$Incl$">
+    <INPUT TYPE="hidden" NAME="EQUINOX" VALUE="$Eqnx$">
+    <INPUT TYPE="submit" VALUE=" Show Orbit in OrbitViewer " NAME="SHOW">
+</p> </FORM>
+# helio_only 0
+<pre>
+<a name="ast_xx"></a><b>астрометрия:</b>
+(End of header)

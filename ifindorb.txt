@@ -1,0 +1,114 @@
+# Si possono aggiungere dei commenti ponendo una '#' all'inizio della riga.
+# FIND_ORB ha tre caselle di dialogo:  la casella "principale", la casella
+# "informazioni", e la casella "effemeridi".  Per ciascuna di esse esiste
+# un titolo e un gruppo di righe relative al testo tradotto.  I numeri
+# all'inizio di ogni riga sono i numeri di identificazione per il testo
+# tradotto.
+# 'ifind_8b.txt' is the 8-bit (Win-1252) variant of this,  made with
+# iconv -f UTF-8 -t WINDOWS-1252 ifindorb.txt > ifind_8b.txt
+
+# main
+99000   FIND_ORB Programma per il calcolo orbitale
+99105   Passo di &Herget
+99106   Passo &completo
+99108   Merc.
+99109   Venere
+99110   Terra
+99111   Marte
+99112   Giove
+99113   Satur.
+99114   Urano
+99115   Nett.
+99116   Plut.
+99117   Luna
+99118   Asteroidi
+99129   &Salva elementi
+99136   Soluz. &Autom.
+99137   Salva &Residui...
+99138   &Effemeride...
+99142   A&pri...
+99148   Informazioni...
+99149   R2:
+99150   UA
+99151   UA
+99153   R1:
+99174   Elementi orbitali:
+99156   Epoca
+99157   Oggetti perturbatori:
+99140   Gauss
+99141   &Peggiori oss.
+99143   &Filtra oss.
+99139   Monte Carlo...
+99144   Impostazioni...
+99145   &Toggle Obs
+99146   Set Sigma(s)
+99180   All Perturbers On
+99001   Exit
+
+# about
+98000   Informazioni su FIND_ORB
+98153   FIND_ORB PROGRAMMA PER IL CALCOLO ORBITALE
+98149   E' un programma gratuito di Project Pluto (c)1997-2014
+98150   Aggiornamenti e informazioni circa altri programmi
+98152   di astronomia si possono trovare su:
+98155   http://www.projectpluto.com
+98179   Version
+
+# ephem
+97000   Calcola l'effemeride
+97147   &Calcola
+97129   &Salva
+97153   Giorno
+97151   N. passi:
+97152   Passo di
+97154   Latitud.
+97155   Longitud.
+
+# settings
+96000   Impostazioni
+96149   Riferimento
+96150   Rumore Monte Carlo
+96151   Max Residui filtrati
+96152   Precisione elementi
+96153   Vincoli
+96173   Solo orbite eliocentriche
+96001   OK
+96002   &Annulla
+
+# messages
+1       Nessuna orbita da ottimizzare!
+2       Non ci sono residui da salvare!
+3       Nessuna orbita di cui calcolare le effemeridi!
+4       Il metodo di Gauss non ha funzionato!
+5       Nessun cambiamento effettuato!
+6       Le effemeridi devono contenere almeno un dato!
+7       Non e' specificata l'ampiezza del passo!
+8       Il mese deve essere compreso tra 1 e 12!
+9       Il giorno deve essere compreso tra 1 e %d!
+10      Non ci sono dati osservativi in questo file!
+11      File non trovato!
+12      La latitudine deve iniziare con una 'N' o una 'S'!
+13      La longitudine deve iniziare con una 'E' o una 'W'!
+14      Invalid date!
+15      %d of %d observations
+16      From %d observations
+17      ; mean residual %s
+18      Find_Orb -- Orbit Determination
+19      Weighting of posns/mags/times is
+20      All preceding observations toggled
+21      All Perturbers On
+22      All Perturbers Off
+
+# months
+1000    Gen
+1001    Feb
+1002    Mar
+1003    Apr
+1004    Mag
+1005    Giu
+1006    Lug
+1007    Ago
+1008    Set
+1009    Ott
+1010    Nov
+1011    Dic

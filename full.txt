@@ -1,0 +1,121 @@
+int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
+                 const double epoch, const char *limited_orbit,
+                 const int sigmas_requested, const double epoch2);
+
+   Simply put,  this function (found in 'orb_func.cpp') does a least-squares
+fit of observations,  doing a single iteration.  However,  as time has gone
+by and Find_Orb's capabilities have expanded,  this function has _really_
+expanded.  It's not actually as scary/complicated as it may appear,  but the
+level of math and jargon is not for the faint of heart.
+
+   I won't describe the mathematics of least-squares fitting;  you can get a
+good description of that in any introductory orbital mechanics text.  But
+there are some specific things in 'full_improvement' that need explaining.
+
+   In least-squares fitting an orbit,  one has to compute the derivatives
+of the residuals relative to changes in the orbit parameters.  Usually,
+that means six parameters,  which can be the state vector elements x, y,
+z, vx, vy, vz (which is what Find_Orb uses),  or six classical orbital
+elements,  or classical elements with q and Tp used instead of M and a,
+or several variations on this theme.
+
+   However,  we aren't always trying to fit six parameters.  If the object
+is small and light enough to be affected by solar radiation pressure,  we
+may be fitting its area/mass ratio.  Or we may need to fit the mass of an
+asteroid perturber.  In either case,  n_params = 7.  Comet non-gravitational
+effects are fitted as two or three parameters,  resulting in n_params = 8
+or 9.
+
+   Occasionally,  people will do tricks such as assuming e=1 or e=0 (parabolic
+or circular orbit) and fitting only the remaining five orbital elements,
+leading to n_params = 5.  Find_Orb doesn't do this,  mostly because it's
+fitting the state vector rather than orbital elements.  Find_Orb handles
+"constrained" orbits somewhat differently;  it just pretends that you have
+"observed" that e=0 or e=1 with low error.  This has its benefits;  you
+can tell it that you have simultaneously "observed" that e=.1 and a=2.5,
+for example,  making for multiple constraints.
+
+   The reason the code works in terms of the state vector is to avoid
+mathematical singularities.  If the least-squares fit includes the
+inclination or eccentricity,  for example,  you'll get very singular
+behavior when those quantities are nearly zero... which is a common
+occurrence;  when i is near zero,  the argument of perihelion and longitude
+of the ascending node become ill-defined or singular,  and when e is near
+zero,  the mean anomaly,  time of perihelion,  and argument of perihelion
+all become singular. Since there are plenty of objects with e or i near
+zero,  that's a Very Bad Thing indeed.
+
+   Anyway.  The code figures out how many parameters will be fitted --
+usually six,  sometimes more -- and initializes the least-squares fitting
+code,  telling it how many parameters to expect.  The state vectors will be
+varied along the six 'unit_vectors'; when first called, full_improvement()
+initializes these to lie along the XYZ and vx, vy, vz axes.  We do a quick
+check to make sure that there are at least three observations and that the
+orbit isn't totally bizarre, bombing out with a negative return value if
+either is the case.
+
+   We may be computing sigmas and covariances for a desired epoch 'epoch2'.
+The idea is that our observations may cover,  say,  1 Mar 2013 to 13 Mar 2013,
+and we're therefore working with an orbit of epoch 7 Mar 2013.  But we're
+really interested in sigmas/covariances for the epoch 19 October 2014,
+because that's when the object will be a possible impactor.  In this case,
+'epoch' would be 7 Mar 2013 and 'epoch2' would be 19 October 2014.  Similarly,
+the constraints are for 'epoch2';  if we set,  say,  q=1.2,  that would
+mean the osculating perihelion distance would be 1.2 AU for 19 October 2014.
+
+   I mention all this because if there are no constraints and we aren't
+looking for sigmas/covariances,  there is no need to compute orbits for
+'epoch2'.  In that case,  the variable 'need_second_epoch' will be zero.
+
+   In doing least-squares fitting,  we need to compute the derivatives
+of zillions of quantities relative to the six (or more) parameters.
+(The 'zillions of quantities' include orbital elements at epoch2 and
+the computed RA/decs for each observation.)  Computing these derivatives
+is a slightly more complex version of the textbook standard methods
+
+df(x)/dx = (f(x + h) - f(x)) / h         + O(h)
+df(x)/dx = (f(x + h) - f(x - h)) / 2h    + O(h ^ 2)
+
+   ...i.e.,  "tweak" our nominal orbit x by some small quantity h,  and
+compare the results to those from the nominal orbit.  (The second method
+is more accurate,  but requires twice as many function evaluations;  we
+can't just re-use f(x) each time.  Find_Orb can do this,  if the
+'use_symmetric_derivatives' variable is non-zero.  But I've never found
+that it did anything except slow things down.)
+
+   So.  For each of the n_param parameters being varied,  we take the
+current nominal orbit 'orbit' and create 'orbit2',  same thing with a
+small amount added in the direction of one of the unit vectors.   We
+then compute RA/decs for each observation,  and an orbit for the epoch
+'epoch2' if needed,  based this slightly tweaked orbit.
+
+   The amount of the 'tweak' can be difficult to determine.  Too large,
+and that O(h) term causes error;  too small,  and you get roundoff error.
+Find_Orb tries to keep the tweak size such that the maximum change in
+computed RA/decs (or computed range or range-dot,  for radar data) is
+1.5 sigmas.  (Though a large range can work and will be used.) If the
+change is too big or small,  then we try again with a suitably
+resized tweak.
+
+   Eventually,  though,  we're all done:  we've computed RA/decs for
+each observation and (usually) orbital elements at 'epoch2',  and done
+so for the nominal orbit and for six (or more) tweaked orbits.  We can
+then do a standard,  textbook,  linear least-squares improvement.
+
+   We may also write out all our sigma/covariance data to the file
+'covar.txt'.  In addition,  the eigennvalues and eigenvectors of the
+covariance matrix are computed.  I did this for a couple of reasons.
+First,  as Milani and Gronchi point out in their book _Theory of Orbit
+Determination_,  the direction of the line of variations is that of
+the eigenvector with lowest eigenvalue,  with length 1/sqrt( lambda)
+where lambda=lowest eigenvalue.  This provides a quick and easy way
+to compute ephemeris uncertainties and impact probabilities,  and for
+achieving better linkages between arcs... I say "quick and easy",
+but must admit I've yet to really implement it in Find_Orb!  I've
+just experimented with it a little.
+
+   But the other advantage I've found is that it turns out that,  if
+your tweaks are applied in the direction of the eigenvectors,  you get
+somewhat better stability.  So Find_Orb now stores the eigenvectors
+in the 'unit_vectors' for use on the next full_improvement.
+

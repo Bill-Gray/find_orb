@@ -1,0 +1,1 @@
+option stack=20000 f find_orb.obj, orb_func.obj, mpc_obs.obj, classel.obj, lsquare.obj, runge.obj, \checkmem\watcheck.obj, \lunar\wafuncs.lib

@@ -1,0 +1,103 @@
+; Any line beginning with a ';' is assumed to be a comment.  Any other
+; non-blank line is assumed to be a possible JPL ephemeris file.  Find_Orb
+; first looks for ephemeris files specified in 'environ.dat',  as described
+; at     http://projectpluto.com/find_orb.htm#de_eph
+;
+;    But if you haven't specified a JPL ephemeris file,  Find_Orb looks
+; through this list.  That lets you simply drop a JPL ephem file into the
+; Find_Orb folder,  and have Find_Orb figure it out on its own.
+;
+;   The files listed are assorted JPL binary ephemerides found on-line or
+; the Willmann-Bell CD,  or distributed with Guide 8.0 or 9.0.  Byte order
+; is not a problem;  the software will flip bytes as needed.
+;
+;    If Find_Orb doesn't locate a JPL ephemeris file,  it'll still run.  It
+; just may be noticeably slower in some situations.
+
+; From the Willmann-Bell CD-ROM:
+; -3000 to +3000,  about 200 MBytes:
+unix.406
+
+; From the Willmann-Bell CD-ROM:
+; 1600-2200:  about 56 MBytes:
+unix.405
+
+; http://cococubed.asu.edu/codes/ephem/unxp1600-2200_ppc_mac_xlf.405
+; Same file as above,  I think
+unxp1600-2200_ppc_mac_xlf.405
+
+; http://cococubed.asu.edu/codes/ephem/unxp1600-2200_intel_mac_ifort.405
+; Same file as above,  I think,  except reversed byte order
+unxp1600-2200_intel_mac_ifort.405
+
+; From the Guide 9.0 DVD:
+; -3000 to +3000: about 557 MBytes:
+jpl_eph.422
+
+; Same file as above,  under a different name,  available at
+; ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de422/lnxm3000p3000.422
+; (about 545 MBytes)
+lnxm3000p3000.422
+
+; Similar files from same site:
+; ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de421/lnxp1900p2053.421
+; (about 13 MBytes)
+lnxp1900p2053.421
+; ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de423/lnxp1800p2200.423
+; (about 37 MBytes)
+lnxp1800p2200.423
+
+
+; ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de418/lnxp1900p2050.418
+; (about 13 MBytes)
+lnxp1900p2050.418
+; ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de414/lnxp1600p2200.414
+; (about 55 MBytes)
+lnxp1600p2200.414
+;ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de405/lnxp1600p2200.405
+; (about 55 MBytes)
+lnxp1600p2200.405
+; ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de406/lnxm3000p3000.406
+; (about 200 MBytes)
+lnxm3000p3000.406
+; ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de403/lnxp1600p2200.403
+; (about 55 MBytes)
+lnxp1600p2200.403
+
+; From the second Guide 8.0 disk: 1800-2200,  about 13.3 MBytes:
+sub_de.406
+
+; ftp://ssd.jpl.nasa.gov/pub/eph/planets/unix/de406/unxp1800.406
+; Covers 1800-2100 (now renamed as shown above)
+unxp1800.406
+
+
+; http://adams.dm.unipi.it/~orbmaint/orbfit/JPLEPH/DE405_win.dat
+; 1960-2020;  about 14 MBytes (file size indicates it may cover more years)
+DE405_win.dat
+
+; http://adams.dm.unipi.it/~orbmaint/orbfit/JPLEPH/DE405.dat
+; 1970-2020;  about 4.7 MBytes
+DE405.dat
+
+
+; From the Willmann-Bell CD-ROM:
+; 1600-2169:  about 43 MBytes:
+unix.200
+
+; Recently (mid-2013) JPL created extra-long ephemerides.  The 430t version
+; had a name change;  both possible names are checked.
+
+jpleph.431
+jpleph.430
+; ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de430/linkp1550p2650.430
+linkp1550p2650.430
+; ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de430/linux_p1550p2650.430
+linux_p1550p2650.430
+; ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de430t/linux_p1550p2650.430t
+linux_p1550p2650.430t
+; ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de431/lnxm13000p17000.431
+lnxm13000p17000.431
+
+;  At least as of 2015 Dec 29,  DE-423 and DE-432t were available only in ASCII
+;  form,  and therefore aren't listed here.

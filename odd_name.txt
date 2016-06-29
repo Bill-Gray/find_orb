@@ -1,0 +1,240 @@
+; Put "unusual" packed desigs (mostly for satellites,  artificial
+; and natural) here,  followed by their unpacked forms.  This is used
+; in the 'get_object_name()' function in mpc_func.cpp,  to allow one
+; to replace the default object name with something more descriptive.
+; For example,  instead of showing '2007-004B' as the object name,  the
+; more human-friendly '2007-004B = THEMIS-B' will be shown.
+
+;  Any line starting with ';' is a comment.  Otherwise,  it's just the
+; packed designation followed by its human-friendly equivalent.
+
+MRO          MRO = Mars Reconnaissance Orbiter
+     RW28E3B 2010 WK1 = RW28E3B = unknown sat
+     6R10DB9 2006 RH120 = 6R10DB9
+J001S        Jupiter I = Io
+J002S        Jupiter II = Europa
+J003S        Jupiter III = Ganymede
+J004S        Jupiter IV = Callisto
+J005S        Jupiter V = Amalthea
+J006S        Jupiter VI = Himalia
+J007S        Jupiter VII = Elara
+J008S        Jupiter VIII = Pasiphae
+J009S        Jupiter IX = Sinope
+J010S        Jupiter X = Lysithea
+J011S        Jupiter XI = Carme
+J012S        Jupiter XII = Ananke
+J013S        Jupiter XIII = Leda
+J014S        Jupiter XIV = S/1979 J 2 = Thebe
+J015S        Jupiter XV = S/1979 J 1 = Adrastea
+J016S        Jupiter XVI = S/1979 J 3 = Metis
+J017S        Jupiter XVII = S/1999 J 1 =  Callirrhoe
+J018S        Jupiter XVIII = S/1975 J 1 = S/2000 J 1 = Themisto
+J019S        Jupiter XIX = S/2000 J 8 = Megaclite
+J020S        Jupiter XX = S/2000 J 9 = Taygete
+J021S        Jupiter XXI = S/2000 J 1 = Chaldene
+J022S        Jupiter XXII = S/2000 J 5 = Harpalyke
+J023S        Jupiter XXIII = S/2000 J 2 = Kalyke
+J024S        Jupiter XXIV = S/2000 J 3 = Iocaste
+J025S        Jupiter XXV = S/2000 J 4 = Erinome
+J026S        Jupiter XXVI = S/2000 J 6 = Isonoe
+J027S        Jupiter XXVII = S/2000 J 7 = Praxidike
+J028S        Jupiter XXVIII = S/2001 J 1 = Autonoe
+J029S        Jupiter XXIX = S/2001 J 2 = Thyone
+J030S        Jupiter XXX = S/2001 J 3 = Hermippe
+J031S        Jupiter XXXI = S/2001 J 11 = Aitne
+J032S        Jupiter XXXII = S/2001 J 4 = Eurydome
+J033S        Jupiter XXXIII = S/2001 J 7 = Euanthe
+J034S        Jupiter XXXIV = S/2001 J 10 = Euporie
+J035S        Jupiter XXXV = S/2001 J 9 = Orthosie
+J036S        Jupiter XXXVI = S/2001 J 5 = Sponde
+J037S        Jupiter XXXVII = S/2001 J 8 = Kale
+J038S        Jupiter XXXVIII = S/2001 J 6 = Pasithee
+J039S        Jupiter XXXIX = S/2003 J 8 = Hegemone
+J040S        Jupiter XL = S/2003 J 21 = Mneme
+J041S        Jupiter XLI = S/2003 J 7 = Aoede
+J042S        Jupiter XLII = S/2003 J 22 = Thelxinoe
+J043S        Jupiter XLIII = S/2002 J 1 = Arche
+J044S        Jupiter XLIV = S/2003 J 11 = Kallichore
+J045S        Jupiter XLV = S/2003 J 6 = Helike
+J046S        Jupiter XLVI = S/2003 J 20 = Carpo
+J047S        Jupiter XLVII = S/2003 J 1 = Eukelade
+J048S        Jupiter XLVIII = S/2003 J 13 = Cyllene
+J049S        Jupiter XLIX = S/2003 J 14 = Kore
+J050S        Jupiter L = S/2003 J 17 = Herse
+J051S        Jupiter LI = S/2010 J 1
+J052S        Jupiter LII = S/2010 J 2
+J053S        Jupiter LIII = S/2000 J 11 = Dia
+S002S        Saturn II = Enceladus
+S003S        Saturn III = Tethys
+S004S        Saturn IV = Dione
+S005S        Saturn V = Rhea
+S006S        Saturn VI = Titan
+S007S        Saturn VII = Hyperion
+S008S        Saturn VIII = Japetus
+S009S        Saturn IX = Phoebe
+S010S        Saturn X = S/1980 S1 = Janus
+S011S        Saturn XI = S/1980 S3 = Epimetheus
+S012S        Saturn XII = S/1980 S6 = Helene
+S013S        Saturn XIII = S/1980 S13 = Telesto
+S014S        Saturn XIV = S/1980 S25 = Calypso
+S015S        Saturn XV = S/1980 S28 = Atlas
+S016S        Saturn XVI = S/1980 S27 = Prometheus
+S017S        Saturn XVII = S/1980 S26 = Pandora
+S018S        Saturn XVIII = S/1981 S13 = Pan
+S019S        Saturn XIX = Ymir = S/2000 S 1
+S020S        Saturn XX = Paaliaq = S/2000 S 2
+S021S        Saturn XXI = Tarvos = S/2000 S 4
+S022S        Saturn XXII = Ijiraq = S/2000 S 6
+S023S        Saturn XXIII = Suttungr = S/2000 S 12
+S024S        Saturn XXIV = Kiviuq = S/2000 S 5
+S025S        Saturn XXV = Mundilfari = S/2000 S 9
+S026S        Saturn XXVI = Albiorix = S/2000 S 11
+S027S        Saturn XXVII = Skathi = S/2000 S 8
+S028S        Saturn XXVIII = Erriapus = S/2000 S 10
+S029S        Saturn XXIX = Siarnaq = S/2000 S 3
+S030S        Saturn XXX = Thrymr = S/2000 S 7
+S031S        Saturn XXXI = Narvi = S/2003 S 1
+; Satellites 32-35 (Methone, Pallene, Polydeuces, Daphnis) are inner objects:
+S032S        Saturn XXXII = Methone = S/2004 S 1
+S033S        Saturn XXXIII = Pallene = S/2004 S 2
+S034S        Saturn XXXIV = Polydeuces = S/2004 S 5
+S035S        Saturn XXXV = Daphnis = S/2005 S 1
+; Now back to outer objects:
+S036S        Saturn XXXVI = Aegir = S/2004 S 10
+S037S        Saturn XXXVII = Bebhionn = S/2004 S 11
+S038S        Saturn XXXVIII = Bergelmir = S/2004 S 15
+S039S        Saturn XXXIX = Bestla = S/2004 S 18
+S040S        Saturn XL = Farbauti = S/2004 S 9
+S041S        Saturn XLI = Fenrir = S/2004 S 16
+S042S        Saturn XLII = Fornjot = S/2004 S 8
+S043S        Saturn XLIII = Hati = S/2004 S 14
+S044S        Saturn XLIV = Hyrokkin = S/2004 S 19
+S045S        Saturn XLV = Kari = S/2006 S 2
+S046S        Saturn XLVI = Loge = S/2006 S 5
+S047S        Saturn XLVII = Skoll = S/2006 S 8
+S048S        Saturn XLVIII = Surtur = S/2006 S 7
+; Satellite 49 is also an inner object:
+S049S        Saturn XLIX = Anthe = S/2007 S 4
+S050S        Saturn L = Jarnsaxa = S/2006 S 6
+S051S        Saturn LI = Greip = S/2006 S 4
+S052S        Saturn LII = Tarqeq = S/2007 S 1
+; Satellite 53 is an inner object:
+S053S        Saturn LIII = Aegaeon = S/2008 S 1
+U001S        Uranus I = Ariel
+U002S        Uranus II = Umbriel
+U003S        Uranus III = Titania
+U004S        Uranus IV = Oberon
+U005S        Uranus V = Miranda
+U006S        Uranus VI = S/1986 U7 = Cordelia
+U007S        Uranus VII = S/1986 U8 = Ophelia
+U008S        Uranus VIII = S/1986 U9 = Bianca
+U009S        Uranus IX = S/1986 U3 = Cressida
+U010S        Uranus X = S/1986 U6 = Desdemona
+U011S        Uranus XI = S/1986 U2 = Juliet
+U012S        Uranus XII = S/1986 U1 = Portia
+U013S        Uranus XIII = S/1986 U4 = Rosalind
+U014S        Uranus XIV = S/1986 U5 = Belinda
+U015S        Uranus XV = S/1985 U1 = Puck
+U016S        Uranus XVI = Caliban = S/1997 U 1
+U017S        Uranus XVII = Sycorax = S/1997 U 2
+U018S        Uranus XVIII = Prospero = S/1999 U 3
+U019S        Uranus XIX = Setebos = S/1999 U 1
+U020S        Uranus XX = Stephano = S/1999 U 2
+U021S        Uranus XXI = Trinculo = S/2001 U 1
+U022S        Uranus XXII = Francisco = S/2001 U 3
+U023S        Uranus XXIII = Margaret = S/2003 U 3
+U024S        Uranus XXIV = Ferdinand = S/2001 U 2
+U025S        Uranus XXV = Perdita = S/1986 U 10
+U026S        Uranus XXVI = Mab = S/2003 U 1
+U027S        Uranus XXVII = Cupid = S/2003 U 2
+N001S        Neptune I = Triton
+N002S        Neptune II = Nereid
+N003S        Neptune III = S/1989 N6 = Naiad
+N004S        Neptune IV = S/1989 N5 = Thalassa
+N005S        Neptune V = S/1989 N3 = Despina
+N006S        Neptune VI = S/1989 N4 = Galatea
+N007S        Neptune VII = S/1989 N2 = Larissa
+N008S        Neptune VIII = S/1989 N1 = Proteus
+N009S        Neptune IX = S/2002 N1 = Halimede
+N010S        Neptune X = S/2003 N1 = Psamathe
+N011S        Neptune XI = S/2002 N2 = Sao
+N012S        Neptune XII = S/2002 N3 = Laomedeia
+N013S        Neptune XIII = S/2002 N4 = Neso
+P001S        Pluto I = Charon = S/1978 P1
+P002S        Pluto II = Nix = S/2005 P 2
+P003S        Pluto III = Hydra = S/2005 P 1
+P004S        Pluto IV = Kerberos = S/2011 (134340) 1 = P4
+P005S        Pluto V = Styx = S/2012 (134340) 1 = P5
+D34340       (134340) Pluto
+
+     WT1190F WT1190F = UDA34A3 = UW8551D = 9U01FF6
+2015-011A    2015-011A = WF839BF = MMS 1
+2015-011D    2015-011D = WF839C0 = MMS 4
+2015-011B    2015-011B = WF839C1 = MMS 2
+2015-011C    2015-011C = WF839C2 = MMS 3
+2015-011E    2015-011E = WF839C3 = MMS obj
+2015-011F    2015-011F = WF839C4 = MMS obj
+2011-037B    2011-037B = TA29DCF = Spektr-R booster
+1965-058A    1965-058A = NORAD 01458 = Vela 3a
+1969-046F    1969-046F = NORAD 03956 = Vela booster
+1972-073A    1972-073A = IMP-7 = NORAD 06197
+1973-078A    1973-078A = IMP-8 = NORAD 06893
+1983-020A    1983-020A = NORAD 13901 = ASTRON
+1983-020D    1983-020D = NORAD 20413 = ASTRON booster
+1992-044A    1992-044A = Geotail = NORAD 22049
+1995-062B    1995-062B = NORAD 23716 = ISO Rk
+1999-040B    1999-040B = Chandra = 6L05B60 = NORAD 25867
+1999-040D    1999-040D = Chandra booster = NORAD 25869
+1999-066A    1999-066A = XMM-Newton = NORAD 25989
+2000-041A    2000-041A = Cluster II-FM6 = NORAD 26410
+2000-041B    2000-041B = NORAD 26411 = Cluster II / FM6 Salsa
+2000-045A    2000-045A = NORAD 26463 = Cluster II-FM5
+2002-048A    2002-048A = NORAD 27540 = Integral
+2003-061B    2003-061B = NORAD 28141 = 5N3DAC3
+2007-004B    2007-004B = THEMIS-B = NORAD 30581 = 7W39BF5
+2007-004C    2007-004C = NORAD 30582 = Themis C = 8C186FB
+2008-051A    2008-051A = TR93D0F = IBEX = NORAD 33401
+2009-026A    2009-026A = Herschel = HPO2
+2009-026B    2009-026B = Planck
+2009-026C    2009-026C = Booster = HPO3
+2009-026D    2009-026D = Sylda = HPO1
+2009-026E    2009-026E = HPO4
+2009-026F    2009-026F = HPO5
+2009-068B    2009-068B = NORAD 36109 = WF0AEDA = WGS 3 rk = S509590
+2010-050A    2010-050A = SM999CF = Chang'e 2 probe
+2010-050B    2010-050B = RV223A9 = Chang'e 2 hardware
+2011-037A    2011-037A = Spektr-R = NORAD 37755
+2012-062A    2012-062A = Star One C3 = NORAD 38991
+2013-070B    2013-070B = NORAD 39459 = UX29E26 = Chang'e 3 booster
+2013-074A    2013-074A = Gaia = NORAD 39479
+2015-007B    WE0913A = DSCOVR object = 2015-007B = NORAD 40391
+1963-039C    1963-039C = Vela 1B
+XMM          1999-066A = XMM-Newton = NORAD 25989
+     TJ7B205 TJ7B205 = unk Molniya
+     UR29394 UR29394 = unk P=2.15d, i=12
+     UV18B9C 1967-040A = NORAD 02765 = UU0E325 = UV18B9C = Vela 7
+     VA3730D VA3730D = unk P=.9d, i=18
+     WF12200 WF12200 = unk P=1.04d, i=21
+     WJ2AD07 WJ2AD07 = unk P=4.04d, i=53
+     SG97830 SG97830 = unk P=1.02, i=11
+     HJ0110  HJ0110 = unk P=1.27d, i=17
+     E1NB003 E1NB003 = unk P=.9d, i=24
+     9V9BAC8 9V9BAC8 = unk P=1.11d, i=22
+     9O0DC57 9O0DC57 = unk P=2.26d, i=25
+     8Q58E4F 8Q58E4F = unk Molniya
+     6Q0B44E 6Q0B44E = unk P=80d
+     5X2744B 5X2744B = unk P=1.2d, i=23
+2015-042B    2015-042B = NORAD 40883 = Breeze-M R/B
+2007-004D    2007-004D = Themis-D = NORAD 30797
+1976-023C    SOLRAD 11A = 1976-023C = NORAD 08748 = WB31C9F = XC83E0D
+2013-024B    2013-024B = NORAD 39169 = WGS 5 Rk
+2013-041B    2013-041B = NORAD 39224 = WGS 6 Rk = S509434
+     S509356 S509356 = WJ2AD07
+     S509474 1999-066A = XMM-Newton = NORAD 25989 = S509474 = S509433
+     S509559 S509559 = probable Vela
+1995-062A    1995-062A = NORAD 23715 = Infrared Space Observatory (ISO)
+1968-014B    1968-014B = NORAD 03145 = OGO 5 rk
+2012-057B    2012-057B = NORAD 38868 = Breeze-M Rkt
+2009-017B    2009-017B = NORAD 34714 = Atlas 5 Centaur R/B
+STEREO-B     2006-047B = NORAD 29511 = STEREO-B
+2015-005B    2015-005B = NORAD 40385
