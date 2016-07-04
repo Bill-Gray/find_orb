@@ -14,35 +14,35 @@ class CMonteCarlo : public CDialog
 {
 // Construction
 public:
-	CMonteCarlo(CWnd* pParent = NULL);   // standard constructor
+   CMonteCarlo(CWnd* pParent = NULL);   // standard constructor
 
 // Dialog Data
-	//{{AFX_DATA(CMonteCarlo)
-	enum { IDD = IDD_MONTE_CARLO };
-	CString	m_gaussian_noise;
-	double	m_max_ecc;
-	double	m_max_incl;
-	CString	m_min_range;
-	BOOL	m_statistical;
-	CString	m_max_range;
-	//}}AFX_DATA
+   //{{AFX_DATA(CMonteCarlo)
+   enum { IDD = IDD_MONTE_CARLO };
+   CString   m_gaussian_noise;
+   double   m_max_ecc;
+   double   m_max_incl;
+   CString   m_min_range;
+   BOOL   m_statistical;
+   CString   m_max_range;
+   //}}AFX_DATA
 
 
 // Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CMonteCarlo)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
+   // ClassWizard generated virtual function overrides
+   //{{AFX_VIRTUAL(CMonteCarlo)
+   protected:
+   virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+   //}}AFX_VIRTUAL
 
 // Implementation
 protected:
 
-	// Generated message map functions
-	//{{AFX_MSG(CMonteCarlo)
-		// NOTE: the ClassWizard will add member functions here
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
+   // Generated message map functions
+   //{{AFX_MSG(CMonteCarlo)
+      // NOTE: the ClassWizard will add member functions here
+   //}}AFX_MSG
+   DECLARE_MESSAGE_MAP()
 };
 
 //{{AFX_INSERT_LOCATION}}
