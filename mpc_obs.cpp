@@ -942,10 +942,9 @@ int get_observer_data( const char FAR *mpc_code, char *buff,
 /* As the function name suggests,  gets the lat/lon of an MPC station.
    Return value is the planet index (3=earth, 0=sun, 1=mercury,  etc.)
    or a negative value if the station doesn't exist,  or if there's no
-   latitude/longitude (planet-centric case,  or spacecraft).  'Inline'
-   because it's used only in get_obs_alt_azzes.        */
+   latitude/longitude (planet-centric case,  or spacecraft).  */
 
-static inline int get_observer_data_latlon( const char FAR *mpc_code,
+static int get_observer_data_latlon( const char FAR *mpc_code,
               char *buff, double *lon_in_radians, double *lat_in_radians,
               double *alt_in_meters)
 {
@@ -1944,6 +1943,8 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
       obs->mag_precision = -1;
 
    obs->is_included = (buff[64] != 'x');
+   FMEMCPY( obs->mpc_code, buff + 77, 3);
+   obs->mpc_code[3] = '\0';
    if( input_coordinate_epoch != 2000.)
       {
       double year = (obs->jd - J2000) / 365.25 + 2000.;
@@ -1967,13 +1968,26 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
       obs->ra *= -1.;
       obs->note2 = 'A';       /* mark as coordinates precessed */
       }
+   if( obs->note2 == 'a')     /* input coords are alt/az,  not RA/dec */
+      {
+      DPT latlon, alt_az, ra_dec;
+      char unused_mpc_info_buffer[100];
+
+      if( get_observer_data_latlon( obs->mpc_code, unused_mpc_info_buffer,
+              &latlon.x, &latlon.y, NULL) == 3)
+         {
+         alt_az.x = obs->ra;     /* because input coords were really alt/az */
+         alt_az.y = obs->dec;
+         full_alt_az_to_ra_dec( &ra_dec, &alt_az, utc, &latlon);
+         obs->ra = -ra_dec.x;
+         obs->dec = ra_dec.y;
+         }
+      }
    if( isdigit( buff[66]) && obs->note2 != 'R' &&
                (buff[67] == '.' || buff[67] == ' '))
       obs->obs_mag = atof( buff + 65);
    else
       obs->obs_mag = BLANK_MAG;
-   FMEMCPY( obs->mpc_code, buff + 77, 3);
-   obs->mpc_code[3] = '\0';
    FMEMCPY( obs->reference, buff + 72, 5);
    obs->reference[5] = '\0';
    FMEMCPY( obs->columns_57_to_65, buff + 56, 9);
