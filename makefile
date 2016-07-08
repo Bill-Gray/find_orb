@@ -74,16 +74,16 @@ clean:
 	$(RM) $(OBJS) fo.o findorb.o fo_serve.o find_orb$(EXE) fo$(EXE)
 	$(RM) fo_serve.cgi cgi_func.o
 	$(RM) covar.txt covar?.txt debug.txt eleme?.txt elements.txt
-	$(RM) ephemeri.txt gauss.out guide.txt monte.txt monte?.txt
-	$(RM) mpc_f?.txt mpc_fmt.txt mpc_sr.txt mpec.htm obser?.txt observe.txt
-	$(RM) residual.txt state.txt state?.txt virtu?.txt virtual.txt
+	$(RM) ephemeri.txt gauss.out guide.txt guide?.txt monte.txt monte?.txt
+	$(RM) mpc_f?.txt mpc_fmt.txt mpc_s?.txt mpec.htm obser?.txt observe.txt
+	$(RM) residual.txt sr_el?.txt state.txt state?.txt virtu?.txt virtual.txt
 	$(RM) sr_elems.txt mpcorb.dat
 
 clean_temp:
 	$(RM) covar.txt covar?.txt debug.txt eleme?.txt elements.txt
-	$(RM) ephemeri.txt gauss.out guide.txt monte.txt monte?.txt
-	$(RM) mpc_f?.txt mpc_fmt.txt mpc_sr.txt mpec.htm obser?.txt observe.txt
-	$(RM) residual.txt state.txt state?.txt virtu?.txt virtual.txt
+	$(RM) ephemeri.txt gauss.out guide.txt guide?.txt monte.txt monte?.txt
+	$(RM) mpc_f?.txt mpc_fmt.txt mpc_s?.txt mpec.htm obser?.txt observe.txt
+	$(RM) residual.txt sr_el?.txt state.txt state?.txt virtu?.txt virtual.txt
 	$(RM) sr_elems.txt mpcorb.dat
 
 .cpp.o:
