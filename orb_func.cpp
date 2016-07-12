@@ -175,10 +175,16 @@ double vector3_dist( const double *a, const double *b)
 the sun,  ending up at a distance r2,  with a straight-line distance s
 between them,  the time required can be found from
 
-(r1 + r2 - s) ^ 1.5 - (r1 + r2 - s) ^ 1.5 - 6kt = 0
+(r1 + r2 + s) ^ 1.5 +/- (r1 + r2 - s) ^ 1.5 = 6kt
 
-   If this quantity is positive,  then the orbit is hyperbolic.  If negative,
-the orbit is elliptical.   */
+   (minus sign if you're taking the "short route" -- sun isn't in the arc
+you travel -- or positive sign if you go around the sun instead.)
+
+   Our interest is in the "short route".  If the time for a transfer orbit
+is less than that time,  only a hyperbolic orbit will get you from A to B
+quickly enough.  Otherwise,  an elliptical orbit is possible.  (Similarly,
+the time for the "long route" can tell you if an elliptical orbit taking
+more than half a revolution is possible.)   */
 
 double euler_function( const OBSERVE FAR *obs1, const OBSERVE FAR *obs2)
 {
