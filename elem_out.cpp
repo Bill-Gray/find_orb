@@ -1942,32 +1942,22 @@ double calc_obs_magnitude( const int is_comet, const double obj_sun,
 /* in turn derived from data in Shevchenko and Lupishko, Solar System     */
 /* Research 32, 220-232, 1998.                                            */
 
-/* Note that it looks as if MPC uses V-w = .2,  just based on NEOCP  */
-/* ephemeris V magnitudes based on PanSTARRS w data;  but,  as described */
-/* in the MPML post referenced below,  this appears to be wrong.  */
+    /* grizyw (Sloan magnitudes) come from table 1, p. 360, 2013 April,
+       Publications of the Astro Soc of Pacific, 2013 PASP, 125:357-395,
+       Denneau et. al., 'The Pan-STARRS Moving Object Process System' */
 
 double mag_band_shift( const char mag_band)
 {
    double rval = 0.;
+   const char *bands = "R BIUCgrizyw";
+   const double offsets[] = { .43, .43,
+                     /* R and 'no band' are treated alike */
+         -.77, .82, 1.16, .4,    /* B, I, U, C */
+         -0.28, 0.23, 0.39, 0.37, 0.36, 0.16 };
+   const char *tptr = strchr( bands, mag_band);
 
-#ifdef OLD_VALUES
-   if( mag_band == 'R' || mag_band == ' ')    /* V-R=+0.3 */
-      rval = .3;           /* assume "no band" = "R" */
-   if( mag_band == 'B')    /* B-V=-0.8 */
-      rval = -.8;
-#endif
-   if( mag_band == 'R' || mag_band == ' ')    /* V-R=+0.3 */
-      rval = .43;          /* assume "no band" = "R" */
-   if( mag_band == 'B')    /* B-V=-0.8 */
-      rval = -.77;
-   if( mag_band == 'I')
-      rval = .82;
-   if( mag_band == 'U')
-      rval = 1.16;
-   if( mag_band == 'C')    /* similar for "C" = "clear"? */
-      rval = .4;
-   if( mag_band == 'w')    /* V-w=.5 to 1.0,  according to */
-      rval = -.75; /* http://tech.groups.yahoo.com/group/mpml/message/24808 */
+   if( tptr)
+      rval = offsets[tptr - bands];
    return( rval);
 }
 
