@@ -4459,7 +4459,9 @@ static int generate_observation_text( const OBSERVE FAR *optr,
          DPT sun_alt_az, object_alt_az;
          int i;
          static const char *net_codes[] = {
-           /* http://www.minorplanetcenter.net/iau/info/CatalogueCodes.html */
+           /* http://www.minorplanetcenter.net/iau/info/CatalogueCodes.html
+                G. V. Williams, 2012, ``Minor Planet Astrophotometry'', PhD
+                thesis, Open University. [2012PhDT.........7W] */
                   "aUSNO-A1",
                   "bUSNO-SA1",
                   "cUSNO-A2",
