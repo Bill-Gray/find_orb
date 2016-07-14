@@ -4459,7 +4459,7 @@ static int generate_observation_text( const OBSERVE FAR *optr,
          DPT sun_alt_az, object_alt_az;
          int i;
          static const char *net_codes[] = {
-                           /* A, B, C: seen so far only for some older obs */
+           /* http://www.minorplanetcenter.net/iau/info/CatalogueCodes.html */
                   "aUSNO-A1",
                   "bUSNO-SA1",
                   "cUSNO-A2",
@@ -4472,9 +4472,8 @@ static int generate_observation_text( const OBSERVE FAR *optr,
                   "jGSC-1.2",
                   "kGSC-2.2",
                   "lACT",
-                  "L2MASS", /* used for WISE & PanSTARRS astrometry */
                   "mGSC-ACT",
-                  "nTRC",
+                  "nSDSS-DR8",       /* was TRC */
                   "oUSNO-B1",
                   "pPPM",
                   "qUCAC-4",     /* also UCAC2-beta for earlier obs */
@@ -4485,8 +4484,30 @@ static int generate_observation_text( const OBSERVE FAR *optr,
                   "vNOMAD",
                   "wCMC-14",
                   "xHIP-2",
+                  "yHIP",
                   "zGSC-1.x",
+                  "AAC",
+                  "BSAO 1984",
+                  "CSAO",
+                  "DAGK 3",
+                  "EFK4",
+                  "FACRS",
+                  "GLick Gaspra Catalogue",
+                  "HIda93 Catalogue",
+                  "IPerth 70",
+                  "JCOSMOS/UKST Southern Sky Catalogue",
+                  "KYale",
+                  "L2MASS", /* used for WISE & PanSTARRS astrometry */
+                  "MGSC-2.3",
                   "NSDSS-DR7",
+                  "OSST-RC1",
+                  "PMPOSC3",
+                  "QCMC-15",
+                  "RSST-RC4",
+                  "SURAT-1",
+                  "TURAT-2",
+                  "UGAIA-DR1",
+                  "VGAIA-DR2",
                   NULL };
 
          if( optr->posn_sigma > 1.01 || optr->posn_sigma < .99)
