@@ -349,24 +349,43 @@ comet elements.  Find_Orb should have a toggle for the units...)
    Frequently,  only A1 and A2 are used;  A3 often doesn't appear unless
 one has three apparitions.  A3 has been added to the console version of
 Find_Orb,  but it appears to be just about unnecessary.
+
+   A small bit of trickery:  for the Marsden-Sekanina formula, g(1) = 1,
+requiring a normalization constant alpha.  We get that on the first call
+by setting alpha = 1,  determining what value we get for g(1),  and setting
+alpha to the inverse of that.
 */
 
 static inline double comet_g_func( const double r)
 {
    static int formula_to_use = -1;
+   static double alpha = 0.;
 
    if( formula_to_use == -1)
       formula_to_use = atoi( get_environment_ptr( "2009BD"));
+   if( !alpha)    /* determine normalization constant to set */
+      {           /* future comet_g_func( 1) = 1             */
+      alpha = 1.;
+      alpha = 1. / comet_g_func( 1.);
+      }
 
    if( !formula_to_use)    /* default, Marsden/Sekanina formula */
       {
-      const double alpha = .111262;    /* in AU/day^2 */
-      const double r0 = 2.808;         /* AU */
-      const double r_over_r0 = r / r0;
-      const double m = 2.15;
-      const double n = 5.093;
-      const double k = 4.6142;
+      static double r0 = 2.808;         /* AU */
+      static double m = 2.15;
+      static double n = 5.093;
+      static double k = 4.6142;
+      static bool first_time = true;
+      double r_over_r0;
 
+      if( first_time)
+         {
+         const char *comet_params = get_environment_ptr( "COMET_CONSTANTS");
+
+         first_time = false;
+         sscanf( comet_params, "%lf,%lf,%lf,%lf", &r0, &m, &n, &k);
+         }
+      r_over_r0 = r / r0;
       return( alpha * pow( r_over_r0, -m) * pow( 1. + pow( r_over_r0, n), -k));
       }
    else        /* just an inverse-square force,  used for 2009 BD */
