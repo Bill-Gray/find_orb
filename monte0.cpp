@@ -221,22 +221,22 @@ double *add_gaussian_noise_to_obs( int n_obs, OBSERVE *obs,
       was left as 999,  and I've no problem with the use of scientific notation
       beyond six digits... purely a matter of personal preference;  I didn't
       want four,  five,  and six-digit numbers shown in SN.)  Also,  this
-      code will remove unnecessary zeroes in the exponent,  so that 'e+004',
+      code will remove leading zeroes in the exponent,  so that 'e+004',
       for example,  becomes 'e+4'.           */
+
+static const char *full_sigmas = "";
 
 char *put_double_in_buff( char *buff, const double ival)
 {
    if( fabs( ival) < 999.999 || fabs( ival) > 999999.)
       {
-      sprintf( buff, "%10.3g", ival);
-      if( buff[5] == 'e' && buff[7] == '0')
-         {
-         memmove( buff + 1, buff, 7);
-         *buff = ' ';
-         }
-      if( buff[6] == 'e' && buff[8] == '0')
-         {
-         memmove( buff + 1, buff, 8);
+      char *tptr;
+
+      sprintf( buff, (*full_sigmas ? "%13.6g" : "%10.3g"), ival);
+      while( (tptr = strchr( buff, 'e')) != NULL
+                     &&  tptr[2] == '0')
+         {           /* remove a leading zero from exponent */
+         memmove( buff + 1, buff, tptr - buff + 2);
          *buff = ' ';
          }
       }
@@ -297,6 +297,8 @@ sigma_P_years = sigma_a * 1.5 * sqrt(a)
 sigma_n = 360 * sigma_P_in_days / P_days^2
 */
 
+const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
+
 double dump_monte_data_to_file( FILE *ofile, const double *sigmas,
             const double semimajor_axis, const double ecc,
             const int planet_orbiting)
@@ -313,6 +315,7 @@ double dump_monte_data_to_file( FILE *ofile, const double *sigmas,
    char tbuff[40], *tptr;
    extern int available_sigmas;
 
+   full_sigmas = get_environment_ptr( "FULL_SIGMAS");
    fprintf( ofile, "Planet orbiting: %d\n", planet_orbiting);
    fprintf( ofile, "Sigmas:\n");
    for( i = 0; i < MONTE_N_ENTRIES; i++)
@@ -321,8 +324,11 @@ double dump_monte_data_to_file( FILE *ofile, const double *sigmas,
          {
          char zbuff[40];
 
-         sprintf( zbuff, "%.9f", sigmas[i]);
-         remove_insignificant_digits( zbuff);
+         sprintf( zbuff, "%.8f", sigmas[i]);
+         if( !*full_sigmas)
+            remove_insignificant_digits( zbuff);
+         else
+            zbuff[9] = '\0';
          sprintf( tbuff, "%10s", zbuff);
          }
       else
@@ -383,6 +389,7 @@ double dump_monte_data_to_file( FILE *ofile, const double *sigmas,
                   per_yrs, uparam);
       }
    available_sigmas = MONTE_CARLO_SIGMAS_AVAILABLE;
+   full_sigmas = "";
    return( uparam);
 }
 
