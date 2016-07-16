@@ -2167,6 +2167,12 @@ int get_defaults( int *ephemeris_output_options, int *element_format,
                &apply_debiasing);
 
    use_sigmas = (use_sigmas_int ? true : false);
+   if( *get_environment_ptr( "COMBINE_ALL"))
+      {
+      extern int combine_all_observations;
+
+      combine_all_observations = 1;
+      }
    return( 0);
 }
 
