@@ -1942,7 +1942,7 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
    if( buff[67] == ' ' && buff[66] >= '0')     /* mag given to integer value */
       obs->mag_precision = -1;
 
-   obs->is_included = (buff[64] != 'x');
+   obs->is_included = (buff[64] != 'x' && buff[12] != '-');
    FMEMCPY( obs->mpc_code, buff + 77, 3);
    obs->mpc_code[3] = '\0';
    if( input_coordinate_epoch != 2000.)
