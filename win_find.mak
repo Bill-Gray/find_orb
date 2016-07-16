@@ -1,19 +1,19 @@
 OBJS=about.obj b32_eph.obj bc405.obj bias.obj clipfunc.obj \
   collide.obj conv_ele.obj eigen.obj elem2tle.obj \
   elem_out.obj ephem0.obj ephem.obj generic.obj gauss.obj \
-  geo_pot.obj healpix.obj jpleph.obj lsquare.obj moid4.obj monte0.obj \
+  geo_pot.obj healpix.obj lsquare.obj moid4.obj monte0.obj \
   monte.obj mpc_obs.obj mt64.obj orbitdlg.obj settings.obj stdafx.obj \
   orb_func.obj orb_fun2.obj pl_cache.obj roots.obj runge.obj \
-  sigma.obj sm_vsop.obj sr.obj tle_out.obj
+  sigma.obj sm_vsop.obj sr.obj
 
 !ifdef BITS_32
 COMMON_FLAGS=-nologo -W3 -EHsc -c -FD
-COMMON_LINK=lunar.lib /nologo /stack:0x8800 /subsystem:windows
+COMMON_LINK=lunar.lib jpleph.lib sat_code.lib /nologo /stack:0x8800 /subsystem:windows
 EXE_NAME=find_o32.exe
 RM=rm
 !else
 COMMON_FLAGS=-nologo -W3 -EHsc -c -FD -D_CRT_SECURE_NO_WARNINGS
-COMMON_LINK=lunar64.lib /nologo /stack:0x8800 /subsystem:windows -ENTRY:"wWinMainCRTStartup"
+COMMON_LINK=lunar64.lib jpleph.lib sat_code.lib /nologo /stack:0x8800 /subsystem:windows -ENTRY:"wWinMainCRTStartup"
 EXE_NAME=find_o64.exe
 RM=del
 !endif
