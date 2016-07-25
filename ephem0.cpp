@@ -2253,19 +2253,27 @@ char *get_file_name( char *filename, const char *template_file_name)
 
 void create_obs_file( const OBSERVE FAR *obs, int n_obs, const int append)
 {
-   char filename[81];
+   char filename[81], curr_sigma_text[81];
    FILE *ofile = fopen( get_file_name( filename, observe_filename),
                            append ? "ab" : "wb");
-   double default_sigma = 1.;  /* default to one-arcsec sigma on RA and dec */
 
+   *curr_sigma_text = '\0';
    while( n_obs--)
       {
       char obuff[81];
 
-      if( obs->posn_sigma != default_sigma)
+      sprintf( obuff, "#Posn sigma %g", obs->posn_sigma_1);
+      if( obs->posn_sigma_2 != obs->posn_sigma_1)  /* elliptical sigma */
          {
-         fprintf( ofile, "#Posn sigma %g\n", obs->posn_sigma);
-         default_sigma = obs->posn_sigma;
+         sprintf( obuff + strlen( obuff), " %g", obs->posn_sigma_2);
+         if( obs->posn_sigma_theta)    /* uncertainty is a tilted ellipse */
+            sprintf( obuff + strlen( obuff), " tilt %.1f",
+                        obs->posn_sigma_theta * 180. / PI);
+         }
+      if( strcmp( curr_sigma_text, obuff))
+         {
+         fprintf( ofile, "%s\n", obuff);
+         strcpy( curr_sigma_text, obuff);
          }
       recreate_observation_line( obuff, obs);
       fprintf( ofile, "%s\n", obuff);

@@ -1207,9 +1207,11 @@ int compute_available_sigmas_hash( const OBSERVE FAR *obs, const int n_obs,
          double temp_darray[10];
 
          temp_darray[0] = obs->jd;
-         temp_darray[1] = obs->posn_sigma;
-         temp_darray[2] = obs->mag_sigma;
-         rval = simple_hash( rval, (const char *)temp_darray, 3 * sizeof( double));
+         temp_darray[1] = obs->posn_sigma_1;
+         temp_darray[2] = obs->posn_sigma_2;
+         temp_darray[3] = obs->posn_sigma_theta;
+         temp_darray[4] = obs->mag_sigma;
+         rval = simple_hash( rval, (const char *)temp_darray, 5 * sizeof( double));
          }
    if( debug_level)
       debug_printf( "Hash result: %8lx\n", rval);
@@ -2222,22 +2224,36 @@ void get_residual_data( const OBSERVE *obs, double *xresid, double *yresid)
       else
          {
          MOTION_DETAILS m;
-         double arcsec_per_second, timing_err, along_track_sigma;
-         const double timing_err_in_seconds = obs->time_sigma * seconds_per_day;
 
          compute_observation_motion_details( obs, &m);
-         *xresid = m.cross_residual / obs->posn_sigma;
-         *yresid = m.time_residual * m.total_motion / 60.;
-                  /* *yresid is now along-track residual in arcseconds */
-         arcsec_per_second = m.total_motion / 60.;
-         timing_err = timing_err_in_seconds * arcsec_per_second;
-         along_track_sigma =
-               sqrt( obs->posn_sigma * obs->posn_sigma + timing_err * timing_err);
+         if( obs->posn_sigma_1 != obs->posn_sigma_2)
+            {
+            const double cos_tilt = cos( obs->posn_sigma_theta);
+            const double sin_tilt = sin( obs->posn_sigma_theta);
 
-//       debug_printf( "%f (%s): resids %f/%f, %f/%f: %f %f\n",
-//                obs->jd, obs->mpc_code, m.cross_residual, obs->posn_sigma,
-//                *yresid, along_track_sigma, timing_err, arcsec_per_second);
-         *yresid /= along_track_sigma;               /* ...now it's in sigmas */
+            *xresid = (cos_tilt * m.xresid - sin_tilt * m.yresid);
+            *xresid /= obs->posn_sigma_1;
+            *yresid = (sin_tilt * m.xresid + cos_tilt * m.yresid);
+            *yresid /= obs->posn_sigma_2;
+            }
+         else        /* if it's a circular error ellipse,  include timing err */
+            {
+            double arcsec_per_second, timing_err, along_track_sigma;
+            const double timing_err_in_seconds = obs->time_sigma * seconds_per_day;
+
+            *xresid = m.cross_residual / obs->posn_sigma_1;
+            *yresid = m.time_residual * m.total_motion / 60.;
+                     /* *yresid is now along-track residual in arcseconds */
+            arcsec_per_second = m.total_motion / 60.;
+            timing_err = timing_err_in_seconds * arcsec_per_second;
+            along_track_sigma =
+                  sqrt( obs->posn_sigma_1 * obs->posn_sigma_1 + timing_err * timing_err);
+
+//          debug_printf( "%f (%s): resids %f/%f, %f/%f: %f %f\n",
+//                   obs->jd, obs->mpc_code, m.cross_residual, obs->posn_sigma_1,
+//                   *yresid, along_track_sigma, timing_err, arcsec_per_second);
+            *yresid /= along_track_sigma;               /* ...now it's in sigmas */
+            }
          }
       }
 }
@@ -2933,13 +2949,15 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
          const double after_rms = compute_rms( obs, n_obs);
 
          sprintf( tstr, "Half-stepping %d\n", 7 - i);
-         debug_printf( "'after' RMS %.4f\n", after_rms);
+         debug_printf( "'after' RMS %.4f; i %d\n", after_rms, i);
          if( after_rms > before_rms * 1.1 && !limited_orbit)
             {
             for( j = 0; j < 6; j++)
                orbit[j] = (orbit[j] + orbit2[j]) * .5;
             i--;
             }
+         else
+            i = 0;
          }
       else
          i = 0;

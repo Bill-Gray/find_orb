@@ -4,7 +4,9 @@ OBSERVE
    {
    double jd, obs_posn[3], obs_vel[3], vect[3], ra, dec, obs_mag;
    double r,  obj_posn[3], obj_vel[3], solar_r, computed_ra, computed_dec;
-   double posn_sigma;         /* in arcseconds */
+   double posn_sigma_1, posn_sigma_2;         /* in arcseconds */
+            /* Usually, posn_sigma_1 = RA sigma, posn_sigma_2 = dec sigma. */
+   double posn_sigma_theta;   /* tilt angle of uncertainty ellipse */
    double mag_sigma;
    double time_sigma;         /* in days */
    double computed_mag;
@@ -114,6 +116,8 @@ int compute_radar_info( const OBSERVE *obs, RADAR_INFO *rinfo);
    /* Following used for obs from spacecraft that lack offset data */
 #define OBS_NO_OFFSET      4
 #define OBS_IS_SELECTED    8
+
+#define OBS_THOLEN_SIGMAS  0x10
 
 #ifdef SEEK_CUR
 OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,

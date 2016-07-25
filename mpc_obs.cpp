@@ -87,6 +87,7 @@ void shellsort_r( void *base, const size_t n_elements, const size_t esize,
          int (*compare)(const void *, const void *, void *), void *context);
 int string_compare_for_sort( const void *a, const void *b, void *context);
 int format_jpl_ephemeris_info( char *buff);                 /* pl_cache.c */
+int set_tholen_style_sigmas( OBSERVE *obs, const char *buff);  /* mpc_obs.c */
 #ifdef _MSC_VER
      /* Microsoft Visual C/C++ has no snprintf.  See 'ephem0.cpp'.  */
 int snprintf( char *string, const size_t max_len, const char *format, ...);
@@ -453,6 +454,21 @@ static double get_ra_dec( const char *ibuff, int *format, double *precision)
 int inquire( const char *prompt, char *buff, const int max_len,
                      const int color);
 #endif
+
+int set_tholen_style_sigmas( OBSERVE *obs, const char *buff)
+{
+   const int n_scanned = sscanf( buff, "%lf%lf%lf",
+               &obs->posn_sigma_1, &obs->posn_sigma_2, &obs->posn_sigma_theta);
+
+   if( n_scanned == 1)        /* just a circular error */
+      obs->posn_sigma_2 = obs->posn_sigma_1;
+   if( n_scanned != 3)        /* no position angle supplied (usual case) */
+      obs->posn_sigma_theta = 0.;
+   else
+      obs->posn_sigma_theta *= PI / 180.;
+   return( n_scanned);
+}
+
 
 static double grab_double( const char *iptr, const int field_size)
 {
@@ -1913,14 +1929,11 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
       }
    else
       {
-      double ra_sigma, dec_sigma;
-
-      obs->ra  = get_ra_dec( buff + 32, &obs->ra_precision, &ra_sigma) * (PI / 12.);
-      ra_sigma *= 15.;     /* cvt minutes/seconds to arcmin/arcsec */
+      obs->ra  = get_ra_dec( buff + 32, &obs->ra_precision, &obs->posn_sigma_1) * (PI / 12.);
+      obs->posn_sigma_1 *= 15.;     /* cvt minutes/seconds to arcmin/arcsec */
       if( obs->ra_precision == BAD_RA_DEC_FMT)
          return( -2);
-      obs->dec = get_ra_dec( buff + 44, &obs->dec_precision, &dec_sigma) * (PI / 180.);
-      obs->posn_sigma = (dec_sigma > ra_sigma ? dec_sigma : ra_sigma);
+      obs->dec = get_ra_dec( buff + 44, &obs->dec_precision, &obs->posn_sigma_2) * (PI / 180.);
       if( obs->dec_precision == BAD_RA_DEC_FMT)
          return( -3);
       }
@@ -2559,7 +2572,7 @@ sigmas are similarly converted.
 #define MINIMUM_RWO_LENGTH 117
 
 static int rwo_to_mpc( char *buff, double *ra_bias, double *dec_bias,
-                  double *posn_sigma, double *mag_sigma)
+                  double *posn_sigma_ra, double *posn_sigma_dec, double *mag_sigma)
 {
    int rval = 0, i, j;
    const size_t line_len = strlen( buff);
@@ -2643,12 +2656,19 @@ static int rwo_to_mpc( char *buff, double *ra_bias, double *dec_bias,
          *ra_bias = atof( buff + 86);
       if( dec_bias)
          *dec_bias = atof( buff + 139);
-      if( posn_sigma)   /* use geom mean of RA and dec sigmas: */
+      if( posn_sigma_ra)
          {
-         if( buff[131] == '.' && buff[78] == '.')
-            *posn_sigma = sqrt( atof( buff + 127) * atof( buff + 74));
+         if( buff[78] == '.')
+            *posn_sigma_ra = atof( buff + 74);
          else
-            *posn_sigma = 1.2;
+            *posn_sigma_ra = 1.2;
+         }
+      if( posn_sigma_dec)
+         {
+         if( buff[131] == '.')
+            *posn_sigma_dec = atof( buff + 127);
+         else
+            *posn_sigma_dec = 1.2;
          }
       if( mag_sigma && buff[165] == '.')
          *mag_sigma = atof( buff + 164);
@@ -3228,7 +3248,9 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
    unsigned n_spurious_matches = 0;
    unsigned n_sat_obs_without_offsets = 0;
    bool obs_are_of_a_comet = false;
-   double override_posn_sigma = 0.;  /* in arcsec */
+   double override_posn_sigma_1 = 0.;  /* in arcsec */
+   double override_posn_sigma_2 = 0.;
+   double override_posn_sigma_theta = 0.;
    double override_mag_sigma = 0.;   /* in mags */
    double override_time_sigma = 0.;  /* in seconds */
             /* We distinguish between observations that are complete clones */
@@ -3254,15 +3276,16 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
    while( fgets_trimmed( buff, sizeof( buff), ifile) && i != n_obs)
       {
       int is_rwo = 0;
-      double rwo_posn_sigma = 0., rwo_mag_sigma = 0.;
+      double rwo_posn_sigma_1 = 0., rwo_posn_sigma_2 = 0., rwo_mag_sigma = 0.;
       char original_packed_desig[13];
+      size_t ilen = strlen( buff);
 
       line_no++;
       lines_actually_read++;
 
       if( *buff == '<')
          remove_html_tags( buff);
-      if( !memcmp( buff, "COD ", 4) && strlen( buff) == 7)
+      if( !memcmp( buff, "COD ", 4) && ilen == 7)
          strcpy( curr_xxx_code, buff + 4);
       if( !memcmp( buff, "COM Long.", 9))
          get_xxx_location( buff);
@@ -3271,9 +3294,27 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
       if( get_neocp_data( buff, desig_from_neocp, mpc_code_from_neocp))
          if( !i && debug_level)
             debug_printf( "Got NEOCP data\n");
-      is_rwo = rwo_to_mpc( buff, &rval[i].ra_bias, &rval[i].dec_bias, &rwo_posn_sigma, &rwo_mag_sigma);
-      if( is_rwo && !i && debug_level)
-         debug_printf( "Got .rwo data\n");
+      if( ilen == 75 || ilen >= MINIMUM_RWO_LENGTH)
+         {
+         is_rwo = rwo_to_mpc( buff, &rval[i].ra_bias, &rval[i].dec_bias,
+                &rwo_posn_sigma_1, &rwo_posn_sigma_2, &rwo_mag_sigma);
+         if( is_rwo && !i && debug_level)
+            debug_printf( "Got .rwo data\n");
+         }
+      if( ilen >= 92 && buff[82] == '.' && buff[88] == '.')
+         {                    /* Possible Tholen-style sigmas:  2F6.3 */
+         double sig1, sig2;   /* right after the usual 80 columns */
+         int bytes_read;
+
+         if( sscanf( buff + 80, "%lf%lf%n", &sig1, &sig2, &bytes_read) >= 2
+                     && bytes_read == 12)
+            {
+            ilen = 80;
+            buff[80] = '\0';
+            rwo_posn_sigma_1 = sig1;
+            rwo_posn_sigma_2 = sig2;
+            }
+         }
       if( fixing_trailing_and_leading_spaces)
          fix_up_mpc_observation( buff);
       original_packed_desig[12] = '\0';
@@ -3358,16 +3399,19 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
             if( observation_is_good)
                {
                const double radians_per_arcsec = PI / (180. * 3600.);
-               double mag_sigma = 0., time_sigma = 0., posn_sigma = 0.0001;
+               double mag_sigma = 0., time_sigma = 0.;
+               double posn_sigma_1 = 0.0001, posn_sigma_2 = 0.0001;
+               double posn_sigma_theta = 0.;
                     /* If we want all observations to have the same sigma, */
                     /* we use a nonexistent MPC code.  "Unknown" codes will */
                     /* just get the default sigma assigned at the end of    */
                     /* 'sigma.txt' (q.v.)                                   */
                const char *mpc_code_to_use = (use_sigmas ? rval[i].mpc_code : "***");
 
-               posn_sigma = get_observation_sigma( rval[i].jd,
+               posn_sigma_1 = get_observation_sigma( rval[i].jd,
                        (int)( rval[i].obs_mag * 10. + .001),
                        mpc_code_to_use, &mag_sigma, &time_sigma, rval[i].note1);
+               posn_sigma_2 = posn_sigma_1;     /* ...for the nonce,  anyway */
                            /* The sigmas just determined may be overruled */
                            /* by keywords given in the observation file : */
                if( use_sigmas)
@@ -3379,13 +3423,22 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                      mag_sigma = override_mag_sigma;
                   if( override_time_sigma)
                      time_sigma = override_time_sigma;
-                  if( override_posn_sigma)
-                     posn_sigma = override_posn_sigma;
+                  if( override_posn_sigma_1)
+                     posn_sigma_1 = override_posn_sigma_1;
+                  if( override_posn_sigma_2)
+                     posn_sigma_2 = override_posn_sigma_2;
+                  if( override_posn_sigma_theta)
+                     posn_sigma_theta = override_posn_sigma_theta;
 
                      /* AstDyS/NEODyS .rwo data has position and mag sigmas */
-                     /* in it.  If available,  we use those :               */
-                  if( rwo_posn_sigma)
-                     posn_sigma = rwo_posn_sigma;
+                     /* in it;  Dave Tholen puts position sigmas in columns */
+                     /* 81-92.  If available,  we use these :               */
+                  if( rwo_posn_sigma_1 && rwo_posn_sigma_2)
+                     {
+                     posn_sigma_1 = rwo_posn_sigma_1;
+                     posn_sigma_2 = rwo_posn_sigma_2;
+                     posn_sigma_theta = 0.;
+                     }
                   if( rwo_mag_sigma)
                      mag_sigma = rwo_mag_sigma;
                   if( sscanf( rval[i].columns_57_to_65, "%lf %lf%n",
@@ -3393,19 +3446,28 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                               && bytes_read >= 8
                               && ra_sigma > 0 && dec_sigma > 0.)
                      {
-                     double tval = sqrt( ra_sigma * dec_sigma);
                      const char end_char = rval[i].columns_57_to_65[8];
+                     double units = 0.;
 
-                     if( bytes_read == 9 || end_char == '"')
-                        posn_sigma = tval;
-                     if( end_char == 'u')
-                        posn_sigma = tval / 1e+6;
-                     if( end_char == 'm')
-                        posn_sigma = tval / 1000.;
-                     if( end_char == '\'')
-                        posn_sigma = tval * 60.;
-                     if( end_char == 'd')
-                        posn_sigma = tval * 60. * 60.;
+                     if( bytes_read == 9)
+                        units = 1.;
+                     if( bytes_read == 8)
+                        {
+                        if( end_char == 'u')
+                           units = 1.e-6;
+                        if( end_char == 'm')
+                           units = 0.001;
+                        if( end_char == '\'')
+                           units = 60.;
+                        if( end_char == 'd')
+                           units = 3600.;
+                        }
+                     if( units)
+                        {
+                        posn_sigma_1 =  ra_sigma * units;
+                        posn_sigma_2 = dec_sigma * units;
+                        }
+                     posn_sigma_theta = 0.;
                      }
                   }
                            /* The observation data's precision has already been */
@@ -3419,8 +3481,11 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                   rval[i].mag_sigma = mag_sigma;
                if( time_sigma > rval[i].time_sigma || !use_sigmas)
                   rval[i].time_sigma = time_sigma;
-               if( posn_sigma > rval[i].posn_sigma || !use_sigmas)
-                  rval[i].posn_sigma = posn_sigma;
+               if( posn_sigma_1 > rval[i].posn_sigma_1 || !use_sigmas)
+                  rval[i].posn_sigma_1 = posn_sigma_1;
+               if( posn_sigma_2 > rval[i].posn_sigma_2 || !use_sigmas)
+                  rval[i].posn_sigma_2 = posn_sigma_2;
+               rval[i].posn_sigma_theta = posn_sigma_theta;
                if( !including_obs)
                   rval[i].is_included = 0;
                if( apply_debiasing)
@@ -3444,16 +3509,30 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
       if( *buff == '#')
          {
          if( !memcmp( buff, "#Weight ", 8))
-            override_posn_sigma = 1. / atof( buff + 8);
+            {
+            override_posn_sigma_1 = override_posn_sigma_2 = 1. / atof( buff + 8);
+            override_posn_sigma_theta = 0.;
+            }
          else if( !memcmp( buff, "#Posn sigma ", 12))
-            override_posn_sigma = atof( buff + 12);
+            {
+            OBSERVE tmp;
+
+            if( set_tholen_style_sigmas( &tmp, buff + 12))
+               {
+               override_posn_sigma_1 = tmp.posn_sigma_1;
+               override_posn_sigma_2 = tmp.posn_sigma_2;
+               override_posn_sigma_theta = tmp.posn_sigma_theta;
+               }
+            }
          else if( !memcmp( buff, "#Mag sigma ", 11))
             override_mag_sigma = atof( buff + 11);
          else if( !memcmp( buff, "#Time sigma ", 12))
             override_time_sigma = atof( buff + 12) / seconds_per_day;
          else if( !memcmp( buff, "#override_weight", 15)
                || !memcmp( buff, "#override_sigma", 14))
-            override_posn_sigma = override_time_sigma = override_mag_sigma = 0.;
+            override_posn_sigma_1 = override_posn_sigma_2
+            = override_posn_sigma_theta
+            = override_time_sigma = override_mag_sigma = 0.;
          else if( !memcmp( buff, "#coord epoch", 12))
             input_coordinate_epoch = atof( buff + 12);
          else if( !memcmp( buff, "#suppress_obs", 13))
@@ -3731,7 +3810,7 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
       debug_printf( "About to read input\n");
    while( fgets_trimmed( buff, sizeof( buff), ifile))
       {
-      const size_t iline_len = strlen( buff);
+      size_t iline_len = strlen( buff);
       bool is_neocp = false;
       double jd;
 
@@ -3745,7 +3824,12 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
       if( debug_level > 8)
          debug_printf( "After get_neocp_data\n");
       if( iline_len > MINIMUM_RWO_LENGTH)
-         rwo_to_mpc( buff, NULL, NULL, NULL, NULL);
+         rwo_to_mpc( buff, NULL, NULL, NULL, NULL, NULL);
+      if( iline_len >= 92 && buff[82] == '.' && buff[88] == '.')
+         {
+         buff[80] = '\0';     /* probably Dave Tholen-style sigmas */
+         iline_len = 80;
+         }
       if( fixing_trailing_and_leading_spaces)
          fix_up_mpc_observation( buff);
       if( debug_level > 8)
@@ -4512,13 +4596,26 @@ static int generate_observation_text( const OBSERVE FAR *optr,
                   "VGAIA-DR2",
                   NULL };
 
-         if( optr->posn_sigma > 1.01 || optr->posn_sigma < .99)
+         if( optr->posn_sigma_1 > 1.01 || optr->posn_sigma_1 < .99
+                  || optr->posn_sigma_1 != optr->posn_sigma_2)
             if( optr->note2 != 'R')
                {
+               int tilt_angle = 0;
+
                strcpy( buff, "Sigma ");
-               sprintf( buff + 6, "%.6f", optr->posn_sigma);
+               sprintf( buff + 6, "%.6f", optr->posn_sigma_1);
                remove_insignificant_digits( buff + 6);
+               if( optr->posn_sigma_1 != optr->posn_sigma_2)
+                  {
+                  char *end_ptr = buff + strlen( buff);
+
+                  sprintf( end_ptr, "x%.6f", optr->posn_sigma_2);
+                  remove_insignificant_digits( end_ptr);
+                  tilt_angle = (int)( optr->posn_sigma_theta * 180. / PI);
+                  }
                strcat( buff, "\" ");
+               if( tilt_angle)
+                  sprintf( buff + strlen( buff), "%d ", tilt_angle);
                }
          buff += strlen( buff);
          reference_to_text( buff, optr->reference, optr->jd);

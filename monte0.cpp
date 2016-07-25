@@ -204,8 +204,8 @@ double *add_gaussian_noise_to_obs( int n_obs, OBSERVE *obs,
       const double x = gaussian_random( );
       const double y = gaussian_random( );
 
-      obs->ra  += x * obs->posn_sigma * noise_in_radians / cos( obs->dec);
-      obs->dec += y * obs->posn_sigma * noise_in_radians;
+      obs->ra  += x * obs->posn_sigma_1 * noise_in_radians / cos( obs->dec);
+      obs->dec += y * obs->posn_sigma_2 * noise_in_radians;
       if( obs->obs_mag != BLANK_MAG)
          obs->obs_mag += gaussian_random( ) * obs->mag_sigma;
       obs->jd  +=     gaussian_random( ) * obs->time_sigma;

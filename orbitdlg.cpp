@@ -1529,7 +1529,8 @@ void COrbitDlg::OnSetWeight()
                      obs[selections[i]].time_sigma = tval / seconds_per_day;
                      break;
                   default:
-                     obs[selections[i]].posn_sigma = tval;
+                     obs[selections[i]].posn_sigma_1
+                              = obs[selections[i]].posn_sigma_2 = tval;
                      break;
                   }
             free( selections);

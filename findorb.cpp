@@ -188,7 +188,7 @@ int64_t nanoseconds_since_1970( void);                      /* mpc_obs.c */
 int metropolis_search( OBSERVE *obs, const int n_obs, double *orbit,
                const double epoch, int n_iterations, double scale);
 const char *get_find_orb_text( const int index);
-
+int set_tholen_style_sigmas( OBSERVE *obs, const char *buff);  /* mpc_obs.c */
 
 extern double maximum_jd, minimum_jd;        /* orb_func.cpp */
 
@@ -3718,9 +3718,8 @@ int main( const int argc, const char **argv)
                                 tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY);
             if( atof( tbuff) != 0.)
                {
-               obs[curr_obs].posn_sigma = atof( tbuff);
-               sprintf( message_to_user, "Uncertainty reset to %.3e arcsec",
-                                    obs[curr_obs].posn_sigma);
+               set_tholen_style_sigmas( obs + curr_obs, tbuff);
+               strcpy( message_to_user, "Positional uncertainty reset");
                }
             else if( atof( tbuff + 1) != 0.)
                {
