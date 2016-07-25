@@ -3320,10 +3320,18 @@ static double find_sungrazer_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
    double best_score = 1e+10;
    double temp_orbit[6];
    double r;
-   int direction;
+   int i, direction, start, end;
 
+               /* Don't try to do a multiple-orbit case at first : */
+   look_for_best_subarc( obs, n_obs, 10., &start, &end);
+   for( i = 0; i < start; i++)
+      obs[i].is_included = 0;
+   for( i = end + 1; i < n_obs; i++)
+      obs[i].is_included = 0;
+   obs += start;
+   n_obs = end - start + 1;
    perturbers = 0;
-   for( r = .85; r < 1.15; r += (r > .95 && r < 1.05 ? .01 : .02))
+   for( r = .85; r < 1.15; r += (r > .95 && r < 1.05 ? .001 : .002))
       for( direction = 0; direction < 2; direction++)
          {
          set_distance( obs, r);

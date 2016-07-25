@@ -4649,6 +4649,7 @@ static int generate_observation_text( const OBSERVE FAR *optr,
                   sprintf( buff + strlen( buff), " az %.1f",
                         sun_alt_az.x);
                }
+#ifdef TEST_SPACECRAFT_LOC
             if( object_alt_az.x <= -1.)
                {        /* flagged as spacecraft obs */
                double xyz[3], dist, ra, dec;
@@ -4663,6 +4664,7 @@ static int generate_observation_text( const OBSERVE FAR *optr,
                           ra * 180. / PI,
                           dec * 180. / PI, dist * AU_IN_KM);
                }
+#endif
             }
          for( i = 0; net_codes[i]; i++)
             if( optr->mag_band2 == net_codes[i][0])
