@@ -148,12 +148,16 @@ double geo_potential_in_au( const double x, const double y, const double z,
 #define ATMOSPHERIC_LIMIT (EARTH_R + 500. / AU_IN_KM)
 // #define ATMOSPHERIC_LIMIT 0
 
-/* 12 Feb 2009:  updated all the following gas giant J2/3/4 data using */
+/* 2016 Jul 25:  updated all the following gas giant J2/3/4 data using */
 /* data from http://ssd.jpl.nasa.gov/?gravity_fields_op */
 
-#define J2_IN_JUPITER_UNITS (.01469643)
-#define J3_IN_JUPITER_UNITS (-6.4e-7)
-#define J4_IN_JUPITER_UNITS (-5.8714e-4)
+#define J2_IN_JUPITER_UNITS (.01469562)
+#define J3_IN_JUPITER_UNITS 0.
+#define J4_IN_JUPITER_UNITS (-5.9131e-4)
+#ifdef NOT_USING_ANYTHING_PAST_J4_YET
+   #define J6_IN_JUPITER_UNITS   20.78e-6
+   #define J6_IN_SATURN_UNITS    86.14e-6
+   #define J8_IN_SATURN_UNITS   -10.e-6
 #define JUPITER_R (71492. / AU_IN_KM)
 #define JUPITER_R2 (JUPITER_R * JUPITER_R)
 #define JUPITER_J2 (J2_IN_JUPITER_UNITS * JUPITER_R2)
@@ -168,16 +172,16 @@ double geo_potential_in_au( const double x, const double y, const double z,
 #define SATURN_J3 0.
 #define SATURN_J4 (J4_IN_SATURN_UNITS * SATURN_R2 * SATURN_R2)
 
-#define J2_IN_URANUS_UNITS (.00334129)
-#define J4_IN_URANUS_UNITS (-3.044e-5)
-#define URANUS_R (26200. / AU_IN_KM)
+#define J2_IN_URANUS_UNITS  3510.68e-6
+#define J4_IN_URANUS_UNITS   -34.17e-6
+#define URANUS_R (25559. / AU_IN_KM)
 #define URANUS_R2 (URANUS_R * URANUS_R)
 #define URANUS_J2 (J2_IN_URANUS_UNITS * URANUS_R * URANUS_R)
 #define URANUS_J3 0.
 #define URANUS_J4 (J4_IN_URANUS_UNITS * URANUS_R2 * URANUS_R2)
 
-#define J2_IN_NEPTUNE_UNITS (.00340849)
-#define J4_IN_NEPTUNE_UNITS (-3.348e-5)
+#define J2_IN_NEPTUNE_UNITS  3408.43e-6
+#define J4_IN_NEPTUNE_UNITS   -33.40e-6
 #define NEPTUNE_R (25225. / AU_IN_KM)
 #define NEPTUNE_R2 (NEPTUNE_R * NEPTUNE_R)
 #define NEPTUNE_J2 (J2_IN_NEPTUNE_UNITS * NEPTUNE_R * NEPTUNE_R)
