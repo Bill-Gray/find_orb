@@ -158,6 +158,7 @@ double geo_potential_in_au( const double x, const double y, const double z,
    #define J6_IN_JUPITER_UNITS   20.78e-6
    #define J6_IN_SATURN_UNITS    86.14e-6
    #define J8_IN_SATURN_UNITS   -10.e-6
+#endif
 #define JUPITER_R (71492. / AU_IN_KM)
 #define JUPITER_R2 (JUPITER_R * JUPITER_R)
 #define JUPITER_J2 (J2_IN_JUPITER_UNITS * JUPITER_R2)
