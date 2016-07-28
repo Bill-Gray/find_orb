@@ -2975,8 +2975,12 @@ int sort_obs_by_date_and_remove_duplicates( OBSERVE *obs, const int n_obs)
          correct_differences( &temp2, &temp1);
          if( !memcmp( &temp1, &temp2, sizeof( OBSERVE)))
             {
-            debug_printf( "Observation %d from %s is effectively a duplicate\n",
-                                      j, temp1.mpc_code);
+            char buff[80];
+
+            full_ctime( buff, temp1.jd, CALENDAR_JULIAN_GREGORIAN
+                        | FULL_CTIME_FORMAT_DAY | FULL_CTIME_6_PLACES);
+            debug_printf( "Observation %d from %s on %s is effectively a duplicate\n",
+                                      j, temp1.mpc_code, buff);
             obs[j - 1] = temp1;
             }
          else
