@@ -306,6 +306,8 @@ int clipboard_to_file( const char *filename, const int append)
 }
 #endif
 
+static bool curses_running = false;
+
 int inquire( const char *prompt, char *buff, const int max_len,
                      const int color)
 {
@@ -315,6 +317,12 @@ int inquire( const char *prompt, char *buff, const int max_len,
    char tbuff[200];
    chtype *buffered_screen;
 
+   if( !curses_running)    /* for error messages either before initscr() */
+      {                    /* or after endwin( )                         */
+      printf( "%s", prompt);
+      getchar( );
+      return( 0);
+      }
    for( i = 0; prompt[i]; i++)
       if( prompt[i] == '\n')
          {
@@ -2240,6 +2248,7 @@ int main( const int argc, const char **argv)
    noecho( );
    clear( );
    refresh( );
+   curses_running = true;
    if( debug_level > 2)
       debug_printf( "(2), ");
 
@@ -4126,6 +4135,7 @@ Shutdown_program:
       resize_term( original_ymax, original_xmax);
 #endif
    endwin( );
+   curses_running = false;
    if( obs && n_obs)
       create_obs_file( obs, n_obs, 0);
    unload_observations( obs, n_obs);
