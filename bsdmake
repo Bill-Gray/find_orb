@@ -42,7 +42,7 @@ RM=rm -f
 
 .ifdef XCOMPILE
 	CC=x86_64-w64-mingw32-g++
-	ADDED_CFLAGS=-DUTF8 -DPDC_WIDE
+	ADDED_CFLAGS=-DUTF8 -DPDC_WIDE -I/usr/local/include
  OBJSADDED=clipfunc.o
 	EXE=.exe
 	LIBSADDED=
@@ -55,11 +55,11 @@ CFLAGS=-c -O3 -Wall -pedantic -Wextra -Wno-unused-parameter
 
 OBJS=b32_eph.o bc405.o bias.o collide.o conv_ele.o eigen.o \
 	elem2tle.o elem_out.o ephem0.o gauss.o geo_pot.o healpix.o \
-	lsquare.o moid4.o monte0.o mpc_obs.o mt64.o \
+	lsquare.o miscell.o moid4.o monte0.o mpc_obs.o mt64.o \
 	orb_func.o orb_fun2.o pl_cache.o roots.o  \
-	runge.o sigma.o sm_vsop.o sr.o tle_out.o $(OBJSADDED)
+	runge.o sigma.o sm_vsop.o sr.o $(OBJSADDED)
 
-LIBS=-llunar -ljpl
+LIBS=-llunar -ljpl -lsatell
 
 find_orb$(EXE):          findorb.o $(OBJS)
 	$(CC) -o find_orb$(EXE) findorb.o $(OBJS) $(CURSES_LIB) $(LIBSADDED) $(LIBS)
@@ -70,21 +70,38 @@ fo$(EXE):          fo.o $(OBJS)
 fo_serve.cgi:          fo_serve.o cgi_func.o $(OBJS)
 	$(CC) -o fo_serve.cgi fo_serve.o cgi_func.o $(OBJS) $(LIBSADDED) $(LIBS)
 
+IDIR=$(HOME)/.find_orb
+
 clean:
 	$(RM) $(OBJS) fo.o findorb.o fo_serve.o find_orb$(EXE) fo$(EXE)
 	$(RM) fo_serve.cgi cgi_func.o
+	cd $(IDIR)
 	$(RM) covar.txt covar?.txt debug.txt eleme?.txt elements.txt
-	$(RM) ephemeri.txt gauss.out guide.txt monte.txt monte?.txt
-	$(RM) mpc_f?.txt mpc_fmt.txt mpc_sr.txt mpec.htm obser?.txt observe.txt
-	$(RM) residual.txt state.txt state?.txt virtu?.txt virtual.txt
+	$(RM) ephemeri.txt gauss.out guide.txt guide?.txt monte.txt monte?.txt
+	$(RM) mpc_f?.txt mpc_fmt.txt mpc_s?.txt mpec.htm obser?.txt observe.txt
+	$(RM) residual.txt sr_el?.txt state.txt state?.txt virtu?.txt virtual.txt
 	$(RM) sr_elems.txt mpcorb.dat
 
 clean_temp:
+	cd $(IDIR)
 	$(RM) covar.txt covar?.txt debug.txt eleme?.txt elements.txt
-	$(RM) ephemeri.txt gauss.out guide.txt monte.txt monte?.txt
-	$(RM) mpc_f?.txt mpc_fmt.txt mpc_sr.txt mpec.htm obser?.txt observe.txt
-	$(RM) residual.txt state.txt state?.txt virtu?.txt virtual.txt
+	$(RM) ephemeri.txt gauss.out guide.txt guide?.txt monte.txt monte?.txt
+	$(RM) mpc_f?.txt mpc_fmt.txt mpc_s?.txt mpec.htm obser?.txt observe.txt
+	$(RM) residual.txt sr_el?.txt state.txt state?.txt virtu?.txt virtual.txt
 	$(RM) sr_elems.txt mpcorb.dat
+
+install:
+	cp find_orb $(HOME)/bin
+	-mkdir $(IDIR)
+	cp command.txt details.txt dosephem.txt dos_help.txt ?findorb.txt           $(IDIR)
+	cp environ.def geo_rect.txt header.htm jpl_eph.txt mpcorb.hdr               $(IDIR)
+	cp mu1.txt observer.txt obslinks.htm ObsCodes.htm ObsCodesF.html            $(IDIR)
+	cp  odd_name.txt rovers.txt scopes.txt sigma.txt xdesig.txt                 $(IDIR)
+
+uninstall:
+	rm -f $(HOME)/bin/find_orb
+	rm -f $(IDIR)/*
+	rmdir $(IDIR)
 
 .cpp.o:
 	$(CC) $(CFLAGS) $(ADDED_CFLAGS) $<
