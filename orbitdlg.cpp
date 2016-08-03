@@ -624,7 +624,9 @@ BOOL COrbitDlg::OnInitDialog()
    SetTimer( 1, 500, NULL);
    SetDlgItemText( IDC_ORBIT1, CA2T(
                "Orbital elements will appear here after you open a file,\n"
-               "select an object from it,  and an orbit is computed.\n\n",
+               "select an object from it,  and an orbit is computed.\n\n"
+               "Click in this area to toggle between orbital elements\n"
+               "and extra details (state vectors,  MOIDs,  etc.)\n",
                CP_UTF8));
    if( *cmd_line != '-' && *cmd_line)
       LoadAFile( cmd_line);
