@@ -83,6 +83,7 @@ double find_moid( const ELEMENTS *elem1, const ELEMENTS *elem2,  /* moid4.c */
                                      double *barbee_style_delta_v);
 int setup_planet_elem( ELEMENTS *elem, const int planet_idx,
                                           const double t_cen);   /* moid4.c */
+FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 
 const char *observe_filename = "observe.txt";
 const char *residual_filename = "residual.txt";
@@ -973,7 +974,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    step = get_step_size( stepsize, &step_units, &n_step_digits);
    if( !step)
       return( -2);
-   ofile = fopen( filename, "w");
+   ofile = fopen_ext( filename, "fcw");
    if( !ofile)
       return( -1);
    if( !abs_mag)
@@ -1272,9 +1273,9 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
 
                write_out_elements_to_file( orbi, ephemeris_t, ephemeris_t,
                           obs, n_obs, "", 5, 0, output_options);
-               ifile = fopen( get_file_name( buff,
+               ifile = fopen_ext( get_file_name( buff,
                         (ephem_type == OPTION_8_LINE_OUTPUT) ? elements_filename : "mpc_fmt.txt"),
-                        "rb");
+                        "fcrb");
                while( fgets( buff, sizeof( buff), ifile))
                   fputs( buff, ofile);
                fclose( ifile);
@@ -2254,8 +2255,8 @@ char *get_file_name( char *filename, const char *template_file_name)
 void create_obs_file( const OBSERVE FAR *obs, int n_obs, const int append)
 {
    char filename[81], curr_sigma_text[81];
-   FILE *ofile = fopen( get_file_name( filename, observe_filename),
-                           append ? "ab" : "wb");
+   FILE *ofile = fopen_ext( get_file_name( filename, observe_filename),
+                           append ? "fcab" : "fcwb");
 
    *curr_sigma_text = '\0';
    while( n_obs--)
@@ -2367,7 +2368,7 @@ static int get_observer_details( const char *observation_filename,
       const char *mpc_code, char *observers, char *measurers, char *scope,
       const char *packed_id)
 {
-   FILE *ifile = fopen( observation_filename, "rb");
+   FILE *ifile = fopen_ext( observation_filename, "fclrb");
    int rval = 0, n_codes_found = 0;
 
    *observers = *measurers = *scope = '\0';
@@ -2430,7 +2431,7 @@ static int get_observer_details( const char *observation_filename,
 
 static void observer_link_substitutions( char *buff)
 {
-   FILE *ifile = fopen( "observer.txt", "rb");
+   FILE *ifile = fopen_ext( "observer.txt", "fcrb");
 
    if( ifile)
       {
@@ -2579,7 +2580,7 @@ static int write_observer_data_to_file( FILE *ofile, const char *ast_filename,
 int write_residuals_to_file( const char *filename, const char *ast_filename,
        const int n_obs, const OBSERVE FAR *obs_data, const int resid_format)
 {
-   FILE *ofile = fopen( filename, "w");
+   FILE *ofile = fopen_ext( filename, "fcw");
    int rval = 0;
 
    if( ofile )
@@ -2624,7 +2625,7 @@ int create_residual_scattergram( const char *filename, const int n_obs,
    const int xspacing = 12, yspacing = 5,
    short *remap_table = (short *)calloc( tbl_height * tbl_width, sizeof( short));
    int i, j;
-   FILE *ofile = fopen( filename, "wb");
+   FILE *ofile = fopen_ext( filename, "fcwb");
 
    for( i = 0; i < n_obs; i++, obs++)
       {
@@ -2712,10 +2713,10 @@ char *mpec_error_message = NULL;
 int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
 {
    char buff[500], mpec_buff[7];
-   FILE *ofile = fopen( mpec_filename, "wb");
+   FILE *ofile = fopen_ext( mpec_filename, "fcwb");
    FILE *header_htm_ifile;
    FILE *residuals_ifile, *ephemeris_ifile, *observations_ifile;
-   FILE *elements_file = fopen( get_file_name( buff, elements_filename), "rb");
+   FILE *elements_file = fopen_ext( get_file_name( buff, elements_filename), "fcrb");
    int line_no = 0, rval = 0, total_lines = 0;
    int mpec_no = atoi( get_environment_ptr( "MPEC"));
    bool orbit_is_heliocentric = true, suppressed = false;
@@ -2738,9 +2739,9 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
    else
       *mpec_buff = '\0';
    sprintf( buff, "%cheader.htm", findorb_language);
-   header_htm_ifile = fopen( buff, "rb");
+   header_htm_ifile = fopen_ext( buff, "crb");
    if( !header_htm_ifile)
-      header_htm_ifile = fopen( buff + 1, "rb");
+      header_htm_ifile = fopen_ext( buff + 1, "fcrb");
    if( header_htm_ifile)                 /* copy header data to pseudo-MPEC */
       {
       while( fgets( buff, sizeof( buff), header_htm_ifile) &&
@@ -2827,7 +2828,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
       set_environment_ptr( "MPEC", buff);
       }
 
-   observations_ifile = fopen( get_file_name( buff, observe_filename), "rb");
+   observations_ifile = fopen_ext( get_file_name( buff, observe_filename), "fcrb");
    assert( observations_ifile);
    if( observations_ifile)
       {
@@ -2908,10 +2909,10 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
    else
       rval |= 1;
 
-   residuals_ifile = fopen( get_file_name( buff, residual_filename), "rb");
+   residuals_ifile = fopen_ext( get_file_name( buff, residual_filename), "fcrb");
    if( residuals_ifile)
       {
-      FILE *obslinks_file = fopen( "obslinks.htm", "rb");
+      FILE *obslinks_file = fopen_ext( "obslinks.htm", "rb");
       FILE *mpc_obslinks_file = fopen( "ObsCodesF.html", "rb");
       long obslinks_header_len = 0, mpc_obslinks_header_len = 0;
       char url[200];
@@ -3145,7 +3146,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
       }
 
                /* ...and now,  the ephemeris: */
-   ephemeris_ifile = fopen( get_file_name( buff, ephemeris_filename), "r");
+   ephemeris_ifile = fopen_ext( get_file_name( buff, ephemeris_filename), "fcr");
    if( ephemeris_ifile && fgets_trimmed( buff, sizeof( buff), ephemeris_ifile))
       {
       fprintf( ofile, "\n<a name=\"eph%s\"></a>", mpec_buff);

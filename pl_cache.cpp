@@ -46,6 +46,7 @@ int64_t planet_ns;
 #define J2000 2451545.0
 #define J0 (J2000 - 2000. * 365.25)
 
+FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 char *fgets_trimmed( char *buff, size_t max_bytes, FILE *ifile); /*elem_out.c*/
 int generic_message_box( const char *message, const char *box_type);
 
@@ -104,7 +105,7 @@ static int planet_posn_raw( int planet_no, const double jd,
       if( *jpl_filename)
          jpl_eph = jpl_init_ephemeris( jpl_filename, NULL, NULL);
       if( !jpl_eph)
-         if( (ifile = fopen( "jpl_eph.txt", "rb")) != NULL)
+         if( (ifile = fopen_ext( "jpl_eph.txt", "fcrb")) != NULL)
             {
             char buff[100];
 

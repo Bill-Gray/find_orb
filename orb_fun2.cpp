@@ -420,6 +420,7 @@ void pop_all_orbits( void)
       ;
 }
 
+FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 double dot_product( const double *v1, const double *v2);    /* sr.c */
 void set_distance( OBSERVE FAR *obs, double r);             /* orb_func.c */
 
@@ -474,7 +475,7 @@ int link_arcs( OBSERVE *obs, int n_obs, const double r1, const double r2)
       rlen = -rlen;
    for( i = 0; i < 3; i++)
       rvect[i] /= rlen;
-   ofile = fopen( "gauss.out", "wb");
+   ofile = fopen_ext( "gauss.out", "fcwb");
    fprintf( ofile, "%.10f %.10f %.10f\n",
             rvect[0], rvect[1], rvect[2]);
    rlen = sqrt( rvect[0] * rvect[0] + rvect[1] * rvect[1]);

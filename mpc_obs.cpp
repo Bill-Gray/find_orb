@@ -88,6 +88,7 @@ void shellsort_r( void *base, const size_t n_elements, const size_t esize,
 int string_compare_for_sort( const void *a, const void *b, void *context);
 int format_jpl_ephemeris_info( char *buff);                 /* pl_cache.c */
 int set_tholen_style_sigmas( OBSERVE *obs, const char *buff);  /* mpc_obs.c */
+FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 #ifdef _MSC_VER
      /* Microsoft Visual C/C++ has no snprintf.  See 'ephem0.cpp'.  */
 int snprintf( char *string, const size_t max_len, const char *format, ...);
@@ -95,16 +96,20 @@ int snprintf( char *string, const size_t max_len, const char *format, ...);
 
 int debug_printf( const char *format, ...)
 {
-   va_list argptr;
-   FILE *ofile = fopen( "debug.txt", "a");
-   time_t t0 = time( NULL);
+   FILE *ofile = fopen_ext( "debug.txt", "ca");
 
-   fprintf( ofile, "%02d:%02d:%02d ",
-            ((int)t0 / 3600) % 24, ((int)t0 / 60) % 60, (int)t0 % 60);
-   va_start( argptr, format);
-   vfprintf( ofile, format, argptr);
-   va_end( argptr);
-   fclose( ofile);
+   if( ofile)
+      {
+      va_list argptr;
+      const time_t t0 = time( NULL);
+
+      fprintf( ofile, "%02d:%02d:%02d ",
+               ((int)t0 / 3600) % 24, ((int)t0 / 60) % 60, (int)t0 % 60);
+      va_start( argptr, format);
+      vfprintf( ofile, format, argptr);
+      va_end( argptr);
+      fclose( ofile);
+      }
    return( 0);
 }
 
@@ -509,7 +514,7 @@ static double center_around( double ival, const double center)
 static bool extract_region_data_for_mpc_station( char *buff,
             const double lat, const double lon)
 {
-   FILE *ifile = fopen( "geo_rect.txt", "rb");
+   FILE *ifile = fopen_ext( "geo_rect.txt", "fcrb");
    const double lat_in_degrees = (180. / PI) * lat;
    const double lon_in_degrees = (180. / PI) * lon;
 
@@ -710,12 +715,12 @@ static inline char **load_mpc_stations( int *n_stations)
          FILE *ifile;
 
          if( loop)
-            ifile = fopen( "rovers.txt", "rb");
+            ifile = fopen_ext( "rovers.txt", "fcrb");
          else
             {
-            ifile = fopen( "ObsCodes.html", "rb");
+            ifile = fopen_ext( "ObsCodes.html", "crb");
             if( !ifile)
-               ifile = fopen( "ObsCodes.htm", "rb");
+               ifile = fopen_ext( "ObsCodes.htm", "fcrb");
             }
          if( ifile)
             {
@@ -752,7 +757,7 @@ static inline char **load_mpc_stations( int *n_stations)
 
 static int get_asteroid_observer_data( const char *mpc_code, char *buff)
 {
-   FILE *ifile = fopen( "mu1.txt", "rb");
+   FILE *ifile = fopen_ext( "mu1.txt", "fcrb");
    char tbuff[100];
    int line_no = 0;
 
@@ -1231,7 +1236,7 @@ static int unpack_provisional_packed_desig( char *obuff, const char *ibuff)
 
 char **load_file_into_memory( const char *filename, size_t *n_lines)
 {
-   FILE *ifile = fopen( filename, "rb");
+   FILE *ifile = fopen_ext( filename, "crb");
    char **rval = NULL;
 
    if( ifile)
@@ -2153,7 +2158,7 @@ static int xref_designation( char *desig)
 
    if( !xlate_table)
       {
-      FILE *ifile = fopen( "xdesig.txt", "rb");
+      FILE *ifile = fopen_ext( "xdesig.txt", "fcrb");
       char buff[100];
       int j;
 
@@ -4040,37 +4045,32 @@ const char *get_environment_ptr( const char *env_ptr)
 
 void set_environment_ptr( const char *env_ptr, const char *new_value)
 {
-   FILE *ofile, *ifile;
-   const char *temp_env = "environ.tmp";
+   size_t i;
+   char **text = load_file_into_memory( environ_dot_dat, NULL);
+   FILE *ofile;
    bool found_it = false;
    const size_t env_ptr_len = strlen( env_ptr);
-   char buff[200];
 
-   ofile = fopen( temp_env, "wb");
+   assert( env_ptr);
+   assert( new_value);
+   if( !text)
+      text = load_file_into_memory( "environ.def", NULL);
+   assert( text);
+   ofile = fopen_ext( environ_dot_dat, "fcwb");
    assert( ofile);
-   ifile = fopen( environ_dot_dat, "rb");
-   if( !ifile)
-      ifile = fopen( "environ.def", "rb");
-   assert( ifile);
-   while( fgets( buff, sizeof( buff), ifile))
-      if( !memcmp( buff, env_ptr, env_ptr_len) && buff[env_ptr_len] == '=')
+   for( i = 0; text[i]; i++)
+      if( !memcmp( text[i], env_ptr, env_ptr_len) && text[i][env_ptr_len] == '=')
          {
          found_it = true;
          fprintf( ofile, "%s=%s\n", env_ptr, new_value);
          }
       else
-         fputs( buff, ofile);
+         fprintf( ofile, "%s\n", text[i]);
 
    if( !found_it)       /* not a replacement,  but a new value: */
       fprintf( ofile, "%s=%s\n", env_ptr, new_value);
    fclose( ofile);
-   fclose( ifile);
-#ifdef _WIN32
-   _unlink( environ_dot_dat);   /* MS is different.  Because they are. */
-#else
-   unlink( environ_dot_dat);
-#endif
-   rename( temp_env, environ_dot_dat);
+   free( text);
    get_environment_ptr( NULL);      /* force a reload of the env data */
 }
 
@@ -4835,7 +4835,7 @@ int sanity_test_observations( const char *filename)
                   char tbuff[100];
 
                   if( !ofile)
-                     ofile = fopen( "sanity.txt", "wb");
+                     ofile = fopen_ext( "sanity.txt", "fwb");
                   sprintf( tbuff, "Line %ld: Sun alt %.1f az %.1f; obj alt %.1f az %.1f\n",
                            line_no,
                            alt_az_sun.y, alt_az_sun.x,

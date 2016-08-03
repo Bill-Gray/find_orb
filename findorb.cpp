@@ -189,6 +189,7 @@ int metropolis_search( OBSERVE *obs, const int n_obs, double *orbit,
                const double epoch, int n_iterations, double scale);
 const char *get_find_orb_text( const int index);
 int set_tholen_style_sigmas( OBSERVE *obs, const char *buff);  /* mpc_obs.c */
+FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 
 extern double maximum_jd, minimum_jd;        /* orb_func.cpp */
 
@@ -785,7 +786,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             if( ephemeris_output_options
                      & (OPTION_STATE_VECTOR_OUTPUT | OPTION_POSITION_OUTPUT))
                {
-               FILE *ofile = fopen( ephemeris_filename, "a");
+               FILE *ofile = fopen_ext( ephemeris_filename, "fca");
 
                add_ephemeris_details( ofile, jd_start, jd_end);
                fclose( ofile);
@@ -1046,7 +1047,7 @@ static unsigned show_basic_info( const OBSERVE FAR *obs, const int n_obs,
    char buff[80];
    double r1, r2;
    unsigned line = 1, column = 24, n_commands = 1;
-   FILE *ifile = fopen( "command.txt", "rb");
+   FILE *ifile = fopen_ext( "command.txt", "fcrb");
 
    get_r1_and_r2( n_obs, obs, &r1, &r2);    /* orb_func.cpp */
    strcpy( buff, "R1:");
@@ -1531,7 +1532,7 @@ static void show_residual_legend( const int line_no, const int residual_format)
 
 static void show_a_file( const char *filename)
 {
-   FILE *ifile = fopen( filename, "rb");
+   FILE *ifile = fopen_ext( filename, "fclrb");
    char buff[260], err_text[100];
    int line_no = 0, keep_going = 1;
    int n_lines = 0, msg_num = 0;
@@ -2055,6 +2056,15 @@ static int blink_state( void)
 }
 #endif
 
+void emergency_exit( void)
+{
+   if( curses_running)
+      {
+      endwin( );
+      curses_running = false;
+      }
+}
+
 extern const char *elements_filename;
 
 #define DISPLAY_BASIC_INFO           1
@@ -2106,6 +2116,7 @@ int main( const int argc, const char **argv)
    extern int monte_carlo_object_count;
    extern char default_comet_magnitude_type;
    extern double max_monte_rms;
+   extern bool use_config_directory;          /* miscell.c */
 #ifdef __PDCURSES__
    int original_xmax, original_ymax;
 #endif
@@ -2113,6 +2124,7 @@ int main( const int argc, const char **argv)
    bool show_commented_elements = false;
 
    setlocale( LC_ALL, "");
+   use_config_directory = false;
    for( i = 1; i < argc; i++)       /* check to see if we're debugging: */
       if( argv[i][0] == '-')
          switch( argv[i][1])
@@ -2198,6 +2210,9 @@ int main( const int argc, const char **argv)
                sanity_check_observations = 0;
                }
                break;
+            case 'z':
+               use_config_directory = true;
+               break;
             default:
                printf( "Unknown command-line option '%s'\n", argv[i]);
                return( -1);
@@ -2235,6 +2250,7 @@ int main( const int argc, const char **argv)
    ttytype[2] = 70;    /* Window must have at least 70 columns in Win32a */
    ttytype[3] = (char)200; /* Window can have a max of 200 columns in Win32a */
 #endif
+   atexit( emergency_exit);
 
 #ifdef XCURSES
    resize_term( 50, 98);
@@ -2508,7 +2524,7 @@ int main( const int argc, const char **argv)
          {
          FILE *ifile;
 
-         ifile = fopen( get_file_name( tbuff, elements_filename), "rb");
+         ifile = fopen_ext( get_file_name( tbuff, elements_filename), "fcrb");
          if( ifile)
             {
             unsigned iline = 0;
@@ -3186,7 +3202,7 @@ int main( const int argc, const char **argv)
                if( monte_carlo_object_count > 3)
                   {
                   double sigmas[MONTE_N_ENTRIES];
-                  FILE *monte_file = fopen( get_file_name( tbuff, "monte.txt"), "wb");
+                  FILE *monte_file = fopen_ext( get_file_name( tbuff, "monte.txt"), "fcwb");
 
                   fprintf( monte_file,
                           "Computed from %d orbits around object %d\n",
@@ -3503,7 +3519,7 @@ int main( const int argc, const char **argv)
                ofile = fopen( filename, "wb");
                if( ofile)
                   {
-                  FILE *ifile = fopen( get_file_name( tbuff, elements_filename), "rb");
+                  FILE *ifile = fopen_ext( get_file_name( tbuff, elements_filename), "fcrb");
 
                   while( fgets( tbuff, sizeof( tbuff), ifile))
                      fputs( tbuff, ofile);

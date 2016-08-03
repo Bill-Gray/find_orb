@@ -105,6 +105,7 @@ double diameter_from_abs_mag( const double abs_mag,      /* ephem0.cpp */
 char **load_file_into_memory( const char *filename, size_t *n_lines);
 const char *get_find_orb_text( const int index);      /* elem_out.cpp */
 void get_find_orb_text_filename( char *filename);     /* elem_out.cpp */
+FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 
 double asteroid_magnitude_slope_param = .15;
 double comet_magnitude_slope_param = 10.;
@@ -580,8 +581,8 @@ static int get_uncertainty( const char *key, char *obuff, const bool in_km)
    char buff[100];
 
    *obuff = '\0';
-   if( available_sigmas && (ifile = fopen(
-                  get_file_name( buff, filenames[available_sigmas]), "rb")) != NULL)
+   if( available_sigmas && (ifile = fopen_ext(
+                  get_file_name( buff, filenames[available_sigmas]), "crb")) != NULL)
       {
       const size_t keylen = strlen( key);
 
@@ -871,9 +872,9 @@ int write_out_elements_to_file( const double *orbit,
             const int options)
 {
    char object_name[80], buff[100], more_moids[80];
-   const char *file_permits = (append_elements_to_element_file ? "a" : "w+");
+   const char *file_permits = (append_elements_to_element_file ? "fca" : "fcw+");
    extern const char *elements_filename;
-   FILE *ofile = fopen( get_file_name( buff, elements_filename), file_permits);
+   FILE *ofile = fopen_ext( get_file_name( buff, elements_filename), file_permits);
    double rel_orbit[6], orbit2[6];
    int planet_orbiting, n_lines, i, bad_elements;
    ELEMENTS elem, helio_elem;
@@ -1245,10 +1246,10 @@ int write_out_elements_to_file( const double *orbit,
          n_clones_accepted++;
       }
 
-   monte_carlo_permits = (n_clones_accepted == 1 ? "wb" : "ab");
+   monte_carlo_permits = (n_clones_accepted == 1 ? "fcwb" : "fcab");
    if( monte_carlo && rms_ok)
       {
-      FILE *ofile2 = fopen( get_file_name( buff, "state.txt"), monte_carlo_permits);
+      FILE *ofile2 = fopen_ext( get_file_name( buff, "state.txt"), monte_carlo_permits);
 
       if( ofile2)
          {
@@ -1453,7 +1454,7 @@ int write_out_elements_to_file( const double *orbit,
       const char *output_filename = (*elements_filename == 's' ?
                                              "mpc_sr.txt" : mpc_fmt_filename);
 
-      ofile = fopen( get_file_name( tbuff, output_filename), file_permits);
+      ofile = fopen_ext( get_file_name( tbuff, output_filename), file_permits);
       elements_in_mpcorb_format( tbuff, obs->packed_id, object_name,
                               &helio_elem, obs, n_obs);
       fprintf( ofile, "%s\n", tbuff);
@@ -1477,7 +1478,7 @@ int write_out_elements_to_file( const double *orbit,
                                   monte_carlo_object_count);
       if( elem.central_obj || elem.ecc > .999999)
          {
-         ofile = fopen( get_file_name( tbuff, "virtual.txt"), monte_carlo_permits);
+         ofile = fopen_ext( get_file_name( tbuff, "virtual.txt"), monte_carlo_permits);
          elements_in_guide_format( tbuff, &elem, virtual_full_desig, obs, n_obs);
          fprintf( ofile, "%s%s\n", tbuff, impact_buff);
          fclose( ofile);
@@ -1485,10 +1486,10 @@ int write_out_elements_to_file( const double *orbit,
 
       if( helio_elem.ecc < .999999 || alt_mpcorb)
          {
-         ofile = fopen( get_file_name( tbuff, element_filename), monte_carlo_permits);
+         ofile = fopen_ext( get_file_name( tbuff, element_filename), monte_carlo_permits);
          if( !strcmp( monte_carlo_permits, "wb"))
             {        /* new file = write out a header for it */
-            FILE *ifile = fopen( "mpcorb.hdr", "rb");
+            FILE *ifile = fopen_ext( "mpcorb.hdr", "fcrb");
             time_t t0 = time( NULL);
 
             fprintf( ofile, "Monte Carlo orbits from Find_Orb\nComputed %s", ctime( &t0));
@@ -1512,7 +1513,7 @@ int write_out_elements_to_file( const double *orbit,
 //       set_statistical_ranging( 1);
       }
 
-   if( (ofile = fopen( get_file_name( tbuff, "guide.txt"), "wb")) != NULL)
+   if( (ofile = fopen_ext( get_file_name( tbuff, "guide.txt"), "fcwb")) != NULL)
       {
       elements_in_guide_format( tbuff, &elem, object_name, obs, n_obs);
       fprintf( ofile, "%s%s\n", tbuff, impact_buff);
@@ -1593,7 +1594,7 @@ efforts to determine an orbit. */
 
 static int get_orbit_from_dastcom( const char *object_name, double *orbit, double *epoch)
 {
-   FILE *ifile = fopen( "ELEMENTS.COMET", "rb");
+   FILE *ifile = fopen_ext( "ELEMENTS.COMET", "crb");
    int got_vectors = 0;
 
    if( ifile)
@@ -1636,7 +1637,7 @@ bool take_first_soln = false;
 static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit,
                double *orbit_epoch, unsigned *perturbers)
 {
-   FILE *ifile = (ignore_prev_solns ? NULL : fopen( vector_data_file, "rb"));
+   FILE *ifile = (ignore_prev_solns ? NULL : fopen_ext( vector_data_file, "crb"));
    int got_vectors = 0, i;
    extern int n_extra_params;
    extern double solar_pressure[];
@@ -1852,7 +1853,7 @@ double observation_rms( const OBSERVE FAR *obs);            /* elem_out.cpp */
 int store_solution( const OBSERVE *obs, const int n_obs, const double *orbit,
        const double orbit_epoch, const int perturbers)
 {
-   FILE *ofile = fopen( vector_data_file, "ab");
+   FILE *ofile = fopen_ext( vector_data_file, "fcab");
 
    if( ofile)
       {

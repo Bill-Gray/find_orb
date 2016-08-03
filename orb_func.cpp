@@ -151,6 +151,7 @@ static int find_transfer_orbit( double *orbit, OBSERVE FAR *obs1,
                 const int already_have_approximate_orbit);
 double observation_rms( const OBSERVE FAR *obs);            /* elem_out.cpp */
 double find_epoch_shown( const OBSERVE *obs, const int n_obs); /* elem_out */
+FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 
 void set_distance( OBSERVE FAR *obs, double r)
 {
@@ -1415,7 +1416,7 @@ static inline void compute_sr_sigmas( const double *sr_orbits,
       if( !i)
          elem0 = elem;
       }
-   monte_file = fopen( get_file_name( filename, "monte.txt"), "wb");
+   monte_file = fopen_ext( get_file_name( filename, "monte.txt"), "fcwb");
 
    fprintf( monte_file, "Computed from %u SR orbits\n", n_orbits);
    compute_monte_sigmas( sigmas, monte_data, n_orbits);
@@ -2685,7 +2686,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
    if( !err_code && *covariance_filename)
       {
       char tbuff[20];
-      FILE *ofile = fopen( get_file_name( tbuff, covariance_filename), "wb");
+      FILE *ofile = fopen_ext( get_file_name( tbuff, covariance_filename), "fcwb");
       double *matrix = lsquare_covariance_matrix( lsquare);
       double *wtw = lsquare_wtw_matrix( lsquare);
       double eigenvals[10], eigenvectors[100], element_sigmas[MONTE_N_ENTRIES];

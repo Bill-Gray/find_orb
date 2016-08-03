@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "mpc_obs.h"
 #include "afuncs.h"
 
+FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 double gauss_method( const OBSERVE FAR *obs1, const OBSERVE FAR *obs2,
                      const OBSERVE FAR *obs3, double *orbit, const double mu,
                      const int desired_soln);               /* gauss.cpp */
@@ -98,7 +99,7 @@ double gauss_method( const OBSERVE FAR *obs1, const OBSERVE FAR *obs2,
    double poly[9], roots[8], r2;
    int i, n_roots, iteration, keep_iterating = 1;
    extern int process_count;
-   FILE *ofile = (process_count? NULL : fopen( "gauss.out", "wb"));
+   FILE *ofile = (process_count? NULL : fopen_ext( "gauss.out", "fcwb"));
 
    if( ofile)
       {

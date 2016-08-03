@@ -41,6 +41,7 @@ static int n_sigma_recs;
 static SIGMA_RECORD *sigma_recs;
 
 int debug_printf( const char *format, ...);                /* runge.cpp */
+FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 
 static int parse_sigma_record( SIGMA_RECORD *w, const char *buff)
 {
@@ -86,7 +87,7 @@ static int parse_sigma_record( SIGMA_RECORD *w, const char *buff)
 
 int load_up_sigma_records( const char *filename)
 {
-   FILE *ifile = fopen( filename, "rb");
+   FILE *ifile = fopen_ext( filename, "fcrb");
 
    if( ifile)
       {
