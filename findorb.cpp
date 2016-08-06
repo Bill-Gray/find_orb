@@ -2056,15 +2056,6 @@ static int blink_state( void)
 }
 #endif
 
-void emergency_exit( void)
-{
-   if( curses_running)
-      {
-      endwin( );
-      curses_running = false;
-      }
-}
-
 extern const char *elements_filename;
 
 #define DISPLAY_BASIC_INFO           1
@@ -2250,7 +2241,6 @@ int main( const int argc, const char **argv)
    ttytype[2] = 70;    /* Window must have at least 70 columns in Win32a */
    ttytype[3] = (char)200; /* Window can have a max of 200 columns in Win32a */
 #endif
-   atexit( emergency_exit);
 
 #ifdef XCURSES
    resize_term( 50, 98);
@@ -2277,6 +2267,17 @@ int main( const int argc, const char **argv)
       argv[1] = temp_clipboard_filename;
       }
 #endif
+#ifdef __PDCURSES__
+   original_xmax = getmaxx( stdscr);
+   original_ymax = getmaxy( stdscr);
+   PDC_set_blink( TRUE);
+   PDC_set_title( get_find_orb_text( 18));
+                              /* "Find_Orb -- Orbit Determination" */
+   if( strstr( longname( ), "SDL"))
+      resize_term( 40, 110);
+   if( !strcmp( longname( ), "Win32"))
+      resize_term( 52, 126);
+#endif
 
    ids = find_objects_in_file( argv[1], &n_ids, NULL);
    if( n_ids <= 0)
@@ -2288,11 +2289,9 @@ int main( const int argc, const char **argv)
          err_msg = "Couldn't locate the file '%s'\n";
       else
          err_msg = "No objects found in file '%s'\n";
-      printf( err_msg, argv[1]);
-#ifdef XCURSES
-      XCursesExit();
-#endif
-      return( -1);
+      sprintf( tbuff, err_msg, argv[1]);
+      inquire( tbuff, NULL, 0, COLOR_DEFAULT_INQUIRY);
+      goto Shutdown_program;
       }
 
    if( debug_level > 2)
@@ -2339,19 +2338,6 @@ int main( const int argc, const char **argv)
    if( debug_level > 2)
       debug_printf( "(3)\n");
    keypad( stdscr, 1);
-// curs_set( 0);
-#ifdef __PDCURSES__
-   original_xmax = getmaxx( stdscr);
-   original_ymax = getmaxy( stdscr);
-   PDC_set_blink( TRUE);
-   PDC_set_title( get_find_orb_text( 18));
-                              /* "Find_Orb -- Orbit Determination" */
-   if( strstr( longname( ), "SDL"))
-      resize_term( 40, 110);
-   if( !strcmp( longname( ), "Win32"))
-      resize_term( 52, 126);
-#endif
-// mouse_set( ALL_MOUSE_EVENTS);
    mousemask( ALL_MOUSE_EVENTS, NULL);
 #ifdef USE_MYCURSES
    initialize_global_bmouse( );
