@@ -1631,6 +1631,24 @@ static int get_orbit_from_dastcom( const char *object_name, double *orbit, doubl
    return( got_vectors);
 }
 
+/* The following ensures that names starting with the same international
+artsat designations compare as equal,  even if they diverge in irrelevant
+ways after that.  For example,  2013-024B = NORAD 39169 = WGS 5 Rk would
+compare as equal to 2013-024B or with 2013-024B = NORAD 39169.  */
+
+static int names_compare( const char *name1, const char *name2)
+{
+   unsigned mask = 0, i;
+
+   for( i = 0; i < 32 && name1[i] && name1[i] != ' '; i++)
+      if( name1[i] >= '0' && name1[i] <= '9')
+         mask |= (1u << i);
+   if( mask == 0x7f && name1[4] == '-')      /* probably artsat desig */
+      if( !memcmp( name1, name2, i))
+         return( 0);
+   return( strcmp( name1, name2));
+}
+
 int ignore_prev_solns;
 bool take_first_soln = false;
 
@@ -1656,7 +1674,7 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
       while( fgets_trimmed( buff, sizeof( buff), ifile))
 //       if( !FMEMCMP( object_name, buff + 11, FSTRLEN( object_name)))
 //          if( buff[ FSTRLEN( object_name) + 11] < ' ' && *buff == ' ')
-         if( !strcmp( object_name, buff + 11) || (take_first_soln && !got_vectors))
+         if( !names_compare( object_name, buff + 11) || (take_first_soln && !got_vectors))
                {
                int n_read;
 

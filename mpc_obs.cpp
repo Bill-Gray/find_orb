@@ -93,6 +93,8 @@ FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
      /* Microsoft Visual C/C++ has no snprintf.  See 'ephem0.cpp'.  */
 int snprintf( char *string, const size_t max_len, const char *format, ...);
 #endif
+int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
+                                   const char *format, ...);
 
 int debug_printf( const char *format, ...)
 {
@@ -1270,6 +1272,65 @@ char **load_file_into_memory( const char *filename, size_t *n_lines)
    return( rval);
 }
 
+static void try_adding_comet_name( const char *search, char *name)
+{
+   FILE *ifile = fopen_ext( "ELEMENTS.COMET", "crb");
+   bool found_name = false;
+
+   debug_printf( "Searching for '%s': %p\n", search, ifile);
+   *name = '\0';
+   if( ifile)
+      {
+      char buff[200];
+      const size_t slen = strlen( search);
+
+      while( !found_name && fgets_trimmed( buff, sizeof( buff), ifile))
+         if( !memcmp( buff, search, slen))
+            {
+            found_name = true;
+            if( buff[slen] != ' ')     /* got a real name */
+               {
+               buff[44] = '\0';
+               remove_trailing_cr_lf( buff);
+               debug_printf( "Got it: '%s'\n", buff);
+               *name++ = ' ';
+               strcpy( name, buff + slen);
+               }
+            }
+      fclose( ifile);
+      }
+}
+
+/* An object with a name such as 1989-013A is probably an artsat,  and
+probably has a NORAD designation within 'all_tle.txt' or similar file.
+(Thus far,  only 'all_tle.txt' is searched.) The following will append
+that designation if it's found. */
+
+static bool try_artsat_xdesig( char *name, const char *filename)
+{
+   FILE *ifile = fopen_ext( "all_tle.txt", "crb");
+   bool found_a_match = false;
+
+   if( ifile)
+      {
+      char tbuff[100], xdesig[20];
+
+      memset( xdesig, ' ', 10);
+      xdesig[0] = name[2];      /* decade */
+      xdesig[1] = name[3];      /* year */
+      memcpy( xdesig + 2, name + 5, strlen( name + 5));
+      while( !found_a_match && fgets( tbuff, sizeof( tbuff), ifile))
+         if( *tbuff == '1' && !memcmp( tbuff + 9, xdesig, 9))
+            {
+            found_a_match = true;
+            tbuff[7] = '\0';
+            snprintf_append( name, 30, " = NORAD %s", tbuff + 2);
+            }
+      fclose( ifile);
+      }
+   return( found_a_match);
+}
+
 /* In an MPC astrometric report line,  the name can be stored in assorted
    highly scrambled and non-intuitive ways.  Those ways _are_ documented
    on the MPC Web site,  which is probably the best place to look to
@@ -1405,6 +1466,7 @@ int get_object_name( char *obuff, const char *packed_desig)
          {
          const char extra_suffix_char = xdesig[10];
          const char suffix_char = xdesig[11];
+         char tbuff[20];
 
          *obuff++ = xdesig[4];
          *obuff++ = '/';
@@ -1419,7 +1481,8 @@ int get_object_name( char *obuff, const char *packed_desig)
             *obuff++ = extra_suffix_char;
          if( suffix_char >= 'a' && suffix_char <= 'z')
             *obuff++ = suffix_char;
-         *obuff++ = '\0';
+         sprintf( tbuff, "%3d%c/", atoi( xdesig), xdesig[4]);
+         try_adding_comet_name( tbuff, obuff);
          rval = 1;
          }
       }
@@ -1434,6 +1497,13 @@ int get_object_name( char *obuff, const char *packed_desig)
          }
       if( !unpack_provisional_packed_desig( obuff, xdesig + 5))
          rval = (xdesig[4] != ' ');
+      if( rval != -1 && xdesig[4] != ' ')
+         {
+         char tbuff[40];
+
+         sprintf( tbuff, "   %s ", obuff - 2);
+         try_adding_comet_name( tbuff, obuff + strlen( obuff));
+         }
       }
 
 #ifdef POSSIBLY_USEFUL_LATER
@@ -1472,6 +1542,9 @@ int get_object_name( char *obuff, const char *packed_desig)
       memcpy( obuff, xdesig + i, 12 - i);
       obuff[12 - i] = '\0';
       remove_trailing_cr_lf( obuff);      /* ephem0.cpp */
+      if( atoi( obuff) > 1956 && atoi( obuff) < 2100)    /* possible artsat */
+         if( obuff[4] == '-' && atoi( obuff + 5))
+            try_artsat_xdesig( obuff, "all_tle.txt");
       }
    return( rval);
 }
