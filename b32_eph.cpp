@@ -40,6 +40,7 @@ int create_b32_ephemeris( const char *filename, const double epoch,
                 const double *orbit, const int n_steps,         /* b32_eph.c */
                 const double ephem_step, const double jd_start);
 char *get_file_name( char *filename, const char *template_file_name);
+FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 
 int add_ephemeris_details( FILE *ofile, const double start_jd,
                                                const double end_jd)
@@ -63,7 +64,7 @@ int add_ephemeris_details( FILE *ofile, const double start_jd,
    fprintf( ofile, "Positions/velocities are in %s J2000\n",
                       atoi( vector_options) ? "ecliptic" : "equatorial");
 
-   ifile = fopen( get_file_name( tbuff, elements_filename), "rb");
+   ifile = fopen_ext( get_file_name( tbuff, elements_filename), "fcrb");
    while( fgets( tbuff, sizeof( tbuff), ifile))
       fwrite( tbuff, strlen( tbuff), 1, ofile);
    fclose( ifile);
