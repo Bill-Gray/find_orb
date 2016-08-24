@@ -176,3 +176,5 @@ JNo -4.408445 +38.543538 1060 Jaime Nomen's new observatory site
 
 Par 148.26 -33.00 392         Parkes Observatory
 Tid 148.98 -35.40 670         Tidbinbilla (DSS-43)
+NMU -106.754 32.2811 1227     NM State Univ all-sky camera
+FLG -111.65578 35.20003 2112  Flagstaff all-sky camera

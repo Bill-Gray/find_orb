@@ -80,6 +80,7 @@
  Meszaros                                  M&eacute;sz&aacute;ros
  Merida                                    M&eacute;rida
  Nomen                                     <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0056561">Nomen</a>
+ Oca\~na                                   Oca&ntilde;a
  Oksanen                                   <a href="http://twitter.com/#!/oksanen">Oksanen</a>
  Ondrejov                                  <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0056561">Ond&#345;ejov</a>
  Sanchez-Ortiz                             <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0257336">S&aacute;nchez-Ortiz</a>
