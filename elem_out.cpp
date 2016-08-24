@@ -1217,11 +1217,23 @@ int write_out_elements_to_file( const double *orbit,
       }
    if( !(options & ELEM_OUT_NO_COMMENT_DATA))
       {
-      fprintf( ofile, "# State vector (heliocentric ecliptic J2000):\n");
-      fprintf( ofile, "# %17.12f%17.12f%17.12f AU\n",
-               orbit2[0], orbit2[1], orbit2[2]);
-      fprintf( ofile, "# %17.12f%17.12f%17.12f mAU/day\n",
-               orbit2[3] * 1000., orbit2[4] * 1000., orbit2[5] * 1000.);
+      double orb[6];
+      const bool is_ecliptic = atoi( get_environment_ptr( "VECTOR_OPTS"));
+
+      memcpy( orb, orbit2, 6 * sizeof( double));
+      if( !is_ecliptic)
+         {
+         ecliptic_to_equatorial( orb);
+         ecliptic_to_equatorial( orb + 3);
+         ecliptic_to_equatorial( rel_orbit);
+         ecliptic_to_equatorial( rel_orbit + 3);
+         }
+      fprintf( ofile, "# State vector (heliocentric %s J2000):\n",
+               is_ecliptic ? "ecliptic" : "equatorial");
+      fprintf( ofile, "# %+17.12f%+17.12f%+17.12f AU\n",
+               orb[0], orb[1], orb[2]);
+      fprintf( ofile, "# %+17.12f%+17.12f%+17.12f mAU/day\n",
+               orb[3] * 1000., orb[4] * 1000., orb[5] * 1000.);
       if( planet_orbiting)
          {
          fprintf( ofile, "# State vector relative to central body:\n");
