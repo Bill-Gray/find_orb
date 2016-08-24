@@ -3489,6 +3489,12 @@ int main( const int argc, const char **argv)
 
                general_relativity_factor = atof( tbuff + 1);
                }
+            else if( *tbuff == 'l')
+               {
+               extern double levenberg_marquardt_lambda;
+
+               levenberg_marquardt_lambda = atof( tbuff + 1);
+               }
             update_element_display = 1;
             break;
          case 's': case 'S':     /* save orbital elements to a file */

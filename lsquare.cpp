@@ -101,6 +101,8 @@ static void dump_matrix( const ldouble *matrix, const int xsize, const int ysize
 }
 #endif
 
+double levenberg_marquardt_lambda = 0.;      /* damping factor */
+
 int lsquare_add_observation( void *lsquare, const double residual,
                                   const double weight, const double *obs)
 {
@@ -115,6 +117,8 @@ int lsquare_add_observation( void *lsquare, const double residual,
       lsq->uw[i] += (ldouble)residual * w2_obs_i;
       for( j = 0; j < n_params; j++)
          lsq->wtw[i + j * n_params] += w2_obs_i * (ldouble)obs[j];
+      lsq->wtw[i + i * n_params] +=
+                  w2_obs_i * (ldouble)( obs[i] * levenberg_marquardt_lambda);
       }
    lsq->n_obs++;
    return( lsq->n_obs);
