@@ -263,15 +263,12 @@ int main( const int argc, const char **argv)
    int n_lines_written = 0;
    FILE *summary_ofile = NULL;
    extern int forced_central_body;
+   extern bool use_config_directory;          /* miscell.c */
 #ifdef FORKING
    int child_status;
 #endif
 
-               /* get_defaults( ) collects a lot of data that's for the  */
-               /* interactive find_orb program.  But it also sets some   */
-               /* important internal values for blunder detection,  etc. */
-               /* So we still call it:                                   */
-   get_defaults( NULL, NULL, NULL, NULL, NULL);
+   use_config_directory = false;
    forced_central_body = 0;
    for( i = 1; i < argc; i++)       /* check to see if we're debugging: */
       if( argv[i][0] == '-')
@@ -358,17 +355,25 @@ int main( const int argc, const char **argv)
             case 't':
                total_objects = atoi( argv[i] + 2);
                break;
-            case 'z':
+            case 'y':
                {
                extern int alt_mpcorb;
 
                alt_mpcorb = 1;
                }
                break;
+            case 'z':
+               use_config_directory = true;
+               break;
             default:
                printf( "Unknown command-line option '%s'\n", argv[i]);
                return( -1);
             }
+               /* get_defaults( ) collects a lot of data that's for the  */
+               /* interactive find_orb program.  But it also sets some   */
+               /* important internal values for blunder detection,  etc. */
+               /* So we still call it:                                   */
+   get_defaults( NULL, NULL, NULL, NULL, NULL);
 
    load_up_sigma_records( "sigma.txt");
    if( debug_level)
@@ -459,6 +464,9 @@ int main( const int argc, const char **argv)
 
             if( n_obs_actually_loaded > 1 && curr_epoch > 0.)
                {
+               int n_obs_included = 0;
+               unsigned j = 0;
+
                write_out_elements_to_file( orbit, curr_epoch, epoch_shown,
                      obs, n_obs, orbit_constraints, element_precision,
                      0, element_options);
@@ -509,7 +517,6 @@ int main( const int argc, const char **argv)
                         {
                         FILE *ephemeris_ifile = fopen( ephemeris_filename, "rb");
                         char new_line[300];
-                        unsigned j = 0;
 
                         tbuff[14] = '\0';
                         sprintf( new_line, "<a href=\"%s\">%s</a>%s",
@@ -537,6 +544,11 @@ int main( const int argc, const char **argv)
                         }
                      }
                   }
+               for( j = 0; j < (unsigned)n_obs_actually_loaded; j++)
+                  if( obs[j].is_included)
+                     n_obs_included++;
+               if( n_obs_included != n_obs_actually_loaded)
+                  printf( " %d /", n_obs_included);
                }
             else
                printf( "; not enough observations\n");
