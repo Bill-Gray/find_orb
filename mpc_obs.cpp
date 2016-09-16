@@ -1277,7 +1277,6 @@ static void try_adding_comet_name( const char *search, char *name)
    FILE *ifile = fopen_ext( "ELEMENTS.COMET", "crb");
    bool found_name = false;
 
-   debug_printf( "Searching for '%s': %p\n", search, ifile);
    *name = '\0';
    if( ifile)
       {
@@ -3575,6 +3574,8 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                   rval[i].ra  -= rval[i].ra_bias  * radians_per_arcsec / cos( rval[i].dec);
                   rval[i].dec -= rval[i].dec_bias * radians_per_arcsec;
                   }
+               if( rval[i].note2 == 'n')        /* video observations:  assume */
+                  rval[i].time_sigma = 0.01 / seconds_per_day;  /* 10ms sigma */
                set_obs_vect( rval + i);
                if( is_rwo && !rval[i].is_included)
                   rval[i].flags |= OBS_DONT_USE;
