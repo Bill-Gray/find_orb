@@ -92,6 +92,7 @@ clean_temp:
 
 install:
 	cp find_orb $(HOME)/bin
+	cp fo       $(HOME)/bin
 	-mkdir $(IDIR)
 	cp command.txt details.txt dosephem.txt dos_help.txt ?findorb.txt           $(IDIR)
 	cp environ.def geo_rect.txt header.htm jpl_eph.txt mpcorb.hdr               $(IDIR)
