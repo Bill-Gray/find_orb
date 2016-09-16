@@ -50,6 +50,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #define YEAR_TO_JD( year) (J2000 + (year - 2000.) * 365.25)
 
 // void elements_in_tle_format( char *buff, const ELEMENTS *elem);
+int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
+                                   const char *format, ...);
 int store_defaults( const int ephemeris_output_options,
          const int element_format, const int element_precision,
          const double max_residual_for_filtering,
@@ -871,7 +873,7 @@ int write_out_elements_to_file( const double *orbit,
             const int precision, const int monte_carlo,
             const int options)
 {
-   char object_name[80], buff[100], more_moids[80];
+   char object_name[80], buff[160], more_moids[80];
    const char *file_permits = (append_elements_to_element_file ? "fca" : "fcw+");
    extern const char *elements_filename;
    FILE *ofile = fopen_ext( get_file_name( buff, elements_filename), file_permits);
@@ -987,10 +989,12 @@ int write_out_elements_to_file( const double *orbit,
              /* kg*AU^3 / (m^2*d^2),  from a private communication  */
              /* from Steve Chesley; see orb_func.cpp for details    */
 
+      strcpy( sigma_buff, "+/- ");
       strcpy( buff, tptr);
       tt_ptr = strstr( buff, "TT") + 2;
       if( !memcmp( buff, "   Peri", 7))
          {
+         assert( tt_ptr);
          if( *constraints)
             {
             if( constraints[0] == 'm' && constraints[1] == '(')
@@ -1009,29 +1013,41 @@ int write_out_elements_to_file( const double *orbit,
             else
                sprintf( tt_ptr, ";  Constraint: %s", constraints);
             }
-         else if( n_extra_params == 2 || n_extra_params == 3)
-            {
-            char tbuff0[40], tbuff1[40];
-
-            sprintf( tt_ptr, "; A1=%s, A2=%s",
-                     put_double_in_buff( tbuff0, solar_pressure[0]),
-                     put_double_in_buff( tbuff1, solar_pressure[1]));
-            if( n_extra_params == 3)
-               sprintf( tt_ptr + strlen( tt_ptr), ", A3=%s",
-                  put_double_in_buff( tbuff1, solar_pressure[2]));
-            }
          else if( n_monte_carlo_impactors && monte_carlo)
             sprintf( tt_ptr, ";  %.2f%% impact (%d/%d)",
                 100. * (double)n_monte_carlo_impactors /
                        (double)monte_carlo_object_count,
                        n_monte_carlo_impactors, monte_carlo_object_count);
-         strcpy( sigma_buff, "+/- ");
          if( showing_sigmas)
             if( !get_uncertainty( "sigma_Tp", sigma_buff + 4, false))
                {
                strcat( sigma_buff, " TT");
                text_search_and_replace( buff, "TT", sigma_buff);
                }
+
+         if( n_extra_params == 2 || n_extra_params == 3)
+            {
+            char tbuff0[40], sig_name[20];
+            int j;
+
+            strcat( tt_ptr, "\n");
+            tt_ptr += strlen( tt_ptr);
+            for( j = 0; j < n_extra_params; j++)
+               {
+               put_double_in_buff( tbuff0, solar_pressure[j]);
+               text_search_and_replace( tbuff0, " ", "");
+               strcat( tbuff0, " ");
+               sprintf( sig_name, "Sigma_A%d:", j + 1);
+               if( showing_sigmas)
+                  if( !get_uncertainty( sig_name, sigma_buff + 4, false))
+                     strcat( tbuff0, sigma_buff);
+               snprintf_append( tt_ptr, 180, "A%d: %s", j + 1, tbuff0);
+               if( j == n_extra_params - 1)
+                  strcat( tt_ptr, " AU/day^2");
+               else
+                  strcat( tt_ptr, (strlen( tt_ptr) > 50) ? "\n" : "   ");
+               }
+            }
          }
 
       else if( !memcmp( buff, "Epoch", 5))
