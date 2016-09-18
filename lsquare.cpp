@@ -126,13 +126,6 @@ int lsquare_add_observation( void *lsquare, const double residual,
 
 ldouble lsquare_determinant;
 
-   /* Until May 2015,  this code used the following Gauss-Jordan inversion
-      scheme.  G-J is an excellent method for general matrix inversion,
-      and I'm leaving it here in case I need a general inverter in the future.
-      But for positive-definite symmetric matrices,  Cholesky decomposition
-      has its benefits,  mostly in that it is more stable.  You will also
-      see that it's quite a bit simpler than G-J.   */
-
    /* A simple Gauss-Jordan matrix inverter,  with partial pivoting.  It
       first extends the size x size square matrix into a size-high by
       (2*size) wide one,  with the expanded space on the right side filled
@@ -272,7 +265,16 @@ static ldouble *calc_inverse( const ldouble *src, const int size)
 
 #ifdef CHOLESKY_INVERSION
 
-   /* Cholesky decomposition,  as described in _Numerical Recipes_ 2.9. */
+   /* Cholesky decomposition,  as described in _Numerical Recipes_ 2.9.
+      Cholesky decomposition appears to be widely recommended for inverting
+      covariance matrices,  and I may end up going that route.  I started
+      out with Gauss-Jackson,  though,  and it appears to work Just Fine.
+      (Admittedly,  with tweaks to improve pivot selection and the
+      calc_improved_matrix() trick given below to "polish" an initial
+      inversion.)  I may take the time,  at some point,  to try to get
+      Cholesky inversion to work... though I don't think it'll actually
+      get me anything at this point.  At least for the nonce,  I'm leaving
+      it ifdeffed out. */
 
 static int cholesky_decomposition( ldouble *a, const int size, ldouble *diag)
 {
@@ -302,7 +304,7 @@ static int cholesky_decomposition( ldouble *a, const int size, ldouble *diag)
    /* Inverting a symmetric positive-definite matrix,  again as described */
    /* in _Numerical Recipes_,  with slight modifications.  In their       */
    /* version,  the lower triangle is computed;  I added a few lines to   */
-   /* get the upper.                                                      */
+   /* get the upper.  NOTE: does not work yet.                            */
 
 static int cholesky_inversion( ldouble *a, const int size)
 {
