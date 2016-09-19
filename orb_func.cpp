@@ -1244,11 +1244,11 @@ cases,  SR may fail with the following. But then other techniques will
 probably succeed,  so I'm not too worried about this.)
 
    In the following,  I take advantage of the fact that geostationary
-satellites orbit at about 40000 km,  and take one day to orbit us.  */
+satellites orbit at about 42164 km,  and take one day to orbit us.  */
 
 inline double minimum_sr_distance( const double time_span)
 {
-   const double geosat_dist = 40000. / AU_IN_KM;
+   const double geosat_dist = 42164. / AU_IN_KM;
    const double geo_orbit_dist = geosat_dist * pow( time_span * 3., 2. / 3.);
    const double lowest_speed = 1.;    /* km/s */
    const double slow_limit = time_span * lowest_speed * seconds_per_day / AU_IN_KM;
