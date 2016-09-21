@@ -1901,7 +1901,8 @@ static int evaluate_limited_orbit( const double *orbit,
          while( *limited_orbit && *limited_orbit != ',')
             tbuff[tbuff_loc++] = *limited_orbit++;
          tbuff[tbuff_loc] = '\0';
-         if( limited_orbit[-1] == 'k')
+         if( limited_orbit[-1] == 'k' ||
+                  (limited_orbit[-2] == 'k' && limited_orbit[-1] == 'm'))
             value /= AU_IN_KM;
          switch( variable)
             {
