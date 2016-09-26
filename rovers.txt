@@ -12,8 +12,13 @@
   You _are_ limited to three characters,  though.
 
      Longitudes and latitudes are assumed to be in decimal degrees,  east
-  positive,  altitudes in meters above the ellipsoid.  The example for
-  (273) EISCAT shows how to do deg/min/sec form.
+  positive,  altitudes in meters above the ellipsoid (not above sea
+  level;  the difference can be over 60 meters,  so it _can_ matter.
+  Though I suspect it's usually ignored;  I'd bet that most of the altitudes
+  below are actually ASL.)  The example for (273) EISCAT shows how to do
+  deg/min/sec form.  The WGS84 ellipsoid is assumed.  GPS will default to
+  that ellipsoid,  but I wouldn't be surprised if some lat/lons are on
+  older systems,  adding up to a few hundred meters of error.
 
      Any line starting with a space is assumed to be a comment.  Negative
   longitudes (and those between 180 and 360) are in the Western Hemisphere.
@@ -116,13 +121,22 @@ Ta2 -70.7322 -29.2608 2347    TAROT La Silla ESO
    http://irtfweb.ifa.hawaii.edu/IRrefdata/telescope_ref_data.php
       I had doubts about these lat/lon/alts,  derived from an aerial survey
    and in NAD83 datum,  with altitudes in feet (data given in non-metric
-   units always makes me worry),  but checks with people who have actually
-   been on Mauna Kea with GPS units have assuaged those worries.
+   units always makes me worry) and given to a meaningless precision of
+   about 0.3 millimeters -- those sorts of mistakes usually mean bogus data
+   -- but checks with people who have actually been on Mauna Kea with GPS
+   units have assuaged those worries.
+      Lat/lon/alts in this file are supposed to be on the WGS84 ellipsoid.
+   But here,  I just took the NAD83 coordinates and ignored the difference
+   (about two meters).
       NOTE that codes (267) = CFHT and (266) = Subaru were added after I did
    all this.  The positions given there differ from those given here by about
    50 meters,  _including vertically_.  I think the (267)/(266) positions
    may have been measured using Google Earth or a similar mediocre-accuracy
    method.
+      Note also that the MPC position for (568) corresponds to longitude
+   -155.4722,  lat 19.8262,  4202 meters,  the position for IRTF (though
+   34 meters above the position given below).  Again,  these may be due to
+   confusion about ellipsoidal vs. above-sea-level altitudes.
 
 0.6 -155.47096 19.82161 4186.3Univ of Hawaii 0.6-m, Mauna Kea
 2.2 -155.46943 19.82299 4213.6Univ of Hawaii 2.2-m, Mauna Kea
