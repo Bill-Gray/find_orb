@@ -348,8 +348,8 @@ A1 to give the radial acceleration;  by A2 to give the transverse acceleration;
 and by A3 to give the "out-of-orbit" component of the acceleration,  with A1
 through A3 to be fitted parameters.  The resulting accelerations should
 be in AU/day^2,  which fortunately matches the units used in this program.
-(Note that MPC uses km/day^2.  Patrick Rocher and JPL use AU/day^2 in their
-comet elements.  Find_Orb should have a toggle for the units...)
+(Note that MPC uses 10^-8 AU/day^2.  Patrick Rocher and JPL use AU/day^2 in
+their comet elements.  Find_Orb should have a toggle for the units...)
 
    Frequently,  only A1 and A2 are used;  A3 often doesn't appear unless
 one has three apparitions.  A3 has been added to the console version of
