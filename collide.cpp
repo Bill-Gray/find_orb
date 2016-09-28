@@ -53,12 +53,19 @@ double planet_radius_in_meters( const int planet_idx)
    return( planet_radius[planet_idx]);
 }
 
+/* NOTE that for the Earth,  I'm using the IAU1976 ellipsoid,  with
+major axis 6378.140 km (see above) and flattening 1/f = 298.257.
+The GRS80 and WGS84 ellipsoids have a major axis of 6378.137 meters
+(three meters less than the IAU1976 value) and 1/f = 298.257223563
+and 298.257222101 respectively (making for semimajor axes also about
+three meters less than the IAU1976 value).      */
+
 #define N_FLATTENINGS 9
 
 double planet_axis_ratio( const int planet_idx)
 {
    static const double flattenings[N_FLATTENINGS] = {
-            0., 0., 0., .00335364,              /* Sun Mer Ven Earth */
+            0., 0., 0., 1. / 298.257,           /* Sun Mer Ven Earth */
             .00647630, .0647630, .0979624,      /* Mars Jup Satu */
             .0229273, .0171 };                  /* Uran Nep */
 
