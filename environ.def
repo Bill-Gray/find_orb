@@ -51,7 +51,7 @@ TIME_RANGE=-1000,3000
    permission for their NEOCP observations to be redistributed in
    "unredacted" form.  (Contact me if you're willing to be added to this
    list.)
-GREENLIT=703 G58 G96 H41 H43 H45 I52 I93 J95
+GREENLIT=568 703 G58 G96 H41 H43 H45 I52 I93 J95
 
    We default to assuming that no object will have an observed arc greater
    than 200 years,  and that if it _is_ longer than that,  it's a mistake.
@@ -160,5 +160,24 @@ AUTO_ARC_LEN=7300
    to kilometers,  or to 23454.7800299146773197201 to switch the distance
    unit to Earth radii (this assumes the equatorial radius of 6378.140 km.)
    The final value gives the time unit:  1=days (default),  24=hours,
-   1440=minutes, 86400=seconds.
+   1440=minutes, 86400=seconds.  For example,  VECTOR_OPTS=1,149597870.7,86400
+   would get you ecliptic J2000 vectors in kilometers and km/s.
 VECTOR_OPTS=0,1,1
+
+   Comet non-gravitational forces in the "standard" Marsden-Sekanina model
+   are assumed to be due to sublimating ice.  As described at page 3 of
+
+   http://www.lpi.usra.edu/books/CometsII/7009.pdf
+
+   'Cometary Orbit Determination and Nongravitational Forces',  D. K. Yeomans,
+   P. W. Chodas, G. Sitarski, S. Szutowicz, M. Krolikowska, "Comets II",
+   this leads to a force whose magnitude is given by a function g(r),  with
+   parameters r0, m, n,  and k.  The following line gives those constants for
+   non-gravs driven by sublimating water ice.  Sekanina and Kracht have
+   proposed different r0, m, n, and k for other sublimation processes.  If
+   you want to do that,  change the line below.  (Note that 'alpha' isn't
+   given;  it's a normalization quantity to ensure g(1) = 1.  Find_Orb
+   will compute it for you.)
+
+COMET_CONSTANTS=2.808,2.15,5.093,4.6142
+
