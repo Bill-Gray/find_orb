@@ -34,13 +34,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 
 #define J2000 2451545.0
 #define EARTH_MAJOR_AXIS 6378140.
-#define EARTH_MINOR_AXIS 6356755.
-#define EARTH_AXIS_RATIO (EARTH_MINOR_AXIS / EARTH_MAJOR_AXIS)
 #define EARTH_MAJOR_AXIS_IN_AU (EARTH_MAJOR_AXIS / AU_IN_METERS)
 #define PI 3.1415926535897932384626433832795028841971693993751058209749445923
 #define LOG_10 2.3025850929940456840179914546843642076011014886287729760333279009675726
-#define speed_of_light_km_per_sec        299792.456
-#define LIGHT_YEAR_IN_KM    (365.25 * seconds_per_day * speed_of_light_km_per_sec)
+#define LIGHT_YEAR_IN_KM    (365.25 * seconds_per_day * SPEED_OF_LIGHT)
 
 #define ROB_MATSON_TEST_CODE     1
 
@@ -91,6 +88,8 @@ const char *residual_filename = "residual.txt";
 const char *ephemeris_filename = "ephemeri.txt";
 const char *elements_filename = "elements.txt";
 
+/* Returns parallax constants (rho_cos_phi, rho_sin_phi) in AU. */
+
 int lat_alt_to_parallax( const double lat, const double ht_in_meters,
             double *rho_cos_phi, double *rho_sin_phi, const int planet_idx)
 {
@@ -106,24 +105,42 @@ int lat_alt_to_parallax( const double lat, const double ht_in_meters,
    return( 0);
 }
 
+/* Takes parallax constants (rho_cos_phi, rho_sin_phi) in units of the
+equatorial radius.  The previous non-iterative version of this function,
+used before 2016 Oct, was taken from Meeus' _Astronomical Algorithms_.  It
+could be off by as much as 16 meters in altitude and wrong in latitude by
+about three meters for each km of altitude (i.e.,  about 25 meters at the
+top of Everest).  Things are worse for planets more oblate than the earth.
+
+   I don't think an exact non-iterative solution is possible.  In any case,
+the iterative solution given below works nicely.   The iterations start out
+with a laughably poor guess,  but convergence is fast;  eight iterations
+gets sub-micron accuracy. */
+
 int parallax_to_lat_alt( const double rho_cos_phi, const double rho_sin_phi,
                double *lat, double *ht_in_meters, const int planet_idx)
 {
-   const double axis_ratio = planet_axis_ratio( planet_idx);
-   const double tan_u = (rho_sin_phi / rho_cos_phi) / axis_ratio;
-   const double radius = sqrt( rho_cos_phi * rho_cos_phi
-                             + rho_sin_phi * rho_sin_phi);
-   const double ang = atan( rho_sin_phi / rho_cos_phi);
-   const double surface_radius = cos( ang) * cos( ang) +
-                           sin( ang) * sin( ang) * axis_ratio;
+   const double major_axis_in_meters = planet_radius_in_meters( planet_idx);
+   const double lat0 = atan2( rho_sin_phi, rho_cos_phi);
+   const double rho0 = sqrt( rho_sin_phi * rho_sin_phi + rho_cos_phi * rho_cos_phi)
+                     * major_axis_in_meters / AU_IN_METERS;
+   double tlat = lat0, talt = 0.;
+   int iter;
 
-   if( lat)
-      *lat = atan( tan_u / axis_ratio);
-   if( ht_in_meters)
+// printf( "Input parallax constants : %+.9f %.9f\n", rho_sin_phi, rho_cos_phi);
+   for( iter = 0; iter < 8; iter++)
       {
-      *ht_in_meters = (radius - surface_radius);
-      *ht_in_meters *= planet_radius_in_meters( planet_idx);
+      double rc2, rs2;
+
+//    printf( "Curr lat/alt: %.9f %.9f\n", tlat * 180. / PI, talt);
+      lat_alt_to_parallax( tlat, talt, &rc2, &rs2, planet_idx);
+      talt -= (sqrt( rs2 * rs2 + rc2 * rc2) - rho0) * AU_IN_METERS;
+      tlat -= atan2( rs2, rc2) - lat0;
       }
+   if( lat)
+      *lat = tlat;
+   if( ht_in_meters)
+      *ht_in_meters = talt;
    return( 0);
 }
 
