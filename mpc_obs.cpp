@@ -95,6 +95,7 @@ int snprintf( char *string, const size_t max_len, const char *format, ...);
 #endif
 int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
                                    const char *format, ...);
+char *mpc_station_name( char *station_data);       /* mpc_obs.cpp */
 
 int debug_printf( const char *format, ...)
 {
@@ -667,11 +668,16 @@ static int extract_mpc_station_data( const char *buff, double *lon_in_radians,
    else        /* latitude & altitude,  not parallaxes: */
       {
       double lat_in_radians, alt_in_meters;
-      const int planet_idx = (buff[30] == '@' ? atoi( buff + 31) : 3);
 
-      if( sscanf( buff + 4, "%lf %lf %lf", &tlon, &lat_in_radians,
+      buff += 4;
+      if( *buff == '!')       /* "long format" */
+         buff++;
+      if( sscanf( buff, "%lf %lf %lf", &tlon, &lat_in_radians,
                                      &alt_in_meters) == 3)
          {
+         const char *tptr = strchr( buff, '@');
+
+         rval = (tptr ? atoi( tptr + 1) : 3);
          if( fabs( tlon) > 361. || fabs( lat_in_radians) > 91.)
             {     /* lat/lon are actually in dddmmss.sss form: */
             tlon = convert_base_60_to_decimal( tlon);
@@ -681,8 +687,7 @@ static int extract_mpc_station_data( const char *buff, double *lon_in_radians,
          lat_in_radians *= PI / 180.;
          if( rho_cos_phi && rho_sin_phi)
             lat_alt_to_parallax( lat_in_radians, alt_in_meters,
-                     rho_cos_phi, rho_sin_phi, planet_idx);   /* ephem0.cpp */
-         rval = planet_idx;
+                     rho_cos_phi, rho_sin_phi, rval);   /* ephem0.cpp */
          }
       }
    if( lon_in_radians)           /* keep longitude in -180 to +180 */
@@ -779,6 +784,18 @@ static int get_asteroid_observer_data( const char *mpc_code, char *buff)
    return( 0);
 }
 
+/* For all MPC stations in ObsCodes.html,  the station name starts
+in column 31.  If you look at 'rovers.txt',  you'll see that some
+station data lines put an ! in column 5,  in which case the station
+name starts in column 48,  allowing room for some extra digits of
+precision.  (And also allowing,  eventually,  for four-character
+MPC codes.)   */
+
+char *mpc_station_name( char *station_data)
+{
+   return( station_data + (station_data[4] == '!' ? 47 : 30));
+}
+
 /* The following function paws through the STATIONS.TXT file (or the
    ObsCodes.html or .htm file),  looking for the observer code in
    question.  When it finds it,  it just copies the entire line into
@@ -833,6 +850,14 @@ int get_observer_data( const char FAR *mpc_code, char *buff,
       station_data = load_mpc_stations( &n_stations);
       shellsort_r( station_data, n_stations, sizeof( char *),
                      string_compare_for_sort, &sort_column);
+      for( i = 1; i < (size_t)n_stations; i++)
+         if( !memcmp( station_data[i], station_data[i - 1], 4))
+            {              /* duplication found:  use the one from  */
+            if( station_data[i][4] == '!')            /* rovers.txt */
+               station_data[i - 1] = station_data[i];
+            else
+               station_data[i] = station_data[i - 1];
+            }
       }
    if( lon_in_radians)
       *lon_in_radians = *rho_cos_phi = *rho_sin_phi = 0.;
@@ -941,23 +966,13 @@ int get_observer_data( const char FAR *mpc_code, char *buff,
       }
    else
       {
-      rval = 3;
+      char *tptr = strchr( curr_station, '@');
+
+      rval = (tptr ? atoi( tptr + 1) : 3);
       if( buff)
          strcpy( buff, curr_station);
       extract_mpc_station_data( curr_station, lon_in_radians,
                                         rho_cos_phi, rho_sin_phi);
-      if( curr_station[30] == '@') /* this is an extraterrestrial station! */
-         {                    /* See 'rovers.txt' for examples */
-         int bytes_read;
-         char *tptr = curr_station + 31;
-
-         sscanf( tptr, "%d%n", &rval, &bytes_read);
-         if( buff)
-            {
-            tptr += bytes_read;
-            memcpy( buff + 30, tptr, strlen( tptr) + 1);
-            }
-         }
       }
    return( rval);
 }
@@ -2061,9 +2076,8 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
    if( obs->note2 == 'a')     /* input coords are alt/az,  not RA/dec */
       {
       DPT latlon, alt_az, ra_dec;
-      char unused_mpc_info_buffer[100];
 
-      if( get_observer_data_latlon( obs->mpc_code, unused_mpc_info_buffer,
+      if( get_observer_data_latlon( obs->mpc_code, NULL,
               &latlon.x, &latlon.y, NULL) == 3)
          {
          alt_az.x = obs->ra;     /* because input coords were really alt/az */
@@ -4028,39 +4042,26 @@ void put_observer_data_in_text( const char FAR *mpc_code, char *buff)
       }
    else
       {
-      int i;
-      char output_format[30];
+      char *name = mpc_station_name( buff);
 
-      strcpy( output_format, "  (%c%.4f %c%.4f)");
-      if( buff[12] != ' ')    /* longitude given to five places */
-         output_format[7] = '5';
-      else if( buff[10] == ' ')        /* longitude given to 3 places */
-         output_format[7] = '3';
-      else
-         output_format[7] = '4';
-      output_format[14] = output_format[7];
-
-      memmove( buff, buff + 30, strlen( buff + 28));
-      for( i = 0; buff[i] >= ' '; i++)
-         ;
+      memmove( buff, name, strlen( name) + 1);
       if( rho_cos_phi)
          {
          double lat, unused_ht_in_meters;
+         const char *output_format = "  (%c%.6f %c%.6f)";
 
                  /* Cvt parallax data from AU back into earth-axis units: */
          rho_cos_phi /= EARTH_MAJOR_AXIS_IN_AU;
          rho_sin_phi /= EARTH_MAJOR_AXIS_IN_AU;
          parallax_to_lat_alt( rho_cos_phi, rho_sin_phi, &lat,
                            &unused_ht_in_meters, planet_idx);
-         sprintf( buff + i, output_format,
+         snprintf_append( buff, 80, output_format,
                            (lat > 0. ? 'N' : 'S'), fabs( lat) * 180. / PI,
                            (lon > 0. ? 'E' : 'W'), fabs( lon) * 180. / PI);
          if( planet_idx == 3)
             extract_region_data_for_mpc_station( buff + strlen( buff),
                            lat, lon);
          }
-      else
-         buff[i] = '\0';
       }
 }
 

@@ -83,6 +83,7 @@ double find_moid( const ELEMENTS *elem1, const ELEMENTS *elem2,  /* moid4.c */
                                      double *barbee_style_delta_v);
 int setup_planet_elem( ELEMENTS *elem, const int planet_idx,
                                           const double t_cen);   /* moid4.c */
+char *mpc_station_name( char *station_data);       /* mpc_obs.cpp */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 
 const char *observe_filename = "observe.txt";
@@ -1699,7 +1700,7 @@ int ephemeris_in_a_file_from_mpc_code( const char *filename,
                                            &rho_cos_phi, &rho_sin_phi);
 
    snprintf( note_text, sizeof( note_text),
-                    "(%s) %s", mpc_code, buff + 30);
+                    "(%s) %s", mpc_code, mpc_station_name( buff));
    return( ephemeris_in_a_file( filename, orbit, obs, n_obs, planet_no,
                epoch_jd, jd_start, stepsize, lon, rho_cos_phi, rho_sin_phi,
                n_steps, note_text, options, n_objects));

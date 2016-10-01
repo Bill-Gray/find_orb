@@ -64,6 +64,7 @@ int create_b32_ephemeris( const char *filename, const double epoch,
                 const double ephem_step, const double jd_start);
 void set_window_placement( HWND hwnd, const char *ibuff);      /* orbitdlg.c */
 char *get_placement_text( HWND hwnd);                          /* orbitdlg.c */
+char *mpc_station_name( char *station_data);       /* mpc_obs.cpp */
 
 /////////////////////////////////////////////////////////////////////////////
 // CEphem dialog
@@ -347,7 +348,7 @@ void CEphem::OnClickedGo()
 #endif
          }
       else
-         strcpy( note_text, buff + 30);      /* copy in observer loc */
+         strcpy( note_text, mpc_station_name( buff)); /* copy in observer loc */
       if( !err_msg)
          {
          double temp_orbit[12];
