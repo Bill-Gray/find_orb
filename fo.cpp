@@ -74,6 +74,7 @@ void move_add_nstr( const int col, const int row, const char *msg,
                      const int n_bytes);              /* fo.cpp */
 double current_jd( void);                       /* elem_out.cpp */
 char *fgets_trimmed( char *buff, size_t max_bytes, FILE *ifile); /*elem_out.c*/
+FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 int make_pseudo_mpec( const char *mpec_filename, const char *obj_name);
                                                /* ephem0.cpp */
 
@@ -130,8 +131,7 @@ static void combine_element_files( const char *filename, const int n_processes)
    for( i = 0; i < n_processes; i++)
       {
       process_count = i + 1;
-      input_files[i] = fopen( get_file_name( buff, filename), "r");
-      assert( input_files[i]);
+      input_files[i] = fopen_ext( get_file_name( buff, filename), "fcr");
       }
    for( i = quit = 0; !quit; i = (i + 1) % n_processes)
       if( !fgets( buff, sizeof( buff), input_files[i]))
@@ -222,11 +222,10 @@ int summ_compare( const void *a, const void *b)
 
 static void get_summary_info( char *buff, const char *mpec_filename)
 {
-   FILE *ifile = fopen( mpec_filename, "rb");
+   FILE *ifile = fopen_ext( mpec_filename, "fcrb");
    char ibuff[400], *tptr;
    unsigned i;
 
-   assert( ifile);
    memset( buff, ' ', 80);
    buff[80] = '\0';
    while( fgets( ibuff, sizeof( ibuff), ifile))
@@ -257,19 +256,21 @@ int main( const int argc, const char **argv)
    int n_ids, i, starting_object = 0;
    int n_processes = 1;
    OBJECT_INFO *ids;
-   int heliocentric_only = 1, total_objects = 0;
+   int total_objects = 0;
    FILE *ifile;
    extern int process_count;
    int n_lines_written = 0;
    FILE *summary_ofile = NULL;
    extern int forced_central_body;
    extern bool use_config_directory;          /* miscell.c */
+   int element_precision = 5;
+   bool all_heliocentric = true;
+   int ephemeris_output_options = OPTION_SHOW_SIGMAS | OPTION_ROUND_TO_NEAREST_STEP;
 #ifdef FORKING
    int child_status;
 #endif
 
    use_config_directory = false;
-   forced_central_body = 0;
    for( i = 1; i < argc; i++)       /* check to see if we're debugging: */
       if( argv[i][0] == '-')
          switch( argv[i][1])
@@ -295,10 +296,7 @@ int main( const int argc, const char **argv)
                            debug_level, __DATE__, __TIME__);
                break;
             case 'h':                     /* show planet-centric orbits */
-               if( argv[i][2])
-                  forced_central_body = atoi( argv[i] + 2);
-               else
-                  heliocentric_only = 0;
+               all_heliocentric = false;
                break;
             case 'i':
                {
@@ -342,7 +340,7 @@ int main( const int argc, const char **argv)
                full_ctime( curr_time, current_jd( ), FULL_CTIME_YMD);
                summary_ofile = fopen( argv[i] + 2, "wb");
                assert( summary_ofile);
-               ifile = fopen( "summ.htm", "rb");
+               ifile = fopen_ext( "summ.htm", "fcrb");
                assert( ifile);
                while( fgets( tbuff, sizeof( tbuff), ifile))
                   {
@@ -373,7 +371,10 @@ int main( const int argc, const char **argv)
                /* interactive find_orb program.  But it also sets some   */
                /* important internal values for blunder detection,  etc. */
                /* So we still call it:                                   */
-   get_defaults( NULL, NULL, NULL, NULL, NULL);
+   get_defaults( &ephemeris_output_options,
+                         NULL, &element_precision, NULL, NULL);
+   if( all_heliocentric)
+      forced_central_body = 0;
 
    load_up_sigma_records( "sigma.txt");
    if( debug_level)
@@ -450,11 +451,11 @@ int main( const int argc, const char **argv)
             extern int n_obs_actually_loaded;
             extern char orbit_summary_text[];
             long file_offset = ids[i].file_offset - 40L;
-            const int element_precision = 5;
-            const int element_options = ELEM_OUT_ALTERNATIVE_FORMAT
-                       | (mpec_path ? 0 : heliocentric_only);
+            int element_options = ELEM_OUT_ALTERNATIVE_FORMAT;
             double epoch_shown, curr_epoch, orbit[12];
 
+            if( all_heliocentric)
+               element_options |= ELEM_OUT_HELIOCENTRIC_ONLY;
                 /* Start a bit ahead of the actual data,  just in case */
                 /* there's a #Sigma: or similar command in there: */
             if( file_offset < 0L)
@@ -506,7 +507,7 @@ int main( const int argc, const char **argv)
                   if( !ephemeris_in_a_file_from_mpc_code( ephemeris_filename,
                               orbits_to_use, obs, n_obs_actually_loaded,
                               curr_epoch, jd_start, "1h", 50, "500",
-                              OPTION_SHOW_SIGMAS | OPTION_ROUND_TO_NEAREST_STEP,
+                              ephemeris_output_options,
                               n_orbits_in_ephem))
                      {
                      write_residuals_to_file( residual_filename, argv[1],
@@ -515,7 +516,7 @@ int main( const int argc, const char **argv)
                      get_summary_info( tbuff, fullpath);
                      if( summary_ofile)
                         {
-                        FILE *ephemeris_ifile = fopen( ephemeris_filename, "rb");
+                        FILE *ephemeris_ifile = fopen_ext( ephemeris_filename, "fcrb");
                         char new_line[300];
 
                         tbuff[14] = '\0';
