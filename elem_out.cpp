@@ -965,6 +965,7 @@ int write_out_elements_to_file( const double *orbit,
    elem.is_asteroid = !(obs->flags & OBS_IS_COMET);
    elem.slope_param = (elem.is_asteroid ? asteroid_magnitude_slope_param
                                         : comet_magnitude_slope_param);
+
    helio_elem = elem;
    if( elem.central_obj)            /* except for planet-encounterers,  'elem' */
       {                             /* will already be heliocentric.  This     */
@@ -2163,9 +2164,16 @@ int get_defaults( int *ephemeris_output_options, int *element_format,
    extern double minimum_jd, maximum_jd;
    extern double maximum_observation_span;
    int i, use_sigmas_int;
+   const char *override_fcct14_filename = get_environment_ptr( "FCCT14_FILE");
 
    if( *language)
       findorb_language = *language;
+   if( *override_fcct14_filename)
+      {
+      extern const char *fcct14_bias_file_name;
+
+      fcct14_bias_file_name = override_fcct14_filename;
+      }
    reset_td_minus_dt_string( get_environment_ptr( "DELTA_T"));
    for( i = 0; i < 12; i++)
       {                          /* create abbreviated month names */

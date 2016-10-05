@@ -37,6 +37,9 @@ the biases corresponding to the catalog in which we're interested and
 computes the bias in RA and dec for a particular JD,  storing them in
 *bias_ra and *bias_dec.       */
 
+const char *fcct14_bias_file_name = "bias.dat";
+         /* override this if the bias file is elsewhere */
+
 int find_fcct_biases( const double ra, const double dec, const char catalog,
                  const double jd, double *bias_ra, double *bias_dec)
 {
@@ -66,7 +69,7 @@ int find_fcct_biases( const double ra, const double dec, const char catalog,
       return( BIAS_NO_BIAS_FILE);
    if( !bias_data)
       {
-      FILE *ifile = fopen( "bias.dat", "rb");
+      FILE *ifile = fopen( fcct14_bias_file_name, "rb");
       char buff[600];
 
       if( !ifile)
