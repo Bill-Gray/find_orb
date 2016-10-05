@@ -2,9 +2,13 @@
 ;   See 'mu.txt' in ftp://cfa-ftp.harvard.edu/pub/MPC/BC405/ for
 ;   the original version (as well as the BC405 orbital elements and
 ;   some documentation.)  The following masses are in units of Sun=1.
-     1  4.755e-10  Ceres
+;   Solar GM = 1.32712440018 x 10^20 (+/- 8 x 10^9) m^3/s^2
+;   2016 Oct 3: replaced Ceres 4.755e-10 and Vesta 1.344e-10 with Dawn's
+;   measurements: Ceres GM=62.68 km^3/s^2 = 4.72299e-10,  Vesta
+;   (2.59076 +/- 0.00001)x10^20 kg =  1.30284e-10 solar masses
+     1  4.7230e-10  Ceres
      2  1.060e-10  Pallas
-     4  1.344e-10  Vesta
+     4  1.303e-10  Vesta
     29  7.700e-12  Amphitrite
     16  1.140e-11  Psyche
     15  1.600e-11  Eunomia
