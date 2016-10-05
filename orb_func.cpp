@@ -405,9 +405,6 @@ int integrate_orbit( double *orbit, const double t0, const double t1)
 
             find_relative_orbit( t, orbit, &ref_orbit, best_fit_planet);
             reset_of_elements_needed = 0;
-            if( !perturbers)        /* for unperturbed cases,  do  */
-//             stepsize = (going_backward ? -32. : 32);     /* a two-body soln and go home */
-               new_t = t1;          /* a two-body soln and go home */
             }
       n_steps++;
 #ifdef CONSOLE
@@ -1341,6 +1338,8 @@ static int sr_orbit_compare( const void *a, const void *b)
    return( (ta[6] > tb[6]) ? 1 : -1);
 }
 
+static bool writing_sr_elems = true;
+
 int get_sr_orbits( double *orbits, OBSERVE FAR *obs,
                const unsigned n_obs, const unsigned starting_orbit,
                const unsigned max_orbits, const double max_time,
@@ -1379,7 +1378,8 @@ int get_sr_orbits( double *orbits, OBSERVE FAR *obs,
       elements_filename = "sr_elems.txt";
       append_elements_to_element_file = (i ? 1 : 0);
       set_locs( orbits, obs[0].jd, obs, n_obs);
-      write_out_elements_to_file( orbits, obs[0].jd,
+      if( writing_sr_elems)
+         write_out_elements_to_file( orbits, obs[0].jd,
                find_epoch_shown( obs, n_obs),
                obs, n_obs, "", 5,
                1, ELEM_OUT_NO_COMMENT_DATA | ELEM_OUT_PRECISE_MEAN_RESIDS);
@@ -3484,7 +3484,9 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
    assert( sr_orbits);
    if( !sr_orbits)
       return( 0.);
+   writing_sr_elems = false;
    n_sr_orbits = get_sr_orbits( sr_orbits, obs, n_obs, 0, max_n_sr_orbits, .5, 0.);
+   writing_sr_elems = true;
    for( i = 0; (unsigned)i < n_sr_orbits && sr_orbits[i * 7 + 6] < .7; i++)
       ;
    n_sr_orbits = i;        /* cut orbits down to the "reasonable" ones */
