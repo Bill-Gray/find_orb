@@ -314,8 +314,9 @@ static double *load_asteroid_masses( void)
             if( rval)
                rval[i++] = mass;
             }
-/*    rval[0] = 4.747105847157599504245142421641e-10;         */
+/*    rval[0] = 4.747105847157599504245142421641e-10;  (solar masses) */
       }  /* Ceres: special 63 km^3/s^2 value:  not now in use */
+         /* since found to be 62.68 km^3/s^2 by Dawn = 4.7229935634e-10 */
    assert( rval);
    return( rval);
 }
