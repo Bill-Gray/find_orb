@@ -905,7 +905,8 @@ int calc_derivatives( const double jd, const double *ival, double *oval,
                accel_multiplier = compute_accel_multiplier( r / planet_radius[i]);
                planet_hit = i;
                }
-            if( i >= IDX_EARTH && i <= IDX_NEPTUNE && r < .015 && j2_multiplier)
+            if( i >= IDX_EARTH && i <= IDX_NEPTUNE && r < .015 && j2_multiplier
+                                 && accel_multiplier)
                {          /* Within .015 AU,  we take J2 into account: */
                double grad[3], delta_j2000[3], matrix[10], delta_planet[3];
                const double j2[6] = { EARTH_J2, MARS_J2, JUPITER_J2,
