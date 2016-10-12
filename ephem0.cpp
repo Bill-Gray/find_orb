@@ -3168,7 +3168,9 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
    if( ephemeris_ifile && fgets_trimmed( buff, sizeof( buff), ephemeris_ifile))
       {
       fprintf( ofile, "\n<a name=\"eph%s\"></a>", mpec_buff);
-      if( !memcmp( buff + 2, "500", 3))
+      if( *buff != '#')        /* non-observables ephemeris,  no MPC code */
+         fprintf( ofile, "<b>Ephemerides:</b>\n");
+      else if( !memcmp( buff + 2, "500", 3))
          fprintf( ofile, "<b>Ephemerides (geocentric):</b>\n");
       else
          fprintf( ofile, "<b>Ephemerides for %s:</b>\n", buff + 1);
