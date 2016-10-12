@@ -152,6 +152,8 @@ static int find_transfer_orbit( double *orbit, OBSERVE FAR *obs1,
 double observation_rms( const OBSERVE FAR *obs);            /* elem_out.cpp */
 double find_epoch_shown( const OBSERVE *obs, const int n_obs); /* elem_out */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
+int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
+                                   const char *format, ...);
 
 void set_distance( OBSERVE FAR *obs, double r)
 {
@@ -408,7 +410,7 @@ int integrate_orbit( double *orbit, const double t0, const double t1)
             }
       n_steps++;
 #ifdef CONSOLE
-      if( !(n_steps % 50) && show_runtime_messages && time( NULL) != real_time)
+      if( !(n_steps % 500) && show_runtime_messages && time( NULL) != real_time)
          {
          char buff[80];
          extern int best_fit_planet, n_posns_cached;
@@ -424,13 +426,15 @@ int integrate_orbit( double *orbit, const double t0, const double t1)
          sprintf( buff, "t = %.5f; %.5f to %.5f; step ",
                  JD_TO_YEAR( t), JD_TO_YEAR( t0), JD_TO_YEAR( t1));
          if( fabs( stepsize) > .1)
-            sprintf( buff + strlen( buff), "%.3f   ", stepsize);
+            snprintf_append( buff, sizeof( buff), "%.3f   ", stepsize);
          else if( fabs( stepsize) > .91)
-            sprintf( buff + strlen( buff), "%.3fm   ", stepsize * minutes_per_day);
+            snprintf_append( buff, sizeof( buff), "%.3fm   ",
+                                          stepsize * minutes_per_day);
          else
-            sprintf( buff + strlen( buff), "%.3fs   ", stepsize * seconds_per_day);
+            snprintf_append( buff, sizeof( buff), "%.3fs   ",
+                                          stepsize * seconds_per_day);
          if( prev_n_steps)    /* i.e.,  not our first time through here */
-            sprintf( buff + strlen( buff), "%d step/sec  ",
+            snprintf_append( buff, sizeof( buff), "%d step/sec  ",
                         n_steps - prev_n_steps);
          move_add_nstr( 10, 10, buff, -1);
          prev_n_steps = n_steps;
@@ -445,7 +449,7 @@ int integrate_orbit( double *orbit, const double t0, const double t1)
          sprintf( buff, "%d steps; %d rejected", n_steps, n_rejects);
          if( best_fit_planet_dist)
             {
-            sprintf( buff + strlen( buff), "; center %d, ",
+            snprintf_append( buff, sizeof( buff), "; center %d, ",
                             best_fit_planet);
             format_dist_in_buff( buff + strlen( buff), best_fit_planet_dist);
             }
@@ -3507,7 +3511,7 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
 
    while( best_score > acceptable_score_limit)
       {
-      int end, n_subarc_obs;
+      int end, n_subarc_obs, n_geocentric_obs = 0;
       const double max_arg_length_for_vaisala = 230.;
       double bogus_epoch;
 
@@ -3520,12 +3524,14 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
       for( i = 0; i < start; i++)
          obs[i].is_included = 0;
       for( i = start; i <= end; i++)
+         {
          obs[i].is_included = 1;
+         if( !strcmp( obs[i].mpc_code, "500"))
+            n_geocentric_obs++;
+         }
       exclude_unusable_observations( obs, n_obs);
       for( i = end + 1; i < n_obs; i++)
          obs[i].is_included = 0;
-//    for( i = 0; i < n_obs; i++)      /* solely to ensure a non-zero r */
-//       obs[i].r = 1.;
       arclen = obs[end].jd - obs[start].jd;
       if( debug_level)
          debug_printf( "From %f to %f (%f days)\n", obs[start].jd, obs[end].jd, arclen);
@@ -3590,9 +3596,11 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
             if( i)          /* dist from observer (second) pass:  some ad hoc */
                {            /* code that says,  "for long arcs,  start farther */
                             /* from the observer".                             */
-               pseudo_r = .004 * pow( arclen, .6666);
+               pseudo_r = 0.004 * pow( arclen, .6666);
                if( dawn_based_observations)     /* for Dawn-based,  assume it */
                   pseudo_r = 1000. / AU_IN_KM;  /* may be a mere 1000 km away */
+               if( n_geocentric_obs)            /* make sure we start outside the earth! */
+                  pseudo_r += 6378. / AU_IN_KM;
                }
             else                  /* (first) Vaisala pass */
                pseudo_r = .1;
