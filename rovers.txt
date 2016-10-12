@@ -77,7 +77,8 @@ RPa !-71.0000 43.6666 200                      Ralph Pass
 
    When 2008 TC3 impacted the earth on 7 Oct 2008,  I added the impact point
    as an "observatory" so I could get impact-centered ephemerides easily.
-   Similarly for the 2014 AA estimated impact coordinates.
+   Similarly for the 2014 AA estimated impact coordinates,  100 km above
+   the Atlantic Ocean.
 
 Sud ! 33.11952  20.59777 10                    Sudan impact site
 Atl !-43.2 12.5        100000                  2014 AA impact location
@@ -174,7 +175,7 @@ MSL !137.4417   -4.5895 0.000              @4  MSL (Curiosity)
    orbit based on the object coming in ten km above Chelyabinsk at 17.3 km/s
    from azimuth 97,  alt +18.  The following 'Che' code helped :
 
-Che !  61.42    55.1528  1000                  Chelyabinsk meteor
+Che !  61.42    55.1528  10000                 Chelyabinsk meteor
 
 Cal !-121.8092 +37.636 87800                   Calif fireball
 
@@ -197,10 +198,7 @@ FLG ! -111.65578 35.20003 2112                 Flagstaff all-sky camera
 
    Coordinates for DSN Stations,  added 2016 Sep 27,  from
    ftp://ssd.jpl.nasa.gov/pub/eph/planets/stations/dsn.itrf93/dsn.itrf93_geodetic_19sep2016.txt
-   Similar degree/minute/second formatting as with (273) EISCAT above,
-   except that the '!' in column 5 indicates a "long format" line.  For
-   this,  the name starts in column 48,  not column 31.  Should be
-   enough precision for anybody...
+   Similar degree/minute/second formatting as with (273) EISCAT above.
 
         longitude    latitude       height
      DDDmmss.sssss  DDmmss.sssss      (m)
