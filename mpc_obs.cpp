@@ -1973,6 +1973,23 @@ static double extract_date_from_mpc_report( const char *buff, unsigned *format)
    return( rval);
 }
 
+/* Some historical observations are provided in apparent coordinates of date.
+When that happens,  they have to be adjusted for both aberration of light
+and nutation and precession.  The following removes the aberration. */
+
+static void adjust_for_aberration( OBSERVE FAR *obs)
+{
+   size_t i;
+
+   set_up_observation( obs);
+   for( i = 0; i < 3; i++)
+      obs->vect[i] -= obs->obs_vel[i] / AU_PER_DAY;
+   ecliptic_to_equatorial( obs->vect);
+   obs->ra  = atan2( obs->vect[1], obs->vect[0]);
+   obs->dec = asin( obs->vect[2] / vector3_length( obs->vect));
+}
+
+
 int apply_debiasing = 0;
 
 int find_fcct_biases( const double ra, const double dec, const char catalog,
@@ -2054,23 +2071,23 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
       {
       double year = (obs->jd - J2000) / 365.25 + 2000.;
 
-      obs->ra *= -1.;
       if( input_coordinate_epoch == -1.)       /* true coords of date */
          {
          double matrix[9];
 
          setup_precession_with_nutation( matrix, year);
-         debug_printf( "Input epoch was -1\n");
-         precess_ra_dec( matrix, &obs->ra, &obs->ra, 0);
+         precess_ra_dec( matrix, &obs->ra, &obs->ra, 1);
+         adjust_for_aberration( obs);
          }
       else
          {
-         if( !input_coordinate_epoch)    /* don't just rotate to mean coords */
-            year = input_coordinate_epoch;         /* of date */
+         if( input_coordinate_epoch)    /* specific epoch given, not just */
+            year = input_coordinate_epoch;         /* mean coords of date */
+         obs->ra *= -1.;
          precess_pt( (DPT DLLPTR *)&obs->ra,
                      (DPT DLLPTR *)&obs->ra, year, 2000.);
+         obs->ra *= -1.;
          }
-      obs->ra *= -1.;
       obs->note2 = 'A';       /* mark as coordinates precessed */
       }
    if( obs->note2 == 'a')     /* input coords are alt/az,  not RA/dec */
@@ -3630,8 +3647,13 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
             override_posn_sigma_1 = override_posn_sigma_2
             = override_posn_sigma_theta
             = override_time_sigma = override_mag_sigma = 0.;
-         else if( !memcmp( buff, "#coord epoch", 12))
-            input_coordinate_epoch = atof( buff + 12);
+         else if( !memcmp( buff, "#coord epoch ", 13))
+            {
+            if( buff[13] == 'a')       /* apparent coords */
+               input_coordinate_epoch = -1.;
+            else
+               input_coordinate_epoch = atof( buff + 13);
+            }
          else if( !memcmp( buff, "#suppress_obs", 13))
             including_obs = false;
          else if( !memcmp( buff, "#include_obs", 12))
