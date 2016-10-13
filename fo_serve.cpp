@@ -139,7 +139,9 @@ int main( const int argc, const char **argv)
    extern double ephemeris_mag_limit;
    size_t i, bytes_written = 0;
    extern char **environ;
+   int element_format = ELEM_OUT_ALTERNATIVE_FORMAT;
    extern bool neocp_redaction_turned_on;
+   int center_object = -2;
 
 #ifndef _WIN32
    avoid_runaway_process( 15);
@@ -219,6 +221,8 @@ int main( const int argc, const char **argv)
          strlcpy( mpc_code, buff, sizeof( mpc_code));
       else if( !strcmp( field, "faint_limit"))
          mag_limit = atof( buff);
+      else if( !strcmp( field, "element_center"))
+         center_object = atoi( buff);
       else if( !strcmp( field, "motion"))
          {             /* '0'=no motions, '1'=total motion & PA', */
          if( buff[0] != '0')       /* '2'=separate RA/dec motions */
@@ -257,6 +261,8 @@ int main( const int argc, const char **argv)
          ephemeris_output_options |= OPTION_COMPUTER_FRIENDLY;
       else if( !strcmp( field, "redact_neocp"))
          neocp_redaction_turned_on = true;
+      else if( !strcmp( field, "ephem_type"))
+         ephemeris_output_options += atoi( buff);
       else if( !strcmp( field, "language"))
          {
          extern char findorb_language;
@@ -273,6 +279,15 @@ int main( const int argc, const char **argv)
    get_defaults( NULL, NULL, NULL, NULL, NULL);
    fprintf( lock_file, "defaults loaded\n");
    ephemeris_mag_limit = mag_limit;
+   if( center_object == -2)
+      element_format &= ~ELEM_OUT_HELIOCENTRIC_ONLY;
+   else
+      {
+      extern int forced_central_body;
+
+      forced_central_body = center_object;
+      element_format |= ELEM_OUT_HELIOCENTRIC_ONLY;
+      }
 
    load_up_sigma_records( "sigma.txt");
    fprintf( lock_file, "Default uncertainties table read\n");
@@ -305,19 +320,21 @@ int main( const int argc, const char **argv)
    if( available_sigmas == COVARIANCE_AVAILABLE)
       {
       extern unsigned perturbers;
+      const int sigma_type = ((element_format & ELEM_OUT_HELIOCENTRIC_ONLY) ?
+                           HELIOCENTRIC_SIGMAS_ONLY : ORBIT_SIGMAS_REQUESTED);
 
       perturbers = 0x7fe;     /* all planets plus the moon */
       if( user_selected_epoch)
          epoch_shown = user_selected_epoch;
       full_improvement( obs, n_obs, orbit, curr_epoch, "",
-                  ORBIT_SIGMAS_REQUESTED, epoch_shown);
+                    sigma_type, epoch_shown);
       }
 
    if( n_obs_actually_loaded > 1 && curr_epoch > 0.)
       {
       write_out_elements_to_file( orbit, curr_epoch, epoch_shown,
             obs, n_obs, orbit_constraints, element_precision,
-            0, ELEM_OUT_ALTERNATIVE_FORMAT);
+            0, element_format);
       }
    else
       printf( "Problem loading observations\n");
