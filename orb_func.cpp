@@ -32,7 +32,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "afuncs.h"
 #include "monte0.h"
 
-#ifdef _MSC_VER
+#ifndef isfinite
    #include <float.h>
    #define isfinite _finite
 #else
