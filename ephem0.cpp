@@ -777,6 +777,8 @@ static void format_motion( char *buff, const double motion)
 void **calloc_double_dimension_array( const size_t x, const size_t y,
                                     const size_t obj_size);
 
+#ifdef ENABLE_SCATTERPLOTS
+
 static inline char **make_text_scattergram( const double *x, const double *y,
          const unsigned n_pts,
          const int xsize, const int ysize, double range)
@@ -872,6 +874,8 @@ static inline double find_cutoff_point( const double *x, const double *y,
       }
    return( lim * 1.1);
 }
+
+#endif        /* #ifdef ENABLE_SCATTERPLOTS */
 
 inline void calc_sr_dist_and_posn_ang( const DPT *ra_decs, const unsigned n_objects,
                      double *dist, double *posn_ang)
