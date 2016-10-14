@@ -2004,6 +2004,7 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
    static bool fcct_error_message_shown = false;
    const double saved_ra_bias = obs->ra_bias;
    const double saved_dec_bias = obs->dec_bias;
+   double coord_epoch = input_coordinate_epoch;
 
    if( !utc)
       return( -1);
@@ -2067,11 +2068,19 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
    obs->is_included = (buff[64] != 'x' && buff[12] != '-');
    FMEMCPY( obs->mpc_code, buff + 77, 3);
    obs->mpc_code[3] = '\0';
-   if( input_coordinate_epoch != 2000.)
+   FMEMCPY( obs->columns_57_to_65, buff + 56, 9);
+   obs->columns_57_to_65[9] = '\0';
+   if( !strcmp( obs->columns_57_to_65, "Apparent "))
+      coord_epoch = -1.;
+   else if( !strcmp( obs->columns_57_to_65, "Mean     "))
+      coord_epoch = 0.;
+   else if( !memcmp( obs->columns_57_to_65, "Epoch", 5))
+      coord_epoch = atof( obs->columns_57_to_65 + 5);
+   if( coord_epoch != 2000.)
       {
       double year = (obs->jd - J2000) / 365.25 + 2000.;
 
-      if( input_coordinate_epoch == -1.)       /* true coords of date */
+      if( coord_epoch == -1.)       /* true coords of date */
          {
          double matrix[9];
 
@@ -2081,8 +2090,8 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
          }
       else
          {
-         if( input_coordinate_epoch)    /* specific epoch given, not just */
-            year = input_coordinate_epoch;         /* mean coords of date */
+         if( coord_epoch)               /* specific epoch given, not just */
+            year = coord_epoch;         /* mean coords of date */
          obs->ra *= -1.;
          precess_pt( (DPT DLLPTR *)&obs->ra,
                      (DPT DLLPTR *)&obs->ra, year, 2000.);
@@ -2111,8 +2120,6 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
       obs->obs_mag = BLANK_MAG;
    FMEMCPY( obs->reference, buff + 72, 5);
    obs->reference[5] = '\0';
-   FMEMCPY( obs->columns_57_to_65, buff + 56, 9);
-   obs->columns_57_to_65[9] = '\0';
    if( memcmp( buff + 72, ".rwo ", 5) &&
           find_fcct_biases( obs->ra, obs->dec, obs->mag_band2, obs->jd,
                                 &obs->ra_bias, &obs->dec_bias) == -2)
