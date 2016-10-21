@@ -1905,7 +1905,7 @@ static double extract_date_from_mpc_report( const char *buff, unsigned *format)
          start_of_decimals = 11;
          }
       }
-   else if( *tbuff == 'J' || *tbuff == 'K')  /* 20th or 21st century */
+   else if( *tbuff >= 'H' && *tbuff <= 'K')  /* 18th through 21st century */
       {                                          /* CYYMMDD format */
       if( (tbuff[7] == '.' || tbuff[7] == ':')
                && (digits_mask & 0x3ff) == 0x37e)  /* i.e, 'Zdddddd.dd' */
