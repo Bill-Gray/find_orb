@@ -68,10 +68,12 @@ PGa ! -98.2161   26.24316  36                  Paul Gabriel, McAllen, Texas USA 
 PWa !  -1.1188   51.0945  120                  Peter Wakelin
 Ran !  12.4545   41.9683   80                  Alberto Rango, Italy
 ScT !-123.6685   49.4348   40                  Roberts Creek 1 (Scott Tilley)
+SGu ! 94.5546   +56.1016  170                  Sergey Guryanov
 SOb !  -2.24377 +53.3199   86                  Unknown satellite observer
 Tim !  20.01361  47.18278  10                  Andras Timar, Hungary
 Tu1 ! -95.983429 +36.139208 201                Tulsa-1
 Tu2 ! -96.1411   +35.8311   330                Tulsa-2
+VMe !  27.543306 +53.904694 217                Vitaly Mechinsky
 
 RPa !-71.0000 43.6666 200                      Ralph Pass
 
