@@ -992,6 +992,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    bool last_line_shown = true;
    RADAR_DATA rdata;
    bool show_radar_data = (get_radar_data( note_text + 1, &rdata) == 0);
+   const double planet_radius_in_au =
+          planet_radius_in_meters( planet_no) / AU_IN_METERS;
 
    step = get_step_size( stepsize, &step_units, &n_step_digits);
    if( !step)
@@ -1149,7 +1151,9 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       }
 
    latlon.x = lon;
-   parallax_to_lat_alt( rho_cos_phi, rho_sin_phi, &latlon.y,
+   parallax_to_lat_alt(
+            rho_cos_phi / planet_radius_in_au,
+            rho_sin_phi / planet_radius_in_au, &latlon.y,
                                 &unused_ht_in_meters, planet_no);
 
    for( i = 0; i < n_steps; i++)
