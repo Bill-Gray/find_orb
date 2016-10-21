@@ -117,7 +117,7 @@ INTEGRAL     2002-048A    2002-048A = NORAD 27540 = Integral
     SK03J170 J050S        Jupiter L = S/2003 J 17 = Herse
     SK10J010 J051S        Jupiter LI = S/2010 J 1
     SK10J020 J052S        Jupiter LII = S/2010 J 2
-    SK00J110 J023S        Jupiter LIII = S/2000 J 11 = Dia
+    SK00J110 J053S        Jupiter LIII = S/2000 J 11 = Dia
     SK01U030 U022S        Uranus XXII = Francisco = S/2001 U 3
     SK01U030 U022S        Uranus XXII = Francisco = S/2001 U 3
     SK03U030 U023S        Uranus XXIII = Margaret = S/2003 U 3

@@ -47,7 +47,6 @@ lnxp1900p2053.421
 ; (about 37 MBytes)
 lnxp1800p2200.423
 
-
 ; ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de418/lnxp1900p2050.418
 ; (about 13 MBytes)
 lnxp1900p2050.418
@@ -71,15 +70,13 @@ sub_de.406
 ; Covers 1800-2100 (now renamed as shown above)
 unxp1800.406
 
-
 ; http://adams.dm.unipi.it/~orbmaint/orbfit/JPLEPH/DE405_win.dat
-; 1960-2020;  about 14 MBytes (file size indicates it may cover more years)
+; 1900-2060;  about 14 MBytes (file size indicates it may cover more years)
 DE405_win.dat
 
 ; http://adams.dm.unipi.it/~orbmaint/orbfit/JPLEPH/DE405.dat
 ; 1970-2020;  about 4.7 MBytes
 DE405.dat
-
 
 ; From the Willmann-Bell CD-ROM:
 ; 1600-2169:  about 43 MBytes:
@@ -99,5 +96,5 @@ linux_p1550p2650.430t
 ; ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de431/lnxm13000p17000.431
 lnxm13000p17000.431
 
-;  At least as of 2015 Dec 29,  DE-423 and DE-432t were available only in ASCII
+;  At least as of 2016 Oct 15,  DE-432 and later were available only in ASCII
 ;  form,  and therefore aren't listed here.
