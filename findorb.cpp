@@ -2396,7 +2396,7 @@ int main( const int argc, const char **argv)
             fclose( ifile);
             n_obs = ids[id_number].n_obs;
             if( !curr_epoch || !epoch_shown || !obs || n_obs < 2)
-               debug_printf( "Curr epoch %f; shown %f; obs %p\n",
+               debug_printf( "Curr epoch %f; shown %f; obs %p; %d obs\n",
                               curr_epoch, epoch_shown, obs, n_obs);
             if( debug_level)
                debug_printf( "got obs; ");
