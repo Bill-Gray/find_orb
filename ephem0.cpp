@@ -3054,7 +3054,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
                if( lon_sign == 'W')
                   lon = -lon;
                fprintf( ofile, " (<a title=\"Click for map\"");
-               fprintf( ofile, " href=\"http://mappoint.msn.com/map.aspx?&amp;C=%.3f,%.3f&amp;A=1000\">",
+               fprintf( ofile, " href=\"http://mappoint.msn.com/map.aspx?&amp;C=%.5f,%.5f&amp;A=1000\">",
                               lat, lon);
                fprintf( ofile, "%s</a>)", latlon);
                }
