@@ -1306,7 +1306,6 @@ static void try_adding_comet_name( const char *search, char *name)
                {
                buff[44] = '\0';
                remove_trailing_cr_lf( buff);
-               debug_printf( "Got it: '%s'\n", buff);
                *name++ = ' ';
                strcpy( name, buff + slen);
                }
