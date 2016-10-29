@@ -1990,7 +1990,7 @@ void format_observation( const OBSERVE FAR *obs, char *text,
             if( four_digit_years)
                sprintf( text, "%04ld\t%02d\t", year, month);
             else
-               sprintf( text, "%02d\t%02d\t", abs( year % 100), month);
+               sprintf( text, "%02d\t%02d\t", abs( (int)year % 100), month);
             text += strlen( text);
             if( resid_format & RESIDUAL_FORMAT_HMS)
                show_dd_hh_mm_ss_point_sss( text, day, 0);
@@ -2029,7 +2029,7 @@ void format_observation( const OBSERVE FAR *obs, char *text,
       if( four_digit_years)
          *text++ = int_to_mutant_hex_char( year / 100);
       sprintf( text, "%02d%02d%02d %s",
-                       abs( year % 100L), month, (int)day, obs->mpc_code);
+                       abs( (int)year % 100), month, (int)day, obs->mpc_code);
       }
    text += strlen( text);
 
