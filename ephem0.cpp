@@ -1432,7 +1432,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                            vect[k] = -obs_posn_equatorial[k];
                      else
                         {           /* we want the lunar posn */
-                        earth_lunar_posn( curr_jd, earth_loc, vect);
+                        earth_lunar_posn( ephemeris_t, earth_loc, vect);
                         for( k = 0; k < 3; k++)
                            vect[k] -= earth_loc[k];
                         moon_more_than_half_lit =
