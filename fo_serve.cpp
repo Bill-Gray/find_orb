@@ -115,6 +115,35 @@ size_t strlcpy(char *dest, const char *src, size_t size)
 }
 #endif
 
+static int desig_matches( const char *iline, const char *desig)
+{
+   const size_t len = strlen( desig);
+   int rval = 0;
+
+   while( *iline == ' ')
+      iline++;
+   if( !memcmp( iline, desig, len) && iline[len] == ' ')
+      rval = 1;
+   return( rval);
+}
+
+static int is_neocp_desig( const char *buff)
+{
+   const size_t len = strlen( buff);
+   int rval = 0;
+
+   if( len > 2 && len < 8 && !strchr( buff, ' '))
+      {
+      int unused, n_bytes;
+
+      rval = 1;
+      if( sscanf( buff, "%d%n", &unused, &n_bytes) == 1
+                  && n_bytes == (int)len)    /* oops!  numbered object */
+         rval = 0;
+      }
+   return( rval);
+}
+
 double current_jd( void);                       /* elem_out.cpp */
 void compute_variant_orbit( double *variant, const double *ref_orbit,
                      const double n_sigmas);       /* orb_func.cpp */
@@ -181,8 +210,27 @@ int main( const int argc, const char **argv)
             FILE *ofile = fopen( temp_obs_filename,
                                (bytes_written ? "ab" : "wb"));
 
+            assert( ofile);
             bytes_written += fwrite( buff, 1, strlen( buff), ofile);
             fclose( ofile);
+            }
+         }
+      else if( !strcmp( field, "obj_name"))
+         {
+         if( is_neocp_desig( buff))
+            {
+            char tbuff[100];
+            FILE *ifile = fopen( "../../neocp2/neocp.txt", "rb");
+            FILE *ofile = fopen( temp_obs_filename,
+                               (bytes_written ? "ab" : "wb"));
+
+            assert( ifile);
+            assert( ofile);
+            while( fgets( tbuff, sizeof( tbuff), ifile))
+               if( desig_matches( tbuff, buff))
+                  bytes_written += fwrite( tbuff, 1, strlen( tbuff), ofile);
+            fclose( ofile);
+            fclose( ifile);
             }
          }
       else if( !strcmp( field, "year"))
@@ -271,6 +319,14 @@ int main( const int argc, const char **argv)
          }
       }
    fprintf( lock_file, "Options read and parsed\n");
+   if( !bytes_written)
+      {
+      printf( "<p> No observations were found.  Click on the browser back arrow\n"
+              "and make sure valid 80-column observations are provided in the\n"
+              "text box or the uploaded file,  or that a valid object name was\n"
+              "given for which MPC has observations. </p>");
+      return( 0);
+      }
 
                /* get_defaults( ) collects a lot of data that's for the  */
                /* interactive find_orb program.  But it also sets some   */
