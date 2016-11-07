@@ -2976,26 +2976,31 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
             {
             char tbuff[4];
             int compare = 1, i, url_index = 0;
-            char *latlon, *remains;
+            char *latlon = NULL, *remains;
 
             memcpy( tbuff, buff + 1, 3);
             tbuff[3] = '\0';
             fprintf( ofile, "<a name=\"stn_%s\"></a>", tbuff);
 
-            for( i = 5; buff[i] && buff[i] != ')'; i++)
-               ;
+            for( i = 5; !latlon && buff[i]; i++)
+               if( !memcmp( buff + i - 2, "  (", 3))
+                  if( (buff[i + 1] == 'N' || buff[i + 1] == 'S'))
+                     {        /* found opening paren of lat/lon */
+                     latlon = buff + i + 1;
+                     i = 0;
+                     while( latlon[i] && latlon[i] != ')')
+                        i++;
+                     if( latlon[i] == ')')    /* found closing paren */
+                        {
+                        remains = latlon + i;
+                        *remains = latlon[-3] = '\0';
+                        }
+                     else          /* oops!  didn't find lat/lon after all */
+                        latlon = NULL;
+                     }
 
-            if( buff[i])  /* found the closing paren of a lat/lon */
+            if( !latlon)  /*  no lat/lon;  assume name ends with a . */
                {
-               remains = buff + i;
-               while( i > 2 && buff[i] != '(')
-                  i--;
-               buff[i - 2] = *remains = '\0';
-               latlon = buff + i + 1;
-               }
-            else  /*  no lat/lon;  assume name ends with a . */
-               {
-               latlon = NULL;
                for( i = 0; buff[i] && buff[i] != '.'; i++)
                   ;
                if( buff[i] == '.' && buff[i + 1])        /* found the '.'! */
