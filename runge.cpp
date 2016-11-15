@@ -1540,7 +1540,7 @@ ldouble take_rk_stepl( const ldouble jd, ELEMENTS *ref_orbit,
       bptr += j;
       if( j != 6)
          {
-         assert( fabs( jd_j) < 1e+9);
+         assert( fabsl( jd_j) < 1e+9);
          calc_derivativesl( jd_j, state_j, ivals_p[j], ref_orbit->central_obj);
          for( k = 0; k < 6; k++)
             ivals_p[j][k] -= ref_state_j[k + 3];

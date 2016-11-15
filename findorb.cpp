@@ -2087,7 +2087,7 @@ int main( const int argc, const char **argv)
    unsigned top_line_residuals;
    bool is_monte_orbit = false;
    unsigned list_codes = SHOW_MPC_CODES_NORMAL;
-   int i, quit = 0, n_obs;
+   int i, quit = 0, n_obs = 0;
    int observation_display = 0;
    OBSERVE FAR *obs = NULL;
    int curr_obs = 0;
