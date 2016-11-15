@@ -1752,6 +1752,7 @@ int main( const int argc, const char **argv)
    loc[0] = (long double)( cos( lon) * cos( lat));
    loc[1] = (long double)( sin( lon) * cos( lat));
    loc[2] = (long double)( sin( lat) * earth_minor_axis / EARTH_MAJOR_AXIS);
+   ggm03c_terms[0] = 1.;      /* include "J0" term    */
    oval = 1. - (double)geo_potential( loc[0], loc[1], loc[2], derivs, n_terms);
    oval -= centrifugal_pot_at_equator * cos( lat) * cos( lat) / 2.;
    printf( "%e  %f\n", oval,
