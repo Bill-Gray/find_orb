@@ -1947,11 +1947,13 @@ static double extract_date_from_mpc_report( const char *buff, unsigned *format)
          start_of_decimals = 8;
          }
       }
-   if( start_of_decimals)
-      while( isdigit( tbuff[start_of_decimals++]))
-         format_found++;
    if( format)
+      {
+      if( start_of_decimals)
+         while( isdigit( tbuff[start_of_decimals++]))
+            format_found++;
       *format = format_found;
+      }
 
    if( month >= 1 && month <= 12 && rval > 0. && rval < 99.)
       rval += (double)dmy_to_day( 0, month, year,
@@ -3685,6 +3687,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
          {
          comment_observation( rval + i, "Deleted");
          rval[i].flags |= OBS_DONT_USE;
+         rval[i].is_included = 0;
          }
    for( i = n_obs_actually_loaded; i < n_obs; i++)
       rval[i].jd = 0.;
@@ -3784,7 +3787,7 @@ may have further information.  These observations will be excluded.\n",
       }
    for( i = 1; i < n_obs_actually_loaded; i++)
       if( rval[i].jd == rval[i - 1].jd && !strcmp( rval[i].mpc_code, rval[i - 1].mpc_code))
-//       if( toupper( rval[i].note2) != 'X' && toupper( rval[i - 1].note2) != 'X')
+         if( toupper( rval[i].note2) != 'X' && toupper( rval[i - 1].note2) != 'X')
             if( !spacewatch_duplication( rval + i - 1))
                {
                rval[i].is_included = 0;
@@ -4045,7 +4048,7 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
       if( rval[i].packed_desig[0])
          rval[n++] = rval[i];
    assert( n == *n_found);
-   sort_object_info( rval, n, OBJECT_INFO_COMPARE_NAME);
+   sort_object_info( rval, n, OBJECT_INFO_COMPARE_PACKED);
    return( rval);
 }
 
