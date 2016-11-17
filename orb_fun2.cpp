@@ -664,32 +664,35 @@ int find_circular_orbits( OBSERVE FAR *obs1, OBSERVE FAR *obs2,
 double improve_along_lov( double *orbit, const double epoch, const double *lov,
           const unsigned n_params, const unsigned n_obs, OBSERVE *obs)
 {
-   double *xresid = (double *)calloc( n_obs * 2, sizeof( double));
-   double *yresid = xresid + n_obs;
+   double *xyz = (double *)calloc( n_obs * 3, sizeof( double));
    const double delta = 0.0001;
-   double a = 0., b = 0., rval;
-   unsigned i;
+   double rval = 0.;
+   unsigned i, j;
 
-   assert( xresid);
-   if( !xresid)
+   assert( xyz);
+   if( !xyz)
       return( 0.);
    for( i = 0; i < n_obs; i++)
-      get_residual_data( obs + i, xresid + i, yresid + i);
+      for( j = 0; j < 3; j++)
+         xyz[i * 3 + j] = obs[i].obj_posn[j] - obs[i].obs_posn[j];
    for( i = 0; i < n_params; i++)
       orbit[i] += delta * lov[i];
    set_locs( orbit, epoch, obs, n_obs);
    for( i = 0; i < n_obs; i++)
-      {
-      double delta_x, delta_y;
+//    if( obs[i].flags & OBS_IS_SELECTED)
+      if( obs[i].is_included)
+         {
+         double dvect[3], *xptr = xyz + i * 3;
+         double temp_vect[3], xprod[3];
 
-      get_residual_data( obs + i, &delta_x, &delta_y);
-      delta_x = (delta_x - xresid[i]) / delta;
-      delta_y = (delta_y - yresid[i]) / delta;
-      a += delta_x * delta_x + delta_y * delta_y;
-      b += delta_x * xresid[i] + delta_y * yresid[i];
-      }
-   free( xresid);
-   rval = -b / a;
+         for( j = 0; j < 3; j++)
+            dvect[j] = (obs[i].obj_posn[j] - obs[i].obs_posn[j]
+                                 - xptr[j]) / delta;
+         vector_cross_product( temp_vect, dvect, obs[i].vect);
+         vector_cross_product( xprod, temp_vect, obs[i].vect);
+         rval = -dot_product( xprod, xptr) / dot_product( xprod, dvect);
+         }
+   free( xyz);
    for( i = 0; i < n_params; i++)
       orbit[i] += (rval - delta) * lov[i];
    set_locs( orbit, epoch, obs, n_obs);
