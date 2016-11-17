@@ -76,6 +76,7 @@ Tu2 ! -96.1411   +35.8311   330                Tulsa-2
 VMe !  27.543306 +53.904694 217                Vitaly Mechinsky
 
 RPa !-71.0000 43.6666 200                      Ralph Pass
+Var !  6.6814    +44.5736  1850                Vars,  southern Alps
 
    When 2008 TC3 impacted the earth on 7 Oct 2008,  I added the impact point
    as an "observatory" so I could get impact-centered ephemerides easily.
@@ -161,7 +162,7 @@ Ke2 !-1552827.24268  +194935.61788  4159.581   Keck 2, Mauna Kea
 Sub !-1552833.66719  +194931.81425  4163.001   Subaru, Mauna Kea
 Gem !-1552808.56831  +194925.68521  4213.439   Gemini North, Mauna Kea
 
-Ce1 ! -2.566025 37.982840 1532                 Centu1 (J95 scope)
+Ce1 ! -2.566025 37.982840 1532                 Centu1 (J75 scope)
 
    At one time,  it looked as if there might be some Dawn-based astrometry,
    with coordinates relative to Ceres.
