@@ -2113,6 +2113,7 @@ int main( const int argc, const char **argv)
 #endif
    double max_residual_for_filtering = 2.5;
    bool show_commented_elements = false;
+   bool drop_single_obs = true;
 
    setlocale( LC_ALL, "");
    use_config_directory = false;
@@ -2120,6 +2121,9 @@ int main( const int argc, const char **argv)
       if( argv[i][0] == '-')
          switch( argv[i][1])
             {
+            case '1':
+               drop_single_obs = false;
+               break;
             case 'a':
                {
                extern int separate_periodic_comet_apparitions;
@@ -2280,6 +2284,15 @@ int main( const int argc, const char **argv)
 #endif
 
    ids = find_objects_in_file( argv[1], &n_ids, NULL);
+   if( drop_single_obs)
+      {
+      int j = 0;
+
+      for( i = 0; i < n_ids; i++)
+         if( ids[i].n_obs > 1)
+            ids[j++] = ids[i];
+      n_ids = j;
+      }
    if( n_ids <= 0)
       {        /* no objects found,  or file not found */
       const char *err_msg;
