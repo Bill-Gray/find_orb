@@ -109,11 +109,16 @@ const char *get_find_orb_text( const int index);      /* elem_out.cpp */
 void get_find_orb_text_filename( char *filename);     /* elem_out.cpp */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 
+extern int debug_level;
 double asteroid_magnitude_slope_param = .15;
 double comet_magnitude_slope_param = 10.;
 char default_comet_magnitude_type = 'N';
 const char *mpc_fmt_filename = "mpc_fmt.txt";
+const char *sof_filename = "sof.txt";
 extern int forced_central_body;
+int add_sof_to_file( const char *filename,         /* elem_ou2.cpp */
+             const ELEMENTS *elem,
+             const int n_obs, const OBSERVE *obs);
 
 int debug_printf( const char *format, ...);                /* runge.cpp */
 
@@ -866,6 +871,9 @@ N_MOIDS_TO_SHOW = 8 at present (we only show planetary MOIDs.) */
 #define N_MOIDS           14
 #define N_MOIDS_TO_SHOW    8
 
+double comet_total_magnitude = 0.;          /* a.k.a. "M1" */
+double comet_nuclear_magnitude = 0.;        /* a.k.a. "M2" */
+
 int write_out_elements_to_file( const double *orbit,
             const double curr_epoch,
             const double epoch_shown,
@@ -873,7 +881,7 @@ int write_out_elements_to_file( const double *orbit,
             const int precision, const int monte_carlo,
             const int options)
 {
-   char object_name[80], buff[160], more_moids[80];
+   char object_name[80], buff[260], more_moids[80];
    const char *file_permits = (append_elements_to_element_file ? "fca" : "fcw+");
    extern const char *elements_filename;
    FILE *ofile = fopen_ext( get_file_name( buff, elements_filename), file_permits);
@@ -961,11 +969,28 @@ int write_out_elements_to_file( const double *orbit,
       sprintf( orbit_summary_text, "q=%.3f, ", elem.q);
    sprintf( orbit_summary_text + strlen( orbit_summary_text),
             "e=%.3f, i=%d", elem.ecc, (int)( elem.incl * 180. / PI + .5));
-   elem.abs_mag = calc_absolute_magnitude( obs, n_obs);
    elem.is_asteroid = !(obs->flags & OBS_IS_COMET);
-   elem.slope_param = (elem.is_asteroid ? asteroid_magnitude_slope_param
-                                        : comet_magnitude_slope_param);
+   if( elem.is_asteroid)
+      {
+      elem.slope_param = asteroid_magnitude_slope_param;
+      elem.abs_mag = calc_absolute_magnitude( obs, n_obs);
+      }
+   else              /* for comets, compute nuclear & total absolute mags */
+      {
+      elem.slope_param = comet_magnitude_slope_param;
+      for( i = 0; i < 2; i++)
+         {
+         default_comet_magnitude_type = 'T' + 'N' - default_comet_magnitude_type;
+         elem.abs_mag = calc_absolute_magnitude( obs, n_obs);
+         if( default_comet_magnitude_type == 'N')
+            comet_nuclear_magnitude = elem.abs_mag;
+         else
+            comet_total_magnitude = elem.abs_mag;
+         }
+      }
 
+   add_sof_to_file( (n_extra_params >= 2 ? "cmt_sof.txt" : sof_filename),
+                    &elem, n_obs, obs);            /* elem_ou2.cpp */
    helio_elem = elem;
    if( elem.central_obj)            /* except for planet-encounterers,  'elem' */
       {                             /* will already be heliocentric.  This     */
@@ -1049,6 +1074,7 @@ int write_out_elements_to_file( const double *orbit,
                   strcat( tt_ptr, (strlen( tt_ptr) > 50) ? "\n" : "   ");
                }
             }
+         assert( strlen( buff) < sizeof( buff) - 1);
          }
 
       else if( !memcmp( buff, "Epoch", 5))
@@ -1836,6 +1862,8 @@ static int obj_desig_to_perturber( const char *packed_desig)
          else if( packed_desig[3] == '8')
             rval = 19;                          /* Iapetus */
          }
+      else if( *packed_desig == 'E' && packed_desig[3] == '1')
+         rval = 10;           /* Earth's moon */
       }
    if( rval > 0)
       excluded_perturbers |= (1 << rval);

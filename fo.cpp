@@ -58,6 +58,7 @@ for Windows and other non-*nix systems. */
 extern int debug_level;
 
 int debug_level = 0;
+extern const char *sof_filename;
 
 char *get_file_name( char *filename, const char *template_file_name);
 int sanity_test_observations( const char *filename);
@@ -122,11 +123,27 @@ static int remove_single_observation_objects( OBJECT_INFO *ids, const int n_ids)
 static void combine_element_files( const char *filename, const int n_processes)
 {
    FILE **input_files = (FILE **)calloc( (size_t)n_processes, sizeof( FILE *));
-   FILE *ofile = fopen( filename, "w");
    char buff[400];
    int i, quit;
+   FILE *ofile;
    extern int process_count;
 
+   if( !strcmp( filename, sof_filename))
+      {
+      FILE *ifile = fopen( filename, "rb");
+
+      assert( ifile);
+      if( !fgets( buff, sizeof( buff), ifile))
+         {        /* get header line */
+         printf( "Failed to read sof.txt\n");
+         exit( -1);
+         }
+      fclose( ifile);
+      ofile = fopen( filename, "w");
+      fwrite( buff, strlen( buff), 1, ofile);
+      }           /* above writes header line back out */
+   else
+      ofile = fopen( filename, "w");
    assert( ofile);
    for( i = 0; i < n_processes; i++)
       {
@@ -608,6 +625,7 @@ int main( const int argc, const char **argv)
 
       combine_element_files( elements_filename, n_processes);
       combine_element_files( mpc_fmt_filename, n_processes);
+      combine_element_files( sof_filename, n_processes);
       for( i = 0; i < n_processes; i++)
          {                             /* clean up temp files: */
          process_count = i + 1;
@@ -616,6 +634,7 @@ int main( const int argc, const char **argv)
          unlink( get_file_name( tbuff, "covar.txt"));
          unlink( get_file_name( tbuff, "sr_elems.txt"));
          unlink( get_file_name( tbuff, "mpc_sr.txt"));
+//       unlink( get_file_name( tbuff, sof_filename));
          }
       }
 #ifdef TEST_PLANET_CACHING_HASH_FUNCTION
