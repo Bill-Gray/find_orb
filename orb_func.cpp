@@ -100,6 +100,7 @@ int n_extra_params = 0, setting_outside_of_arc = 1;
 double solar_pressure[3], uncertainty_parameter = 99.;
 int available_sigmas = NO_SIGMAS_AVAILABLE;
 int available_sigmas_hash = 0;
+static bool fail_on_hitting_planet = false;
 
 double gaussian_random( void);                           /* monte0.c */
 void get_residual_data( const OBSERVE *obs, double *xresid, double *yresid);
@@ -154,6 +155,8 @@ double find_epoch_shown( const OBSERVE *obs, const int n_obs); /* elem_out */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
                                    const char *format, ...);
+double improve_along_lov( double *orbit, const double epoch, const double *lov,
+          const unsigned n_params, const unsigned n_obs, OBSERVE *obs);
 
 void set_distance( OBSERVE FAR *obs, double r)
 {
@@ -340,6 +343,7 @@ clock_t integration_timeout = (clock_t)0;
 
 #define STEP_INCREMENT 2
 #define INTEGRATION_TIMED_OUT       -3
+#define HIT_A_PLANET                -4
 
 int integrate_orbit( double *orbit, const double t0, const double t1)
 {
@@ -555,6 +559,14 @@ int integrate_orbit( double *orbit, const double t0, const double t1)
       else if( integration_timeout && !(n_steps % 100))
          if( clock( ) > integration_timeout)
             rval = INTEGRATION_TIMED_OUT;
+      if( fail_on_hitting_planet)
+         {
+         extern int planet_hit;
+
+         if( planet_hit != -1)
+            rval = HIT_A_PLANET;
+         }
+
       if( debug_level && n_steps % 10000 == 0)
          {
          extern int best_fit_planet;
@@ -1329,7 +1341,9 @@ int find_nth_sr_orbit( double *orbit, OBSERVE FAR *obs, int n_obs,
             i = n_ranges * 2;  /* break out of loop */
             }
          }
-      find_trial_orbit( orbit, obs, n_obs, dist, 2. * rand2 - 1.);
+      fail_on_hitting_planet = true;
+      rval = find_trial_orbit( orbit, obs, n_obs, dist, 2. * rand2 - 1.);
+      fail_on_hitting_planet = false;
       }
    return( rval);
 }
@@ -3412,6 +3426,10 @@ static double only_one_position_available( OBSERVE FAR *obs,
 #define INITIAL_ORBIT_FAILED              -1
 #define INITIAL_ORBIT_FOUND                0
 
+         /* Rather arbitrarily,  we don't use SR for spans greater */
+         /* than 20 days.  Probably could drop that a lot without trouble. */
+#define MAX_SR_SPAN 20
+
 double *sr_orbits;
 unsigned n_sr_orbits = 0;
 unsigned max_n_sr_orbits;
@@ -3489,7 +3507,10 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
    if( !sr_orbits)
       return( 0.);
    writing_sr_elems = false;
-   n_sr_orbits = get_sr_orbits( sr_orbits, obs, n_obs, 0, max_n_sr_orbits, .5, 0.);
+   if( obs[n_obs - 1].jd - obs[0].jd < MAX_SR_SPAN)
+      n_sr_orbits = get_sr_orbits( sr_orbits, obs, n_obs, 0, max_n_sr_orbits, .5, 0.);
+   else
+      n_sr_orbits = 0;     /* don't bother with SR for long time spans */
    writing_sr_elems = true;
    for( i = 0; (unsigned)i < n_sr_orbits && sr_orbits[i * 7 + 6] < .7; i++)
       ;
@@ -3536,7 +3557,7 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
       if( debug_level)
          debug_printf( "From %f to %f (%f days)\n", obs[start].jd, obs[end].jd, arclen);
       n_subarc_obs = end - start + 1;
-
+      fail_on_hitting_planet = true;
       if( n_subarc_obs >= 3)     /* at least three observations;  try Gauss */
          {
 #ifdef CONSOLE
@@ -3673,6 +3694,7 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
       memcpy( orbit, best_orbit, 6 * sizeof( double));
       }
 
+   fail_on_hitting_planet = false;
 // set_locs( orbit, obs[start].jd, obs, n_obs);
    perturbers = perturbers_automatically_found & (~AUTOMATIC_PERTURBERS);
    attempt_extensions( obs, n_obs, orbit);
@@ -3795,6 +3817,7 @@ static void attempt_extensions( OBSERVE *obs, const int n_obs, double *orbit)
    const double residual_limit = 200.;   /* allow up to 200" in orbit extension */
    double arc_limit_in_days = atof( get_environment_ptr( "AUTO_ARC_LEN"));
    const int stored_setting_outside_of_arc = setting_outside_of_arc;
+   unsigned best_perturbers = perturbers;
 
    if( !arc_limit_in_days)
       arc_limit_in_days = 3650;        /* Default to ten years at most */
@@ -3821,24 +3844,43 @@ static void attempt_extensions( OBSERVE *obs, const int n_obs, double *orbit)
          if( debug_level)
             debug_printf( "   Try extend %d to %d (%f day arc)\n",
                      start, end, obs[end].jd - obs[start].jd);
+//                printf( "   Try extend %d to %d (%f day arc)\n",
+//                   start, end, obs[end].jd - obs[start].jd);
          if( obs[end].jd - obs[start].jd > 100.)
             perturbers |= (1 << 5);       /* add Jupiter for >100-day arc */
          if( obs[end].jd - obs[start].jd > 400.)
             perturbers |= (1 << 6);       /* add Saturn for >400-day arc */
          if( obs[end].jd - obs[start].jd > 2000.)
-            perturbers |= (1 << 2) | (1 << 3) | (1 << 4) | (1 << 7);
-                    /* after six years, venus,  earth,  mars,  and uranus can matter */
+            perturbers |= 0x19e;
+                    /* after six years, merc, venus,  earth,  mars,  */
+                    /* uranus,  and neptune can matter */
          if( obs[end].jd - obs[start].jd > 365. * 20.)
             perturbers |= (1 << 1) | (1 << 8);
                     /* after twenty years,  include Merc, Nept too */
          for( i = 0; i < 5 && !result; i++)
             {
             perturbers |= (perturbers_automatically_found & (~AUTOMATIC_PERTURBERS));
+//          printf( "i = %d;  %d obs;  rms %f\n", i, n_obs,
+//                       compute_rms( obs, n_obs));
+            if( available_sigmas == COVARIANCE_AVAILABLE)
+               {
+               int loop;
+
+               for( loop = 0; loop < 3; loop++)
+                  {
+                  improve_along_lov( orbit, epoch, eigenvects[0],
+                                            n_extra_params + 6, n_obs, obs);
+//                printf( "Loop %d, rms %f\n", loop,
+//                       compute_rms( obs, n_obs));
+                  }
+               }
             if( full_improvement( obs, n_obs, orbit, epoch, NULL,
                            NO_ORBIT_SIGMAS_REQUESTED, epoch))
                result = -1;   /* full improvement failed */
             else
                {
+//             printf( "fully improved : rms %f\n",
+//                       compute_rms( obs, n_obs));
                score[i] = evaluate_initial_orbit( obs, n_obs, orbit);
                if( i && score[i - 1] < score[i] + .1)      /* no real improvement... */
                   result = 1;                               /* we must have converged */
@@ -3860,13 +3902,22 @@ static void attempt_extensions( OBSERVE *obs, const int n_obs, double *orbit)
                memcpy( best_orbit, orbit, 6 * sizeof( double));
                best_start = start;
                best_end = end;
+               best_perturbers = perturbers;
                }
             }
          }
       }
       while( !done);
    setting_outside_of_arc = stored_setting_outside_of_arc;
-   memcpy( orbit, best_orbit, 6 * sizeof( double));
+   if( memcmp( orbit, best_orbit, 6 * sizeof( double)))
+      {
+      memcpy( orbit, best_orbit, 6 * sizeof( double));
+      perturbers = best_perturbers;
+#if 0
+      full_improvement( obs, n_obs, orbit, epoch, NULL,
+                           NO_ORBIT_SIGMAS_REQUESTED, epoch);
+#endif
+      }
    for( i = 0; i < best_start; i++)
       obs[i].is_included = 0;
    for( i = best_end + 1; i < n_obs; i++)
