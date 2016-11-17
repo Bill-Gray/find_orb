@@ -63,7 +63,9 @@ MAX_OBSERVATION_SPAN=200
    For radar stations,  power (in watts), temp in K, gain, altitude limit
    in degrees,  and an arbitrary "radar constant" are needed.  So far,  the
    only radar stations for which I have those data are (251) Arecibo and
-   (253) Goldstone.
+   (253) Goldstone.  [Correction:  at least most of these data are provided
+   in Table 1 of https://arxiv.org/pdf/1604.01080v1.pdf.  And Table 2 provides
+   'relative sensitivities',  including for bistatic modes.]
 RADAR_251=900000,25,10,70.5,1.5e-11
 RADAR_253=430000,17,.94,20,1e-11
 
@@ -136,13 +138,21 @@ BC405_ASTEROIDS=300
    heliocentric ones,  to be referred to the J2000 ecliptic.
 ECLIPTIC_ORBITS_ONLY=0
 
-   By default,  Find_Orb includes,  for objects close to the earth,  the
-   geopotential terms (spherical harmonics) up to l=6.  You can modify the
-   following quantity to change this.  Note that at present,  the maximum
-   is l=19.  (See http://www.projectpluto.com/force.htm for details.)  (I've
-   since shut off these geoterms,  though J2,  J3,  and J4 are still in.
-   I'm not entirely convinced the higher-order terms are being used properly.)
-GEO_TERMS=0
+   Find_Orb will apply geopotential terms (spherical harmonics) for objects
+   close to the earth.  It has a bit of logic to determine how many should
+   be computed,  as a function of distance (only J2 for most cases,  but
+   many terms as one gets close to the earth).  The following GEO_TERMS
+   quantity can be raised to include more terms,  or lowered to get better
+   speed for artsats.  However,  through experimentation,  I've found that
+   setting it to the default value of 6 gets good results;  increasing it
+   doesn't change orbits much,  lowering it causes them to start showing
+   errors.
+GEO_TERMS=6
+
+   By default,  the DRAG_SHUTOFF=1 tells Find_Orb not to include the effects
+   of atmospheric drag.  Set it to zero if you want objects entering the
+   earth's atmosphere (only one handled thus far) to be affected by drag.
+DRAG_SHUTOFF=1
 
    By default,  Find_Orb will look for an orbit covering,  at most,  20
    years (7300 days) of observations.  This is simply for speed reasons,
