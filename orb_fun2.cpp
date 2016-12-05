@@ -33,7 +33,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 
 double improve_along_lov( double *orbit, const double epoch, const double *lov,
           const unsigned n_params, const unsigned n_obs, OBSERVE *obs);
-void get_residual_data( const OBSERVE *obs, double *xresid, double *yresid);
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 int adjust_herget_results( OBSERVE FAR *obs, int n_obs, double *orbit);
 double evaluate_for_simplex_method( const OBSERVE FAR *obs,
