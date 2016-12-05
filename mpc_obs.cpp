@@ -78,7 +78,7 @@ int compute_observer_loc( const double jde, const int planet_no,
 int compute_observer_vel( const double jde, const int planet_no,
              const double rho_cos_phi,           /* mpc_obs.cpp */
              const double rho_sin_phi, const double lon, double FAR *vel);
-void get_residual_data( const OBSERVE *obs, double *xresid, double *yresid);
+int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid);
 static int xref_designation( char *desig);
 int64_t nanoseconds_since_1970( void);                      /* mpc_obs.c */
 int debug_printf( const char *format, ...);                 /* mpc_obs.c */
@@ -212,7 +212,7 @@ static void remove_html_tags( char *buff)
 
 static void fix_up_mpc_observation( char *buff)
 {
-   size_t len = strlen( buff);
+   const size_t len = strlen( buff);
 
    if( len == 80 && observation_jd( buff))      /* doesn't need fixing */
       {                                      /* except maybe for desig */
