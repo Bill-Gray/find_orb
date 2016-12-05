@@ -32,16 +32,18 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "afuncs.h"
 #include "monte0.h"
 
-#ifndef isfinite
-   #include <float.h>
-   #define isfinite _finite
-#else
+#ifndef _MSC_VER
    #define CONSOLE
       /* In the console version of Find_Orb,  the following two functions */
       /* get remapped to Curses functions.  In the non-interactive one,   */
       /* they're mapped to 'do-nothings'.  See fo.cpp & find_orb.cpp.     */
-void refresh_console( void);
-void move_add_nstr( const int col, const int row, const char *msg, const int n_bytes);
+   void refresh_console( void);
+   void move_add_nstr( const int col, const int row, const char *msg, const int n_bytes);
+#endif
+
+#ifndef isfinite
+   #include <float.h>
+   #define isfinite _finite
 #endif
 
 unsigned perturbers = 0;
@@ -103,7 +105,7 @@ int available_sigmas_hash = 0;
 static bool fail_on_hitting_planet = false;
 
 double gaussian_random( void);                           /* monte0.c */
-void get_residual_data( const OBSERVE *obs, double *xresid, double *yresid);
+int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid);
 int debug_printf( const char *format, ...);
 double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit);
 int adjust_herget_results( OBSERVE FAR *obs, int n_obs, double *orbit);
@@ -151,6 +153,8 @@ static int find_transfer_orbit( double *orbit, OBSERVE FAR *obs1,
                 OBSERVE FAR *obs2,
                 const int already_have_approximate_orbit);
 double observation_rms( const OBSERVE FAR *obs);            /* elem_out.cpp */
+double compute_weighted_rms( const OBSERVE FAR *obs, const int n_obs,
+                           int *n_resids);                  /* orb_func.cpp */
 double find_epoch_shown( const OBSERVE *obs, const int n_obs); /* elem_out */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
@@ -814,6 +818,25 @@ double compute_rms( const OBSERVE FAR *obs, const int n_obs)
    return( sqrt( rval / (double)(n_included * 2)));
 }
 
+double compute_weighted_rms( const OBSERVE FAR *obs, const int n_obs, int *n_resids)
+{
+   double rval = 0;
+   int i, n = 0;
+
+   for( i = n_obs; i; i--, obs++)
+      if( obs->is_included)
+         {
+         double xresid, yresid;
+
+         n += get_residual_data( obs, &xresid, &yresid);
+
+         rval += xresid * xresid + yresid * yresid;
+         }
+   if( n_resids)
+      *n_resids = n;
+   return( sqrt( rval / (double)n));
+}
+
 static double eval_3x3_determinant( const double *a, const double *b,
                          const double *c)
 {
@@ -1113,7 +1136,7 @@ int search_for_trial_orbit( double *orbit, OBSERVE FAR *obs, int n_obs,
       find_trial_orbit( orbit, obs, n_obs, r1, ang_param);
       rms[0] = rms[1];
       rms[1] = rms[2];
-      rms[2] = compute_rms( obs, n_obs);
+      rms[2] = compute_weighted_rms( obs, n_obs, NULL);
 //    debug_printf( "r1 %f, ang_param %f: %f\n",
 //                r1, ang_param, rms[2]);
       if( !i || best_rms_found > rms[2])
@@ -1140,7 +1163,7 @@ int search_for_trial_orbit( double *orbit, OBSERVE FAR *obs, int n_obs,
             debug_printf ("x: %f %f %f; y: %f %f %f\n",
                      x[0], x[1], x[2], y[0], y[1], y[2]);
             find_trial_orbit( orbit, obs, n_obs, r1, new_x);
-            new_rms = compute_rms( obs, n_obs);
+            new_rms = compute_weighted_rms( obs, n_obs, NULL);
             if( y[1] > y[0])
                max_idx = 1;
             if( y[2] > y[max_idx])
@@ -2206,7 +2229,8 @@ a range observation,  a Doppler (range-rate) observation,  or both.  And some
 observations are not included in the least-squares fit,  and therefore
 correspond to zero observations.  The following code looks at an "observation"
 and computes the residuals for zero,  one,  or two observations.  The unused
-"observations" are left with zero residuals.
+"observations" are left with zero residuals.  The number of residuals determined
+is returned.
 
    About how timing errors are included:  they are assumed to affect optical data
 only,  and only in the along-track direction.  We convert the timing error,  in
@@ -2226,8 +2250,10 @@ be our 'timing_err'.  Added in quadrature,  that would mean that the total
 along-track error would be sqrt( 0.7^2 + 2.4^2) = 2".5 (values carefully chosen
 to produce an exact result).        */
 
-void get_residual_data( const OBSERVE *obs, double *xresid, double *yresid)
+int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid)
 {
+   int n_residuals = 0;
+
    *xresid = *yresid = 0.;
    if( obs->is_included)
       {
@@ -2237,9 +2263,15 @@ void get_residual_data( const OBSERVE *obs, double *xresid, double *yresid)
 
          compute_radar_info( obs, &rinfo);
          if( rinfo.rtt_obs)
+            {
             *xresid = (rinfo.rtt_obs - rinfo.rtt_comp) / rinfo.rtt_sigma;
+            n_residuals++;
+            }
          if( rinfo.doppler_obs)
+            {
             *yresid = (rinfo.doppler_obs - rinfo.doppler_comp) / rinfo.doppler_sigma;
+            n_residuals++;
+            }
          }
       else
          {
@@ -2274,8 +2306,10 @@ void get_residual_data( const OBSERVE *obs, double *xresid, double *yresid)
 //                   *yresid, along_track_sigma, timing_err, arcsec_per_second);
             *yresid /= along_track_sigma;               /* ...now it's in sigmas */
             }
+         n_residuals = 2;
          }
       }
+   return( n_residuals);
 }
 
 /* Describing what 'full_improvement()' does requires an entire separate
@@ -3177,7 +3211,7 @@ static double adjustment_for_orbit_likelihood( const double semimajor_axis,
 double evaluate_initial_orbit( const OBSERVE FAR *obs,
                               const int n_obs, const double *orbit)
 {
-   const double rms_err = compute_rms( obs, n_obs);
+   const double rms_err = compute_weighted_rms( obs, n_obs, NULL);
    double rval, rel_orbit[6];
    ELEMENTS elem;
    int planet_orbiting = find_best_fit_planet( obs->jd,
@@ -3192,7 +3226,7 @@ double evaluate_initial_orbit( const OBSERVE FAR *obs,
       calc_classical_elements( &elem, orbit, obs[0].jd, 1);
       }
 
-   rval = rms_err;
+   rval = rms_err / 2.;
                /* For arcs with very few observations,  we really shouldn't */
                /* think too long and hard about the rms error :             */
    if( n_obs < 6)
@@ -3929,7 +3963,7 @@ int metropolis_search( OBSERVE *obs, const int n_obs, double *orbit,
                const double epoch, int n_iterations, double scale)
 {
    int iter;
-   double rms = compute_rms( obs, n_obs);
+   double rms = compute_weighted_rms( obs, n_obs, NULL);
    extern double **eigenvects;
    double zorbit[9];
 
@@ -3954,7 +3988,7 @@ int metropolis_search( OBSERVE *obs, const int n_obs, double *orbit,
          }
       memcpy( solar_pressure, new_orbit + 6, n_extra_params * sizeof( double));
       set_locs( new_orbit, epoch, obs, n_obs);
-      new_rms = compute_rms( obs, n_obs);
+      new_rms = compute_weighted_rms( obs, n_obs, NULL);
       debug_printf( "Iter %d: prev rms %f; new rms %f\n", iter, rms, new_rms);
       if( new_rms < rms)
          {
