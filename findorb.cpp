@@ -78,11 +78,6 @@ BMOUSE global_bmouse;
    #define BUTTON_CTRL BUTTON_CONTROL
 #endif
 
-#if ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406
-   #define CAN_SUPPRESS_WARNINGS_WITHIN_CODE
-#endif
-
-
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
