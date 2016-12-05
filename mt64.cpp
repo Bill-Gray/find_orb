@@ -80,10 +80,6 @@
    #endif
 #endif
 
-#if ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406
-   #define DIAGNOSTIC_PRAGMAS_IN_FUNCTIONS_OK
-#endif
-
 #define MM 156
 #define MATRIX_A UINT64_C( 0xB5026F5AA96619E9)
 #define UM       UINT64_C( 0xFFFFFFFF80000000)   /* Most significant 33 bits */
@@ -277,6 +273,8 @@ version would address it. */
 #include <string.h>     /* for memcpy( ) prototype */
 #endif
 
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
+
 double mt64_double( uint64_t * RESTRICT mt)
 {
 #ifdef NON_IEEE_WAY
@@ -290,14 +288,7 @@ double mt64_double( uint64_t * RESTRICT mt)
 // const uint64_t rval = jflone | mt64_get_bits( mt, 52);
 
 #ifndef AVOID_TYPE_PUNNING
-   #ifdef DIAGNOSTIC_PRAGMAS_IN_FUNCTIONS_OK
-      #pragma GCC diagnostic push
-      #pragma GCC diagnostic ignored "-Wstrict-aliasing"
-   #endif
    return( *((const double * RESTRICT)&rval) - 1.);
-   #ifdef DIAGNOSTIC_PRAGMAS_IN_FUNCTIONS_OK
-      #pragma GCC diagnostic pop
-   #endif
 #else
    double d_rval;
 
@@ -307,6 +298,8 @@ double mt64_double( uint64_t * RESTRICT mt)
 #endif
 #endif
 }
+
+#pragma GCC diagnostic warning "-Wstrict-aliasing"
 
 // double mt64_double( uint64_t * RESTRICT mt)
 // {
