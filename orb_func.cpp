@@ -3412,7 +3412,9 @@ static double find_sungrazer_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
 that observation,  putting it in a near-circular orbit with a=2.2,  with
 as low an inclination as possible (z-velocity is zero).  Simply done to
 make sure the program doesn't crash if only one valid observation is
-supplied... this was easier than generating an error message right away. */
+supplied... this was easier than generating an error message right away.
+Also used if we're just looking at the observations and don't actually
+need a "real" orbit (force_bogus_orbit == true).      */
 
 static void generate_bogus_orbit_for_single_obs( OBSERVE FAR *obs, double *orbit)
 {
@@ -3432,6 +3434,8 @@ static void generate_bogus_orbit_for_single_obs( OBSERVE FAR *obs, double *orbit
    orbit[5] = 0.;
 }
 
+bool force_bogus_orbit = false;
+
 static double only_one_position_available( OBSERVE FAR *obs,
                               const unsigned n_obs, double *orbit)
 {
@@ -3441,9 +3445,8 @@ static double only_one_position_available( OBSERVE FAR *obs,
    for( i = n_usable_obs = 0; i < n_obs; i++)
       if( !(obs[i].flags & OBS_DONT_USE))
          n_usable_obs++;
-   if( n_usable_obs < 2)   /* if only one observation is available, */
-      {                    /* we make a 'bogus orbit' from it.  We  */
-                           /* need _something_ to avoid a crash.    */
+   if( n_usable_obs < 2 || force_bogus_orbit)
+      {
       for( i = 0; i < n_obs && (obs[i].flags & OBS_DONT_USE); i++)
          ;
       if( i == n_obs)      /* all obs marked as unusable; */
@@ -3502,7 +3505,7 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
       }
                /* We may have eliminated all observations,  or all */
                /* but one... in which case we do this :            */
-   if( n_obs <= 1)
+   if( n_obs <= 1 || force_bogus_orbit)
       return( only_one_position_available( obs, n_obs, orbit));
 
    arclen = obs[n_obs - 1].jd - obs[0].jd;
