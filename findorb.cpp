@@ -805,6 +805,8 @@ static void object_comment_text( char *buff, const OBJECT_INFO *id)
    At present,  it's used only in main( ) when you first start findorb,
    so you can select the object for which you want an orbit.         */
 
+extern bool force_bogus_orbit;
+
 int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
 {
    static int choice = 0, show_packed = 0;
@@ -954,6 +956,9 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
                sort_order = (sort_order + 1) % 3;
                sort_object_info( ids, n_ids, sort_order);
                break;
+            case '!':
+               force_bogus_orbit = true;
+                     /* intentionally do _not_ break here, fall through: */
             case ' ':
             case 13:
                rval = choice;
@@ -2424,6 +2429,7 @@ int main( const int argc, const char **argv)
             update_element_display = 1;
             clear( );
             }
+         force_bogus_orbit = false;
          }
 
       if( base_format == RESIDUAL_FORMAT_SHORT)  /* multi-obs per line */
