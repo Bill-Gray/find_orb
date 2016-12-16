@@ -349,13 +349,13 @@ int main( const int argc, const char **argv)
    fprintf( lock_file, "Default uncertainties table read\n");
 
    ids = find_objects_in_file( temp_obs_filename, &n_ids, NULL);
+   fprintf( lock_file, "%d objects found in file\n", n_ids);
    if( n_ids <= 0)
       {
       printf( n_ids == -1 ? "Couldn't open observation file\n" :
                             "No valid observations found in that data\n");
       return( 0);
       }
-   fprintf( lock_file, "%d objects found in file\n", n_ids);
 
    const char *orbit_constraints = "";
    OBSERVE FAR *obs;
