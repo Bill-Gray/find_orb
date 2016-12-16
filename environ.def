@@ -65,9 +65,17 @@ MAX_OBSERVATION_SPAN=200
    only radar stations for which I have those data are (251) Arecibo and
    (253) Goldstone.  [Correction:  at least most of these data are provided
    in Table 1 of https://arxiv.org/pdf/1604.01080v1.pdf.  And Table 2 provides
-   'relative sensitivities',  including for bistatic modes.]
+   'relative sensitivities',  based on DSS-14 Goldstone (253) = 1, including
+   for bistatic modes.  One could,  and I probably eventually will,  copy the
+   (253) line for use with other stations;  compute ephemerides that way;
+   replace the power,  temperature,  etc. values with the ones that actually
+   apply for that telescope;  then scale up/down the "radar constant" to get
+   SNRs that are the appropriate multiple of (253) Goldstone.]
 RADAR_251=900000,25,10,70.5,1.5e-11
 RADAR_253=430000,17,.94,20,1e-11
+   The Parkes radio telescope in Australia lacks an official MPC code.  But it
+   has an unofficial MPC code in 'rovers.txt' (q.v.).
+RADAR_d43=430000,17,.94,20,7e-14
 
    'Settings2' gives five parameters.  The first is 1 if observation weighting
    is used and 0 if it is not.  Next,  the 'faint limit' on ephemerides (by
@@ -89,7 +97,7 @@ SETTINGS2=1 22.00 0 3 0
    Most JPL filenames can be automatically detected via the list in
    'jpl_eph.txt'.  But if it's in a different folder or an odd name,  you
    can add the path to one of the following,  depending on whether you're
-   on Windows or Linux.  (LINUX_JPL_FILENAME is also used for OS/X.)
+   on Windows or Linux.  (LINUX_JPL_FILENAME is also used for OS/X and *BSD.)
 LINUX_JPL_FILENAME=
 JPL_FILENAME=
 
@@ -148,6 +156,14 @@ ECLIPTIC_ORBITS_ONLY=0
    doesn't change orbits much,  lowering it causes them to start showing
    errors.
 GEO_TERMS=6
+
+   Find_Orb can use either the method of Encke (do a two-body solution relative
+   to the 'best fitting' body,  integrating perturbations to that orbit).  By
+   default,  it instead uses the method of Cowell (the 'direct' method,  in
+   which you just integrate the accelerations from all bodies).  I'm still
+   experimenting with both methods.  But you will probably be best off leaving
+   this value at zero,  meaning Cowell is used.
+ENCKE=1
 
    By default,  the DRAG_SHUTOFF=1 tells Find_Orb not to include the effects
    of atmospheric drag.  Set it to zero if you want objects entering the
