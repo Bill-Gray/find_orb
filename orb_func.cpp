@@ -3854,6 +3854,7 @@ static void attempt_extensions( OBSERVE *obs, const int n_obs, double *orbit)
    const double residual_limit = 200.;   /* allow up to 200" in orbit extension */
    double arc_limit_in_days = atof( get_environment_ptr( "AUTO_ARC_LEN"));
    const int stored_setting_outside_of_arc = setting_outside_of_arc;
+   int best_available_sigmas;
    unsigned best_perturbers = perturbers;
 
    if( !arc_limit_in_days)
@@ -3862,6 +3863,7 @@ static void attempt_extensions( OBSERVE *obs, const int n_obs, double *orbit)
          /* So far,  the "best" we've got is the orbit that was handed to */
          /* us by initial_orbit( ).  So let's store that :                */
    memcpy( best_orbit, orbit, 6 * sizeof( double));
+   best_available_sigmas = available_sigmas;
    get_first_and_last_included_obs( obs, n_obs, &best_start, &best_end);
    epoch = obs[best_start].jd;
    do
@@ -3940,6 +3942,7 @@ static void attempt_extensions( OBSERVE *obs, const int n_obs, double *orbit)
                best_start = start;
                best_end = end;
                best_perturbers = perturbers;
+               best_available_sigmas = available_sigmas;
                }
             }
          }
@@ -3949,6 +3952,7 @@ static void attempt_extensions( OBSERVE *obs, const int n_obs, double *orbit)
    if( memcmp( orbit, best_orbit, 6 * sizeof( double)))
       {
       memcpy( orbit, best_orbit, 6 * sizeof( double));
+      available_sigmas = best_available_sigmas;
       perturbers = best_perturbers;
 #if 0
       full_improvement( obs, n_obs, orbit, epoch, NULL,
