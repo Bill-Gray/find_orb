@@ -13,6 +13,7 @@ int find_fcct_biases( const double ra, const double dec, const char catalog,
 #define BIAS_NO_DATA_FOR_THAT_CATALOG     -1
 #define BIAS_NO_BIAS_FILE                 -2
 #define BIAS_NOT_ALLOCATED                -3
+#define BIAS_FILE_WRONG_SIZE              -4
 
 /* Compute star catalog position/proper motion biases,  from tables by
 Farnocchia,  Chesley,  Chamberlin,  Tholen,  _Icarus_ 245 (2015) 94-111,
@@ -39,6 +40,8 @@ computes the bias in RA and dec for a particular JD,  storing them in
 
 const char *fcct14_bias_file_name = "bias.dat";
          /* override this if the bias file is elsewhere */
+
+FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 
 int find_fcct_biases( const double ra, const double dec, const char catalog,
                  const double jd, double *bias_ra, double *bias_dec)
@@ -69,54 +72,72 @@ int find_fcct_biases( const double ra, const double dec, const char catalog,
       return( BIAS_NO_BIAS_FILE);
    if( !bias_data)
       {
-      FILE *ifile = fopen( fcct14_bias_file_name, "rb");
-      char buff[600];
+      FILE *ifile;
+      const char *crunched_fcct14_file_name = "bias_bin.dat";
+      size_t nbytes;
+      const size_t csize = n_tiles * n_cats * 4 * sizeof( int16_t);
+               /* The above "compressed size" corresponds to 12*64*64*19*4
+                  = 3735552 short ints, or 7471104 bytes. */
 
-      if( !ifile)
-         {
-         bias_file_known_to_be_missing = true;
-         return( BIAS_NO_BIAS_FILE);
-         }
-      bias_data = (int16_t *)calloc( n_tiles, n_cats * 4 * sizeof( int16_t));
-               /* The above corresponds to 12*64*64*19*4 = 3735552 shorts,  or
-                  or 7471104 bytes.  The calloc() _could_ fail : */
-
+      bias_data = (int16_t *)malloc( csize + 1);
       if( !bias_data)
-         {
-         fclose( ifile);
          return( BIAS_NOT_ALLOCATED);
+      ifile = fopen_ext( crunched_fcct14_file_name, "crb");
+      if( ifile)     /* not our first time:  we have a compressed file */
+         {
+         nbytes = fread( bias_data, 1, csize + 1, ifile);
+         fclose( ifile);
+         if( nbytes != csize)
+            return( BIAS_FILE_WRONG_SIZE);
          }
-      loc = 0;
-      while( loc < n_tiles && fgets( buff, sizeof( buff), ifile))
-         if( *buff != '!')
+      else
+         {
+         char buff[600];   /* first time: read ASCII file & binary-ize; */
+         FILE *ofile;     /* store binary version for all future use   */
+
+         ifile = fopen( fcct14_bias_file_name, "rb");
+         if( !ifile)
             {
-            char *tptr = buff;
-            int16_t *bptr = bias_data + loc * n_cats * 4;
-
-            for( i = 0; i < n_cats * 4; i++, bptr++)
-               {
-               bool is_negative = false;
-
-               while( *tptr == ' ')
-                  tptr++;
-               if( *tptr == '-')
-                  {
-                  is_negative = true;
-                  tptr++;
-                  }
-               while( *tptr != ' ')
-                  {
-                  if( *tptr >= '0' && *tptr <= '9')
-                     *bptr = (int16_t)( *bptr * 10 + *tptr - '0');
-                  tptr++;
-                  }
-               if( is_negative)
-                  *bptr = -*bptr;
-               }
-            loc++;
+            bias_file_known_to_be_missing = true;
+            free( bias_data);
+            return( BIAS_NO_BIAS_FILE);
             }
-      fclose( ifile);
-      assert( loc == n_tiles);
+         loc = 0;
+         while( loc < n_tiles && fgets( buff, sizeof( buff), ifile))
+            if( *buff != '!')
+               {
+               char *tptr = buff;
+               int16_t *bptr = bias_data + loc * n_cats * 4;
+
+               for( i = 0; i < n_cats * 4; i++, bptr++)
+                  {
+                  bool is_negative = false;
+
+                  while( *tptr == ' ')
+                     tptr++;
+                  if( *tptr == '-')
+                     {
+                     is_negative = true;
+                     tptr++;
+                     }
+                  while( *tptr != ' ')
+                     {
+                     if( *tptr >= '0' && *tptr <= '9')
+                        *bptr = (int16_t)( *bptr * 10 + *tptr - '0');
+                     tptr++;
+                     }
+                  if( is_negative)
+                     *bptr = -*bptr;
+                  }
+               loc++;
+               }
+         fclose( ifile);
+         assert( loc == n_tiles);
+         ofile = fopen_ext( crunched_fcct14_file_name, "fwb");
+         nbytes = fwrite( bias_data, 1, csize, ofile);
+         assert( nbytes == csize);
+         fclose( ofile);
+         }
       }
    ra_dec_to_xy( ra, dec, &x, &y);
    loc = xy_to_healpix( x, y, 64);
