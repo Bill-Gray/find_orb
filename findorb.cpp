@@ -2212,9 +2212,23 @@ int main( const int argc, const char **argv)
                printf( "Unknown command-line option '%s'\n", argv[i]);
                return( -1);
             }
-
    sscanf( get_environment_ptr( "CONSOLE_OPTS"), "%9s %d %d %u",
                mpc_code, &observation_display, &residual_format, &list_codes);
+
+   for( i = 1; i < argc; i++)
+      {
+      const char *tptr = strchr( argv[i], '=');
+
+      if( tptr && argv[i][0] != '-')
+         {
+         const size_t len = tptr - argv[i];
+
+         memcpy( tbuff, argv[i], len);
+         tbuff[len] = '\0';
+         set_environment_ptr( tbuff, argv[i] + len + 1);
+         }
+      }
+
    get_defaults( &ephemeris_output_options, &element_format,
          &element_precision, &max_residual_for_filtering,
          &noise_in_arcseconds);
