@@ -1878,6 +1878,8 @@ static double extract_date_from_mpc_report( const char *buff, unsigned *format)
 
    if( len != 80)             /* check for correct length */
       return( 0.);
+   if( buff[12] != ' ' && buff[12] != '*')
+      return( 0.);
    if( !is_valid_mpc_code( buff + 77))
       return( 0.);
    memcpy( tbuff, buff + 15, 17);
@@ -2375,22 +2377,20 @@ static double observation_jd( const char *buff)
 {
    const double utc = extract_date_from_mpc_report( buff, NULL);
 
-   if( utc)
-      if( (buff[12] == ' ' || buff[12] == '*')
-                  && is_valid_mpc_code( buff + 77))
-         {
+   if( utc && is_valid_mpc_code( buff + 77))
+      {
 #ifdef STRICT_OBSERVATION_CHECKING
-         static const char digits[] =
-               { 15, 16, 17, 18, 21, 23, 24, 26, 0 };
-         int i;
+      static const char digits[] =
+            { 15, 16, 17, 18, 21, 23, 24, 26, 0 };
+      int i;
 
-         for( i = 0; digits[i]; i++)
-            if( buff[digits[i]] < '0' || buff[digits[i]] > '9')
-               return( 0.);
-#endif
-         if( !observatory_is_acceptable( buff + 77))
+      for( i = 0; digits[i]; i++)
+         if( buff[digits[i]] < '0' || buff[digits[i]] > '9')
             return( 0.);
-         }
+#endif
+      if( !observatory_is_acceptable( buff + 77))
+         return( 0.);
+      }
    return( utc);
 }
 
