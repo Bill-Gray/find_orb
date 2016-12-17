@@ -155,6 +155,7 @@ static int find_transfer_orbit( double *orbit, OBSERVE FAR *obs1,
 double observation_rms( const OBSERVE FAR *obs);            /* elem_out.cpp */
 double compute_weighted_rms( const OBSERVE FAR *obs, const int n_obs,
                            int *n_resids);                  /* orb_func.cpp */
+double planet_radius_in_meters( const int planet_idx);      /* collide.cpp */
 double find_epoch_shown( const OBSERVE *obs, const int n_obs); /* elem_out */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
@@ -3212,7 +3213,7 @@ double evaluate_initial_orbit( const OBSERVE FAR *obs,
                               const int n_obs, const double *orbit)
 {
    const double rms_err = compute_weighted_rms( obs, n_obs, NULL);
-   double rval, rel_orbit[6];
+   double rval, rel_orbit[6], planet_radius_in_au;
    ELEMENTS elem;
    int planet_orbiting = find_best_fit_planet( obs->jd,
                                   orbit, rel_orbit);
@@ -3225,6 +3226,8 @@ double evaluate_initial_orbit( const OBSERVE FAR *obs,
       elem.gm = get_planet_mass( 0);
       calc_classical_elements( &elem, orbit, obs[0].jd, 1);
       }
+   planet_radius_in_au =
+          planet_radius_in_meters( planet_orbiting) / AU_IN_METERS;
 
    rval = rms_err / 2.;
                /* For arcs with very few observations,  we really shouldn't */
@@ -3246,6 +3249,9 @@ double evaluate_initial_orbit( const OBSERVE FAR *obs,
          }
       rval -= adjustment_for_orbit_likelihood( elem.major_axis, elem.incl);
       }
+          /* strongly discourage elliptical orbits going through planets : */
+   if( elem.ecc < 1. && elem.q < planet_radius_in_au)
+      rval += 10000.;
    if( debug_level > 4)
       debug_printf( "Orbit with a=%f, q=%f, e=%f, i=%f: %f\n",
             elem.major_axis, elem.q, elem.ecc, elem.incl * 180. / PI, rval);
@@ -3731,10 +3737,10 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
       memcpy( orbit, best_orbit, 6 * sizeof( double));
       }
 
-   fail_on_hitting_planet = false;
 // set_locs( orbit, obs[start].jd, obs, n_obs);
    perturbers = perturbers_automatically_found & (~AUTOMATIC_PERTURBERS);
    attempt_extensions( obs, n_obs, orbit);
+   fail_on_hitting_planet = false;
 // available_sigmas = NO_SIGMAS_AVAILABLE;
    return( obs[start].jd);    /* ...and return epoch = JD of first observation */
 }
