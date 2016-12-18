@@ -207,3 +207,10 @@ VECTOR_OPTS=0,1,1
 
 COMET_CONSTANTS=2.808,2.15,5.093,4.6142
 
+   Initial orbit determination (IOD) usually takes a couple of seconds.
+   For longer arcs,  it might take five or ten seconds.  If it takes more
+   than IOD_TIMEOUT seconds (defaults to 20),  we stop looking for a better
+   initial orbit and take whatever our best orbit thus far is.  (Such cases
+   usually come about because the observations are inconsistent and there
+   isn't really a meaningful orbit that fits them.)
+IOD_TIMEOUT=20

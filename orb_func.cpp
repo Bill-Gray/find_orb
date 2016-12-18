@@ -3489,6 +3489,7 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
    const double acceptable_score_limit = 5.;
    double best_score = 1e+50;
    double best_orbit[6];
+   const int max_time = atoi( get_environment_ptr( "IOD_TIMEOUT"));
 
    for( i = 0; i < 6; i++)
       best_orbit[i] = 0.;
@@ -3537,7 +3538,6 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
    if( debug_level)
       debug_printf( "  about to search orbits\n");
 
-// n_sr_orbits = get_sr_orbits( sr_orbits, obs, n_obs, 0, 100, 1., 1.);
    if( !max_n_sr_orbits)
       {
       max_n_sr_orbits = atoi( get_environment_ptr( "MAX_SR_ORBITS"));
@@ -3550,6 +3550,8 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
    if( !sr_orbits)
       return( 0.);
    writing_sr_elems = false;
+   if( max_time)
+      integration_timeout = clock( ) + (clock_t)( max_time * CLOCKS_PER_SEC);
    if( obs[n_obs - 1].jd - obs[0].jd < MAX_SR_SPAN)
       n_sr_orbits = get_sr_orbits( sr_orbits, obs, n_obs, 0, max_n_sr_orbits, .5, 0.);
    else
@@ -3570,6 +3572,7 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
               /* SR orbits are stored in seven doubles,  including a score. */
       for( i = 1; i < (int)n_sr_orbits; i++)  /* Shift 'em to remove the score. */
          memmove( sr_orbits + i * 6, sr_orbits + i * 7, 6 * sizeof( double));
+      integration_timeout = 0;
       return( obs[0].jd);
       }
 
@@ -3584,7 +3587,10 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
          debug_printf( "  Current arc: %d to %d\n", start, end);
       bogus_epoch = only_one_position_available( obs + start, end - start + 1, orbit);
       if( bogus_epoch)
+         {
+         integration_timeout = 0;
          return( bogus_epoch);
+         }
       for( i = 0; i < start; i++)
          obs[i].is_included = 0;
       for( i = start; i <= end; i++)
@@ -3739,9 +3745,10 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
 
 // set_locs( orbit, obs[start].jd, obs, n_obs);
    perturbers = perturbers_automatically_found & (~AUTOMATIC_PERTURBERS);
-   attempt_extensions( obs, n_obs, orbit);
    fail_on_hitting_planet = false;
+   attempt_extensions( obs, n_obs, orbit);
 // available_sigmas = NO_SIGMAS_AVAILABLE;
+   integration_timeout = 0;
    return( obs[start].jd);    /* ...and return epoch = JD of first observation */
 }
 
