@@ -3325,6 +3325,29 @@ static void check_satellite_obs( const OBSERVE *obs, unsigned n_obs)
 }
 #endif    /* #ifdef FUTURE_SATELLITE_OBS_CHECKING */
 
+/* Observation sigmas,  etc. can be set by inserting lines such as
+
+#Posn sigma .3
+#Mag sigma .23
+
+   etc. (see below).  The following function allows one to use COM lines
+such as
+
+COM Posn sigma .3
+COM Mag sigma .23
+
+   instead.  MPC will complain about the former,  but will ignore the latter.
+*/
+
+static void convert_com_to_pound_sign( char *buff)
+{
+   if( !memcmp( buff, "COM ", 4))
+      {
+      *buff = '#';
+      memmove( buff + 1, buff + 4, strlen( buff + 3));
+      }
+}
+
 /* (691) Spacewatch has a habit of providing near-duplicate observations,
 one "hand-measured",  the other not,  like this :
 
@@ -3625,6 +3648,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
             }
          }
       override_time = 0.;
+      convert_com_to_pound_sign( buff);
                /* For backwards compatibility,  we'll handle both 'weight' */
                /* and 'sigma' keywords,  with the former considered to     */
                /* indicate 1/sigma arcseconds.                             */
@@ -3676,6 +3700,10 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                   /* Above allows one to reset the time of the preceding obs */
          else if( !memcmp( buff, "#comet", 6))
             obs_are_of_a_comet = (atoi( buff + 6) != 0);
+         else if( !strcmp( buff, "#ignore obs"))
+            while( fgets_trimmed( buff, sizeof( buff), ifile)
+                     && !strstr( buff, "end ignore obs"))
+               ;     /* deliberately empty loop */
          }
       }
 
@@ -3946,6 +3974,7 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
          debug_printf( "Input line len %zd\n", strlen( buff));
       if( *buff == '<')
          remove_html_tags( buff);
+      convert_com_to_pound_sign( buff);
       if( !n || *mpc_code_from_neocp)
          is_neocp = get_neocp_data( buff, desig_from_neocp,
                                                  mpc_code_from_neocp);
@@ -4037,6 +4066,10 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
                prev_loc = -1;
                }
             }
+      if( !strcmp( buff, "#ignore obs"))
+         while( fgets_trimmed( buff, sizeof( buff), ifile)
+                    && !strstr( buff, "end ignore obs"))
+            ;     /* deliberately empty loop */
       }
    fclose( ifile);
    *n_found = n;
