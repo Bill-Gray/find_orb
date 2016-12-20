@@ -2572,6 +2572,14 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
                        n_obs, epoch2, rel_orbit);
             if( debug_level > 4)
                debug_printf( "Second set done: %d\n", set_locs_rval);
+            if( set_locs_rval == INTEGRATION_TIMED_OUT)
+               {
+               free( xresids);
+               memcpy( orbit, original_orbit, 6 * sizeof( double));
+               memcpy( solar_pressure, original_params, 3 * sizeof( double));
+               runtime_message = NULL;
+               return( -4);
+               }
             if( set_locs_rval)      /* gonna have to try again, */
                {                    /* with a smaller tweak */
                delta_val /= 2.;
