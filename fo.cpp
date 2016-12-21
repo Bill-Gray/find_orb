@@ -395,7 +395,7 @@ int main( const int argc, const char **argv)
 
    load_up_sigma_records( "sigma.txt");
    if( debug_level)
-      debug_printf( "Default uncertainties table read\n");
+      debug_printf( "%d sigma recs read\n", i);
 
    if( argc < 2)
       {
@@ -486,7 +486,7 @@ int main( const int argc, const char **argv)
                unsigned j = 0;
 
                write_out_elements_to_file( orbit, curr_epoch, epoch_shown,
-                     obs, n_obs, orbit_constraints, element_precision,
+                     obs, n_obs_actually_loaded, orbit_constraints, element_precision,
                      0, element_options);
                printf( "; %s ", orbit_summary_text);
                if( !mpec_path)
@@ -570,7 +570,7 @@ int main( const int argc, const char **argv)
                }
             else
                printf( "; not enough observations\n");
-            unload_observations( obs, n_obs);
+            unload_observations( obs, n_obs_actually_loaded);
             }
          object_comment_text( tbuff, ids + i);
                   /* Abbreviate 'observations:' to 'obs:' */
