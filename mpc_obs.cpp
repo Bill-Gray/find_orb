@@ -1731,11 +1731,17 @@ void set_up_observation( OBSERVE FAR *obs)
          {
          FMEMCPY( unfound[n_unfound++], obs->mpc_code, 3);
          sprintf( tbuff, "Didn't find observer %s\n", obs->mpc_code);
-         strcat( tbuff, "Observation(s) will be excluded and treated as\n");
-         strcat( tbuff, "geocentric.  You can fix this by downloading the\n");
-         strcat( tbuff, "current list of MPC stations at\n\n");
-         strcat( tbuff, "http://www.minorplanetcenter.net/iau/lists/ObsCodes.html\n\n");
-         strcat( tbuff, "and saving it to the folder in which Find_Orb runs.\n");
+         strcat( tbuff, "Observation(s) will be excluded and treated as\n"
+                        "geocentric.");
+         if( strcmp( obs->mpc_code, "XXX"))
+            strcat( tbuff, " You can fix this by downloading the\n"
+                        "current list of MPC stations at\n\n"
+                        "http://www.minorplanetcenter.net/iau/lists/ObsCodes.html\n\n"
+                        "and saving it to the folder in which Find_Orb runs.\n");
+         else
+            strcat( tbuff, " You can read about how to add an XXX\n"
+                    "position for a new/temporary observer at\n\n"
+                    "http://www.projectpluto.com/find_orb.htm#xxx_code\n");
          generic_message_box( tbuff, "o");
          comment_observation( obs, "? NoCode");
          }
@@ -3941,7 +3947,7 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
    char buff[250], mpc_code_from_neocp[4], desig_from_neocp[15];
 #ifdef CONSOLE
    const clock_t t0 = clock( );
-   int next_output = 20000;
+   int next_output = 20000, n_obs_read = 0;
    long filesize;
 
    if( ifile)
@@ -4026,21 +4032,6 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
                      rval[loc].file_offset = 0;
                   }
                n++;
-#ifdef CONSOLE
-               if( n == next_output)
-                  {
-                  char msg_buff[80];
-                  const double t_elapsed =
-                           (double)( clock( ) - t0) / (double)CLOCKS_PER_SEC;
-                  const double fraction_file_read =
-                           (double)ftell( ifile) / (double)filesize;
-
-                  next_output += (int)((double)n / (t_elapsed + 1.));
-                  sprintf( msg_buff, "%4.1f%% complete", fraction_file_read * 100.);
-                  move_add_nstr( 3, 3, msg_buff, -1);
-                  refresh_console( );
-                  }
-#endif
                }
             rval[loc].n_obs++;
             if( rval[loc].jd_start > jd)
@@ -4065,6 +4056,30 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
                n_alloced = new_size;
                prev_loc = -1;
                }
+#ifdef CONSOLE
+            n_obs_read++;
+            if( n_obs_read == next_output)
+               {
+               char msg_buff[80];
+               const double t_elapsed =
+                        (double)( clock( ) - t0) / (double)CLOCKS_PER_SEC;
+               const double fraction_file_read =
+                        (double)ftell( ifile) / (double)filesize;
+               const double t_total = t_elapsed / (fraction_file_read + .01);
+
+               next_output += (int)((double)n_obs_read / (t_elapsed + 1.));
+               snprintf( msg_buff, sizeof( msg_buff),
+                       "%4.1f%% complete; %.0f seconds elapsed, %.0f remain",
+                                    fraction_file_read * 100.,
+                                    t_elapsed, t_total - t_elapsed);
+               move_add_nstr( 3, 3, msg_buff, -1);
+               snprintf( msg_buff, sizeof( msg_buff),
+                        "%d observations of %d objects read thus far",
+                        n_obs_read, n);
+               move_add_nstr( 4, 3, msg_buff, -1);
+               refresh_console( );
+               }
+#endif
             }
       if( !strcmp( buff, "#ignore obs"))
          while( fgets_trimmed( buff, sizeof( buff), ifile)
