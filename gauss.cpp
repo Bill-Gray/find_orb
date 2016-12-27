@@ -34,6 +34,12 @@ int find_real_polynomial_roots( const double *poly, int poly_order,
 
 /* References are to Boulet,  _Methods of Orbit Determination_. */
 
+/* Higher-order terms in the f and g series are given in Boulet,
+section 3.6.1 (program FANDG),  starting at line 16010. */
+
+#define INCLUDE_FIFTH
+#define INCLUDE_SIXTH
+
 static double dot_prod3( const double FAR *a, const double FAR *b)
 {
    return( a[0] * b[0] + a[1] * b[1] + a[2] * b[2]);
@@ -156,7 +162,7 @@ double gauss_method( const OBSERVE FAR *obs1, const OBSERVE FAR *obs2,
       }
    r2 = roots[desired_soln];
 
-   for( iteration = 0; keep_iterating && iteration < 6; iteration++)
+   for( iteration = 0; keep_iterating && iteration < 96; iteration++)
       {
             /* See p. 419, (10.28), (10.27): */
       const double u2 = mu / (r2 * r2 * r2);
@@ -170,18 +176,45 @@ double gauss_method( const OBSERVE FAR *obs1, const OBSERVE FAR *obs2,
       if( iteration)       /* we can refine the above; see (10.15), (3.80) */
          {
          const double z2 = dot_prod3( orbit, orbit + 3) / (r2 * r2);
+         const double zs = z2 * z2;
          const double u2_z2_tau1_cubed = u2 * z2 * tau1_squared * tau1;
          const double u2_z2_tau3_cubed = u2 * z2 * tau3_squared * tau3;
          const double q = dot_prod3( orbit + 3, orbit + 3) / (r2 * r2) - u2;
-         const double quartic = u2 * (3 * q - 15. * z2 * z2 + u2) / 24.;
+         const double quartic = u2 * (3 * q - 15. * zs + u2) / 24.;
+#ifdef INCLUDE_FIFTH
+         const double quint_f = u2 * (3 * q +  7. * zs - u2) * z2 / 8.;
+         const double quint_g = u2 * (9 * q - 45. * zs + u2) / 120.;
+#ifdef INCLUDE_SIXTH
+         const double sixth_f = u2 * (zs * (630 * q + 210 * u2 - 945 * zs)
+               - u2 * (24 * q + u2) - 45 * q * q) / 720.;
+         const double sixth_g = u2 * z2 * (210 * zs - 90 * q - 15 * u2) / 360.;
+#endif
+#endif
+         const double tau1_fourth = tau1_squared * tau1_squared;
+         const double tau3_fourth = tau3_squared * tau3_squared;
 
-         f1_new += u2_z2_tau1_cubed / 2. + quartic * tau1_squared * tau1_squared;
-         f3_new += u2_z2_tau3_cubed / 2. + quartic * tau3_squared * tau3_squared;
+         f1_new += u2_z2_tau1_cubed / 2. + tau1_fourth * quartic;
+         f3_new += u2_z2_tau3_cubed / 2. + tau3_fourth * quartic;
          g1_new += u2_z2_tau1_cubed * tau1 / 4.;
          g3_new += u2_z2_tau3_cubed * tau3 / 4.;
-         f1 = (f1 + f1_new) / 2.;      /* for stability reasons,  we average */
-         f3 = (f3 + f3_new) / 2.;      /* the new f1, f3, g1, and g3 with    */
-         g1 = (g1 + g1_new) / 2.;      /* values from previous iterations    */
+#ifdef INCLUDE_FIFTH
+         f1_new += quint_f * tau1_fourth * tau1;
+         f3_new += quint_f * tau3_fourth * tau3;
+         g1_new += quint_g * tau1_fourth * tau1;
+         g3_new += quint_g * tau3_fourth * tau3;
+#ifdef INCLUDE_SIXTH
+         f1_new += sixth_f * tau1_fourth * tau1_squared;
+         f3_new += sixth_f * tau3_fourth * tau3_squared;
+         g1_new += sixth_g * tau1_fourth * tau1_squared;
+         g3_new += sixth_g * tau3_fourth * tau3_squared;
+#endif
+#endif
+         }
+      if( iteration && iteration < 4)
+         {
+         f1 = (f1 + f1_new) / 2.;      /* for stability reasons,  average */
+         f3 = (f3 + f3_new) / 2.;      /* the new f1, f3, g1, and g3 with */
+         g1 = (g1 + g1_new) / 2.;      /* values from previous iteration  */
          g3 = (g3 + g3_new) / 2.;
          }
       else        /* on first iteration,  we don't average f1, f3, g1, g3 */
@@ -209,13 +242,14 @@ double gauss_method( const OBSERVE FAR *obs1, const OBSERVE FAR *obs2,
 
 
       if( ofile)
-         fprintf( ofile, "r2 = %f\np1 = %f   p2 = %f    p3 = %f\n",
-                  r2, p1, p2, p3);
+         fprintf( ofile, "%d: r2 = %f\np1 = %f   p2 = %f    p3 = %f\n",
+                  iteration, r2, p1, p2, p3);
       if( p1 < 0. || p2 < 0. || p3 < 0.)
          keep_iterating = 0;
       else
          {
-         double r2_new_squared = 0.;
+         double r2_new_squared = 0., new_r2;
+         const double tolerance = 1e-5;
 
          for( i = 0; i < 3; i++)
             {
@@ -228,7 +262,10 @@ double gauss_method( const OBSERVE FAR *obs1, const OBSERVE FAR *obs2,
             rval = p2;
             r2_new_squared += r2_component * r2_component;
             }
-         r2 = sqrt( r2_new_squared);
+         new_r2 = sqrt( r2_new_squared);
+         if( fabs( new_r2 - r2) < tolerance)
+            keep_iterating = 0;
+         r2 = new_r2;
          }
                /* compute better tau values,  including light time lag: */
 
