@@ -269,6 +269,7 @@ int main( const int argc, const char **argv)
 {
    char tbuff[300];
    char **summary_lines = NULL;
+   const char *separate_residual_file_name = NULL;
    const char *mpec_path = NULL;
    int n_ids, i, starting_object = 0;
    int n_processes = 1;
@@ -298,6 +299,9 @@ int main( const int argc, const char **argv)
 
                separate_periodic_comet_apparitions ^= 1;
                }
+            case 'b':
+               separate_residual_file_name = argv[i] + 2;
+               break;
             case 'c':
                {
                extern int combine_all_observations;
@@ -489,6 +493,11 @@ int main( const int argc, const char **argv)
                      obs, n_obs_actually_loaded, orbit_constraints, element_precision,
                      0, element_options);
                printf( "; %s ", orbit_summary_text);
+               if( separate_residual_file_name)
+                  write_residuals_to_file( separate_residual_file_name, argv[1],
+                               n_obs_actually_loaded, obs, RESIDUAL_FORMAT_PRECISE
+                               | RESIDUAL_FORMAT_COMPUTER_FRIENDLY
+                               | RESIDUAL_FORMAT_FOUR_DIGIT_YEARS);
                if( !mpec_path)
                   append_elements_to_element_file = 1;
                else

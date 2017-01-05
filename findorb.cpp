@@ -4149,6 +4149,8 @@ int main( const int argc, const char **argv)
             }
             break;
          case KEY_F(18):    /* shift-f6 */
+            residual_format ^= RESIDUAL_FORMAT_COMPUTER_FRIENDLY;
+            break;
          case 9:
          case ALT_A:             case ALT_G:
          case ALT_H: case ALT_I: case ALT_K:

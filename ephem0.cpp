@@ -112,10 +112,11 @@ could be off by as much as 16 meters in altitude and wrong in latitude by
 about three meters for each km of altitude (i.e.,  about 25 meters at the
 top of Everest).  Things are worse for planets more oblate than the earth.
 
-   I don't think an exact non-iterative solution is possible.  In any case,
-the iterative solution given below works nicely.   The iterations start out
-with a laughably poor guess,  but convergence is fast;  eight iterations
-gets sub-micron accuracy. */
+   An exact non-iterative solution exists,  but is somewhat complicated
+(requires finding zeroes of a quartic polynomial).  The iterative
+solution given below is faster and simpler.  It starts out with a
+laughably poor guess,  but convergence is fast;  eight iterations gets
+sub-micron accuracy. */
 
 int parallax_to_lat_alt( const double rho_cos_phi, const double rho_sin_phi,
                double *lat, double *ht_in_meters, const int planet_idx)
@@ -1854,6 +1855,19 @@ static void put_residual_into_text( char *text, const double resid,
    const int precise = resid_format
                 & (RESIDUAL_FORMAT_OVERPRECISE | RESIDUAL_FORMAT_PRECISE);
 
+   if( resid_format & RESIDUAL_FORMAT_COMPUTER_FRIENDLY)
+      {
+      const char *fmt;
+
+      if( zval < 99.9)
+         fmt = "%+8.3f";
+      else if( zval < 999.9)
+         fmt = "%+8.2f";
+      else
+         fmt = "%+8.0f";
+      snprintf( text, 9, fmt, resid);
+      return;
+      }
    if( zval > 999. * 3600.)      /* >999 degrees: error must have occurred */
       strcpy( text, " Err!");
    else if( zval > 59940.0)             /* >999': show integer degrees */
