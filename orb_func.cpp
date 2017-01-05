@@ -610,20 +610,31 @@ static const double max_reasonable_speed = AU_PER_DAY * .05;
 
 bool all_reasonable = false;
 
+#define UNREASONABLE_TOO_FAR      0x100
+#define UNREASONABLE_TOO_FAST     0x200
+#define UNREASONABLE_ZERO_R       0x400
+#define UNREASONABLE_ZERO_V       0x800
+
 static int is_unreasonable_orbit( const double *orbit)
 {
-   int rval, i;
+   int rval = 0, i;
+   double r, v;
 
    if( all_reasonable)
       return( 0);
-   if( vector3_length( orbit) > max_reasonable_dist ||
-       vector3_length( orbit + 3) > max_reasonable_speed)
-      rval = -1;
-   else
-      rval = 0;
+   r = vector3_length( orbit);
+   v = vector3_length( orbit + 3);
+   if( r > max_reasonable_dist)
+      rval = UNREASONABLE_TOO_FAR;
+   else if( !r)
+      rval = UNREASONABLE_ZERO_R;
+   if( v > max_reasonable_speed)
+      rval |= UNREASONABLE_TOO_FAST;
+   else if( !v)
+      rval |= UNREASONABLE_ZERO_V;
    for( i = 0; i < 6; i++)
       if( !isfinite( orbit[i]))
-         rval = -2;
+         rval |= (1 << i);
    return( rval);
 }
 
@@ -1879,6 +1890,7 @@ void compute_variant_orbit( double *variant, const double *ref_orbit,
    unsigned i;
    extern double **eigenvects;
 
+   assert( eigenvects);
    if( eigenvects)
       for( i = 0; i < 6; i++)
          *variant++ = *ref_orbit++ + (n_sigmas * eigenvects[0][i]);
@@ -2960,7 +2972,10 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
       fclose( ofile);
       free( matrix);
       free( wtw);
-      available_sigmas = COVARIANCE_AVAILABLE;
+      if( eigenvals[0] > 0.)
+         available_sigmas = COVARIANCE_AVAILABLE;
+      else
+         available_sigmas = NO_SIGMAS_AVAILABLE;
       available_sigmas_hash = compute_available_sigmas_hash( obs, n_obs, epoch2,
                   perturbers, planet_orbiting);
       }
