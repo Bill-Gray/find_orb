@@ -1185,11 +1185,13 @@ static void show_residual_text( char *buff, const int line_no,
    put_colored_text( buff, line_no, column, (int)strlen( buff), default_color);
    if( resid_column)
       {
-      const int residual_field_size = 13;
+      char *tptr = buff + resid_column - 2;
+      const int residual_field_size = (tptr[1] == '+' || tptr[1] == '-') ?
+                                    17 : 13;
       int resid_color = default_color;
       char tbuff[40];
 
-      memcpy( tbuff, buff + resid_column - 2, residual_field_size);
+      memcpy( tbuff, tptr, residual_field_size);
       if( !is_included)
          {
          resid_color = (default_color == COLOR_SELECTED_OBS ?
