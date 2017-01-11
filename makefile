@@ -89,6 +89,7 @@ clean_temp:
 	$(RM) mpc_f?.txt mpc_fmt.txt mpc_s?.txt mpec.htm obser?.txt observe.txt
 	$(RM) residual.txt sr_el?.txt state.txt state?.txt virtu?.txt virtual.txt
 	$(RM) sr_elems.txt mpcorb.dat
+	$(RM) sof?.txt sof1s?.txt
 
 install:
 	cp find_orb $(HOME)/bin
