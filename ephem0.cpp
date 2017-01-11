@@ -1856,10 +1856,12 @@ static void put_residual_into_text( char *text, const double resid,
                 & (RESIDUAL_FORMAT_OVERPRECISE | RESIDUAL_FORMAT_PRECISE);
 
    if( resid_format & RESIDUAL_FORMAT_COMPUTER_FRIENDLY)
-      {
-      const char *fmt;
+      {                   /* resids in arcseconds at all times,  with */
+      const char *fmt;    /* some added precision  */
 
-      if( zval < 99.9)
+      if( zval < 9.99)
+         fmt = "%+8.4f";
+      else if( zval < 99.9)
          fmt = "%+8.3f";
       else if( zval < 999.9)
          fmt = "%+8.2f";
