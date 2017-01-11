@@ -21,7 +21,7 @@
 99116   Плутон
 99117   Moon
 99118   Asteroids
-99129   Sa&ve elements
+99129   Sa&ve Элементы
 99136   &Auto-Solve
 99137   Save &Residuals...
 99138   &Ephemeris...
@@ -85,10 +85,10 @@
 97200   &Observables
 97201   State &vectors
 97202   Car&tesian coords
-97203   MP&CORB elements
-97204   &8-line elements
+97203   MP&CORB Элементы
+97204   &8-line Элементы
 97205   C&lose approaches
-97206   MPC code
+97206   код в МРС
 96999   Suppress output below mag:
 
 # settings
