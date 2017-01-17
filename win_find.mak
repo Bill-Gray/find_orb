@@ -1,5 +1,5 @@
 OBJS=about.obj b32_eph.obj bc405.obj bias.obj clipfunc.obj \
-  collide.obj conv_ele.obj eigen.obj elem2tle.obj \
+  collide.obj conv_ele.obj eigen.obj elem2tle.obj elem_ou2.obj \
   elem_out.obj ephem0.obj ephem.obj generic.obj gauss.obj \
   geo_pot.obj healpix.obj lsquare.obj miscell.obj \
   moid4.obj monte0.obj \

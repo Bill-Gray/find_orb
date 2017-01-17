@@ -273,7 +273,9 @@ version would address it. */
 #include <string.h>     /* for memcpy( ) prototype */
 #endif
 
+#ifdef __GNUC__
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
+#endif
 
 double mt64_double( uint64_t * RESTRICT mt)
 {
@@ -299,7 +301,9 @@ double mt64_double( uint64_t * RESTRICT mt)
 #endif
 }
 
+#ifdef __GNUC__
 #pragma GCC diagnostic warning "-Wstrict-aliasing"
+#endif
 
 // double mt64_double( uint64_t * RESTRICT mt)
 // {

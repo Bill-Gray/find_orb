@@ -28,6 +28,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "monte0.h"     /* for put_double_in_buff() proto */
 #include "date.h"
 
+#ifdef _MSC_VER   /* MSVC/C++ lacks snprintf.  See 'ephem0.cpp' for details. */
+int snprintf( char *string, const size_t max_len, const char *format, ...);
+#endif
 int add_sof_to_file( const char *filename,         /* elem_ou2.cpp */
              const ELEMENTS *elem,
              const int n_obs, const OBSERVE *obs);

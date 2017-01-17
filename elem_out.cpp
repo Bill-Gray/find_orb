@@ -1261,7 +1261,8 @@ int write_out_elements_to_file( const double *orbit,
    if( !(options & ELEM_OUT_NO_COMMENT_DATA))
       {
       double orb[6];
-      const bool is_ecliptic = atoi( get_environment_ptr( "VECTOR_OPTS"));
+      const bool is_ecliptic =
+                  (atoi( get_environment_ptr( "VECTOR_OPTS")) != 0);
 
       memcpy( orb, orbit2, 6 * sizeof( double));
       if( !is_ecliptic)
