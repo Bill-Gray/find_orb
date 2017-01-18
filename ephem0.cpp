@@ -1195,7 +1195,9 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
          double *orbi = orbits_at_epoch + obj_n * 6;
          double radial_vel, v_dot_r;
          double topo[3], topo_vel[3], geo[3], r;
+#ifdef SOLRAD_11B_HACK
          double gvel[3];
+#endif
          double topo_ecliptic[3];
          double orbi_after_light_lag[3];
          OBSERVE temp_obs;
@@ -1207,7 +1209,9 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
             topo[j] = orbi[j] - obs_posn[j];
             geo[j] = orbi[j] - geo_posn[j];
             topo_vel[j] = orbi[j + 3] - obs_vel[j];
+#ifdef SOLRAD_11B_HACK
             gvel[j] = orbi[j + 3] - geo_vel[j];
+#endif
             }
 #ifdef SOLRAD_11B_HACK
          for( j = 0; j < 3; j++)       /* reflect through the geocenter  */
@@ -3075,7 +3079,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
                if( lon_sign == 'W')
                   lon = -lon;
                fprintf( ofile, " (<a title=\"Click for map\"");
-               fprintf( ofile, " href=\"http://mappoint.msn.com/map.aspx?&amp;C=%.5f,%.5f&amp;A=1000\">",
+               fprintf( ofile, " href=\"http://maps.google.com/maps?q=%.5f,+%.5f\">",
                               lat, lon);
                fprintf( ofile, "%s</a>)", latlon);
                }
