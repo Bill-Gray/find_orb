@@ -33,7 +33,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "monte0.h"
 
 #ifndef _MSC_VER
+         /* All non-Microsoft builds are for the console */
    #define CONSOLE
+#endif
+
+#ifdef CONSOLE
       /* In the console version of Find_Orb,  the following two functions */
       /* get remapped to Curses functions.  In the non-interactive one,   */
       /* they're mapped to 'do-nothings'.  See fo.cpp & find_orb.cpp.     */

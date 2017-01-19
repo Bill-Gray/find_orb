@@ -449,7 +449,11 @@ static double get_ra_dec( const char *ibuff, int *format, double *precision)
 }
 
 #ifndef _MSC_VER
+         /* All non-Microsoft builds are for the console */
    #define CONSOLE
+#endif
+
+#ifdef CONSOLE
       /* In the console version of Find_Orb,  the following two functions */
       /* get remapped to Curses functions.  In the non-interactive one,   */
       /* they're mapped to 'do-nothings'.  See fo.cpp & find_orb.cpp.     */
