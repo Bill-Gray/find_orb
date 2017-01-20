@@ -31,7 +31,7 @@ can turn it back to 'false'.
 int generic_message_box( const char *message, const char *box_type);
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 
-bool use_config_directory = false;
+int use_config_directory = false;
 
 FILE *fopen_ext( const char *filename, const char *permits)
 {

@@ -2109,7 +2109,7 @@ int main( const int argc, const char **argv)
    extern int monte_carlo_object_count;
    extern char default_comet_magnitude_type;
    extern double max_monte_rms;
-   extern bool use_config_directory;          /* miscell.c */
+   extern int use_config_directory;          /* miscell.c */
 #ifdef __PDCURSES__
    int original_xmax, original_ymax;
 #endif

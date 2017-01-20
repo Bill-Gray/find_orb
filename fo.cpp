@@ -280,7 +280,7 @@ int main( const int argc, const char **argv)
    int n_lines_written = 0;
    FILE *summary_ofile = NULL;
    extern int forced_central_body;
-   extern bool use_config_directory;          /* miscell.c */
+   extern int use_config_directory;          /* miscell.c */
    int element_precision = 5;
    bool all_heliocentric = true;
    int ephemeris_output_options = OPTION_SHOW_SIGMAS | OPTION_ROUND_TO_NEAREST_STEP;
