@@ -76,7 +76,11 @@
    #ifdef _MSC_VER
       #define UINT64_C( a) (a##ui64)
    #else
-      #define UINT64_C( a) ((uint64_t)(a##UL))
+      #ifdef _WIN32
+         #define UINT64_C( a) (a##ULL)
+      #else
+         #define UINT64_C( a) ((uint64_t)(a##UL))
+      #endif
    #endif
 #endif
 
