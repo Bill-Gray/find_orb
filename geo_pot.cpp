@@ -17,7 +17,20 @@ double geo_potential_in_au( const double x, const double y, const double z,
 
 #define PI 3.1415926535897932384626433832795028841971693993751058209749445923
 
+#ifdef __WATCOMC__
+   /* OpenWATCOM apparently lacks sqrtl()... : */
+static long double sqrtl( const long double ival)
+{
+   assert( ival > 0.);
+   return( (long double)sqrt( (double)ival));
+}
+   /* ...and we have a smaller stack to work with : */
+#define N_TERMS 10
+#else
+   /* Everyplace else,  we can go with a lot of spherical harmonic
+   terms (more than are probably ever apt to be really needed) : */
 #define N_TERMS 50
+#endif
 
 /* First few terms for the Earth geopotential expansion,  from  GGM03C
 
@@ -1507,7 +1520,6 @@ static void renormalize_terms( void)
 
          if( l != m)
             factor /= sqrtl((long double)((l + m + 1) * (l - m)));
-//          factor /= sqrtl((long double)((l + m + 1) * (long double)(l - m)));
          }
       }
 }
