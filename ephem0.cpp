@@ -1574,7 +1574,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   }
                }
 
-            if( options & OPTION_LUNAR_ELONGATION)
+            if( !obj_n && (options & OPTION_LUNAR_ELONGATION))
                sprintf( buff + strlen( buff), "%6.1f",
                                   acose( cos_lunar_elong) * 180. / PI);
 
