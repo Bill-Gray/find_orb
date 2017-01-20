@@ -4001,7 +4001,8 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
          fix_up_mpc_observation( buff);
       if( debug_level > 8)
          debug_printf( "After fixup: %zd\n", strlen( buff));
-      if( (jd = observation_jd( buff)) && !is_second_line( buff))
+      jd = observation_jd( buff);
+      if( jd != 0. && !is_second_line( buff))
          if( !station || !memcmp( buff + 76, station, 3))
             {
             int loc;
@@ -4863,7 +4864,7 @@ void add_version_and_de_text( char *buff)
 
 int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff)
 {
-   size_t i, n_selected = 0, first = -1, last = 0;
+   size_t i, n_selected = 0, first = 0, last = 0;
    int n_lines = 1;
    char *tptr = buff;
 
