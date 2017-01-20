@@ -104,7 +104,7 @@ static FILE *open_bc405_file( void)
                   "No asteroid ephemeris data is available,  so\n"
                   "asteroid perturbations cannot be included.  You can\n"
                   "fix this by downloading the necessary files.  See\n"
-                  "http://www.projectpluto.com/ast_pert.htm for details.\n", "o");
+                  "https://www.projectpluto.com/ast_pert.htm for details.\n", "o");
       }
    return( ifile);
 }

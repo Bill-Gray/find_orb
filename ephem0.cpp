@@ -3144,7 +3144,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
                text_search_and_replace( buff, "<HUGE>", "&lt;HUGE&gt;");
                text_search_and_replace( buff, "m^2", "m<sup>2</sup>");
                text_search_and_replace( buff, "   Find_Orb",
-                                "   <a href=\"http://www.projectpluto.com/find_orb.htm\">Find_Orb</a>");
+                                "   <a href=\"https://www.projectpluto.com/find_orb.htm\">Find_Orb</a>");
                fprintf( ofile, "%s\n", buff);
                }
             line_no++;

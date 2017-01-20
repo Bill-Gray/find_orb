@@ -387,7 +387,7 @@ int integrate_orbit( double *orbit, const double t0, const double t1)
       sprintf( buff, "Integrating from %.4f to %.4f runs outside\n",
                JD_TO_YEAR( t0), JD_TO_YEAR( t1));
       strcat( buff, "Find_Orb's default time range.  See\n\n");
-      strcat( buff, "http://www.projectpluto.com/find_orb.htm#time_range\n\n");
+      strcat( buff, "https://www.projectpluto.com/find_orb.htm#time_range\n\n");
       strcat( buff, "for instructions on how to extend the range.\n");
       generic_message_box( buff, "o");
       exit( -1);

@@ -1745,7 +1745,7 @@ void set_up_observation( OBSERVE FAR *obs)
          else
             strcat( tbuff, " You can read about how to add an XXX\n"
                     "position for a new/temporary observer at\n\n"
-                    "http://www.projectpluto.com/find_orb.htm#xxx_code\n");
+                    "https://www.projectpluto.com/find_orb.htm#xxx_code\n");
          generic_message_box( tbuff, "o");
          comment_observation( obs, "? NoCode");
          }
@@ -2142,7 +2142,7 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
          strcpy( tbuff, "Didn't find observational bias data file\n"
                         "To include the FCCT14 bias data,  Find_Orb needs\n"
                         "the file 'bias.dat'.  There is more information\n"
-                        "about this at http://www.projectpluto.com/bias.htm\n"
+                        "about this at https://www.projectpluto.com/bias.htm\n"
                         "Biases will not be applied until the file is available.\n");
          generic_message_box( tbuff, "o");
          fcct_error_message_shown = true;
