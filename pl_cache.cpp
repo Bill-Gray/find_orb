@@ -290,7 +290,7 @@ static inline int hash_function( const int planet_no, const double jd)
    int32_t dword_ptr[2];
    int rval;
 
-   memcpy( &dword_ptr, &jd, sizeof( double));
+   memcpy( dword_ptr, &jd, sizeof( double));
    rval = dword_ptr[0] ^ dword_ptr[1] ^ (planet_no << 8);
 
    rval &= 0x7fffffff;
