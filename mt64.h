@@ -1,5 +1,5 @@
 #ifndef RESTRICT
-   #if defined (__cplusplus) && !defined( _MSC_VER)
+   #if defined (__cplusplus) && !defined( _MSC_VER) && !defined( __WATCOMC__)
       #define RESTRICT __restrict
    #else
       #define RESTRICT
