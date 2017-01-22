@@ -2958,8 +2958,8 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
    residuals_ifile = fopen_ext( get_file_name( buff, residual_filename), "fcrb");
    if( residuals_ifile)
       {
-      FILE *obslinks_file = fopen_ext( "obslinks.htm", "rb");
-      FILE *mpc_obslinks_file = fopen( "ObsCodesF.html", "rb");
+      FILE *obslinks_file = fopen_ext( "obslinks.htm", "fcrb");
+      FILE *mpc_obslinks_file = fopen_ext( "ObsCodesF.html", "fcrb");
       long obslinks_header_len = 0, mpc_obslinks_header_len = 0;
       char url[200];
               /* In making a pseudo-MPEC,  we attempt to include links     */
@@ -2968,20 +2968,14 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
               /* sites of observatory codes) and 'ObsLinksF.html' (the     */
               /* MPC's list) are both searched,  in that order.            */
 
-      if( obslinks_file)
-         {
-         while( fgets( url, sizeof( url), obslinks_file)
-                        && memcmp( url, "<a name=\"0\">", 12))
-            ;
-         obslinks_header_len = ftell( obslinks_file);
-         }
-      if( mpc_obslinks_file)
-         {
-         while( fgets( url, sizeof( url), mpc_obslinks_file)
-                        && memcmp( url, "<pre>", 5))
-            ;
-         mpc_obslinks_header_len = ftell( mpc_obslinks_file);
-         }
+      while( fgets( url, sizeof( url), obslinks_file)
+                     && memcmp( url, "<a name=\"0\">", 12))
+         ;
+      obslinks_header_len = ftell( obslinks_file);
+      while( fgets( url, sizeof( url), mpc_obslinks_file)
+                     && memcmp( url, "<pre>", 5))
+         ;
+      mpc_obslinks_header_len = ftell( mpc_obslinks_file);
       while( fgets( buff, sizeof( buff), residuals_ifile) && memcmp( buff, "Station", 7))
          ;
       fprintf( ofile, "<a name=\"stations\"></a>\n");
@@ -3031,39 +3025,35 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
                else
                   remains = buff + i;
                }
-            if( compare && obslinks_file)
+            if( compare)
                {
-               char text_to_find[50];
+               char text_to_find[50], *tptr;
 
                sprintf( text_to_find, "></a> %.3s  <", buff + 1);
                url[19] = '\0';
                fseek( obslinks_file, obslinks_header_len, SEEK_SET);
                while( (compare = memcmp( url + 13, text_to_find, 12)) != 0 &&
-                                 fgets( url, sizeof( url), obslinks_file))
+                                 fgets_trimmed( url, sizeof( url), obslinks_file))
                   ;
-               url_index = 24;   /* if there is a link,  it starts in byte 24 */
+               tptr = strstr( url, "<br>");
+               if( tptr)
+                  *tptr = '\0';
+               url_index = 23;   /* if there is a link,  it starts in byte 23 */
                }
-            if( compare && mpc_obslinks_file)
+            if( compare)   /* still don't have URL;  try ObsLinks.html */
                {
                *url = '\0';
                fseek( mpc_obslinks_file, mpc_obslinks_header_len, SEEK_SET);
                while( (compare = memcmp( url, buff + 1, 3)) != 0 &&
-                                 fgets( url, sizeof( url), mpc_obslinks_file))
+                                 fgets_trimmed( url, sizeof( url), mpc_obslinks_file))
                   ;
-               if( !compare)     /* got the observatory code;  is there a link? */
-                  if( url[33] != '<')   /* no;  don't bother with it */
-                     compare = 1;
-               url_index = 33;   /* if there is a link,  it starts in byte 33 */
+               url_index = 32;   /* if there is a link,  it starts in byte 32 */
                }
 
             if( !compare)   /* we got a link to an observatory code */
                {
-               for( i = url_index; url[i] && url[i] != '>'; i++)
-                  ;
-               url[i + 1] = '\0';
                buff[5] = '\0';
-               fprintf( ofile, "%s %s%s</a>",
-                       buff, url + url_index, buff + 6);
+               fprintf( ofile, "%s%s", buff, url + url_index);
                }
             else
                fprintf( ofile, "%s", buff);
@@ -3086,10 +3076,8 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
             observer_link_substitutions( remains + 1);
             fprintf( ofile, "%s\n", remains + 1);
             }
-      if( obslinks_file)
-         fclose( obslinks_file);
-      if( mpc_obslinks_file)
-         fclose( mpc_obslinks_file);
+      fclose( obslinks_file);
+      fclose( mpc_obslinks_file);
       }
    else
       rval |= 2;

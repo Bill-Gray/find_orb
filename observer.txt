@@ -12,6 +12,7 @@
  Bernardi                                  <a href="http://www.ifa.hawaii.edu/~bernardi/">Bernardi</a>
  Beshore                                   <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0196807">Beshore</a>
  Birtwhistle                               <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0065100">Birtwhistle</a>
+ Bittesini                                 <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0005299">Bittesini</a>
  Blythe                                    <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0017281">Blythe</a>
  2.24-m University of Hawaii               <a href="http://www.ifa.hawaii.edu/88inch/">2.24-m University of Hawaii</a>
  Boattini                                  <a href="http://spaceguard.rm.iasf.cnr.it/tumblingstone/issues/num23/eng/boattini.html">Boattini</a>
@@ -68,6 +69,7 @@
  Lowe                                      <a href="http://members.shaw.ca/andrewlowe/">Lowe</a>
  Lutkenhoner                               L&uuml;tkenh&ouml;ner
  Mainzer                                   <a href="http://science.jpl.nasa.gov/people/Mainzer/">Mainzer</a>
+ Manca                                     <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0015460">Manca</a>
  Marinello                                 <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0229836">Marinello</a>
  Masek                                     Ma&#353;ek
  Masiero                                   <a href="http://twitter.com/joemasiero">Masiero</a>
@@ -88,6 +90,8 @@
  Ory                                       <a href="https://en.wikipedia.org/wiki/Michel_Ory">Ory</a>
  P\'al                                     <a href="http://en.scientificcommons.org/andras_pal">P&aacute;l</a>
  Pelle                                     <a href="http://chez.mana.pf/~jcpelle/">Pelle</a>
+ Pettarin                                  <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0007258">Pettarin</a>
+ Piani                                     <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0010573">Piani</a>
  PinPoint                                  <a href="http://pinpoint.dc3.com/">PinPoint</a>
  Piszkesteto                               Piszk&eacute;stet&#337;
  Pittichova                                <a href="http://www.ifa.hawaii.edu/~jana/jana.html">Pittichova</a>
@@ -111,6 +115,7 @@
  Sostero                                   <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0009878">Sostero</a>
  Stoss                                     <a href="http://www.starkenburg-sternwarte.de/asteroiden/namen/7689.htm">Stoss</a>
  Tancredi                                  <a href="http://www.anii.org.uy/cvuy/SNI2008/Ciencias%20Naturales%20y%20Exactas/Ciencias%20F%C3%ADsicas/Gonzalo%20TANCREDI%20Machado.pdf">Tancredi</a>
+ Testa                                     <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0011667">Testa</a>
  Tholen                                    <a href="http://www.ifa.hawaii.edu/faculty/tholen/">Tholen</a>
  Ticha, J                                  Tich&aacute;, J
  Ticha, M                                  Tich&#253;, M

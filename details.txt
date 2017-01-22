@@ -456,6 +456,19 @@ COD J97 Alginet
 OBS T. Climent
 TEL 0.25-m f/4 Schmidt-Cassegrain + CCD
 
+COD K88
+OBS K. Sarneczky
+TEL 0.60-m Schmidt + CCD
+
+COD K92
+OBS T. Lister, S. Greenstreet, E. Gomez
+MEA S. Greentstreet
+TEL 1.0-m f/6.3 Cassegrain + CCD
+
+COD K93
+OBS R. Miles
+TEL 1.0-m f/8.0 Ritchey-Chretien + CCD
+
 COD O75
 OBS T. Namkhai, S. Schmalz
 MEA S. Schmalz
@@ -465,13 +478,17 @@ COD Q60
 OBS L. Elenin
 TEL 0.4-m f/2.4 reflector + CCD
 
-COD W86
-OBS T. Lister
-TEL 1.0-m f/8 Ritchey-Chretien + CCD
+COD W34
+OBS R. L. Flynn
+TEL 0.20-m f/10 Schmidt-Cassegrain + f/7.0 focal reducer
 
 COD W85
 OBS T. Lister, S. Greenstreet, E. Gomez
 MEA T. Lister
+TEL 1.0-m f/8 Ritchey-Chretien + CCD
+
+COD W86
+OBS T. Lister
 TEL 1.0-m f/8 Ritchey-Chretien + CCD
 
 COD Y00
@@ -483,4 +500,9 @@ NET UCAC4
 ACK batch_2016_Y00_ARTSAT_015
 AC2 cjacqueslf at gmail_dot_com
 TEL 0.28-m f/2.2 astrograph + CCD
+
+COD Z18
+OBS J. Licandro, A. Cabrera-Lavers
+MEA M. Micheli, F. J. Pozuelos, D. Farnocchia
+TEL 10.40-m reflector + CCD
 
