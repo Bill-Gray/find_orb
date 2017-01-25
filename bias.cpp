@@ -120,6 +120,7 @@ int find_fcct_biases( const double ra, const double dec, const char catalog,
                      is_negative = true;
                      tptr++;
                      }
+                  *bptr = 0;
                   while( *tptr != ' ')
                      {
                      if( *tptr >= '0' && *tptr <= '9')
