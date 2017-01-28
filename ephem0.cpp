@@ -2299,7 +2299,7 @@ void create_obs_file( const OBSERVE FAR *obs, int n_obs, const int append)
       {
       char obuff[81];
 
-      sprintf( obuff, "#Posn sigma %g", obs->posn_sigma_1);
+      sprintf( obuff, "COM Posn sigma %g", obs->posn_sigma_1);
       if( obs->posn_sigma_2 != obs->posn_sigma_1)  /* elliptical sigma */
          {
          sprintf( obuff + strlen( obuff), " %g", obs->posn_sigma_2);
@@ -2307,7 +2307,7 @@ void create_obs_file( const OBSERVE FAR *obs, int n_obs, const int append)
             sprintf( obuff + strlen( obuff), " tilt %.1f",
                         obs->posn_sigma_theta * 180. / PI);
          }
-      if( strcmp( curr_sigma_text, obuff))
+      if( obs->note2 != 'R' && strcmp( curr_sigma_text, obuff))
          {
          fprintf( ofile, "%s\n", obuff);
          strcpy( curr_sigma_text, obuff);
