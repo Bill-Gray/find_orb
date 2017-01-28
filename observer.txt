@@ -26,7 +26,9 @@
  Christensen                               <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0013858">Christensen</a>
  Cutri                                     <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0241529">Cutri</a>
  Dailey                                    <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0249522">Dailey</a>
+ Delbo                                     <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0016250">Delb&oacute;</a>
  Denisenko                                 <a href="https://en.wikipedia.org/wiki/Denis_Denisenko">Denisenko</a>
+ Denneau                                   <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0012267">Denneau</a>
  Ernst                                     <a href="http://www.starkenburg-sternwarte.de/asteroiden/namen/7686.htm">Ernst</a>
  Foglia                                    <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0013147">Foglia</a>
  Galad                                     <a href="http://en.wikipedia.org/wiki/Adri%C3%A1n_Gal%C3%A1d">Gal&aacute;d</a>
@@ -46,6 +48,7 @@
  Holman                                    <a href="http://en.wikipedia.org/wiki/3666_Holman">Holman</a>
  Holvorcem                                 <a href="http://sites.mpc.com.br/holvorcem/">Holvorcem</a>
  Hormuth                                   <a href="http://sternwarte-weinheim.de/widm.html#felix">Hormuth</a>
+ Hui                                       <a href="http://comethunter.lamost.org/">Hui</a>
  Hurtado                                   <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0362911">Hurtado</a>
  Jahn                                      <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0010340">Jahn</a>
  Jelinek                                   Jel&iacute;nek
@@ -93,7 +96,6 @@
  Pettarin                                  <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0007258">Pettarin</a>
  Piani                                     <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0010573">Piani</a>
  PinPoint                                  <a href="http://pinpoint.dc3.com/">PinPoint</a>
- Piszkesteto                               Piszk&eacute;stet&#337;
  Pittichova                                <a href="http://www.ifa.hawaii.edu/~jana/jana.html">Pittichova</a>
  Pizzetti                                  <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0233559">Pizzetti</a>
  Pons                                      <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0007645">Pons</a>
@@ -120,6 +122,7 @@
  Ticha, J                                  Tich&aacute;, J
  Ticha, M                                  Tich&#253;, M
  Tlatov                                    <a href="http://www.iau.org/administration/membership/individual/674/">Tlatov</a>
+ Thuillot                                  <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0018568">Thuillot</a>
  Tombaugh                                  <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0001604">Tombaugh</a>
  Veran                                     V&eacute;ran
  Veres                                     <a href="https://scienceandtechnology.jpl.nasa.gov/people/P_Veres">Vere&#x161;</a>

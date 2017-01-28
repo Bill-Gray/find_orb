@@ -54,8 +54,13 @@ OBS M. Ory
 TEL 0.61-m f/3.88 reflector + CCD
 
 COD 204
+CON F. Bellini, Via A. Del Sarto 3, Varese, Italy
+CON [belcat (at) tele2 (dot) it]
+AC2 [luca_buzzi (at) alice (dot) it]
 OBS L. Buzzi
+MEA L. Buzzi
 TEL 0.60-m f/4.64 Newtonian + CCD
+NET USNO-B1.0
 
 COD 212
 OBS I. Almendros
@@ -79,6 +84,7 @@ TEL 0.35-m f/5 reflector + CCD
 
 COD 291
 TEL 1.8-m f/2.7 reflector + CCD
+OBS J. V. Scotti, R. S. McMillan
 
 COD 300
 TEL 1.0-m f/3.0 reflector + CCD
@@ -91,26 +97,6 @@ TEL 6.5-m Clay reflector + CCD
 COD 322
 OBS J. Biggs
 TEL 0.25-m f/4.5 Newtonian + CCD
-
-COD 415
-CON D. Herald, P.O. Box 254, Woden, ACT 2606, Australia [DRHerald (at) bigpond.net.au]
-OBS D. Herald
-TEL 0.36-m f/3.9 Schmidt-Cassegrain + CCD
-ACK MPCReport file updated 2009.03.03 00:42:01
-AC2 DRHerald (at) bigpond.net.au
-
-COD 428
-OBS J. Broughton
-TEL 0.25-m f/7.2 Schmidt-Cassegrain + CCD
-
-COD 461
-OBS K. Sarneczky
-TEL 0.60-m Schmidt + CCD
-
-COD 474
-OBS A. C. Gilmore, P. M. Kilmartin
-MEA P. M. Kilmartin
-TEL 1.0-m f/7.7 reflector + CCD
 
 COD 333
 OBS W. K. Y. Yeung
@@ -132,12 +118,24 @@ MEA R. H. McNaught
 ACK Charon
 TEL 1.0-m f/8 reflector + CCD
 
+COD 415
+CON D. Herald, P.O. Box 254, Woden, ACT 2606, Australia
+CON [DRHerald (at) bigpond.net.au]
+OBS D. Herald
+TEL 0.36-m f/3.9 Schmidt-Cassegrain + CCD
+ACK MPCReport file updated 2009.03.03 00:42:01
+AC2 [DRHerald (at) bigpond.net.au]
+
 COD 422
 OBS G. J. Garradd
 ACK 2002 05 22 observations
 TEL 0.45-m f/5.4 reflector + CCD
 COM Reduction done using Charon
 NET UCAC1
+
+COD 428
+OBS J. Broughton
+TEL 0.25-m f/7.2 Schmidt-Cassegrain + CCD
 
 COD 442
 OBS A. Sanchez
@@ -155,11 +153,46 @@ COD 458
 OBS D. Rodriguez
 TEL 0.20-m f/10 Schmidt-Cassegrain + CCD
 
+COD 461
+CON K. S\'arneczky, 6701 Szeged, POB 406. Hungary
+CON [sky (at) titan (dot) physx.u-szeged (dot) hu]
+OBS K. Sarneczky
+TEL 0.60-m Schmidt + CCD
+NET USNO-B1.0
+COM Posn sigma 0.2", mag sigma 0.3, time sigma 0.5s
+
+COD 467
+CON M. Micheli
+CON [marco (dot) micheli (at) esa (dot) int]
+OBS G. W. Christie
+MEA M. Micheli, G. W. Christie, K. Merz, D. Koschny
+TEL 0.40-m f/10 Schmidt-Cassegrain + CCD
+
+COD 474
+OBS A. C. Gilmore, P. M. Kilmartin
+MEA P. M. Kilmartin
+TEL 1.0-m f/7.7 reflector + CCD
+ACK 160412A7
+AC2 alan (dot) gilmore (at) canterbury.ac (dot) nz
+NET PPMXL
+
 COD 493
 OBS F. Hormuth
 TEL 1.23-m reflector + CCD
 
+COD 511
+CON J. E. Arlot, IMCCE, Observatoire de Paris
+CON 61 Avenue de l'Observatoire, F75014 Paris, France
+CON [arlot (at) bdl (dot) fr]
+OBS W. Polycarpe, M. Dennefield, W. Thuillot, B. Carry, P. David
+OBS S. Bouquillon, F. Taris, P. Tanga, M. Delbo, E. Saquet, V. Robert
+MEA W. Thuillot, S. Bouquillon, F. Taris, T. Carlucci, C. Barache
+TEL 1.20-m f/6 reflector + CCD
+
 COD 557
+CON P. Pravec, Astronomical Institute, Czech Academy of Sciences,
+CON CZ-25165 Ondrejov, Czech Republic
+CON [ppravec (at) asu.cas (dot) cz]
 OBS P. Pravec, P. Kusnirak
 TEL 0.65-m f/3.6 reflector + CCD
 NET USNO-SA 2.0
@@ -179,6 +212,14 @@ OBS L. Bittesini, F. Fabris, E. Pettarin, F. Piani
 MEA E. Pettarin
 TEL 0.30-m f/4.5 reflector + CCD
 
+COD 598
+CON M. Micheli
+CON [marco (dot) micheli (at) esa (dot) int]
+OBS A. Buzzoni, R. Gualandi, F. Matassoni
+MEA M. Micheli, A. Buzzoni, C. Colombo, P. Di Lizia
+TEL 1.52-m f/8 Ritchey-Chretien + CCD
+NET Gaia-DR1
+
 COD 611
 OBS R. Stoss, M. Busch, L. Kurtze, P. Geffert
 TEL 0.45-m f/4.4 reflector + CCD
@@ -193,6 +234,7 @@ TEL 0.30-m f/9 Schmidt-Cassegrain + CCD
 
 COD 649
 CON Powell Observatory Louisburg, KS USA
+CON [lrobinsn (at) ix.netcom (dot) com]
 OBS M. Glaze, R. Trentman
 NET USNO-A2.0
 TEL 0.75-m Newtonian + CCD
@@ -206,12 +248,16 @@ NET Tycho-2
 
 COD 678
 CON C. W. Juels, P. O. Box 19960, Fountain Hills, AZ  85269
-CON [cwjuels_nospam_at_cox.net]
+CON [cwjuels_nospam (at) cox (dot) net]
 OBS C. W. Juels,  P. R. Holvorcem
 MEA PinPoint Engine
 TEL 0.07-m f/2.8 refractor + CCD
 NET GSC-ACT
 ACK MPC_HJ0110_OBS_050629_061012_A.txt
+
+COD 691
+TEL 0.9-m f/3 reflector + CCD
+OBS J. V. Scotti
 
 COD 699
 OBS M. E. Van Ness
@@ -276,8 +322,14 @@ OBS J. E. McGaha
 TEL 0.36-m f/10.0 Schmidt-Cassegrain + CCD
 
 COD 926
+CON M. Schwartz, Tenagra Observatories, HC 2 Box 292, Nogales, AZ 85621, U.S.A.
+CON [mbs (at) tenagraobservatories (dot) com]
 OBS M. Schwartz, P. R. Holvorcem
+MEA M. Schwartz
+AC2 [holvorcem (at) mpc.com (dot) br], [mbs (at) tenagraobservatories (dot) com]
 TEL 0.41-m f/3.75 astrograph + CCD
+NET UCAC-3
+ACK Batch 160511b.txt (926) - NEOCP follow-up
 
 COD 938
 OBS R. Goncalves
@@ -340,9 +392,23 @@ OBS D. O'Donoghue, M. Still, P. Vaisanen
 MEA P. Kankiewicz.
 TEL 10-m SALT + CCD
 
+COD C23
+OBS A. Diepvens
+TEL 0.20-m f/9 refractor + CCD
+
+COD C42
+OBS H. Tan, X. Gao, P. Sun
+MEA Z. Xu, P. Sun, M.-T. Hui
+TEL 0.5-m f/4 reflector + CCD
+
 COD C51
 MEA A. Mainzer, E. Wright, J. Bauer, T. Grav, J. Dailey
 MEA J. Masiero, R. Cutri, R. McMillan, R. Walker
+
+COD D29
+OBS H. B. Zhao, B. Li, G. Zhaori, R. Q. Hong, L. F. Hu
+MEA H. B. Zhao, B. Li. H. Lu, G. Zhaori
+TEL 1.04-m f/1.8 Schmidt + CCD
 
 COD E12
 OBS R. H. McNaught, S. Larson, et.al.
@@ -358,6 +424,16 @@ TEL 1.8-m Ritchey-Chretien + CCD
 COD F84
 OBS N. Teamo
 TEL 0.35-m f/2.0 Schmidt + 1392x1040 CCD
+
+COD G40
+CON Goran Gasparovic, Actarius Grupa, Badaliceva 25, 10000 Zagreb, Croatia
+CON [gasparovic (at) actarius (dot) hr]
+OBS G. Gasparovic, Y. Chen
+MEA G. Gasparovic, Y. Chen
+TEL 0.43-m f/6.8 Corrected Dall-Kirkham + CCD
+ACK 2016-07-13 [G40], 2010-050B (GG712B), Gasparovic
+AC2 [gasparovic (at) actarius (dot) hr], [ying (dot) chen (at) actarius (dot) hr], [paul (at) slooh (dot) com]
+NET UCAC-4
 
 COD G45
 OBS L. Banks, M. Blythe, R. Brungard, P. Festler, T. McVey
@@ -414,15 +490,34 @@ COD H72
 OBS M. Fauerbach, M. Mon
 TEL 0.40-m f/5.3 reflector + CCD
 
+COD H85
+CON J. C. Pelle, BP 130085, 98717 PUNAAUIA, French Polynesia
+CON [jcpelle (at) mail (dot) pf]
+OBS K. Levin
+MEA J. C. Pelle
+TEL 0.45-m f/7.25 Ritchey-Chretien + 3072x2054 CCD
+AC2 [jcpelle (at) mail (dot) pf], [klevin57 (at) gmail (dot) com]
+NET UCAC-2
+
 COD I77
 OBS C. Jacques,E. Pimentel
 MEA C. Jacques
 TEL 0.30-m f/3.0 Schmidt-Cassegrain + CCD
 ACK batch_2004_I77_002
-AC2 cjacqueslf_nospam_at_yahoo.com.br
+AC2 [cjacqueslf_nospam (at) yahoo (dot) com (dot) br]
 
 COD I93
-0.40-m f/3.7 reflector + CCD
+OBS F. Losse
+TEL 0.40-m f/3.7 reflector + CCD
+
+COD J04
+CON M. Micheli
+CON [marco (dot) micheli (at) esa.int]
+OBS D. Abreu
+MEA M. Micheli, D. Koschny, E. Schwab, M. Busch, A. Kn\"ofel
+TEL 1.0-m f/4.4 reflector + CCD
+NET UCAC-4
+ACK [ART SAT] XL8D89E (J04)
 
 COD J41
 OBS D. Grennan
@@ -437,17 +532,18 @@ OBS S. Sanchez, J. Nomen, M. Hurtado, J. A. Jaume, W. K. Y. Yeung, F. Serra
 OBS T. Valls, I. Mas, J. Marcus
 TEL 0.36-m f/2 reflector + CCD.
 
-COD J87 La Canada
-OBS J. Lacruz
-TEL 0.30-m f/3.3 Schmidt-Cassegrain + CCD
-
 COD J77 Stourton Caundle
 OBS R. Miles
 TEL 0.28-m f/10 Schmidt-Cassegrain + CCD
 
+COD J87 La Canada
+OBS J. Lacruz
+TEL 0.30-m f/3.3 Schmidt-Cassegrain + CCD
+
 COD J95
 CON Phlox Cottage, Wantage Road, Gt Shefford
 CON Berkshire England RG17 7DA
+CON [peter (at) birtwhi (dot) demon.co (dot) uk]
 OBS P. Birtwhistle
 NET USNO-SA2.0
 TEL 0.30-m f/6.3 Schmidt-Cassegrain + CCD
@@ -459,6 +555,18 @@ TEL 0.25-m f/4 Schmidt-Cassegrain + CCD
 COD K88
 OBS K. Sarneczky
 TEL 0.60-m Schmidt + CCD
+
+COD K91
+CON LCOGT, 6740 Cortona Drive Suite 102, Goleta, CA 93117
+CON [tlister (at) lcogt (dot) net]
+OBS T. Lister, S. Greenstreet, E. Gomez
+MEA T. Lister
+TEL 1.0-m f/8 Ritchey-Chretien + CCD
+ACK M70pEPX(=ExoMars1)_K91_8x6imstacks (at) Leiden
+COM LCOGT CPT Node 1m0 Dome A at Sutherland, South Africa
+AC2 [tlister (at) lcogt.net], [sgreenstreet (at) lcogt (dot) net]
+NET UCAC-4
+BND R
 
 COD K92
 OBS T. Lister, S. Greenstreet, E. Gomez
@@ -478,6 +586,28 @@ COD Q60
 OBS L. Elenin
 TEL 0.4-m f/2.4 reflector + CCD
 
+COD Q62
+TEL 0.1-m f/5 astrograph + CCD
+
+COD Q64
+CON M. Micheli
+CON [marco (dot) micheli (at) esa (dot) int]
+OBS A. Tripp, S. Roberts
+MEA M. Micheli, A. Tripp, K. Merz, D. Koschny
+TEL 1.0-m f/8 Ritchey-Chretien + CCD
+NET PPMXL
+ACK [ART SAT] ExoMars (Q64)
+
+COD Q65
+CON Marco Langbroek, Zusterhof 10, 2311 RK Leiden, Netherlands
+CON [asteroids (at) langbroek (dot) org]
+OBS M. Langbroek, P. Starr
+MEA M. Langbroek
+TEL 0.51-m f/6.8 Dall-Kirkham + CCD
+ACK ARTSAT 2010-050B obs 27 Feb 2016
+NUM 9
+NET UCAC-4
+
 COD W34
 OBS R. L. Flynn
 TEL 0.20-m f/10 Schmidt-Cassegrain + f/7.0 focal reducer
@@ -493,16 +623,44 @@ TEL 1.0-m f/8 Ritchey-Chretien + CCD
 
 COD Y00
 CON C. Jacques, Rua Bernardino S. Figueiredo 348, Belo Horizonte, MG, Brazil
-CON [cjacqueslf at gmail_dot_com]
+CON [cjacqueslf (at) gmail (dot) com]
 OBS C. Jacques, E. Pimentel, J. Barros
 MEA C. Jacques
 NET UCAC4
-ACK batch_2016_Y00_ARTSAT_015
-AC2 cjacqueslf at gmail_dot_com
 TEL 0.28-m f/2.2 astrograph + CCD
+
+COD Y28
+CON M. Micheli
+CON [marco (dot) micheli (at) esa (dot) int]
+OBS F. Monteiro, H. Medeiros, P. Arcoverde, D. Lazzaro, R. Souza, T. Rodrigues
+MEA M. Micheli, F. Monteiro
+TEL 1.0-m f/7 reflector + CCD
+NET PPMXL
 
 COD Z18
 OBS J. Licandro, A. Cabrera-Lavers
 MEA M. Micheli, F. J. Pozuelos, D. Farnocchia
 TEL 10.40-m reflector + CCD
 
+COD Z58
+CON M. Micheli
+CON [marco (dot) micheli (at) esa.int]
+OBS F. Oca\~na, A. Montero, A. Ibarra
+MEA M. Micheli, F. Oca\~na, D. Koschny
+TEL 0.56-m f/2.52 astrograph prime-focus corrector + 4K CCD
+NET PPMXL
+COM Observations from ESA's TBT, obtained just around the time of separation
+ACK [ART SAT] ExoMars
+AC2 [francisco (dot) ocana (dot) gonzalez (at) gmail (dot) com]
+
+COD Z66
+OBS N. Sanchez-Ortiz, J. Nomen, M. Hurtado
+TEL 0.40-m f/2.2 reflector + CCD
+ACK WT1190F second sensor
+AC2 [jaime (dot) nomen (at) deimos-space (dot) com]
+NET UCAC-2
+
+COD T05
+OBS L. Denneau, A. Heinze, H. Weiland, B. Stalder, J. Tonry, A. Sherstyuk
+MEA L. Denneau, A. Heinze, J. Tonry
+TEL 0.5-m f/2.0 Schmidt + CCD
