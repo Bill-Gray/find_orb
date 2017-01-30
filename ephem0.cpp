@@ -2876,7 +2876,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
             n_redacted_lines++;
       fseek( observations_ifile, 0L, SEEK_SET);
       while( fgets_trimmed( buff, sizeof( buff), observations_ifile))
-         if( *buff != '#')       /* may be comments or 'sigma' lines */
+         if( memcmp( buff, "COM ", 4))      /* skip comment/'sigma' lines */
             {
 //          if( buff[14] == 's' || buff[14] == 'v' || buff[14] == 'r')
 //             fprintf( ofile, "%s\n", buff);
