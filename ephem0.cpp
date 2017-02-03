@@ -660,7 +660,25 @@ SNR( alt) = SNR( zenith) * ((90 - alt)/19.5) ^ .25,     70.5 < alt < 90
 
    Or something like that,  perhaps with a different exponent:  a function
 equal to one at alt=90 degrees and zero at alt=70.5 degrees,  with roughly
-the right behavior in between. */
+the right behavior in between.
+
+   See further comments in 'environ.def'.
+
+   Other quantities of interest for radar:  the 'number of runs',  i.e.,
+for the time the object is above the horizon,  you'll start by transmitting
+power for the entire round-trip time to the object.  Then you shut off and
+listen for the returning data for an equal time.  Then you switch back to
+transmitting,  and back to receiving...
+
+n_runs = (time the object is above horizon) / (twice the round-trip time)
+
+   In bistatic mode,  one setup transmits continuously while the other
+receives continuously,  so that factor of two should go away (it's as
+if you're getting in twice as many runs.)  Radar ephemerides also show
+"SNR/run" and "SNR/day",  where that latter quantity is SNR/run times
+the square root of the number of runs (i.e.,  it's more like "SNR per
+time we spend observing that day,  which will probably not be 24 hours.")
+*/
 
 const double optical_albedo = .1;
 
