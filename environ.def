@@ -94,6 +94,12 @@ RADAR_d43=430000,17,.94,20,7e-14
    http://www.projectpluto.com/bias.htm for more information.
 SETTINGS2=1 22.00 0 3 0
 
+   Note the comments in the above paragraph about FCCT14 debiasing.  By
+   default,  Find_Orb looks for the 'bias.dat' file to be in the same
+   directory as Find_Orb itself.  However,  you can set the file name
+   with the following line.
+FCCT14_FILE=
+
    Most JPL filenames can be automatically detected via the list in
    'jpl_eph.txt'.  But if it's in a different folder or an odd name,  you
    can add the path to one of the following,  depending on whether you're

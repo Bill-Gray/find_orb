@@ -38,7 +38,7 @@ the biases corresponding to the catalog in which we're interested and
 computes the bias in RA and dec for a particular JD,  storing them in
 *bias_ra and *bias_dec.       */
 
-const char *fcct14_bias_file_name = "bias.dat";
+const char *fcct14_bias_file_name = NULL;
          /* override this if the bias file is elsewhere */
 
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
@@ -95,7 +95,11 @@ int find_fcct_biases( const double ra, const double dec, const char catalog,
          char buff[600];   /* first time: read ASCII file & binary-ize; */
          FILE *ofile;     /* store binary version for all future use   */
 
-         ifile = fopen( fcct14_bias_file_name, "rb");
+         ifile = NULL;
+         if( fcct14_bias_file_name && * fcct14_bias_file_name)
+            ifile = fopen( fcct14_bias_file_name, "rb");
+         if( !ifile)
+            ifile = fopen_ext( "bias.dat", "crb");
          if( !ifile)
             {
             bias_file_known_to_be_missing = true;
@@ -134,7 +138,7 @@ int find_fcct_biases( const double ra, const double dec, const char catalog,
                }
          fclose( ifile);
          assert( loc == n_tiles);
-         ofile = fopen_ext( crunched_fcct14_file_name, "fwb");
+         ofile = fopen_ext( crunched_fcct14_file_name, "fcwb");
          nbytes = fwrite( bias_data, 1, csize, ofile);
          assert( nbytes == csize);
          fclose( ofile);
