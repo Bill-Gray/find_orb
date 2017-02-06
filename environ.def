@@ -220,3 +220,11 @@ COMET_CONSTANTS=2.808,2.15,5.093,4.6142
    usually come about because the observations are inconsistent and there
    isn't really a meaningful orbit that fits them.)
 IOD_TIMEOUT=20
+
+   Find_Orb defaults to looking for the BC405 ephemeris file (orbital elements
+   at 40-day intervals for 300 asteroids used in the BC405 theory;  see
+   http://www.projectpluto.com/ast_pert.htm for details) in its configuration
+   directory,  then the local directory.  But using the following line,  you
+   can move the 'asteroid_ephemeris.txt' file to a different directory,  and/or
+   rename it.
+# BC405_FILENAME=/home/phred/big/asteroid_ephemeris.txt

@@ -34,6 +34,8 @@ int generic_message_box( const char *message, const char *box_type);
 int asteroid_position_raw( const int astnum, const double jd,
                               double *posn);       /* bc405.cpp */
 int planet_posn( const int planet_no, const double jd, double *vect_2000);
+FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
+const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 
 #define BC405_INVALID_CHUNK            (-1)
 #define NO_BC405_FILE                  (-2)
@@ -54,13 +56,21 @@ static FILE *open_bc405_file( void)
    if( failure_detected)
       return( NULL);
    if( !ifile)
-      ifile = fopen( data_file_name, "rb");
+      ifile = fopen_ext( data_file_name, "crb");
    if( !ifile)
       {
-      ifile = fopen( "asteroid_ephemeris.txt", "rb");
+      ifile = fopen_ext( "asteroid_ephemeris.txt", "crb");
+      if( !ifile)       /* file name may be specified in environ.dat */
+         {
+         const char *ast_ephem_filename
+                        = get_environment_ptr( "BC405_FILENAME");
+
+         if( *ast_ephem_filename)
+            ifile = fopen( ast_ephem_filename, "rb");
+         }
       if( !ifile)       /* maybe the sub-ephemeris is available? */
          {
-         ifile = fopen( "bc405sub.dat", "rb");
+         ifile = fopen_ext( "bc405sub.dat", "crb");
          if( ifile)
             {
             int32_t temp;
@@ -81,7 +91,7 @@ static FILE *open_bc405_file( void)
       else
          {
          char buff[100];
-         FILE *ofile = fopen( data_file_name, "wb");
+         FILE *ofile = fopen_ext( data_file_name, "cwb");
 
          if( !ofile)
             return( NULL);
@@ -93,7 +103,7 @@ static FILE *open_bc405_file( void)
             }
          fclose( ifile);
          fclose( ofile);
-         ifile = fopen( data_file_name, "rb");
+         ifile = fopen_ext( data_file_name, "crb");
          assert( ifile != NULL);
          }
       }
@@ -223,11 +233,11 @@ scaled to this.            */
 static FILE *get_precomputed_data_fp( void)
 {
    const char *data_file_name = "bc405pre.dat";
-   FILE *ifile = fopen( data_file_name, "r+b");
+   FILE *ifile = fopen_ext( data_file_name, "cr+b");
 
    if( !ifile)             /* Create output binary file if not found, */
       {                    /* seeding with zeroes :                   */
-      FILE *ofile = fopen( data_file_name, "w+b");
+      FILE *ofile = fopen_ext( data_file_name, "cw+b");
       int16_t posns[MAX_BC405_N_ASTEROIDS];
       int i;
 
@@ -241,7 +251,7 @@ static FILE *get_precomputed_data_fp( void)
          assert( count == (size_t)bc405_n_asteroids);
          }
       fclose( ofile);
-      ifile = fopen( data_file_name, "r+b");
+      ifile = fopen_ext( data_file_name, "cr+b");
       assert( ifile);
       }
    return( ifile);
@@ -294,7 +304,7 @@ static double *masses;
 
 static double *load_asteroid_masses( void)
 {
-   FILE *ifile = fopen( "mu1.txt", "rb");
+   FILE *ifile = fopen_ext( "mu1.txt", "fcrb");
    double *rval = NULL;
 
    assert( ifile);
