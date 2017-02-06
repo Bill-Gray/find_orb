@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <math.h>
-#ifndef isnan
+#ifdef _MSC_VER
    /* Microsoft doesn't "do" standards,  lacks isnan : */
    #include <float.h>
    #define isnan _isnan

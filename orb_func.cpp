@@ -45,7 +45,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    void move_add_nstr( const int col, const int row, const char *msg, const int n_bytes);
 #endif
 
-#ifndef isfinite
+#ifdef _MSC_VER
    #include <float.h>
    #define isfinite _finite
 #endif
