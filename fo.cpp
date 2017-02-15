@@ -265,6 +265,54 @@ static void get_summary_info( char *buff, const char *mpec_filename)
    fclose( ifile);
 }
 
+#define VT100_RED       '1'
+#define VT100_GREEN     '2'
+#define VT100_YELLOW    '3'
+#define VT100_BLUE      '4'
+#define VT100_PURPLE    '5'
+#define VT100_CYAN      '6'
+#define VT100_GRAY      '7'
+
+/* This inserts VT100 color codes so that text such as,  say,
+
+...e=1.005...
+
+can be transformed into the following,  which will cause the eccentricity
+to be highlighted in red :
+
+...\033[33me=1.005\033[0m...           */
+
+static void add_vt100_colors( char *text, size_t nbytes, const char color)
+{
+   size_t len;
+
+   memmove( text + 5, text, strlen( text) + 1);
+   memcpy( text, "\033[3xm", 5);
+   text[3] = color;
+   text += 5;
+   len = strlen( text);
+   text += (len < nbytes ? len : nbytes);
+   memmove( text + 4, text, strlen( text) + 1);
+   memcpy( text, "\033[0m", 4);
+}
+
+static void colorize_text( char *text)
+{
+   char *tptr = strstr( text, "a=");
+
+   if( tptr && atof( tptr + 2) > 7.)
+      add_vt100_colors( tptr, 9, VT100_GREEN);
+   tptr = strstr( text, "e=");
+   if( tptr && atof( tptr + 2) > .9)
+      add_vt100_colors( tptr, 8, VT100_YELLOW);
+   tptr = strstr( text, "i=");
+   if( tptr && atof( tptr + 2) > 60.)
+      add_vt100_colors( tptr, 5, VT100_CYAN);
+   tptr = strstr( text, "MOID ");
+   if( tptr && atof( tptr + 5) < 0.0105)
+      add_vt100_colors( tptr, 10, VT100_RED);
+}
+
 int main( const int argc, const char **argv)
 {
    char tbuff[300];
@@ -283,6 +331,7 @@ int main( const int argc, const char **argv)
    extern int use_config_directory;          /* miscell.c */
    int element_precision = 5;
    bool all_heliocentric = true;
+   bool use_colors = true;
    int ephemeris_output_options = OPTION_SHOW_SIGMAS | OPTION_ROUND_TO_NEAREST_STEP;
 #ifdef FORKING
    int child_status;
@@ -373,6 +422,9 @@ int main( const int argc, const char **argv)
                break;
             case 't':
                total_objects = atoi( argv[i] + 2);
+               break;
+            case 'v':
+               use_colors = false;
                break;
             case 'y':
                {
@@ -492,7 +544,10 @@ int main( const int argc, const char **argv)
                write_out_elements_to_file( orbit, curr_epoch, epoch_shown,
                      obs, n_obs_actually_loaded, orbit_constraints, element_precision,
                      0, element_options);
-               printf( "; %s ", orbit_summary_text);
+               strcpy( tbuff, orbit_summary_text);
+               if( use_colors)
+                  colorize_text( tbuff);
+               printf( "; %s ", tbuff);
                if( separate_residual_file_name)
                   write_residuals_to_file( separate_residual_file_name, argv[1],
                                n_obs_actually_loaded, obs, RESIDUAL_FORMAT_PRECISE
