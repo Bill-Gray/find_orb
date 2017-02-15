@@ -205,6 +205,12 @@ extern double maximum_jd, minimum_jd;        /* orb_func.cpp */
 
 
 #define COLOR_GRAY                  9
+#define COLOR_BROWN                10
+#define COLOR_ORANGE               11
+#define COLOR_FAINT_GREEN          12
+#define COLOR_FAINT_BLUE           13
+#define COLOR_FAINT_RED            14
+#define COLOR_FAINT_GRAY           15
 
 #ifdef USE_MYCURSES
 static int curses_kbhit( )
@@ -2341,18 +2347,33 @@ int main( const int argc, const char **argv)
    if( debug_level > 2)
       debug_printf( "Initializing curses...");
    start_color( );
-   if( COLORS >= COLOR_GRAY)
+   if( COLORS >= COLOR_FAINT_GRAY && can_change_color())
+      {
       init_color( COLOR_GRAY, 500, 500, 500);
+      init_color( COLOR_BROWN, 500, 200, 0);
+      init_color( COLOR_ORANGE, 1000, 500, 0);
+      init_color( COLOR_FAINT_GREEN, 0, 500, 500);
+      init_color( COLOR_FAINT_BLUE, 0, 0, 500);
+      init_color( COLOR_FAINT_RED, 400, 0, 0);
+      init_color( COLOR_FAINT_GRAY, 300, 300, 300);
+      init_pair( COLOR_SCROLL_BAR, COLOR_GREEN, COLOR_GRAY);
+      init_pair( COLOR_MENU, COLOR_ORANGE, COLOR_FAINT_GRAY);
+      init_pair( COLOR_OBS_INFO, COLOR_WHITE, COLOR_FAINT_RED);
+      }
+   else
+      {
+      init_pair( COLOR_SCROLL_BAR, COLOR_GREEN, COLOR_CYAN);
+      init_pair( COLOR_MENU, COLOR_WHITE, COLOR_BLUE);
+      init_pair( COLOR_OBS_INFO, COLOR_WHITE, COLOR_RED);
+      }
    init_pair( COLOR_BACKGROUND, COLOR_WHITE, COLOR_BLACK);
    init_pair( COLOR_ORBITAL_ELEMENTS, COLOR_BLACK, COLOR_YELLOW);
    init_pair( COLOR_FINAL_LINE, COLOR_WHITE, COLOR_BLUE);
    init_pair( COLOR_SELECTED_OBS, COLOR_WHITE, COLOR_MAGENTA);
    init_pair( COLOR_HIGHLIT_BUTTON, COLOR_BLACK, COLOR_GREEN);
    init_pair( COLOR_EXCLUDED_OBS, COLOR_RED, COLOR_GREEN);
-   init_pair( COLOR_OBS_INFO, COLOR_WHITE, COLOR_RED);
    init_pair( COLOR_MESSAGE_TO_USER, COLOR_BLACK, COLOR_WHITE);
    init_pair( COLOR_RESIDUAL_LEGEND, COLOR_BLACK, COLOR_CYAN);
-   init_pair( COLOR_MENU, COLOR_GREEN, COLOR_MAGENTA);
 
                   /* MPC color-coded station colors: */
    init_pair( 16, COLOR_YELLOW, COLOR_BLACK);
@@ -2361,8 +2382,6 @@ int main( const int argc, const char **argv)
    init_pair( 19, COLOR_BLUE, COLOR_BLACK);
    init_pair( 20, COLOR_GREEN, COLOR_BLACK);
 
-   init_pair( COLOR_SCROLL_BAR, COLOR_GREEN,
-         (COLORS > COLOR_GRAY ? COLOR_GRAY : COLOR_CYAN));
 
    if( debug_level > 2)
       debug_printf( "(3)\n");
