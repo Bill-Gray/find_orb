@@ -45,7 +45,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    void move_add_nstr( const int col, const int row, const char *msg, const int n_bytes);
 #endif
 
-#ifdef _MSC_VER
+/* MS only got around to adding 'isfinite' in VS2013 : */
+
+#if defined( _MSC_VER) && (_MSC_VER < 1800)
    #include <float.h>
    #define isfinite _finite
 #endif

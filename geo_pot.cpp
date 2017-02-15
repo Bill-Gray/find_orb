@@ -3,8 +3,10 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <math.h>
-#ifdef _MSC_VER
-   /* Microsoft doesn't "do" standards,  lacks isnan : */
+
+/* MS only got around to adding 'isfinite',  asinh in VS2013 : */
+
+#if defined( _MSC_VER) && (_MSC_VER < 1800)
    #include <float.h>
    #define isnan _isnan
 #endif
