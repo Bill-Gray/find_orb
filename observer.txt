@@ -24,6 +24,8 @@
  Cikota                                    <a href="http://dalje.com/en-croatia/asteroid-named-after-croatian-capital-zagreb/250877">Cikota</a>
  Crni Vrh                                  &#x10c;rni Vrh
  Christensen                               <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0013858">Christensen</a>
+ Cremaschini                               <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0014062">Cremaschini</a>
+ Concari                                   <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0006671">Concari</a>
  Cutri                                     <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0241529">Cutri</a>
  Dailey                                    <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0249522">Dailey</a>
  Delbo                                     <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0016250">Delb&oacute;</a>
@@ -32,6 +34,7 @@
  Ernst                                     <a href="http://www.starkenburg-sternwarte.de/asteroiden/namen/7686.htm">Ernst</a>
  Foglia                                    <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0013147">Foglia</a>
  Galad                                     <a href="http://en.wikipedia.org/wiki/Adri%C3%A1n_Gal%C3%A1d">Gal&aacute;d</a>
+ Galli                                     <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0006515">Galli</a>
  Garradd                                   <a href="http://members.ozemail.com.au/~loomberah/">Garradd</a>
  Gasparovic                                Ga&#x161;parovi&#x107;
  Geffert                                   <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0017855">Geffert</a>
@@ -106,6 +109,7 @@
  Ritchey-Chretien                          Ritchey-Chr&eacute;tien
  W. H. Ryan                                <a href="http://infohost.nmt.edu/~bryan/">W. H. Ryan</a>
  Sarneczky                                 <a href="http://en.wikipedia.org/wiki/Kriszti%C3%A1n_S%C3%A1rneczky">S&aacute;rneczky</a>
+ S\'arneczky                               <a href="http://en.wikipedia.org/wiki/Kriszti%C3%A1n_S%C3%A1rneczky">S&aacute;rneczky</a>
  Sarounova                                 &#352;arounov&aacute;
  Scotti                                    <a href="http://www.lpl.arizona.edu/~jscotti/">Scotti</a>
  Sayer                                     <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0017853">Sayer</a>
@@ -124,6 +128,7 @@
  Tlatov                                    <a href="http://www.iau.org/administration/membership/individual/674/">Tlatov</a>
  Thuillot                                  <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0018568">Thuillot</a>
  Tombaugh                                  <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0001604">Tombaugh</a>
+ Tombelli                                  <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0009904">Tombelli</a>
  Veran                                     V&eacute;ran
  Veres                                     <a href="https://scienceandtechnology.jpl.nasa.gov/people/P_Veres">Vere&#x161;</a>
  Veillet                                   <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0016984">Veillet</a>

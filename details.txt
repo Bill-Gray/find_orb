@@ -589,6 +589,11 @@ TEL 0.4-m f/2.4 reflector + CCD
 COD Q62
 TEL 0.1-m f/5 astrograph + CCD
 
+COD Q63
+OBS T. Lister, S. Greenstreet, E. Gomez
+NET PPMXL
+TEL 1.0-m f/8 Ritchey-Chretien + CCD
+
 COD Q64
 CON M. Micheli
 CON [marco (dot) micheli (at) esa (dot) int]
@@ -607,6 +612,28 @@ TEL 0.51-m f/6.8 Dall-Kirkham + CCD
 ACK ARTSAT 2010-050B obs 27 Feb 2016
 NUM 9
 NET UCAC-4
+
+COD T05
+OBS L. Denneau, A. Heinze, H. Weiland, B. Stalder, J. Tonry, A. Sherstyuk
+MEA L. Denneau, A. Heinze, J. Tonry
+NET 2MASS
+TEL 0.5-m f/2.0 Schmidt + CCD
+
+COD T12
+CON D. J. Tholen, Institute for Astronomy, 2680 Woodlawn Drive, Honolulu, HI 96822
+CON [tholen (at) ifa (dot) hawaii (dot) edu]
+OBS D. Fohring, D. Hung, Y. Ramanjooloo, Z. Claytor, D. J. Tholen
+NET Gaia-DR1
+TEL 2.24-m University of Hawaii reflector
+
+COD U69
+TEL 0.61-m f/6.5 astrograph + CCD
+
+COD V03
+CON D. Rankin, P. O. Box 410313, Big Water, Utah U. S. A.
+CON [david (at) rankinstudio (dot) com]
+NET PPMXL
+TEL 0.30-m refractor + CCD
 
 COD W34
 OBS R. L. Flynn
@@ -660,7 +687,3 @@ ACK WT1190F second sensor
 AC2 [jaime (dot) nomen (at) deimos-space (dot) com]
 NET UCAC-2
 
-COD T05
-OBS L. Denneau, A. Heinze, H. Weiland, B. Stalder, J. Tonry, A. Sherstyuk
-MEA L. Denneau, A. Heinze, J. Tonry
-TEL 0.5-m f/2.0 Schmidt + CCD

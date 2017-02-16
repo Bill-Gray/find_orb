@@ -58,11 +58,13 @@ AOO !  30.75564  46.47778   56.                Astronomical Observatory of Odess
 Bag !-118.5      34.         0.                S Hutcheon obs
 Ber ! 138.6333        0.82043 -0.56986         Anthony Beresford, Adelaide, South Australia
 CBa !   6.3785   52.8344    10                 Cees Bassa
+Cro |   4.499947 52.13878    0                 Cronesteyn (Marco Langbroek)
 Fet ! -75.6910   44.6062   100                 Kevin Fetter, Brockville, Ontario, Canada
 GRR !  18.5129  -33.94058   10                 Greg Roberts, South Africa
 Hol !   8.6558   49.8822   135                 Gerhard Holtkamp, Germany
 IHN ! -81.081444 41.547806 300                 Indian Hill North
 ITE !   8.87444  46.178771 210                 Marco Iten Gaggiole
+Lei |   4.49081  52.15412    0                 Leiden (Marco Langbroek)
 MMc ! 262.1339        0.86573 +0.49912         Mike McCants
 PGa ! -98.2161   26.24316  36                  Paul Gabriel, McAllen, Texas USA 78504-2940
 PWa !  -1.1188   51.0945  120                  Peter Wakelin
