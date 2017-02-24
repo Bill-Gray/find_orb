@@ -818,7 +818,10 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
    static int choice = 0, show_packed = 0;
    int rval = -1;
    int sort_order = OBJECT_INFO_COMPARE_PACKED;
+   char search_text[20];
+   int64_t t_last_key = (clock_t)0;
 
+   *search_text = '\0';
    if( ids && n_ids)
       {
       int i, curr_page = 0, err_message = 0, force_full_width_display = 0;
@@ -937,18 +940,28 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
             }
                      /* if a letter/number is hit,  look for an obj that */
                      /* starts with that letter/number: */
-         if( c > ' ' && c <= 'z' && isalnum( c))
-            for( i = 1; i < n_ids; i++)
-               {
-               const int loc = (i + choice) % n_ids;
+         if( c >= ' ' && c <= 'z')
+            {
+            const int64_t t = nanoseconds_since_1970( );
+            const int64_t one_billion = 1000000000;
+            int len;
 
-               if( c == ids[loc].obj_name[0])
+            if( t > t_last_key + one_billion)
+               *search_text = '\0';
+            t_last_key = t;
+            len = 0;
+            while( search_text[len] && len < 15)
+               len++;
+            search_text[len++] = (char)c;
+            search_text[len] = '\0';
+            for( i = 0; i < n_ids; i++)
+               if( !memcmp( search_text, ids[i].obj_name, len))
                   {
-                  choice = loc;
+                  choice = i;
                   i = n_ids;
                   c = 0;
                   }
-               }
+            }
 #ifdef ALT_0
          if( c >= ALT_0 && c <= ALT_9)
             choice = (n_ids - 1) * (c - ALT_0 + 1) / 11;
