@@ -586,9 +586,6 @@ COD Q60
 OBS L. Elenin
 TEL 0.4-m f/2.4 reflector + CCD
 
-COD Q62
-TEL 0.1-m f/5 astrograph + CCD
-
 COD Q63
 OBS T. Lister, S. Greenstreet, E. Gomez
 NET PPMXL

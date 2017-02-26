@@ -134,6 +134,8 @@
  Veillet                                   <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0016984">Veillet</a>
  Visnjan                                   <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0017853">Vi&#353;njan</a>
  Vorobjov                                  <a href="http://scibuff.com/">Vorobjov</a>
+ Wainscoat                                 <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0009725">Wainscoat</a>
  Watters                                   <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0133009">Watters</a>
+ Weryk                                     <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0009281">Weryk</a>
  Wiggins                                   <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0004099">Wiggins</a>
  Zolnowski                                 <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0384815">&#379;o&#322;nowski</a>
