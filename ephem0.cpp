@@ -2541,18 +2541,18 @@ static int write_observer_data_to_file( FILE *ofile, const char *ast_filename,
    for( i = 0; i < n_stations; i++)
       {
       char buff[200], tbuff[100];
-      char details[3][300];
+      char details[4][300];
       int details_found = 0;
       size_t loc;
 
       FSTRCPY( tbuff, stations[i]);
       put_observer_data_in_text( tbuff, buff);
-      fprintf( ofile, "(%s) %s", tbuff, buff);
+      snprintf( details[0], sizeof( details[0]), "(%s) %s.", tbuff, buff);
 
       if( try_ast_file)
          {
          details_found = get_observer_details( ast_filename, tbuff,
-                                 details[0], details[1], details[2],
+                                 details[1], details[2], details[3],
                                  obs_data->packed_id);
          if( details_found == -1)       /* file wasn't found,  or it has */
             {                           /* no observational details.  In */
@@ -2564,7 +2564,7 @@ static int write_observer_data_to_file( FILE *ofile, const char *ast_filename,
       if( !details_found && try_details_file)
          {
          details_found = get_observer_details( "details.txt", tbuff,
-                                 details[0], details[1], details[2], NULL);
+                                 details[1], details[2], details[3], NULL);
          if( details_found == -1)       /* file wasn't found,  or it has */
             {                           /* no observational details.  In */
             details_found = 0;          /* either case,  ignore it for   */
@@ -2575,7 +2575,7 @@ static int write_observer_data_to_file( FILE *ofile, const char *ast_filename,
       if( !details_found && try_scope_file)
          {
          details_found = get_observer_details( "scopes.txt", tbuff,
-                                 details[0], details[1], details[2], NULL);
+                                 details[1], details[2], details[3], NULL);
          if( details_found == -1)       /* file wasn't found,  or it has */
             {                           /* no observational details.  In */
       /*    details_found = 0;   */     /* either case,  ignore it for   */
@@ -2583,18 +2583,19 @@ static int write_observer_data_to_file( FILE *ofile, const char *ast_filename,
             }
          }
 
-      fprintf( ofile, ".");
-      loc = 7 + strlen( buff);
-      for( j = 0; j < 3; j++)
+      loc = 0;
+      for( j = 0; j < 4; j++)
          if( *details[j])
             {
             char inserted_text[15], *outtext = details[j];
 
-            if( j == 2)
+            if( j == 3)                      /* telescope */
                strcpy( inserted_text, " ");
-            else
+            else if( j == 0)                 /* observatory name/location */
+               *inserted_text = '\0';
+            else              /* j=1: observer(s); j=2: measurer(s) */
                {
-               strcpy( inserted_text, j ? " Measurer" : "  Observer");
+               strcpy( inserted_text, (j == 2) ? " Measurer" : "  Observer");
                if( strchr( outtext, ','))
                   strcat( inserted_text, "s");
                strcat( inserted_text, " ");
@@ -2604,26 +2605,27 @@ static int write_observer_data_to_file( FILE *ofile, const char *ast_filename,
             memcpy( outtext, inserted_text, strlen( inserted_text));
             while( *outtext)
                {
-               bool done;
-               size_t k;
+               int len = (int)strlen( outtext);
 
-               for( k = 0; outtext[k] && outtext[k] != ' '; k++)
-                  ;
-               done = !outtext[k];
-               outtext[k] = '\0';
-               if( loc + k > 78)    /* gotta go to a new line */
+               if( len > 78 - loc)
                   {
-                  fprintf( ofile, "\n    %s", outtext);
-                  loc = k + 4;
+                  int k = 78 - loc;
+
+                  while( k && outtext[k - 1] != ' ')
+                     k--;
+                  len = k;
+                  while( k && outtext[k - 1] == ' ')
+                     k--;
+                  outtext[k] = '\0';
+                  fprintf( ofile, "%s\n   ", outtext);
+                  loc = 3;
                   }
-               else
+              else
                   {
-                  fprintf( ofile, " %s", outtext);
-                  loc += k + 1;
+                  fprintf( ofile, "%s", outtext);
+                  loc += len;
                   }
-               outtext += k;
-               if( !done)
-                  outtext++;
+               outtext += len;
                }
             }
       fprintf( ofile, "\n");
