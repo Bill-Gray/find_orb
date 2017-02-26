@@ -2166,9 +2166,13 @@ int separate_periodic_comet_apparitions = 0;
 
 static void reduce_designation( char *desig, const char *idesig)
 {
+   size_t i = 12;
+
    memcpy( desig, idesig, 12);
    desig[12] = '\0';
-   if( desig[5] != ' ' && strlen( desig) > 9)
+   while( i > 0 && desig[i - 1] == ' ')
+      i--;
+   if( desig[5] != ' ' && i > 9)
       if( isdigit( desig[1]) && isdigit( desig[2]) && isdigit( desig[3]))
          {
          if( strchr( "PCDXA", desig[4]))        /* it's a numbered comet... */
