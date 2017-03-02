@@ -30,8 +30,16 @@ can turn it back to 'false'.
 
 int generic_message_box( const char *message, const char *box_type);
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
+void make_config_dir_name( char *oname, const char *iname);  /* miscell.cpp */
 
 int use_config_directory = false;
+
+void make_config_dir_name( char *oname, const char *iname)
+{
+   strcpy( oname, getenv( "HOME"));
+   strcat( oname, "/.find_orb/");
+   strcat( oname, iname);
+}
 
 FILE *fopen_ext( const char *filename, const char *permits)
 {
@@ -59,9 +67,7 @@ FILE *fopen_ext( const char *filename, const char *permits)
       {
       char tname[255];
 
-      strcpy( tname, getenv( "HOME"));
-      strcat( tname, "/.find_orb/");
-      strcat( tname, filename);
+      make_config_dir_name( tname, filename);
       permits++;
       if( *permits == 'l')       /* permits are 'cl' = check both */
          permits++;

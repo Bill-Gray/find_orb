@@ -47,6 +47,7 @@ int64_t planet_ns;
 #define J0 (J2000 - 2000. * 365.25)
 
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
+void make_config_dir_name( char *oname, const char *iname);  /* miscell.cpp */
 char *fgets_trimmed( char *buff, size_t max_bytes, FILE *ifile); /*elem_out.c*/
 int generic_message_box( const char *message, const char *box_type);
 
@@ -111,7 +112,16 @@ static int planet_posn_raw( int planet_no, const double jd,
 
             while( !jpl_eph && fgets_trimmed( buff, sizeof( buff), ifile))
                if( *buff && *buff != ';')
+                  {
                   jpl_eph = jpl_init_ephemeris( buff, NULL, NULL);
+                  if( !jpl_eph)
+                     {
+                     char tname[255];
+
+                     make_config_dir_name( tname, buff);
+                     jpl_eph = jpl_init_ephemeris( tname, NULL, NULL);
+                     }
+                  }
             if( debug_level)
                debug_printf( "Ephemeris file %s\n", buff);
             fclose( ifile);
