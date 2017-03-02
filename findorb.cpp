@@ -2137,7 +2137,10 @@ int main( const int argc, const char **argv)
    bool drop_single_obs = true;
 
    setlocale( LC_ALL, "");
-   use_config_directory = false;
+   if( !strcmp( argv[0], "find_orb"))
+      use_config_directory = true;
+   else
+      use_config_directory = false;
    for( i = 1; i < argc; i++)       /* check to see if we're debugging: */
       if( argv[i][0] == '-')
          switch( argv[i][1])
