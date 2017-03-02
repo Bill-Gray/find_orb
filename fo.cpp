@@ -337,7 +337,10 @@ int main( const int argc, const char **argv)
    int child_status;
 #endif
 
-   use_config_directory = false;
+   if( !strcmp( argv[0], "fo"))
+      use_config_directory = true;
+   else
+      use_config_directory = false;
    for( i = 1; i < argc; i++)       /* check to see if we're debugging: */
       if( argv[i][0] == '-')
          switch( argv[i][1])
