@@ -19,7 +19,7 @@
 
 CURSES_LIB=-lncursesw
 CC=g++
-LIBSADDED=-lm
+LIBSADDED=-L $(INSTALL_DIR)/lib -lm
 EXE=
 OBJSADDED=
 RM=rm -f
@@ -35,6 +35,17 @@ ifdef MSWIN
 	CURSES_LIB=pdcurses.a -static-libgcc
 endif
 
+# You can have your include files in ~/include and libraries in
+# ~/lib,  in which case only the current user can use them;  or
+# (with root privileges) you can install them to /usr/local/include
+# and /usr/local/lib for all to enjoy.
+
+ifdef GLOBAL
+	INSTALL_DIR=/usr/local
+else
+	INSTALL_DIR=~
+endif
+
 ifdef X
 	ADDED_CFLAGS=-DXCURSES -DPDC_WIDE -I../PDCurses
 	CURSES_LIB=-lXCurses -lXaw -lXmu -lXt -lX11 -lSM -lICE -lXext -lXpm
@@ -42,7 +53,7 @@ endif
 
 ifdef XCOMPILE
 	CC=x86_64-w64-mingw32-g++
-	ADDED_CFLAGS=-DUTF8 -DPDC_WIDE -I/usr/local/include
+	ADDED_CFLAGS=-DUTF8 -DPDC_WIDE -I $(INSTALL_DIR)/include
  OBJSADDED=clipfunc.o
 	EXE=.exe
 	LIBSADDED=
@@ -51,7 +62,7 @@ endif
 
 all: fo$(EXE) find_orb$(EXE) fo_serve.cgi
 
-CFLAGS=-c -O3 -Wall -pedantic -Wextra -Wno-unused-parameter
+CFLAGS=-c -O3 -Wall -pedantic -Wextra -Wno-unused-parameter -I $(INSTALL_DIR)/include
 
 OBJS=b32_eph.o bc405.o bias.o collide.o conv_ele.o eigen.o \
 	elem2tle.o elem_out.o elem_ou2.o ephem0.o gauss.o geo_pot.o healpix.o \
@@ -92,7 +103,7 @@ clean_temp:
 	$(RM) sof?.txt sof1s?.txt
 
 install:
-	cp find_orb $(HOME)/bin
+	-cp find_orb $(HOME)/bin
 	cp fo       $(HOME)/bin
 	-mkdir $(IDIR)
 	cp command.txt details.txt dosephem.txt dos_help.txt ?findorb.txt           $(IDIR)
@@ -102,6 +113,7 @@ install:
 
 uninstall:
 	rm -f $(HOME)/bin/find_orb
+	rm -f $(HOME)/bin/fo
 	rm -f $(IDIR)/*
 	rmdir $(IDIR)
 
