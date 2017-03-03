@@ -2607,9 +2607,9 @@ static int write_observer_data_to_file( FILE *ofile, const char *ast_filename,
                {
                int len = (int)strlen( outtext);
 
-               if( len > 78 - loc)
+               if( len > 78 - (int)loc)
                   {
-                  int k = 78 - loc;
+                  int k = 78 - (int)loc;
 
                   while( k && outtext[k - 1] != ' ')
                      k--;
