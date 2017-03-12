@@ -3370,19 +3370,32 @@ one "hand-measured",  the other not,  like this :
 
    Normally,  two observations with identical times and observatories would
 both be discarded.  In this case,  we want to toss out the first (non-hand
-measured) observation only.         */
+measured) observation only.
+
+   More recently,  there have been similar situations,  except one has no
+note and the other has a 'K' ('stacked image').  In that case,  we're supposed
+to ignore the stacked one and keep the blank-note one.  */
 
 inline int spacewatch_duplication( OBSERVE FAR *obs)
 {
    int rval = 0;
 
-   if( !strcmp( obs->mpc_code, "691") && obs[0].note1 == ' '
-                                      && obs[1].note1 == 'H')
+   if( !strcmp( obs->mpc_code, "691") && obs[0].note1 == ' ')
       {
-      rval = 1;
-      obs->is_included = 0;
-      obs->flags |= OBS_DONT_USE;
-      comment_observation( obs, "Replaced");
+      if( obs[1].note1 == 'H')
+         {
+         rval = 1;
+         obs->is_included = 0;
+         obs->flags |= OBS_DONT_USE;
+         comment_observation( obs, "Replaced");
+         }
+      else if( obs[1].note1 == 'K')
+         {
+         rval = 1;
+         obs[1].is_included = 0;
+         obs[1].flags |= OBS_DONT_USE;
+         comment_observation( obs + 1, "Replaced");
+         }
       }
    return( rval);
 }
