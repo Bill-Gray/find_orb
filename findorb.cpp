@@ -3975,8 +3975,8 @@ int main( const int argc, const char **argv)
             }
             break;
          case '&':
-            if( !find_precovery_plates( "plates.txt", orbit, curr_epoch))
-               show_a_file( "plates.txt");
+            if( !find_precovery_plates( "fields.txt", orbit, curr_epoch))
+               show_a_file( "fields.txt");
             break;
          case ';':
             observation_display ^= DISPLAY_RESIDUAL_LEGEND;

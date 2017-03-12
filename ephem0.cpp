@@ -448,12 +448,52 @@ double get_step_size( const char *stepsize, char *step_units, int *step_digits)
    return( step);
 }
 
+static double centralize_ang_around_zero( double ang)
+{
+   ang = fmod( ang, PI + PI);
+   if( ang > PI)
+      ang -= PI + PI;
+   else if( ang <= -PI)
+      ang += PI + PI;
+   return( ang);
+}
+
+typedef struct
+{
+   double ra, dec, jd, r;
+} obj_location_t;
+
+static void setup_obj_loc( obj_location_t *p, double *orbit,
+                           const double epoch_jd)
+{
+   double obs_posn[3], topo[3];
+   size_t i;
+
+   integrate_orbit( orbit, epoch_jd, p->jd);
+   compute_observer_loc( p->jd, 3, 0., 0., 0., obs_posn);
+   for( i = 0; i < 3; i++)
+      topo[i] = orbit[i] - obs_posn[i];
+   ecliptic_to_equatorial( topo);
+   p->ra = atan2( topo[1], topo[0]);
+   p->dec = asin( topo[2] / vector3_length( topo));
+}
+
+typedef struct
+{
+   double ra, dec, jd;
+   double height, width, tilt;
+   uint32_t file_offset;
+   char obscode[4];
+} field_location_t;
+
 int find_precovery_plates( const char *filename, const double *orbit,
                            double epoch_jd)
 {
-   FILE *ofile, *ifile = fopen( "sky_cov.txt", "rb");
-   double orbi[6];
-   char buff[100];
+   FILE *ofile, *ifile = fopen( "css.idx", "rb");
+   FILE *original_file = fopen( "css_index.csv", "rb");
+   double orbi[6], stepsize = 1.;
+   obj_location_t p1, p2;
+   field_location_t field;
 
    if( !ifile)
       return( -2);
@@ -463,71 +503,61 @@ int find_precovery_plates( const char *filename, const double *orbit,
       fclose( ifile);
       return( -1);
       }
+   memset( &p1, 0, sizeof( obj_location_t));
+   memset( &p2, 0, sizeof( obj_location_t));
    setvbuf( ofile, NULL, _IONBF, 0);
    memcpy( orbi, orbit, 6 * sizeof( double));
-   while( fgets_trimmed( buff, sizeof( buff), ifile))
+   while( fread( &field, sizeof( field), 1, ifile) == 1)
       {
-      char tbuff[80];
-      int line_no = 0;
-      FILE *coverage_file = fopen( buff + 8, "rb");
-      const long jd = dmy_to_day( 1, 1, atol( buff) / 1000, CALENDAR_GREGORIAN)
-                                + atol( buff) % 1000;
-      const double curr_jd = (double)jd + .5;
-      double obs_posn[3], topo[3];
+      double delta_ra;
       double obj_ra, obj_dec;
-      int i;
+      double fraction;
 
-      integrate_orbit( orbi, epoch_jd, curr_jd);
-      epoch_jd = curr_jd;
-      compute_observer_loc( curr_jd, 3, 0., 0., 0., obs_posn);
-      for( i = 0; i < 3; i++)
-         topo[i] = orbi[i] - obs_posn[i];
-      ecliptic_to_equatorial( topo);
-      obj_ra = atan2( topo[1], topo[0]);
-      obj_dec = asin( topo[2] / vector3_length( topo));
-
-//    fprintf( ofile, "Looking at %s\n", buff);
-//    fprintf( ofile, "JD %f; %f %f\n", curr_jd, obj_ra * 180. / PI,
-//             obj_dec * 180. / PI);
-      if( coverage_file)
+      if( field.jd < p1.jd || field.jd > p2.jd)
          {
-         while( fgets( tbuff, sizeof( tbuff), coverage_file))
+         const double new_p2_jd = ceil( (field.jd - .5) / stepsize) * stepsize + .5;
+
+         if( new_p2_jd == p1.jd)
+            p2 = p1;
+         else
             {
-            double ra_min, ra_max, dec_min, dec_max;
-
-            line_no++;
-            ra_min = ra_max = atof( tbuff);
-            dec_min = dec_max = atof( tbuff + 10);
-            for( i = 1; i < 4; i++)
-               {
-               double ra = atof( tbuff + i * 18 + 1);
-               double dec = atof( tbuff + i * 18 + 10);
-
-               while( ra - ra_min > PI)
-                  ra -= PI + PI;
-               while( ra - ra_max < -PI)
-                  ra += PI + PI;
-               if( ra_min > ra)
-                  ra_min = ra;
-               if( ra_max < ra)
-                  ra_max = ra;
-               if( dec_min > dec)
-                  dec_min = dec;
-               if( dec_max < dec)
-                  dec_max = dec;
-               }
-            while( obj_ra - ra_min > PI)
-               obj_ra -= PI + PI;
-            while( obj_ra - ra_min < -PI)
-               obj_ra += PI + PI;
-            if (obj_ra > ra_min && obj_ra < ra_max && obj_dec > dec_min
-                            && obj_dec < dec_max)
-               fprintf( ofile, "%4d %s\n", line_no, buff + 8);
+            p2.jd = new_p2_jd;
+            setup_obj_loc( &p2, orbi, epoch_jd);
+            epoch_jd = p2.jd;
             }
-         fclose( coverage_file);
+         p1.jd = new_p2_jd - stepsize;
+         setup_obj_loc( &p1, orbi, epoch_jd);
+         epoch_jd = p1.jd;
+         }
+      fraction = (field.jd - p1.jd) / stepsize;
+      obj_ra = p1.ra + fraction * centralize_ang_around_zero( p2.ra - p1.ra);
+      obj_dec = p1.dec + fraction * (p2.dec - p1.dec);
+      delta_ra = centralize_ang_around_zero( obj_ra - field.ra);
+      if( obj_dec > field.dec - field.height / 2. &&
+          obj_dec < field.dec + field.height / 2. &&
+          fabs( delta_ra) < 0.5 * field.width / cos( field.dec))
+         {
+         char time_buff[40], buff[200];
+
+         full_ctime( time_buff, field.jd, FULL_CTIME_YMD
+                     | FULL_CTIME_MONTHS_AS_DIGITS | FULL_CTIME_TENTHS_SEC);
+         obj_ra = centralize_ang( obj_ra);
+         if( !original_file)
+            strcpy( buff, field.obscode);
+         else
+            {
+            fseek( original_file, field.file_offset, SEEK_SET);
+            if( !fgets_trimmed( buff, sizeof( buff), original_file))
+               *buff = '\0';
+            }
+         fprintf( ofile, "%8.4f %8.4f %s %s\n",
+                     obj_ra * 180. / PI, obj_dec * 180. / PI,
+                     time_buff, buff);
          }
       }
    fclose( ifile);
+   if( original_file)
+      fclose( original_file);
    fclose( ofile);
    return( 0);
 }
@@ -2779,6 +2809,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
    extern char findorb_language;
 
    assert( ofile);
+   setvbuf( ofile, NULL, _IONBF, 0);
    if( elements_file)
       {
       unsigned i;
@@ -2994,48 +3025,37 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
          if( *buff == ' ')
             {
             observer_link_substitutions( buff);
+            assert( strlen( buff) < sizeof( buff));
             fprintf( ofile, "%s\n", buff);
             }
          else
             {
             char tbuff[4];
-            int compare = 1, i, url_index = 0;
-            char *latlon = NULL, *remains;
+            int compare = 1, url_index = 0;
+            char *tptr, saved_char;
+            bool got_lat_lon = false;
 
             memcpy( tbuff, buff + 1, 3);
             tbuff[3] = '\0';
             fprintf( ofile, "<a name=\"stn_%s\"></a>", tbuff);
 
-            for( i = 5; !latlon && buff[i]; i++)
-               if( !memcmp( buff + i - 2, "  (", 3))
-                  if( (buff[i + 1] == 'N' || buff[i + 1] == 'S'))
-                     {        /* found opening paren of lat/lon */
-                     latlon = buff + i + 1;
-                     i = 0;
-                     while( latlon[i] && latlon[i] != ')')
-                        i++;
-                     if( latlon[i] == ')')    /* found closing paren */
-                        {
-                        remains = latlon + i;
-                        *remains = latlon[-3] = '\0';
-                        }
-                     else          /* oops!  didn't find lat/lon after all */
-                        latlon = NULL;
-                     }
-
-            if( !latlon)  /*  no lat/lon;  assume name ends with a . */
+            tptr = strstr( buff, "  (N");
+            if( !tptr)
+               tptr = strstr( buff, "  (S");
+            if( tptr && strchr( tptr, ')'))
+               got_lat_lon = true;
+            if( !tptr)
+               tptr = strstr( buff, ". ");
+            if( !tptr)
                {
-               for( i = 0; buff[i] && buff[i] != '.'; i++)
-                  ;
-               if( buff[i] == '.' && buff[i + 1])        /* found the '.'! */
-                  {
-                  buff[i + 1] = '\0';
-                  remains = buff + i + 1;
-                  }
-               else
-                  remains = buff + i;
+               tptr = buff + strlen( buff);
+               if( tptr[-1] == '.')
+                  tptr--;
                }
-            if( compare)
+                        /* At this point,  tptr should point at the end */
+                        /* of the observatory name. */
+
+/*          if( compare)         */
                {
                char text_to_find[50], *tptr;
 
@@ -3060,6 +3080,8 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
                url_index = 32;   /* if there is a link,  it starts in byte 32 */
                }
 
+            saved_char = *tptr;
+            *tptr = '\0';
             if( !compare)   /* we got a link to an observatory code */
                {
                buff[5] = '\0';
@@ -3067,24 +3089,33 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
                }
             else
                fprintf( ofile, "%s", buff);
+            *tptr = saved_char;
 
-            if( latlon)
+            if( got_lat_lon)
                {
                double lat, lon;
                char lat_sign, lon_sign;
+               char *new_tptr = strchr( tptr, ')');
+               int n_scanned;
 
-               sscanf( latlon, "%c%lf %c%lf", &lat_sign, &lat, &lon_sign, &lon);
+               assert( new_tptr);
+               n_scanned = sscanf( tptr + 3, "%c%lf %c%lf", &lat_sign, &lat, &lon_sign, &lon);
+               if( n_scanned != 4)
+                  printf( "%s\n", tptr);
+               assert( n_scanned == 4);
                if( lat_sign == 'S')
                   lat = -lat;
                if( lon_sign == 'W')
                   lon = -lon;
-               fprintf( ofile, " (<a title=\"Click for map\"");
+               fprintf( ofile, "  (<a title=\"Click for map\"");
                fprintf( ofile, " href=\"http://maps.google.com/maps?q=%.5f,+%.5f\">",
                               lat, lon);
-               fprintf( ofile, "%s</a>)", latlon);
+               *new_tptr = '\0';
+               fprintf( ofile, "%s</a>)", tptr + 3);
+               tptr = new_tptr + 1;
                }
-            observer_link_substitutions( remains + 1);
-            fprintf( ofile, "%s\n", remains + 1);
+            observer_link_substitutions( tptr);
+            fprintf( ofile, "%s\n", tptr);
             }
       fclose( obslinks_file);
       fclose( mpc_obslinks_file);
