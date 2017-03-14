@@ -489,19 +489,29 @@ typedef struct
 int find_precovery_plates( const char *filename, const double *orbit,
                            double epoch_jd)
 {
-   FILE *ofile, *ifile = fopen( "css.idx", "rb");
-   FILE *original_file = fopen( "css_index.csv", "rb");
+   FILE *ofile = fopen( filename, "w");
+   FILE *ifile, *original_file;
    double orbi[6], stepsize = 1.;
    obj_location_t p1, p2;
    field_location_t field;
 
-   if( !ifile)
-      return( -2);
-   ofile = fopen( filename, "w");
    if( !ofile)
-      {
-      fclose( ifile);
       return( -1);
+   ifile = fopen_ext( "css.idx", "crb");
+   if( !ifile)
+      {
+      fprintf( ofile, "Couldn't open 'css.idx'\n");
+      fclose( ofile);
+      return( -2);
+      }
+   original_file = fopen_ext( "css_index.csv", "crb");
+   if( !original_file)
+      {
+      fprintf( ofile, "Couldn't open 'css_index.csv'\n");
+      if( ifile)
+         fclose( ifile);
+      fclose( ofile);
+      return( -3);
       }
    memset( &p1, 0, sizeof( obj_location_t));
    memset( &p2, 0, sizeof( obj_location_t));
@@ -533,9 +543,10 @@ int find_precovery_plates( const char *filename, const double *orbit,
       obj_ra = p1.ra + fraction * centralize_ang_around_zero( p2.ra - p1.ra);
       obj_dec = p1.dec + fraction * (p2.dec - p1.dec);
       delta_ra = centralize_ang_around_zero( obj_ra - field.ra);
+      delta_ra *= cos( field.dec);
       if( obj_dec > field.dec - field.height / 2. &&
           obj_dec < field.dec + field.height / 2. &&
-          fabs( delta_ra) < 0.5 * field.width / cos( field.dec))
+          fabs( delta_ra) < field.width / 2.)
          {
          char time_buff[40], buff[200];
 
