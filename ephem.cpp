@@ -65,6 +65,7 @@ int create_b32_ephemeris( const char *filename, const double epoch,
 void set_window_placement( HWND hwnd, const char *ibuff);      /* orbitdlg.c */
 char *get_placement_text( HWND hwnd);                          /* orbitdlg.c */
 char *mpc_station_name( char *station_data);       /* mpc_obs.cpp */
+int remove_rgb_code( char *buff);                              /* ephem.cpp */
 
 /////////////////////////////////////////////////////////////////////////////
 // CEphem dialog
@@ -375,7 +376,10 @@ void CEphem::OnClickedGo()
          pListBox->ResetContent( );
          while( fgets_trimmed( buff, sizeof( buff), ifile))
             if( *buff != '#' && *buff)
+               {
+               remove_rgb_code( buff);
                pListBox->AddString( CA2T( buff));
+               }
          fclose( ifile);
          make_pseudo_mpec( mpec_filename, obj_name);      /* ephem0.cpp */
          ephemeris_and_pseudo_mpec_made = 1;

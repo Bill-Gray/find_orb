@@ -31,6 +31,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "date.h"
 #include "comets.h"
 #include "mpc_obs.h"
+#include "vislimit.h"
 
 #define J2000 2451545.0
 #define EARTH_MAJOR_AXIS 6378140.
@@ -82,6 +83,7 @@ int setup_planet_elem( ELEMENTS *elem, const int planet_idx,
                                           const double t_cen);   /* moid4.c */
 char *mpc_station_name( char *station_data);       /* mpc_obs.cpp */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
+int remove_rgb_code( char *buff);                              /* ephem.cpp */
 
 const char *observe_filename = "observe.txt";
 const char *residual_filename = "residual.txt";
@@ -1226,6 +1228,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       double geo_posn[3], geo_vel[3];
       char buff[440];
       double curr_jd = jd_start + (double)i * step, delta_t;
+      long rgb = 0;
 
       if( options & OPTION_ROUND_TO_NEAREST_STEP)
          curr_jd = floor( (curr_jd - .5) / step + .5) * step + .5;
@@ -1403,12 +1406,12 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
          else if( ephem_type == OPTION_OBSERVABLES)
             {
             DPT ra_dec, alt_az[3];
-            double cos_lunar_elong;
+            double lunar_elong = 0.;
             double ra, dec, sec, earth_r = 0.;
             int hr, min, deg, dec_sign = '+';
             char ra_buff[80], dec_buff[80], date_buff[80];
             char r_buff[20], solar_r_buff[20];
-            double cos_elong, solar_r;
+            double cos_elong, solar_r, elong;
             bool moon_more_than_half_lit = false;
             bool is_in_shadow = false;
             const double arcsec_to_radians = PI / (180. * 3600.);
@@ -1423,6 +1426,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
             earth_r = vector3_length( obs_posn_equatorial);
             cos_elong = r * r + earth_r * earth_r - solar_r * solar_r;
             cos_elong /= 2. * earth_r * r;
+            elong = acose( cos_elong);
 
             ra_dec.x = atan2( topo[1], topo[0]) + ra_offset;
             ra = ra_dec.x * 12. / PI;
@@ -1482,6 +1486,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                dec_sign = '-';
                }
             if( !obj_n)
+               {
+
                for( j = 0; j < 3; j++)    /* compute alt/azzes of object (j=0), */
                   {                       /* sun (j=1), and moon (j=2)          */
                   DPT obj_ra_dec = ra_dec;
@@ -1503,8 +1509,9 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                               (dot_product( earth_loc, vect) > 0.);
                         ecliptic_to_equatorial( vect);   /* mpc_obs.cpp */
                         is_in_shadow = shadow_check( earth_loc, orbi_after_light_lag);
-                        cos_lunar_elong = dot_product( vect, geo)
+                        cos_elong = dot_product( vect, geo)
                                  / (vector3_length( vect) * vector3_length( geo));
+                        lunar_elong = acose( cos_elong);
                         }
                      vector_to_polar( &obj_ra_dec.x, &obj_ra_dec.y, vect);
                      }
@@ -1512,6 +1519,41 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   full_ra_dec_to_alt_az( &obj_ra_dec, &alt_az[j], NULL, &latlon, utc, NULL);
                   alt_az[j].x = centralize_ang( alt_az[j].x + PI);
                   }
+               if( alt_az[0].y < 0.)
+                  rgb = 0x653700;   /* brown = below horizon */
+               else
+                  {
+                  BRIGHTNESS_DATA bdata;
+
+                  bdata.ht_above_sea_in_meters = 1000.;
+                  bdata.latitude = PI / 4.;    /* 45 degrees */
+                  bdata.temperature_in_c = 20.;      /* centigrade */
+                  bdata.moon_elongation = lunar_elong;
+                  bdata.relative_humidity = 20.;  /* 20% */
+                  bdata.year = 2000. + (ephemeris_t - J2000) / 365.25;
+                  bdata.month = bdata.year * 12. - floor( bdata.year * 12.);
+                  bdata.dist_moon = lunar_elong;
+                  bdata.dist_sun = elong;
+                  bdata.zenith_angle    = PI / 2. - alt_az[0].y;
+                  bdata.zenith_ang_sun  = PI / 2. - alt_az[1].y;
+                  bdata.zenith_ang_moon = PI / 2. - alt_az[2].y;
+                  bdata.mask = 31;
+                  set_brightness_params( &bdata);
+                  compute_sky_brightness( &bdata);
+                  for( j = 0; j < 3; j++)
+                     {
+                     double component = log10( bdata.brightness[j + 1]);
+                     static double dark[3] = { -13.5, -13, -12.4 };
+                     static double light[3] = { -7, -7, -5 };
+
+                     component = (component - dark[j]) * 255. / (light[j] - dark[j]);
+                     if( component > 255.)
+                        component = 255.;
+                     if( component > 0.)
+                        rgb |= (unsigned)component << (j * 8);
+                     }
+                  }
+               }
             if( computer_friendly)
                sprintf( dec_buff, "%9.5f", dec);
             else
@@ -1542,7 +1584,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                }
             sprintf( buff, "%s  %s   %s %s%s %5.1f",
                   date_buff, ra_buff, dec_buff, r_buff, solar_r_buff,
-                  acose( cos_elong) * 180. / PI);
+                  elong * 180. / PI);
 
             if( show_visibility)
                {
@@ -1564,6 +1606,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                else
                   tbuff[2] = ' ';         /* moon's down */
                tbuff[3] = '\0';
+               snprintf_append( buff, sizeof( buff), "$%06lx", rgb);
                strcat( buff, tbuff);
                }
             if( !obj_n)
@@ -1634,8 +1677,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                }
 
             if( !obj_n && (options & OPTION_LUNAR_ELONGATION))
-               sprintf( buff + strlen( buff), "%6.1f",
-                                  acose( cos_lunar_elong) * 180. / PI);
+               sprintf_append( buff, sizeof( buff), "%6.1f", lunar_elong * 180. / PI);
+
 
             if( options & OPTION_MOTION_OUTPUT)
                {
@@ -1765,6 +1808,21 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    free( orbits_at_epoch);
    fclose( ofile);
    return( 0);
+}
+
+/* The above ephemeris code may insert a six-character hexadecimal
+color,  computed using sky background brightness data,  prefaced by
+'$'.  This should be removed before the line is shown to a user.
+The RGB value is returned,  and may (or may not) be made use of. */
+
+int remove_rgb_code( char *buff)
+{
+   unsigned rval = (unsigned)-1;
+
+   buff = strchr( buff, '$');
+   if( buff && sscanf( buff + 1, "%06x", &rval) == 1)
+      memmove( buff, buff + 7, strlen( buff + 6));
+   return( (int)rval);
 }
 
 bool is_topocentric_mpc_code( const char *mpc_code)
@@ -3249,7 +3307,29 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
          fprintf( ofile, "<b>Ephemerides for %s:</b>\n", buff + 1);
 
       while( fgets( buff, sizeof( buff), ephemeris_ifile))
+         {
+         char *color = strchr( buff, '$');
+
+         if( color)
+            {
+            unsigned rgb, sum_components;
+            char replace[80];
+            const char *format;
+
+            sscanf( color + 1, "%6x", &rgb);
+            sum_components = (rgb & 0xff) + ((rgb >> 8) & 0xff) + (rgb >> 16);
+            if( sum_components < 0x180)      /* dark color = use white text */
+               format = "<a class=\"whtext\" style=\"background-color:#%06x;\">";
+            else           /* bright color:  normal (black) text  */
+               format = "<a style=\"background-color:#%06x;\">";
+            memmove( color + 1, color + 7, strlen( color + 6));  /* remove RGB */
+            memmove( color + 8, color + 4, strlen( color + 9));
+            memcpy( color + 4, "</a>", 4);                 /* insert end tag */
+            snprintf( replace, sizeof( replace), format, rgb);
+            text_search_and_replace( color, "$", replace);
+            }
          fputs( buff, ofile);
+         }
       fclose( ephemeris_ifile);
       }
    else

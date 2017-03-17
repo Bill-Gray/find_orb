@@ -185,6 +185,7 @@ int metropolis_search( OBSERVE *obs, const int n_obs, double *orbit,
 const char *get_find_orb_text( const int index);
 int set_tholen_style_sigmas( OBSERVE *obs, const char *buff);  /* mpc_obs.c */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
+int remove_rgb_code( char *buff);                              /* ephem.cpp */
 
 extern double maximum_jd, minimum_jd;        /* orb_func.cpp */
 
@@ -1620,6 +1621,8 @@ static void show_a_file( const char *filename)
          {
          const int curr_line = top_line + i;
 
+         if( is_ephem)
+            remove_rgb_code( buff);
          if( i >= 3 || !is_ephem)
             put_colored_text( buff, i, 0, -1,
                (line_no == curr_line ? COLOR_ORBITAL_ELEMENTS : COLOR_BACKGROUND));
@@ -1861,8 +1864,10 @@ static void put_colored_text( const char *text, const int line_no,
    attrset( COLOR_PAIR( color & 255));
    if( color & 256)
       attron( A_BLINK);
+#ifdef __PDCURSES__
    if( color & 512)
       attron( A_BOLD);
+#endif
 #ifdef A_LEFTLINE
    if( color & 1024)
       attron( A_LEFTLINE);
@@ -2395,7 +2400,7 @@ int main( const int argc, const char **argv)
    init_pair( 16, COLOR_YELLOW, COLOR_BLACK);
    init_pair( 17, COLOR_WHITE, COLOR_BLACK);
    init_pair( 18, COLOR_MAGENTA, COLOR_BLACK);
-   init_pair( 19, COLOR_BLUE, COLOR_BLACK);
+   init_pair( 19, COLOR_CYAN, COLOR_BLACK);
    init_pair( 20, COLOR_GREEN, COLOR_BLACK);
 
 
