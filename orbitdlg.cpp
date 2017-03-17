@@ -915,7 +915,7 @@ void COrbitDlg::OnSelchangeResiduals()
    UpdateResidualDisplay( );
 }
 
-#define TRUE_OR_FALSE( X)  ((X) ? TRUE : FALSE)
+#define TRUE_OR_FALSE( X)  ((ephemeris_output_options & (X)) ? TRUE : FALSE)
 
 void COrbitDlg::OnClickedMakeEphemeris()
 {
@@ -937,27 +937,23 @@ void COrbitDlg::OnClickedMakeEphemeris()
       dlg.epoch = orbit_epoch;
       dlg.m_number_steps = 10;
       dlg.m_ephem_step = _T( "1");
-      dlg.m_ephem_type =(ephemeris_output_options & 7);
-      dlg.m_alt_az = ((ephemeris_output_options & OPTION_ALT_AZ_OUTPUT) ? TRUE : FALSE);
-      dlg.m_motion = ((ephemeris_output_options & OPTION_MOTION_OUTPUT) ? TRUE : FALSE);
-      dlg.m_separate_motions = ((ephemeris_output_options & OPTION_SEPARATE_MOTIONS) ? TRUE : FALSE);
-      dlg.m_round_step = ((ephemeris_output_options & OPTION_ROUND_TO_NEAREST_STEP) ? TRUE : FALSE);
-      dlg.m_radial_velocity = ((ephemeris_output_options & OPTION_RADIAL_VEL_OUTPUT) ? TRUE : FALSE);
-      dlg.m_phase_angle = ((ephemeris_output_options & OPTION_PHASE_ANGLE_OUTPUT) ? TRUE : FALSE);
-      dlg.m_phase_angle_bisector =
-                  TRUE_OR_FALSE( ephemeris_output_options & OPTION_PHASE_ANGLE_BISECTOR);
-      dlg.m_helio_ecliptic =
-                  TRUE_OR_FALSE( ephemeris_output_options & OPTION_HELIO_ECLIPTIC);
-      dlg.m_show_sigmas =
-                  TRUE_OR_FALSE( ephemeris_output_options & OPTION_SHOW_SIGMAS);
-      dlg.m_topo_ecliptic =
-                  TRUE_OR_FALSE( ephemeris_output_options & OPTION_TOPO_ECLIPTIC);
-      dlg.m_human_readable =
-                 !TRUE_OR_FALSE( ephemeris_output_options & OPTION_COMPUTER_FRIENDLY);
-      dlg.m_ground_track =
-                 TRUE_OR_FALSE( ephemeris_output_options & OPTION_GROUND_TRACK);
-      dlg.m_speed =
-                 TRUE_OR_FALSE( ephemeris_output_options & OPTION_SPACE_VEL_OUTPUT);
+      dlg.m_ephem_type = (ephemeris_output_options & 7);
+      dlg.m_alt_az           = TRUE_OR_FALSE( OPTION_ALT_AZ_OUTPUT);
+      dlg.m_visibility       = TRUE_OR_FALSE( OPTION_VISIBILITY);
+      dlg.m_motion           = TRUE_OR_FALSE( OPTION_MOTION_OUTPUT);
+      dlg.m_separate_motions = TRUE_OR_FALSE( OPTION_SEPARATE_MOTIONS);
+      dlg.m_round_step       = TRUE_OR_FALSE( OPTION_ROUND_TO_NEAREST_STEP);
+      dlg.m_radial_velocity  = TRUE_OR_FALSE( OPTION_RADIAL_VEL_OUTPUT);
+      dlg.m_phase_angle      = TRUE_OR_FALSE( OPTION_PHASE_ANGLE_OUTPUT);
+      dlg.m_phase_angle_bisector = TRUE_OR_FALSE( OPTION_PHASE_ANGLE_BISECTOR);
+      dlg.m_helio_ecliptic   = TRUE_OR_FALSE( OPTION_HELIO_ECLIPTIC);
+      dlg.m_show_sigmas      = TRUE_OR_FALSE( OPTION_SHOW_SIGMAS);
+      dlg.m_topo_ecliptic    = TRUE_OR_FALSE( OPTION_TOPO_ECLIPTIC);
+      dlg.m_human_readable   = !TRUE_OR_FALSE( OPTION_COMPUTER_FRIENDLY);
+      dlg.m_ground_track     = TRUE_OR_FALSE( OPTION_GROUND_TRACK);
+      dlg.m_speed            = TRUE_OR_FALSE( OPTION_SPACE_VEL_OUTPUT);
+      dlg.m_suppress_unobservable
+                               = TRUE_OR_FALSE( OPTION_SUPPRESS_UNOBSERVABLE);
       get_object_name( object_name, ((OBSERVE FAR *)obs_data)->packed_id);
       dlg.obj_name = object_name;
       dlg.m_mag_limit = ephemeris_mag_limit;
@@ -1744,8 +1740,6 @@ BOOL COrbitDlg::OnCommand( UINT wParam, LONG lParam)
    return TRUE;
 }
 #endif
-
-int debug_printf( const char *format, ...);                /* runge.cpp */
 
 static int count_lines_in_buffer( const TCHAR *buff)
 {
