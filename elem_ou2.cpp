@@ -19,8 +19,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 
 #include <math.h>
 #include <string.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include "watdefs.h"
 #include "comets.h"
 #include "afuncs.h"
@@ -210,9 +213,13 @@ int add_sof_to_file( const char *filename,
 {
    char templat[MAX_SOF_LEN], obuff[MAX_SOF_LEN];
    char output_filename[100];
-   FILE *fp = fopen( filename, "a+b");
+   struct stat sb;
+   FILE *fp;
    int rval = -1, forking;
 
+   if( stat( filename, &sb) == -1)
+      return( -2);
+   fp = fopen( filename, "a+b");
    get_file_name( output_filename, filename);
    forking = strcmp( output_filename, filename);
    if( fp)
