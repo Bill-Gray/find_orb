@@ -36,9 +36,13 @@ int use_config_directory = false;
 
 void make_config_dir_name( char *oname, const char *iname)
 {
+#ifdef _WIN32
+   strcpy( oname, iname);
+#else
    strcpy( oname, getenv( "HOME"));
    strcat( oname, "/.find_orb/");
    strcat( oname, iname);
+#endif
 }
 
 FILE *fopen_ext( const char *filename, const char *permits)
