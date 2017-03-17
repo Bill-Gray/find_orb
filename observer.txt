@@ -72,6 +72,7 @@
  Lazzaro                                   <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0003602">Lazzaro</a>
  La Canada                                 La Ca&ntilde;ada
  Lipunov                                   <a href="http://xray.sai.msu.su/~lipunov/">Lipunov</a>
+ Lovejoy                                   <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0061342">Lovejoy</a>
  Lowe                                      <a href="http://members.shaw.ca/andrewlowe/">Lowe</a>
  Lutkenhoner                               L&uuml;tkenh&ouml;ner
  Mainzer                                   <a href="http://science.jpl.nasa.gov/people/Mainzer/">Mainzer</a>
@@ -105,6 +106,7 @@
  Puckett                                   <a href="http://facstaff.columbusstate.edu/puckett_andrew/orbitmaster.html">Puckett</a>
  Pravec                                    <a href="http://en.wikipedia.org/wiki/Petr_Pravec">Pravec</a>
  Primak                                    <a href="http://www.facebook.com/people/Natalia-Primak/1198556290">Primak</a>
+ Rankin                                    <a href="http://rankinstudio.com/">Rankin</a>
  Rinner                                    <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0023999">Rinner</a>
  Ritchey-Chretien                          Ritchey-Chr&eacute;tien
  W. H. Ryan                                <a href="http://infohost.nmt.edu/~bryan/">W. H. Ryan</a>

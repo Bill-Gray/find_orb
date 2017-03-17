@@ -376,6 +376,9 @@ OBS N. Loaring, P. Vaisanen, T. Kwiatkowski, M. Polinska
 MEA
 TEL 10.50-m reflector + CCD
 
+COD A77
+OBS J.-F. Soulier, C. Rinner, F. Kugel, J. Nicolas
+
 COD B04
 OBS A. Carbognani
 TEL 0.81-m f/7.9 reflector + CCD
@@ -546,7 +549,7 @@ CON Berkshire England RG17 7DA
 CON [peter (at) birtwhi (dot) demon.co (dot) uk]
 OBS P. Birtwhistle
 NET USNO-SA2.0
-TEL 0.30-m f/6.3 Schmidt-Cassegrain + CCD
+TEL 0.40-m f/6.0 Schmidt-Cassegrain + CCD
 
 COD J97 Alginet
 OBS T. Climent
@@ -582,6 +585,9 @@ OBS T. Namkhai, S. Schmalz
 MEA S. Schmalz
 TEL 0.4-m f/2.3 reflector + CCD
 
+COD Q38
+OBS M. Mattiazzo
+
 COD Q60
 OBS L. Elenin
 TEL 0.4-m f/2.4 reflector + CCD
@@ -610,6 +616,10 @@ ACK ARTSAT 2010-050B obs 27 Feb 2016
 NUM 9
 NET UCAC-4
 
+COD Q80
+OBS T. Lovejoy
+TEL 0.20-m f/2.1 Schmidt-Cassegrain + CCD
+
 COD T05
 OBS L. Denneau, A. Heinze, H. Weiland, B. Stalder, J. Tonry, A. Sherstyuk
 MEA L. Denneau, A. Heinze, J. Tonry
@@ -629,12 +639,18 @@ TEL 0.61-m f/6.5 astrograph + CCD
 COD V03
 CON D. Rankin, P. O. Box 410313, Big Water, Utah U. S. A.
 CON [david (at) rankinstudio (dot) com]
+OBS D. Rankin
 NET PPMXL
 TEL 0.30-m refractor + CCD
 
 COD W34
 OBS R. L. Flynn
 TEL 0.20-m f/10 Schmidt-Cassegrain + f/7.0 focal reducer
+
+COD W77
+OBS J. E. Mazur
+NET UCAC4
+TEL 0.36-m f/6 Schmidt-Cassegrain + CCD
 
 COD W85
 OBS T. Lister, S. Greenstreet, E. Gomez
