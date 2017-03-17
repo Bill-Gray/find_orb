@@ -1677,7 +1677,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                }
 
             if( !obj_n && (options & OPTION_LUNAR_ELONGATION))
-               sprintf_append( buff, sizeof( buff), "%6.1f", lunar_elong * 180. / PI);
+               snprintf_append( buff, sizeof( buff), "%6.1f", lunar_elong * 180. / PI);
 
 
             if( options & OPTION_MOTION_OUTPUT)
