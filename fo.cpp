@@ -119,6 +119,26 @@ static int remove_single_observation_objects( OBJECT_INFO *ids, const int n_ids)
    return( j);
 }
 
+void make_config_dir_name( char *oname, const char *iname);
+
+static int unlink_config_file( const char *filename)
+{
+   char buff[255];
+   int err_code;
+   extern int use_config_directory;          /* miscell.c */
+
+   get_file_name( buff, filename);
+   if( use_config_directory)
+      {
+      char cpath[255];
+
+      make_config_dir_name( cpath, buff);
+      err_code = unlink( cpath);
+      }
+   else
+      err_code = unlink( buff);
+   return( err_code);
+}
 #ifdef FORKING
 static void combine_element_files( const char *filename, const int n_processes)
 {
@@ -130,7 +150,7 @@ static void combine_element_files( const char *filename, const int n_processes)
 
    if( !strcmp( filename, sof_filename))
       {
-      FILE *ifile = fopen( filename, "rb");
+      FILE *ifile = fopen_ext( filename, "fclr");
 
       assert( ifile);
       if( !fgets( buff, sizeof( buff), ifile))
@@ -148,7 +168,7 @@ static void combine_element_files( const char *filename, const int n_processes)
    for( i = 0; i < n_processes; i++)
       {
       process_count = i + 1;
-      input_files[i] = fopen_ext( get_file_name( buff, filename), "fcr");
+      input_files[i] = fopen_ext( get_file_name( buff, filename), "fclr");
       }
    for( i = quit = 0; !quit; i = (i + 1) % n_processes)
       if( !fgets( buff, sizeof( buff), input_files[i]))
@@ -172,7 +192,9 @@ static void combine_element_files( const char *filename, const int n_processes)
 
       fclose( input_files[i]);
       process_count = i + 1;
-      err_code = unlink( get_file_name( buff, filename));
+      err_code = unlink_config_file( filename);
+      if( err_code)
+         perror( buff);
       assert( !err_code);
       }
    free( input_files);
@@ -696,12 +718,12 @@ int main( const int argc, const char **argv)
       for( i = 0; i < n_processes; i++)
          {                             /* clean up temp files: */
          process_count = i + 1;
-         unlink( get_file_name( tbuff, "monte.txt"));
-         unlink( get_file_name( tbuff, "guide.txt"));
-         unlink( get_file_name( tbuff, "covar.txt"));
-         unlink( get_file_name( tbuff, "sr_elems.txt"));
-         unlink( get_file_name( tbuff, "mpc_sr.txt"));
-//       unlink( get_file_name( tbuff, sof_filename));
+         unlink_config_file( "monte.txt");
+         unlink_config_file( "guide.txt");
+         unlink_config_file( "covar.txt");
+         unlink_config_file( "sr_elems.txt");
+         unlink_config_file( "mpc_sr.txt");
+//       unlink_config_file( sof_filename);
          }
       }
 #ifdef TEST_PLANET_CACHING_HASH_FUNCTION

@@ -37,6 +37,7 @@ int snprintf( char *string, const size_t max_len, const char *format, ...);
 int add_sof_to_file( const char *filename,         /* elem_ou2.cpp */
              const ELEMENTS *elem,
              const int n_obs, const OBSERVE *obs);
+FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 
 const double PI = 3.1415926535897932384626433832795028841971693993751058209749445923;
 const double jd_1970 = 2440587.5;
@@ -213,31 +214,27 @@ int add_sof_to_file( const char *filename,
 {
    char templat[MAX_SOF_LEN], obuff[MAX_SOF_LEN];
    char output_filename[100];
-   struct stat sb;
    FILE *fp;
    int rval = -1, forking;
 
-   if( stat( filename, &sb) == -1)
-      return( -2);
-   fp = fopen( filename, "a+b");
+   fp = fopen_ext( filename, "ca+b");
    get_file_name( output_filename, filename);
    forking = strcmp( output_filename, filename);
    if( fp)
       {
       fseek( fp, 0L, SEEK_SET);
-      if( fgets( templat, sizeof( templat), fp))
+      if( !fgets( templat, sizeof( templat), fp))
+         assert( 1);
+      if( forking)
          {
-         if( forking)
-            {
-            fclose( fp);
-            fp = fopen( output_filename, "a+b");
-            }
-         fseek( fp, 0L, SEEK_END);
-         rval = put_comet_data_into_sof( obuff, templat, elem, n_obs, obs);
-         fwrite( obuff, strlen( obuff), 1, fp);
+         fclose( fp);
+         fp = fopen_ext( output_filename, "ca+b");
+         assert( fp);
          }
+      fseek( fp, 0L, SEEK_END);
+      rval = put_comet_data_into_sof( obuff, templat, elem, n_obs, obs);
+      fwrite( obuff, strlen( obuff), 1, fp);
       fclose( fp);
       }
-// printf( "rval %d\n", rval);
    return( rval);
 }
