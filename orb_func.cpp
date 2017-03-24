@@ -3209,7 +3209,7 @@ static const char *incl_vs_a_scattergram[30] = {
 /* slightly encouraged.                                                   */
 
 static double adjustment_for_orbit_likelihood( const double semimajor_axis,
-                           const double inclination)
+                 const double inclination, const double q)
 {
    const int n_xbins = 60, n_ybins = 30;
    double xbin = semimajor_axis * 10.;
@@ -3217,7 +3217,8 @@ static double adjustment_for_orbit_likelihood( const double semimajor_axis,
    const int ixbin = (int)xbin, iybin = (int)ybin;
    double rval;
 
-   if( ixbin >= 0 && iybin >= 0 && ixbin < n_xbins - 1 && iybin < n_ybins - 1)
+   if( ixbin >= 0 && iybin >= 0 && ixbin < n_xbins - 1 && iybin < n_ybins - 1
+               && q > 1.1)
       {
       const char *tptr1 = incl_vs_a_scattergram[iybin] + ixbin;
       const char *tptr2 = incl_vs_a_scattergram[iybin + 1] + ixbin;
@@ -3232,6 +3233,8 @@ static double adjustment_for_orbit_likelihood( const double semimajor_axis,
 //    debug_printf( "xbin %f, ybin %f: %f\n",
 //             xbin + (double)ixbin,
 //             ybin + (double)iybin, rval);
+      if( q < 1.2)
+         rval *= (q - 1.1) / 10.;
       }
    else
       rval = 0.;
@@ -3272,11 +3275,13 @@ double evaluate_initial_orbit( const OBSERVE FAR *obs,
          {                                    /* are not very likely */
          double high_inclination_penalty = (elem.incl - .5) * .2;
 
+         if( high_inclination_penalty > .2)  /* nearly 90 degrees */
+            high_inclination_penalty = .2;
          if( elem.ecc > .6)
             high_inclination_penalty *= (.8 - elem.ecc) / .2;
          rval += high_inclination_penalty;
          }
-      rval -= adjustment_for_orbit_likelihood( elem.major_axis, elem.incl);
+      rval -= adjustment_for_orbit_likelihood( elem.major_axis, elem.incl, elem.q);
       }
           /* strongly discourage elliptical orbits going through planets : */
    if( elem.ecc < 1. && elem.q < planet_radius_in_au)
