@@ -5,7 +5,7 @@
 # Usage: make -f [path/]linmake [CLANG=Y] [XCOMPILE=Y] [MSWIN=Y] [X=Y] [tgt]
 #
 #	where tgt can be any of:
-# [all|find_orb|fo|fo_serve|clean|clean_temp]
+# [all|find_orb|fo|fo_serve|clean|clean_temp|vec2tle]
 #
 #	'XCOMPILE' = cross-compile for Windows,  using MinGW,  on a Linux box
 #	'MSWIN' = compile for Windows,  using MinGW and PDCurses,  on a Windows machine
@@ -60,7 +60,7 @@ ifdef XCOMPILE
 	CURSES_LIB=pdcurses.a -static-libgcc
 endif
 
-all: fo$(EXE) find_orb$(EXE) fo_serve.cgi
+all: fo$(EXE) find_orb$(EXE) fo_serve.cgi vec2tle$(EXE)
 
 CFLAGS=-c -O3 -Wall -pedantic -Wextra -Wno-unused-parameter -I $(INSTALL_DIR)/include
 
@@ -70,22 +70,25 @@ OBJS=b32_eph.o bc405.o bias.o collide.o conv_ele.o eigen.o \
 	orb_func.o orb_fun2.o pl_cache.o roots.o  \
 	runge.o sigma.o sm_vsop.o sr.o $(OBJSADDED)
 
-LIBS=-llunar -ljpl -lsatell
+LIBS=$(LIBSADDED) -llunar -ljpl -lsatell
 
 find_orb$(EXE):          findorb.o $(OBJS)
-	$(CC) -o find_orb$(EXE) findorb.o $(OBJS) $(CURSES_LIB) $(LIBSADDED) $(LIBS)
+	$(CC) -o find_orb$(EXE) findorb.o $(OBJS) $(CURSES_LIB) $(LIBS)
 
 fo$(EXE):          fo.o $(OBJS)
-	$(CC) -o fo$(EXE) fo.o $(OBJS) $(LIBSADDED) $(LIBS)
+	$(CC) -o fo$(EXE) fo.o $(OBJS) $(LIBS)
+
+vec2tle$(EXE):          vec2tle.o conv_ele.o elem2tle.o lsquare.o
+	$(CC) -o vec2tle$(EXE) vec2tle.o conv_ele.o elem2tle.o lsquare.o $(LIBS)
 
 fo_serve.cgi:          fo_serve.o cgi_func.o $(OBJS)
-	$(CC) -o fo_serve.cgi fo_serve.o cgi_func.o $(OBJS) $(LIBSADDED) $(LIBS)
+	$(CC) -o fo_serve.cgi fo_serve.o cgi_func.o $(OBJS) $(LIBS)
 
 IDIR=$(HOME)/.find_orb
 
 clean:
 	$(RM) $(OBJS) fo.o findorb.o fo_serve.o find_orb$(EXE) fo$(EXE)
-	$(RM) fo_serve.cgi cgi_func.o
+	$(RM) fo_serve.cgi vec2tle.o vec2tle$(EXE) cgi_func.o
 	cd $(IDIR)
 	$(RM) covar.txt covar?.txt debug.txt eleme?.txt elements.txt
 	$(RM) ephemeri.txt gauss.out guide.txt guide?.txt monte.txt monte?.txt
