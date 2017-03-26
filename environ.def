@@ -2,7 +2,10 @@
    with a space is a comment.)  If a line is uncommented,  it's probably
    controlled via the user interface.
 
-   The default version of this file is stored in 'environ.def'.
+   The default version of this file is stored in 'environ.def'.  Once
+   you've run Find_Orb or 'fo' (Find_Orb's non-interactive sibling),  new
+   settings are written to 'environ.dat'.  If you decide at some point that
+   you'd like to reset to factory defaults,  just delete 'environ.dat'.
 
    Windows Find_Orb ignores the following 'CONSOLE_OPTS' line.  For the
    console flavor of Find_Orb,  this line gives the default MPC code for
