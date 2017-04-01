@@ -354,6 +354,7 @@ int main( const int argc, const char **argv)
    int element_precision = 5;
    bool all_heliocentric = true;
    bool use_colors = true;
+   bool show_processing_steps = true;
    int ephemeris_output_options = OPTION_SHOW_SIGMAS | OPTION_ROUND_TO_NEAREST_STEP;
 #ifdef FORKING
    int child_status;
@@ -408,6 +409,9 @@ int main( const int argc, const char **argv)
                break;
             case 'p':
                n_processes = atoi( argv[i] + 2);
+               break;
+            case 'q':            /* "quiet" */
+               show_processing_steps = false;
                break;
 #ifdef FORKING
             case 'r':
@@ -499,7 +503,8 @@ int main( const int argc, const char **argv)
       }
 
    n_ids = remove_single_observation_objects( ids, n_ids);
-   printf( "Processing %d objects\n", n_ids);
+   if( show_processing_steps)
+      printf( "Processing %d objects\n", n_ids);
    if( !total_objects)
       total_objects = n_ids;
 
@@ -524,7 +529,8 @@ int main( const int argc, const char **argv)
       }
    if( n_processes > 1)
       process_count++;
-   printf( "Process count %d\n", process_count);
+   if( show_processing_steps)
+      printf( "Process count %d\n", process_count);
 #endif
 
    if( summary_ofile)
@@ -538,7 +544,7 @@ int main( const int argc, const char **argv)
          OBSERVE FAR *obs;
          const int n_obs = ids[i].n_obs;
 
-         if( n_processes > 1)
+         if( n_processes > 1 && show_processing_steps)
             printf( "(%d) ", process_count);
          printf( "%d: %s", i + 1, ids[i].obj_name);
          if( n_obs < 2)
@@ -572,7 +578,8 @@ int main( const int argc, const char **argv)
                strcpy( tbuff, orbit_summary_text);
                if( use_colors)
                   colorize_text( tbuff);
-               printf( "; %s ", tbuff);
+               if( show_processing_steps)
+                  printf( "; %s ", tbuff);
                if( separate_residual_file_name)
                   write_residuals_to_file( separate_residual_file_name, argv[1],
                                n_obs_actually_loaded, obs, RESIDUAL_FORMAT_PRECISE
@@ -654,7 +661,8 @@ int main( const int argc, const char **argv)
                for( j = 0; j < (unsigned)n_obs_actually_loaded; j++)
                   if( obs[j].is_included)
                      n_obs_included++;
-               if( n_obs_included != n_obs_actually_loaded)
+               if( n_obs_included != n_obs_actually_loaded
+                              && show_processing_steps)
                   printf( " %d /", n_obs_included);
                }
             else
@@ -664,7 +672,8 @@ int main( const int argc, const char **argv)
          object_comment_text( tbuff, ids + i);
                   /* Abbreviate 'observations:' to 'obs:' */
          text_search_and_replace( tbuff, "ervations", "");
-         printf( "  %s\n", tbuff);
+         if( show_processing_steps)
+            printf( "  %s\n", tbuff);
          }
    free( ids);
    if( summary_ofile)
@@ -705,7 +714,8 @@ int main( const int argc, const char **argv)
       }
    fclose( ifile);
 #ifdef FORKING
-   printf( "Process %d is done\n", process_count);
+   if( show_processing_steps)
+      printf( "Process %d is done\n", process_count);
    wait( &child_status); /* wait for child to exit, and store its status */
    if( process_count == 1)
       {
