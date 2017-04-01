@@ -3039,13 +3039,17 @@ https://github.com/noporpoise/sort_r
    shows.  But I found it easier to write the following.  At least right
 now,  I'm sorting arrays small enough that Shellsort is more than adequate. */
 
+#if defined _GNU_SOURCE
+   #define HAVE_REENTRANT_QSORT
+#endif
+
 void shellsort_r( void *base, const size_t n_elements, const size_t esize,
          int (*compare)(const void *, const void *, void *), void *context)
 {
 // printf( "Sort begins: %f, %u elements, size %u\n",
 //                  (double)clock( ) / (double)CLOCKS_PER_SEC,
 //                  (unsigned)n_elements, (unsigned)esize);
-#if (defined _GNU_SOURCE || defined __GNU__ || defined __linux)
+#ifdef HAVE_REENTRANT_QSORT
    qsort_r( base, n_elements, esize, compare, context);
 #else
    size_t gap = 1;
