@@ -502,6 +502,9 @@ TEL 0.45-m f/7.25 Ritchey-Chretien + 3072x2054 CCD
 AC2 [jcpelle (at) mail (dot) pf], [klevin57 (at) gmail (dot) com]
 NET UCAC-2
 
+COD I33
+TEL 4.1-m reflector + CCD
+
 COD I77
 OBS C. Jacques,E. Pimentel
 MEA C. Jacques
@@ -573,7 +576,7 @@ BND R
 
 COD K92
 OBS T. Lister, S. Greenstreet, E. Gomez
-MEA S. Greentstreet
+MEA S. Greenstreet
 TEL 1.0-m f/6.3 Cassegrain + CCD
 
 COD K93

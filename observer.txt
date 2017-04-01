@@ -7,6 +7,7 @@
 ; a citation describing the honoree is usually included.
 ;
  Bedient                                   <a href="http://www.ifa.hawaii.edu/tops/bedient.html">Bedient</a>
+ Bauer                                     <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0019494">Bauer</a>
  Bell                                      <a href="http://www.corvus.com/adastra2002/bell.htm">Bell</a>
  Beresford                                 <a href="http://www.adam.com.au/dberesford/">Beresford</a>
  Bernardi                                  <a href="http://www.ifa.hawaii.edu/~bernardi/">Bernardi</a>
@@ -89,6 +90,7 @@
  Meszaros                                  M&eacute;sz&aacute;ros
  Merida                                    M&eacute;rida
  Nomen                                     <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0056561">Nomen</a>
+ Nugent                                    <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0008801">Nugent</a>
  Oca\~na                                   Oca&ntilde;a
  Oksanen                                   <a href="http://twitter.com/#!/oksanen">Oksanen</a>
  Ondrejov                                  <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0056561">Ond&#345;ejov</a>
@@ -120,6 +122,7 @@
  Sherrod                                   <a href="http://www.arksky.org/pubs.htm">Sherrod</a>
  Shurpakov                                 <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0279274">Shurpakov</a>
  Skvarc                                    <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0089818">Skvar&#269;</a>
+ Sonnett                                   <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0008796">Sonnett</a>
  Sostero                                   <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0009878">Sostero</a>
  Stoss                                     <a href="http://www.starkenburg-sternwarte.de/asteroiden/namen/7689.htm">Stoss</a>
  Tancredi                                  <a href="http://www.anii.org.uy/cvuy/SNI2008/Ciencias%20Naturales%20y%20Exactas/Ciencias%20F%C3%ADsicas/Gonzalo%20TANCREDI%20Machado.pdf">Tancredi</a>
