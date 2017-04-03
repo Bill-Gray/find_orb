@@ -48,11 +48,11 @@ zero,  that's a Very Bad Thing indeed.
    Anyway.  The code figures out how many parameters will be fitted --
 usually six,  sometimes more -- and initializes the least-squares fitting
 code,  telling it how many parameters to expect.  The state vectors will be
-varied along the six 'unit_vectors'; when first called, full_improvement()
-initializes these to lie along the XYZ and vx, vy, vz axes.  We do a quick
-check to make sure that there are at least three observations and that the
-orbit isn't totally bizarre, bombing out with a negative return value if
-either is the case.
+varied along the six 'unit_vectors';  these could,  in theory,  be any
+six linearly independent vectors;  I'll explain the choice later.  We also
+do a check to make sure that there are at least three observations and that
+the orbit isn't totally bizarre, bombing out with a negative return value
+if either is the case.
 
    We may be computing sigmas and covariances for a desired epoch 'epoch2'.
 The idea is that our observations may cover,  say,  1 Mar 2013 to 13 Mar 2013,
@@ -110,12 +110,40 @@ Determination_,  the direction of the line of variations is that of
 the eigenvector with lowest eigenvalue,  with length 1/sqrt( lambda)
 where lambda=lowest eigenvalue.  This provides a quick and easy way
 to compute ephemeris uncertainties and impact probabilities,  and for
-achieving better linkages between arcs... I say "quick and easy",
-but must admit I've yet to really implement it in Find_Orb!  I've
-just experimented with it a little.
+achieving better linkages between arcs.
 
    But the other advantage I've found is that it turns out that,  if
 your tweaks are applied in the direction of the eigenvectors,  you get
 somewhat better stability.  So Find_Orb now stores the eigenvectors
 in the 'unit_vectors' for use on the next full_improvement.
 
+   The reason this helps is that depending on how you parameterize the
+orbit,  the uncertainty area can look like an ellipsoid, or like a
+"bananaoid."  In the latter case,  finding a minimum point can be a lot
+harder.  Consider the Rosenbrock "banana" function :
+
+https://en.wikipedia.org/wiki/Rosenbrock_function
+
+   f(x, y) = (a-x)^2 + b(y-x^2)^2
+
+   This is sometimes used to test the stability/convergence of
+minimization routines.  It can be a pretty brutal test.  But if,
+instead of looking for a minimum x and y,  we look for a minimum
+in x and z=y-x^2,  the function becomes
+
+   f(x, z) = (a-x)^2 + bz^2
+
+   Almost any minimization routine,  including least squares,  will
+then converge quickly on x=a, z=0,  and thereby y=a^2.
+
+   It's also for this reason that the initial unit vectors are set up
+using the set_fixed_unit_vectors( ) function.  For a short arc, the
+uncertainty ellipsoid (and therefore the eigenvectors) will have two
+long axes and four shorter ones.  The long axes/lowest eigenvalues
+will be in the radial velocity and distance direction; that is, we've
+a decent idea of the tangential velocity,  but the distance and radial
+velocity are poorly determined.  So we set up two vectors that run
+along those directions,  with four more somewhat arbitrarily set up
+orthogonal to them;  it's really getting those two long axes of the
+ellipsoid set up that matters most.  It appears to really improve the
+stability of the initial least-squares fit.
