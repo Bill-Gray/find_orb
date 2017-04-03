@@ -2004,6 +2004,7 @@ static void adjust_for_aberration( OBSERVE FAR *obs)
 
 
 int apply_debiasing = 0;
+int object_type;
 
 int find_fcct_biases( const double ra, const double dec, const char catalog,
                  const double jd, double *bias_ra, double *bias_dec);
@@ -2029,9 +2030,7 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
    obs->dec_bias = saved_dec_bias;
    obs->packed_id[12] = '\0';
    if( get_object_name( tbuff, obs->packed_id) == 1)
-      obs->flags = OBS_IS_COMET;
-   else
-      obs->flags = 0;
+      object_type = OBJECT_TYPE_COMET;
    if( override_time)
       {
       utc = override_time;
@@ -3421,7 +3420,6 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
    unsigned lines_actually_read = 0;
    unsigned n_spurious_matches = 0;
    unsigned n_sat_obs_without_offsets = 0;
-   bool obs_are_of_a_comet = false;
    double override_posn_sigma_1 = 0.;  /* in arcsec */
    double override_posn_sigma_2 = 0.;
    double override_posn_sigma_theta = 0.;
@@ -3447,6 +3445,10 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
    if( !rval)
       return( NULL);
    input_coordinate_epoch = 2000.;
+            /* Start out assuming asteroid-type magnitudes.  The name */
+            /* may tell you it's really a comet,  and the orbit may   */
+            /* tell you it's an artsat.                               */
+   object_type = OBJECT_TYPE_ASTEROID;
    while( fgets_trimmed( buff, sizeof( buff), ifile) && i != n_obs)
       {
       int is_rwo = 0;
@@ -3672,8 +3674,6 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                set_obs_vect( rval + i);
                if( is_rwo && !rval[i].is_included)
                   rval[i].flags |= OBS_DONT_USE;
-               if( obs_are_of_a_comet)
-                  rval[i].flags |= OBS_IS_COMET;
                i++;
                }
             }
@@ -3730,7 +3730,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                               CALENDAR_JULIAN_GREGORIAN, NULL);
                   /* Above allows one to reset the time of the preceding obs */
          else if( !memcmp( buff, "#comet", 6))
-            obs_are_of_a_comet = (atoi( buff + 6) != 0);
+            object_type = OBJECT_TYPE_COMET;
          else if( !strcmp( buff, "#ignore obs"))
             while( fgets_trimmed( buff, sizeof( buff), ifile)
                      && !strstr( buff, "end ignore obs"))

@@ -70,7 +70,7 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit);
 int set_locs( const double *orbit, double t0, OBSERVE FAR *obs, int n_obs);
 int text_search_and_replace( char FAR *str, const char *oldstr,
                                      const char *newstr);   /* ephem0.cpp */
-double calc_obs_magnitude( const int is_comet, const double obj_sun,
+double calc_obs_magnitude( const double obj_sun,
           const double obj_earth, const double earth_sun, double *phase_ang);
 int find_best_fit_planet( const double jd, const double *ivect,
                                  double *rel_vect);         /* runge.cpp */
@@ -116,6 +116,8 @@ char default_comet_magnitude_type = 'N';
 const char *mpc_fmt_filename = "mpc_fmt.txt";
 const char *sof_filename = "sof.txt";
 extern int forced_central_body;
+void compute_variant_orbit( double *variant, const double *ref_orbit,
+                     const double n_sigmas);       /* orb_func.cpp */
 int add_sof_to_file( const char *filename,         /* elem_ou2.cpp */
              const ELEMENTS *elem,
              const int n_obs, const OBSERVE *obs);
@@ -969,7 +971,7 @@ int write_out_elements_to_file( const double *orbit,
       sprintf( orbit_summary_text, "q=%.3f, ", elem.q);
    sprintf( orbit_summary_text + strlen( orbit_summary_text),
             "e=%.3f, i=%d", elem.ecc, (int)( elem.incl * 180. / PI + .5));
-   elem.is_asteroid = !(obs->flags & OBS_IS_COMET);
+   elem.is_asteroid = (object_type == OBJECT_TYPE_ASTEROID);
    if( elem.is_asteroid)
       {
       elem.slope_param = asteroid_magnitude_slope_param;
@@ -991,6 +993,15 @@ int write_out_elements_to_file( const double *orbit,
 
    add_sof_to_file( (n_extra_params >= 2 ? "cmt_sof.txt" : sof_filename),
                     &elem, n_obs, obs);            /* elem_ou2.cpp */
+   if( showing_sigmas == COVARIANCE_AVAILABLE)
+      {
+      ELEMENTS elem2 = elem;
+      double rel_orbit2[6];
+
+      compute_variant_orbit( rel_orbit2, rel_orbit, 1.);    /* orb_func.cpp */
+      calc_classical_elements( &elem2, rel_orbit2, epoch_shown, 1);
+      add_sof_to_file( "sofv.txt", &elem2, n_obs, obs);     /* elem_ou2.cpp */
+      }
    helio_elem = elem;
    if( elem.central_obj)            /* except for planet-encounterers,  'elem' */
       {                             /* will already be heliocentric.  This     */
@@ -1973,7 +1984,7 @@ int store_solution( const OBSERVE *obs, const int n_obs, const double *orbit,
 
 #define LOG_10 2.3025850929940456840179914546843642076011014886287729760333279009675726
 
-double calc_obs_magnitude( const int is_comet, const double obj_sun,
+double calc_obs_magnitude( const double obj_sun,
             const double obj_earth, const double earth_sun, double *phase_ang)
 {
    double rval;
@@ -1985,7 +1996,7 @@ double calc_obs_magnitude( const int is_comet, const double obj_sun,
    if( phase_ang)
       *phase_ang = ph_ang;
 
-   if( is_comet)
+   if( object_type == OBJECT_TYPE_COMET)
       rval = comet_magnitude_slope_param * log( obj_sun);
    else
       {
@@ -2041,7 +2052,6 @@ double mag_band_shift( const char mag_band)
 double calc_absolute_magnitude( OBSERVE FAR *obs, int n_obs)
 {
    int obs_no;
-   const bool is_comet = (obs->flags & OBS_IS_COMET);
    double n_mags = 0.;
    double rval = 0.;
 
@@ -2056,11 +2066,12 @@ double calc_absolute_magnitude( OBSERVE FAR *obs, int n_obs)
             {
             bool use_obs = true;
 
-            if( is_comet && obs->mag_band != default_comet_magnitude_type)
+            if( object_type == OBJECT_TYPE_COMET
+                            && obs->mag_band != default_comet_magnitude_type)
                use_obs = false;
             if( obs->obs_mag == BLANK_MAG || !obs->is_included)
                use_obs = false;
-            obs->computed_mag = calc_obs_magnitude( (obs->flags & OBS_IS_COMET),
+            obs->computed_mag = calc_obs_magnitude(
                   obs->solar_r, obs->r, earth_sun, NULL) - mag_band_shift( obs->mag_band);
             if( use_obs)
                {

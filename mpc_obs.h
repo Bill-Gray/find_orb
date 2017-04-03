@@ -111,13 +111,22 @@ int compute_radar_info( const OBSERVE *obs, RADAR_INFO *rinfo);
 #define NO_ORBIT_SIGMAS_REQUESTED    (-1)
 
 /* Bitfields for 'flags' parameter of OBSERVE */
-#define OBS_IS_COMET       1
+/*   The OBS_IS_COMET flag is now obsolete */
+/* #define OBS_IS_COMET       1   */
 #define OBS_DONT_USE       2
    /* Following used for obs from spacecraft that lack offset data */
 #define OBS_NO_OFFSET      4
 #define OBS_IS_SELECTED    8
 
 #define OBS_THOLEN_SIGMAS  0x10
+
+extern int object_type;
+
+      /* The above should be one of these three values.  Natural */
+      /* satellites are folded into the 'asteroid' umbrella :    */
+#define OBJECT_TYPE_ASTEROID     0
+#define OBJECT_TYPE_COMET        1
+#define OBJECT_TYPE_ARTSAT       2
 
 #ifdef SEEK_CUR
 OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,

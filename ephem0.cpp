@@ -47,7 +47,7 @@ double vector_to_polar( double *lon, double *lat, const double *vector);
 char *fgets_trimmed( char *buff, size_t max_bytes, FILE *ifile); /*elem_out.c*/
 int parallax_to_lat_alt( const double rho_cos_phi, const double rho_sin_phi,
        double *lat, double *ht_in_meters, const int planet_idx); /* ephem0.c */
-double calc_obs_magnitude( const int is_comet, const double obj_sun,
+double calc_obs_magnitude( const double obj_sun,
           const double obj_earth, const double earth_sun, double *phase_ang);
 int lat_alt_to_parallax( const double lat, const double ht_in_meters,
              double *rho_cos_phi, double *rho_sin_phi, const int planet_idx);
@@ -1612,7 +1612,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
             if( !obj_n)
                {
                double phase_ang;
-               double curr_mag = abs_mag + calc_obs_magnitude( obs->flags & OBS_IS_COMET,
+               double curr_mag = abs_mag + calc_obs_magnitude(
                           solar_r, r, earth_r, &phase_ang);  /* elem_out.cpp */
 
                if( curr_mag > 999.)       /* avoid overflow for objects     */
@@ -1665,7 +1665,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   else
                      snprintf_append( buff, sizeof( buff), " %3d ", (int)( curr_mag + .5));
                   if( phase_ang > PI * 2. / 3.)    /* over 120 degrees */
-                     if( !(obs->flags & OBS_IS_COMET))   /* and isn't a comet */
+                     if( object_type != OBJECT_TYPE_COMET)
                         {
                         char *endptr = buff + strlen( buff);
 
