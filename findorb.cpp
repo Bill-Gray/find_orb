@@ -161,8 +161,9 @@ int add_ephemeris_details( FILE *ofile, const double start_jd,  /* b32_eph.c */
 void set_distance( OBSERVE FAR *obs, double r);             /* orb_func.c */
 int filter_obs( OBSERVE FAR *obs, const int n_obs,          /* mpc_obs.c */
                   const double max_residual_in_arcseconds);
-int find_precovery_plates( const char *filename, const double *orbit,
-                           double epoch_jd);          /* ephem0.cpp */
+int find_precovery_plates( OBSERVE *obs, const int n_obs,
+                           const char *filename, const double *orbit,
+                           double epoch_jd);                   /* ephem0.cpp */
 void set_statistical_ranging( const int new_using_sr);      /* elem_out.cpp */
 int link_arcs( OBSERVE *obs, int n_obs, const double r1, const double r2);
 int find_circular_orbits( OBSERVE FAR *obs1, OBSERVE FAR *obs2,
@@ -3980,7 +3981,7 @@ int main( const int argc, const char **argv)
             }
             break;
          case '&':
-            if( !find_precovery_plates( "fields.txt", orbit, curr_epoch))
+            if( !find_precovery_plates( obs, n_obs, "fields.txt", orbit, curr_epoch))
                show_a_file( "fields.txt");
             break;
          case ';':

@@ -84,6 +84,9 @@ int setup_planet_elem( ELEMENTS *elem, const int planet_idx,
 char *mpc_station_name( char *station_data);       /* mpc_obs.cpp */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 int remove_rgb_code( char *buff);                              /* ephem.cpp */
+int find_precovery_plates( OBSERVE *obs, const int n_obs,
+                           const char *filename, const double *orbit,
+                           double epoch_jd);                   /* ephem0.cpp */
 
 const char *observe_filename = "observe.txt";
 const char *residual_filename = "residual.txt";
@@ -463,6 +466,7 @@ static double centralize_ang_around_zero( double ang)
 typedef struct
 {
    double ra, dec, jd, r;
+   double sun_obj, sun_earth;
 } obj_location_t;
 
 static void setup_obj_loc( obj_location_t *p, double *orbit,
@@ -477,8 +481,13 @@ static void setup_obj_loc( obj_location_t *p, double *orbit,
       topo[i] = orbit[i] - obs_posn[i];
    ecliptic_to_equatorial( topo);
    p->ra = atan2( topo[1], topo[0]);
-   p->dec = asin( topo[2] / vector3_length( topo));
+   p->r = vector3_length( topo);
+   p->dec = asin( topo[2] / p->r);
+   p->sun_earth = vector3_length( obs_posn);
+   p->sun_obj = vector3_length( orbit);
 }
+
+#pragma pack( 1)
 
 typedef struct
 {
@@ -486,15 +495,21 @@ typedef struct
    double height, width, tilt;
    uint32_t file_offset;
    char obscode[4];
+   char file_number;
 } field_location_t;
 
-int find_precovery_plates( const char *filename, const double *orbit,
+#pragma pack( )
+
+int find_precovery_plates( OBSERVE *obs, const int n_obs,
+                           const char *filename, const double *orbit,
                            double epoch_jd)
 {
    FILE *ofile = fopen( filename, "w");
-   FILE *ifile, *original_file;
+   FILE *ifile, *original_file = NULL;
+   int current_file_number = -1;
    double orbi[6], stepsize = 1.;
    obj_location_t p1, p2;
+   double abs_mag = calc_absolute_magnitude( obs, n_obs);
    field_location_t field;
 
    if( !ofile)
@@ -505,15 +520,6 @@ int find_precovery_plates( const char *filename, const double *orbit,
       fprintf( ofile, "Couldn't open 'css.idx'\n");
       fclose( ofile);
       return( -2);
-      }
-   original_file = fopen_ext( "css_index.csv", "crb");
-   if( !original_file)
-      {
-      fprintf( ofile, "Couldn't open 'css_index.csv'\n");
-      if( ifile)
-         fclose( ifile);
-      fclose( ofile);
-      return( -3);
       }
    memset( &p1, 0, sizeof( obj_location_t));
    memset( &p2, 0, sizeof( obj_location_t));
@@ -551,21 +557,55 @@ int find_precovery_plates( const char *filename, const double *orbit,
           fabs( delta_ra) < field.width / 2.)
          {
          char time_buff[40], buff[200];
+         int i;
+         bool matches_an_observation = false;
+         const double jdt = field.jd + td_minus_utc( field.jd) / seconds_per_day;
+         const double mag = abs_mag + calc_obs_magnitude(
+                        p2.sun_obj, p2.r, p2.sun_earth, NULL);
 
          full_ctime( time_buff, field.jd, FULL_CTIME_YMD
+                     | FULL_CTIME_LEADING_ZEROES
                      | FULL_CTIME_MONTHS_AS_DIGITS | FULL_CTIME_TENTHS_SEC);
          obj_ra = centralize_ang( obj_ra);
-         if( !original_file)
-            strcpy( buff, field.obscode);
-         else
+         for( i = 0; i < n_obs; i++)
+            if( fabs( obs[i].jd - jdt) < 1.e-3
+                     && !strcmp( field.obscode, obs[i].mpc_code))
+               matches_an_observation = true;
+         fprintf( ofile, "%c %8.4f %8.4f %4.1f %s %s",
+                  (matches_an_observation ? '*' : ' '),
+                  obj_ra * 180. / PI, obj_dec * 180. / PI, mag, time_buff,
+                  field.obscode);
+         if( current_file_number != field.file_number)
+            {
+            char filename[20];
+
+            current_file_number = field.file_number;
+            sprintf( filename, "css%d.csv", current_file_number);
+            if( original_file)
+               fclose( original_file);
+            original_file = fopen_ext( filename, "crb");
+            if( !original_file)
+               fprintf( ofile, "'%s' not opened\n", filename);
+            }
+         if( original_file)
             {
             fseek( original_file, field.file_offset, SEEK_SET);
-            if( !fgets_trimmed( buff, sizeof( buff), original_file))
-               *buff = '\0';
+            if( fgets_trimmed( buff, sizeof( buff), original_file))
+               {
+               char filename[100];
+
+               for( i = 0; buff[i]; i++)
+                  if( buff[i] == ',')
+                     buff[i] = ' ';
+               if( sscanf( buff, "%*f %*f %*s %*s %24s %90s",
+                                  time_buff, filename) == 2)
+                  fprintf( ofile, " %s %s", time_buff, filename);
+               }
+            else
+               fprintf( ofile, "File %d: seeked to %ld and failed",
+                        (int)field.file_number, (long)field.file_offset);
             }
-         fprintf( ofile, "%8.4f %8.4f %s %s\n",
-                     obj_ra * 180. / PI, obj_dec * 180. / PI,
-                     time_buff, buff);
+         fprintf( ofile, "\n");
          }
       }
    fclose( ifile);

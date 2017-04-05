@@ -7,8 +7,8 @@ To do it,  we need a list of previously imaged fields.  Catalina Sky
 Survey has kindly provided a list of (at present) over three million
 fields.  This code reads in the field information (currently just CSS
 fields) and generate a list in binary format,  sorted in descending
-order by date.   The input 'css_index.csv' file,  provided by Rob
-Seaman,  looks like this :
+order by date.   The input files,  provided by Rob Seaman,  look
+like this :
 
 RA dec time obscode (ignorable YYYYMMDD) image_name
 63.3921,26.7177,2003-03-23T02:42:04.406,703,20030323,01_03MAR23_N26021_0001.arch.H
@@ -31,7 +31,12 @@ have to integrate backward,  forward,  backward,  etc.)
 
 The resulting index is written to 'css.idx',  with a bit of text dumped
 to persuade me that correct values are being written.
-*/
+
+It may be useful to split the above data among two or more files.  (For
+example, one may have a list of fields from first light up to a week ago,
+and a smaller file that just has the last few nights.  You update the latter,
+but the big file stays unchanged.)  For this reason,  the index actually
+covers up to ten files,  css0.csv through css9.csv.   */
 
 #include <stdio.h>
 #include <stdint.h>
@@ -44,13 +49,18 @@ to persuade me that correct values are being written.
 #define PI \
    3.1415926535897932384626433832795028841971693993751058209749445923
 
+#pragma pack( 1)
+
 typedef struct
 {
    double ra, dec, jd;
    double height, width, tilt;
    uint32_t file_offset;
    char obscode[4];
+   char file_number;
 } field_location_t;
+
+#pragma pack( )
 
 int field_compare( const void *a, const void *b)
 {
@@ -104,24 +114,18 @@ static void get_field_size( double *width, double *height, const double jd,
 
 int main( const int argc, const char **argv)
 {
-   const char *filename = "css_index.csv";
-   FILE *ifile = fopen( filename, "rb");
+   int file_number;
    FILE *ofile;
    char buff[200];
    field_location_t *rval = NULL;
    int n_alloced = 0, n = 0, i;
-   uint32_t file_loc = 0;
    int verbose = 0, n_duplicates = 0;
 
+   setvbuf( stdout, NULL, _IONBF, 0);
    for( i = 1; i < argc; i++)
       if( argv[i][0] == '-')
          switch( argv[i][1])
             {
-            case 'f':
-               filename = argv[i] + 2;
-               if( !*filename && i < argc - 1)
-                  filename = argv[i + 1];
-               break;
             case 'v':
                verbose = 1;
                break;
@@ -130,48 +134,54 @@ int main( const int argc, const char **argv)
                return( -1);
             }
 
-   ifile = fopen( filename, "rb");
-   if( !ifile)
+   for( file_number = 0; file_number < 10; file_number++)
       {
-      printf( "%s not opened\n", filename);
-      return( -1);
-      }
-   printf( "%s opened;  reading fields\n", filename);
-   setvbuf( stdout, NULL, _IONBF, 0);
-   while( fgets( buff, sizeof( buff), ifile))
-      {
-      char timestr[80];
-      size_t i;
-      int n_scanned;
+      FILE *ifile;
 
-      for( i = 0; buff[i]; i++)
-         if( buff[i] == ',')
-            buff[i] = ' ';
-      if( n >= n_alloced)
+      sprintf( buff, "css%d.csv", file_number);
+      ifile = fopen( buff, "rb");
+      if( ifile)
          {
-         n_alloced += 200 + n_alloced / 2;
-         rval = (field_location_t *)realloc( rval,
-                               n_alloced * sizeof( field_location_t));
+         uint32_t file_loc = 0;
+
+         printf( "%s opened;  reading fields\n", buff);
+         while( fgets( buff, sizeof( buff), ifile))
+            {
+            char timestr[80];
+            size_t i;
+            int n_scanned;
+
+            for( i = 0; buff[i]; i++)
+               if( buff[i] == ',')
+                  buff[i] = ' ';
+            if( n >= n_alloced)
+               {
+               n_alloced += 200 + n_alloced / 2;
+               rval = (field_location_t *)realloc( rval,
+                                     n_alloced * sizeof( field_location_t));
+               }
+            n_scanned = sscanf( buff, "%lf %lf %70s %3s", &rval[n].ra,
+                        &rval[n].dec, timestr, (char *)&rval[n].obscode);
+            assert( n_scanned == 4);
+            rval[n].jd = get_time_from_string( 0., timestr, 0, NULL);
+            if( rval[n].jd)      /* some lines have 'time=NULL' */
+               {
+               rval[n].ra  *= PI / 180.;
+               rval[n].dec *= PI / 180.;
+               rval[n].file_offset = file_loc;
+               rval[n].file_number = (char)file_number;
+               get_field_size( &rval[n].width, &rval[n].height, rval[n].jd,
+                                    rval[n].obscode);
+               n++;
+               }
+            file_loc += strlen( buff);
+            if( n < 10 || n % 100000 == 0)
+               printf( "%d fields read and parsed\r", n);
+            }
+         fclose( ifile);
+         printf( "\n%d fields found\n", n);
          }
-      n_scanned = sscanf( buff, "%lf %lf %70s %3s", &rval[n].ra,
-                  &rval[n].dec, timestr, (char *)&rval[n].obscode);
-      assert( n_scanned == 4);
-      rval[n].jd = get_time_from_string( 0., timestr, 0, NULL);
-      if( rval[n].jd)      /* some lines have 'time=NULL' */
-         {
-         rval[n].ra  *= PI / 180.;
-         rval[n].dec *= PI / 180.;
-         rval[n].file_offset = file_loc;
-         get_field_size( &rval[n].width, &rval[n].height, rval[n].jd,
-                              rval[n].obscode);
-         n++;
-         }
-      file_loc += strlen( buff);
-      if( n < 10 || n % 100000 == 0)
-         printf( "%d fields read and parsed\r", n);
       }
-   fclose( ifile);
-   printf( "\n%d fields found\n", n);
    if( verbose)
       for( i = 0; i < 20; i++)
          printf( "%f %f %f: %ld %s %f\n", rval[i].jd,
