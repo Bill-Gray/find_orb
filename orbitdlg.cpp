@@ -1021,7 +1021,6 @@ void COrbitDlg::OnClickedMakeEphemeris()
          set_environment_ptr( "EPHEM_LAT", CT2A( dlg.m_lat));
          sprintf( tstr, "%d ", dlg.m_use_mpc_code);
          strcat( tstr, CT2A( dlg.m_mpc_code));
-         debug_printf( "New MPC code text: '%s'\n", tstr);
          set_environment_ptr( "EPHEM_MPC_CODE", tstr);
          ephemeris_output_options = dlg.GetEphemerisBitmask();
          }
