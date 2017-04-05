@@ -1,3 +1,7 @@
+# Makefile for Microsoft C/C++ to build a Windows executable with MFC.
+# Add BITS_32=Y for 32-bit code.  Assumes various libraries
+# ('lunar' or 'lunar64', 'sat_code', 'jpl_eph') will be found.
+
 OBJS=about.obj b32_eph.obj bc405.obj bias.obj clipfunc.obj \
   collide.obj conv_ele.obj eigen.obj elem2tle.obj elem_ou2.obj \
   elem_out.obj ephem0.obj ephem.obj generic.obj gauss.obj \
