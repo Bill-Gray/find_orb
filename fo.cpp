@@ -76,6 +76,9 @@ void move_add_nstr( const int col, const int row, const char *msg,
 double current_jd( void);                       /* elem_out.cpp */
 char *fgets_trimmed( char *buff, size_t max_bytes, FILE *ifile); /*elem_out.c*/
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
+int find_precovery_plates( OBSERVE *obs, const int n_obs,
+                           const char *filename, const double *orbit,
+                           double epoch_jd);                   /* ephem0.cpp */
 int make_pseudo_mpec( const char *mpec_filename, const char *obj_name);
                                                /* ephem0.cpp */
 
@@ -339,6 +342,7 @@ int main( const int argc, const char **argv)
 {
    char tbuff[300];
    char **summary_lines = NULL;
+   const char *precovery_dir = NULL;
    const char *separate_residual_file_name = NULL;
    const char *mpec_path = NULL;
    int n_ids, i, starting_object = 0;
@@ -390,6 +394,14 @@ int main( const int argc, const char **argv)
                   debug_level = 1;
                debug_printf( "fo: debug_level = %d; %s %s\n",
                            debug_level, __DATE__, __TIME__);
+               break;
+            case 'f':
+               if( argv[i][2])
+                  precovery_dir = argv[i] + 2;
+               else if( i < argc - 1 && argv[i + 1][0] != '-')
+                  precovery_dir = argv[i + 1];
+               else
+                  precovery_dir = "";
                break;
             case 'h':                     /* show planet-centric orbits */
                all_heliocentric = false;
@@ -658,6 +670,16 @@ int main( const int argc, const char **argv)
                         }
                      }
                   }
+               if( precovery_dir)
+                  {
+                  char fullpath[100];
+
+                  sscanf( obs->packed_id, "%s", tbuff);
+                  sprintf( fullpath, "%s/%s.txt", precovery_dir, tbuff);
+                  find_precovery_plates( obs, n_obs_actually_loaded,
+                           fullpath, orbit, curr_epoch);      /* ephem0.cpp */
+                  }
+
                for( j = 0; j < (unsigned)n_obs_actually_loaded; j++)
                   if( obs[j].is_included)
                      n_obs_included++;
