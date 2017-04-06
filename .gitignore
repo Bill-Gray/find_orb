@@ -33,6 +33,7 @@ find_orb
 
 covar.txt
 covar?.txt
+cssfield
 elements.txt
 eleme?.txt
 environ.dat
@@ -52,6 +53,7 @@ sr_elems.txt
 sr_el?.txt
 state.txt
 state?.txt
+vec2tle
 vectors.dat
 virtu?.txt
 virtual.txt
