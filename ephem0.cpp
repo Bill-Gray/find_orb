@@ -500,6 +500,19 @@ typedef struct
 
 #pragma pack( )
 
+/* In searching for fields,  we may be interested in fields _within_ a certain
+range of dates,  or those _outside_ that range.  We signal the former with
+max_jd > min_jd.  We signal the latter by reversing them (min_jd > max_jd.) */
+
+static inline bool jd_is_in_range( const double jd, const double min_jd,
+                                                      const double max_jd)
+{
+   if( max_jd > min_jd)    /* looking for fields _within_ this range */
+      return( jd > min_jd && jd < max_jd);
+   else                    /* looking for fields _outside_ this range */
+      return( jd < min_jd || jd > max_jd);
+}
+
 int find_precovery_plates( OBSERVE *obs, const int n_obs,
                            const char *filename, const double *orbit,
                            double epoch_jd)
@@ -511,6 +524,13 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
    obj_location_t p1, p2;
    double abs_mag = calc_absolute_magnitude( obs, n_obs);
    field_location_t field;
+   double min_jd = 0., max_jd = 1e+30;
+   double limiting_mag = 26.;
+   const char *min_jd_text = get_environment_ptr( "FIELD_TMIN");
+   const char *max_jd_text = get_environment_ptr( "FIELD_TMAX");
+   const char *mag_limit_text = get_environment_ptr( "FIELD_MAG_LIMIT");
+        /* Slightly easier to work with 'bit set means included' : */
+   const int inclusion = atoi( get_environment_ptr( "FIELD_INCLUSION")) ^ 3;
 
    if( !ofile)
       return( -1);
@@ -525,89 +545,106 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
    memset( &p2, 0, sizeof( obj_location_t));
    setvbuf( ofile, NULL, _IONBF, 0);
    memcpy( orbi, orbit, 6 * sizeof( double));
+   if( *min_jd_text)
+      min_jd = get_time_from_string( 0, min_jd_text,
+                     FULL_CTIME_YMD | CALENDAR_JULIAN_GREGORIAN, NULL);
+   if( *max_jd_text)
+      max_jd = get_time_from_string( 0, max_jd_text,
+                     FULL_CTIME_YMD | CALENDAR_JULIAN_GREGORIAN, NULL);
+   if( *mag_limit_text)
+      limiting_mag = atof( mag_limit_text);
    while( fread( &field, sizeof( field), 1, ifile) == 1)
-      {
-      double delta_ra;
-      double obj_ra, obj_dec;
-      double fraction;
-
-      if( field.jd < p1.jd || field.jd > p2.jd)
+      if( jd_is_in_range( field.jd, min_jd, max_jd))
          {
-         const double new_p2_jd = ceil( (field.jd - .5) / stepsize) * stepsize + .5;
+         double delta_ra;
+         double obj_ra, obj_dec;
+         double fraction, mag;
 
-         if( new_p2_jd == p1.jd)
-            p2 = p1;
-         else
+         if( field.jd < p1.jd || field.jd > p2.jd)
             {
-            p2.jd = new_p2_jd;
-            setup_obj_loc( &p2, orbi, epoch_jd);
-            epoch_jd = p2.jd;
-            }
-         p1.jd = new_p2_jd - stepsize;
-         setup_obj_loc( &p1, orbi, epoch_jd);
-         epoch_jd = p1.jd;
-         }
-      fraction = (field.jd - p1.jd) / stepsize;
-      obj_ra = p1.ra + fraction * centralize_ang_around_zero( p2.ra - p1.ra);
-      obj_dec = p1.dec + fraction * (p2.dec - p1.dec);
-      delta_ra = centralize_ang_around_zero( obj_ra - field.ra);
-      delta_ra *= cos( field.dec);
-      if( obj_dec > field.dec - field.height / 2. &&
-          obj_dec < field.dec + field.height / 2. &&
-          fabs( delta_ra) < field.width / 2.)
-         {
-         char time_buff[40], buff[200];
-         int i;
-         bool matches_an_observation = false;
-         const double jdt = field.jd + td_minus_utc( field.jd) / seconds_per_day;
-         const double mag = abs_mag + calc_obs_magnitude(
-                        p2.sun_obj, p2.r, p2.sun_earth, NULL);
+            const double new_p2_jd = ceil( (field.jd - .5) / stepsize) * stepsize + .5;
 
-         full_ctime( time_buff, field.jd, FULL_CTIME_YMD
-                     | FULL_CTIME_LEADING_ZEROES
-                     | FULL_CTIME_MONTHS_AS_DIGITS | FULL_CTIME_TENTHS_SEC);
-         obj_ra = centralize_ang( obj_ra);
-         for( i = 0; i < n_obs; i++)
-            if( fabs( obs[i].jd - jdt) < 1.e-3
-                     && !strcmp( field.obscode, obs[i].mpc_code))
-               matches_an_observation = true;
-         fprintf( ofile, "%c %8.4f %8.4f %4.1f %s %s",
-                  (matches_an_observation ? '*' : ' '),
-                  obj_ra * 180. / PI, obj_dec * 180. / PI, mag, time_buff,
-                  field.obscode);
-         if( current_file_number != field.file_number)
-            {
-            char filename[20];
-
-            current_file_number = field.file_number;
-            sprintf( filename, "css%d.csv", current_file_number);
-            if( original_file)
-               fclose( original_file);
-            original_file = fopen_ext( filename, "crb");
-            if( !original_file)
-               fprintf( ofile, "'%s' not opened\n", filename);
-            }
-         if( original_file)
-            {
-            fseek( original_file, field.file_offset, SEEK_SET);
-            if( fgets_trimmed( buff, sizeof( buff), original_file))
-               {
-               char filename[100];
-
-               for( i = 0; buff[i]; i++)
-                  if( buff[i] == ',')
-                     buff[i] = ' ';
-               if( sscanf( buff, "%*f %*f %*s %*s %24s %90s",
-                                  time_buff, filename) == 2)
-                  fprintf( ofile, " %s %s", time_buff, filename);
-               }
+            if( new_p2_jd == p1.jd)
+               p2 = p1;
             else
-               fprintf( ofile, "File %d: seeked to %ld and failed",
-                        (int)field.file_number, (long)field.file_offset);
+               {
+               p2.jd = new_p2_jd;
+               setup_obj_loc( &p2, orbi, epoch_jd);
+               epoch_jd = p2.jd;
+               }
+            p1.jd = new_p2_jd - stepsize;
+            setup_obj_loc( &p1, orbi, epoch_jd);
+            epoch_jd = p1.jd;
             }
-         fprintf( ofile, "\n");
+         fraction = (field.jd - p1.jd) / stepsize;
+         obj_ra = p1.ra + fraction * centralize_ang_around_zero( p2.ra - p1.ra);
+         obj_dec = p1.dec + fraction * (p2.dec - p1.dec);
+         delta_ra = centralize_ang_around_zero( obj_ra - field.ra);
+         delta_ra *= cos( field.dec);
+         mag = abs_mag + calc_obs_magnitude(
+                              p2.sun_obj, p2.r, p2.sun_earth, NULL);
+         if( obj_dec > field.dec - field.height / 2. &&
+             obj_dec < field.dec + field.height / 2.
+             && mag < limiting_mag && fabs( delta_ra) < field.width / 2.)
+            {
+            char time_buff[40], buff[200];
+            int i;
+            bool matches_an_observation = false;
+            bool show_it = true;
+            const double jdt = field.jd + td_minus_utc( field.jd) / seconds_per_day;
+
+            full_ctime( time_buff, field.jd, FULL_CTIME_YMD
+                        | FULL_CTIME_LEADING_ZEROES
+                        | FULL_CTIME_MONTHS_AS_DIGITS | FULL_CTIME_TENTHS_SEC);
+            obj_ra = centralize_ang( obj_ra);
+            for( i = 0; i < n_obs; i++)
+               if( fabs( obs[i].jd - jdt) < 1.e-3
+                        && !strcmp( field.obscode, obs[i].mpc_code))
+                  matches_an_observation = true;
+            if( matches_an_observation)
+               show_it = ((inclusion & 2) != 0);
+            else
+               show_it = ((inclusion & 1) != 0);
+            if( show_it)
+               {
+               fprintf( ofile, "%c %8.4f %8.4f %4.1f %s %s",
+                        (matches_an_observation ? '*' : ' '),
+                        obj_ra * 180. / PI, obj_dec * 180. / PI, mag,
+                        time_buff, field.obscode);
+               if( current_file_number != field.file_number)
+                  {
+                  char filename[20];
+
+                  current_file_number = field.file_number;
+                  sprintf( filename, "css%d.csv", current_file_number);
+                  if( original_file)
+                     fclose( original_file);
+                  original_file = fopen_ext( filename, "crb");
+                  if( !original_file)
+                     fprintf( ofile, "'%s' not opened\n", filename);
+                  }
+               if( original_file)
+                  {
+                  fseek( original_file, field.file_offset, SEEK_SET);
+                  if( fgets_trimmed( buff, sizeof( buff), original_file))
+                     {
+                     char filename[100];
+
+                     for( i = 0; buff[i]; i++)
+                        if( buff[i] == ',')
+                           buff[i] = ' ';
+                     if( sscanf( buff, "%*f %*f %*s %*s %24s %90s",
+                                        time_buff, filename) == 2)
+                        fprintf( ofile, " %s %s", time_buff, filename);
+                     }
+                  else
+                     fprintf( ofile, "File %d: seeked to %ld and failed",
+                              (int)field.file_number, (long)field.file_offset);
+                  }
+               fprintf( ofile, "\n");
+               }
+            }
          }
-      }
    fclose( ifile);
    if( original_file)
       fclose( original_file);

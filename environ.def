@@ -110,23 +110,6 @@ FCCT14_FILE=
 LINUX_JPL_FILENAME=
 JPL_FILENAME=
 
-   By default,  when you tick the 'Comet non-gravs' box in the Settings
-   dialog,  the forces are modelled using the "standard" comet
-   non-gravitational model devised by Marsden and Sekanina.  Their
-   model assumes the force will have an "outward" (away from the sun)
-   and "along-orbit" component,  with that force having a somewhat
-   complex relationship to distance from the sun,  approximating
-   the complex way in which outgassing occurs at different temperatures.
-   Change 2009BD=0 to 2009BD=1 to switch to a simpler model in
-   which those forces vary simply as the inverse square of distance
-   from the sun.  (Similar to the usual solar radiation pressure model
-   used for artificial satellites,  except adding in an along-orbit
-   counterpart.)  This inverse-square,  but otherwise cometlike, model
-   is a good fit to the Yarkovsky/YORP non-gravs for some rocky
-   objects, such as (101955) Bennu and 2009 BD;  and for similar
-   non-grav forces on some artificial satellites.
-2009BD=0
-
    When Find_Orb loads up a short arc,  it uses "statistical ranging"
    (SR),  and defaults to trying 100 possible orbits at a mix of
    distances and radial velocities to characterize the possible orbits
@@ -231,3 +214,28 @@ IOD_TIMEOUT=20
    can move the 'asteroid_ephemeris.txt' file to a different directory,  and/or
    rename it.
 # BC405_FILENAME=/home/phred/big/asteroid_ephemeris.txt
+
+   I had a request (https://groups.yahoo.com/neo/groups/find_orb/conversations/messages/35)
+   for an option to output planetary state vectors at the epoch of the orbital
+   elements to 'elements.txt'.  If you want to do that,  set PLANET_STATES=1.
+   By default,  it's blank and planet states are not written out.
+PLANET_STATES=
+
+   When looking for precoveries,  one may wish to look only within a certain
+   range of dates,  and (usually) only to a certain magnitude depth (not
+   usually much point in looking for an object if it's expected to be at 34th
+   magnitude.)  The following lines let you set such limits.  Swap TMAX and
+   TMIN if what you actually want are observations _outside_ a given range.
+FIELD_TMIN=1800 Jan 1
+FIELD_TMAX=2200 Jan 1
+FIELD_MAG_LIMIT=23
+
+   Also when looking for precoveries,  one may want to list only images that
+   haven't been measured yet,  or only those that have been measured.  (Note
+   that the only way Find_Orb knows which images have been measured is by
+   looking at the astrometry.  That is to say,  if the astrometry you've used
+   to compute the orbit came from an image,  Find_Orb will notice that fact.
+   Otherwise,  it'll assume that the image in question hasn't been measured.)
+   A value of 1 means "show only measured images";  2="show only unmeasured";
+   0 or blank means "show all images".
+FIELD_INCLUSION=0
