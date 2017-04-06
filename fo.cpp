@@ -81,6 +81,7 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
                            double epoch_jd);                   /* ephem0.cpp */
 int make_pseudo_mpec( const char *mpec_filename, const char *obj_name);
                                                /* ephem0.cpp */
+void set_environment_ptr( const char *env_ptr, const char *new_value);
 
 /* In this non-interactive version of Find_Orb,  we just print out warning
 messages such as "3 observations were made in daylight" or "couldn't find
@@ -481,6 +482,21 @@ int main( const int argc, const char **argv)
                printf( "Unknown command-line option '%s'\n", argv[i]);
                return( -1);
             }
+
+   for( i = 1; i < argc; i++)
+      {
+      const char *tptr = strchr( argv[i], '=');
+
+      if( tptr && argv[i][0] != '-')
+         {
+         const size_t len = tptr - argv[i];
+
+         memcpy( tbuff, argv[i], len);
+         tbuff[len] = '\0';
+         set_environment_ptr( tbuff, argv[i] + len + 1);
+         }
+      }
+
                /* get_defaults( ) collects a lot of data that's for the  */
                /* interactive find_orb program.  But it also sets some   */
                /* important internal values for blunder detection,  etc. */
