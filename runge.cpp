@@ -34,6 +34,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "afuncs.h"
 #include "comets.h"
 #include "afuncs.h"
+#include "mpc_obs.h"
 
 #define PI 3.1415926535897932384626433832795028841971693993751058209749445923
 #define J2000 2451545.
@@ -363,32 +364,22 @@ alpha to the inverse of that.
 
 static inline double comet_g_func( const double r)
 {
-   static int formula_to_use = -1;
-   static double alpha = 0.;
-
-   if( formula_to_use == -1)
-      formula_to_use = atoi( get_environment_ptr( "2009BD"));
-   if( !alpha)    /* determine normalization constant to set */
-      {           /* future comet_g_func( 1) = 1             */
-      alpha = 1.;
-      alpha = 1. / comet_g_func( 1.);
-      }
-
-   if( !formula_to_use)    /* default, Marsden/Sekanina formula */
-      {
+   if( object_type == OBJECT_TYPE_COMET)
+      {                      /* default, Marsden/Sekanina formula */
       static double r0 = 2.808;         /* AU */
       static double m = 2.15;
       static double n = 5.093;
       static double k = 4.6142;
-      static bool first_time = true;
+      static double alpha = 0.;
       double r_over_r0;
 
-      if( first_time)
+      if( !alpha)
          {
          const char *comet_params = get_environment_ptr( "COMET_CONSTANTS");
 
-         first_time = false;
          sscanf( comet_params, "%lf,%lf,%lf,%lf", &r0, &m, &n, &k);
+         alpha = 1.;
+         alpha = 1. / comet_g_func( 1.);
          }
       r_over_r0 = r / r0;
       return( alpha * pow( r_over_r0, -m) * pow( 1. + pow( r_over_r0, n), -k));
