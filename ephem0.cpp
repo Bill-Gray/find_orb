@@ -91,6 +91,7 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
 const char *observe_filename = "observe.txt";
 const char *residual_filename = "residual.txt";
 const char *ephemeris_filename = "ephemeri.txt";
+bool is_default_ephem = true;
 const char *elements_filename = "elements.txt";
 
 /* Returns parallax constants (rho_cos_phi, rho_sin_phi) in AU. */
@@ -1137,7 +1138,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    step = get_step_size( stepsize, &step_units, &n_step_digits);
    if( !step)
       return( -2);
-   ofile = fopen_ext( filename, "fcw");
+   ofile = fopen_ext( filename, is_default_ephem ? "fcw" : "fw");
    if( !ofile)
       return( -1);
    if( !abs_mag)
@@ -2945,7 +2946,8 @@ char *mpec_error_message = NULL;
 int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
 {
    char buff[500], mpec_buff[7];
-   FILE *ofile = fopen_ext( mpec_filename, "fcwb");
+   const char *mpec_permits = (strchr( mpec_filename, '/') ? "fwb" : "fcwb");
+   FILE *ofile = fopen_ext( mpec_filename, mpec_permits);
    FILE *header_htm_ifile;
    FILE *residuals_ifile, *ephemeris_ifile, *observations_ifile;
    FILE *elements_file = fopen_ext( get_file_name( buff, elements_filename), "fcrb");
@@ -3372,7 +3374,8 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
       }
 
                /* ...and now,  the ephemeris: */
-   ephemeris_ifile = fopen_ext( get_file_name( buff, ephemeris_filename), "fcr");
+   ephemeris_ifile = fopen_ext( get_file_name( buff, ephemeris_filename),
+               is_default_ephem ? "fcr" : "fr");
    if( ephemeris_ifile && fgets_trimmed( buff, sizeof( buff), ephemeris_ifile))
       {
       fprintf( ofile, "\n<a name=\"eph%s\"></a>", mpec_buff);

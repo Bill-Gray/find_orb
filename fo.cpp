@@ -82,6 +82,7 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
 int make_pseudo_mpec( const char *mpec_filename, const char *obj_name);
                                                /* ephem0.cpp */
 void set_environment_ptr( const char *env_ptr, const char *new_value);
+const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 
 /* In this non-interactive version of Find_Orb,  we just print out warning
 messages such as "3 observations were made in daylight" or "couldn't find
@@ -265,7 +266,7 @@ int summ_compare( const void *a, const void *b)
 
 static void get_summary_info( char *buff, const char *mpec_filename)
 {
-   FILE *ifile = fopen_ext( mpec_filename, "fcrb");
+   FILE *ifile = fopen_ext( mpec_filename, "frb");
    char ibuff[400], *tptr;
    unsigned i;
 
@@ -396,13 +397,22 @@ int main( const int argc, const char **argv)
                debug_printf( "fo: debug_level = %d; %s %s\n",
                            debug_level, __DATE__, __TIME__);
                break;
+            case 'e':
+               {
+               extern const char *ephemeris_filename;
+               extern bool is_default_ephem;
+
+               if( !argv[i][2] && i < argc - 1 && argv[i + 1][0] != '-')
+                  ephemeris_filename = argv[i + 1];
+               else
+                  ephemeris_filename = argv[i] + 2;
+               is_default_ephem = false;
+               }
             case 'f':
-               if( argv[i][2])
-                  precovery_dir = argv[i] + 2;
-               else if( i < argc - 1 && argv[i + 1][0] != '-')
+               if( !argv[i][2] && i < argc - 1 && argv[i + 1][0] != '-')
                   precovery_dir = argv[i + 1];
                else
-                  precovery_dir = "";
+                  precovery_dir = argv[i] + 2;
                break;
             case 'h':                     /* show planet-centric orbits */
                all_heliocentric = false;
@@ -415,7 +425,10 @@ int main( const int argc, const char **argv)
                }
                break;
             case 'm':
-               mpec_path = argv[i] + 2;
+               if( argv[i][2] == '\0' && i < argc - 1)
+                  mpec_path = argv[i + 1];
+               else
+                  mpec_path = argv[i] + 2;
                break;
             case 'n':
                starting_object = atoi( argv[i] + 2);
@@ -619,15 +632,22 @@ int main( const int argc, const char **argv)
                   {
                   char fullpath[100];
                   int n_orbits_in_ephem = 1;
+                  int n_ephemeris_steps = 50;
+                  char ephemeris_step_size[20], mpc_code[20];
                   extern const char *ephemeris_filename;
                   extern const char *residual_filename;
                   extern int available_sigmas;
                   extern double ephemeris_mag_limit;
                   double *orbits_to_use = orbit;
-                  const double jd_start = get_time_from_string( 0., "now",
+                  const double jd_start = get_time_from_string( 0.,
+                           get_environment_ptr( "EPHEM_START"),
                            CALENDAR_JULIAN_GREGORIAN | FULL_CTIME_YMD
                            | FULL_CTIME_TWO_DIGIT_YEAR, NULL);
 
+                  sscanf( get_environment_ptr( "EPHEM_STEPS"), "%d %9s",
+                         &n_ephemeris_steps, ephemeris_step_size);
+                  sscanf( get_environment_ptr( "CONSOLE_OPTS"), "%9s",
+                                 mpc_code);
                   create_obs_file( obs, n_obs_actually_loaded, 0);
                   ephemeris_mag_limit = 999.;
                   if( available_sigmas == COVARIANCE_AVAILABLE)
@@ -647,7 +667,8 @@ int main( const int argc, const char **argv)
                   text_search_and_replace( fullpath, " ", "");
                   if( !ephemeris_in_a_file_from_mpc_code( ephemeris_filename,
                               orbits_to_use, obs, n_obs_actually_loaded,
-                              curr_epoch, jd_start, "1h", 50, "500",
+                              curr_epoch, jd_start, ephemeris_step_size,
+                              n_ephemeris_steps, mpc_code,
                               ephemeris_output_options,
                               n_orbits_in_ephem))
                      {
