@@ -200,13 +200,8 @@ z      Integrate current orbit forward,  then back,  a certain number of
 "      Shows details of Curses mouse commands (these differ from one platform
          to the next,  and I needed a way to puzzle them out),  and info on
          the DE file currently in use.
-~      Remove duplicate observations.
 .      Show flavor of Curses and DE version in use.
 ,      Show 'debug.txt' (log of debug messages).
-'      Switch to an alternative,  non-standard 'mpcorb' format, one that can
-         handle parabolic, hyperbolic,  and long-period orbits.  If you really
-         want to know, see comments for elements_in_mpcorb_format() in
-         elem_out.cpp.
 \      Shift all observations from a given observatory by a given time offset.
          Used when I was trying to puzzle out some timing errors from a
          specific observatory for a specific object.

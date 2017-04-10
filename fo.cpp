@@ -481,13 +481,6 @@ int main( const int argc, const char **argv)
             case 'v':
                use_colors = false;
                break;
-            case 'y':
-               {
-               extern int alt_mpcorb;
-
-               alt_mpcorb = 1;
-               }
-               break;
             case 'z':
                use_config_directory = true;
                break;

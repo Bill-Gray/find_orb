@@ -3932,17 +3932,6 @@ int main( const int argc, const char **argv)
             message_to_user[xmax] = '\0';
             }
             break;
-         case '~':         /* remove duplicate obs */
-            for( i = 0; i < n_obs; i++)
-               if( !memcmp( obs + i, obs + i + 1, sizeof( OBSERVE)))
-                  {
-                  n_obs--;
-                  memmove( obs + i, obs + i + 1,
-                                 (n_obs - i) * sizeof( OBSERVE));
-                  i--;
-                  }
-            update_element_display = 1;
-            break;
          case KEY_MOUSE_MOVE:
          case KEY_TIMER:
             break;
@@ -3953,16 +3942,6 @@ int main( const int argc, const char **argv)
                         getmaxx( stdscr), getmaxy( stdscr));
             break;
 #endif
-         case '\'':
-            {
-            extern int alt_mpcorb;
-
-            alt_mpcorb ^= 1;
-            strcpy( message_to_user, "Alternate MPCORB display");
-            add_off_on = alt_mpcorb;
-            update_element_display = 1;
-            }
-            break;
          case '{':
             {
             double rms;
@@ -4200,7 +4179,7 @@ int main( const int argc, const char **argv)
          case ALT_N:
          case ALT_O: case ALT_P: case ALT_Q:
          case ALT_R: case ALT_X: case ALT_Y:
-         case ALT_Z:
+         case ALT_Z: case '~':   case '\'':
          default:
             debug_printf( "Key %d hit\n", c);
             show_a_file( "dos_help.txt");

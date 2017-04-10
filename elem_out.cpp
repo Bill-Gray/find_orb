@@ -364,33 +364,7 @@ double current_jd( void)
    return( jd);
 }
 
-/* The 'standard' MPCORB format gives a mean anomaly and semimajor axis.
-It can't handle parabolic or hyperbolic orbits,  and precision suffers
-for high-eccentricity,  long-period objects.  If 'alt_mpcorb' != 0,
-we switch to output wherein the time of perihelion is stored,  split into
-an integer part,  where the mean anomaly used to go;  plus a fractional
-part,  put where the mean motion used to be;  and the semimajor axis
-is replaced with the perihelion distance.
-
-   When loading such an orbit into another program,  we've the advantages
-that (a) not much has changed,  so most of the code can be left the same,
-and (b) it's easy to tell alternate from standard format;  the latter has
-decimal points in columns 30 and 83,  whilst the alternate form has
-digits there.
-
-   We've the disadvantage that nearly everybody else uses just the standard
-format.  So at least for the nonce,  this is mostly a theoretical improvement.
-Plus,  it's a little weird to have the time of perihelion spread out into
-two different columns... I had to do that to keep everything else in its
-"traditional" column,  though.
-
-   Incidentally,  in the new format,  six bytes that used to contain
-digits now contain spaces.  At some point,  they may contain an indicator
-of a central object (so non-heliocentric orbits can be stored).  And perhaps
-some other uses yet to be determined.        */
-
 int n_clones_accepted = 0;
-int alt_mpcorb;
 
 static int elements_in_mpcorb_format( char *buff, const char *packed_desig,
                 const char *full_desig, const ELEMENTS *elem,
@@ -429,18 +403,7 @@ static int elements_in_mpcorb_format( char *buff, const char *packed_desig,
            elem->ecc);
    sprintf( buff + 79, "%12.8f%12.7f",
             (180 / PI) / elem->t0,        /* n */
-            alt_mpcorb ? elem->q : elem->major_axis);
-   if( alt_mpcorb)
-      {
-      const double fractional_day = elem->perih_time - floor( elem->perih_time);
-      int microdays = (int)( fractional_day * 1000000. + .5);
-
-      sprintf( buff + 26, "%7.0f", floor( elem->perih_time));
-      if( microdays >= 1000000)
-         microdays = 999999;
-      sprintf( buff + 80, " %06d", microdays);
-      buff[33] = buff[34] = buff[87] = buff[88] = buff[89] = buff[90] = ' ';
-      }
+            elem->major_axis);
    for( i = 0; i < n_obs; i++)
       if( obs[i].is_included)
          n_included_obs++;
@@ -1516,7 +1479,7 @@ int write_out_elements_to_file( const double *orbit,
       bad_elements |= 2;
 
          /* Also,  write out elements in MPCORB-like format: */
-   if( helio_elem.ecc < .999999 || alt_mpcorb)
+   if( helio_elem.ecc < .999999)
       {
       const char *output_filename = (*elements_filename == 's' ?
                                              "mpc_sr.txt" : mpc_fmt_filename);
@@ -1551,7 +1514,7 @@ int write_out_elements_to_file( const double *orbit,
          fclose( ofile);
          }
 
-      if( helio_elem.ecc < .999999 || alt_mpcorb)
+      if( helio_elem.ecc < .999999)
          {
          ofile = fopen_ext( get_file_name( tbuff, element_filename), monte_carlo_permits);
          if( !strcmp( monte_carlo_permits, "wb"))
@@ -1562,8 +1525,6 @@ int write_out_elements_to_file( const double *orbit,
             fprintf( ofile, "Monte Carlo orbits from Find_Orb\nComputed %s", ctime( &t0));
             fprintf( ofile, "Find_Orb version %s %s\n", __DATE__, __TIME__);
             fprintf( ofile, (using_sr ? "Statistical Ranging\n" : "Full Monte Carlo\n"));
-            if( alt_mpcorb)
-               fprintf( ofile, "ALTERNATIVE FORMAT improved as described below\n");
             if( ifile)
                {
                while( fgets( tbuff, 80 * 9, ifile))
@@ -2183,7 +2144,7 @@ int store_defaults( const int ephemeris_output_options,
               use_blunder_method);
    set_environment_ptr( "FILTERING", buff);
    sprintf( buff, "%d %.2f %d %d %d", use_sigmas ? 1 : 0,
-                                 ephemeris_mag_limit, alt_mpcorb,
+                                 ephemeris_mag_limit, 0,
                                  forced_central_body,
                                  apply_debiasing);
    set_environment_ptr( "SETTINGS2", buff);
@@ -2204,6 +2165,7 @@ int get_defaults( int *ephemeris_output_options, int *element_format,
    extern double minimum_jd, maximum_jd;
    extern double maximum_observation_span;
    int i, use_sigmas_int;
+   int previously_alt_mpcorb;    /* option that's now obsolete */
    const char *override_fcct14_filename = get_environment_ptr( "FCCT14_FILE");
 
    if( *language)
@@ -2258,7 +2220,7 @@ int get_defaults( int *ephemeris_output_options, int *element_format,
    probability_of_blunder /= 100.;        /* cvt from percent to raw prob */
    sscanf( get_environment_ptr( "SETTINGS2"), "%d %lf %d %d %d",
                &use_sigmas_int, &ephemeris_mag_limit,
-               &alt_mpcorb, &forced_central_body,
+               &previously_alt_mpcorb, &forced_central_body,
                &apply_debiasing);
 
    use_sigmas = (use_sigmas_int ? true : false);

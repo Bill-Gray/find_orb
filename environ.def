@@ -83,10 +83,9 @@ RADAR_d43=430000,17,.94,20,7e-14
    'Settings2' gives five parameters.  The first is 1 if observation weighting
    is used and 0 if it is not.  Next,  the 'faint limit' on ephemerides (by
    default,  ephemerides are not listed if the object is fainter than mag 22).
-   The next value is always 0 unless reset by hand;  it determines the use of
-   an "alternative MPCORB" format (one allowing for parabolic and hyperbolic
-   orbits and avoiding loss-of-precision issues) that I doubt I'll persuade
-   anyone to adopt.  The fourth number indicates a central object for orbital
+   The third value is always 0 unless reset by hand;  it determined the use of
+   an "alternative MPCORB" format I was previously considering.  The value is
+   now simply unused.  The fourth number indicates a central object for orbital
    elements,  if one isn't allowing automatic selection of elements.  By default,
    the central object is 3,  i.e.,  the earth.
       The final number is 1 if FCCT14 astrometric debiasing is applied,  and 0
