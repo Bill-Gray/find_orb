@@ -28,11 +28,18 @@ ifdef CLANG
 	CC=clang
 endif
 
+# I'm using 'mkdir -p' to avoid error messages if the directory exists.
+# It may fail on very old systems,  and will probably fail on non-POSIX
+# systems.  If so,  change to '-mkdir' and ignore errors.
+
 ifdef MSWIN
 	LIBSADDED=
 	EXE=.exe
 	OBJSADDED=clipfunc.o
 	CURSES_LIB=-lpdcurses -static-libgcc
+	MKDIR=-mkdir
+else
+	MKDIR=mkdir -p
 endif
 
 # You can have your include files in ~/include and libraries in
@@ -113,7 +120,7 @@ clean_temp:
 install:
 	-cp find_orb $(HOME)/bin
 	cp fo       $(HOME)/bin
-	-mkdir $(IDIR)
+	$(MKDIR) $(IDIR)
 	cp command.txt details.txt dosephem.txt dos_help.txt ?findorb.txt           $(IDIR)
 	cp environ.def geo_rect.txt header.htm jpl_eph.txt mpcorb.hdr               $(IDIR)
 	cp mu1.txt observer.txt obslinks.htm ObsCodes.htm ObsCodesF.html            $(IDIR)
