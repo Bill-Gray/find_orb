@@ -2810,10 +2810,13 @@ static int write_observer_data_to_file( FILE *ofile, const char *ast_filename,
    return( 0);
 }
 
+bool residual_file_in_config_dir = true;
+
 int write_residuals_to_file( const char *filename, const char *ast_filename,
        const int n_obs, const OBSERVE FAR *obs_data, const int resid_format)
 {
-   FILE *ofile = fopen_ext( filename, "fcw");
+   FILE *ofile = fopen_ext( filename,
+               residual_file_in_config_dir ? "fcw" : "fw");
    int rval = 0;
 
    if( ofile )

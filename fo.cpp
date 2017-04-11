@@ -381,7 +381,10 @@ int main( const int argc, const char **argv)
                separate_periodic_comet_apparitions ^= 1;
                }
             case 'b':
-               separate_residual_file_name = argv[i] + 2;
+               if( !argv[i][2] && i < argc - 1 && argv[i + 1][0] != '-')
+                  separate_residual_file_name = argv[i + 1];
+               else
+                  separate_residual_file_name = argv[i] + 2;
                break;
             case 'c':
                {
@@ -615,10 +618,16 @@ int main( const int argc, const char **argv)
                if( show_processing_steps)
                   printf( "; %s ", tbuff);
                if( separate_residual_file_name)
+                  {
+                  extern bool residual_file_in_config_dir;
+
+                  residual_file_in_config_dir = false;
                   write_residuals_to_file( separate_residual_file_name, argv[1],
                                n_obs_actually_loaded, obs, RESIDUAL_FORMAT_PRECISE
                                | RESIDUAL_FORMAT_COMPUTER_FRIENDLY
                                | RESIDUAL_FORMAT_FOUR_DIGIT_YEARS);
+                  residual_file_in_config_dir = true;
+                  }
                if( !mpec_path)
                   append_elements_to_element_file = 1;
                else
