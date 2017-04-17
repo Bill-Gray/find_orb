@@ -167,12 +167,12 @@ int main( const int argc, const char **argv)
    double mag_limit = 99.;
    extern double ephemeris_mag_limit;
    size_t i, bytes_written = 0;
-   extern char **environ;
    int element_format = ELEM_OUT_ALTERNATIVE_FORMAT;
    extern bool neocp_redaction_turned_on;
    int center_object = -2;
-
 #ifndef _WIN32
+   extern char **environ;
+
    avoid_runaway_process( 15);
 #endif         /* _WIN32 */
    neocp_redaction_turned_on = false;
@@ -185,8 +185,10 @@ int main( const int argc, const char **argv)
       }
    fprintf( lock_file, "We're in\n");
    combine_all_observations = 1;
+#ifndef _WIN32
    for( i = 0; environ[i]; i++)
       fprintf( lock_file, "%s\n", environ[i]);
+#endif
 
    fprintf( lock_file, "setrlimit called\n");
    strcpy( mpc_code, "500");
