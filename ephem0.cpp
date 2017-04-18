@@ -2364,6 +2364,21 @@ void format_observation( const OBSERVE FAR *obs, char *text,
       for( i = 0; original_text_ptr[i]; i++)
          if( original_text_ptr[i] == '\t')
             original_text_ptr[i] = ' ';
+
+   if( resid_format & RESIDUAL_FORMAT_EXTRA)
+      {
+      char tbuff[50];
+      int tformat = (resid_format | RESIDUAL_FORMAT_SHORT)
+            ^ RESIDUAL_FORMAT_TIME_RESIDS ^ RESIDUAL_FORMAT_EXTRA
+            ^ RESIDUAL_FORMAT_FOUR_DIGIT_YEARS;
+
+      format_observation( obs, tbuff, tformat);
+      strcat( text, tbuff + 11);
+      tformat &= ~RESIDUAL_FORMAT_TIME_RESIDS;
+      tformat |= RESIDUAL_FORMAT_MAG_RESIDS;
+      format_observation( obs, tbuff, tformat);
+      strcat( text, tbuff + 11);
+      }
 }
 
 
@@ -2821,7 +2836,7 @@ int write_residuals_to_file( const char *filename, const char *ast_filename,
 
    if( ofile )
       {
-      char buff[100];
+      char buff[200];
       int number_lines = (n_obs + 2) / 3;
       int i;
 

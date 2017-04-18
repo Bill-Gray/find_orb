@@ -625,7 +625,8 @@ int main( const int argc, const char **argv)
                   write_residuals_to_file( separate_residual_file_name, argv[1],
                                n_obs_actually_loaded, obs, RESIDUAL_FORMAT_PRECISE
                                | RESIDUAL_FORMAT_COMPUTER_FRIENDLY
-                               | RESIDUAL_FORMAT_FOUR_DIGIT_YEARS);
+                               | RESIDUAL_FORMAT_FOUR_DIGIT_YEARS
+                               | RESIDUAL_FORMAT_EXTRA);
                   residual_file_in_config_dir = true;
                   }
                if( !mpec_path)

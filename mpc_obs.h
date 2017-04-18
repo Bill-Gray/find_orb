@@ -240,6 +240,8 @@ int clean_up_find_orb_memory( void);         /* orb_func.cpp */
    if( resid_format & 128),  very low resids are shown in milli,  micro,
                   nano,  or pico-arcsec.  This is just for checking certain
                   roundoff errors;  you'd not normally do this!
+   if( resid_format & 0x100),  residuals are shown with extra digits,  but
+        in 'computer-friendly' (no suffixes,  etc.) form.
 */
 
 #define RESIDUAL_FORMAT_FULL_NO_TABS          0
@@ -253,6 +255,7 @@ int clean_up_find_orb_memory( void);         /* orb_func.cpp */
 #define RESIDUAL_FORMAT_PRECISE            0x40
 #define RESIDUAL_FORMAT_OVERPRECISE        0x80
 #define RESIDUAL_FORMAT_COMPUTER_FRIENDLY  0x100
+#define RESIDUAL_FORMAT_EXTRA              0x200
 
 int write_residuals_to_file( const char *filename, const char *ast_filename,
         const int n_obs, const OBSERVE FAR *obs_data, const int resid_format);

@@ -55,9 +55,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    #include <conio.h>
 BMOUSE global_bmouse;
 #else
-            /* If we're using PDCurses,  I currently use the DLL version.  */
 #if defined( _WIN32)
-   #define PDC_DLL_BUILD
    #ifdef MOUSE_MOVED
       #undef MOUSE_MOVED
    #endif
@@ -1312,7 +1310,7 @@ void show_residuals( const OBSERVE FAR *obs, const int n_obs,
    int n_obs_shown = getmaxy( stdscr) - line_no;
    const int n_mpc_codes = find_mpc_color( mpc_color_codes, NULL);
    const int base_format = (residual_format & 3);
-   char buff[120];
+   char buff[200];
 
    n_stations_shown = (list_codes == SHOW_MPC_CODES_MANY ?
                               n_obs_shown - 3 : n_obs_shown / 3);
@@ -4173,13 +4171,16 @@ int main( const int argc, const char **argv)
          case KEY_F(18):    /* shift-f6 */
             residual_format ^= RESIDUAL_FORMAT_COMPUTER_FRIENDLY;
             break;
+         case '~':
+            residual_format ^= RESIDUAL_FORMAT_EXTRA;
+            break;
          case 9:
          case ALT_A:             case ALT_G:
          case ALT_H: case ALT_I: case ALT_K:
          case ALT_N:
          case ALT_O: case ALT_P: case ALT_Q:
          case ALT_R: case ALT_X: case ALT_Y:
-         case ALT_Z: case '~':   case '\'':
+         case ALT_Z: case '\'':
          default:
             debug_printf( "Key %d hit\n", c);
             show_a_file( "dos_help.txt");
