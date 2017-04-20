@@ -1888,7 +1888,7 @@ static double extract_date_from_mpc_report( const char *buff, unsigned *format)
 
    if( len != 80)             /* check for correct length */
       return( 0.);
-   if( buff[12] != ' ' && buff[12] != '*')
+   if( buff[12] != ' ' && buff[12] != '*' && buff[12] != '-')
       return( 0.);
    if( !is_valid_mpc_code( buff + 77))
       return( 0.);
@@ -3477,13 +3477,13 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
          if( is_rwo && !i && debug_level)
             debug_printf( "Got .rwo data\n");
          }
-      if( ilen >= 92 && buff[82] == '.' && buff[88] == '.')
+      if( ilen >= 90 && buff[82] == '.' && buff[88] == '.')
          {                    /* Possible Tholen-style sigmas:  2F6.3 */
          double sig1, sig2;   /* right after the usual 80 columns */
          int bytes_read;
 
          if( sscanf( buff + 80, "%lf%lf%n", &sig1, &sig2, &bytes_read) >= 2
-                     && bytes_read == 12)
+                     && bytes_read >= 10)
             {
             ilen = 80;
             buff[80] = '\0';
@@ -3672,7 +3672,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                if( rval[i].note2 == 'n')        /* video observations:  assume */
                   rval[i].time_sigma = 0.01 / seconds_per_day;  /* 10ms sigma */
                set_obs_vect( rval + i);
-               if( is_rwo && !rval[i].is_included)
+               if( !rval[i].is_included)
                   rval[i].flags |= OBS_DONT_USE;
                i++;
                }
@@ -4013,7 +4013,7 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
          debug_printf( "After get_neocp_data\n");
       if( iline_len > MINIMUM_RWO_LENGTH)
          rwo_to_mpc( buff, NULL, NULL, NULL, NULL, NULL);
-      if( iline_len >= 92 && buff[82] == '.' && buff[88] == '.')
+      if( iline_len >= 90 && buff[82] == '.' && buff[88] == '.')
          {
          buff[80] = '\0';     /* probably Dave Tholen-style sigmas */
          iline_len = 80;
