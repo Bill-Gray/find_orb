@@ -4310,9 +4310,10 @@ static int get_year_and_mpc_half_month_letter( const double jd, char *letter)
 
    The following function converts those five bytes to human-readable form.
 
-   MPC references are stored as five-digit numbers.  At the current (2012)
-rate,  this should work until sometime around 2018,  when we'll have the
-MPC 100K Bug to fix.
+   MPC references are stored as five-digit numbers.  The dreaded MPC 100K
+bug was triggered on 2016 May 21,  when MPCs 99895-100318 were issued.  MPC
+references past 99999 are now stored as '@' plus four digits.  Note that this
+doesn't buy us much;  we should hit the MPC 110K bug sometime in mid-2018.
 
    MPS references are stored as 'a...z' plus four digits,  allowing 260K
 references.  To get beyond that,  MPC used a tilde (~) followed by four
@@ -4339,6 +4340,8 @@ static void reference_to_text( char *obuff, const char *reference,
       strcpy( obuff, "NEOCP");
    else if( *reference >= '0' && *reference <= '9')
       sprintf( obuff, "MPC %s", reference);
+   else if( *reference == '@')
+      sprintf( obuff, "MPC 10%s", reference + 1);
    else if( *reference >= 'a' && *reference <= 'z')
       sprintf( obuff, "MPS %d%s", *reference - 'a', reference + 1);
    else if( *reference == 'E')
