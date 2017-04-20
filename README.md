@@ -5,13 +5,13 @@
 More about Find_Orb (what it does,  how to use it,  pre-built Windows
 executables) at
 
-http://www.projectpluto.com/find_orb.htm
+https://www.projectpluto.com/find_orb.htm
 
 This project includes code for building Linux,  Windows,  and BSD
 (and possibly OS/X) versions of the interactive Find_Orb orbit
 determination software, the non-interactive `fo` software,  and
 the `fo_serve.cgi` program that underlies the
-[on-line Find_Orb service](http://www.projectpluto.com/fo.htm).  Be
+[on-line Find_Orb service](https://www.projectpluto.com/fo.htm).  Be
 warned,  though, that (at least thus far) only the Linux and
 BSD versions (OS/X is possible,  but untested) can be built with
 what's currently posted.

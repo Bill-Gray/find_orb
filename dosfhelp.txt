@@ -1,7 +1,7 @@
    Les paramtres affichs par ce logiciel sont en gros les mmes que ceux
 affichs par la version Windows, telle que dcrite dans
 
-http://www.projectpluto.com/ffind_orb.htm
+https://www.projectpluto.com/ffind_orb.htm
 
    Les commandes sont trs diffrentes, car elles sont bases uniquement sur
 le clavier:

@@ -50,7 +50,7 @@
 98149   Copyright freeware de Project Pluto (C)1997-2014
 98150   Des mises à jour et des informations sur les autres
 98152   logiciels d'astronomie peuvent être trouvées à:
-98155   http://www.projectpluto.com
+98155   https://www.projectpluto.com
 98179   Version
 
 # ephem

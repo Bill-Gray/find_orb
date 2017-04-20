@@ -51,7 +51,7 @@
 98149   E' un programma gratuito di Project Pluto (c)1997-2014
 98150   Aggiornamenti e informazioni circa altri programmi
 98152   di astronomia si possono trovare su:
-98155   http://www.projectpluto.com
+98155   https://www.projectpluto.com
 98179   Version
 
 # ephem

@@ -50,7 +50,7 @@
 98149   GPL'ed software by Project Pluto (C)1997-2016
 98150   Updates and information about other astronomy
 98152   software can be found at:
-98155   http://www.projectpluto.com
+98155   https://www.projectpluto.com
 98179   Version
 
 # ephem

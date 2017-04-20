@@ -93,7 +93,7 @@ RADAR_d43=430000,17,.94,20,7e-14
    motion biases,  using tables from Farnocchia,  Chesley,  Chamberlin,
    Tholen, _Icarus_ 245 (2015) 94-111,
    http://adsabs.harvard.edu/abs/2015Icar..245...94F  .  See
-   http://www.projectpluto.com/bias.htm for more information.
+   https://www.projectpluto.com/bias.htm for more information.
 SETTINGS2=1 22.00 0 3 0
 
    Note the comments in the above paragraph about FCCT14 debiasing.  By
@@ -208,7 +208,7 @@ IOD_TIMEOUT=20
 
    Find_Orb defaults to looking for the BC405 ephemeris file (orbital elements
    at 40-day intervals for 300 asteroids used in the BC405 theory;  see
-   http://www.projectpluto.com/ast_pert.htm for details) in its configuration
+   https://www.projectpluto.com/ast_pert.htm for details) in its configuration
    directory,  then the local directory.  But using the following line,  you
    can move the 'asteroid_ephemeris.txt' file to a different directory,  and/or
    rename it.

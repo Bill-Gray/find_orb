@@ -193,7 +193,7 @@ The file 'elp82.dat' is missing.  Without\n\
 this file,  lunar positions will be very inaccurate\n\
 and orbits will be somewhat less accurate.  Either\n\
 get the file,  or set up JPL ephemerides.  See\n\
-http://www.projectpluto.com/find_orb.htm#de_eph\n\
+https://www.projectpluto.com/find_orb.htm#de_eph\n\
 for details on how to do this.", "o");
          first_time = 0;
          compute_rough_planet_loc( (jd - J2000) / 36525., 10, vect_2000);
@@ -239,7 +239,7 @@ for details on how to do this.", "o");
 The file 'ps_1996.dat' is missing.  Without it,\n\
 planetary positions will be of low accuracy.  Either\n\
 get the file,  or set up JPL ephemerides.  See\n\
-http://www.projectpluto.com/find_orb.htm#de_eph\n\
+https://www.projectpluto.com/find_orb.htm#de_eph\n\
 for details on how to do this.", "o");
          debug_printf( "Loading ps_1996: rval %d, planet %d, JD %f\n",
                   rval, planet_no, jd);
@@ -643,7 +643,7 @@ int format_jpl_ephemeris_info( char *buff)
    if( !de_version && !jd_start && !jd_end)
       {
       strcpy( buff, "\nNo JPL DE ephemeris file loaded; using (slower) PS1996 series\n");
-      strcat( buff, "See http://www.projectpluto.com/find_orb.htm#de_eph for\n");
+      strcat( buff, "See https://www.projectpluto.com/find_orb.htm#de_eph for\n");
       strcat( buff, "info on how/why to use JPL DE ephemerides\n");
       }
    else

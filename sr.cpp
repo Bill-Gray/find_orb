@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 that much of it is explained a bit in Andrea Milani and Giovanni
 Gronchi's book _The Theory of Orbit Determination_:
 
-http://www.projectpluto.com/books.htm#milani
+https://www.projectpluto.com/books.htm#milani
 
    ...the relevant part appeared originally in:
 

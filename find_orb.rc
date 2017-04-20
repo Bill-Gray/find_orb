@@ -225,7 +225,7 @@ BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC6,25,95,20,20
     CTEXT           "12 Apr 2009",IDC_VERSION_INFO,0,68,185,20
     CTEXT           "astronomical software, at:",IDC_STATIC5,0,40,185,10
-    CTEXT           "http://www.projectpluto.com",IDC_STATIC7,0,55,185,10
+    CTEXT           "https://www.projectpluto.com",IDC_STATIC7,0,55,185,10
 END
 
 IDD_GENERIC_ENTRY DIALOG DISCARDABLE  0, 0, 186, 63

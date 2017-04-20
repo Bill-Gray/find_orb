@@ -3,7 +3,7 @@
    The parameters shown in this software are basically the same as those
 shown in the Windows software,  as described at
 
-http://www.projectpluto.com/find_orb.htm
+https://www.projectpluto.com/find_orb.htm
 
    Commands are very different,  because they are all keyboard based (but
 you can do a few minor things with the mouse;  see end of this text.)
@@ -34,9 +34,9 @@ g      Determine orbit with method of Gauss.  (There may be alternative
          the changes in the orbital elements,  and you get an idea of the
          level of uncertainty.  (Elements will also be stored in 'mpcorb.dat'.)
 :      'Linearizes' the orbit,  as described at:
-         http://www.projectpluto.com/vaisala.htm#linearized
+         https://www.projectpluto.com/vaisala.htm#linearized
 #      Uses a downhill simplex method,  as described at
-         http://www.projectpluto.com/herget.htm#simplex
+         https://www.projectpluto.com/herget.htm#simplex
 /      Uses a downhill 'superplex' method,  as described at the above URL.
 Backspace   Undo the last orbit-fitting command.
 F12    Find a circular orbit connecting the first and last positions.  Hit
