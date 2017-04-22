@@ -238,3 +238,10 @@ FIELD_MAG_LIMIT=23
    A value of 1 means "show only measured images";  2="show only unmeasured";
    0 or blank means "show all images".
 FIELD_INCLUSION=0
+
+   Set the following COMBINE_ALL parameter to any non-blank value,  and all
+   observations in a file will be loaded as if they were of a single object.
+   This can be convenient when you're checking a linkage,  for example;  you
+   can compute an orbit based on all the observations without having to
+   change the designations to all be the same.
+COMBINE_ALL=
