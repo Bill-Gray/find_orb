@@ -42,27 +42,56 @@
 99144   Impostazioni...
 99145   &Toggle Obs
 99146   Set Sigma(s)
+99179   (Will fill in Find_Orb & DE version info)
 99180   All Perturbers On
 99001   Exit
 
 # about
 98000   Informazioni su FIND_ORB
-98153   FIND_ORB PROGRAMMA PER IL CALCOLO ORBITALE
 98149   E' un programma gratuito di Project Pluto (c)1997-2014
 98150   Aggiornamenti e informazioni circa altri programmi
 98152   di astronomia si possono trovare su:
+98153   FIND_ORB PROGRAMMA PER IL CALCOLO ORBITALE
 98155   https://www.projectpluto.com
 98179   Version
 
 # ephem
 97000   Calcola l'effemeride
-97147   &Calcola
+97001   &Done
 97129   &Salva
-97153   Giorno
+97147   &Calcola
+97148   &Pseudo-MPEC
+97149   Paste to &Clipboard
+97150   &Now
 97151   N. passi:
 97152   Passo di
+97153   Giorno
 97154   Latitud.
 97155   Longitud.
+97175   Show &Motion details
+97176   Show &Alt/az
+97182   &Radial velocity
+97183   &Phase angle
+97184   S&eparate motions
+97185   Phase angle &bisector
+97186   &Heliocentric ecliptic
+97187   &Topocentric ecliptic
+97188   Ro&und to nearest step
+97189   Ground track
+97192   S&uppress unobserables
+97193   &Visibility indicators
+97194   Ephem u&ncertainty
+97195   Human-readable output
+97196   Speed
+97199   Latitude
+97200   &Observables
+97201   State &vectors
+97202   Car&tesian coords
+97203   MP&CORB elements
+97204   &8-line elements
+97205   C&lose approaches
+97206   MPC code
+96999   Suppress output below mag:
 
 # settings
 96000   Impostazioni
@@ -74,6 +103,8 @@
 96173   Solo orbite eliocentriche
 96001   OK
 96002   &Annulla
+
+#ephemeris
 
 # messages
 1       Nessuna orbita da ottimizzare!
@@ -98,6 +129,11 @@
 20      All preceding observations toggled
 21      All Perturbers On
 22      All Perturbers Off
+
+900     English
+901     French
+902     Italian
+903     Russian
 
 # months
 1000    Gen
