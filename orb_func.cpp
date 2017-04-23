@@ -168,6 +168,11 @@ int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
                                    const char *format, ...);
 double improve_along_lov( double *orbit, const double epoch, const double *lov,
           const unsigned n_params, const unsigned n_obs, OBSERVE *obs);
+void adjust_error_ellipse_for_timing_error( double *sigma_a, double *sigma_b,
+         double *angle, const double vx, const double vy);   /* errors.cpp */
+void compute_error_ellipse_adjusted_for_motion( double *sigma1, double *sigma2,
+                  double *posn_angle, const OBSERVE *obs,
+                  const MOTION_DETAILS *m);                  /* orb_func.cpp */
 
 void set_distance( OBSERVE FAR *obs, double r)
 {
@@ -2267,7 +2272,27 @@ to adjust that,  under our model that timing errors don't affect cross-track
 residuals.  But during four seconds,  the object would move 2.4";  that would
 be our 'timing_err'.  Added in quadrature,  that would mean that the total
 along-track error would be sqrt( 0.7^2 + 2.4^2) = 2".5 (values carefully chosen
-to produce an exact result).        */
+to produce an exact result).
+
+   That sort of example,  with a circular uncertainty stretched out into an
+ellipse,  is straightforward.  If the existing uncertainty is already
+elliptical,  stretching _that_ out is more complex;  see 'errors.cpp'. */
+
+void compute_error_ellipse_adjusted_for_motion( double *sigma1, double *sigma2,
+                  double *posn_angle, const OBSERVE *obs,
+                  const MOTION_DETAILS *m)
+{
+   const double timing_err_in_minutes = obs->time_sigma * minutes_per_day;
+   const double dy =  timing_err_in_minutes * m->ra_motion;
+   const double dx =  timing_err_in_minutes * m->dec_motion;
+         /* (dx, dy) = motion of object over obs->time_sigma, in arcsec */
+
+   *sigma1 = obs->posn_sigma_1;    /* start with "non-moving" error ellipse */
+   *sigma2 = obs->posn_sigma_2;
+   *posn_angle = obs->posn_sigma_theta;
+   adjust_error_ellipse_for_timing_error( sigma1, sigma2, posn_angle,
+                  dx, dy);
+}
 
 int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid)
 {
@@ -2295,36 +2320,18 @@ int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid)
       else
          {
          MOTION_DETAILS m;
+         double sigma_1, sigma_2, tilt;
+         double cos_tilt, sin_tilt;
 
          compute_observation_motion_details( obs, &m);
-         if( obs->posn_sigma_1 != obs->posn_sigma_2)
-            {
-            const double cos_tilt = cos( obs->posn_sigma_theta);
-            const double sin_tilt = sin( obs->posn_sigma_theta);
-
-            *xresid = (cos_tilt * m.xresid - sin_tilt * m.yresid);
-            *xresid /= obs->posn_sigma_1;
-            *yresid = (sin_tilt * m.xresid + cos_tilt * m.yresid);
-            *yresid /= obs->posn_sigma_2;
-            }
-         else        /* if it's a circular error ellipse,  include timing err */
-            {
-            double arcsec_per_second, timing_err, along_track_sigma;
-            const double timing_err_in_seconds = obs->time_sigma * seconds_per_day;
-
-            *xresid = m.cross_residual / obs->posn_sigma_1;
-            *yresid = m.time_residual * m.total_motion / 60.;
-                     /* *yresid is now along-track residual in arcseconds */
-            arcsec_per_second = m.total_motion / 60.;
-            timing_err = timing_err_in_seconds * arcsec_per_second;
-            along_track_sigma =
-                  sqrt( obs->posn_sigma_1 * obs->posn_sigma_1 + timing_err * timing_err);
-
-//          debug_printf( "%f (%s): resids %f/%f, %f/%f: %f %f\n",
-//                   obs->jd, obs->mpc_code, m.cross_residual, obs->posn_sigma_1,
-//                   *yresid, along_track_sigma, timing_err, arcsec_per_second);
-            *yresid /= along_track_sigma;               /* ...now it's in sigmas */
-            }
+         compute_error_ellipse_adjusted_for_motion( &sigma_1, &sigma_2,
+                  &tilt, obs, &m);
+         cos_tilt = cos( tilt);
+         sin_tilt = sin( tilt);
+         *xresid = (cos_tilt * m.xresid - sin_tilt * m.yresid);
+         *xresid /= sigma_1;
+         *yresid = (sin_tilt * m.xresid + cos_tilt * m.yresid);
+         *yresid /= sigma_2;
          n_residuals = 2;
          }
       }
