@@ -96,6 +96,11 @@ int snprintf( char *string, const size_t max_len, const char *format, ...);
 int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
                                    const char *format, ...);
 char *mpc_station_name( char *station_data);       /* mpc_obs.cpp */
+#ifdef ERROR_ELLIPSE_INFO
+void compute_error_ellipse_adjusted_for_motion( double *sigma1, double *sigma2,
+                  double *posn_angle, const OBSERVE *obs,
+                  const MOTION_DETAILS *m);                  /* orb_func.cpp */
+#endif
 
 int debug_printf( const char *format, ...)
 {
@@ -4645,6 +4650,16 @@ static int generate_observation_text( const OBSERVE FAR *optr,
                                            ra_motion_buff, dec_motion_buff);
             buff += strlen( buff);
 
+#ifdef ERROR_ELLIPSE_INFO
+               {
+               double sig1, sig2, tilt;
+
+               compute_error_ellipse_adjusted_for_motion( &sig1, &sig2, &tilt,
+                              optr, &m);
+               snprintf_append( buff, 90, " %.3fx%.3f PA %.2f\n",
+                         sig1, sig2, tilt * 180. / PI);
+               }
+#else
             if( fabs( m.time_residual) < .999)
                {
                sprintf( buff, "%.3f sec", fabs( m.time_residual));
@@ -4660,6 +4675,7 @@ static int generate_observation_text( const OBSERVE FAR *optr,
                sprintf( buff, "%d hr", (int)( m.time_residual / 3600.));
             else
                strcpy( buff, "!!!!");
+#endif
             }
          break;
       case 1:
@@ -4923,7 +4939,7 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff)
       mean_yresid /= (double)n_selected;
       mean_xresid2 /= (double)n_selected;
       mean_yresid2 /= (double)n_selected;
-      sprintf( buff + strlen( buff), "Mean RA residual %.2f +/- %.2f; dec %.2f +/- %.2f\n",
+      sprintf( buff + strlen( buff), "Mean RA residual %.3f +/- %.3f; dec %.3f +/- %.3f\n",
              mean_xresid, sqrt( mean_xresid2 - mean_xresid * mean_xresid),
              mean_yresid, sqrt( mean_yresid2 - mean_yresid * mean_yresid));
       n_lines++;
@@ -4937,10 +4953,10 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff)
          dist *= 180. / PI;      /* cvt radians to degrees */
          delta_time = optr2->jd - optr1->jd;
 
-         sprintf( buff + strlen( buff), "Observations are %.1f\" = %.2f' = %.3f degrees apart\n",
+         sprintf( buff + strlen( buff), "Observations are %.2f\" = %.2f' = %.3f degrees apart\n",
                dist * 3600., dist * 60., dist);
          if( fabs( delta_time) < 1.)
-            sprintf( buff + strlen( buff), "Time diff: %.1f sec = %.2f min = %.3f hrs\n",
+            sprintf( buff + strlen( buff), "Time diff: %.2f sec = %.2f min = %.3f hrs\n",
                      delta_time * seconds_per_day,
                      delta_time * minutes_per_day,
                      delta_time * hours_per_day);
@@ -4951,9 +4967,9 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff)
          dist *= 60. / 24.;      /* then convert to '/hr */
                            /* Dunno how the PA got flipped,  but it did: */
          posn_ang = 2. * PI - posn_ang;
-         sprintf( buff + strlen( buff), "Motion: %.1f'/hr in RA, %.1f'/hr in dec",
+         sprintf( buff + strlen( buff), "Motion: %.2f'/hr in RA, %.2f'/hr in dec",
                   dist * sin( posn_ang), dist * cos( posn_ang));
-         sprintf( buff + strlen( buff), " (total %.1f'/hr at PA %.1f)\n",
+         sprintf( buff + strlen( buff), " (total %.2f'/hr at PA %.1f)\n",
                   dist, posn_ang * 180. / PI);
          n_lines += 3;
          }
