@@ -1,6 +1,8 @@
 #include <math.h>
+#ifdef TEST_CODE
 #include <stdio.h>
 #include <stdlib.h>
+#endif          /* #ifdef TEST_CODE */
 
 #define PI 3.1415926535897932384626433832795028841971693993751058209749445923
 
@@ -134,6 +136,9 @@ of the following.)
    ...i.e.,  we have reduced it to a new quadratic form/covariance matrix.
 */
 
+void adjust_error_ellipse_for_timing_error( double *sigma_a, double *sigma_b,
+         double *angle, const double vx, const double vy);   /* errors.cpp */
+
 static void adjust_quadratic_form_for_timing_error( const double A,
          const double B, const double C, const double vx, const double vy,
          double *A1, double *B1, double *C1)
@@ -142,12 +147,14 @@ static void adjust_quadratic_form_for_timing_error( const double A,
    const double Fx = A * vx + B * vy;
    const double Fy = C * vy + B * vx;
 
-   printf( "E = %f; Fx = %f; Fy = %f\n", E, Fx, Fy);
-   printf( "Bits: %f %f %f\n", Fx * Fx / E, Fx * Fy / E, Fy * Fy / E);
    *A1 = A - Fx * Fx / E;
    *B1 = B - Fx * Fy / E;
    *C1 = C - Fy * Fy / E;
+#ifdef TEST_CODE
+   printf( "E = %f; Fx = %f; Fy = %f\n", E, Fx, Fy);
+   printf( "Bits: %f %f %f\n", Fx * Fx / E, Fx * Fy / E, Fy * Fy / E);
    printf( "Results: %f %f %f\n", *A1, *B1, *C1);
+#endif          /* #ifdef TEST_CODE */
 }
 
 static void convert_error_ellipse_to_quadratic_form( const double a,
@@ -179,12 +186,37 @@ static void convert_quadratic_form_to_error_ellipse( const double A,
    const double eigenval2 = (A + C - tval) * .5;
    const double eigenval1 = (A * C - B * B) / eigenval2;
 
+#ifdef TEST_CODE
    printf( "Eigenvals %f %f\n", eigenval1, eigenval2);
+#endif          /* #ifdef TEST_CODE */
    *a = 1. / sqrt( -eigenval1);
    *b = 1. / sqrt( -eigenval2);
    *angle = atan2( eigenval1 - A, B);
 }
 
+/* adjust_error_ellipse_for_timing_error( ) puts the above pieces
+together to do the only thing that matters from the viewpoint of
+Find_Orb:  given the estimated error ellipse and the uncertainty
+vector from timing,  it computes an adjusted error ellipse "stretched
+out" in the direction of motion.   */
+
+void adjust_error_ellipse_for_timing_error( double *sigma_a, double *sigma_b,
+         double *angle, const double vx, const double vy)
+{
+   double A, B, C;
+   double A1, B1, C1;
+
+   convert_error_ellipse_to_quadratic_form( *sigma_a,
+               *sigma_b, *angle, &A, &B, &C);
+
+   adjust_quadratic_form_for_timing_error( A, B, C, vx, vy,
+                  &A1, &B1, &C1);
+   convert_quadratic_form_to_error_ellipse( A1, B1, C1,
+                 sigma_a, sigma_b, angle);
+}
+
+
+#ifdef TEST_CODE
 int main( const int argc, const char **argv)
 {
    const double sigma_a = atof( argv[1]);
@@ -215,3 +247,4 @@ int main( const int argc, const char **argv)
       }
    return( 0);
 }
+#endif          /* #ifdef TEST_CODE */
