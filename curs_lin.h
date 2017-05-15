@@ -39,6 +39,8 @@
 
 #define ALT_COMMA     (ALT_BASE + ',')
 #define ALT_STOP      (ALT_BASE + '.')
+
+#ifdef OLD_VALUES_SEE_COMMENT_BELOW
 #define CTL_PGUP      0x22a
 #define CTL_PGDN      0x225
 #define CTL_RIGHT     0x22f
@@ -57,3 +59,40 @@
 // #define CTL_PGUP      (ALT_BASE + 259)
 // #define CTL_PGDN      (ALT_BASE + 260)
 // #define CTL_DEL       (ALT_BASE + 261)
+
+#define CTL_PAD2     0x020c
+#define CTL_PAD3     0x0225
+#define CTL_PAD4     0x0220
+#define CTL_PAD6     0x022f
+#define CTL_PAD8     0x0235
+#define CTL_PAD9     0x022a
+      /*  CTL_PAD1, 5, 7 all map to 0x105B and can't be distinguished */
+#endif
+
+/* 2016 Jul 31:  after upgrading from Xubuntu 14.04 to 16.04,  some key
+code changed.  CTL_PGUP and CTL_PGDN no longer are recognized by ncurses.
+The following values got bumped up by one.  I don't have a good solution
+to this at present;  it appears,  at least,  as if ncurses does not have a
+good way of describing which of these keys has been hit,  and one has to
+have version-specific code.  My regard for the developers of ncurses is
+such that I doubt they did something that dumb;  this is probably
+something I've just not figured out yet.      */
+
+#define CTL_RIGHT     0x230
+#define CTL_LEFT      0x221
+#define CTL_UP        0x236
+#define CTL_DN        0x20d
+#define CTL_DEL       0x207
+#define ALT_PGUP      0x229
+#define ALT_PGDN      0x224
+#define ALT_RIGHT     0x22e
+#define ALT_LEFT      0x21f
+#define ALT_UP        0x234
+#define ALT_DN        0x20b
+
+#define CTL_PAD2     0x020d
+#define CTL_PAD3     0x0226
+#define CTL_PAD4     0x0221
+#define CTL_PAD6     0x0230
+#define CTL_PAD8     0x0236
+#define CTL_PAD9     0x022b
