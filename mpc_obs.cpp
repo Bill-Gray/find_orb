@@ -96,6 +96,7 @@ int snprintf( char *string, const size_t max_len, const char *format, ...);
 int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
                                    const char *format, ...);
 char *mpc_station_name( char *station_data);       /* mpc_obs.cpp */
+int get_object_name( char *obuff, const char *packed_desig);   /* mpc_obs.c */
 #ifdef ERROR_ELLIPSE_INFO
 void compute_error_ellipse_adjusted_for_motion( double *sigma1, double *sigma2,
                   double *posn_angle, const OBSERVE *obs,
@@ -1357,6 +1358,20 @@ static bool try_artsat_xdesig( char *name, const char *filename)
    return( found_a_match);
 }
 
+/* Looks for designations of the form YYYY-NNN(letter).  */
+
+static int is_artsat_desig( const char *desig)
+{
+   size_t slen;
+
+   for( slen = strlen( desig); slen > 8; desig++, slen--)
+      if( desig[4] == '-' && atoi( desig) > 1956 && atoi( desig) < 2100
+               && isdigit( desig[5]) && isdigit( desig[6])
+               && isdigit( desig[7]) && isupper( desig[8]))
+         return( 1);
+   return( 0);
+}
+
 /* In an MPC astrometric report line,  the name can be stored in assorted
    highly scrambled and non-intuitive ways.  Those ways _are_ documented
    on the MPC Web site,  which is probably the best place to look to
@@ -1367,10 +1382,14 @@ static bool try_artsat_xdesig( char *name, const char *filename)
    Return values are as follows.  Note that 'other' includes artsats and
    temporary designations.        */
 
-#define OBJ_DESIG_ASTEROID   0
-#define OBJ_DESIG_COMET      1
-#define OBJ_DESIG_NATSAT     2
-#define OBJ_DESIG_OTHER     -1
+#define OBJ_DESIG_ASTEROID_PROVISIONAL   0
+#define OBJ_DESIG_ASTEROID_NUMBERED      1
+#define OBJ_DESIG_COMET_PROVISIONAL      2
+#define OBJ_DESIG_COMET_NUMBERED         3
+#define OBJ_DESIG_NATSAT_PROVISIONAL     4
+#define OBJ_DESIG_NATSAT_NUMBERED        5
+#define OBJ_DESIG_ARTSAT                 6
+#define OBJ_DESIG_OTHER                 -1
 
 int get_object_name( char *obuff, const char *packed_desig)
 {
@@ -1410,7 +1429,9 @@ int get_object_name( char *obuff, const char *packed_desig)
             if( !compare)
                {
                strcpy( obuff, extra_names[i] + 13);
-               return( 0);
+               if( is_artsat_desig( obuff))
+                  return( OBJ_DESIG_ARTSAT);
+               return( get_object_name( NULL, packed_desig));
                }
             }
 
@@ -1445,7 +1466,7 @@ int get_object_name( char *obuff, const char *packed_desig)
             if( obj_number % 10)
                strcat( obuff, roman_digits[obj_number % 10]);
             }
-         rval = OBJ_DESIG_NATSAT;
+         rval = OBJ_DESIG_NATSAT_NUMBERED;
          }
       else if( strchr( "MVEJSUNP", xdesig[8]) && isdigit( xdesig[6])
                && isdigit( xdesig[7]) && isdigit( xdesig[9])
@@ -1472,7 +1493,7 @@ int get_object_name( char *obuff, const char *packed_desig)
                obuff[10] = '\0';
                }
             }
-         rval = OBJ_DESIG_NATSAT;
+         rval = OBJ_DESIG_NATSAT_PROVISIONAL;
          }
       }
    unpack_provisional_packed_desig( provisional_desig, xdesig + 5);
@@ -1491,7 +1512,7 @@ int get_object_name( char *obuff, const char *packed_desig)
          if( number >= 0)
             {
             number = number * 10000L + atol( xdesig + 1);
-            rval = OBJ_DESIG_ASTEROID;
+            rval = OBJ_DESIG_ASTEROID_NUMBERED;
             if( obuff)
                {
                sprintf( obuff, "(%d)", number);
@@ -1527,7 +1548,7 @@ int get_object_name( char *obuff, const char *packed_desig)
             sprintf( tbuff, "%3d%c/", atoi( xdesig), xdesig[4]);
             try_adding_comet_name( tbuff, obuff);
             }
-         rval = OBJ_DESIG_COMET;
+         rval = OBJ_DESIG_COMET_NUMBERED;
          }
       }
 
@@ -1540,7 +1561,8 @@ int get_object_name( char *obuff, const char *packed_desig)
          *obuff++ = '/';
          }
       if( !unpack_provisional_packed_desig( obuff, xdesig + 5))
-         rval = (xdesig[4] != ' ');
+         rval = ((xdesig[4] == ' ') ? OBJ_DESIG_ASTEROID_PROVISIONAL
+                                    : OBJ_DESIG_COMET_PROVISIONAL);
       if( rval != OBJ_DESIG_OTHER && xdesig[4] != ' ' && obuff)
          {
          char tbuff[40];
@@ -1586,9 +1608,13 @@ int get_object_name( char *obuff, const char *packed_desig)
       memcpy( obuff, xdesig + i, 12 - i);
       obuff[12 - i] = '\0';
       remove_trailing_cr_lf( obuff);      /* ephem0.cpp */
-      if( atoi( obuff) > 1956 && atoi( obuff) < 2100)    /* possible artsat */
-         if( obuff[4] == '-' && atoi( obuff + 5))
-            try_artsat_xdesig( obuff, "all_tle.txt");
+      }
+
+   if( rval == OBJ_DESIG_OTHER && is_artsat_desig( packed_desig))
+      {
+      rval = OBJ_DESIG_ARTSAT;
+      if( obuff)
+         try_artsat_xdesig( obuff, "all_tle.txt");
       }
    return( rval);
 }
@@ -2046,6 +2072,7 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
    const double saved_ra_bias = obs->ra_bias;
    const double saved_dec_bias = obs->dec_bias;
    double coord_epoch = input_coordinate_epoch;
+   int obj_desig_type;
 
    if( !utc)
       return( -1);
@@ -2056,7 +2083,9 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
    obs->ra_bias = saved_ra_bias;
    obs->dec_bias = saved_dec_bias;
    obs->packed_id[12] = '\0';
-   if( get_object_name( NULL, obs->packed_id) == OBJ_DESIG_COMET)
+   obj_desig_type = get_object_name( NULL, obs->packed_id);
+   if( obj_desig_type == OBJ_DESIG_COMET_PROVISIONAL
+         || obj_desig_type == OBJ_DESIG_COMET_NUMBERED)
       object_type = OBJECT_TYPE_COMET;
    if( override_time)
       {
