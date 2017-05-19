@@ -293,3 +293,77 @@ int get_sr_orbits( double *orbits, OBSERVE FAR *obs,
                const unsigned max_orbits, const double max_time,
                const double noise_in_sigmas);            /* orb_func.cpp */
 
+/* For a 'classical' Herget,  we fit two parameters: R1 and R2,  assuming that they
+   have zero residuals.
+   For an 'extended' Herget,  it's six parameters: R1, R2,  deltaRAs and delta_decs
+   (the residuals for those two observations).
+   For an 'adjustment',  four params:  just the deltaRAs and delta_decs.
+   For a traditional Vaisala,  no parameters (q/Q is fed),  then 'adjustment' is
+      done to get a minimum chi-squared.
+   For a parabolic orbit at fixed distance,  four parameters (deltaRAs and delta_decs)
+      are fitted,  with the second distance changed using Euler's relationship.  So it
+      can be just a tweaked version of the 'adjustment'.
+   For a best-fit parabolic orbit,  the distance at first observation is a fifth
+      parameter.
+   NOTE that not all of these possible fits are implemented yet!
+
+   The last hex digit gives the number of parameters;  preceding digit
+   gives the fit type.  For a "full" fit,  four parameters are added:  offsets
+   in RA and dec for two observations.  Thus,  FIT_CLASSIC_HERGET fits just two
+   parameters:  distances as of two observations.  FIT_HERGET_FULL fits those
+   _and_ the four offset parameters (so it ends up as being a plain-vanilla
+   unconstrained six-parameter fit.)   */
+
+#define FIT_CLASSIC_HERGET          0x12
+#define FIT_HERGET_FULL             0x16
+
+/* You can call find_parameterized_orbit() with params = NULL and
+   parameter_type == FIT_NOTHING.  In that case,  we fall through a lot
+   of code and end up just getting the orbit connecting obs1 to obs2. */
+
+#define FIT_NOTHING                 0x00
+
+/* The following leaves the distances to the two observations unchanged.
+   The result is almost identical to that from the 'linearizing' trick
+   I've long applied to Herget orbits to distribute the residuals among
+   all observations. */
+#define FIT_FIXED_DISTANCES         0x24
+
+/* A plain vanilla FIT_VAISALA has one parameter,  q/Q,  and the assumption
+   that the two observations are "perfect".  FIT_VAISALA_FULL also adjusts
+   those two observations,  adding four more parameters as described above,
+   to distribute the residual error among all observations. */
+
+#define FIT_VAISALA                 0x31
+#define FIT_VAISALA_FULL            0x35
+
+/* There are two possible parabolic orbit fits for a given distance,
+one headed "toward" you and one "away" from you.  (I know this is always
+the case when the orbital arc is far enough from the sun,  but haven't
+been able to mathematically prove (yet) that it is true near the sun...
+which may turn out to matter for sungrazers.  Also note that I'm only
+considering orbits where the transfer orbit between the two observations
+does not include the sun:  i.e.,  the change in true anomaly is between
+-180 and +180 degrees.)  */
+
+#define FIT_PARABOLIC1              0x41
+#define FIT_PARABOLIC1_FULL         0x45
+#define FIT_PARABOLIC2              0x51
+#define FIT_PARABOLIC2_FULL         0x55
+
+/* If you're fitting a parabolic orbit,  but with the initial distance
+fixed,  you have one less parameter.  (In the "non-full" cases,  you
+have no parameters to fit at all:  the distance to the first observation,
+and the direction to the second,  completely specify the orbit.) */
+
+#define FIT_PARABOLIC1_FIXED        0x60
+#define FIT_PARABOLIC1_FIXED_FULL   0x65
+#define FIT_PARABOLIC2_FIXED        0x70
+#define FIT_PARABOLIC2_FIXED_FULL   0x74
+
+/* Dunno if we'll actually do this,  but... we _could_ fit circular orbits.
+To do so,  we'd apply the four RA/dec offset parameters,  then find the
+circular orbit connecting the two resulting adjusted observations.  (Or
+some other set of four parameters.)    */
+
+// #define FIT_CIRCULAR_ORBIT          0x?4

@@ -166,6 +166,7 @@ double find_epoch_shown( const OBSERVE *obs, const int n_obs); /* elem_out */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
                                    const char *format, ...);
+void set_obs_vect( OBSERVE FAR *obs);        /* mpc_obs.h */
 double improve_along_lov( double *orbit, const double epoch, const double *lov,
           const unsigned n_params, const unsigned n_obs, OBSERVE *obs);
 void adjust_error_ellipse_for_timing_error( double *sigma_a, double *sigma_b,
@@ -1028,6 +1029,71 @@ static int find_transfer_orbit( double *orbit, OBSERVE FAR *obs1,
    return( XFER_OK);
 }
 
+static int find_parameterized_orbit( double *orbit, const double *params,
+                OBSERVE obs1, OBSERVE obs2, const unsigned parameter_type,
+                const int already_have_approximate_orbit)
+{
+   const double *ra_dec_offsets = NULL;
+   int rval;
+
+   switch( parameter_type)
+      {
+      case FIT_CLASSIC_HERGET:
+      case FIT_HERGET_FULL:
+         obs1.r *= 1. + params[0] * 100.;
+         obs2.r *= 1. + params[1] * 100.;
+         if( parameter_type == FIT_HERGET_FULL)
+            ra_dec_offsets = params + 2;
+         break;
+      case FIT_FIXED_DISTANCES:
+         ra_dec_offsets = params;
+         break;
+      case FIT_VAISALA_FULL:
+         ra_dec_offsets = params + 1;
+         break;
+               /* figure out parabolics & circulars later */
+      default:
+         break;
+      }
+   if( ra_dec_offsets)
+      {
+      obs1.ra += *ra_dec_offsets++;
+      obs1.dec += *ra_dec_offsets++;
+      set_obs_vect( &obs1);
+      obs2.ra  += *ra_dec_offsets++;
+      obs2.dec += *ra_dec_offsets++;
+      set_obs_vect( &obs2);
+      }
+   switch( parameter_type)
+      {
+      case FIT_VAISALA:
+      case FIT_VAISALA_FULL:
+         obs1.solar_r *= 1. + params[0] * 100.;
+         obs1.r = find_r_given_solar_r( &obs1, obs1.solar_r);
+         obs2.r = find_r_given_solar_r( &obs2, obs1.solar_r);
+         break;
+      default:
+         break;
+      }
+   set_distance( &obs1, obs1.r);
+   set_distance( &obs2, obs2.r);
+   rval = find_transfer_orbit(  orbit, &obs1, &obs2,
+                          already_have_approximate_orbit);
+   return( rval);
+}
+
+int find_vaisala_orbit( double *orbit, const OBSERVE *obs1,
+                     const OBSERVE *obs2, const double solar_r)
+{
+   double ignored_params[1];
+   OBSERVE tobs = *obs1;
+
+   ignored_params[0] = 0.;
+   tobs.solar_r = solar_r;
+   return( find_parameterized_orbit( orbit, ignored_params,
+               tobs, *obs2, FIT_VAISALA, 0));
+}
+
 int drop_excluded_obs( OBSERVE *obs, int *n_obs)
 {
    int rval = 0;
@@ -1040,6 +1106,81 @@ int drop_excluded_obs( OBSERVE *obs, int *n_obs)
       }
    while( *n_obs && !obs[*n_obs - 1].is_included)   /* skip excluded obs at */
       (*n_obs)--;                                   /* end of arc */
+   return( rval);
+}
+
+int extended_orbit_fit( double *orbit, OBSERVE *obs, int n_obs,
+                  const unsigned fit_type, double epoch)
+{
+   int i, j, rval = 0, n_resids;
+   const int n_params = (int)( fit_type & 0xf);
+   double orbit_at_epoch[6];
+   void *lsquare = lsquare_init( n_params);
+   double *resids, *slopes;
+   double params[10];
+   const double delta_val = 1e-6;
+   const OBSERVE obs1 = obs[0], obs2 = obs[n_obs - 1];
+
+   obs += drop_excluded_obs( obs, &n_obs);
+   n_resids = 2 * n_obs + MAX_CONSTRAINTS;
+   resids = (double *)calloc( n_resids * (n_params + 1), sizeof( double));
+   slopes = resids + n_resids;
+   for( i = -1; i < n_params; i++)
+      {
+      for( j = 0; j < n_params; j++)
+         params[j] = 0.;
+      if( i >= 0)
+         params[i] = -delta_val;
+      rval = find_parameterized_orbit( orbit, params, obs1, obs2,
+                     fit_type, 0);
+      if( rval)
+         printf( "Iter %d, rval %d\n", i, rval);
+      set_locs_extended( orbit, obs1.jd, obs, n_obs, epoch, orbit_at_epoch);
+      for( j = 0; j < n_obs; j++)
+         if( obs[j].is_included)
+            {
+            double dx, dy;
+
+            get_residual_data( obs + j, &dx, &dy);
+            printf( "Resids: obs %d, param %d, %f %f\n", j, i, dx, dy);
+            if( i == -1)
+               {
+               resids[j + j] = dx;
+               resids[j + j + 1] = dy;
+               }
+            else
+               {
+               dx -= resids[j + j];
+               dy -= resids[j + j + 1];
+               slopes[(j + j    ) * n_params + i] = dx / delta_val;
+               slopes[(j + j + 1) * n_params + i] = dy / delta_val;
+               }
+            }
+      }
+
+   lsquare = lsquare_init( n_params);
+   assert( lsquare);
+   for( i = 0; i < n_obs; i++)
+      if( obs[i].is_included)
+         {
+         double weight = 1.;
+
+         for( j = i + i; j < i + i + 2; j++)
+            lsquare_add_observation( lsquare, resids[j], weight, slopes + j * n_params);
+         }
+
+   free( resids);
+   lsquare_solve( lsquare, params);
+   for( i = 0; i < n_params; i++)
+      printf( "Param %d: %.9f\n", i, params[i]);
+   lsquare_free( lsquare);
+   rval = find_parameterized_orbit( orbit, params, obs1, obs2,
+                     fit_type, 0);
+   if( rval)
+      printf( "Final failure: %d\n", rval);
+   set_locs_extended( orbit, obs1.jd, obs, n_obs, epoch, orbit_at_epoch);
+            /* Except we really want to return the orbit at epoch : */
+   memcpy( orbit_at_epoch, orbit, 6 * sizeof( double));
    return( rval);
 }
 
@@ -1501,8 +1642,6 @@ static OBSERVE *get_real_arc( OBSERVE *obs, int *n_obs,
 }
 
 #define RAD2SEC (180. * 3600. / PI)
-
-void set_obs_vect( OBSERVE FAR *obs);        /* mpc_obs.h */
 
 int adjust_herget_results( OBSERVE FAR *obs, int n_obs, double *orbit)
 {
