@@ -1,4 +1,4 @@
-   Version date: 2015 Jun 6
+   Version date: 2017 May 26
 
    The parameters shown in this software are basically the same as those
 shown in the Windows software,  as described at
@@ -298,14 +298,23 @@ prediction, positive x _east_ of prediction.
 
 New moon dates for the next few years :
 
- 3 Dec 2013    23 Oct 2014    13 Sep 2015     2 Aug 2016
- 1 Jan 2014    22 Nov 2014    13 Oct 2015     1 Sep 2016
-30 Jan 2014    22 Dec 2014    11 Nov 2015     1 Oct 2016
- 1 Mar 2014    20 Jan 2015    11 Dec 2015    30 Oct 2016
-30 Mar 2014    18 Feb 2015    10 Jan 2016    29 Nov 2016
-29 Apr 2014    20 Mar 2015     8 Feb 2016    29 Dec 2016
-28 May 2014    18 Apr 2015     9 Mar 2016    28 Jan 2017
-27 Jun 2014    18 May 2015     7 Apr 2016    26 Feb 2017
-26 Jul 2014    16 Jun 2015     6 May 2016    28 Mar 2017
-25 Aug 2014    16 Jul 2015     5 Jun 2016    26 Apr 2017
-24 Sep 2014    14 Aug 2015     4 Jul 2016    25 May 2017
+2016 May  6     2017 Dec 18     2019 Aug  1     2021 Mar 13     2022 Oct 25
+2016 Jun  5     2018 Jan 17     2019 Aug 30     2021 Apr 12     2022 Nov 23
+2016 Jul  4     2018 Feb 15     2019 Sep 28     2021 May 11     2022 Dec 23
+2016 Aug  2     2018 Mar 17     2019 Oct 28     2021 Jun 10     2023 Jan 21
+2016 Sep  1     2018 Apr 16     2019 Nov 26     2021 Jul 10     2023 Feb 20
+2016 Oct  1     2018 May 15     2019 Dec 26     2021 Aug  8     2023 Mar 21
+2016 Oct 30     2018 Jun 13     2020 Jan 24     2021 Sep  7     2023 Apr 20
+2016 Nov 29     2018 Jul 13     2020 Feb 23     2021 Oct  6     2023 May 19
+2016 Dec 29     2018 Aug 11     2020 Mar 24     2021 Nov  4     2023 Jun 18
+2017 Jan 28     2018 Sep  9     2020 Apr 23     2021 Dec  4     2023 Jul 17
+2017 Feb 26     2018 Oct  9     2020 May 22     2022 Jan  2     2023 Aug 16
+2017 Mar 28     2018 Nov  7     2020 Jun 21     2022 Feb  1     2023 Sep 15
+2017 Apr 26     2018 Dec  7     2020 Jul 20     2022 Mar  2     2023 Oct 14
+2017 May 25     2019 Jan  6     2020 Aug 19     2022 Apr  1     2023 Nov 13
+2017 Jun 24     2019 Feb  4     2020 Sep 17     2022 Apr 30     2023 Dec 12
+2017 Jul 23     2019 Mar  6     2020 Oct 16     2022 May 30     2024 Jan 11
+2017 Aug 21     2019 Apr  5     2020 Nov 15     2022 Jun 29     2024 Feb  9
+2017 Sep 20     2019 May  4     2020 Dec 14     2022 Jul 28     2024 Mar 10
+2017 Oct 19     2019 Jun  3     2021 Jan 13     2022 Aug 27     2024 Apr  8
+2017 Nov 18     2019 Jul  2     2021 Feb 11     2022 Sep 25     2024 May  8
