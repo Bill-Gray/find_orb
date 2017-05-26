@@ -117,6 +117,7 @@
  Sarounova                                 &#352;arounov&aacute;
  Scotti                                    <a href="http://www.lpl.arizona.edu/~jscotti/">Scotti</a>
  Sayer                                     <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0017853">Sayer</a>
+ Schwab                                    <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0185638">Schwab</a>
  Schwartz                                  <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0013820">Schwartz</a>
  Shelly                                    <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0017280">Shelly</a>
  Sherrod                                   <a href="http://www.arksky.org/pubs.htm">Sherrod</a>
