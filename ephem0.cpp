@@ -2365,7 +2365,8 @@ void format_observation( const OBSERVE FAR *obs, char *text,
          if( original_text_ptr[i] == '\t')
             original_text_ptr[i] = ' ';
 
-   if( resid_format & RESIDUAL_FORMAT_EXTRA)
+   if( (resid_format & RESIDUAL_FORMAT_EXTRA)
+               && base_format != RESIDUAL_FORMAT_SHORT)
       {
       char tbuff[50];
       int tformat = (resid_format | RESIDUAL_FORMAT_SHORT)
