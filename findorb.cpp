@@ -138,6 +138,7 @@ int find_nth_sr_orbit( double *orbit, OBSERVE FAR *obs, int n_obs,
 char *fgets_trimmed( char *buff, size_t max_bytes, FILE *ifile);
 int debug_printf( const char *format, ...);                /* runge.cpp */
 static void get_mouse_data( int *mouse_x, int *mouse_y, int *mouse_z, unsigned long *button);
+int get_object_name( char *obuff, const char *packed_desig);   /* mpc_obs.c */
 int make_pseudo_mpec( const char *mpec_filename, const char *obj_name);
                                               /* ephem0.cpp */
 int store_defaults( const int ephemeris_output_options,
@@ -185,6 +186,12 @@ const char *get_find_orb_text( const int index);
 int set_tholen_style_sigmas( OBSERVE *obs, const char *buff);  /* mpc_obs.c */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 int remove_rgb_code( char *buff);                              /* ephem.cpp */
+int find_vaisala_orbit( double *orbit, const OBSERVE *obs1,   /* orb_func.c */
+                     const OBSERVE *obs2, const double solar_r);
+int extended_orbit_fit( double *orbit, OBSERVE *obs, int n_obs,
+                  const unsigned fit_type, double epoch);     /* orb_func.c */
+const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
+void set_environment_ptr( const char *env_ptr, const char *new_value);
 
 extern double maximum_jd, minimum_jd;        /* orb_func.cpp */
 
@@ -796,6 +803,29 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
          }
       }
 }
+
+static int select_element_frame( void)
+{
+   const char *menu = "0 Default element frame\n"
+                      "1 J2000 ecliptic frame\n"
+                      "2 J2000 equatorial frame\n"
+                      "3 Body frame\n";
+
+   int c = inquire( menu, NULL, 0, COLOR_DEFAULT_INQUIRY);
+
+   if( c >= KEY_F( 1) && c <= KEY_F( 4))
+      c += '0' - KEY_F( 1);
+   if( c >= '0' && c <= '3')
+      {
+      char obuff[2];
+
+      obuff[0] = (char)c;
+      obuff[1] = '\0';
+      set_environment_ptr( "ELEMENTS_FRAME", obuff);
+      }
+   return( c);
+}
+
 
 static void object_comment_text( char *buff, const OBJECT_INFO *id)
 {
@@ -2089,8 +2119,6 @@ extern const char *elements_filename;
 #define DISPLAY_RESIDUAL_LEGEND      8
 
 int sanity_test_observations( const char *filename);
-const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
-void set_environment_ptr( const char *env_ptr, const char *new_value);
 
 /* main( ) begins by using the select_object_in_file( ) function (see above)
    to determine which object is going to be analyzed in the current 'run'.
@@ -2750,8 +2778,24 @@ int main( const int argc, const char **argv)
          int dir = 1;
          const unsigned station_start_line = getmaxy( stdscr) - n_stations_shown;
          unsigned long button;
+         wchar_t text[100], *search_ptr;
+         const wchar_t *search_strings[] = { L"Peri", L"Epoch", L"(J2000 ecliptic)",
+                  L"(J2000 equator)", L"(body frame)",
+                  L"Xres  Yres", L"Tres  Cres", L" delta ", L"Sigma", NULL };
+         const int search_char[] = { '+', 'e', ALT_N, ALT_N, ALT_N, 't', 't', '=', '%' };
 
          get_mouse_data( (int *)&x, (int *)&y, (int *)&z, &button);
+         for( i = 0; i < 99 && i < getmaxx( stdscr); i++)
+            {
+            move( y, i);
+            text[i] = (wchar_t)( inch( ) & A_CHARTEXT);
+            }
+         text[i] = '\0';
+         for( i = 0; search_strings[i]; i++)
+            if( (search_ptr = wcsstr( text, search_strings[i])) != NULL)
+               if( x >= (unsigned)( search_ptr - text)
+                        && x <= (unsigned)( search_ptr - text) + wcslen( search_strings[i]))
+                  c = search_char[i];
 #ifndef USE_MYCURSES
          dir = (( button & button1_events) ? 1 : -1);
          if( debug_mouse_messages)
@@ -2763,17 +2807,16 @@ int main( const int argc, const char **argv)
             c = KEY_UP;
          else if( button & BUTTON5_PRESSED)   /* actually 'wheel down' */
             c = KEY_DOWN;
-         else
 #endif
-            if( y >= station_start_line)
-               {
-               const char *search_code =
-                       mpc_color_codes[y - station_start_line].code;
+         if( y >= station_start_line)
+            {
+            const char *search_code =
+                    mpc_color_codes[y - station_start_line].code;
 
+            curr_obs = (curr_obs + dir + n_obs) % n_obs;
+            while( FSTRCMP( obs[curr_obs].mpc_code, search_code))
                curr_obs = (curr_obs + dir + n_obs) % n_obs;
-               while( FSTRCMP( obs[curr_obs].mpc_code, search_code))
-                  curr_obs = (curr_obs + dir + n_obs) % n_obs;
-               }
+            }
          else if( y >= top_line_residuals)
             {
             const unsigned max_x = getmaxx( stdscr);
@@ -2853,14 +2896,8 @@ int main( const int argc, const char **argv)
                   }
                }
             }
-         else if( y >= top_line_residual_legend &&
-                                  y < top_line_residuals)
-            {
-            if( (int)x >= resid_column)   /* toggle mag resids or time resids */
-               c = (((int)x >= resid_column + 9) ? '=' : 't');
-            else
-               c = 'k';       /* cycle the residual format */
-            }
+         else if( y == top_line_residual_legend && c == KEY_MOUSE)
+            c = 'k';           /* cycle the residual format */
          else if( n_command_lines &&
                           y == top_line_basic_info_perturbers + n_command_lines)
             {                      /* clicked on a perturber 'radio button' */
@@ -2880,21 +2917,10 @@ int main( const int argc, const char **argv)
                              x < command_areas[i].col2)
                   c = command_areas[i].key;
             }
-         else if( (observation_display & DISPLAY_ORBITAL_ELEMENTS))
-            if( y >= top_line_orbital_elements && y < top_line_residual_legend)
-               {
-               c = CTRL( 'B');      /* default to toggling commented elems */
-               if( x < 40 && !show_commented_elements)
-                  {
-                  const unsigned periapsis_line = top_line_orbital_elements +
-                     ((element_format & ELEM_OUT_ALTERNATIVE_FORMAT) ? 1 : 2);
-
-                  if( y == periapsis_line)
-                     c = '+';
-                  if( y == periapsis_line + 1) /* epoch line follows the  */
-                     c = 'e';                  /* periapsis line          */
-                  }
-               }
+         else if( (observation_display & DISPLAY_ORBITAL_ELEMENTS)
+                  && c == KEY_MOUSE
+                  && y >= top_line_orbital_elements)
+               c = CTRL( 'B');      /* toggle commented elems */
          }
 
       if( c >= '1' && c <= '9')
@@ -3623,8 +3649,33 @@ int main( const int argc, const char **argv)
             else
                strcpy( message_to_user, "No more orbits to undo!");
             break;
-         case 'v':         /* apply Vaisala method */
          case 'V':         /* apply Vaisala method, without linearizing */
+            {
+            double vaisala_dist;
+
+            inquire( "Enter peri/apohelion distance: ", tbuff, sizeof( tbuff),
+                                    COLOR_DEFAULT_INQUIRY);
+            vaisala_dist = atof( tbuff);
+            if( vaisala_dist)
+               {
+               curr_epoch = obs->jd;
+               find_vaisala_orbit( orbit, obs, obs + n_obs - 1, vaisala_dist);
+               update_element_display = 1;
+               }
+            }
+            break;
+         case 'v':         /* apply Vaisala method */
+            extended_orbit_fit( orbit, obs, n_obs, FIT_VAISALA_FULL, curr_epoch);
+            update_element_display = 1;
+            break;
+         case ALT_H:
+            curr_epoch = obs->jd;
+            extended_orbit_fit( orbit, obs, n_obs,
+                     atoi( get_environment_ptr( "H")), curr_epoch);
+            update_element_display = 1;
+            break;
+#ifdef NOT_IN_USE
+         case 'v':         /* apply Vaisala method */
             {
             double vaisala_dist, angle_param;
             int n_fields, success = 0;
@@ -3689,6 +3740,7 @@ int main( const int argc, const char **argv)
                }
             }
             break;
+#endif
          case 'w': case 'W':
             {
             double worst_rms = 0., rms;
@@ -4174,11 +4226,21 @@ int main( const int argc, const char **argv)
          case '~':
             residual_format ^= RESIDUAL_FORMAT_EXTRA;
             break;
+         case ALT_O:
+            for( i = 0; i < n_obs; i++)
+               if( !strcmp( obs[i].mpc_code, obs[curr_obs].mpc_code))
+                  obs[i].flags |= OBS_IS_SELECTED;
+               else
+                  obs[i].flags &= ~OBS_IS_SELECTED;
+            break;
+         case ALT_N:
+            select_element_frame( );
+            update_element_display = 1;
+            break;
          case 9:
          case ALT_A:             case ALT_G:
-         case ALT_H: case ALT_I: case ALT_K:
-         case ALT_N:
-         case ALT_O: case ALT_P: case ALT_Q:
+         case ALT_I: case ALT_K:
+         case ALT_P: case ALT_Q:
          case ALT_R: case ALT_X: case ALT_Y:
          case ALT_Z: case '\'':
          default:
