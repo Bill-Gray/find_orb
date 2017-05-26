@@ -132,10 +132,16 @@ ASTEROID_THRESH=10
    you expected.
 BC405_ASTEROIDS=300
 
-   By default,  planet-centric orbits are shown referenced to the planet
-   equators.  Set the following to 1 to force _all_ orbits,  not just
-   heliocentric ones,  to be referred to the J2000 ecliptic.
-ECLIPTIC_ORBITS_ONLY=0
+   By default,  geoocentric elements are referred to the J2000 _equator_.
+   Everything else (heliocentric and other non-earth-centric) is referred
+   to the J2000 _ecliptic_.  Set the following to be 1 to force all
+   elements to be J2000 ecliptic (including geocentric ones),  or 2 to
+   force all elements to be J2000 equatorial.  Set it to be 3 to force
+   all elements to be body-centric.  Note that for geocentric elements,
+   this will result in elements that are slightly different from those you'd
+   get by default,  due to precession and nutation since 2000;  the angles
+   should be passably close to those seen in TLEs.
+ELEMENTS_FRAME=0
 
    Find_Orb will apply geopotential terms (spherical harmonics) for objects
    close to the earth.  It has a bit of logic to determine how many should

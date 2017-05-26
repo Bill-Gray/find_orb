@@ -839,6 +839,11 @@ N_MOIDS_TO_SHOW = 8 at present (we only show planetary MOIDs.) */
 double comet_total_magnitude = 0.;          /* a.k.a. "M1" */
 double comet_nuclear_magnitude = 0.;        /* a.k.a. "M2" */
 
+#define ELEMENT_FRAME_DEFAULT                   0
+#define ELEMENT_FRAME_J2000_ECLIPTIC            1
+#define ELEMENT_FRAME_J2000_EQUATORIAL          2
+#define ELEMENT_FRAME_BODY_FRAME                3
+
 int write_out_elements_to_file( const double *orbit,
             const double curr_epoch,
             const double epoch_shown,
@@ -865,10 +870,9 @@ int write_out_elements_to_file( const double *orbit,
    const char *monte_carlo_permits;
    const bool rms_ok = (compute_rms( obs, n_obs) < max_monte_rms);
    extern int available_sigmas;
+   const char *body_frame_note = NULL;
    int showing_sigmas = available_sigmas;
-   const bool force_ecliptic_orbits_only =
-         (*get_environment_ptr( "ECLIPTIC_ORBITS_ONLY") == '1');
-   bool note_orbit_in_body_plane = false;
+   int elements_frame = atoi( get_environment_ptr( "ELEMENTS_FRAME"));
 
    setvbuf( ofile, NULL, _IONBF, 0);
    setvbuf( stdout, NULL, _IONBF, 0);
@@ -897,22 +901,29 @@ int write_out_elements_to_file( const double *orbit,
       }
    else
       planet_orbiting = find_best_fit_planet( epoch_shown, orbit2, rel_orbit);
-   if( force_ecliptic_orbits_only == false)
-      {                               /* Objects orbiting earth default to */
-      if( planet_orbiting == 3)       /* J2000; for other planets,  to the */
-         {                            /* planes of their equators at J2000 */
-                           /* Cvt ecliptic to equatorial: */
-         ecliptic_to_equatorial( rel_orbit);
-         ecliptic_to_equatorial( rel_orbit + 3);
-         note_orbit_in_body_plane = true;
-         }
-      else if( (planet_orbiting > 0 && planet_orbiting < 10) || planet_orbiting == 100)
-         {
-         ecliptic_to_planetary_plane(
-                     (planet_orbiting == 100 ? -1 : planet_orbiting), rel_orbit);
-         note_orbit_in_body_plane = true;
-         }
+
+            /* By default,  we use J2000 equatorial elements for geocentric
+            elements,  J2000 ecliptic for everybody else. */
+   if( elements_frame == ELEMENT_FRAME_DEFAULT)
+      elements_frame = ((planet_orbiting == 3) ?
+                  ELEMENT_FRAME_J2000_EQUATORIAL :
+                  ELEMENT_FRAME_J2000_ECLIPTIC);
+
+   if( elements_frame == ELEMENT_FRAME_J2000_ECLIPTIC)
+      body_frame_note = "(J2000 ecliptic)";
+   if( elements_frame == ELEMENT_FRAME_J2000_EQUATORIAL)
+      {
+      ecliptic_to_equatorial( rel_orbit);
+      ecliptic_to_equatorial( rel_orbit + 3);
+      body_frame_note = "(J2000 equator)";
       }
+   if( elements_frame == ELEMENT_FRAME_BODY_FRAME)
+      {
+      ecliptic_to_planetary_plane(
+                  (planet_orbiting == 100 ? -1 : planet_orbiting), rel_orbit);
+      body_frame_note = "(body frame)";
+      }
+
    if( !(options & ELEM_OUT_ALTERNATIVE_FORMAT))
       showing_sigmas = 0;
    if( showing_sigmas == COVARIANCE_AVAILABLE)
@@ -965,13 +976,10 @@ int write_out_elements_to_file( const double *orbit,
       calc_classical_elements( &elem2, rel_orbit2, epoch_shown, 1);
       add_sof_to_file( "sofv.txt", &elem2, n_obs, obs);     /* elem_ou2.cpp */
       }
-   helio_elem = elem;
-   if( elem.central_obj)            /* except for planet-encounterers,  'elem' */
-      {                             /* will already be heliocentric.  This     */
-      helio_elem.central_obj = 0;   /* code would do no harm,  but would waste */
-      helio_elem.gm = SOLAR_GM;     /* a little computational effort.          */
-      calc_classical_elements( &helio_elem, orbit2, epoch_shown, 1);
-      }
+   helio_elem = elem;            /* Heliocentric J2000 ecliptic elems */
+   helio_elem.central_obj = 0;
+   helio_elem.gm = SOLAR_GM;
+   calc_classical_elements( &helio_elem, orbit2, epoch_shown, 1);
    n_lines = elements_in_mpc_format( tbuff, &elem, object_name,
                is_cometary( constraints) && fabs( elem.ecc - 1.) < 1.e-6,
                output_format);
@@ -1076,7 +1084,7 @@ int write_out_elements_to_file( const double *orbit,
 
                setup_planet_elem( &planet_elem, moid_idx[j],
                                 (epoch_shown - J2000) / 36525.);
-               moid = find_moid( &planet_elem, &elem,
+               moid = find_moid( &planet_elem, &helio_elem,
                               (j ? NULL : &barbee_style_delta_v));
                if( j < 2)        /* Earth or Jupiter */
                   moid_limit = 1.;
@@ -1212,14 +1220,28 @@ int write_out_elements_to_file( const double *orbit,
                break;
             }
          }
-      if( note_orbit_in_body_plane && strlen( buff) < 30)
+      if( body_frame_note)
          {
-         size_t j;
+         size_t j = strlen( buff);
 
-         note_orbit_in_body_plane = false;
-         for( j = strlen( buff); j < 36; j++)
-            buff[j] = ' ';
-         strcpy( buff + 36, "(J2000 equatorial)");
+         if( j < 30)
+            {
+            while( j < 36)
+               buff[j++] = ' ';
+            strcpy( buff + j, body_frame_note);
+            body_frame_note = NULL;
+            }
+         else
+            {
+            j = 30;
+            while( buff[j] == ' ')
+               j++;
+            if( j >= 60)    /* spaces to put the note in */
+               {
+               memcpy( buff + 36, body_frame_note, strlen( body_frame_note));
+               body_frame_note = NULL;
+               }
+            }
          }
       fprintf( ofile, "%s\n", buff);
       tptr += strlen( tptr) + 1;
@@ -1324,12 +1346,13 @@ int write_out_elements_to_file( const double *orbit,
                {                     /* if orbits come close to overlapping */
                const double semimajor_axes[3] = { 1., 5.2033, 30.069 };
                const char *names[3] = { "Earth", "Jupiter", "Neptune" };
-               const double ratio =  semimajor_axes[i] / elem.major_axis;
+               const double ratio =  semimajor_axes[i] / helio_elem.major_axis;
                const double tisserand = ratio
-                  + 2. * sqrt( (1. - elem.ecc * elem.ecc) / ratio) * cos( elem.incl);
-               const double aphelion = elem.major_axis * 2. - elem.q;
+                  + 2. * sqrt( (1. - helio_elem.ecc * helio_elem.ecc) / ratio)
+                  * cos( helio_elem.incl);
+               const double aphelion = helio_elem.major_axis * 2. - helio_elem.q;
 
-               if( elem.q < semimajor_axes[i] / .7 && aphelion > semimajor_axes[i] * .7)
+               if( helio_elem.q < semimajor_axes[i] / .7 && aphelion > semimajor_axes[i] * .7)
                   fprintf( ofile, "# Tisserand relative to %s: %.5f\n",
                         names[i], tisserand);
                }
@@ -1343,7 +1366,7 @@ int write_out_elements_to_file( const double *orbit,
             {
             double ecliptic_lat, ecliptic_lon;
 
-            get_periapsis_loc( &ecliptic_lon, &ecliptic_lat, &elem);
+            get_periapsis_loc( &ecliptic_lon, &ecliptic_lat, &helio_elem);
             fprintf( ofile, "# Perihelion (%.3f, %.3f)\n",
                   ecliptic_lon * 180. / PI, ecliptic_lat * 180. / PI);
             }
