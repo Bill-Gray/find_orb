@@ -1133,8 +1133,8 @@ int extended_orbit_fit( double *orbit, OBSERVE *obs, int n_obs,
          params[i] = -delta_val;
       rval = find_parameterized_orbit( orbit, params, obs1, obs2,
                      fit_type, 0);
-      if( rval)
-         printf( "Iter %d, rval %d\n", i, rval);
+//    if( rval)
+//       printf( "Iter %d, rval %d\n", i, rval);
       set_locs_extended( orbit, obs1.jd, obs, n_obs, epoch, orbit_at_epoch);
       for( j = 0; j < n_obs; j++)
          if( obs[j].is_included)
@@ -1142,7 +1142,7 @@ int extended_orbit_fit( double *orbit, OBSERVE *obs, int n_obs,
             double dx, dy;
 
             get_residual_data( obs + j, &dx, &dy);
-            printf( "Resids: obs %d, param %d, %f %f\n", j, i, dx, dy);
+//          printf( "Resids: obs %d, param %d, %f %f\n", j, i, dx, dy);
             if( i == -1)
                {
                resids[j + j] = dx;
@@ -1171,13 +1171,24 @@ int extended_orbit_fit( double *orbit, OBSERVE *obs, int n_obs,
 
    free( resids);
    lsquare_solve( lsquare, params);
-   for( i = 0; i < n_params; i++)
-      printf( "Param %d: %.9f\n", i, params[i]);
+// for( i = 0; i < n_params; i++)
+//    printf( "Param %d: %.9f\n", i, params[i]);
    lsquare_free( lsquare);
+   if( fit_type == FIT_CLASSIC_HERGET || fit_type == FIT_HERGET_FULL)
+      {
+      double rescale_adjustment = 1., tval;
+
+      for( i = 0; i < 2; i++)
+         {
+         tval = fabs( params[i]) * 300.;
+         if( rescale_adjustment < tval)
+            rescale_adjustment = tval;
+         }
+      for( i = 0; i < n_params; i++)
+         params[i] /= rescale_adjustment;
+      }
    rval = find_parameterized_orbit( orbit, params, obs1, obs2,
                      fit_type, 0);
-   if( rval)
-      printf( "Final failure: %d\n", rval);
    set_locs_extended( orbit, obs1.jd, obs, n_obs, epoch, orbit_at_epoch);
             /* Except we really want to return the orbit at epoch : */
    memcpy( orbit_at_epoch, orbit, 6 * sizeof( double));
@@ -1643,6 +1654,8 @@ static OBSERVE *get_real_arc( OBSERVE *obs, int *n_obs,
 
 #define RAD2SEC (180. * 3600. / PI)
 
+#ifdef NO_LONGER_USED
+
 int adjust_herget_results( OBSERVE FAR *obs, int n_obs, double *orbit)
 {
    int i, n_found, rval = 0;
@@ -1708,6 +1721,26 @@ int adjust_herget_results( OBSERVE FAR *obs, int n_obs, double *orbit)
       }
    if( rval && rval != -2)
       debug_printf( "Adjust fail %d\n", rval);
+   return( rval);
+}
+#endif      /* #ifdef NO_LONGER_USED */
+
+int adjust_herget_results( OBSERVE FAR *obs, int n_obs, double *orbit)
+{
+   int n_found, rval = 0;
+
+   obs = get_real_arc( obs, &n_obs, &n_found);
+   if( n_found < 2)   /* must have at least two obs */
+      rval = -2;
+   else if( is_unreasonable_orbit( orbit))
+      rval = -3;
+   else
+      {
+      rval = extended_orbit_fit( orbit, obs, n_obs,
+                     FIT_FIXED_DISTANCES, obs->jd);
+      if( !rval)
+         rval = set_locs( orbit, obs->jd, obs, n_obs);
+      }
    return( rval);
 }
 
