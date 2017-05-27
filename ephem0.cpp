@@ -3394,7 +3394,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
 
                /* ...and now,  the ephemeris: */
    ephemeris_ifile = fopen_ext( get_file_name( buff, ephemeris_filename),
-               is_default_ephem ? "fcr" : "fr");
+               is_default_ephem ? "cr" : "r");
    if( ephemeris_ifile && fgets_trimmed( buff, sizeof( buff), ephemeris_ifile))
       {
       fprintf( ofile, "\n<a name=\"eph%s\"></a>", mpec_buff);
