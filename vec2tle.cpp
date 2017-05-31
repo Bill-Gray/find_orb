@@ -474,8 +474,19 @@ int main( const int argc, const char **argv)
                params_to_set = atoi( argv[i] + 2);
                break;
             case 'o': case 'O':
-               ofile = fopen( argv[i] + 2, "wb");
-               printf( "Output directed to %s\n", argv[i] + 2);
+               {
+               const char *output_filename = argv[i] + 2;
+
+               if( !*output_filename && i < argc - 1)
+                  output_filename = argv[i + 1];
+               ofile = fopen( output_filename, "wb");
+               printf( "Output directed to %s\n", output_filename);
+               if( !ofile)
+                  {
+                  perror( "Output not opened");
+                  return( -1);
+                  }
+               }
                break;
             case 'f': case 'F':
                output_freq = atoi( argv[i] + 2);
