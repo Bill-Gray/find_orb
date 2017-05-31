@@ -63,7 +63,6 @@ ifdef XCOMPILE
 	ADDED_CFLAGS=-DUTF8 -DPDC_WIDE -I $(INSTALL_DIR)/include
  OBJSADDED=clipfunc.o
 	EXE=.exe
-	LIBSADDED=
 	CURSES_LIB=-lpdcurses -static-libgcc
 	LIBSADDED=-L $(INSTALL_DIR)/win_lib -lm -lgdi32 -luser32 -mwindows
 endif
