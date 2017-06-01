@@ -1,6 +1,6 @@
-# Make file for vec2tle with g++
-# (vec2tle reads an ephemeris of state vectors for a geocentric object and
-# computes TLEs fitted to them.  See 'vec2tle.cpp' for details)
+# Make file for eph2tle with g++
+# (eph2tle reads an ephemeris of state vectors for a geocentric object and
+# computes TLEs fitted to them.  See 'eph2tle.cpp' for details)
 
 CC=g++
 LIBSADDED=-L $(INSTALL_DIR)/lib -lm
@@ -41,12 +41,12 @@ ifdef XCOMPILE
 	LIBSADDED=-static-libgcc -L $(INSTALL_DIR)/win_lib -lm -mwindows
 endif
 
-all: vec2tle$(EXE)
+all: eph2tle$(EXE)
 
-OBJS=vec2tle.o elem2tle.o lsquare.o conv_ele.o
+OBJS=eph2tle.o elem2tle.o lsquare.o conv_ele.o
 
-vec2tle$(EXE): $(OBJS)
-	$(CC) -o vec2tle$(EXE) $(OBJS) -llunar -lsatell $(LIBSADDED)
+eph2tle$(EXE): $(OBJS)
+	$(CC) -o eph2tle$(EXE) $(OBJS) -llunar -lsatell $(LIBSADDED)
 
 CFLAGS=-O3 -Wall -pedantic -Wextra -c -I $(INSTALL_DIR)/include
 
@@ -54,4 +54,4 @@ CFLAGS=-O3 -Wall -pedantic -Wextra -c -I $(INSTALL_DIR)/include
 	$(CC) $(CFLAGS) $<
 
 clean:
-	rm -f vec2tle$(EXE) $(OBJS)
+	rm -f eph2tle$(EXE) $(OBJS)

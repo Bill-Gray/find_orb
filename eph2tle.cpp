@@ -189,7 +189,7 @@ static int iterated_vector_to_tle( tle_t *tle, const double *state_vect,
 
 static void error_exit( const int exit_value)
 {
-   printf( "Run as vec2tle <input filename> (options)\n\n");
+   printf( "Run as eph2tle <input filename> (options)\n\n");
    printf( "Options are:\n");
    printf( "   -i(international designator)     ex: -i97034A\n");
    printf( "   -n(NORAD designator)             ex: -n31415\n");
@@ -426,7 +426,7 @@ proper motions and offsets from the IAU nutation theories,  ought to be used.
 
 int main( const int argc, const char **argv)
 {
-   FILE *ifile = fopen( "vec2tle.txt", "rb");
+   FILE *ifile = fopen( "eph2tle.txt", "rb");
    FILE *ofile = stdout;
    int i, j, count = 0, output_freq = 10, line = 0;
    int tles_written = 0;
@@ -522,10 +522,10 @@ int main( const int argc, const char **argv)
    strcpy( tle.intl_desig, intl_desig);
    if( !ifile)
       {
-      printf( "vec2tle.txt not found\n");
+      printf( "eph2tle.txt not found\n");
       error_exit( -4);
       }
-   fprintf( ofile, "# Made by vec2tle, compiled " __DATE__ " " __TIME__ "\n");
+   fprintf( ofile, "# Made by eph2tle, compiled " __DATE__ " " __TIME__ "\n");
    fprintf( ofile, "# Run at %s#\n", ctime( &t0));
    while( fgets_trimmed( buff, sizeof( buff), ifile))
       fprintf( ofile, "%s\n", buff);
