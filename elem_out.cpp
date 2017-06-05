@@ -121,6 +121,7 @@ void compute_variant_orbit( double *variant, const double *ref_orbit,
 int add_sof_to_file( const char *filename,         /* elem_ou2.cpp */
              const ELEMENTS *elem,
              const int n_obs, const OBSERVE *obs);
+void make_config_dir_name( char *oname, const char *iname);  /* miscell.cpp */
 
 int debug_printf( const char *format, ...);                /* runge.cpp */
 
@@ -2189,6 +2190,7 @@ int get_defaults( int *ephemeris_output_options, int *element_format,
    static char month_names[12][17];
    extern double minimum_jd, maximum_jd;
    extern double maximum_observation_span;
+   extern int use_config_directory;
    int i, use_sigmas_int;
    int previously_alt_mpcorb;    /* option that's now obsolete */
    const char *override_fcct14_filename = get_environment_ptr( "FCCT14_FILE");
@@ -2254,6 +2256,14 @@ int get_defaults( int *ephemeris_output_options, int *element_format,
       extern int combine_all_observations;
 
       combine_all_observations = 1;
+      }
+   if( use_config_directory)
+      {
+      static char cospar_name[255];
+      extern const char *cospar_filename;
+
+      make_config_dir_name( cospar_name, "cospar.txt");
+      cospar_filename = cospar_name;
       }
    return( 0);
 }
