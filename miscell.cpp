@@ -37,6 +37,10 @@ const char *alt_config_directory;
 
 void make_config_dir_name( char *oname, const char *iname)
 {
+#ifndef _WIN32
+   char *home_ptr = getenv( "HOME");
+#endif
+
    if( alt_config_directory && *alt_config_directory)
       {
       strcpy( oname, alt_config_directory);
@@ -46,8 +50,13 @@ void make_config_dir_name( char *oname, const char *iname)
 #ifdef _WIN32
    strcpy( oname, iname);
 #else
-   strcpy( oname, getenv( "HOME"));
-   strcat( oname, "/.find_orb/");
+   if( home_ptr)
+      {
+      strcpy( oname, getenv( "HOME"));
+      strcat( oname, "/.find_orb/");
+      }
+   else
+      *oname = '\0';
    strcat( oname, iname);
 #endif
 }
