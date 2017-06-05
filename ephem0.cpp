@@ -1180,7 +1180,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
        ephem_type == OPTION_8_LINE_OUTPUT)
       {
       timescale = "y";        /* force TT output */
-      fprintf( ofile, "%.5f %f %d\n", jd_start, step, n_steps);
+      fprintf( ofile, "%.5f %f %d %s %s\n", jd_start, step, n_steps,
+                     get_environment_ptr( "VECTOR_OPTS"), note_text);
       }
    else if( ephem_type != OPTION_CLOSE_APPROACHES)
       {
