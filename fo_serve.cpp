@@ -175,6 +175,7 @@ int main( const int argc, const char **argv)
 
    avoid_runaway_process( 15);
 #endif         /* _WIN32 */
+   setvbuf( lock_file, NULL, _IONBF, 0);
    neocp_redaction_turned_on = false;
    printf( "Content-type: text/html\n\n");
    if( !lock_file)
@@ -209,12 +210,15 @@ int main( const int argc, const char **argv)
          {
          if( strlen( buff) > 70)
             {
+            char *tptr = strstr( buff, "Debug level:");
             FILE *ofile = fopen( temp_obs_filename,
                                (bytes_written ? "ab" : "wb"));
 
             assert( ofile);
             bytes_written += fwrite( buff, 1, strlen( buff), ofile);
             fclose( ofile);
+            if( tptr)
+               debug_level = atoi( tptr + 12);
             }
          }
       else if( !strcmp( field, "obj_name"))
