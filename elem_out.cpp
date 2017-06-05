@@ -616,29 +616,30 @@ static void consider_replacing( char *buff, const char *search_text,
    and the y-axis is the cross-product of x and z. */
 
 static void ecliptic_to_planetary_plane( const int planet_no,
-               double *state_vect)
+               const double epoch_jd, double *state_vect)
 {
    double planet_matrix[9], xform[3][3];
    int i;
    double tval;
 
-   calc_planet_orientation( planet_no, 0, J2000, planet_matrix);
+   calc_planet_orientation( planet_no, 0, epoch_jd, planet_matrix);
          /* At this point,  planet_matrix[6, 7, 8] is a J2000 equatorial */
          /* vector pointing in the direction of the planet's north pole. */
          /* Copy that as our z-axis,  xform[2]: */
    memcpy( xform[2], planet_matrix + 6, 3 * sizeof( double));
          /* Our "X-axis" is perpendicular to "Z",  but in the plane */
-         /* of the ecliptic,  corresponding to the ascending node of */
-         /* the planet's equator relative to the ecliptic:           */
+         /* of the J2000 equator,  corresponding to the ascending node  */
+         /* of the planet's equator relative to the J2000 equator:      */
    tval = sqrt( xform[2][0] * xform[2][0] + xform[2][1] * xform[2][1]);
    xform[0][0] = -xform[2][1] / tval;
    xform[0][1] =  xform[2][0] / tval;
    xform[0][2] = 0.;
+         /* So we've got two of the three base vectors,  still in J2000 */
+         /* equatorial.  Transform them to ecliptic... */
+   equatorial_to_ecliptic( xform[0]);
+   equatorial_to_ecliptic( xform[2]);
          /* ...and 'Y' is simply the cross-product of 'X' and 'Z': */
    vector_cross_product( xform[1], xform[2], xform[0]);
-         /* OK,  now we transform x, y, and z to ecliptic coords: */
-   for( i = 0; i < 3; i++)
-      equatorial_to_ecliptic( xform[i]);
          /* OK.  Now we're ready to transform the state vector : */
    for( i = 0; i < 2; i++, state_vect += 3)
       {
@@ -920,7 +921,8 @@ int write_out_elements_to_file( const double *orbit,
    if( elements_frame == ELEMENT_FRAME_BODY_FRAME)
       {
       ecliptic_to_planetary_plane(
-                  (planet_orbiting == 100 ? -1 : planet_orbiting), rel_orbit);
+                  (planet_orbiting == 100 ? -1 : planet_orbiting),
+                  epoch_shown, rel_orbit);
       body_frame_note = "(body frame)";
       }
 
