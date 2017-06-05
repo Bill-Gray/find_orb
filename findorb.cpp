@@ -76,6 +76,7 @@ BMOUSE global_bmouse;
    #define BUTTON_CTRL BUTTON_CONTROL
 #endif
 
+#include <wchar.h>
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
@@ -2262,7 +2263,15 @@ int main( const int argc, const char **argv)
                }
                break;
             case 'z':
+               {
+               extern const char *alt_config_directory;
+
                use_config_directory = true;
+               alt_config_directory = argv[i] + 2;
+               if( !*alt_config_directory && i < argc - 1
+                           && argv[i + 1][0] != '-')
+                  alt_config_directory = argv[i + 1];
+               }
                break;
             default:
                printf( "Unknown command-line option '%s'\n", argv[i]);
@@ -2367,7 +2376,6 @@ int main( const int argc, const char **argv)
       {        /* no objects found,  or file not found */
       const char *err_msg;
 
-      endwin( );
       if( n_ids == -1)
          err_msg = "Couldn't locate the file '%s'\n";
       else

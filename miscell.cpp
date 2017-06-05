@@ -33,9 +33,16 @@ FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 void make_config_dir_name( char *oname, const char *iname);  /* miscell.cpp */
 
 int use_config_directory = false;
+const char *alt_config_directory;
 
 void make_config_dir_name( char *oname, const char *iname)
 {
+   if( alt_config_directory && *alt_config_directory)
+      {
+      strcpy( oname, alt_config_directory);
+      strcat( oname, iname);
+      return;
+      }
 #ifdef _WIN32
    strcpy( oname, iname);
 #else
