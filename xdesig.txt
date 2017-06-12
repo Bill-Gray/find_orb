@@ -76,6 +76,14 @@
     SK03J010 J047S        Eukelade
     SK03J130 J048S        Cyllene
 
+; Newly numbered,  June 2017, MPC 105280
+    SK16J010 J054S        Jupiter LIV = S/2016 J 1
+    SK03J180 J055S        Jupiter LV = S/2003 J 18
+    SK11J020 J056S        Jupiter LVI = S/2011 J 2
+    SK03J050 J057S        Jupiter LVII = S/2003 J 5
+    SK03J150 J058S        Jupiter LVIII = S/2003 J 15
+    SK17J010 J059S        Jupiter LIX = S/2017 J 1
+
 ;   McNaught find from 26 Aug 2004:
      4H42B88 1965-058A
      4I034AB 2002-048A

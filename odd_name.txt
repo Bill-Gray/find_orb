@@ -64,6 +64,12 @@ J050S        Jupiter L = S/2003 J 17 = Herse
 J051S        Jupiter LI = S/2010 J 1
 J052S        Jupiter LII = S/2010 J 2
 J053S        Jupiter LIII = S/2000 J 11 = Dia
+J054S        Jupiter LIV = S/2016 J 1
+J055S        Jupiter LV = S/2003 J 18
+J056S        Jupiter LVI = S/2011 J 2
+J057S        Jupiter LVII = S/2003 J 5
+J058S        Jupiter LVIII = S/2003 J 15
+J059S        Jupiter LIX = S/2017 J 1
 S002S        Saturn II = Enceladus
 S003S        Saturn III = Tethys
 S004S        Saturn IV = Dione
