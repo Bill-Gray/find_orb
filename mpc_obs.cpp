@@ -2381,7 +2381,7 @@ static int xref_designation( char *desig)
    memcpy( prev_desig_in, desig, 12);
    reduce_designation( reduced_desig, desig);
 
-   for( i = 0, gap = 0x8000; gap; gap >>= 1)
+   for( i = -1, gap = 0x8000; gap; gap >>= 1)
       if( i + gap < n_lines)
          {
          char *xlate_ptr = xlate_table + (i + gap) * 26;
