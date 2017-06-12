@@ -37,6 +37,7 @@ cssfield
 elements.txt
 eleme?.txt
 environ.dat
+eph2tle
 ephemeri.txt
 guide.txt
 guide?.txt
@@ -53,7 +54,6 @@ sr_elems.txt
 sr_el?.txt
 state.txt
 state?.txt
-vec2tle
 vectors.dat
 virtu?.txt
 virtual.txt
