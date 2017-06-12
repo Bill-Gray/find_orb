@@ -1,6 +1,12 @@
-Flying cows
-Irrelevance
-Lines not in the MPC 80-column format are ignored.
+COM Lines not in the MPC's 80-column format are ignored.
+COM See http://www.minorplanetcenter.net/iau/info/OpticalObs.html for a
+COM format specification.  In the following header line, 'nn' = notes 1
+COM and 2; 'B' = photometric band; 'z' = astrometric catalog used for the
+COM reduction; '<ref'> = reference; 'COD' = MPC three-character
+COM observatory code.
+
+123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|
+<-ObjDesig->*nnYYYY MM DD.DDDDD HH MM SS.SSSsdd mm ss.ss<blanks >MM.MMBz<ref>COD
     Example2  C1997 04 21.34707 13 57 33.13 -09 12 14.3                      413
     Example2  C1997 04 21.39162 13 57 36.42 -09 12 37.9                      413
     Example2  C1997 04 21.43617 13 57 36.13 -09 12 59.7                      413
