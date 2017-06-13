@@ -641,7 +641,8 @@ static inline void get_xxx_location( const char *buff)
 
 extern int debug_level;
 
-/* A return value of -1 indicates malformed input.  Anything else indicates */
+/* A return value of -1 indicates malformed input; -2 indicates a satellite */
+/* (for which no position is available) .  Anything else indicates          */
 /* the number of the planet on which the station is located (earth=3,  the  */
 /* usual value... but note that rovers.txt contains extraterrestrial "MPC   */
 /* stations",  so values from 0 to 10 may occur.)                           */
@@ -662,6 +663,7 @@ static int extract_mpc_station_data( const char *buff, double *lon_in_radians,
          return( -1);
    if( lon_in_radians && rho_cos_phi && rho_sin_phi)
       *lon_in_radians = *rho_cos_phi = *rho_sin_phi = 0.;
+
    if( buff[7] == '.' && buff[14] == '.' && buff[23] == '.')
       {              /* for-real MPC data,  with parallax constants: */
       tlon = grab_double( buff + 4, 9) * PI / 180.;
@@ -674,7 +676,7 @@ static int extract_mpc_station_data( const char *buff, double *lon_in_radians,
       }
    else if( !memcmp( buff + 3, "                           ", 27)
             && buff[30] > ' ')    /* satellite stations (SOHO, */
-      rval = 3;                   /* WISE,  etc.:  all blanks) */
+      rval = -2;                  /* WISE,  etc.:  all blanks) */
    else        /* latitude & altitude,  not parallaxes: */
       {
       double lat_in_radians, alt_in_meters;
@@ -685,9 +687,7 @@ static int extract_mpc_station_data( const char *buff, double *lon_in_radians,
       if( sscanf( buff, "%lf %lf %lf", &tlon, &lat_in_radians,
                                      &alt_in_meters) == 3)
          {
-         const char *tptr = strchr( buff, '@');
-
-         rval = (tptr ? atoi( tptr + 1) : 3);
+         rval = 3;
          if( fabs( tlon) > 361. || fabs( lat_in_radians) > 91.)
             {     /* lat/lon are actually in dddmmss.sss form: */
             tlon = convert_base_60_to_decimal( tlon);
@@ -705,6 +705,13 @@ static int extract_mpc_station_data( const char *buff, double *lon_in_radians,
       *lon_in_radians = centralize_ang( tlon);
       if( *lon_in_radians > PI)
          *lon_in_radians -= PI + PI;
+      }
+   if( rval == 3)       /* are we _really_ on Earth? */
+      {
+      const char *tptr = strchr( buff, '@');
+
+      if( tptr)
+         rval = atoi( tptr + 1);
       }
    return( rval);
 }
@@ -937,9 +944,9 @@ int get_observer_data( const char FAR *mpc_code, char *buff,
       sprintf( tbuff + 3, format_string, lon0, lat0, alt0);
       if( buff)
          strcpy( buff, tbuff);
-      extract_mpc_station_data( tbuff, lon_in_radians,
+      rval = extract_mpc_station_data( tbuff, lon_in_radians,
                                         rho_cos_phi, rho_sin_phi);
-      return( 3);
+      return( rval);
       }
 
    if( !memcmp( mpc_code, "Ast", 3))
@@ -976,12 +983,9 @@ int get_observer_data( const char FAR *mpc_code, char *buff,
       }
    else
       {
-      char *tptr = strchr( curr_station, '@');
-
-      rval = (tptr ? atoi( tptr + 1) : 3);
       if( buff)
          strcpy( buff, curr_station);
-      extract_mpc_station_data( curr_station, lon_in_radians,
+      rval = extract_mpc_station_data( curr_station, lon_in_radians,
                                         rho_cos_phi, rho_sin_phi);
       }
    return( rval);
@@ -1774,7 +1778,7 @@ void set_up_observation( OBSERVE FAR *obs)
    int observer_planet = get_observer_data( obs->mpc_code, tbuff,
                            &lon, &rho_cos_phi, &rho_sin_phi);
 
-   if( observer_planet < 0)
+   if( observer_planet == -1)
       {
       static unsigned n_unfound = 0;
       static char unfound[10][4];
@@ -1811,6 +1815,8 @@ void set_up_observation( OBSERVE FAR *obs)
       obs->flags |= OBS_NO_OFFSET;
       comment_observation( obs, "? offset");
       }
+   if( observer_planet == -2)          /* satellite observation,  with  */
+      observer_planet = 3;             /* sat posn relative to earth    */
    compute_observer_loc( obs->jd, observer_planet,
                rho_cos_phi, rho_sin_phi, lon, obs->obs_posn);
    compute_observer_vel( obs->jd, observer_planet,
@@ -4194,7 +4200,7 @@ void put_observer_data_in_text( const char FAR *mpc_code, char *buff)
    const int planet_idx = get_observer_data( mpc_code, buff,
                                   &lon, &rho_cos_phi, &rho_sin_phi);
 
-   if( planet_idx < 0)
+   if( planet_idx == -1)
       {
       char tbuff[4];
 
