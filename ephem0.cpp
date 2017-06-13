@@ -1135,6 +1135,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    const double planet_radius_in_au =
           planet_radius_in_meters( planet_no) / AU_IN_METERS;
 
+   if( planet_no < 0)      /* bad observatory code or satellite */
+      return( -3);
    step = get_step_size( stepsize, &step_units, &n_step_digits);
    if( !step)
       return( -2);
@@ -1904,13 +1906,18 @@ int remove_rgb_code( char *buff)
    return( (int)rval);
 }
 
+/* "is_topocentric_mpc_code( )" is taken to mean "can you compute alt/az
+ephems and/or visibility info from this station",  and is used in
+figuring out which options are available for an ephemeris. */
+
 bool is_topocentric_mpc_code( const char *mpc_code)
 {
    char buff[100];
    double rho_cos_phi, rho_sin_phi, lon;
+   const int planet_idx = get_observer_data( mpc_code,
+                    buff, &lon, &rho_cos_phi, &rho_sin_phi);
 
-   get_observer_data( mpc_code, buff, &lon, &rho_cos_phi, &rho_sin_phi);
-   return( rho_cos_phi != 0. || rho_sin_phi != 0.);
+   return( planet_idx >= 0 && (rho_cos_phi != 0. || rho_sin_phi != 0.));
 }
 
 int ephemeris_in_a_file_from_mpc_code( const char *filename,
