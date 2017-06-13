@@ -1398,8 +1398,11 @@ double take_pd89_step( const double jd, ELEMENTS *ref_orbit,
 
          /* These "original" constants can be found in Danby, p. 298.  */
          /* The ones actually used are from _Numerical Recipes_,  and  */
-         /* are claimed to be slightly better.  (Must admit,  I've not */
-         /* done a really careful comparison!)                         */
+         /* are for the Cash-Karp variant of Runge-Kutta.  NR says      */
+         /* these constants are slightly better.  (Must admit,  I've not */
+         /* done a really careful comparison!)  Dormand-Prince's method */
+         /* (the 5/4 order version,  not the 9/8 one given above) may also */
+         /* be worth a look.   */
 #ifdef ORIGINAL_FEHLBERG_CONSTANTS
 #define RKF_B21 2. / 9.
 #define RKF_B31 1. / 12.
@@ -1469,6 +1472,16 @@ double take_pd89_step( const double jd, ELEMENTS *ref_orbit,
 #define RKF_A5           1.
 #define RKF_A6            .875
 #endif
+/*   Butcher tableau looks like this :
+A1 |
+A2 | B21
+A3 | B31 B32
+A4 | B41 B42 B43
+A5 | B51 B52 B53 B54
+A6 | B61 B62 B63 B64 B65
+---+---------------------
+   | C1  C2  C3  C4  C5  C6
+   | C^1 C^2 C^3 C^4 C^5 C^6          */
 
 ldouble take_rk_stepl( const ldouble jd, ELEMENTS *ref_orbit,
                  const ldouble *ival, ldouble *ovals,
