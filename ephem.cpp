@@ -66,6 +66,8 @@ void set_window_placement( HWND hwnd, const char *ibuff);      /* orbitdlg.c */
 char *get_placement_text( HWND hwnd);                          /* orbitdlg.c */
 char *mpc_station_name( char *station_data);       /* mpc_obs.cpp */
 int remove_rgb_code( char *buff);                              /* ephem.cpp */
+void compute_variant_orbit( double *variant, const double *ref_orbit,
+                     const double n_sigmas);                /* orb_func.cpp */
 
 /////////////////////////////////////////////////////////////////////////////
 // CEphem dialog
@@ -242,17 +244,6 @@ int CEphem::GetEphemerisBitmask( )
    if( m_speed)
       rval |= OPTION_SPACE_VEL_OUTPUT;
    return( rval);
-}
-
-static void compute_variant_orbit( double *variant, const double *ref_orbit,
-                     const double n_sigmas)
-{
-   unsigned i;
-   extern double **eigenvects;
-
-   if( eigenvects)
-      for( i = 0; i < 6; i++)
-         *variant++ = *ref_orbit++ + (n_sigmas * eigenvects[0][i]);
 }
 
 void CEphem::OnClickedGo()
