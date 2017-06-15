@@ -2510,6 +2510,11 @@ int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid)
    return( n_residuals);
 }
 
+static const char *monte_label[MONTE_N_ENTRIES] = {
+                           "Tp", "e", "q", "Q", "1/a", "i", "M",
+                           "omega", "Omega" };
+
+
 /* See 'full.txt' for an explanation of why we do this.  Basically,  this
 sets up initial axes for the least-squares fit that are passably close to
 some of the principal axes of the covariance matrix (eigenvectors),  giving
@@ -2981,7 +2986,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
       debug_printf( "Making covar file\n");
    if( !err_code && *covariance_filename)
       {
-      char tbuff[20];
+      char tbuff[200];
       FILE *ofile = fopen_ext( get_file_name( tbuff, covariance_filename), "fcwb");
       double *matrix = lsquare_covariance_matrix( lsquare);
       double *wtw = lsquare_wtw_matrix( lsquare);
@@ -3128,26 +3133,44 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
             fprintf( ofile, "%s", tbuff);
             }
          }
+
+      fprintf( ofile, "\n\nCovariance in 'traditional' elements:\n");
+      *tbuff = '\0';
+      for( i = 0; i < MONTE_N_ENTRIES; i++)
+         snprintf_append( tbuff, sizeof( tbuff), "   %-7s", monte_label[i]);
+      fprintf( ofile, "%s\n", tbuff);    /* label element covariance at top */
       for( i = 0; i < MONTE_N_ENTRIES; i++)
          {
-         static const char *text[MONTE_N_ENTRIES] = {
-                           "Tp", "e", "q", "Q", "1/a", "i", "M",
-                           "omega", "Omega" };
-
-         sigma_squared = 0.;
-         for( j = 0; j < n_params; j++)
+         for( j = 0; j < MONTE_N_ENTRIES; j++)
             {
-            int k;
-            double dot = 0.;
+            int k, l;
+            double covar_elem = 0.;
+            char covar_text[20];
 
-            for( k = 0; k < n_params; k++)
-               dot += element_slopes[k][i] * matrix[k + j * n_params];
-            sigma_squared += dot * element_slopes[j][i];
+            for( l = 0; l < n_params; l++)
+               {
+               double dot = 0.;
+
+               for( k = 0; k < n_params; k++)
+                  dot += element_slopes[k][i] * matrix[k + l * n_params];
+               covar_elem += dot * element_slopes[l][j];
+               }
+            put_double_in_buff( covar_text, covar_elem);
+            fprintf( ofile, "%s", covar_text);
+            if( i == j)       /* on the diagonal of the covariance matrix: */
+               {              /* we can compute sigmas here */
+               assert( covar_elem >= 0.);
+               element_sigmas[i] = sqrt( covar_elem);
+               }
             }
-//       assert( sigma_squared >= 0.);
-         element_sigmas[i] = sqrt( sigma_squared);
+         fprintf( ofile, " %s\n", monte_label[i]);
+         }
+      fprintf( ofile, "%s\n", tbuff);   /* label element covariance at end */
+
+      for( i = 0; i < MONTE_N_ENTRIES; i++)
+         {
          put_double_in_buff( tbuff, element_sigmas[i]);
-         fprintf( ofile, "\n   %-6s %s %.9f", text[i], tbuff, elements_in_array[i]);
+         fprintf( ofile, "\n   %-6s %s %.9f", monte_label[i], tbuff, elements_in_array[i]);
          fprintf( ofile, "\n  ");
          for( j = 0; j < n_params; j++)
             {
