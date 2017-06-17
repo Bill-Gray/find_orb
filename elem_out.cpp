@@ -1716,7 +1716,7 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
    char object_name[80];
 
    get_object_name( object_name, obs->packed_id);
-   for( i = 0; i < 3; i++)
+   for( i = 0; i < MAX_N_NONGRAV_PARAMS; i++)
       solar_pressure[i] = 0.;
    n_extra_params = 0;
    if( ifile)
@@ -1736,7 +1736,7 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
                *orbit_epoch = atof( buff);
                *perturbers = 0;
                fgets_trimmed( buff, sizeof( buff), ifile);
-               for( i = 0; i < 3; i++)
+               for( i = 0; i < MAX_N_NONGRAV_PARAMS; i++)
                    solar_pressure[i] = 0.;
                n_read = sscanf( buff, "%lf%lf%lf%x%lf %lf %lf",
                              &orbit[0], &orbit[1], &orbit[2], perturbers,

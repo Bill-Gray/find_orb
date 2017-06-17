@@ -105,7 +105,7 @@ const double SRP1AU = 2.3e-7;
    /* would make it big and light.  Solar sails aren't easy.             */
 
 int n_extra_params = 0, setting_outside_of_arc = 1;
-double solar_pressure[3], uncertainty_parameter = 99.;
+double solar_pressure[MAX_N_NONGRAV_PARAMS], uncertainty_parameter = 99.;
 int available_sigmas = NO_SIGMAS_AVAILABLE;
 int available_sigmas_hash = 0;
 static bool fail_on_hitting_planet = false;
@@ -2655,7 +2655,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
                /* We save the input orbit;  if there's an error,  we can */
                /* restore it:         */
    memcpy( original_orbit, orbit, 6 * sizeof( double));
-   memcpy( original_params, solar_pressure, 3 * sizeof( double));
+   memcpy( original_params, solar_pressure, MAX_N_NONGRAV_PARAMS * sizeof( double));
    sprintf( tstr, "full improvement: %f  ", JD_TO_YEAR( epoch));
    runtime_message = tstr;
    for( i = 0; i < n_obs; i++)
@@ -2780,7 +2780,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
          double delta_val =
                       delta_vals[i] / (integration_length * integration_length);
          double worst_error_squared = 0;
-         double original_solar_pressure[3];
+         double original_solar_pressure[MAX_N_NONGRAV_PARAMS];
          double *slope_ptr;
          double rel_orbit[6];
          int set_locs_rval;
@@ -2790,12 +2790,12 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
          if( i == 6 && asteroid_mass && !n_iterations)
             delta_val = 1.e-15 + original_asteroid_mass / 100.;
          memcpy( original_solar_pressure, solar_pressure,
-                                3 * sizeof( double));
+                               n_extra_params * sizeof( double));
          do
             {
             memcpy( tweaked_orbit, orbit, 6 * sizeof( double));
             memcpy( solar_pressure, original_solar_pressure,
-                                3 * sizeof( double));
+                                n_extra_params * sizeof( double));
             for( j = 0; j < 6; j++)  /* adjust position/velocity */
                tweaked_orbit[j] -= unit_vectors[i][j] * delta_val;
             if( asteroid_mass)
@@ -2815,7 +2815,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
                {
                free( xresids);
                memcpy( orbit, original_orbit, 6 * sizeof( double));
-               memcpy( solar_pressure, original_params, 3 * sizeof( double));
+               memcpy( solar_pressure, original_params, n_extra_params * sizeof( double));
                runtime_message = NULL;
                return( -4);
                }
@@ -2922,7 +2922,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
          else
             delta_vals[i] *= 2.;
          memcpy( solar_pressure, original_solar_pressure,
-                                3 * sizeof( double));
+                                n_extra_params * sizeof( double));
          if( asteroid_mass)
             *asteroid_mass = original_asteroid_mass;
          if( n_iterations++ >= max_iterations)
@@ -2931,7 +2931,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
             debug_printf( "Worst err %f sigmas\n", worst_error_in_sigmas);
             free( xresids);
             memcpy( orbit, original_orbit, 6 * sizeof( double));
-            memcpy( solar_pressure, original_params, 3 * sizeof( double));
+            memcpy( solar_pressure, original_params, n_extra_params * sizeof( double));
             runtime_message = NULL;
             return( -4);
             }

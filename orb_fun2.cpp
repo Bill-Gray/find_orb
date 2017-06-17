@@ -365,7 +365,7 @@ static STORED_ORBIT
    STORED_ORBIT *prev;
    double epoch;
    double orbit[6];
-   double solar_pressure[3];
+   double solar_pressure[MAX_N_NONGRAV_PARAMS];
    int n_extra_params;
    } *stored = NULL;
 
@@ -382,7 +382,7 @@ void push_orbit( const double epoch, const double *orbit)
       head->prev = stored;
       head->epoch = epoch;
       memcpy( head->orbit, orbit, 6 * sizeof( double));
-      memcpy( head->solar_pressure, solar_pressure, 3 * sizeof( double));
+      memcpy( head->solar_pressure, solar_pressure, n_extra_params * sizeof( double));
       head->n_extra_params = n_extra_params;
       stored = head;
       }
@@ -400,8 +400,8 @@ int pop_orbit( double *epoch, double *orbit)
          {
          *epoch = stored->epoch;
          memcpy( orbit, stored->orbit, 6 * sizeof( double));
-         memcpy( solar_pressure, stored->solar_pressure, 3 * sizeof( double));
          n_extra_params = stored->n_extra_params;
+         memcpy( solar_pressure, stored->solar_pressure, n_extra_params * sizeof( double));
          available_sigmas = NO_SIGMAS_AVAILABLE;
          }
       free( stored);

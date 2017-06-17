@@ -63,6 +63,11 @@ RADAR_INFO
 
 int compute_radar_info( const OBSERVE *obs, RADAR_INFO *rinfo);
 
+/* So far,  there can be zero,  one,  two,  or three nongravitational
+parameters in Find_Orb.  This may get bumped up at some point. */
+
+#define MAX_N_NONGRAV_PARAMS 3
+
 /* Bitfield options for ephemeris_in_a_file( ): */
 /* Bottom three bits define an ephemeris type.  "Observables" are the */
 /* usual RA/dec,  radial velocity,  etc. type output.  "State vector  */

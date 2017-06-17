@@ -1443,7 +1443,7 @@ void COrbitDlg::OnSettings()
       monte_noise = dlg.m_monte_noise;
       constraints = CT2A( dlg.m_constraints);
       if( n_extra_params != dlg.m_physical_model)
-         solar_pressure[0] = solar_pressure[1] = solar_pressure[2] = 0.;
+         memset( solar_pressure, 0, MAX_N_NONGRAV_PARAMS * sizeof( double));
       n_extra_params = dlg.m_physical_model;
       set_environment_ptr( "REFERENCE", CT2A( dlg.m_reference));
       default_comet_magnitude_type =
