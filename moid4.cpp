@@ -160,6 +160,13 @@ double find_moid( const ELEMENTS *elem1, const ELEMENTS *elem2,
    double least_dist_squared = 10000.;
    int i, j;
 
+   if( elem1->ecc > elem2->ecc)
+      {
+      const ELEMENTS *tptr = elem1;
+
+      elem1 = elem2;
+      elem1 = tptr;
+      }
    fill_matrix( mat1, elem1);
    fill_matrix( mat2, elem2);
    for( i = 0; i < 3; i++)
