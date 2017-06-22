@@ -15,6 +15,7 @@ int debug_printf( const char *format, ...);                /* runge.cpp */
 double get_planet_mass( const int planet_idx);                /* orb_func.c */
 void remove_insignificant_digits( char *tbuff);          /* monte0.c */
 void set_up_observation( OBSERVE FAR *obs);                 /* mpc_obs.c */
+void set_obs_vect( OBSERVE FAR *obs);        /* mpc_obs.h */
 
 #define PI 3.1415926535897932384626433832795028841971693993751058209749445923
 
@@ -110,7 +111,10 @@ void restore_ra_decs_mags_times( unsigned n_obs, OBSERVE *obs,
       obs->dec = *tptr++;
       obs->obs_mag = *tptr++;
       obs->jd = *tptr++;
-      set_up_observation( obs);
+      if( obs->note2 == 'S')
+         set_obs_vect( obs);
+      else
+         set_up_observation( obs);
       obs++;
       }
 }
@@ -209,7 +213,10 @@ double *add_gaussian_noise_to_obs( int n_obs, OBSERVE *obs,
       if( obs->obs_mag != BLANK_MAG)
          obs->obs_mag += gaussian_random( ) * obs->mag_sigma;
       obs->jd  +=     gaussian_random( ) * obs->time_sigma;
-      set_up_observation( obs);
+      if( obs->note2 == 'S')
+         set_obs_vect( obs);
+      else
+         set_up_observation( obs);
       obs++;
       }
    return( rval);
