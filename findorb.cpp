@@ -4276,6 +4276,37 @@ int main( const int argc, const char **argv)
             select_element_frame( );
             update_element_display = 1;
             break;
+         case ALT_G:
+            {
+            int n_variants;
+
+            inquire( "Number orbital MC variants: ",
+                               tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY);
+            n_variants = atoi( tbuff);
+            if( n_variants > 0)
+               {
+               extern int append_elements_to_element_file;
+               const clock_t t0 = clock( );
+
+               for( i = 0; i < n_variants; i++)
+                  {
+                  push_orbit( curr_epoch, orbit);
+                  generate_mc_variant_from_covariance( orbit);
+                  if( tbuff[strlen( tbuff) - 1] == 'z')
+                     set_locs( orbit, curr_epoch, obs, n_obs);
+                  write_out_elements_to_file( orbit, curr_epoch, epoch_shown,
+                       obs, n_obs, orbit_constraints, element_precision,
+                       1, element_format);
+                  append_elements_to_element_file = 1;
+                  pop_orbit( &curr_epoch, orbit);
+                  }
+               set_locs( orbit, curr_epoch, obs, n_obs);
+               append_elements_to_element_file = 0;
+               sprintf( message_to_user, "Time: %.3f seconds",
+                      (double)( clock( ) - t0) / (double)CLOCKS_PER_SEC);
+               }
+            }
+            break;
 #ifdef GOT_CLIPBOARD_FUNCTIONS
          case ALT_I:
             i = copy_file_to_clipboard( elements_filename);
@@ -4287,7 +4318,7 @@ int main( const int argc, const char **argv)
             break;
 #endif
          case 9:
-         case ALT_A: case ALT_G: case ALT_K:
+         case ALT_A: case ALT_K:
          case ALT_P: case ALT_Q:
          case ALT_R: case ALT_X: case ALT_Y:
          case ALT_Z: case '\'':
