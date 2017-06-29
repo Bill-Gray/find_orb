@@ -191,6 +191,7 @@ int find_vaisala_orbit( double *orbit, const OBSERVE *obs1,   /* orb_func.c */
                      const OBSERVE *obs2, const double solar_r);
 int extended_orbit_fit( double *orbit, OBSERVE *obs, int n_obs,
                   const unsigned fit_type, double epoch);     /* orb_func.c */
+int generate_mc_variant_from_covariance( double *orbit);    /* orb_fun2.cpp */
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 void set_environment_ptr( const char *env_ptr, const char *new_value);
 
@@ -289,11 +290,16 @@ static int extended_getch( void)
 }
 
 #ifdef _WIN32
-int clipboard_to_file( const char *filename, const int append);      /* mpc_obs.cpp */
+#define GOT_CLIPBOARD_FUNCTIONS
+int clipboard_to_file( const char *filename, const int append); /* clipfunc.cpp */
+int copy_file_to_clipboard( const char *filename);    /* clipfunc.cpp */
+
 #elif defined __PDCURSES__
+
+#define GOT_CLIPBOARD_FUNCTIONS
 int clipboard_to_file( const char *filename, const int append)
 {
-   long size;
+   long size = -99;
    char *contents;
    int err_code;
 
@@ -311,8 +317,33 @@ int clipboard_to_file( const char *filename, const int append)
          }
       PDC_freeclipboard( contents);
       }
-   printf( "Error code %d\n", err_code);
-   return( 0);
+   return( err_code);
+}
+
+int copy_file_to_clipboard( const char *filename)
+{
+   FILE *ifile = fopen( filename, "rb");
+   int err_code = -1;
+
+   if( ifile)
+      {
+      size_t length, bytes_read;
+      char *buff;
+
+      fseek( ifile, 0L, SEEK_END);
+      length = (size_t)ftell( ifile);
+      printf( "Length is %d\n", (int)length);
+      fseek( ifile, 0L, SEEK_SET);
+      buff = (char *)malloc( length + 1);
+      assert( buff);
+      buff[length] = '\0';
+      bytes_read = fread( buff, 1, length, ifile);
+      assert( bytes_read == length);
+      fclose( ifile);
+      err_code = PDC_setclipboard( buff, length);
+      free( buff);
+      }
+   return( err_code);
 }
 #endif
 
@@ -2341,7 +2372,7 @@ int main( const int argc, const char **argv)
    if( debug_level > 2)
       debug_printf( "(2), ");
 
-#if (defined __PDCURSES__ || defined _WIN32)
+#ifdef GOT_CLIPBOARD_FUNCTIONS
    if( !strcmp( argv[1], "c") || !strcmp( argv[1], "c+"))
       {
       const char *temp_clipboard_filename = "obs_temp.txt";
@@ -4245,9 +4276,18 @@ int main( const int argc, const char **argv)
             select_element_frame( );
             update_element_display = 1;
             break;
+#ifdef GOT_CLIPBOARD_FUNCTIONS
+         case ALT_I:
+            i = copy_file_to_clipboard( elements_filename);
+            if( i)
+               sprintf( message_to_user,
+                              "Error %d in copying elements to clipboard", i);
+            else
+               strcpy( message_to_user, "Elements copied to clipboard");
+            break;
+#endif
          case 9:
-         case ALT_A:             case ALT_G:
-         case ALT_I: case ALT_K:
+         case ALT_A: case ALT_G: case ALT_K:
          case ALT_P: case ALT_Q:
          case ALT_R: case ALT_X: case ALT_Y:
          case ALT_Z: case '\'':
