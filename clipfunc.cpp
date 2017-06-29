@@ -21,8 +21,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include <windows.h>
 
 int copy_buffer_to_clipboard( const char *contents, const long length);
-int copy_file_to_clipboard( const char *filename);    /* mpc_obs.cpp */
-int clipboard_to_file( const char *filename, const int append);      /* ephem0.cpp */
+int copy_file_to_clipboard( const char *filename);    /* clipfunc.cpp */
+int clipboard_to_file( const char *filename, const int append); /* clipfunc.cpp */
 
       /* Following is copied shamelessly from pdcclip.c from PDCurses. */
       /* With one strange addition:  "solo" line feeds are expanded to */
