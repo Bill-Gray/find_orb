@@ -2846,6 +2846,7 @@ int main( const int argc, const char **argv)
             c = KEY_UP;
          else if( button & BUTTON5_PRESSED)   /* actually 'wheel down' */
             c = KEY_DOWN;
+         else
 #endif
          if( y >= station_start_line)
             {
@@ -2936,7 +2937,16 @@ int main( const int argc, const char **argv)
                }
             }
          else if( y == top_line_residual_legend && c == KEY_MOUSE)
-            c = 'k';           /* cycle the residual format */
+            {
+            if( x >= 44 && x <= 51 && base_format == RESIDUAL_FORMAT_80_COL)
+               {
+               extern int sigmas_in_columns_57_to_65;
+
+               sigmas_in_columns_57_to_65 ^= 1;
+               }
+            else
+               c = 'k';           /* cycle the residual format */
+            }
          else if( n_command_lines &&
                           y == top_line_basic_info_perturbers + n_command_lines)
             {                      /* clicked on a perturber 'radio button' */

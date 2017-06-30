@@ -2431,6 +2431,20 @@ static inline void set_obs_to_microday( OBSERVE FAR *obs)
 }
 #endif
 
+static void put_sigma( char *buff, const double val)
+{
+   char tbuff[15];
+
+   sprintf( tbuff, "%.2f", val);
+   if( *tbuff == '0')    /* skip leading zero */
+      memcpy( buff, tbuff + 1, 3);
+   else
+      memcpy( buff, tbuff, 3);
+}
+
+
+int sigmas_in_columns_57_to_65 = 0;
+
 void recreate_observation_line( char *obuff, const OBSERVE FAR *obs)
 {
    char buff[100];
@@ -2459,6 +2473,11 @@ void recreate_observation_line( char *obuff, const OBSERVE FAR *obs)
       mag_digits_to_erase = 2 - obs->mag_precision;
    memset( obuff + 70 - mag_digits_to_erase, ' ', mag_digits_to_erase);
    memcpy( obuff + 56, obs->columns_57_to_65, 9);
+   if( sigmas_in_columns_57_to_65)
+      {
+      put_sigma( obuff + 57, obs->posn_sigma_1);
+      put_sigma( obuff + 61, obs->posn_sigma_2);
+      }
    if( !obs->is_included)
       obuff[64] = 'x';
    if( obs->flags & OBS_DONT_USE)
