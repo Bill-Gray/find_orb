@@ -3159,9 +3159,8 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
             fprintf( ofile, "%s", covar_text);
             if( i == j)       /* on the diagonal of the covariance matrix: */
                {              /* we can compute sigmas here */
-               assert( covar_elem >= 0.);
-               element_sigmas[i] = sqrt( covar_elem);
-               }
+               element_sigmas[i] = (covar_elem > 0. ? sqrt( covar_elem) : 0.);
+               }              /* roundoff gets us below zero sometimes */
             }
          fprintf( ofile, " %s\n", monte_label[i]);
          }
