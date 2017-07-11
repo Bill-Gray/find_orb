@@ -2001,34 +2001,60 @@ double calc_obs_magnitude( const double obj_sun,
    return( rval);
 }
 
-/* The following function,  as the comment indicates,  assumes that a */
-/* "no band" case (obs->mag_band == ' ') must be an R mag.  That's     */
-/* probably the best guess for most modern,  unfiltered CCD             */
-/* observations.  MPC assumes a B (photographic) magnitude,  which is   */
-/* probably the best guess for older observations.  I suppose one would */
-/* ideally look at the second 'note'  which is C for CCD observations   */
-/* and P for photographic observations.  The code could then assume a  */
-/* default of R for CCD obs,  B for photographic,  and V for the      */
-/* admittedly rare micrometer or encoder-based observations.         */
-/* http://www.minorplanetcenter.net/iau/info/OpticalObs.html              */
+/* The following function,  as the comment indicates,  assumes that
+a "no band" case (obs->mag_band == ' ') must be an R mag.  That's
+probably the best guess for most modern CCD observations.  MPC
+assumes a B (photographic) magnitude,  which is probably the best
+guess for older observations.  I suppose one would ideally look at
+the second 'note'  which is C for CCD observations and P for
+photographic observations.  The code could then assume a default of
+R for CCD obs,  B for photographic,  and V for the admittedly rare
+micrometer or encoder-based observations.
 
-/* Estimates for the mag band shifts in R, B, I, and U are from a post by */
-/* Petr Pravec,  http://tech.groups.yahoo.com/group/mpml/message/24833,   */
-/* in turn derived from data in Shevchenko and Lupishko, Solar System     */
-/* Research 32, 220-232, 1998.                                            */
+It may be more accurate to infer a mag_band code based on the catalog
+being used:  'r' for any of the UCACs,  'G' for Gaia,  'V' for GSC-1.x
+for declinations north of +3 and 'R' south of that,  etc.  The idea
+is that if you used UCAC magnitudes for calibration,  you're reporting
+an 'r' magnitude,  no matter what filter you had.  Problems are cases
+where the photometry was done with a different catalog than the astrometry;
+or the catalog had multiple magnitude bands (Ax.0,  B1.0);  or tricky
+things were done to "adjust" the magnitudes to a different band,  using
+either 2MASS colors to estimate a color correction or just ass uming
+an average color correction.
 
-    /* grizyw (Sloan magnitudes) come from table 1, p. 360, 2013 April,
-       Publications of the Astro Soc of Pacific, 2013 PASP, 125:357-395,
-       Denneau et. al., 'The Pan-STARRS Moving Object Process System' */
+'C' ('clear',  'unfiltered') magnitudes are something of a problem.
+They never really should have existed.  As described above,  the key
+thing isn't what filter you use (though that's a nice thing to
+know);  it's what sort of reference photometry you used.  At
+present,   I'm treating 'C' magnitudes as close enough to 'R' or
+'blank'.  (I perhaps should treat them as 'probably wrong' and give
+them minimal or no weight in the computation of H values.)
+
+Estimates for the mag band shifts in R, B, I, and U are from a post by
+Petr Pravec,  http://tech.groups.yahoo.com/group/mpml/message/24833,
+in turn derived from data in Shevchenko and Lupishko, Solar System
+Research 32, 220-232, 1998 :
+
+http://www.asu.cas.cz/~ppravec/ShevchenkoandLupishko1998.pdf
+
+grizyw (Sloan magnitudes) come from table 1, p. 360, 2013 April,
+Publications of the Astro Soc of Pacific, 2013 PASP, 125:357-395,
+Denneau et. al., 'The Pan-STARRS Moving Object Process System'
+
+2017 Jul 11:  David Tholen found V-G=0.28 (private communication at
+present,  will give a "proper" reference once it's published...
+also provides V-G as quadratic functions of V-I or V-R,  which
+should be handy in other contexts) */
 
 double mag_band_shift( const char mag_band)
 {
    double rval = 0.;
-   const char *bands = "R BIUCgrizyw";
+   const char *bands = "R BIUCgrizywG";
    const double offsets[] = { .43, .43,
                      /* R and 'no band' are treated alike */
-         -.77, .82, 1.16, .4,    /* B, I, U, C */
-         -0.28, 0.23, 0.39, 0.37, 0.36, 0.16 };
+         -.77, .82, -1.16, .4,    /* B, I, U, C */
+         -0.28, 0.23, 0.39, 0.37, 0.36, 0.16,     /* grizyw */
+         0.28 };                                  /* G */
    const char *tptr = strchr( bands, mag_band);
 
    if( tptr)
@@ -2150,6 +2176,7 @@ extern int use_blunder_method;
 extern bool use_sigmas;
 extern double ephemeris_mag_limit;
 extern int apply_debiasing;
+extern int sigmas_in_columns_57_to_65;
 
 int store_defaults( const int ephemeris_output_options,
          const int element_format, const int element_precision,
@@ -2170,7 +2197,8 @@ int store_defaults( const int ephemeris_output_options,
               use_blunder_method);
    set_environment_ptr( "FILTERING", buff);
    sprintf( buff, "%d %.2f %d %d %d", use_sigmas ? 1 : 0,
-                                 ephemeris_mag_limit, 0,
+                                 ephemeris_mag_limit,
+                                 sigmas_in_columns_57_to_65,
                                  forced_central_body,
                                  apply_debiasing);
    set_environment_ptr( "SETTINGS2", buff);
@@ -2192,7 +2220,6 @@ int get_defaults( int *ephemeris_output_options, int *element_format,
    extern double maximum_observation_span;
    extern int use_config_directory;
    int i, use_sigmas_int;
-   int previously_alt_mpcorb;    /* option that's now obsolete */
    const char *override_fcct14_filename = get_environment_ptr( "FCCT14_FILE");
 
    if( *language)
@@ -2247,7 +2274,7 @@ int get_defaults( int *ephemeris_output_options, int *element_format,
    probability_of_blunder /= 100.;        /* cvt from percent to raw prob */
    sscanf( get_environment_ptr( "SETTINGS2"), "%d %lf %d %d %d",
                &use_sigmas_int, &ephemeris_mag_limit,
-               &previously_alt_mpcorb, &forced_central_body,
+               &sigmas_in_columns_57_to_65, &forced_central_body,
                &apply_debiasing);
 
    use_sigmas = (use_sigmas_int ? true : false);
