@@ -55,10 +55,14 @@
  413                                    .3                Siding Spring
  E12                                    .25               Siding Spring #2
  568 2                                  .1          .2    David Tholen et. al., Mauna Kea
+ T09                                    .1          .2    David Tholen et. al., Subaru
+ T12                                    .1          .2    David Tholen et. al., 2.24-m
+ T14                                    .1          .2    David Tholen et. al., CFHT
  568 ~                                  .1          .2    TNO survey folks, Mauna Kea
  J95                                    .2          .2    Great Shefford
  J75                                    .2          .1    La Sagra
-#   (J95) and Tholen at (568) have demonstrated,  via observations of
+ Y00                                                .2    SONEAR
+#   (J95), (Y00) and Tholen at (568) have demonstrated,  via observations of
 # artsats,  that they really have gotten timing right.  (J75) has had
 # cause to observe very fast-moving artsats;  their actual time sigma
 # is probably quite a bit better than the above .1 second.
