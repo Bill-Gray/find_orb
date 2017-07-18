@@ -87,10 +87,12 @@ int get_multipart_form_data( const char *boundary, char *field,
                 char *buff, char *filename, const size_t max_len)
 {
    char *tptr, *endptr;
-   size_t bytes_read = 0;
+   size_t bytes_read = 0, blen = 0;
 
    if( filename)
       *filename = '\0';
+   while( boundary[blen] >= ' ')
+      blen++;
    if( fgets( buff, (int)max_len, stdin)
                   && (tptr = strstr( buff, "name=\"")) != NULL
                   && (endptr = strchr( tptr + 6, '"')) != NULL)
@@ -109,7 +111,7 @@ int get_multipart_form_data( const char *boundary, char *field,
          {
          while( bytes_read < max_len - 1 &&
                  fgets( buff + bytes_read, (int)( max_len - bytes_read), stdin)
-                 && strcmp( buff + bytes_read, boundary))
+                 && memcmp( buff + bytes_read, boundary, blen))
             bytes_read += strlen( buff + bytes_read);
          }
       }
