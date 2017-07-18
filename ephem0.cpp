@@ -2473,10 +2473,16 @@ void recreate_observation_line( char *obuff, const OBSERVE FAR *obs)
       mag_digits_to_erase = 2 - obs->mag_precision;
    memset( obuff + 70 - mag_digits_to_erase, ' ', mag_digits_to_erase);
    memcpy( obuff + 56, obs->columns_57_to_65, 9);
-   if( sigmas_in_columns_57_to_65)
+   if( sigmas_in_columns_57_to_65 &&
+               !memcmp( obuff + 56, "         ", 9))
       {
-      put_sigma( obuff + 57, obs->posn_sigma_1);
-      put_sigma( obuff + 61, obs->posn_sigma_2);
+      if( obs->posn_sigma_1 == obs->posn_sigma_2)
+         put_sigma( obuff + 59, obs->posn_sigma_1);
+      else
+         {
+         put_sigma( obuff + 57, obs->posn_sigma_1);
+         put_sigma( obuff + 61, obs->posn_sigma_2);
+         }
       }
    if( !obs->is_included)
       obuff[64] = 'x';

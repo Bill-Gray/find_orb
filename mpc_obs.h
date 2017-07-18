@@ -247,6 +247,8 @@ int clean_up_find_orb_memory( void);         /* orb_func.cpp */
                   roundoff errors;  you'd not normally do this!
    if( resid_format & 0x100),  residuals are shown with extra digits,  but
         in 'computer-friendly' (no suffixes,  etc.) form.
+   if( resid_format & 0x200),  residuals are shown on-screen in RA/dec,
+        time/cross-track,  and total angular/magnitude.
 */
 
 #define RESIDUAL_FORMAT_FULL_NO_TABS          0

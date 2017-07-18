@@ -1565,7 +1565,7 @@ static const char *legends[] = {
 "YYYY MM DD.DDDDD    Obs   RA (J2000)     dec          Xres  Yres   delta  R",
 NULL,       /* this is the 'with tabs' format used in Windows Find_Orb */
 " YYMMDD Obs  Xres  Yres     ",
-"   YYYY MM DD.DDDDD   RA (J2000)   dec               mag     ref Obs   Xres  Yres   delta  R" };
+"   YYYY MM DD.DDDDD   RA (J2000)   dec      sigmas   mag     ref Obs   Xres  Yres   delta  R" };
 
 static void show_residual_legend( const int line_no, const int residual_format)
 {
@@ -2820,8 +2820,10 @@ int main( const int argc, const char **argv)
          wchar_t text[100], *search_ptr;
          const wchar_t *search_strings[] = { L"Peri", L"Epoch", L"(J2000 ecliptic)",
                   L"(J2000 equator)", L"(body frame)",
+                  L"sigmas",
                   L"Xres  Yres", L"Tres  Cres", L" delta ", L"Sigma", NULL };
-         const int search_char[] = { '+', 'e', ALT_N, ALT_N, ALT_N, 't', 't', '=', '%' };
+         const int search_char[] = { '+', 'e', ALT_N, ALT_N, ALT_N,
+                  ALT_K, 't', 't', '=', '%' };
 
          get_mouse_data( (int *)&x, (int *)&y, (int *)&z, &button);
          for( i = 0; i < 99 && i < getmaxx( stdscr); i++)
@@ -2937,16 +2939,7 @@ int main( const int argc, const char **argv)
                }
             }
          else if( y == top_line_residual_legend && c == KEY_MOUSE)
-            {
-            if( x >= 44 && x <= 51 && base_format == RESIDUAL_FORMAT_80_COL)
-               {
-               extern int sigmas_in_columns_57_to_65;
-
-               sigmas_in_columns_57_to_65 ^= 1;
-               }
-            else
-               c = 'k';           /* cycle the residual format */
-            }
+            c = 'k';           /* cycle the residual format */
          else if( n_command_lines &&
                           y == top_line_basic_info_perturbers + n_command_lines)
             {                      /* clicked on a perturber 'radio button' */
@@ -4327,8 +4320,14 @@ int main( const int argc, const char **argv)
                strcpy( message_to_user, "Elements copied to clipboard");
             break;
 #endif
-         case 9:
-         case ALT_A: case ALT_K:
+         case ALT_K:
+            {
+            extern int sigmas_in_columns_57_to_65;
+
+            sigmas_in_columns_57_to_65 ^= 1;
+            }
+            break;
+         case ALT_A: case 9:
          case ALT_P: case ALT_Q:
          case ALT_R: case ALT_X: case ALT_Y:
          case ALT_Z: case '\'':
