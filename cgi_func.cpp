@@ -15,6 +15,8 @@ examples of usage.
 */
 
 void avoid_runaway_process( const int max_time_to_run);   /* cgi_func.c */
+int get_urlencoded_form_data( char *field, const size_t max_field,
+                              char *buff, const size_t max_buff);
 int get_multipart_form_data( const char *boundary, char *field,
                 char *buff, char *filename, const size_t max_len);
 
@@ -82,6 +84,50 @@ void avoid_runaway_process( const int max_time_to_run)
 {
 }
 #endif         /* _WIN32 */
+
+static int get_urlencoded_piece( char *buff, size_t max_buff,
+                                 const char end_char)
+{
+   int c;
+
+   max_buff--;
+   while( (c = fgetc( stdin)) != EOF && max_buff-- && c != end_char)
+      {
+      if( c == '+')
+         c = ' ';
+      else if( c == '%')
+         {
+         int i, c1;
+
+         c = 0;
+         for( i = 0; i < 2; i++)
+            {
+            c *= 16;
+            c1 = fgetc( stdin);
+            if( c1 >= '0' && c1 <= '9')
+               c += c1 - '0';
+            else if( c1 >= 'A' && c1 <= 'F')
+               c += c1 - 'A' + 10;
+            else                    /* wasn't an hex digit: */
+               return( -1);         /* not supposed to happen */
+            }
+         }
+      *buff++ = (char)c;
+      }
+   *buff =  '\0';
+   return( c);
+}
+
+int get_urlencoded_form_data( char *field, const size_t max_field,
+                              char *buff, const size_t max_buff)
+{
+   int c;
+
+   if( get_urlencoded_piece( field, max_field, '=') != '=')
+      return( -1);
+   c = get_urlencoded_piece( buff, max_buff, '&');
+   return( c != '&' && c != EOF);
+}
 
 int get_multipart_form_data( const char *boundary, char *field,
                 char *buff, char *filename, const size_t max_len)
