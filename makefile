@@ -60,7 +60,7 @@ endif
 
 ifdef XCOMPILE
 	CC=x86_64-w64-mingw32-g++
-	ADDED_CFLAGS=-DUTF8 -DPDC_WIDE -I $(INSTALL_DIR)/include
+	ADDED_CFLAGS=-DUTF8 -DPDC_WIDE -I $(INSTALL_DIR)/include -I../PDCurses
  OBJSADDED=clipfunc.o
 	EXE=.exe
 	CURSES_LIB=-lpdcurses -static-libgcc
@@ -73,9 +73,9 @@ CFLAGS=-c -O3 -Wall -pedantic -Wextra -Wno-unused-parameter -I $(INSTALL_DIR)/in
 
 OBJS=b32_eph.o bc405.o bias.o collide.o conv_ele.o eigen.o \
 	elem2tle.o elem_out.o elem_ou2.o ephem0.o errors.o gauss.o   \
-	geo_pot.o healpix.o lsquare.o miscell.o moid4.o monte0.o  \
-	mpc_obs.o mt64.o orb_func.o orb_fun2.o pl_cache.o roots.o  \
-	runge.o sigma.o sm_vsop.o sr.o $(OBJSADDED)
+	geo_pot.o healpix.o lsquare.o miscell.o moid4.o monte0.o mpc_fmt.o \
+	mpc_obs.o mt64.o nanosecs.o orb_func.o orb_fun2.o pl_cache.o roots.o  \
+	runge.o shellsor.o sigma.o sm_vsop.o sr.o $(OBJSADDED)
 
 LIBS=$(LIBSADDED) -llunar -ljpl -lsatell
 
