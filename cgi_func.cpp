@@ -15,7 +15,8 @@ examples of usage.
 */
 
 void avoid_runaway_process( const int max_time_to_run);   /* cgi_func.c */
-int get_urlencoded_form_data( char *field, const size_t max_field,
+int get_urlencoded_form_data( const char **idata,       /* cgi_func.c */
+                              char *field, const size_t max_field,
                               char *buff, const size_t max_buff);
 int get_multipart_form_data( const char *boundary, char *field,
                 char *buff, char *filename, const size_t max_len);
@@ -85,13 +86,14 @@ void avoid_runaway_process( const int max_time_to_run)
 }
 #endif         /* _WIN32 */
 
-static int get_urlencoded_piece( char *buff, size_t max_buff,
-                                 const char end_char)
+static int get_urlencoded_piece( const char **idata,
+              char *buff, size_t max_buff, const char end_char)
 {
    int c;
+   const char *tptr = *idata;
 
    max_buff--;
-   while( (c = fgetc( stdin)) != EOF && max_buff-- && c != end_char)
+   while( (c = *tptr++) > 13 && max_buff-- && c != end_char)
       {
       if( c == '+')
          c = ' ';
@@ -103,7 +105,7 @@ static int get_urlencoded_piece( char *buff, size_t max_buff,
          for( i = 0; i < 2; i++)
             {
             c *= 16;
-            c1 = fgetc( stdin);
+            c1 = *tptr++;
             if( c1 >= '0' && c1 <= '9')
                c += c1 - '0';
             else if( c1 >= 'A' && c1 <= 'F')
@@ -115,18 +117,20 @@ static int get_urlencoded_piece( char *buff, size_t max_buff,
       *buff++ = (char)c;
       }
    *buff =  '\0';
+   *idata = tptr;
    return( c);
 }
 
-int get_urlencoded_form_data( char *field, const size_t max_field,
+int get_urlencoded_form_data( const char **idata,
+                              char *field, const size_t max_field,
                               char *buff, const size_t max_buff)
 {
    int c;
 
-   if( get_urlencoded_piece( field, max_field, '=') != '=')
+   if( get_urlencoded_piece( idata, field, max_field, '=') != '=')
       return( -1);
-   c = get_urlencoded_piece( buff, max_buff, '&');
-   return( c != '&' && c != EOF);
+   c = get_urlencoded_piece( idata, buff, max_buff, '&');
+   return( c != '&' && c > 13);
 }
 
 int get_multipart_form_data( const char *boundary, char *field,
