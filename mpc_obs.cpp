@@ -2331,6 +2331,21 @@ sigmas are similarly converted.
 
 */
 
+static void xfer_rwo_time_to_mpc( char *obuff, const char *ibuff)
+{
+   if( ibuff[17] == ' ')            /* six or fewer decimals:  leave in */
+      memcpy( obuff, ibuff, 17);    /* MPC 'standard' 80-column format */
+   else                           /* >6 decimals,  won't fit 'standard'; */
+      {                           /* use Find_Orb CYYMMDD.ddddddddd format */
+      obuff[0] = 'A' + (ibuff[0] - '1') * 10 + ibuff[1] - '0';
+      obuff[1] = ibuff[2];    /* decade */
+      obuff[2] = ibuff[3];    /* year */
+      obuff[3] = ibuff[5];    /* month, tens */
+      obuff[4] = ibuff[6];    /* month, units */
+      memcpy( obuff + 5, ibuff + 8, 12);     /* DD.ddddddddd */
+      }
+}
+
 #define MINIMUM_RWO_LENGTH 117
 
 static int rwo_to_mpc( char *buff, double *ra_bias, double *dec_bias,
@@ -2350,8 +2365,7 @@ static int rwo_to_mpc( char *buff, double *ra_bias, double *dec_bias,
          debug_printf( "Input: '%s'\n", buff);
       memset( obuff, ' ', 80);
       obuff[14] = buff[13];   /* obs type */
-      for( i = 15; i < 33; i++)     /* Year,  month,  day */
-         obuff[i] = buff[i + 2];
+      xfer_rwo_time_to_mpc( obuff + 15, buff + 17);
       obuff[32] = buff[34];      /* units specifier */
       memcpy( obuff + 34, buff + 36, 36);  /* xyz */
       memcpy( obuff + 77, buff + 72, 3);   /* MPC code */
@@ -2383,8 +2397,7 @@ static int rwo_to_mpc( char *buff, double *ra_bias, double *dec_bias,
 
       memset( obuff, ' ', 80);
       obuff[14] = buff[13];   /* obs type */
-      for( i = 15; i < 33; i++)     /* Year,  month,  day */
-         obuff[i] = buff[i + 2];
+      xfer_rwo_time_to_mpc( obuff + 15, buff + 17);
       for( i = 32; i < 44; i++)     /* RA */
          obuff[i] = buff[i + 18];
       for( i = 44; i < 56; i++)     /* dec */
