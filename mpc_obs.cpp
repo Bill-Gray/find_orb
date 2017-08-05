@@ -3800,9 +3800,9 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
 
 void put_observer_data_in_text( const char FAR *mpc_code, char *buff)
 {
-   double lon, rho_cos_phi, rho_sin_phi;
-   const int planet_idx = get_observer_data( mpc_code, buff,
-                                  &lon, &rho_cos_phi, &rho_sin_phi);
+   double lon, lat, alt_in_meters;
+   const int planet_idx = get_observer_data_latlon( mpc_code, buff,
+                             &lon, &lat, &alt_in_meters);
 
    if( planet_idx == -1)
       {
@@ -3816,16 +3816,10 @@ void put_observer_data_in_text( const char FAR *mpc_code, char *buff)
       char *name = mpc_station_name( buff);
 
       memmove( buff, name, strlen( name) + 1);
-      if( rho_cos_phi)
+      if( lon || lat)
          {
-         double lat, unused_ht_in_meters;
          const char *output_format = "  (%c%.6f %c%.6f)";
 
-                 /* Cvt parallax data from AU back into earth-axis units: */
-         rho_cos_phi /= EARTH_MAJOR_AXIS_IN_AU;
-         rho_sin_phi /= EARTH_MAJOR_AXIS_IN_AU;
-         parallax_to_lat_alt( rho_cos_phi, rho_sin_phi, &lat,
-                           &unused_ht_in_meters, planet_idx);
          snprintf_append( buff, 80, output_format,
                            (lat > 0. ? 'N' : 'S'), fabs( lat) * 180. / PI,
                            (lon > 0. ? 'E' : 'W'), fabs( lon) * 180. / PI);
