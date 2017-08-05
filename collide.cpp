@@ -36,8 +36,8 @@ const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 double find_collision_time( ELEMENTS *elem, double *latlon, const int is_impact);
 double planet_axis_ratio( const int planet_idx);            /* collide.cpp */
 double planet_radius_in_meters( const int planet_idx);      /* collide.cpp */
-int find_lat_lon_alt( const double jd, const double *ivect,  /* collide.cpp */
-                                   double *lat_lon_alt, const bool geometric);
+double find_lat_lon_alt( const double ut, const double *ivect,
+                  const int planet_no, double *lat_lon, const bool geometric);
 void calc_approx_planet_orientation( const int planet,        /* runge.cpp */
          const int system_number, const double jde, double *matrix);
 
@@ -72,14 +72,15 @@ double planet_axis_ratio( const int planet_idx)
    return( planet_idx >= N_FLATTENINGS ? 1. : 1. - flattenings[planet_idx]);
 }
 
-static double find_geodetic_lat_lon_alt( const double ut, const double *ivect,
-                     const int planet_no, double *lat_lon)
+double find_lat_lon_alt( const double ut, const double *ivect,
+                  const int planet_no, double *lat_lon, const bool geometric)
 {
    double planet_matrix[9];
    double loc[3], loc2k[3], alt_in_meters;
    const double planet_radius_in_au =
           planet_radius_in_meters( planet_no) / AU_IN_METERS;
    int i;
+   double rho_sin_phi, rho_cos_phi;
 
    loc2k[0] = ivect[0];
    loc2k[1] = ivect[1];
@@ -92,7 +93,18 @@ static double find_geodetic_lat_lon_alt( const double ut, const double *ivect,
       lat_lon[0] += PI + PI;
    for( i = 0; i < 3; i++)          /* then cvt from AU to planet radii: */
       loc[i] /= planet_radius_in_au;
-   parallax_to_lat_alt( sqrt( loc[0] * loc[0] + loc[1] * loc[1]), loc[2],
+   rho_cos_phi = sqrt( loc[0] * loc[0] + loc[1] * loc[1]);
+   rho_sin_phi = loc[2];
+   if( geometric)
+      {
+      const double planet_radius_in_meters =
+
+               planet_radius_in_au * AU_IN_METERS;
+      lat_lon[1] = atan( rho_sin_phi / rho_cos_phi);
+      alt_in_meters = vector3_length( loc) * planet_radius_in_meters;
+      }
+   else
+      parallax_to_lat_alt( rho_cos_phi, rho_sin_phi,
                        lat_lon + 1, &alt_in_meters, planet_no);
    return( alt_in_meters);
 }
@@ -122,8 +134,8 @@ double find_collision_time( ELEMENTS *elem, double *latlon, const int is_impact)
          ecliptic_to_equatorial( loc2k);
       jd = elem->perih_time + t0;
       ut = jd - td_minus_ut( jd) / seconds_per_day;
-      alt_in_meters = find_geodetic_lat_lon_alt( ut, loc2k, elem->central_obj,
-                                    latlon);
+      alt_in_meters = find_lat_lon_alt( ut, loc2k, elem->central_obj,
+                                    latlon, false);
       if( alt_in_meters < alt_0)
          t_high = t0;
       else
@@ -131,50 +143,4 @@ double find_collision_time( ELEMENTS *elem, double *latlon, const int is_impact)
       t0 = (t_low + t_high) / 2.;
       }
    return( t0);
-}
-
-/* 30 Jan 2009:  Rob Matson asked if I could provide ephemerides in
-   geodetic lat/lon/alt for 2008 TC3,  in aid of running the resulting
-   vector through the atmosphere. Input vector is assumed to be in
-   geocentric equatorial J2000 and in AU;  time is assumed to be TT.
-   Note shameless cannibalisation of code from above. */
-
-int find_lat_lon_alt( const double jd, const double *ivect,
-                                  double *lat_lon_alt, const bool geometric)
-{
-   double planet_matrix[9];
-   double loc[3], loc2k[3];
-   double rho_cos_phi, rho_sin_phi;
-   const double ut = jd - td_minus_ut( jd) / seconds_per_day;
-
-   loc2k[0] = ivect[0];
-   loc2k[1] = ivect[1];
-   loc2k[2] = ivect[2];
-   calc_planet_orientation( 3, 0, ut, planet_matrix);
-               /* cvt J2000 to planet-centric coords: */
-   precess_vector( planet_matrix, loc2k, loc);
-   lat_lon_alt[0] = -atan2( loc[1], loc[0]);
-   if( lat_lon_alt[0] < 0.)           /* keep in 0-360 range */
-      lat_lon_alt[0] += PI + PI;
-
-   rho_cos_phi = sqrt( loc[0] * loc[0] + loc[1] * loc[1]);
-   rho_sin_phi = loc[2];
-   if( geometric)
-      {
-      lat_lon_alt[1] = atan( rho_sin_phi / rho_cos_phi);
-      lat_lon_alt[2] = vector3_length( loc);
-      }
-   else
-      {
-      const double planet_radius_in_au =
-               planet_radius_in_meters( 3) / AU_IN_METERS;
-      double ht_in_meters;
-
-      rho_cos_phi /= planet_radius_in_au;
-      rho_sin_phi /= planet_radius_in_au;
-      parallax_to_lat_alt( rho_cos_phi, rho_sin_phi,
-               lat_lon_alt + 1,  &ht_in_meters, 3);
-      lat_lon_alt[2] = ht_in_meters / AU_IN_METERS;
-      }
-   return( 0);
 }

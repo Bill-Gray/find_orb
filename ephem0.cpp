@@ -388,8 +388,8 @@ it in,  then commented it out.  I'd have removed it,  but I'm thinking
 this might be a useful option someday.  */
 
 #ifdef ROB_MATSON_TEST_CODE
-int find_lat_lon_alt( const double jd, const double *ivect,  /* collide.cpp */
-                                  double *lat_lon_alt, const bool geometric);
+double find_lat_lon_alt( const double ut, const double *ivect,
+                  const int planet_no, double *lat_lon, const bool geometric);
 #endif
 
 /* 'get_step_size' parses input text to get a step size in days,  so that */
@@ -1820,14 +1820,15 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
             if( options & OPTION_GROUND_TRACK)
                {
                char *tptr = buff + strlen( buff);
-               double lat_lon_alt[3];
+               double lat_lon[2], alt_in_meters;
+               const double meters_per_km = 1000.;
 
-               find_lat_lon_alt( ephemeris_t, geo, lat_lon_alt,
+               alt_in_meters = find_lat_lon_alt( utc, geo, 3, lat_lon,
                         *get_environment_ptr( "GEOMETRIC_GROUND_TRACK") == '1');
                sprintf( tptr, "%9.4f %+08.4f %10.3f",
-                     lat_lon_alt[0] * 180. / PI,
-                     lat_lon_alt[1] * 180. / PI,
-                     lat_lon_alt[2] * AU_IN_KM);
+                     lat_lon[0] * 180. / PI,
+                     lat_lon[1] * 180. / PI,
+                     alt_in_meters / meters_per_km);
                tptr[29] = '\0';
                }
 #endif
