@@ -383,14 +383,13 @@ static void format_velocity_in_buff( char *buff, double vel)
 }
 
 /* Rob Matson asked about having the program produce ECF (Earth-Centered
-Fixed) coordinates,  in geometric lat/lon/altitude form.  I just hacked
-it in,  then commented it out.  I'd have removed it,  but I'm thinking
-this might be a useful option someday.  */
+Fixed) coordinates,  in geometric lat/lon/altitude form.  This 'ground
+track' option in ephemerides has since been expanded to allow geodetic
+output,  with the possibility of creating such ephemerides from other
+planets as well. */
 
-#ifdef ROB_MATSON_TEST_CODE
 double find_lat_lon_alt( const double ut, const double *ivect,
                   const int planet_no, double *lat_lon, const bool geometric);
-#endif
 
 /* 'get_step_size' parses input text to get a step size in days,  so that */
 /* '4h' becomes .16667 days,  '30m' becomes 1/48 day,  and '10s' becomes  */
@@ -1244,10 +1243,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
             fprintf( ofile, "  rvel ");
          if( show_radar_data)
             fprintf( ofile, "  SNR");
-#ifdef ROB_MATSON_TEST_CODE
          if( options & OPTION_GROUND_TRACK)
             fprintf( ofile, "  lon      lat      alt (km) ");
-#endif
          if( options & OPTION_SPACE_VEL_OUTPUT)
             fprintf( ofile, "  svel ");
          if( show_uncertainties)
@@ -1281,10 +1278,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
             fprintf( ofile, "  -----");
          if( show_radar_data)
             fprintf( ofile, " ----");
-#ifdef ROB_MATSON_TEST_CODE
          if( options & OPTION_GROUND_TRACK)
             fprintf( ofile, " -------- -------- ----------");
-#endif
          if( options & OPTION_SPACE_VEL_OUTPUT)
             fprintf( ofile, "  -----");
          if( show_uncertainties)
@@ -1816,14 +1811,13 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   show_packed_with_si_prefixes( tptr + 1, snr);
                   }
                }
-#ifdef ROB_MATSON_TEST_CODE
             if( options & OPTION_GROUND_TRACK)
                {
                char *tptr = buff + strlen( buff);
                double lat_lon[2], alt_in_meters;
                const double meters_per_km = 1000.;
 
-               alt_in_meters = find_lat_lon_alt( utc, geo, 3, lat_lon,
+               alt_in_meters = find_lat_lon_alt( utc, geo, planet_no, lat_lon,
                         *get_environment_ptr( "GEOMETRIC_GROUND_TRACK") == '1');
                sprintf( tptr, "%9.4f %+08.4f %10.3f",
                      lat_lon[0] * 180. / PI,
@@ -1831,7 +1825,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                      alt_in_meters / meters_per_km);
                tptr[29] = '\0';
                }
-#endif
+
             if( options & OPTION_SPACE_VEL_OUTPUT)
                {
                         /* get 'full' velocity; cvt AU/day to km/sec: */
