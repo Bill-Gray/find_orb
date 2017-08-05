@@ -868,6 +868,7 @@ int write_out_elements_to_file( const double *orbit,
    extern unsigned perturbers;
    int reference_shown = 0;
    double moids[N_MOIDS + 1];
+   double j2000_ecliptic_rel_orbit[6];
    double barbee_style_delta_v = 0.;   /* see 'moid4.cpp' */
    const char *monte_carlo_permits;
    const bool rms_ok = (compute_rms( obs, n_obs) < max_monte_rms);
@@ -904,6 +905,7 @@ int write_out_elements_to_file( const double *orbit,
    else
       planet_orbiting = find_best_fit_planet( epoch_shown, orbit2, rel_orbit);
 
+   memcpy( j2000_ecliptic_rel_orbit, rel_orbit, 6 * sizeof( double));
             /* By default,  we use J2000 equatorial elements for geocentric
             elements,  J2000 ecliptic for everybody else. */
    if( elements_frame == ELEMENT_FRAME_DEFAULT)
@@ -1391,16 +1393,18 @@ int write_out_elements_to_file( const double *orbit,
    *impact_buff = '\0';
    if( elem.central_obj < 15)
       {
-      double latlon[2];
+      double latlon[2], t0;
       const int is_an_impact = (obs->jd < elem.perih_time);
                                          /* basically means,  "if we */
                                          /* observed the object after */
                                          /* periapsis, must be a launch; */
                                          /* otherwise,  must be impact." */
-//    const double saved_mean_anomaly = elem.mean_anomaly;
-      const double t0 = find_collision_time( &elem, latlon, is_an_impact);
+      ELEMENTS j2000_ecliptic_rel_elem = elem;
 
-//    elem.mean_anomaly = saved_mean_anomaly;
+      calc_classical_elements( &j2000_ecliptic_rel_elem,
+                                j2000_ecliptic_rel_orbit, epoch_shown, 1);
+
+      t0 = find_collision_time( &j2000_ecliptic_rel_elem, latlon, is_an_impact);
       if( t0 < 1.)      /* t0 = 1 -> it was a miss after all */
          {
          char *end_ptr;
