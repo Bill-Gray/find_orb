@@ -128,10 +128,7 @@ double find_collision_time( ELEMENTS *elem, double *latlon, const int is_impact)
       double alt_in_meters, ut, jd;
 
       comet_posn_and_vel( elem, elem->perih_time + t0, loc2k, vel2k);
-                /* Geocentric elems are already in J2000 equatorial coords. */
-                /* Others are in ecliptic,  so cvt them to equatorial:      */
-      if( elem->central_obj != 3)
-         ecliptic_to_equatorial( loc2k);
+      ecliptic_to_equatorial( loc2k);
       jd = elem->perih_time + t0;
       ut = jd - td_minus_ut( jd) / seconds_per_day;
       alt_in_meters = find_lat_lon_alt( ut, loc2k, elem->central_obj,
