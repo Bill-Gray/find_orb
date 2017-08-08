@@ -6,6 +6,11 @@
 # and the TLE-based ephemeris, in kilometers,  is given for each TLE
 # as the "worst residual".
 #
+#    This fitting is done using the 'eph2tle' code packaged with Find_Orb.
+# The code has details on how the TLEs were computed :
+#
+#    https://github.com/Bill-Gray/find_orb/eph2tle.cpp
+#
 #    Be warned:  the error given is that between the numerically
 # integrated ephems and the TLE model.  There will usually be at
 # least some additional difference between the ephems and the actual

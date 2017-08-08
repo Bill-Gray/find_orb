@@ -1,3 +1,65 @@
+/* eph2tle.cpp: computes TLEs (Two-Line Elements) fitting numerically
+integrated ephemerides of artificial satellites.  Executive summary
+of what it does follows this GPL licence text.
+
+Copyright (C) 2015-2017, Project Pluto
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301, USA.
+
+*****************************
+
+   'eph2tle' assumes you've computed an orbit for your artsat
+of interest using Find_Orb.  You've then computed an ephemeris
+of geocentric J2000 equatorial state vectors with a small step
+size (I almost always use 0.1 days).
+
+   You can then run,  for example,
+
+./eph2tle ephemeri.txt -o 13070b.tle
+
+   to compute TLEs fitted to the ephemerides in 'ephemeri.txt'.
+
+   By default,  the program reads in ten state vectors,  covering
+a particular day,  and fits the TLE to those.  If the ephemeris
+step size was,  say,  0.3 days,  and you used the '-f20' option
+to tell eph2tle to read 20 state vectors at a time,  you'd get
+TLEs that would each cover a six-day span.  Usually,  though,
+TLEs covering longer time spans will have higher "worst errors".
+
+   The program first fits a TLE to the middle state vector.  It
+has a quick and dirty way of doing this (iterated_vector_to_tle)
+which almost always converges nicely for objects with orbital
+periods of less than two days.  Even if it doesn't converge,  it
+provides a starting point for a downhill simplex search fitting
+to all ten state vectors.  After that,  we try a least-squares
+fit to get a "better" TLE.
+
+   We then output the resulting TLE and move on to the next ten
+state vectors.
+
+   Convergence usually happens,  but it's not guaranteed.  For
+one thing,  you can't fit a TLE to an hyperbolic orbit.  Fitting
+a TLE to an object passing the Moon usually doesn't work.  There
+are some other situations,  all involving high-flying objects,
+that have horrible residuals.  These may reflect the inability
+of the SDP4 model to fit every possible geocentric orbit (you
+do get fits in such cases when forcing use of SGP4),  but I'm
+not totally convinced of that;  it could be the program is not
+doing a sufficiently exhaustive search in such cases. */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
