@@ -1095,6 +1095,25 @@ inline void calc_sr_dist_and_posn_ang( const DPT *ra_decs, const unsigned n_obje
    free( x);
 }
 
+static void put_base_60( char *obuff, const double angle, const int n_digits,
+               const bool show_sign)
+{
+   const double round_up[4] = { 500., 50., 5., .5 };
+   const long millisec = (long)( angle * 3600. * 1000. + round_up[n_digits]);
+
+   assert( n_digits >= 0 && n_digits <= 3);
+   if( show_sign)
+      {
+      *obuff++ = (angle < 0. ? '-' : '+');
+      if( angle < 0.)
+         return( put_base_60( obuff, -angle, n_digits, false));
+      }
+   sprintf( obuff, "%02ld %02ld %02ld.%03ld",
+         millisec / 3600000L, (millisec / 60000L) % 60L,
+         (millisec / 1000L) % 60L, millisec % 1000L);
+   obuff[n_digits + 9] = '\0';
+}
+
 double ephemeris_mag_limit = 22.;
 
 int ephemeris_in_a_file( const char *filename, const double *orbit,
@@ -1483,8 +1502,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
             {
             DPT ra_dec, alt_az[3];
             double lunar_elong = 0.;
-            double ra, dec, sec, earth_r = 0.;
-            int hr, min, deg, dec_sign = '+';
+            double ra, dec, earth_r = 0.;
             char ra_buff[80], dec_buff[80], date_buff[80];
             char r_buff[20], solar_r_buff[20];
             double cos_elong, solar_r, elong;
@@ -1511,15 +1529,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
             if( computer_friendly)
                snprintf( ra_buff, sizeof( ra_buff), "%9.5f", ra * 15.);
             else
-               {
-               hr  = (int)ra;
-               min = (int)((ra - (double)hr) * 60.);
-               sec =       (ra - (double)hr) * 3600. - 60. * (double)min;
-               snprintf( ra_buff, sizeof( ra_buff), "%02d %02d %6.3f",
-                                 hr, min, sec);
-               if( ra_buff[6] == ' ')        /* leading zero */
-                  ra_buff[6] = '0';
-               }
+               put_base_60( ra_buff, ra, 3, false);
 
             ra_dec.y = asin( topo[2] / r) + dec_offset;
             stored_ra_decs[obj_n] = ra_dec;
@@ -1556,11 +1566,6 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                fprintf( ofile, " %s %3d", tbuff, integer_posn_ang);
                }
             dec = ra_dec.y * 180. / PI;
-            if( dec < 0.)
-               {
-               dec = -dec;
-               dec_sign = '-';
-               }
             if( !obj_n)
                {
 
@@ -1633,14 +1638,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
             if( computer_friendly)
                sprintf( dec_buff, "%9.5f", dec);
             else
-               {
-               deg = (int)dec;
-               min = (int)( (dec - (double)deg) * 60.);
-               sec =        (dec - (double)deg) * 3600. - (double)min * 60.;
-               sprintf( dec_buff, "%c%02d %02d %5.2f", dec_sign, deg, min, sec);
-               if( dec_buff[7] == ' ')        /* leading zero */
-                  dec_buff[7] = '0';
-               }
+               put_base_60( dec_buff, dec, 2, true);
 
             if( computer_friendly)
                {
