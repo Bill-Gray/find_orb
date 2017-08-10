@@ -1,0 +1,91 @@
+BASIC IDEAS BEHIND PRECOVERIES
+
+   'ephem0.cpp' now has a 'find_precovery_plates' function.  As of this
+writing (mid-August 2017),  it is able to integrate an orbit backward in
+time and tell you on which of about three million CSS images that object
+might be found.  Extending this to handle other multi-million-image lists
+would be trivial,  and I've hopes of doing so if I can persuade (for
+example) PanSTARRS,  WISE,  Spacewatch,  etc. to cough up their lists
+of "what images were taken in what parts of the sky at what times."
+
+   There is a fast way of doing this,  and a simpler but slower way of
+doing this.  We expect this to be a common operation,  so fast would be
+good.  (It takes a few seconds,  usually,  to search all three million
+fields on my somewhat elderly machine.)
+
+   The simpler,  slower method is to say :
+
+   For each of the three million fields :
+      Numerically integrate our object of interest to the time that image
+      was taken.
+      Is it in the field of view?  (If so,  add it to the output.)
+
+   The problem with this is that computing three million positions for
+an object takes a long time.  I actually did this,  but only for testing
+purposes.
+
+   The faster,  but more complicated,  method looks like this:
+
+   (1) Sort the fields in order of the time midpoint of the exposure.
+   (2) Starting with the first field,  compute geocentric positions of our
+      object of interest for a time "before" and "after" that of the
+      exposure.  Make those times close enough that motion between them
+      is passably close to linear.
+   (3) We can now compute approximate positions for our object of interest
+      between those start/end times,  using linear interpolation.  We
+      allow a wide margin of about .1 degree for the fact that the motion
+      does have some real curvature,  plus enough extra margin to allow
+      for the maximum possible topocentric parallax over that interval.
+   (4) If,  after allowing for that extra margin,  we still think the object
+      might have been on that plate,  do the full "slower" method above:
+      find out _exactly_ where the object would have been at that time.
+      This time,  we do a topocentric calculation that includes light-time
+      lag... no approximations this time.
+   (5) If this precise location would have been on that image,  add that
+      field to the output.
+   (6) Move on to each field in turn,  running it through (2) to (5).
+
+   The reason this is fast is that much of the time,  we're doing a quick
+linear interpolation and finding that it's nowhere near the field in
+question.  (That is to say,  most images will be quite far away from
+whatever object we're actually interested in.)  We will have to do that
+full positional computation for every image on which the object really
+did appear,  plus a small fraction on which it wasn't caught.
+
+   (1) is not theoretically necessary.  But it saves computing time if
+you integrate backward through time once,  rather than hopping about at
+random through the decades of CSS observations.  It also makes it very
+likely that the field you're looking at will be "close" in time to the
+preceding one,  meaning you can recycle the "before" and "after"
+computations from the preceding field.  (The sorted list of fields
+is precomputed.  It takes a minute or so to do it... not something
+you'd want to have to wait for with each precovery search.)
+
+IMPLEMENTATION DETAILS:
+
+   The folks at CSS thought they might want to do certain types of
+filtering.  Currently implemented are :
+
+   (1) Ignore fields where the computed magnitude was less than
+some specified limit (no point trying to recover the object from a
+field if it would have been at mag 32 at the time).
+
+   (2) Ignore fields where we've already measured the astrometry.
+
+   (3) Show _only_ fields where we've measured the astrometry.
+
+   (4) Show only fields within a given date range,  _or_ only those
+_outside_ that date range.
+
+PLANNED IMPROVEMENTS :
+
+   Finding out which of several million tracklets (ITF or short-arc
+astrometry) would fit your observations is only slightly different
+from telling you which images to look at.
+
+   We really should integrate at least two orbits:  the nominal one,
+plus a one-sigma variant.  If we do that,  the problem becomes one
+of "does the uncertainty region intersect the image rectangle" instead
+of "does the nominal position land in the image rectangle."  We have
+to output a bit more information as well.
+

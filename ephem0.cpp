@@ -522,6 +522,8 @@ static inline bool jd_is_in_range( const double jd, const double min_jd,
       return( jd < min_jd || jd > max_jd);
 }
 
+/* See 'precover.txt' for information on what's going on here. */
+
 int find_precovery_plates( OBSERVE *obs, const int n_obs,
                            const char *filename, const double *orbit,
                            double epoch_jd)
@@ -531,7 +533,7 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
    int current_file_number = -1;
    double orbi[6], stepsize = 1.;
    obj_location_t p1, p2;
-   double abs_mag = calc_absolute_magnitude( obs, n_obs);
+   const double abs_mag = calc_absolute_magnitude( obs, n_obs);
    field_location_t field;
    double min_jd = 0., max_jd = 1e+30;
    double limiting_mag = 26.;
@@ -570,10 +572,11 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
          double obj_ra, obj_dec;
          double fraction, mag;
          double margin = .1;
+         const double jdt = field.jd + td_minus_utc( field.jd) / seconds_per_day;
 
-         while( field.jd < p1.jd || field.jd > p2.jd)
+         while( jdt < p1.jd || jdt > p2.jd)
             {
-            const double new_p2_jd = ceil( (field.jd - .5) / stepsize) * stepsize + .5;
+            const double new_p2_jd = ceil( (jdt - .5) / stepsize) * stepsize + .5;
             const double scale_factor = 2.;
 
             if( new_p2_jd == p1.jd)
@@ -594,7 +597,7 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
             setup_obj_loc( &p1, orbi, epoch_jd, NULL);
             epoch_jd = p1.jd;
             }
-         fraction = (field.jd - p1.jd) / stepsize;
+         fraction = (jdt - p1.jd) / stepsize;
          obj_ra = p1.ra + fraction * centralize_ang_around_zero( p2.ra - p1.ra);
          obj_dec = p1.dec + fraction * (p2.dec - p1.dec);
          delta_ra = centralize_ang_around_zero( obj_ra - field.ra);
@@ -610,7 +613,7 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
             double temp_orbit[6];
 
             memcpy( temp_orbit, orbi, 6 * sizeof( double));
-            p3.jd = field.jd;
+            p3.jd = jdt;
             p3.r = p2.r;         /* close enough,  for light-time calc */
             setup_obj_loc( &p3, temp_orbit, epoch_jd, field.obscode);
             obj_ra = p3.ra;
@@ -628,7 +631,6 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
             int i;
             bool matches_an_observation = false;
             bool show_it = true;
-            const double jdt = field.jd + td_minus_utc( field.jd) / seconds_per_day;
 
             full_ctime( time_buff, field.jd, FULL_CTIME_YMD
                         | FULL_CTIME_LEADING_ZEROES
