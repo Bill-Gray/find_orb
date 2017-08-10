@@ -472,13 +472,20 @@ typedef struct
 } obj_location_t;
 
 static void setup_obj_loc( obj_location_t *p, double *orbit,
-                           const double epoch_jd)
+                           const double epoch_jd, const char *mpc_code)
 {
    double obs_posn[3], topo[3];
    size_t i;
+   double rho_sin_phi = 0., rho_cos_phi = 0., lon = 0.;
+   int planet_no = 3;
 
-   integrate_orbit( orbit, epoch_jd, p->jd);
-   compute_observer_loc( p->jd, 3, 0., 0., 0., obs_posn);
+   integrate_orbit( orbit, epoch_jd, p->jd - p->r / AU_PER_DAY);
+   if( mpc_code)
+      planet_no = get_observer_data( mpc_code, NULL,
+                          &lon, &rho_cos_phi, &rho_sin_phi);
+
+   compute_observer_loc( p->jd, planet_no, rho_cos_phi, rho_sin_phi,
+                                    lon, obs_posn);
    for( i = 0; i < 3; i++)
       topo[i] = orbit[i] - obs_posn[i];
    ecliptic_to_equatorial( topo);
@@ -562,7 +569,7 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
          double delta_ra, delta_dec;
          double obj_ra, obj_dec;
          double fraction, mag;
-         const double margin = .1;
+         double margin = .1;
 
          while( field.jd < p1.jd || field.jd > p2.jd)
             {
@@ -574,7 +581,8 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
             else if( new_p2_jd != p2.jd)
                {
                p2.jd = new_p2_jd;
-               setup_obj_loc( &p2, orbi, epoch_jd);
+               p2.r = 0.;
+               setup_obj_loc( &p2, orbi, epoch_jd, NULL);
                epoch_jd = p2.jd;
                }
             while( stepsize > p2.r * scale_factor)
@@ -582,7 +590,8 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
             while( stepsize < p2.r * scale_factor)
                stepsize *= 2.;
             p1.jd = new_p2_jd - stepsize;
-            setup_obj_loc( &p1, orbi, epoch_jd);
+            p1.r = 0.;
+            setup_obj_loc( &p1, orbi, epoch_jd, NULL);
             epoch_jd = p1.jd;
             }
          fraction = (field.jd - p1.jd) / stepsize;
@@ -591,6 +600,7 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
          delta_ra = centralize_ang_around_zero( obj_ra - field.ra);
          delta_ra *= cos( field.dec);
          delta_dec = field.dec - obj_dec;
+         margin += EARTH_MAJOR_AXIS_IN_AU / p1.r;
          mag = abs_mag + calc_obs_magnitude(
                               p2.sun_obj, p2.r, p2.sun_earth, NULL);
          if( mag < limiting_mag && fabs( delta_dec) < field.height / 2. + margin
@@ -601,7 +611,8 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
 
             memcpy( temp_orbit, orbi, 6 * sizeof( double));
             p3.jd = field.jd;
-            setup_obj_loc( &p3, temp_orbit, epoch_jd);
+            p3.r = p2.r;         /* close enough,  for light-time calc */
+            setup_obj_loc( &p3, temp_orbit, epoch_jd, field.obscode);
             obj_ra = p3.ra;
             obj_dec = p3.dec;
             delta_ra = centralize_ang_around_zero( obj_ra - field.ra);
