@@ -87,6 +87,8 @@ int remove_rgb_code( char *buff);                              /* ephem.cpp */
 int find_precovery_plates( OBSERVE *obs, const int n_obs,
                            const char *filename, const double *orbit,
                            double epoch_jd);                   /* ephem0.cpp */
+static void put_base_60( char *obuff, const double angle, const int n_digits,
+               const bool show_sign);                          /* ephem0.cpp */
 
 const char *observe_filename = "observe.txt";
 const char *residual_filename = "residual.txt";
@@ -531,6 +533,7 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
    const char *mag_limit_text = get_environment_ptr( "FIELD_MAG_LIMIT");
         /* Slightly easier to work with 'bit set means included' : */
    const int inclusion = atoi( get_environment_ptr( "FIELD_INCLUSION")) ^ 3;
+   const bool show_base_60 = (*get_environment_ptr( "FIELD_DEBUG") != '\0');
 
    if( !ofile)
       return( -1);
@@ -560,18 +563,23 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
          double obj_ra, obj_dec;
          double fraction, mag;
 
-         if( field.jd < p1.jd || field.jd > p2.jd)
+         while( field.jd < p1.jd || field.jd > p2.jd)
             {
             const double new_p2_jd = ceil( (field.jd - .5) / stepsize) * stepsize + .5;
+            const double scale_factor = 0.125;
 
             if( new_p2_jd == p1.jd)
                p2 = p1;
-            else
+            else if( new_p2_jd != p2.jd)
                {
                p2.jd = new_p2_jd;
                setup_obj_loc( &p2, orbi, epoch_jd);
                epoch_jd = p2.jd;
                }
+            while( stepsize > p2.r * scale_factor)
+               stepsize /= 2.;
+            while( stepsize < p2.r * scale_factor)
+               stepsize *= 2.;
             p1.jd = new_p2_jd - stepsize;
             setup_obj_loc( &p1, orbi, epoch_jd);
             epoch_jd = p1.jd;
@@ -607,9 +615,19 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
                show_it = ((inclusion & 1) != 0);
             if( show_it)
                {
-               fprintf( ofile, "%c %8.4f %8.4f %4.1f %s %s",
-                        (matches_an_observation ? '*' : ' '),
-                        obj_ra * 180. / PI, obj_dec * 180. / PI, mag,
+               obj_ra *= 180. / PI;
+               obj_dec *= 180. / PI;
+               if( !show_base_60)
+                  snprintf( buff, sizeof( buff), "%8.4f %8.4f",
+                                    obj_ra, obj_dec);
+               else
+                  {
+                  put_base_60( buff, obj_ra / 15., 3, false);
+                  buff[12] = ' ';
+                  put_base_60( buff + 13, obj_dec, 2, true);
+                  }
+               fprintf( ofile, "%c %s %4.1f %s %s",
+                        (matches_an_observation ? '*' : ' '), buff, mag,
                         time_buff, field.obscode);
                if( current_file_number != field.file_number)
                   {
