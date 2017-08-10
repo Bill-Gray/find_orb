@@ -559,14 +559,15 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
    while( fread( &field, sizeof( field), 1, ifile) == 1)
       if( jd_is_in_range( field.jd, min_jd, max_jd))
          {
-         double delta_ra;
+         double delta_ra, delta_dec;
          double obj_ra, obj_dec;
          double fraction, mag;
+         const double margin = .1;
 
          while( field.jd < p1.jd || field.jd > p2.jd)
             {
             const double new_p2_jd = ceil( (field.jd - .5) / stepsize) * stepsize + .5;
-            const double scale_factor = 0.125;
+            const double scale_factor = 2.;
 
             if( new_p2_jd == p1.jd)
                p2 = p1;
@@ -589,11 +590,28 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
          obj_dec = p1.dec + fraction * (p2.dec - p1.dec);
          delta_ra = centralize_ang_around_zero( obj_ra - field.ra);
          delta_ra *= cos( field.dec);
+         delta_dec = field.dec - obj_dec;
          mag = abs_mag + calc_obs_magnitude(
                               p2.sun_obj, p2.r, p2.sun_earth, NULL);
-         if( obj_dec > field.dec - field.height / 2. &&
-             obj_dec < field.dec + field.height / 2.
-             && mag < limiting_mag && fabs( delta_ra) < field.width / 2.)
+         if( mag < limiting_mag && fabs( delta_dec) < field.height / 2. + margin
+                                && fabs( delta_ra) < field.width / 2. + margin)
+            {                          /* approx posn is on plate;  compute */
+            obj_location_t p3;         /* an accurate position */
+            double temp_orbit[6];
+
+            memcpy( temp_orbit, orbi, 6 * sizeof( double));
+            p3.jd = field.jd;
+            setup_obj_loc( &p3, temp_orbit, epoch_jd);
+            obj_ra = p3.ra;
+            obj_dec = p3.dec;
+            delta_ra = centralize_ang_around_zero( obj_ra - field.ra);
+            delta_ra *= cos( field.dec);
+            delta_dec = field.dec - obj_dec;
+            mag = abs_mag + calc_obs_magnitude(
+                              p3.sun_obj, p3.r, p3.sun_earth, NULL);
+            }
+         if( mag < limiting_mag && fabs( delta_dec) < field.height / 2.
+                                && fabs( delta_ra) < field.width / 2.)
             {
             char time_buff[40], buff[200];
             int i;
