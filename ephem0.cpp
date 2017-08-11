@@ -83,12 +83,14 @@ int setup_planet_elem( ELEMENTS *elem, const int planet_idx,
                                           const double t_cen);   /* moid4.c */
 char *mpc_station_name( char *station_data);       /* mpc_obs.cpp */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
-int remove_rgb_code( char *buff);                              /* ephem.cpp */
-int find_precovery_plates( OBSERVE *obs, const int n_obs,
+int remove_rgb_code( char *buff);                              /* ephem0.cpp */
+int find_precovery_plates( OBSERVE *obs, const int n_obs,      /* ephem0.cpp */
                            const char *filename, const double *orbit,
-                           double epoch_jd);                   /* ephem0.cpp */
-static void put_base_60( char *obuff, const double angle, const int n_digits,
-               const bool show_sign);                          /* ephem0.cpp */
+                           const int n_orbits, double epoch_jd);
+static void output_signed_angle_to_buff( char *obuff, const double angle,
+                               const int precision);         /* ephem0.cpp */
+static void output_angle_to_buff( char *obuff, const double angle,
+                               const int precision);         /* ephem0.cpp */
 
 const char *observe_filename = "observe.txt";
 const char *residual_filename = "residual.txt";
@@ -526,12 +528,12 @@ static inline bool jd_is_in_range( const double jd, const double min_jd,
 
 int find_precovery_plates( OBSERVE *obs, const int n_obs,
                            const char *filename, const double *orbit,
-                           double epoch_jd)
+                           const int n_orbits, double epoch_jd)
 {
    FILE *ofile = fopen( filename, "w");
    FILE *ifile, *original_file = NULL;
    int current_file_number = -1;
-   double orbi[6], stepsize = 1.;
+   double *orbi, stepsize = 1.;
    obj_location_t p1, p2;
    const double abs_mag = calc_absolute_magnitude( obs, n_obs);
    field_location_t field;
@@ -556,7 +558,8 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
    memset( &p1, 0, sizeof( obj_location_t));
    memset( &p2, 0, sizeof( obj_location_t));
    setvbuf( ofile, NULL, _IONBF, 0);
-   memcpy( orbi, orbit, 6 * sizeof( double));
+   orbi = (double *)malloc( 6 * n_orbits * sizeof( double));
+   memcpy( orbi, orbit,     6 * n_orbits * sizeof( double));
    if( *min_jd_text)
       min_jd = get_time_from_string( 0, min_jd_text,
                      FULL_CTIME_YMD | CALENDAR_JULIAN_GREGORIAN, NULL);
@@ -653,9 +656,9 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
                                     obj_ra, obj_dec);
                else
                   {
-                  put_base_60( buff, obj_ra / 15., 3, false);
+                  output_angle_to_buff( buff, obj_ra / 15., 3);
                   buff[12] = ' ';
-                  put_base_60( buff + 13, obj_dec, 2, true);
+                  output_signed_angle_to_buff( buff + 13, obj_dec, 2);
                   }
                fprintf( ofile, "%c %s %4.1f %s %s",
                         (matches_an_observation ? '*' : ' '), buff, mag,
@@ -697,6 +700,7 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
    fclose( ifile);
    if( original_file)
       fclose( original_file);
+   free( orbi);
    fclose( ofile);
    return( 0);
 }
@@ -1144,25 +1148,6 @@ inline void calc_sr_dist_and_posn_ang( const DPT *ra_decs, const unsigned n_obje
    free( x);
 }
 
-static void put_base_60( char *obuff, const double angle, const int n_digits,
-               const bool show_sign)
-{
-   const double round_up[4] = { 500., 50., 5., .5 };
-   const long millisec = (long)( angle * 3600. * 1000. + round_up[n_digits]);
-
-   assert( n_digits >= 0 && n_digits <= 3);
-   if( show_sign)
-      {
-      *obuff++ = (angle < 0. ? '-' : '+');
-      if( angle < 0.)
-         return( put_base_60( obuff, -angle, n_digits, false));
-      }
-   sprintf( obuff, "%02ld %02ld %02ld.%03ld",
-         millisec / 3600000L, (millisec / 60000L) % 60L,
-         (millisec / 1000L) % 60L, millisec % 1000L);
-   obuff[n_digits + 9] = '\0';
-}
-
 double ephemeris_mag_limit = 22.;
 
 int ephemeris_in_a_file( const char *filename, const double *orbit,
@@ -1578,7 +1563,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
             if( computer_friendly)
                snprintf( ra_buff, sizeof( ra_buff), "%9.5f", ra * 15.);
             else
-               put_base_60( ra_buff, ra, 3, false);
+               output_angle_to_buff( ra_buff, ra, 3);
 
             ra_dec.y = asin( topo[2] / r) + dec_offset;
             stored_ra_decs[obj_n] = ra_dec;
@@ -1687,7 +1672,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
             if( computer_friendly)
                sprintf( dec_buff, "%9.5f", dec);
             else
-               put_base_60( dec_buff, dec, 2, true);
+               output_signed_angle_to_buff( dec_buff, dec, 2);
 
             if( computer_friendly)
                {
@@ -1990,7 +1975,7 @@ static int64_t ten_to_the_nth( int n)
    return( rval);
 }
 
-/* See comments for get_ra_dec() in mpc_obs.cpp for info on the meaning  */
+/* See comments for get_ra_dec() in mpc_fmt.cpp for info on the meaning  */
 /* of 'precision' in this function.                                      */
 
 static void output_angle_to_buff( char *obuff, const double angle,
@@ -2075,6 +2060,13 @@ static void output_angle_to_buff( char *obuff, const double angle,
    for( i = strlen( obuff); i < 12; i++)
       obuff[i] = ' ';
    obuff[12] = '\0';
+}
+
+static void output_signed_angle_to_buff( char *obuff, const double angle,
+                               const int precision)
+{
+   *obuff++ = (angle < 0. ? '-' : '+');
+   output_angle_to_buff( obuff, fabs( angle), precision);
 }
 
 /* 'put_residual_into_text( )' expresses a residual,  from 0 to 180 degrees, */

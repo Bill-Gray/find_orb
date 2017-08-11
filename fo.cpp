@@ -76,9 +76,9 @@ void move_add_nstr( const int col, const int row, const char *msg,
 double current_jd( void);                       /* elem_out.cpp */
 char *fgets_trimmed( char *buff, size_t max_bytes, FILE *ifile); /*elem_out.c*/
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
-int find_precovery_plates( OBSERVE *obs, const int n_obs,
+int find_precovery_plates( OBSERVE *obs, const int n_obs,      /* ephem0.cpp */
                            const char *filename, const double *orbit,
-                           double epoch_jd);                   /* ephem0.cpp */
+                           const int n_orbits, double epoch_jd);
 int make_pseudo_mpec( const char *mpec_filename, const char *obj_name);
                                                /* ephem0.cpp */
 void set_environment_ptr( const char *env_ptr, const char *new_value);
@@ -717,7 +717,7 @@ int main( const int argc, const char **argv)
                   sscanf( obs->packed_id, "%s", tbuff);
                   sprintf( fullpath, "%s/%s.txt", precovery_dir, tbuff);
                   find_precovery_plates( obs, n_obs_actually_loaded,
-                           fullpath, orbit, curr_epoch);      /* ephem0.cpp */
+                           fullpath, orbit, 1, curr_epoch);  /* ephem0.cpp */
                   }
 
                for( j = 0; j < (unsigned)n_obs_actually_loaded; j++)

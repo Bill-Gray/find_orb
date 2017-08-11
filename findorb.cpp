@@ -161,9 +161,9 @@ int add_ephemeris_details( FILE *ofile, const double start_jd,  /* b32_eph.c */
 void set_distance( OBSERVE FAR *obs, double r);             /* orb_func.c */
 int filter_obs( OBSERVE FAR *obs, const int n_obs,          /* mpc_obs.c */
                   const double max_residual_in_arcseconds);
-int find_precovery_plates( OBSERVE *obs, const int n_obs,
+int find_precovery_plates( OBSERVE *obs, const int n_obs,      /* ephem0.cpp */
                            const char *filename, const double *orbit,
-                           double epoch_jd);                   /* ephem0.cpp */
+                           const int n_orbits, double epoch_jd);
 void set_statistical_ranging( const int new_using_sr);      /* elem_out.cpp */
 int link_arcs( OBSERVE *obs, int n_obs, const double r1, const double r2);
 int find_circular_orbits( OBSERVE FAR *obs1, OBSERVE FAR *obs2,
@@ -1412,22 +1412,18 @@ void show_residuals( const OBSERVE FAR *obs, const int n_obs,
             if( base_format == RESIDUAL_FORMAT_80_COL)
                {                         /* show in original 80-column MPC  */
                char resid_data[70];      /* format, w/added data if it fits */
-               char hh_mm_ss[8];
                const int dropped_start = 12;     /* ...but omit designation */
                OBSERVE temp_obs = obs[line_start + i];
+               const int time_prec = temp_obs.time_precision;
 
-               temp_obs.time_precision = 5;
                format_observation( &temp_obs, buff,
-                         (residual_format & ~3) | RESIDUAL_FORMAT_HMS);
-               strcpy( resid_data, buff + 44);
-               memcpy( hh_mm_ss, buff + 9, 8);
-               recreate_observation_line( buff, obs + line_start + i);
+                           (residual_format & ~(3 | RESIDUAL_FORMAT_HMS)));
+               strcpy( resid_data, buff + 39);
                if( residual_format & RESIDUAL_FORMAT_HMS)
-                  {
-                  memmove( buff + 35, buff + 32, strlen( buff + 31));
-                  buff[25] = buff[34] = ' ';
-                  memcpy( buff + 26, hh_mm_ss, 8);
-                  }
+                  if( time_prec == 5 || time_prec == 6)  /* 1e-5 or 1e-6 day */
+                     temp_obs.time_precision += 16;
+                              /* show corresponding 1s or 0.1s HHMMSS fmt */
+               recreate_observation_line( buff, &temp_obs);
                memmove( buff, buff + dropped_start, strlen( buff + dropped_start) + 1);
                strcpy( buff + strlen( buff), resid_data + 10);
                if( temp_obs.flags & OBS_IS_SELECTED)
@@ -1590,7 +1586,8 @@ static void show_residual_legend( const int line_no, const int residual_format)
       }
 
    if( residual_format & RESIDUAL_FORMAT_HMS)
-      text_search_and_replace( buff, ".DDDDD", " HH:MM:SS");
+      text_search_and_replace( buff, "YYYY MM DD.DDDDD ",
+                                     "CYYMMDD:HHMMSSsss");
 
    if( line_no >= 0)
       {
@@ -2365,9 +2362,17 @@ int main( const int argc, const char **argv)
    if( debug_level > 2)
       debug_printf( "Curses initialised, ");
    cbreak( );
+   if( debug_level > 7)
+      debug_printf( "cbreak, ");
    noecho( );
+   if( debug_level > 7)
+      debug_printf( "noecho, ");
    clear( );
+   if( debug_level > 7)
+      debug_printf( "clear, ");
    refresh( );
+   if( debug_level > 7)
+      debug_printf( "refresh, ");
    curses_running = true;
    if( debug_level > 2)
       debug_printf( "(2), ");
@@ -4052,7 +4057,7 @@ int main( const int argc, const char **argv)
             }
             break;
          case '&':
-            if( !find_precovery_plates( obs, n_obs, "fields.txt", orbit, curr_epoch))
+            if( !find_precovery_plates( obs, n_obs, "fields.txt", orbit, 1, curr_epoch))
                show_a_file( "fields.txt");
             break;
          case ';':
