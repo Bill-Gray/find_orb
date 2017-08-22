@@ -1345,7 +1345,7 @@ int write_out_elements_to_file( const double *orbit,
 
       if( !elem.central_obj)
          {
-         if( elem.ecc != 1.)
+         if( elem.ecc < 1.)
             {
             for( i = 0; i < 3; i++)  /* show Tisserand data for Ear, Jup & Nep */
                {                     /* if orbits come close to overlapping */
