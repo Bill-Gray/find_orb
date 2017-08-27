@@ -629,12 +629,24 @@ MEA L. Denneau, A. Heinze, J. Tonry
 NET 2MASS
 TEL 0.5-m f/2.0 Schmidt + CCD
 
+COD T09
+CON D. J. Tholen, Institute for Astronomy, 2680 Woodlawn Drive, Honolulu, HI 96822
+CON [tholen (at) ifa (dot) hawaii (dot) edu]
+NET Gaia-DR1
+TEL 8.2-m Subaru reflector
+
 COD T12
 CON D. J. Tholen, Institute for Astronomy, 2680 Woodlawn Drive, Honolulu, HI 96822
 CON [tholen (at) ifa (dot) hawaii (dot) edu]
 OBS D. Fohring, D. Hung, Y. Ramanjooloo, Z. Claytor, D. J. Tholen
 NET Gaia-DR1
 TEL 2.24-m University of Hawaii reflector
+
+COD T14
+CON D. J. Tholen, Institute for Astronomy, 2680 Woodlawn Drive, Honolulu, HI 96822
+CON [tholen (at) ifa (dot) hawaii (dot) edu]
+NET Gaia-DR1
+TEL 3.6-m Canada-France-Hawaii Telescope
 
 COD U69
 TEL 0.61-m f/6.5 astrograph + CCD

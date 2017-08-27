@@ -135,6 +135,7 @@
  Thuillot                                  <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0018568">Thuillot</a>
  Tombaugh                                  <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0001604">Tombaugh</a>
  Tombelli                                  <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0009904">Tombelli</a>
+ Tonry                                     <a href="http://www.ifa.hawaii.edu/~jt/">Tonry</a>
  Veran                                     V&eacute;ran
  Veres                                     <a href="https://scienceandtechnology.jpl.nasa.gov/people/P_Veres">Vere&#x161;</a>
  Veillet                                   <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0016984">Veillet</a>
