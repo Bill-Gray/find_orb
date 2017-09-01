@@ -474,28 +474,39 @@ typedef struct
 } obj_location_t;
 
 static void setup_obj_loc( obj_location_t *p, double *orbit,
-                           const double epoch_jd, const char *mpc_code)
+          const size_t n_orbits, const double epoch_jd, const char *mpc_code)
 {
-   double obs_posn[3], topo[3];
-   size_t i;
+   size_t i, j;
    double rho_sin_phi = 0., rho_cos_phi = 0., lon = 0.;
+   double obs_posn[3];
    int planet_no = 3;
 
-   integrate_orbit( orbit, epoch_jd, p->jd - p->r / AU_PER_DAY);
+   assert( p->jd > 2e+6);
+   assert( p->jd < 3e+6);
    if( mpc_code)
       planet_no = get_observer_data( mpc_code, NULL,
                           &lon, &rho_cos_phi, &rho_sin_phi);
-
    compute_observer_loc( p->jd, planet_no, rho_cos_phi, rho_sin_phi,
                                     lon, obs_posn);
-   for( i = 0; i < 3; i++)
-      topo[i] = orbit[i] - obs_posn[i];
-   ecliptic_to_equatorial( topo);
-   p->ra = atan2( topo[1], topo[0]);
-   p->r = vector3_length( topo);
-   p->dec = asin( topo[2] / p->r);
-   p->sun_earth = vector3_length( obs_posn);
-   p->sun_obj = vector3_length( orbit);
+   for( i = 0; i < n_orbits; i++)
+      {
+      double topo[3];
+
+      if( !mpc_code)
+         p[i].r = 0.;
+      assert( p[i].r >= 0.);
+      assert( p[i].r < 10.);
+      integrate_orbit( orbit, epoch_jd, p->jd - p[i].r / AU_PER_DAY);
+      for( j = 0; j < 3; j++)
+         topo[j] = orbit[j] - obs_posn[j];
+      ecliptic_to_equatorial( topo);
+      p->ra = atan2( topo[1], topo[0]);
+      p->r = vector3_length( topo);
+      p->dec = asin( topo[2] / p->r);
+      p->sun_earth = vector3_length( obs_posn);
+      p->sun_obj = vector3_length( orbit);
+      orbit += 6;
+      }
 }
 
 #pragma pack( 1)
@@ -534,7 +545,7 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
    FILE *ifile, *original_file = NULL;
    int current_file_number = -1;
    double *orbi, stepsize = 1.;
-   obj_location_t p1, p2;
+   obj_location_t *p1, *p2;
    const double abs_mag = calc_absolute_magnitude( obs, n_obs);
    field_location_t field;
    double min_jd = 0., max_jd = 1e+30;
@@ -555,8 +566,8 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
       fclose( ofile);
       return( -2);
       }
-   memset( &p1, 0, sizeof( obj_location_t));
-   memset( &p2, 0, sizeof( obj_location_t));
+   p1 = (obj_location_t *)calloc( 2 * n_orbits, sizeof( obj_location_t));
+   p2 = p1 + n_orbits;
    setvbuf( ofile, NULL, _IONBF, 0);
    orbi = (double *)malloc( 6 * n_orbits * sizeof( double));
    memcpy( orbi, orbit,     6 * n_orbits * sizeof( double));
@@ -577,38 +588,36 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
          double margin = .1;
          const double jdt = field.jd + td_minus_utc( field.jd) / seconds_per_day;
 
-         while( jdt < p1.jd || jdt > p2.jd)
+         while( jdt < p1->jd || jdt > p2->jd)
             {
             const double new_p2_jd = ceil( (jdt - .5) / stepsize) * stepsize + .5;
             const double scale_factor = 2.;
 
-            if( new_p2_jd == p1.jd)
-               p2 = p1;
-            else if( new_p2_jd != p2.jd)
+            if( new_p2_jd == p1->jd)
+               memcpy( p2, p1, n_orbits * sizeof( obj_location_t));
+            else if( new_p2_jd != p2->jd)
                {
-               p2.jd = new_p2_jd;
-               p2.r = 0.;
-               setup_obj_loc( &p2, orbi, epoch_jd, NULL);
-               epoch_jd = p2.jd;
+               p2->jd = new_p2_jd;
+               setup_obj_loc( p2, orbi, n_orbits, epoch_jd, NULL);
+               epoch_jd = p2->jd;
                }
-            while( stepsize > p2.r * scale_factor)
+            while( stepsize > p2->r * scale_factor)
                stepsize /= 2.;
-            while( stepsize < p2.r * scale_factor)
+            while( stepsize < p2->r * scale_factor)
                stepsize *= 2.;
-            p1.jd = new_p2_jd - stepsize;
-            p1.r = 0.;
-            setup_obj_loc( &p1, orbi, epoch_jd, NULL);
-            epoch_jd = p1.jd;
+            p1->jd = new_p2_jd - stepsize;
+            setup_obj_loc( p1, orbi, n_orbits, epoch_jd, NULL);
+            epoch_jd = p1->jd;
             }
-         fraction = (jdt - p1.jd) / stepsize;
-         obj_ra = p1.ra + fraction * centralize_ang_around_zero( p2.ra - p1.ra);
-         obj_dec = p1.dec + fraction * (p2.dec - p1.dec);
+         fraction = (jdt - p1->jd) / stepsize;
+         obj_ra = p1->ra + fraction * centralize_ang_around_zero( p2->ra - p1->ra);
+         obj_dec = p1->dec + fraction * (p2->dec - p1->dec);
          delta_ra = centralize_ang_around_zero( obj_ra - field.ra);
          delta_ra *= cos( field.dec);
          delta_dec = field.dec - obj_dec;
-         margin += EARTH_MAJOR_AXIS_IN_AU / p1.r;
+         margin += EARTH_MAJOR_AXIS_IN_AU / p1->r;
          mag = abs_mag + calc_obs_magnitude(
-                              p2.sun_obj, p2.r, p2.sun_earth, NULL);
+                              p2->sun_obj, p2->r, p2->sun_earth, NULL);
          if( mag < limiting_mag && fabs( delta_dec) < field.height / 2. + margin
                                 && fabs( delta_ra) < field.width / 2. + margin)
             {                          /* approx posn is on plate;  compute */
@@ -617,8 +626,8 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
 
             memcpy( temp_orbit, orbi, 6 * sizeof( double));
             p3.jd = jdt;
-            p3.r = p2.r;         /* close enough,  for light-time calc */
-            setup_obj_loc( &p3, temp_orbit, epoch_jd, field.obscode);
+            p3.r = p2->r;         /* close enough,  for light-time calc */
+            setup_obj_loc( &p3, temp_orbit, 1, epoch_jd, field.obscode);
             obj_ra = p3.ra;
             obj_dec = p3.dec;
             delta_ra = centralize_ang_around_zero( obj_ra - field.ra);
@@ -701,6 +710,7 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
    if( original_file)
       fclose( original_file);
    free( orbi);
+   free( p1);
    fclose( ofile);
    return( 0);
 }
