@@ -2990,10 +2990,14 @@ if you do that,  you don't redistribute anything.        */
 
 bool neocp_redaction_turned_on = true;
 
+static bool is_neocp_line( const char *mpc_line)
+{
+   return( strlen( mpc_line) == 80 && !memcmp( mpc_line + 72, "NEOCP", 5));
+}
+
 static bool line_must_be_redacted( const char *mpc_line)
 {
-   return( strlen( mpc_line) == 80 && neocp_redaction_turned_on
-               &&  !memcmp( mpc_line + 72, "NEOCP", 5)
+   return( is_neocp_line( mpc_line) && neocp_redaction_turned_on
                && !strstr( get_environment_ptr( "GREENLIT"), mpc_line + 77));
 }
 
@@ -3051,6 +3055,8 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
    int mpec_no = atoi( get_environment_ptr( "MPEC"));
    bool orbit_is_heliocentric = true, suppressed = false;
    extern char findorb_language;
+   unsigned redacted_line_number = 0, n_redacted_lines = 0;
+   unsigned n_neocp_lines = 0;
 
    assert( ofile);
    setvbuf( ofile, NULL, _IONBF, 0);
@@ -3073,6 +3079,21 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
    header_htm_ifile = fopen_ext( buff, "crb");
    if( !header_htm_ifile)
       header_htm_ifile = fopen_ext( buff + 1, "fcrb");
+   assert( header_htm_ifile);
+
+   observations_ifile = fopen_ext( get_file_name( buff, observe_filename), "fcrb");
+   assert( observations_ifile);
+
+                  /* Count number of redacted and (current) NEOCP lines : */
+   while( fgets_trimmed( buff, sizeof( buff), observations_ifile))
+      if( is_neocp_line( buff))
+         {
+         if( memcmp( buff + 56, "Removed", 7))
+            n_neocp_lines++;
+         if( line_must_be_redacted( buff))
+            n_redacted_lines++;
+         }
+
    if( header_htm_ifile)                 /* copy header data to pseudo-MPEC */
       {
       while( fgets( buff, sizeof( buff), header_htm_ifile) &&
@@ -3150,6 +3171,9 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
             }
          else if( !memcmp( buff, "# helio_only", 12) && !orbit_is_heliocentric)
             suppressed = (buff[13] == '1');
+         else if( !memcmp( buff, "# neocp_only", 12) && !n_neocp_lines)
+            suppressed = (buff[13] == '1');
+
       fclose( header_htm_ifile);
       }
 
@@ -3159,16 +3183,8 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
       set_environment_ptr( "MPEC", buff);
       }
 
-   observations_ifile = fopen_ext( get_file_name( buff, observe_filename), "fcrb");
-   assert( observations_ifile);
    if( observations_ifile)
       {
-      unsigned redacted_line_number = 0, n_redacted_lines = 0;
-
-                  /* First,  count number of redacted lines... */
-      while( fgets_trimmed( buff, sizeof( buff), observations_ifile))
-         if( line_must_be_redacted( buff))
-            n_redacted_lines++;
       fseek( observations_ifile, 0L, SEEK_SET);
       while( fgets_trimmed( buff, sizeof( buff), observations_ifile))
          if( memcmp( buff, "COM ", 4))      /* skip comment/'sigma' lines */
@@ -3237,8 +3253,6 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
             }
       fclose( observations_ifile);
       }
-   else
-      rval |= 1;
 
    residuals_ifile = fopen_ext( get_file_name( buff, residual_filename), "fcrb");
    if( residuals_ifile)

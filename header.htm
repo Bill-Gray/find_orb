@@ -19,9 +19,10 @@
 $Error      # The server flavor of Find_Orb inserts error messages here.
 <ul>
 <li> <a href="#ast_xx"> Astrometry </a> </li>
+# neocp_only 1    These lines only make sense for NEOCP objects:
 <li> <a href="http://cgi.minorplanetcenter.net/cgi-bin/showobsorbs.cgi?Obj=$Name$&amp;obs=y"> Astrometry (from NEOCP,  if available) </a> </li>
-# <li> <a href="https://www.projectpluto.com/fo.htm?obj_name=$Name$"> Customizable ephemeris </a> </li>
 <li> <a href="http://cneos.jpl.nasa.gov/scout/#/object/$Name$"> 'Scout' (JPL) information </a> </li>
+# neocp_only 0
 <li> <a href="#stations"> Observing stations </a> </li>
 <li> <a href="#elements_xx"> Orbital elements </a> </li>
 <li> <a href="#residuals_xx"> Residuals </a> </li>
