@@ -1,4 +1,5 @@
 #include <math.h>
+#include <assert.h>
 #ifdef TEST_CODE
 #include <stdio.h>
 #include <stdlib.h>
@@ -189,6 +190,8 @@ static void convert_quadratic_form_to_error_ellipse( const double A,
 #ifdef TEST_CODE
    printf( "Eigenvals %f %f\n", eigenval1, eigenval2);
 #endif          /* #ifdef TEST_CODE */
+   assert( eigenval1 < 0.);
+   assert( eigenval2 < 0.);
    *a = 1. / sqrt( -eigenval1);
    *b = 1. / sqrt( -eigenval2);
    *angle = atan2( eigenval1 - A, B);
