@@ -92,11 +92,9 @@ int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
                                    const char *format, ...);
 char *mpc_station_name( char *station_data);       /* mpc_obs.cpp */
 int get_object_name( char *obuff, const char *packed_desig);   /* mpc_obs.c */
-#ifdef ERROR_ELLIPSE_INFO
 void compute_error_ellipse_adjusted_for_motion( double *sigma1, double *sigma2,
                   double *posn_angle, const OBSERVE *obs,
                   const MOTION_DETAILS *m);                  /* orb_func.cpp */
-#endif
 
 int debug_printf( const char *format, ...)
 {
@@ -4305,7 +4303,7 @@ static int generate_observation_text( const OBSERVE FAR *optr,
                                            ra_motion_buff, dec_motion_buff);
             buff += strlen( buff);
 
-#ifdef ERROR_ELLIPSE_INFO
+            if( *get_environment_ptr( "ALT_INFO"))
                {
                double sig1, sig2, tilt;
 
@@ -4314,23 +4312,24 @@ static int generate_observation_text( const OBSERVE FAR *optr,
                snprintf_append( buff, 90, " %.3fx%.3f PA %.2f\n",
                          sig1, sig2, tilt * 180. / PI);
                }
-#else
-            if( fabs( m.time_residual) < .999)
-               {
-               sprintf( buff, "%.3f sec", fabs( m.time_residual));
-               *buff = (m.time_residual > 0. ? '+' : '-');
-               }
-            else if( fabs( m.time_residual) < 99.9)
-               sprintf( buff, "%.2f sec", m.time_residual);
-            else if( fabs( m.time_residual / 60.) < 99.9)
-               sprintf( buff, "%.2f min", m.time_residual / 60.);
-            else if( fabs( m.time_residual / 60.) < 9999.)
-               sprintf( buff, "%d min", (int)( m.time_residual / 60.));
-            else if( fabs( m.time_residual / 3600.) < 9999.)
-               sprintf( buff, "%d hr", (int)( m.time_residual / 3600.));
             else
-               strcpy( buff, "!!!!");
-#endif
+               {
+               if( fabs( m.time_residual) < .999)
+                  {
+                  sprintf( buff, "%.3f sec", fabs( m.time_residual));
+                  *buff = (m.time_residual > 0. ? '+' : '-');
+                  }
+               else if( fabs( m.time_residual) < 99.9)
+                  sprintf( buff, "%.2f sec", m.time_residual);
+               else if( fabs( m.time_residual / 60.) < 99.9)
+                  sprintf( buff, "%.2f min", m.time_residual / 60.);
+               else if( fabs( m.time_residual / 60.) < 9999.)
+                  sprintf( buff, "%d min", (int)( m.time_residual / 60.));
+               else if( fabs( m.time_residual / 3600.) < 9999.)
+                  sprintf( buff, "%d hr", (int)( m.time_residual / 3600.));
+               else
+                  strcpy( buff, "!!!!");
+               }
             }
          break;
       case 1:
@@ -4452,6 +4451,7 @@ static int generate_observation_text( const OBSERVE FAR *optr,
                   "TURAT-2",
                   "UGAIA-DR1",
                   "VGAIA-DR2",
+                  "WUCAC-5",
                   NULL };
 
          if( optr->posn_sigma_1 > 1.01 || optr->posn_sigma_1 < .99
