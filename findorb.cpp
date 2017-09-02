@@ -490,6 +490,30 @@ static int extract_date( const char *buff, double *jd)
 void compute_variant_orbit( double *variant, const double *ref_orbit,
                      const double n_sigmas);       /* orb_func.cpp */
 
+static double *set_up_alt_orbits( const double *orbit, unsigned *n_orbits)
+{
+   extern int available_sigmas;
+   extern double *sr_orbits;
+   extern unsigned n_sr_orbits;
+
+   switch( available_sigmas)
+      {
+      case COVARIANCE_AVAILABLE:
+         memcpy( sr_orbits, orbit, 6 * sizeof( double));
+         compute_variant_orbit( sr_orbits + 6, sr_orbits, 1.);
+         *n_orbits = 2;
+         break;
+      case SR_SIGMAS_AVAILABLE:
+         *n_orbits = n_sr_orbits;
+         break;
+      default:
+         memcpy( sr_orbits, orbit, 6 * sizeof( double));
+         *n_orbits = 1;
+         break;
+      }
+   return( sr_orbits);
+}
+
 /* Here's a simplified example of the use of the 'ephemeris_in_a_file'
    function... nothing fancy,  but it shows how it's used.  */
 
@@ -776,34 +800,13 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
          }
       else
          {
-         double temp_orbit[14];     /* allow for a one-sigma variant,  too */
          const double *orbits_to_use = orbit;
          extern const char *ephemeris_filename;
-         extern int available_sigmas;
          unsigned n_orbits = 1;
 
          if( (ephemeris_output_options & 7) == OPTION_OBSERVABLES &&
                      (ephemeris_output_options & OPTION_SHOW_SIGMAS))
-            switch( available_sigmas)
-               {
-               case COVARIANCE_AVAILABLE:
-                  memcpy( temp_orbit, orbit, 6 * sizeof( double));
-                  compute_variant_orbit( temp_orbit + 6, temp_orbit, 1.);
-                  orbits_to_use = temp_orbit;
-                  n_orbits = 2;
-                  break;
-               case SR_SIGMAS_AVAILABLE:
-                  {
-                  extern double *sr_orbits;
-                  extern unsigned n_sr_orbits;
-
-                  orbits_to_use = sr_orbits;
-                  n_orbits = n_sr_orbits;
-                  }
-                  break;
-               default:
-                  break;
-               }
+            orbits_to_use = set_up_alt_orbits( orbit, &n_orbits);
          if( ephemeris_in_a_file_from_mpc_code(
                get_file_name( buff, ephemeris_filename),
                orbits_to_use, obs, n_obs,
