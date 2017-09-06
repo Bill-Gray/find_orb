@@ -20,11 +20,18 @@ fields on my somewhat elderly machine.)
       was taken.
       Is it in the field of view?  (If so,  add it to the output.)
 
-   The problem with this is that computing three million positions for
-an object takes a long time.  I actually did this,  but only for testing
-purposes.
+   The problem with this is that computing three million positions to
+full,  numerically-integrated precision takes a long time.  I actually
+did this,  but only for testing purposes.
 
-   The faster,  but more complicated,  method looks like this:
+   The faster,  but more complicated,  method computes a somewhat
+approximate position for each of those three million times.  Almost
+always,  we can then see immediately that there's no hope of finding
+the object on that particular field (the sky is big and each field is
+tiny).  If it _does_ look possible,  we do the numerical integration
+to that instant and verify that the object was on that field.
+
+   The resulting algorithm looks like this :
 
    (1) Sort the fields in order of the time midpoint of the exposure.
    (2) Starting with the first field,  compute geocentric positions of our

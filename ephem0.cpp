@@ -91,6 +91,8 @@ static void output_signed_angle_to_buff( char *obuff, const double angle,
                                const int precision);         /* ephem0.cpp */
 static void output_angle_to_buff( char *obuff, const double angle,
                                const int precision);         /* ephem0.cpp */
+static void put_residual_into_text( char *text, const double resid,
+                                 const int resid_format);    /* ephem0.cpp */
 
 const char *observe_filename = "observe.txt";
 const char *residual_filename = "residual.txt";
@@ -500,11 +502,11 @@ static void setup_obj_loc( obj_location_t *p, double *orbit,
       for( j = 0; j < 3; j++)
          topo[j] = orbit[j] - obs_posn[j];
       ecliptic_to_equatorial( topo);
-      p->ra = atan2( topo[1], topo[0]);
-      p->r = vector3_length( topo);
-      p->dec = asin( topo[2] / p->r);
-      p->sun_earth = vector3_length( obs_posn);
-      p->sun_obj = vector3_length( orbit);
+      p[i].ra = atan2( topo[1], topo[0]);
+      p[i].r = vector3_length( topo);
+      p[i].dec = asin( topo[2] / p[i].r);
+      p[i].sun_earth = vector3_length( obs_posn);
+      p[i].sun_obj = vector3_length( orbit);
       orbit += 6;
       }
 }
@@ -535,6 +537,59 @@ static inline bool jd_is_in_range( const double jd, const double min_jd,
       return( jd < min_jd || jd > max_jd);
 }
 
+static void put_ephemeris_posn_angle_sigma( char *obuff, const double dist,
+              const double posn_ang, const bool computer_friendly)
+{
+   int integer_posn_ang =
+               (int)( floor( -posn_ang * 180. / PI + .5)) % 180;
+   const double dist_in_arcsec = dist * 3600. * 180. / PI;
+   char resid_buff[10];
+
+   if( integer_posn_ang < 0)
+      integer_posn_ang += 180;
+   if( computer_friendly)
+      sprintf( resid_buff, "  %6u", (unsigned)dist_in_arcsec);
+   else
+      {
+      put_residual_into_text( resid_buff, dist_in_arcsec, 0);
+      resid_buff[5] = '\0';
+      }
+   sprintf( obuff, "%s %3d", resid_buff + 1, integer_posn_ang);
+}
+
+static unsigned precovery_in_field( const field_location_t *field,
+         const obj_location_t *p, const unsigned n_objs,
+         const double margin)
+{
+   unsigned i, rval = 0;
+
+   for( i = 0; i < n_objs; i++, p++)
+      {
+      const double delta_dec = p->dec - field->dec;
+      const double delta_ra = centralize_ang_around_zero( p->ra - field->ra)
+                           * cos( field->dec);
+
+      if( fabs( delta_dec) < field->height / 2. + margin
+                            && fabs( delta_ra) < field->width / 2. + margin)
+         rval++;
+      }
+   return( rval);
+}
+
+static void show_precovery_extent( char *obuff, const obj_location_t *objs,
+                               const int n_objs)
+{
+   *obuff = '\0';
+   if( n_objs == 2)
+      {
+      double dist, posn_ang;
+
+      calc_dist_and_posn_ang( &objs[0].ra, &objs[1].ra,
+                              &dist, &posn_ang);
+      put_ephemeris_posn_angle_sigma( obuff, dist, posn_ang, true);
+      }
+}
+
 /* See 'precover.txt' for information on what's going on here. */
 
 int find_precovery_plates( OBSERVE *obs, const int n_obs,
@@ -545,7 +600,7 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
    FILE *ifile, *original_file = NULL;
    int current_file_number = -1;
    double *orbi, stepsize = 1.;
-   obj_location_t *p1, *p2;
+   obj_location_t *p1, *p2, *p3;
    const double abs_mag = calc_absolute_magnitude( obs, n_obs);
    field_location_t field;
    double min_jd = 0., max_jd = 1e+30;
@@ -566,10 +621,11 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
       fclose( ofile);
       return( -2);
       }
-   p1 = (obj_location_t *)calloc( 2 * n_orbits, sizeof( obj_location_t));
+   p1 = (obj_location_t *)calloc( 3 * n_orbits, sizeof( obj_location_t));
    p2 = p1 + n_orbits;
+   p3 = p2 + n_orbits;
    setvbuf( ofile, NULL, _IONBF, 0);
-   orbi = (double *)malloc( 6 * n_orbits * sizeof( double));
+   orbi = (double *)malloc( 12 * n_orbits * sizeof( double));
    memcpy( orbi, orbit,     6 * n_orbits * sizeof( double));
    if( *min_jd_text)
       min_jd = get_time_from_string( 0, min_jd_text,
@@ -582,11 +638,11 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
    while( fread( &field, sizeof( field), 1, ifile) == 1)
       if( jd_is_in_range( field.jd, min_jd, max_jd))
          {
-         double delta_ra, delta_dec;
-         double obj_ra, obj_dec;
          double fraction, mag;
          double margin = .1;
          const double jdt = field.jd + td_minus_utc( field.jd) / seconds_per_day;
+         bool possibly_within_field = false;
+         int i;
 
          while( jdt < p1->jd || jdt > p2->jd)
             {
@@ -610,39 +666,34 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
             epoch_jd = p1->jd;
             }
          fraction = (jdt - p1->jd) / stepsize;
-         obj_ra = p1->ra + fraction * centralize_ang_around_zero( p2->ra - p1->ra);
-         obj_dec = p1->dec + fraction * (p2->dec - p1->dec);
-         delta_ra = centralize_ang_around_zero( obj_ra - field.ra);
-         delta_ra *= cos( field.dec);
-         delta_dec = field.dec - obj_dec;
+         for( i = 0; i < n_orbits; i++)        /* compute approx RA/decs */
+            {
+            const double delta_ra = p2[i].ra - p1[i].ra;
+
+            p3[i].ra = p1[i].ra + fraction * centralize_ang_around_zero( delta_ra);
+            p3[i].dec = p1[i].dec + fraction * (p2[i].dec - p1[i].dec);
+            }
          margin += EARTH_MAJOR_AXIS_IN_AU / p1->r;
          mag = abs_mag + calc_obs_magnitude(
                               p2->sun_obj, p2->r, p2->sun_earth, NULL);
-         if( mag < limiting_mag && fabs( delta_dec) < field.height / 2. + margin
-                                && fabs( delta_ra) < field.width / 2. + margin)
+         if( mag < limiting_mag && precovery_in_field( &field, p3, n_orbits, margin))
             {                          /* approx posn is on plate;  compute */
-            obj_location_t p3;         /* an accurate position */
-            double temp_orbit[6];
+            double *temp_orbit = orbi + 6 * n_orbits;
 
-            memcpy( temp_orbit, orbi, 6 * sizeof( double));
-            p3.jd = jdt;
-            p3.r = p2->r;         /* close enough,  for light-time calc */
-            setup_obj_loc( &p3, temp_orbit, 1, epoch_jd, field.obscode);
-            obj_ra = p3.ra;
-            obj_dec = p3.dec;
-            delta_ra = centralize_ang_around_zero( obj_ra - field.ra);
-            delta_ra *= cos( field.dec);
-            delta_dec = field.dec - obj_dec;
-            mag = abs_mag + calc_obs_magnitude(
-                              p3.sun_obj, p3.r, p3.sun_earth, NULL);
+            memcpy( temp_orbit, orbi, 6 * n_orbits * sizeof( double));
+            memcpy( p3, p2, n_orbits * sizeof( obj_location_t));
+            p3->jd = jdt;
+            setup_obj_loc( p3, temp_orbit, n_orbits, epoch_jd, field.obscode);
+            possibly_within_field = true;
             }
-         if( mag < limiting_mag && fabs( delta_dec) < field.height / 2.
-                                && fabs( delta_ra) < field.width / 2.)
+         if( mag < limiting_mag && possibly_within_field
+                                && precovery_in_field( &field, p3, n_orbits, 0.))
             {
             char time_buff[40], buff[200];
             int i;
             bool matches_an_observation = false;
             bool show_it = true;
+            double obj_ra = p3->ra, obj_dec = p3->dec;
 
             full_ctime( time_buff, field.jd, FULL_CTIME_YMD
                         | FULL_CTIME_LEADING_ZEROES
@@ -669,7 +720,7 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
                   buff[12] = ' ';
                   output_signed_angle_to_buff( buff + 13, obj_dec, 2);
                   }
-               fprintf( ofile, "%c %s %4.1f %s %s",
+               fprintf( ofile, "%c %s%4.1f %s %s",
                         (matches_an_observation ? '*' : ' '), buff, mag,
                         time_buff, field.obscode);
                if( current_file_number != field.file_number)
@@ -684,6 +735,9 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
                   if( !original_file)
                      fprintf( ofile, "'%s' not opened\n", filename);
                   }
+               show_precovery_extent( buff, p1, n_orbits);
+               fprintf( ofile, "%s", buff);
+
                if( original_file)
                   {
                   fseek( original_file, field.file_offset, SEEK_SET);
@@ -1580,9 +1634,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
             if( n_objects > 1 && obj_n == n_objects - 1 && show_this_line)
                {
                double dist, posn_ang;
-               unsigned dist_in_arcsec;
                char tbuff[10];
-               int integer_posn_ang;
 
                if( n_objects == 2)
                   calc_dist_and_posn_ang( (const double *)&stored_ra_decs[0],
@@ -1591,23 +1643,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                else
                   calc_sr_dist_and_posn_ang( stored_ra_decs, n_objects,
                                        &dist, &posn_ang);
-               integer_posn_ang =
-                           (int)( floor( -posn_ang * 180. / PI + .5)) % 180;
-               while( integer_posn_ang < 0)
-                  integer_posn_ang += 180;
-               dist *= 180. * 3600. / PI;
-               dist_in_arcsec = (unsigned)dist;
-               if( computer_friendly)
-                  sprintf( tbuff, "%6u", dist_in_arcsec);
-               else if( dist_in_arcsec < 9)
-                  sprintf( tbuff, "%4.1f", dist);
-               else if( dist_in_arcsec < 10000)
-                  sprintf( tbuff, "%4u", dist_in_arcsec);
-               else if( dist_in_arcsec < 60000)
-                  sprintf( tbuff, "%3u'", dist_in_arcsec / 60);
-               else
-                  sprintf( tbuff, "%3ud", dist_in_arcsec / 3600);
-               fprintf( ofile, " %s %3d", tbuff, integer_posn_ang);
+               put_ephemeris_posn_angle_sigma( tbuff, dist, posn_ang, computer_friendly);
+               fprintf( ofile, " %s", tbuff);
                }
             dec = ra_dec.y * 180. / PI;
             if( !obj_n)

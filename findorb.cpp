@@ -4060,8 +4060,14 @@ int main( const int argc, const char **argv)
             }
             break;
          case '&':
-            if( !find_precovery_plates( obs, n_obs, "fields.txt", orbit, 1, curr_epoch))
+            {
+            unsigned n_orbits;
+            double *orbits_to_use = set_up_alt_orbits( orbit, &n_orbits);
+
+            if( !find_precovery_plates( obs, n_obs, "fields.txt",
+                                 orbits_to_use, n_orbits, curr_epoch))
                show_a_file( "fields.txt");
+            }
             break;
          case ';':
             observation_display ^= DISPLAY_RESIDUAL_LEGEND;
