@@ -95,6 +95,8 @@ int get_object_name( char *obuff, const char *packed_desig);   /* mpc_obs.c */
 void compute_error_ellipse_adjusted_for_motion( double *sigma1, double *sigma2,
                   double *posn_angle, const OBSERVE *obs,
                   const MOTION_DETAILS *m);                  /* orb_func.cpp */
+double n_nearby_obs( const OBSERVE FAR *obs, const unsigned n_obs,
+          const unsigned idx, const double time_span);       /* orb_func.cpp */
 
 int debug_printf( const char *format, ...)
 {
@@ -4240,7 +4242,7 @@ line 4: (709) W & B Observatory, Cloudcroft  (N32.95580 E254.22882)
 */
 
 static int generate_observation_text( const OBSERVE FAR *optr,
-                       const int line_number, char *buff)
+                       const int line_number, char *buff, int show_alt_info)
 {
    const double earth_sun = vector3_length( optr->obs_posn);
 
@@ -4303,7 +4305,7 @@ static int generate_observation_text( const OBSERVE FAR *optr,
                                            ra_motion_buff, dec_motion_buff);
             buff += strlen( buff);
 
-            if( *get_environment_ptr( "ALT_INFO"))
+            if( show_alt_info)
                {
                double sig1, sig2, tilt;
 
@@ -4635,6 +4637,8 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff)
       }
    else
       {
+      const int alt_info = atoi( get_environment_ptr( "ALT_INFO"));
+
       n_lines = 0;
 #ifdef _MSC_VER
       for( i = 0; i < 6; i++)
@@ -4642,7 +4646,13 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff)
       for( i = 0; i < 5; i++)
 #endif
          {
-         generate_observation_text( obs + first, (int)i, tptr);
+         extern double overobserving_time_span;
+
+         generate_observation_text( obs + first, (int)i, tptr, alt_info);
+         if( alt_info && i == 4)
+            snprintf_append( tptr, 90, " Nnear=%.3f",
+                     n_nearby_obs( obs, n_obs, first,
+                                  overobserving_time_span));
          if( *tptr)
             {
             strcat( tptr, "\n");
