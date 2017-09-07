@@ -174,6 +174,8 @@ void adjust_error_ellipse_for_timing_error( double *sigma_a, double *sigma_b,
 void compute_error_ellipse_adjusted_for_motion( double *sigma1, double *sigma2,
                   double *posn_angle, const OBSERVE *obs,
                   const MOTION_DETAILS *m);                  /* orb_func.cpp */
+double n_nearby_obs( const OBSERVE FAR *obs, const unsigned n_obs,
+          const unsigned idx, const double time_span);       /* orb_func.cpp */
 
 void set_distance( OBSERVE FAR *obs, double r)
 {
@@ -2276,26 +2278,41 @@ static double dotted_dist( OBSERVE FAR *obs)
    return( dot_prod( obs->vect, obs->obj_posn) - dot_prod( obs->vect, obs->obs_posn));
 }
 
-/* 2012 Nov 8: following discussion with Marco Micheli,  we're trying out the
-following scheme to handle situations wherein one observatory "over-observes",
-causing its (possibly bad) data to dominate the orbit solution.  Marco's idea
-was that if an object is observed more than 'k' times in a night,  those
-observations should be re-weighted by sqrt( k/N),  where N is the number of
-observations over that night.
+double n_nearby_obs( const OBSERVE FAR *obs, const unsigned n_obs,
+          const unsigned idx, const double time_span)
+{
+   unsigned i = idx;
+   double rval = 1., dt = 0.;
+   const double span_limit = 4.;
 
-   The following code looks at a given observation and sees how many
-observations were made from the same observatory in the preceding/following
-'overobserving_time_span' days.  If more than 'overobserving_ceiling' are
-found,  that observation is downweighted accordingly.  If you set the
-timespan to .5 = half a day,  and leave 'overobserving_ceiling'  at its
-default value of 4,  then any given observatory's weight is limited to
-four observations a night.  Making more observations _will_ beat down
-random errors slightly,  but the risk that the observatory's systematic
-errors will cause chaos will be effectively eliminated.
+   while( i && obs[idx].jd - obs[i - 1].jd < time_span * span_limit)
+      i--;
+   while( i < n_obs && dt < span_limit)
+      {
+      const double dt = (obs[i].jd - obs[idx].jd) / time_span;
 
-   Leave 'overobserving_time_span' at zero,  and 'n_within_limits' will be
-one (only observation "within limits" will be the one we actually made!) and
-no re-weighting will occur.         */
+      if( obs[i].is_included && i != idx
+              && !strcmp( obs[i].mpc_code, obs[idx].mpc_code))
+         rval += exp( -dt * dt / 2.);
+      i++;
+      }
+   return( rval);
+}
+
+/* "Correcting" for over-observing is a rather complicated issue.  From 2012
+Nov 8 to 2017 Sep 7,  I used a method that I got after discussion with Marco
+Micheli and Alan Harris:  if an object is observed more than 'k' times in a
+night,  its observations should be re-weighted by sqrt( k/Nobs), where Nobs
+is the number of observations over that night.  The idea was that after
+getting 'k' observations, you've beaten down the random observational
+errors,  and you aren't going to do anything about the systematic errors.
+This scheme was later used in FCCT15 (with k=1) and VFCC17 (with k=4),  and
+is shown below in the PREVIOUS_METHOD_SEE_ABOVE_COMMENTS section.
+
+   Since then,  I've revisited the question of what Nobs should be (number
+of observations that night?  Within four hours?  etc.) and have put the
+reweighting factor on a less ad hoc,  more solid mathematical foundation.
+See https://www.projectpluto.com/errors.htm for details.  */
 
 double overobserving_time_span = 0.;
 unsigned overobserving_ceiling = 4;
@@ -2305,22 +2322,20 @@ unsigned overobserving_ceiling = 4;
 static double reweight_for_overobserving( const OBSERVE FAR *obs,
             const unsigned n_obs, const unsigned idx)
 {
-   unsigned n_within_limits = 0, i = idx;
-   double rval = 1.;
+   double rval;
+   const double n_nearby = n_nearby_obs( obs, n_obs, idx,
+                                   overobserving_time_span);
 
-   while( i && obs[idx].jd - obs[i - 1].jd < overobserving_time_span)
-      i--;
-// if( !(idx % 50))
-//    debug_printf( "idx %u, i %u: %f\n", idx, i,
-//             obs[idx].jd - obs[i].jd);
-   while( i < n_obs && obs[i].jd - obs[idx].jd < overobserving_time_span)
-      {
-      if( obs[i].is_included && !strcmp( obs[i].mpc_code, obs[idx].mpc_code))
-         n_within_limits++;
-      i++;
-      }
-   if( n_within_limits > overobserving_ceiling)
-      rval = sqrt( (double)overobserving_ceiling / (double)n_within_limits);
+#ifdef PREVIOUS_METHOD_SEE_ABOVE_COMMENTS
+   if( n_nearby > overobserving_ceiling)
+      rval = sqrt( (double)overobserving_ceiling / n_nearby);
+   else
+      rval = 1.;
+#else                  /* newer,  less ad hoc reweighting scheme */
+   const double Nmax = (double)overobserving_ceiling;
+
+   rval = sqrt( Nmax / (n_nearby + Nmax - 1.));
+#endif
    return( rval);
 }
 
@@ -2956,7 +2971,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
 
          if( use_blunder_method == 2 && probability_of_blunder)
             weight = reweight_for_blunders( resid2, weight);
-         if( overobserving_time_span)
+         if( overobserving_time_span && overobserving_ceiling)
             weight *= reweight_for_overobserving( obs, n_obs, i);
          FMEMCPY( loc_vals, slopes + i * 2 * n_params,
                                          2 * n_params * sizeof( double));
