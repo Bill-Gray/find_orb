@@ -4384,28 +4384,31 @@ static int generate_observation_text( const OBSERVE FAR *optr,
             }
          break;
       case 2:
-         {
-         strcpy( buff, "Delta=");
-         buff += strlen( buff);
-         format_dist_in_buff( buff, optr->r);  /* ephem0.cpp */
-
-         strcat( buff, "  r=");
-         buff += strlen( buff);
-         format_dist_in_buff( buff, optr->solar_r);  /* ephem0.cpp */
-         strcat( buff, "  ");
-         if( optr->obs_mag < BLANK_MAG)
-            sprintf( buff + strlen( buff), "mag=%5.2f  ", optr->obs_mag);
+         if( show_alt_info && optr->second_line)
+            strcpy( buff, optr->second_line);
          else
-            strcat( buff, "           ");
-         if( optr->computed_mag)
-            sprintf( buff + strlen( buff), "mag (computed)=%5.2f   ",
-                      optr->computed_mag);
+            {
+            strcpy( buff, "Delta=");
+            buff += strlen( buff);
+            format_dist_in_buff( buff, optr->r);  /* ephem0.cpp */
 
-         full_ctime( buff + strlen( buff),
-                           optr->jd - td_minus_utc( optr->jd) / seconds_per_day,
-                           FULL_CTIME_HUNDREDTH_SEC | FULL_CTIME_YMD
-                            | CALENDAR_JULIAN_GREGORIAN);
-         }
+            strcat( buff, "  r=");
+            buff += strlen( buff);
+            format_dist_in_buff( buff, optr->solar_r);  /* ephem0.cpp */
+            strcat( buff, "  ");
+            if( optr->obs_mag < BLANK_MAG)
+               sprintf( buff + strlen( buff), "mag=%5.2f  ", optr->obs_mag);
+            else
+               strcat( buff, "           ");
+            if( optr->computed_mag)
+               sprintf( buff + strlen( buff), "mag (computed)=%5.2f   ",
+                         optr->computed_mag);
+
+            full_ctime( buff + strlen( buff),
+                              optr->jd - td_minus_utc( optr->jd) / seconds_per_day,
+                              FULL_CTIME_HUNDREDTH_SEC | FULL_CTIME_YMD
+                               | CALENDAR_JULIAN_GREGORIAN);
+            }
          break;
       case 3:
          {
