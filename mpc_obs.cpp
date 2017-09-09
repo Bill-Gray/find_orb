@@ -4251,9 +4251,11 @@ line 3: Obj alt 4.9 az 271.2  Sun alt -17.4 az 89.1
 line 4: (709) W & B Observatory, Cloudcroft  (N32.95580 E254.22882)
 */
 
-static int generate_observation_text( const OBSERVE FAR *optr,
-                       const int line_number, char *buff, int show_alt_info)
+static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
+                 const int n_obs, const int line_number, char *buff,
+                 const int show_alt_info)
 {
+   const OBSERVE FAR *optr = obs + idx;
    const double earth_sun = vector3_length( optr->obs_posn);
 
    *buff = '\0';
@@ -4557,6 +4559,14 @@ static int generate_observation_text( const OBSERVE FAR *optr,
          if( optr->ra_bias || optr->dec_bias)
              sprintf( buff + strlen( buff), "   RA bias %.3f\" dec bias %.3f\"",
                            optr->ra_bias, optr->dec_bias);
+         if( show_alt_info)
+            {
+            extern double overobserving_time_span;
+
+            snprintf_append( buff, 90, " Nnear=%.3f",
+                     n_nearby_obs( obs, n_obs, idx,
+                                  overobserving_time_span));
+            }
          break;
       case 5:
          put_observer_data_in_text( optr->mpc_code, buff);
@@ -4659,13 +4669,7 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff)
       for( i = 0; i < 5; i++)
 #endif
          {
-         extern double overobserving_time_span;
-
-         generate_observation_text( obs + first, (int)i, tptr, alt_info);
-         if( alt_info && i == 4)
-            snprintf_append( tptr, 90, " Nnear=%.3f",
-                     n_nearby_obs( obs, n_obs, first,
-                                  overobserving_time_span));
+         generate_observation_text( obs, first, n_obs, (int)i, tptr, alt_info);
          if( *tptr)
             {
             strcat( tptr, "\n");
