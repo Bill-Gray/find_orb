@@ -1124,32 +1124,42 @@ static void try_adding_comet_name( const char *search, char *name)
 }
 
 /* An object with a name such as 1989-013A is probably an artsat,  and
-probably has a NORAD designation within 'all_tle.txt' or similar file.
+probably has a NORAD designation,  name,  and other info in 'satcat.txt',
+a master list of artsats available at
+
+http://planet4589.org/space/log/satcat.txt
+
+   The following code can turn,  for example,  '1966-092A' into
+'1966-092A = NORAD 02501 = Molniya-1'.
+
+within 'all_tle.txt' or similar file.
 (Thus far,  only 'all_tle.txt' is searched.) The following will append
 that designation if it's found. */
 
-static bool try_artsat_xdesig( char *name, const char *filename)
+static bool try_artsat_xdesig( char *name)
 {
-   FILE *ifile = fopen_ext( "all_tle.txt", "crb");
+   FILE *ifile = fopen_ext( "satcat.txt", "crb");
    bool found_a_match = false;
 
    if( ifile)
       {
-      char tbuff[100], xdesig[20];
+      char tbuff[250];
+      size_t slen;
 
-      memset( xdesig, ' ', 10);
-      xdesig[0] = name[2];      /* decade */
-      xdesig[1] = name[3];      /* year */
-      memcpy( xdesig + 2, name + 5, strlen( name + 5));
+      while( *name == ' ')    /* skip leading spaces */
+         name++;
+      remove_trailing_cr_lf( name);
+      slen = strlen( name);
       while( !found_a_match && fgets( tbuff, sizeof( tbuff), ifile))
-         if( *tbuff == '1' && !memcmp( tbuff + 9, xdesig, 9))
+         if( !memcmp( tbuff + 8, name, slen) && tbuff[slen + 8] == ' ')
             {
             found_a_match = true;
-            tbuff[7] = '\0';
-            snprintf_append( name, 30, " = NORAD %s", tbuff + 2);
+            snprintf_append( name, 50, " = NORAD %.5s = %.31s",
+                        tbuff + 2, tbuff + 23);
             }
       fclose( ifile);
       }
+   debug_printf( "%s: file %p, found %d\n", name, ifile, (int)found_a_match);
    return( found_a_match);
 }
 
@@ -1409,7 +1419,7 @@ int get_object_name( char *obuff, const char *packed_desig)
       {
       rval = OBJ_DESIG_ARTSAT;
       if( obuff)
-         try_artsat_xdesig( obuff, "all_tle.txt");
+         try_artsat_xdesig( obuff);
       }
    return( rval);
 }
