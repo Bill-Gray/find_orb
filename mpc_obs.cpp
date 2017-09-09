@@ -1156,10 +1156,10 @@ static bool try_artsat_xdesig( char *name)
             found_a_match = true;
             snprintf_append( name, 50, " = NORAD %.5s = %.31s",
                         tbuff + 2, tbuff + 23);
+            remove_trailing_cr_lf( name);
             }
       fclose( ifile);
       }
-   debug_printf( "%s: file %p, found %d\n", name, ifile, (int)found_a_match);
    return( found_a_match);
 }
 
