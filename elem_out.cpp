@@ -108,6 +108,7 @@ char **load_file_into_memory( const char *filename, size_t *n_lines);
 const char *get_find_orb_text( const int index);      /* elem_out.cpp */
 void get_find_orb_text_filename( char *filename);     /* elem_out.cpp */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
+static int names_compare( const char *name1, const char *name2);
 
 extern int debug_level;
 double asteroid_magnitude_slope_param = .15;
@@ -1590,6 +1591,8 @@ int string_compare_for_sort( const void *a, const void *b, void *context)
    const char **b1 = (const char **)b;
    int *sort_column = (int *)context;
 
+   if( *sort_column == -11)
+      return( names_compare( a1[0] + 11, b1[0] + 11));
    return( strcmp( a1[0] + *sort_column, b1[0] + *sort_column));
 }
 
@@ -1617,7 +1620,7 @@ void set_solutions_found( OBJECT_INFO *ids, const int n_ids)
       ids[i].solution_exists = 0;
    if( ilines)
       {
-      int sort_column = 11;
+      int sort_column = -11;
 
       assert( n_lines % 3 == 0);
       n_lines /= 3;   /* three lines in 'vectors.dat' for each set of elems */
@@ -1630,7 +1633,7 @@ void set_solutions_found( OBJECT_INFO *ids, const int n_ids)
          for( step = 0x80000000; step; step >>= 1)
             if( (loc1 = loc + step) < n_lines)
                {
-               const int compare = strcmp( ilines[loc1 * 3] + 11, ids[i].obj_name);
+               const int compare = names_compare( ilines[loc1 * 3] + 11, ids[i].obj_name);
 
                if( compare < 0)
                   loc = loc1;
@@ -1696,14 +1699,17 @@ compare as equal to 2013-024B or with 2013-024B = NORAD 39169.  */
 
 static int names_compare( const char *name1, const char *name2)
 {
-   unsigned mask = 0, i;
+   if( name1[4] == '-' && name1[9] == ' ')
+      {
+      unsigned mask = 0, i;
 
-   for( i = 0; i < 32 && name1[i] && name1[i] != ' '; i++)
-      if( name1[i] >= '0' && name1[i] <= '9')
-         mask |= (1u << i);
-   if( mask == 0x7f && name1[4] == '-')      /* probably artsat desig */
-      if( !memcmp( name1, name2, i))
-         return( 0);
+      for( i = 0; i < 9 && name1[i]; i++)
+         if( name1[i] >= '0' && name1[i] <= '9')
+            mask |= (1u << i);
+      if( mask == 0xef)
+         if( !memcmp( name1, name2, 9))
+            return( 0);
+      }
    return( strcmp( name1, name2));
 }
 
