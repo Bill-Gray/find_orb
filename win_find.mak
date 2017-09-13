@@ -6,10 +6,11 @@ OBJS=about.obj b32_eph.obj bc405.obj bias.obj clipfunc.obj \
   collide.obj conv_ele.obj eigen.obj elem2tle.obj elem_ou2.obj \
   elem_out.obj ephem0.obj ephem.obj generic.obj gauss.obj \
   geo_pot.obj healpix.obj lsquare.obj miscell.obj \
-  moid4.obj monte0.obj errors.obj \
-  monte.obj mpc_obs.obj mt64.obj orbitdlg.obj settings.obj stdafx.obj \
-  orb_func.obj orb_fun2.obj pl_cache.obj roots.obj runge.obj \
-  sigma.obj sm_vsop.obj sr.obj
+  moid4.obj monte0.obj errors.obj monte.obj mpc_fmt.obj \
+  mpc_obs.obj mt64.obj nanosecs.obj orbitdlg.obj \
+  orb_func.obj orb_fun2.obj pl_cache.obj roots.obj  \
+  runge.obj settings.obj shellsor.obj  \
+  sigma.obj sm_vsop.obj sr.obj stdafx.obj
 
 !ifdef BITS_32
 COMMON_FLAGS=-nologo -W3 -EHsc -c -FD
