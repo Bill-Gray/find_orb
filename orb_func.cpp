@@ -3825,17 +3825,6 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
    if( debug_level)
       debug_printf( "  about to search orbits\n");
 
-   if( !max_n_sr_orbits)
-      {
-      max_n_sr_orbits = atoi( get_environment_ptr( "MAX_SR_ORBITS"));
-      if( !max_n_sr_orbits)
-         max_n_sr_orbits = 500;
-      }
-   if( !sr_orbits)
-      sr_orbits = (double *)calloc( (size_t)max_n_sr_orbits, 7 * sizeof( double));
-   assert( sr_orbits);
-   if( !sr_orbits)
-      return( 0.);
    writing_sr_elems = false;
    if( max_time)
       integration_timeout = clock( ) + (clock_t)( max_time * CLOCKS_PER_SEC);

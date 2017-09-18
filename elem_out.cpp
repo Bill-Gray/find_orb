@@ -2229,6 +2229,8 @@ int get_defaults( int *ephemeris_output_options, int *element_format,
    extern double minimum_jd, maximum_jd;
    extern double maximum_observation_span;
    extern int use_config_directory;
+   extern double *sr_orbits;
+   extern unsigned max_n_sr_orbits;
    int i, use_sigmas_int;
    const char *override_fcct14_filename = get_environment_ptr( "FCCT14_FILE");
 
@@ -2302,6 +2304,11 @@ int get_defaults( int *ephemeris_output_options, int *element_format,
       make_config_dir_name( cospar_name, "cospar.txt");
       cospar_filename = cospar_name;
       }
+   max_n_sr_orbits = atoi( get_environment_ptr( "MAX_SR_ORBITS"));
+   if( !max_n_sr_orbits)
+      max_n_sr_orbits = 500;
+   sr_orbits = (double *)calloc( (size_t)max_n_sr_orbits, 7 * sizeof( double));
+   assert( sr_orbits);
    return( 0);
 }
 
