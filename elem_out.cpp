@@ -2298,11 +2298,10 @@ int get_defaults( int *ephemeris_output_options, int *element_format,
       }
    if( use_config_directory)
       {
-      static char cospar_name[255];
-      extern const char *cospar_filename;
+      char cospar_name[255];
 
       make_config_dir_name( cospar_name, "cospar.txt");
-      cospar_filename = cospar_name;
+      load_cospar_file( cospar_name);
       }
    max_n_sr_orbits = atoi( get_environment_ptr( "MAX_SR_ORBITS"));
    if( !max_n_sr_orbits)
