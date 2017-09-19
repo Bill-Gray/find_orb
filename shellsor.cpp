@@ -1,6 +1,6 @@
 #include <string.h>
 
-#ifdef _WIN32
+#if defined( _WIN32) || defined( __WATCOMC__)
 #include <malloc.h>     /* for alloca() prototype */
 #endif
 
