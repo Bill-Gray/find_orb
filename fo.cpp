@@ -40,6 +40,9 @@ for Windows and other non-*nix systems. */
    #include <sys/time.h>         /* these allow resource limiting */
    #include <sys/resource.h>     /* see '-r' command switch below */
 #endif
+#ifdef __WATCOMC__
+   #include <io.h>
+#endif
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
@@ -126,6 +129,7 @@ static int remove_single_observation_objects( OBJECT_INFO *ids, const int n_ids)
 
 void make_config_dir_name( char *oname, const char *iname);
 
+#ifdef FORKING
 static int unlink_config_file( const char *filename)
 {
    char buff[255];
@@ -138,13 +142,21 @@ static int unlink_config_file( const char *filename)
       char cpath[255];
 
       make_config_dir_name( cpath, buff);
+#ifdef _WIN32                /* MS is different. */
+      err_code = _unlink( cpath);
+#else
       err_code = unlink( cpath);
+#endif
       }
    else
+#ifdef _WIN32
+      err_code = _unlink( buff);
+#else
       err_code = unlink( buff);
+#endif
    return( err_code);
 }
-#ifdef FORKING
+
 static void combine_element_files( const char *filename, const int n_processes)
 {
    FILE **input_files = (FILE **)calloc( (size_t)n_processes, sizeof( FILE *));
