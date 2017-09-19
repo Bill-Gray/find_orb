@@ -154,7 +154,15 @@ int wclear( WINDOW *w)
    return( 0);
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 attr_t curses_attrs[COLOR_PAIRS];
+
+#ifdef __cplusplus
+}
+#endif
 
 int init_pair( const short idx, const short foreground, const short background)
 {
@@ -602,4 +610,9 @@ int init_color(short color, short red, short green, short blue)
 mmask_t mousemask(mmask_t ignored1, mmask_t *ignored2)
 {
    return( (mmask_t)0);
+}
+
+bool can_change_color( void)
+{
+   return( 0);
 }

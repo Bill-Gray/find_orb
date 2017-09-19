@@ -70,6 +70,7 @@ chtype mvinch(int, int);
 chtype mvwinch(WINDOW *, int, int);
 chtype winch(WINDOW *);
 int waddchnstr(WINDOW *, const chtype *, int);
+bool can_change_color( void);
 
 #define keypad(w,flag)          (w->use_keypad = flag)
 #define attroff(attr)           wattroff( stdscr, attr )
@@ -101,9 +102,10 @@ extern attr_t curses_attrs[];
 
 #define COLOR_PAIRS        256
 #define COLOR_PAIR( X)          (curses_attrs[X])
-#define A_BLINK          ((unsigned char)0x8000)
-#define A_STANDOUT       ((unsigned char)0x0800)
-#define A_BOLD           ((unsigned char)0x0800)
+#define A_BLINK          0x8000
+#define A_STANDOUT       0x0800
+#define A_BOLD           0x0800
+#define A_CHARTEXT       0x00ff
 
 #define KEY_DOWN       ( 80 + 256)
 #define KEY_UP         ( 72 + 256)
