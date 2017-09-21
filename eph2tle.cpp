@@ -590,7 +590,8 @@ int main( const int argc, const char **argv)
    fprintf( ofile, "# Made by eph2tle, compiled " __DATE__ " " __TIME__ "\n");
    fprintf( ofile, "# Run at %s#\n", ctime( &t0));
    while( fgets_trimmed( buff, sizeof( buff), ifile))
-      fprintf( ofile, "%s\n", buff);
+      if( *buff != ';')
+         fprintf( ofile, "%s\n", buff);
    fclose( ifile);
    ifile = fopen( argv[1], "rb");
    if( !ifile)
