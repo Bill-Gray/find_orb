@@ -557,23 +557,64 @@ static void put_ephemeris_posn_angle_sigma( char *obuff, const double dist,
    sprintf( obuff, "%s %3d", resid_buff + 1, integer_posn_ang);
 }
 
-static unsigned precovery_in_field( const field_location_t *field,
+#define SWAP( A, B, TEMP)   { TEMP = A;  A = B;  B = TEMP; }
+
+/* At present,  this assumes a 'nominal' position in p[0] and a one-sigma
+variant in p[1].  We figure out the range,  in sigmas,  of that line within
+the rectangle defined by 'field' (keeping in mind that the line may miss
+the rectangle entirely,  and usually does).  But if the line of variation
+_does_ go through the triangle,  running from sigma1 to sigma2,  then we
+evaluate the probability that the object is on that field as the area
+under the normal curve between sigma1 and sigma2, and return that.
+
+   For cases where we don't have variant orbits (n_objs == 1),  we just
+set up a really low difference and are basically just checking to see if
+the nominal position is on the field. (Which,  with one orbit,  is all
+we can do anyway.)
+
+   For objects with low positional uncertainty,  that probability will
+usually be essentially 1 or 0.  If the uncertainty is close to the field
+size,  you'll start to see "maybe it's on the field and maybe it isn't"
+cases.
+
+   TO BE DONE:  figure out how to extend this to non-covariance (SR) cases.
+I've ideas for this... but first,  the (more common) covariance case.  */
+
+static double precovery_in_field( const field_location_t *field,
          const obj_location_t *p, const unsigned n_objs,
          const double margin)
 {
-   unsigned i, rval = 0;
+   double sigma1 = -10., sigma2 = 10.;
+   const double d_ra = (n_objs > 1 ? p[1].ra - p[0].ra : 1e-8);
+   const double d_dec = (n_objs > 1 ? p[1].dec - p[0].dec : 1e-8);
+   double sig1, sig2, temp, size;
+   const double sqrt_2 =
+      1.414213562373095048801688724209698078569671875376948073176679737990732;
 
-   for( i = 0; i < n_objs; i++, p++)
-      {
-      const double delta_dec = p->dec - field->dec;
-      const double delta_ra = centralize_ang_around_zero( p->ra - field->ra)
-                           * cos( field->dec);
+   size = (field->width / 2. + margin) / cos( field->dec);
+   sig1 = centralize_ang_around_zero( field->ra + size - p[0].ra) / d_ra;
+   sig2 = sig1 - 2 * size / d_ra;
+   if( sig1 > sig2)
+      SWAP( sig1, sig2, temp);
+   if( sigma1 < sig1)
+      sigma1 = sig1;
+   if( sigma2 > sig2)
+      sigma2 = sig2;
 
-      if( fabs( delta_dec) < field->height / 2. + margin
-                            && fabs( delta_ra) < field->width / 2. + margin)
-         rval++;
-      }
-   return( rval);
+   size = field->height / 2. + margin;
+   sig1 = (field->dec + size - p[0].dec) / d_dec;
+   sig2 = (field->dec - size - p[0].dec) / d_dec;
+   if( sig1 > sig2)
+      SWAP( sig1, sig2, temp);
+   if( sigma1 < sig1)
+      sigma1 = sig1;
+   if( sigma2 > sig2)
+      sigma2 = sig2;
+
+   if( sigma1 >= sigma2)
+      return( 0.);
+   else
+      return( (erf( sigma2 / sqrt_2) - erf( sigma1 / sqrt_2)) * .5);
 }
 
 static void show_precovery_extent( char *obuff, const obj_location_t *objs,
@@ -642,6 +683,7 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
          double margin = .1;
          const double jdt = field.jd + td_minus_utc( field.jd) / seconds_per_day;
          bool possibly_within_field = false;
+         double prob;
          int i;
 
          while( jdt < p1->jd || jdt > p2->jd)
@@ -676,7 +718,7 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
          margin += EARTH_MAJOR_AXIS_IN_AU / p1->r;
          mag = abs_mag + calc_obs_magnitude(
                               p2->sun_obj, p2->r, p2->sun_earth, NULL);
-         if( mag < limiting_mag && precovery_in_field( &field, p3, n_orbits, margin))
+         if( mag < limiting_mag && precovery_in_field( &field, p3, n_orbits, margin) > .01)
             {                          /* approx posn is on plate;  compute */
             double *temp_orbit = orbi + 6 * n_orbits;
 
@@ -687,7 +729,7 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
             possibly_within_field = true;
             }
          if( mag < limiting_mag && possibly_within_field
-                                && precovery_in_field( &field, p3, n_orbits, 0.))
+               && (prob = precovery_in_field( &field, p3, n_orbits, 0.)) > .1)
             {
             char time_buff[40], buff[200];
             int i;
@@ -736,6 +778,7 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
                      fprintf( ofile, "'%s' not opened\n", filename);
                   }
                show_precovery_extent( buff, p1, n_orbits);
+               snprintf_append( buff, sizeof( buff), " %.3f ", prob);
                fprintf( ofile, "%s", buff);
 
                if( original_file)
