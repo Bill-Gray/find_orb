@@ -1115,18 +1115,40 @@ int extended_orbit_fit( double *orbit, OBSERVE *obs, int n_obs,
                   const unsigned fit_type, double epoch)
 {
    int i, j, rval = 0, n_resids;
+   int n_selected;
    const int n_params = (int)( fit_type & 0xf);
    double orbit_at_epoch[6];
    void *lsquare = lsquare_init( n_params);
    double *resids, *slopes;
    double params[10];
    const double delta_val = 1e-6;
-   const OBSERVE obs1 = obs[0], obs2 = obs[n_obs - 1];
+   OBSERVE obs1, obs2;
 
    obs += drop_excluded_obs( obs, &n_obs);
    n_resids = 2 * n_obs + MAX_CONSTRAINTS;
    resids = (double *)calloc( n_resids * (n_params + 1), sizeof( double));
    slopes = resids + n_resids;
+   for( i = n_selected = 0; i < n_obs; i++)
+      if( obs[i].flags & OBS_IS_SELECTED)
+         n_selected++;
+   if( n_selected == 2)
+      {
+      for( i = n_selected = 0; i < n_obs; i++)
+         if( obs[i].flags & OBS_IS_SELECTED)
+            {
+            if( !n_selected)
+               obs1 = obs[i];
+            else
+               obs2 = obs[i];
+            n_selected++;
+            }
+      }
+   else
+      {
+      obs1 = obs[0];
+      obs2 = obs[n_obs - 1];
+      }
+   integrate_orbit( orbit, epoch, obs1.jd);
    for( i = -1; i < n_params; i++)
       {
       for( j = 0; j < n_params; j++)
@@ -1194,6 +1216,7 @@ int extended_orbit_fit( double *orbit, OBSERVE *obs, int n_obs,
    set_locs_extended( orbit, obs1.jd, obs, n_obs, epoch, orbit_at_epoch);
             /* Except we really want to return the orbit at epoch : */
    memcpy( orbit_at_epoch, orbit, 6 * sizeof( double));
+   integrate_orbit( orbit, obs1.jd, epoch);
    return( rval);
 }
 
