@@ -2533,6 +2533,8 @@ int main( const int argc, const char **argv)
             if( file_offset < 0L)
                file_offset = 0L;
             fseek( ifile, file_offset, SEEK_SET);
+            if( obs)
+               unload_observations( obs, n_obs);
 
             obs = load_object( ifile, ids + id_number, &curr_epoch,
                                                   &epoch_shown, orbit);
@@ -2639,10 +2641,11 @@ int main( const int argc, const char **argv)
             if( i < 72 && !clock_shown)
                {
                time_t t0 = time( NULL);
+               char tbuf[40];
 
-               strcpy( tbuff, ctime( &t0) + 11);
-               tbuff[9] = '\0';
-               put_colored_text( tbuff, line_no - 1, 72, -1, COLOR_OBS_INFO);
+               strcpy( tbuf, ctime( &t0) + 11);
+               tbuf[9] = '\0';
+               put_colored_text( tbuf, line_no - 1, 72, -1, COLOR_OBS_INFO);
                clock_shown = true;
                }
             }
@@ -2958,6 +2961,9 @@ int main( const int argc, const char **argv)
             else
                c = '1' + (x / 7);
             }
+         else if( y > top_line_basic_info_perturbers + n_command_lines
+               && y < top_line_orbital_elements)   /* in obs details area: */
+            c = ALT_Q;         /* toggle display header/'traditional' data */
          else if( y >= top_line_basic_info_perturbers &&
                   y < top_line_basic_info_perturbers + n_command_lines)
             {
@@ -4341,8 +4347,15 @@ int main( const int argc, const char **argv)
             sigmas_in_columns_57_to_65 ^= 1;
             }
             break;
+         case ALT_Q:
+            {
+            extern int show_observational_details;
+
+            show_observational_details ^= 1;
+            }
+            break;
          case ALT_A: case 9:
-         case ALT_P: case ALT_Q:
+         case ALT_P:
          case ALT_R: case ALT_X: case ALT_Y:
          case ALT_Z: case '\'':
          default:
