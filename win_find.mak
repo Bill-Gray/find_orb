@@ -3,13 +3,13 @@
 # ('lunar' or 'lunar64', 'sat_code', 'jpl_eph') will be found.
 
 OBJS=about.obj b32_eph.obj bc405.obj bias.obj clipfunc.obj \
-  collide.obj conv_ele.obj eigen.obj elem2tle.obj elem_ou2.obj \
+  collide.obj conv_ele.obj details.obj eigen.obj elem2tle.obj elem_ou2.obj \
   elem_out.obj ephem0.obj ephem.obj generic.obj gauss.obj \
   geo_pot.obj healpix.obj lsquare.obj miscell.obj \
   moid4.obj monte0.obj errors.obj monte.obj mpc_fmt.obj \
   mpc_obs.obj mt64.obj nanosecs.obj orbitdlg.obj \
   orb_func.obj orb_fun2.obj pl_cache.obj roots.obj  \
-  runge.obj settings.obj shellsor.obj  \
+  runge.obj settings.obj shellsor.obj stackall.obj \
   sigma.obj sm_vsop.obj sr.obj stdafx.obj
 
 !ifdef BITS_32

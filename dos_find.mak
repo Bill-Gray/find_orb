@@ -4,13 +4,13 @@
 
 all: find_orb.exe fo.exe fo_serve.exe
 
-OBJS=b32_eph.obj bc405.obj bias.obj collide.obj conv_ele.obj eigen.obj \
-  elem2tle.obj elem_out.obj elem_ou2.obj ephem0.obj \
+OBJS=b32_eph.obj bc405.obj bias.obj collide.obj conv_ele.obj details.obj  \
+  eigen.obj elem2tle.obj elem_out.obj elem_ou2.obj ephem0.obj \
   errors.obj gauss.obj geo_pot.obj \
   healpix.obj lsquare.obj miscell.obj moid4.obj monte0.obj \
   mpc_fmt.obj mpc_obs.obj mt64.obj nanosecs.obj \
   orb_func.obj orb_fun2.obj pl_cache.obj roots.obj \
-  runge.obj shellsor.obj sigma.obj sm_vsop.obj sr.obj
+  runge.obj shellsor.obj sigma.obj sm_vsop.obj sr.obj stackall.obj
 
 CCLIBS      = user32.lib gdi32.lib advapi32.lib shell32.lib comdlg32.lib
 ADD_LIBS    = pdcurses.lib sat_code.lib jpleph.lib
