@@ -17,7 +17,7 @@ OBSERVE
    char mpc_code[4], packed_id[13], reference[6];
    char columns_57_to_65[10];
    char mag_band, mag_band2, discovery_asterisk, note1, note2, satellite_obs;
-   char unused_padding_byte_to_avoid_compiler_warning;
+   const char **obs_details;
    };
 
 #define OBJECT_INFO struct object_info

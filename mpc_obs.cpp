@@ -34,6 +34,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include <stdarg.h>
 #include <assert.h>
 #include "watdefs.h"
+#include "details.h"
 #include "comets.h"
 #include "lunar.h"
 #include "afuncs.h"
@@ -2791,6 +2792,8 @@ static void fix_radar_time( char *buff)
 }
 #endif
 
+static void *obs_details;
+
 int unload_observations( OBSERVE FAR *obs, const int n_obs)
 {
    int i;
@@ -2804,6 +2807,11 @@ int unload_observations( OBSERVE FAR *obs, const int n_obs)
             free( obs[i].second_line);
             }
       free( obs);
+      }
+   if( obs_details)
+      {
+      free_observation_details( obs_details);
+      obs_details = NULL;
       }
    return( 0);
 }
@@ -3123,6 +3131,8 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
             /* may tell you it's really a comet,  and the orbit may   */
             /* tell you it's an artsat.                               */
    object_type = OBJECT_TYPE_ASTEROID;
+   assert( !obs_details);
+   obs_details = init_observation_details( );
    while( fgets_trimmed( buff, sizeof( buff), ifile) && i != n_obs)
       {
       int is_rwo = 0;
@@ -3172,6 +3182,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
       original_packed_desig[12] = '\0';
       memcpy( original_packed_desig, buff, 12);
       xref_designation( buff);
+      add_line_to_observation_details( obs_details, buff);
       if( observation_jd( buff) &&
                      !compare_desigs( packed_desig, buff))
          {
@@ -3350,6 +3361,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                set_obs_vect( rval + i);
                if( !rval[i].is_included)
                   rval[i].flags |= OBS_DONT_USE;
+               rval[i].obs_details = get_code_details( obs_details, rval[i].mpc_code);
                i++;
                }
             }
@@ -4582,6 +4594,8 @@ void add_version_and_de_text( char *buff)
    format_jpl_ephemeris_info( buff + strlen( buff));
 }
 
+int show_observational_details = 0;
+
 int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff)
 {
    size_t i, n_selected = 0, first = 0, last = 0;
@@ -4658,7 +4672,25 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff)
       strcat( buff, "\n");
       n_lines++;
       }
-   else
+   else if( show_observational_details)
+      {
+      const char **lines = obs[first].obs_details;
+
+      if( lines)
+         for( i = 0; lines[i]; i++)
+            {
+            strcpy( tptr, lines[i]);
+            strcat( tptr, "\n");
+            tptr += strlen( tptr);
+            }
+      else
+         {
+         strcpy( tptr, "(No observation header available)\n");
+         i = 1;
+         }
+      n_lines = i;
+      }
+   else        /* "standard",  computed details */
       {
       const int alt_info = atoi( get_environment_ptr( "ALT_INFO"));
 
