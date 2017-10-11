@@ -137,6 +137,7 @@ INTEGRAL     2002-048A    2002-048A = NORAD 27540 = Integral
     SK02N020 N011S        Neptune XI = S/2002 N2 = Sao
     SK02N030 N012S        Neptune XII = S/2002 N3 = Laomedeia
     SK02N040 N013S        Neptune XIII = S/2002 N4 = Neso
+    SK03J030 J060S        Jupiter LX = S/2003 J 3
 
 ;  When Herschel/Planck launched in May 2009,  there was some initial
 ; confusion as to which object was which.  So five of them got temporary
