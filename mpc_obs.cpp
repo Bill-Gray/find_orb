@@ -380,55 +380,50 @@ are located.
    You _can_ use this to override the existing codes,  but the only case
 I can think of where you'd do that would be if you thought there might
 be an error in the MPC's ObsCodes.html listing.  (Or in the supplement
-in 'rovers.txt'.)
+in 'rovers.txt'.)    */
 
-   Up to MAX_XXX_CODES are kept track of,  using the following xxx_code_t
-structure. */
+static void *obs_details;
 
-typedef struct
+static double get_lat_lon( const char *ibuff, char *compass)
 {
-   char mpc_code[4];
-   double lon, lat, alt;
-} xxx_code_t;
+   double deg = 0., min = 0., sec = 0.;
 
-#define MAX_XXX_CODES 20
+   *compass = '\0';
+   sscanf( ibuff, "%lf %lf %lf %c", &deg, &min, &sec, compass);
+   deg += min / 60. + sec / 3600.;
+   return( deg);
+}
 
-static xxx_code_t xxx_codes[MAX_XXX_CODES];
-static char curr_xxx_code[8];
-
-static inline void get_xxx_location( const char *buff)
+static inline int get_lat_lon_from_header( double *lat,
+            double *lon, double *alt, const char *mpc_code)
 {
-   double deg, min, sec;
-   char compass;
-   const char *tptr;
-   xxx_code_t * xxx;
-   size_t i = 0;
+   const char **lines = get_code_details( obs_details, mpc_code);
+   size_t i;
+   int rval = 0;
 
-   debug_printf( "Looking for code in '%s'\n", buff);
-   while( i < MAX_XXX_CODES - 1 && xxx_codes[i].mpc_code[0]
-                  && memcmp( curr_xxx_code, xxx_codes[i].mpc_code, 3))
-      i++;
-   xxx = &xxx_codes[i];
-   memcpy( xxx->mpc_code, curr_xxx_code, 3);
-   deg = min = sec = 0.;
-   sscanf( buff + 9, "%lf %lf %lf %c", &deg, &min, &sec, &compass);
-   xxx->lon = deg + min / 60. + sec / 3600.;
-   if( xxx->lon > 180.)
-      xxx->lon -= 360.;
-   if( compass == 'W')
-      xxx->lon *= -1.;
-   tptr = strstr( buff, "Lat.");
-   if( tptr)
-      {
-      deg = min = sec = 0.;
-      sscanf( tptr + 4, "%lf %lf %lf %c", &deg, &min, &sec, &compass);
-      xxx->lat = deg + min / 60. + sec / 3600.;
-      if( compass == 'S' || compass == 's')
-         xxx->lat = -xxx->lat;
-      }
-   tptr = strstr( buff, "Alt.");
-   if( tptr)
-      xxx->alt = atof( tptr + 4);
+   for( i = 0; !rval && lines && lines[i]; i++)
+      if( !memcmp( lines[i], "COM Long.", 9))
+         {
+         char compass;
+         const char *tptr = strstr( lines[i], "Lat.");
+
+         *lon = get_lat_lon( lines[i] + 9, &compass);
+         if( *lon > 180.)
+            *lon -= 360.;
+         if( compass == 'W')
+            *lon *= -1.;
+         if( tptr)
+            {
+            *lat = get_lat_lon( tptr + 4, &compass);
+            if( compass == 'S' || compass == 's')
+               *lat = -*lat;
+            }
+         tptr = strstr( lines[i], "Alt.");
+         if( tptr)
+            *alt = atof( tptr + 4);
+         rval = 1;
+         }
+   return( rval);
 }
 
 extern int debug_level;
@@ -685,14 +680,9 @@ int get_observer_data( const char FAR *mpc_code, char *buff,
       return( -1);
       }
 
-   for( i = 0; i < MAX_XXX_CODES; i++)
-      if( !strcmp( mpc_code, xxx_codes[i].mpc_code))
-         {
-         lat0 = xxx_codes[i].lat;
-         lon0 = xxx_codes[i].lon;
-         alt0 = xxx_codes[i].alt;
-         format_string = "%11.5f%9.5f%7.1fTemporary MPC code";
-         }
+
+   if( get_lat_lon_from_header( &lat0, &lon0, &alt0, mpc_code))
+      format_string = "%11.5f%9.5f%7.1fTemporary MPC code";
 
    if( !strcmp( mpc_code, "247"))
       {
@@ -2792,8 +2782,6 @@ static void fix_radar_time( char *buff)
 }
 #endif
 
-static void *obs_details;
-
 int unload_observations( OBSERVE FAR *obs, const int n_obs)
 {
    int i;
@@ -3145,10 +3133,6 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
 
       if( *buff == '<')
          remove_html_tags( buff);
-      if( !memcmp( buff, "COD ", 4) && ilen == 7)
-         strcpy( curr_xxx_code, buff + 4);
-      if( !memcmp( buff, "COM Long.", 9))
-         get_xxx_location( buff);
       if( !memcmp( buff, "errmod  = 'fcct14'", 18))
          is_fcct14_data = true;
       if( debug_level > 2)
