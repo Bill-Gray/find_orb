@@ -100,6 +100,7 @@ extern unsigned perturbers;
 #define KEY_MOUSE_MOVE 31000
 #define KEY_TIMER      31001
 #define AUTO_REPEATING 31002
+#define KEY_ALREADY_HANDLED    31003
 
 /* You can cycle between showing only the station data for the currently
 selected observation;  or the "normal" having,  at most,  a third of
@@ -2829,14 +2830,21 @@ int main( const int argc, const char **argv)
          const unsigned station_start_line = getmaxy( stdscr) - n_stations_shown;
          unsigned long button;
          wchar_t text[100], *search_ptr;
-         const wchar_t *search_strings[] = { L"Peri", L"Epoch", L"(J2000 ecliptic)",
+         const wchar_t *search_strings[] = { L"YY MM DD.DDD", L"Peri",
+                  L"Epoch", L"(J2000 ecliptic)",
                   L"(J2000 equator)", L"(body frame)",
                   L"sigmas",
                   L"Xres  Yres", L"Tres  Cres", L" delta ", L"Sigma", NULL };
-         const int search_char[] = { '+', 'e', ALT_N, ALT_N, ALT_N,
-                  ALT_K, 't', 't', '=', '%' };
+         const int search_char[] = { KEY_ALREADY_HANDLED, '+', 'e',
+                  ALT_N, ALT_N, ALT_N, ALT_K, 't', 't', '=', '%' };
 
          get_mouse_data( (int *)&x, (int *)&y, (int *)&z, &button);
+#ifndef USE_MYCURSES
+         dir = (( button & button1_events) ? 1 : -1);
+         if( debug_mouse_messages)
+            sprintf( message_to_user, "x=%d y=%d z=%d button=%lx",
+                              x, y, z, button);
+#endif
          for( i = 0; i < 99 && i < getmaxx( stdscr); i++)
             {
             move( y, i);
@@ -2845,15 +2853,28 @@ int main( const int argc, const char **argv)
          text[i] = '\0';
          for( i = 0; search_strings[i]; i++)
             if( (search_ptr = wcsstr( text, search_strings[i])) != NULL)
-               if( x >= (unsigned)( search_ptr - text)
-                        && x <= (unsigned)( search_ptr - text) + wcslen( search_strings[i]))
+               {
+               const unsigned loc = x - (unsigned)( search_ptr - text);
+
+               if( loc < (unsigned)wcslen( search_strings[i]))
+                  {
                   c = search_char[i];
-#ifndef USE_MYCURSES
-         dir = (( button & button1_events) ? 1 : -1);
-         if( debug_mouse_messages)
-            sprintf( message_to_user, "x=%d y=%d z=%d button=%lx",
-                              x, y, z, button);
-#endif
+                  if( !i)     /* clicked on YY MM DD.DDD */
+                     {
+                     static const double time_diffs[] = { 3650., 365., 180., 90., 30.,
+                                    0., 10., 1., .3, 0.1, 0.01, 0.001 };
+                     const double curr_jd = obs[curr_obs].jd;
+                     const double step = time_diffs[loc];
+
+                     if( dir == 1)
+                        while( curr_obs < n_obs - 1 && obs[curr_obs].jd < curr_jd + step)
+                           curr_obs++;
+                     else
+                        while( curr_obs > 0 && obs[curr_obs].jd > curr_jd - step)
+                           curr_obs--;
+                     }
+                  }
+               }
 #ifdef BUTTON5_PRESSED
          if( button & BUTTON4_PRESSED)   /* actually 'wheel up' */
             c = KEY_UP;
@@ -3965,6 +3986,7 @@ int main( const int argc, const char **argv)
                strcpy( message_to_user, "Using total mags for comets");
             }
          case KEY_MOUSE:   /* already handled above */
+         case KEY_ALREADY_HANDLED:
             break;
          case 27:
          case 'q': case 'Q':
