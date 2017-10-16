@@ -732,17 +732,26 @@ reflect the fact that it assumes the earth's orbit is circular.  Alan
 points out that this really should only apply to crossing orbits (which,
 with earth's orbit considered circular,  means q < 1 < Q.)  If the MOID
 is non-zero,  it's hard to say exactly what the "encounter velocity" means.
-*/
+
+   Note furthermore that the above can be reduced to
+
+dv = v0 * sqrt(3. - tisserand)
+
+   where v0 = orbital speed for the earth (roughly 30 km/s) and 'tisserand'
+is the usual Tisserand criterion.           */
 
 static double encounter_velocity( const ELEMENTS *elem, const double a0)
 {
    const double a = elem->major_axis;
    double tval = sqrt( a * (1. - elem->ecc * elem->ecc) / a0);
+   double tisserand = a0 / a + 2. * tval * cos( elem->incl);
+   double rval;
 
-   tval = 3. - a0 / a - 2. * tval * cos( elem->incl);
-   if( tval < 0.)    /* can happen if the orbits can't really intersect */
-      tval = 0.;     /* (i.e.,  q > 1 or Q < 1) */
-   return( 30. * sqrt( tval));
+   if( tisserand > 3.)    /* can happen if the orbits can't really */
+      rval = 0.;          /* intersect (i.e.,  q > 1 or Q < 1) */
+   else
+      rval = 30. * sqrt( 3. - tisserand);
+   return( rval);
 }
 
 /* The results from write_out_elements_to_file() can be somewhat
