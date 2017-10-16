@@ -2334,7 +2334,7 @@ sigmas are similarly converted.
 
 static void xfer_rwo_time_to_mpc( char *obuff, const char *ibuff)
 {
-   if( ibuff[17] == ' ')            /* six or fewer decimals:  leave in */
+   if( ibuff[17] == ' ' || ibuff[16] == ' ') /* six or fewer decimals: */
       memcpy( obuff, ibuff, 17);    /* MPC 'standard' 80-column format */
    else                           /* >6 decimals,  won't fit 'standard'; */
       {                           /* use Find_Orb CYYMMDD.ddddddddd format */
