@@ -37,12 +37,15 @@ to that instant and verify that the object was on that field.
    (2) Starting with the first field,  compute geocentric positions of our
       object of interest for a time "before" and "after" that of the
       exposure.  Make those times close enough that motion between them
-      is passably close to linear.
+      is passably close to linear.  (I set the time difference to depend
+      on the distance to the object:  if it's very close,  you need a small
+      time difference.)
    (3) We can now compute approximate positions for our object of interest
       between those start/end times,  using linear interpolation.  We
       allow a wide margin of about .1 degree for the fact that the motion
       does have some real curvature,  plus enough extra margin to allow
       for the maximum possible topocentric parallax over that interval.
+      The extra margin is (radius_earth / distance_to_object),  in radians.
    (4) If,  after allowing for that extra margin,  we still think the object
       might have been on that plate,  do the full "slower" method above:
       find out _exactly_ where the object would have been at that time.
@@ -55,9 +58,10 @@ to that instant and verify that the object was on that field.
    The reason this is fast is that much of the time,  we're doing a quick
 linear interpolation and finding that it's nowhere near the field in
 question.  (That is to say,  most images will be quite far away from
-whatever object we're actually interested in.)  We will have to do that
-full positional computation for every image on which the object really
-did appear,  plus a small fraction on which it wasn't caught.
+whatever object we're actually interested in.)  We'll get to step (3)
+and be done.  Only in a percent or two of cases will we have to do that
+full positional computation (step (4)) and maybe find out that yes,
+we really did image the object (step (5)).
 
    (1) is not theoretically necessary.  But it saves computing time if
 you integrate backward through time once,  rather than hopping about at
@@ -84,15 +88,70 @@ field if it would have been at mag 32 at the time).
    (4) Show only fields within a given date range,  _or_ only those
 _outside_ that date range.
 
+HANDLING UNCERTAINTIES:
+
+   The above works nicely if you have a single orbit with low
+uncertainties.  But suppose the orbit isn't well-determined for the
+distant past?
+
+   Fortunately,  Find_Orb can (usually) determine ephemeris uncertainties.
+Those uncertainties are (usually) elongated ellipses,  to the point
+where we can say that the object is on a particular line,  spread
+out in a Gaussian distribution along that "line of variation" with
+a particular uncertainty.
+
+   So the above scheme is modified slightly: Find_Orb integrates
+the nominal orbit for the object,  _plus_ a one-sigma variant object.
+As we go backward in time,  we can compute a probability that the
+object would appear on a particular image.  We may have cases
+where the nominal position isn't on the image,  but can say that
+if the object is (say) 0.2 to 1.3 sigmas off the nominal position,
+it would be on the image.  That would give us a 32.4% chance that
+the object would be in the image.  Given that,  we might (or might
+not) try to find it.
+
+   The problem becomes one of "does the uncertainty region intersect
+the image rectangle" instead of "does the nominal position land in the
+image rectangle."  We can provide a little more information as well:
+"the object will probably be found here on your image" (or,  in
+the above case,  "is probably a little off the image on this side")
+"and is probably within thus-and-such distance,  at thus-and-such
+position angle."  As described above,  we can also give a probability
+that it's on the image at all.
+
+   This does slow things down a bit,  because we're now integrating
+two orbits instead of one.  Fortunately,  much of the work (computing
+perturber positions,  for example) only need be done once,  so it
+doesn't actually take twice as long as the single-orbit case.  And
+in any case,  we really need to know if we're apt to find an object
+or if we'd just be wasting time looking for it.  So the extra time
+is well-spent.
+
+   Also,  the above description of the uncertainty area being nearly
+linear is really only true once the orbit can be fitted with least
+squares.  At the early stages,  when the observed arc is small,
+almost _any_ orbit linking the first observation to the last observation
+will have reasonable residuals and has to be considered.  (Within
+some limits.)  So for _really_ short,  just-posted-on-NEOCP orbits,
+this scheme doesn't work.  I've ideas for handling that situation
+as well,  but thus far,  I don't have actual working code.
+
 PLANNED IMPROVEMENTS :
 
    Finding out which of several million tracklets (ITF or short-arc
 astrometry) would fit your observations is only slightly different
-from telling you which images to look at.
+from telling you which images to look at.  It has the advantage of
+being somewhat automatable,  and it doesn't require access to images.
 
-   We really should integrate at least two orbits:  the nominal one,
-plus a one-sigma variant.  If we do that,  the problem becomes one
-of "does the uncertainty region intersect the image rectangle" instead
-of "does the nominal position land in the image rectangle."  We have
-to output a bit more information as well.
+   Ideally,  Find_Orb would say : "Your object _might_ be linked to
+objects A, B, and/or C in the ITF."  It would then try computing
+an orbit with A's observations added in,  then with B's,  and then
+with C's,  to see if the residuals looked good.
 
+   Also,  note that if you're a survey,  for "ITF",  you might say
+"our file of observations that weren't quite good enough to submit
+to MPC."  You might,  for example,  require that an object be
+detected on three out of four images before it could be submitted
+to MPC.  But you might also keep a file of two-out-of-four detections,
+and only use them when you could confirm them by linking them to
+another object.
