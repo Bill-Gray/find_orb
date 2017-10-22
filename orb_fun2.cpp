@@ -338,7 +338,7 @@ int filter_obs( OBSERVE FAR *obs, const int n_obs,
             {
             n_active++;
             if( n_active == 3)      /* found enough;  break out of loop */
-               i = n_obs;
+               break;
             }
          if( pass && is_okay != obs[i].is_included)
             {
