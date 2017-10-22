@@ -2140,7 +2140,7 @@ static void output_angle_to_buff( char *obuff, const double angle,
    if( n_digits_to_show)
       {
       char *tptr = obuff + strlen( obuff);
-      char format[5];
+      char format[7];
 
       if( precision < 307 || precision > 312)   /* omit decimal point for */
          *tptr++ = '.';                         /* super-precise formats */
