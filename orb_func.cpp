@@ -1561,7 +1561,7 @@ int find_nth_sr_orbit( double *orbit, OBSERVE FAR *obs, int n_obs,
          else
             {
             dist = roots[i] + (search_dist - dist);
-            i = n_ranges * 2;  /* break out of loop */
+            break;
             }
          }
       fail_on_hitting_planet = true;
@@ -2211,8 +2211,7 @@ static int evaluate_limited_orbit( const double *orbit,
                   value /= 365.25 * 1440.;
                value = pow( value * sqrt( get_planet_mass( planet_orbiting) / SOLAR_GM),
                                                      2. / 3.);
-                           /* then _don't_ break; just fall through to the */
-                           /* major axis code:                             */
+                           /* fall-thru   */
             case 'a':
                constraints[rval++] = (elem.major_axis / value) - 1.;
                break;
