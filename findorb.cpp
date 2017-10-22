@@ -1024,8 +1024,8 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
                if( !memcmp( search_text, ids[i].obj_name, len))
                   {
                   choice = i;
-                  i = n_ids;
                   c = 0;
+                  break;
                   }
             }
 #ifdef ALT_0
@@ -1043,7 +1043,7 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
                break;
             case '!':
                force_bogus_orbit = true;
-                     /* intentionally do _not_ break here, fall through: */
+                     /* fall-thru */
             case ' ':
             case 13:
                rval = choice;

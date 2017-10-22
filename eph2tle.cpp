@@ -529,6 +529,7 @@ int main( const int argc, const char **argv)
                break;
             case '7':
                n_params = 7;        /* fit bstar,  too */
+               break;
             case '8':
                use_eight = 1;
                break;
@@ -562,6 +563,7 @@ int main( const int argc, const char **argv)
             case 'l': case 'L':
                sscanf( argv[i] + 2, "%lf,%d",
                   &levenberg_marquardt_lambda0, &n_damped);
+               break;
             case 'r':
                srand( atoi( argv[i] + 2));
                break;

@@ -392,6 +392,7 @@ int main( const int argc, const char **argv)
 
                separate_periodic_comet_apparitions ^= 1;
                }
+               break;
             case 'b':
                if( !argv[i][2] && i < argc - 1 && argv[i + 1][0] != '-')
                   separate_residual_file_name = argv[i + 1];
@@ -423,6 +424,7 @@ int main( const int argc, const char **argv)
                   ephemeris_filename = argv[i] + 2;
                is_default_ephem = false;
                }
+               break;
             case 'f':
                if( !argv[i][2] && i < argc - 1 && argv[i + 1][0] != '-')
                   precovery_dir = argv[i + 1];
