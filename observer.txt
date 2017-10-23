@@ -96,6 +96,7 @@
  Ondrejov                                  <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0056561">Ond&#345;ejov</a>
  Sanchez-Ortiz                             <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0257336">S&aacute;nchez-Ortiz</a>
  Ortiz                                     <a href="http://en.wikipedia.org/wiki/Jos%C3%A9_Luis_Ortiz_Moreno">Ortiz</a>
+ Oschin Schmidt                            <a href="https://en.wikipedia.org/wiki/Samuel_Oschin_telescope">Oschin Schmidt</a>
  Ory                                       <a href="https://en.wikipedia.org/wiki/Michel_Ory">Ory</a>
  P\'al                                     <a href="http://en.scientificcommons.org/andras_pal">P&aacute;l</a>
  Pelle                                     <a href="http://chez.mana.pf/~jcpelle/">Pelle</a>

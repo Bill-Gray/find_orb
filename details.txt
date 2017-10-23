@@ -505,6 +505,10 @@ NET UCAC-2
 COD I33
 TEL 4.1-m reflector + CCD
 
+COD I41
+TEL 1.2-m f/2.44 Oschin Schmidt + CCD
+NET SDSS
+
 COD I77
 OBS C. Jacques,E. Pimentel
 MEA C. Jacques

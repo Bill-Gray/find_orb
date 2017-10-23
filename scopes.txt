@@ -10,11 +10,17 @@
 # which presumably supplies at least data about the scope for almost every
 # observatory site.
 #
-COD 000
-TEL 0.76-m reflector
+#   Further wrinkle: many sites have two telescopes specified,  and we've no
+# idea offhand which is correct.  In some cases,  I've taken the effort to
+# insert a leading space before COD and TEL so those lines will get ignored
+# instead of running the risk of adding spurious scope details.  I probably
+# didn't get them all,  though.
+#
+ COD 000
+ TEL 0.76-m reflector
 
-COD 000
-TEL 0.35-m refractor
+ COD 000
+ TEL 0.35-m refractor
 
 COD 006
 TEL 0.38-m f/11 astrograph
@@ -22,11 +28,11 @@ TEL 0.38-m f/11 astrograph
 COD 010
 TEL 0.9-m Schmidt
 
-COD 012
-TEL 0.85-m Schmidt
+ COD 012
+ TEL 0.85-m Schmidt
 
-COD 012
-TEL 0.4-m double astrograph
+ COD 012
+ TEL 0.4-m double astrograph
 
 COD 017
 TEL 1.0-m reflector
@@ -547,11 +553,11 @@ TEL 0.4-m f/10 Cassegrain
 COD 658
 TEL 1.82-m Plaskett reflector
 
-COD 661
-TEL 0.40-m f/5.0 Newtonian
+ COD 661
+ TEL 0.40-m f/5.0 Newtonian
 
-COD 661
-TEL 0.50-m f/1.0 Baker-Nunn
+ COD 661
+ TEL 0.50-m f/1.0 Baker-Nunn
 
 COD 662
 TEL 3.05-m Shane reflector
@@ -565,17 +571,17 @@ TEL 0.76-m f/6 reflector
 COD 673
 TEL 0.61-m f/16 reflector
 
-COD 675
-TEL 1.2-m Oschin Schmidt
+ COD 675
+ TEL 1.2-m Oschin Schmidt
 
-COD 675
-TEL 0.46-m Schmidt
+ COD 675
+ TEL 0.46-m Schmidt
 
-COD 675
-TEL 1.5-m reflector
+ COD 675
+ TEL 1.5-m reflector
 
-COD 675
-TEL 5.08-m Hale reflector
+ COD 675
+ TEL 5.08-m Hale reflector
 
 COD 682
 TEL 0.25-m Schmidt-Cassegrain
@@ -586,29 +592,29 @@ TEL 0.35-m f/5 reflector
 COD 684
 TEL 0.46-m f/4.5 reflector
 
-COD 688
-TEL 0.33-m Pluto refractor
+ COD 688
+ TEL 0.33-m Pluto refractor
 
-COD 688
-TEL 1.83-m Perkins reflector
+ COD 688
+ TEL 1.83-m Perkins reflector
 
-COD 688
-TEL 1.07-m Hall reflector
+ COD 688
+ TEL 1.07-m Hall reflector
 
-COD 688
-TEL 0.79-m Cassegrain reflector
+ COD 688
+ TEL 0.79-m Cassegrain reflector
 
-COD 689
-TEL 1.52-m astrometric reflector
+ COD 689
+ TEL 1.52-m astrometric reflector
 
-COD 689
-TEL 1.02-m Ritchey-Chretien reflector
+ COD 689
+ TEL 1.02-m Ritchey-Chretien reflector
 
-COD 689
-TEL 0.61-m Cassegrain reflector
+ COD 689
+ TEL 0.61-m Cassegrain reflector
 
-COD 689
-TEL 0.20-m refractor
+ COD 689
+ TEL 0.20-m refractor
 
 COD 690
 TEL 0.33-m astrograph
@@ -619,32 +625,32 @@ TEL 0.91-m Spacewatch telescope
 COD 693
 TEL 1.54-m reflector
 
-COD 695
-TEL 4.0-m Mayall reflector
+ COD 695
+ TEL 4.0-m Mayall reflector
 
-COD 695
-TEL 2.29-m Steward reflector
+ COD 695
+ TEL 2.29-m Steward reflector
 
-COD 695
-TEL 0.91-m Warner & Swasey reflector #1
+ COD 695
+ TEL 0.91-m Warner & Swasey reflector #1
 
-COD 695
-TEL 2.13-m reflector
+ COD 695
+ TEL 2.13-m reflector
 
-COD 695
-TEL 1.3-m Cassegrain reflector
+ COD 695
+ TEL 1.3-m Cassegrain reflector
 
-COD 695
-TEL 0.61/0.91-m Burrell Schmidt
+ COD 695
+ TEL 0.61/0.91-m Burrell Schmidt
 
-COD 696
-TEL 1.2-m reflector
+ COD 696
+ TEL 1.2-m reflector
 
-COD 696
-TEL MMT
+ COD 696
+ TEL MMT
 
-COD 696
-TEL 0.61-m Cassegrain reflector
+ COD 696
+ TEL 0.61-m Cassegrain reflector
 
 COD 699
 TEL 0.59-m LONEOS Schmidt
@@ -652,29 +658,29 @@ TEL 0.59-m LONEOS Schmidt
 COD 701
 TEL 0.4-m Schmidt-Cassegrain
 
-COD 703
-TEL 0.41-m Schmidt
+ COD 703
+ TEL 0.41-m Schmidt
 
-COD 703
-TEL 0.68-m f/1.7 Schmidt
+ COD 703
+ TEL 0.68-m f/1.7 Schmidt
 
-COD 704
-TEL 1.0-m f/2.15 reflector
+ COD 704
+ TEL 1.0-m f/2.15 reflector
 
-COD 704
-TEL 1.0-m f/2.15 reflector (LINEAR 1)
+ COD 704
+ TEL 1.0-m f/2.15 reflector (LINEAR 1)
 
-COD 704
-TEL 1.0-m f/2.15 reflector (LINEAR 2)
+ COD 704
+ TEL 1.0-m f/2.15 reflector (LINEAR 2)
 
-COD 704
-TEL 1.0-m f/2.15 reflector (LINEAR 3)
+ COD 704
+ TEL 1.0-m f/2.15 reflector (LINEAR 3)
 
-COD 705
-TEL 0.5-m reflector
+ COD 705
+ TEL 0.5-m reflector
 
-COD 705
-TEL 3.5-m reflector
+ COD 705
+ TEL 3.5-m reflector
 
 COD 710
 TEL 0.25-m Schmidt-Cassegrain
@@ -703,17 +709,17 @@ TEL 0.41-m Schmidt-Cassegrain
 COD 715
 TEL 0.41-m Schmidt-Cassegrain
 
-COD 716
-TEL 0.25-m Schmidt-Cassegrain
+ COD 716
+ TEL 0.25-m Schmidt-Cassegrain
 
-COD 716
-TEL 0.30-m Schmidt-Cassegrain
+ COD 716
+ TEL 0.30-m Schmidt-Cassegrain
 
-COD 716
-TEL 0.50-m Ritchey-Chretien
+ COD 716
+ TEL 0.50-m Ritchey-Chretien
 
-COD 716
-TEL 0.35-m Schmidt-Cassegrain
+ COD 716
+ TEL 0.35-m Schmidt-Cassegrain
 
 COD 718
 TEL 0.35-m Schmidt-Cassegrain
@@ -736,11 +742,11 @@ TEL 0.30-m Schmidt-Cassegrain
 COD 735
 TEL 0.46-m f/4.5 Newtonian
 
-COD 739
-TEL 0.25-m Schmidt-Cassegrain
+ COD 739
+ TEL 0.25-m Schmidt-Cassegrain
 
-COD 739
-TEL 0.30-m Schmidt-Cassegrain
+ COD 739
+ TEL 0.30-m Schmidt-Cassegrain
 
 COD 740
 TEL 0.25-m Schmidt-Cassegrain
@@ -784,23 +790,23 @@ TEL 1.5-m Ritchey-Chretien
 COD 808
 TEL 0.5-m f/7.5 double astrograph
 
-COD 809
-TEL 1.0-m Schmidt
+ COD 809
+ TEL 1.0-m Schmidt
 
-COD 809
-TEL 3.5-m NTT
+ COD 809
+ TEL 3.5-m NTT
 
-COD 809
-TEL 0.4-m GPO astrograph
+ COD 809
+ TEL 0.4-m GPO astrograph
 
-COD 809
-TEL 1.54-m Danish reflector
+ COD 809
+ TEL 1.54-m Danish reflector
 
-COD 809
-TEL 1.20-m f/10 Cassegrain
+ COD 809
+ TEL 1.20-m f/10 Cassegrain
 
-COD 809
-TEL 0.62-m Bochum Cassegrain
+ COD 809
+ TEL 0.62-m Bochum Cassegrain
 
 COD 817
 TEL 0.41-m Schmidt-Cassegrain
@@ -844,11 +850,11 @@ TEL 0.30-m Schmidt-Cassegrain
 COD 859
 TEL 0.30-m Schmidt-Cassegrain
 
-COD 860
-TEL 0.20-m f/3.3 reflector
+ COD 860
+ TEL 0.20-m f/3.3 reflector
 
-COD 860
-TEL 0.36-m Schmidt-Cassegrain
+ COD 860
+ TEL 0.36-m Schmidt-Cassegrain
 
 COD 886
 TEL 0.25-m f/6.3 reflector
@@ -1135,6 +1141,9 @@ COD Ke2
 TEL 10-m Keck II reflector
 
 # Following are some scopes collected at random from MPECs.
+
+ COD 688
+ TEL 4-m Discovery Channel Telescope
 
 COD G83
 TEL 8.4-m reflector + CCD
