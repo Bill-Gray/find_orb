@@ -45,13 +45,13 @@ void shellsort_r( void *base, const size_t n_elements, const size_t elem_size,
 #ifdef HAVE_REENTRANT_QSORT
    qsort_r( base, n_elements, elem_size, compare, context);
 #else
-   size_t gap = 1;
+   size_t gap = 724;
    char *data = (char *)base;
    char *pivot = (char *)alloca( elem_size);
 
    while( gap < n_elements)
-      gap = gap * 3 + 1;
-   while( gap /= 3)
+      gap = gap * 8 / 3 + 1;
+   while( (gap = gap * 3 / 8) != 0)
       {
       size_t j;
       const size_t spacing = elem_size * gap;
