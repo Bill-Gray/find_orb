@@ -165,7 +165,11 @@ double planet_radius_in_meters( const int planet_idx);      /* collide.cpp */
 double find_epoch_shown( const OBSERVE *obs, const int n_obs); /* elem_out */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
-                                   const char *format, ...);
+                                   const char *format, ...)
+#ifdef __GNUC__
+         __attribute__ (( format( printf, 3, 4)))
+#endif
+;
 void set_obs_vect( OBSERVE FAR *obs);        /* mpc_obs.h */
 double improve_along_lov( double *orbit, const double epoch, const double *lov,
           const unsigned n_params, const unsigned n_obs, OBSERVE *obs);

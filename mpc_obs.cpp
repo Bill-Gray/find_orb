@@ -90,7 +90,11 @@ FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 int snprintf( char *string, const size_t max_len, const char *format, ...);
 #endif
 int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
-                                   const char *format, ...);
+                                   const char *format, ...)
+#ifdef __GNUC__
+         __attribute__ (( format( printf, 3, 4)))
+#endif
+;
 char *mpc_station_name( char *station_data);       /* mpc_obs.cpp */
 int get_object_name( char *obuff, const char *packed_desig);   /* mpc_obs.c */
 void compute_error_ellipse_adjusted_for_motion( double *sigma1, double *sigma2,
@@ -1357,9 +1361,11 @@ int get_object_name( char *obuff, const char *packed_desig)
          *obuff++ = '/';
          }
       if( !unpack_provisional_packed_desig( obuff, xdesig + 5))
-         rval = ((xdesig[4] == ' ') ? OBJ_DESIG_ASTEROID_PROVISIONAL
+         rval = ((xdesig[4] == ' ' || xdesig[4] == 'A') ?
+                                      OBJ_DESIG_ASTEROID_PROVISIONAL
                                     : OBJ_DESIG_COMET_PROVISIONAL);
-      if( rval != OBJ_DESIG_OTHER && xdesig[4] != ' ' && obuff)
+      if( rval != OBJ_DESIG_OTHER && xdesig[4] != ' '
+                                  && xdesig[4] != 'A' && obuff)
          {
          char tbuff[40];
 

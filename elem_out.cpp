@@ -51,7 +51,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 
 // void elements_in_tle_format( char *buff, const ELEMENTS *elem);
 int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
-                                   const char *format, ...);
+                                   const char *format, ...)
+#ifdef __GNUC__
+         __attribute__ (( format( printf, 3, 4)))
+#endif
+;
 int store_defaults( const int ephemeris_output_options,
          const int element_format, const int element_precision,
          const double max_residual_for_filtering,
