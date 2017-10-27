@@ -1622,6 +1622,8 @@ void set_up_observation( OBSERVE FAR *obs)
    set_obs_vect( obs);
 }
 
+static char get_net_used_from_obs_header( const char *mpc_code);
+
 bool is_valid_mpc_code( const char *mpc_code);        /* mpc_fmt.cpp */
 
 /* Some historical observations are provided in apparent coordinates of date.
@@ -1720,6 +1722,8 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
    obs->is_included = (buff[64] != 'x' && buff[12] != '-');
    FMEMCPY( obs->mpc_code, buff + 77, 3);
    obs->mpc_code[3] = '\0';
+   if( obs->mag_band2 == ' ' && obs_details)
+      obs->mag_band2 = get_net_used_from_obs_header( obs->mpc_code);
    FMEMCPY( obs->columns_57_to_65, buff + 56, 9);
    obs->columns_57_to_65[9] = '\0';
    if( !strcmp( obs->columns_57_to_65, "Apparent "))
@@ -4242,6 +4246,110 @@ static size_t strip_trailing_zeroes( char *buff)
    return( i);
 }
 
+int text_search_and_replace( char FAR *str, const char *oldstr,
+                                     const char *newstr);   /* ephem0.cpp */
+
+/* Code to get around the fact that people (probably shouldn't,  but do)
+specify NETs in a variety of nonstandard ways,  such as
+
+NET Gaia DR1.0
+NET Gaia DR1
+NET Gaia-DR1
+NET Gaiadr1       */
+
+static void reduce_net_name( char *reduced, const char *ibuff)
+{
+
+   strncpy( reduced, ibuff, 79);
+   text_search_and_replace( reduced, "-", "");
+   text_search_and_replace( reduced, " ", "");
+   text_search_and_replace( reduced, ".0", "");
+}
+
+static const char *net_codes[] = {
+    /* http://www.minorplanetcenter.net/iau/info/CatalogueCodes.html
+         G. V. Williams, 2012, ``Minor Planet Astrophotometry'', PhD
+         thesis, Open University. [2012PhDT.........7W] */
+           "aUSNO-A1",
+           "bUSNO-SA1",
+           "cUSNO-A2",
+           "dUSNO-SA2",
+           "eUCAC-1",
+           "fTycho-1",
+           "gTycho-2",
+           "hGSC-1.0",
+           "iGSC-1.1",
+           "jGSC-1.2",
+           "kGSC-2.2",
+           "lACT",
+           "mGSC-ACT",
+           "nSDSS-DR8",       /* was TRC */
+           "oUSNO-B1",
+           "pPPM",
+           "qUCAC-4",     /* also UCAC2-beta for earlier obs */
+           "rUCAC-2",
+           "sUSNO-B2",
+           "tPPMXL",
+           "uUCAC-3",
+           "vNOMAD",
+           "wCMC-14",
+           "xHIP-2",
+           "yHIP",
+           "zGSC-1.x",
+           "AAC",
+           "BSAO 1984",
+           "CSAO",
+           "DAGK 3",
+           "EFK4",
+           "FACRS",
+           "GLick Gaspra Catalogue",
+           "HIda93 Catalogue",
+           "IPerth 70",
+           "JCOSMOS/UKST Southern Sky Catalogue",
+           "KYale",
+           "L2MASS", /* used for WISE & PanSTARRS astrometry */
+           "MGSC-2.3",
+           "NSDSS-DR7",
+           "OSST-RC1",
+           "PMPOSC3",
+           "QCMC-15",
+           "RSST-RC4",
+           "SURAT-1",
+           "TURAT-2",
+           "UGAIA-DR1",
+           "VGAIA-DR2",
+           "WUCAC-5",
+           NULL };
+
+/* get_net_used_from_obs_header( ) looks through the observation header
+for the given MPC code for a line starting with 'NET '.  It then looks
+through the above 'net_codes' array in hopes of finding a match to the
+rest of the line. If it does, we've got our byte for column 72 of the
+punched-card astrometry format. */
+
+static char get_net_used_from_obs_header( const char *mpc_code)
+{
+   const char **lines;
+   char rval = ' ';
+   size_t i, j;
+
+   if( obs_details && (lines = get_code_details( obs_details, mpc_code)) != NULL)
+      for( i = 0; lines[i] && rval == ' '; i++)
+         if( !memcmp( lines[i], "NET ", 4))
+            {
+            char net1[80], net2[80];
+
+            reduce_net_name( net1, lines[i] + 4);
+            for( j = 0; net_codes[j]; j++)
+               {
+               reduce_net_name( net1, net_codes[j] + 1);
+               if( !strcasecmp( net1, net2))
+                  rval = net_codes[j][0];
+               }
+            }
+   return( rval);
+}
+
 /*  Generates text such as:
 
 line 0: Elong 167.3    Phase   6.6    RA vel -0.88'/hr   decvel -0.37'/hr   dT=8.15 sec
@@ -4418,60 +4526,6 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
          {
          DPT sun_alt_az, object_alt_az;
          int i;
-         static const char *net_codes[] = {
-           /* http://www.minorplanetcenter.net/iau/info/CatalogueCodes.html
-                G. V. Williams, 2012, ``Minor Planet Astrophotometry'', PhD
-                thesis, Open University. [2012PhDT.........7W] */
-                  "aUSNO-A1",
-                  "bUSNO-SA1",
-                  "cUSNO-A2",
-                  "dUSNO-SA2",
-                  "eUCAC-1",
-                  "fTycho-1",
-                  "gTycho-2",
-                  "hGSC-1.0",
-                  "iGSC-1.1",
-                  "jGSC-1.2",
-                  "kGSC-2.2",
-                  "lACT",
-                  "mGSC-ACT",
-                  "nSDSS-DR8",       /* was TRC */
-                  "oUSNO-B1",
-                  "pPPM",
-                  "qUCAC-4",     /* also UCAC2-beta for earlier obs */
-                  "rUCAC-2",
-                  "sUSNO-B2",
-                  "tPPMXL",
-                  "uUCAC-3",
-                  "vNOMAD",
-                  "wCMC-14",
-                  "xHIP-2",
-                  "yHIP",
-                  "zGSC-1.x",
-                  "AAC",
-                  "BSAO 1984",
-                  "CSAO",
-                  "DAGK 3",
-                  "EFK4",
-                  "FACRS",
-                  "GLick Gaspra Catalogue",
-                  "HIda93 Catalogue",
-                  "IPerth 70",
-                  "JCOSMOS/UKST Southern Sky Catalogue",
-                  "KYale",
-                  "L2MASS", /* used for WISE & PanSTARRS astrometry */
-                  "MGSC-2.3",
-                  "NSDSS-DR7",
-                  "OSST-RC1",
-                  "PMPOSC3",
-                  "QCMC-15",
-                  "RSST-RC4",
-                  "SURAT-1",
-                  "TURAT-2",
-                  "UGAIA-DR1",
-                  "VGAIA-DR2",
-                  "WUCAC-5",
-                  NULL };
 
          if( optr->posn_sigma_1 > 1.01 || optr->posn_sigma_1 < .99
                   || optr->posn_sigma_1 != optr->posn_sigma_2)
