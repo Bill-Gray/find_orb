@@ -739,7 +739,11 @@ int main( const int argc, const char **argv)
                      n_obs_included++;
                if( n_obs_included != n_obs_actually_loaded
                               && show_processing_steps)
+                  {
+                  if( use_colors)        /* reverse colors to draw attn */
+                     printf( "\033[30;47m");
                   printf( " %d /", n_obs_included);
+                  }
                }
             else
                printf( "; not enough observations\n");
@@ -750,6 +754,8 @@ int main( const int argc, const char **argv)
          text_search_and_replace( tbuff, "ervations", "");
          if( show_processing_steps)
             printf( "  %s\n", tbuff);
+         if( use_colors)
+            printf( "\033[0m");
          }
    free( ids);
    if( summary_ofile)
