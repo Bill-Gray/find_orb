@@ -203,3 +203,7 @@ S510599      2016-031B    2016-031B = NORAD 41553 = S510599
 ORX          2016-055A    2016-055A = OSIRIS-REx
      Osiris  2016-055A    2016-055A = OSIRIS-REx
      A104lks      YS18A5C YS185AC = YS16534 = A104ayW = unid artsat
+     A104shw      YS18A5C YS185AC = YS16534 = A104ayW = unid artsat
+     YT273BF      YS18A5C YS185AC = YS16534 = A104ayW = unid artsat
+     YU3F416      YS18A5C YS185AC = YS16534 = A104ayW = unid artsat
+     YUA31FA      YS18A5C YS185AC = YS16534 = A104ayW = unid artsat
