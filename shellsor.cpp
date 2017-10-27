@@ -24,7 +24,57 @@ an ignored NULL context pointer.  (Which,  you'll see,  I've done below.)
    Note that Shellsort is decently fast,  but not nearly as fast as Quicksort.
 If sorting speed matters in your application,  either ignore this or modify
 the Shellsort to actually be qsort or something similarly fast... I'm tempted
-to do so because Sort Algorithms Are Fun,  but I've got too much else to do. */
+to do so because Sort Algorithms Are Fun,  but I've got too much else to do.
+
+   A note about the gap sequence:  it used to be gap = gap * 3 + 1,  for
+a sequence of 1, 4, 13, 40, 121,... I accepted this commonly-used sequence
+uncritically for some years,  until testing found it to be _much_ slower
+than gap = gap * 8 / 3 + 1 (i.e.,  a smaller gap exponent).  I did some
+more testing to search for gaps that would be pairwise relatively prime,
+and ideally relatively prime for nearby but non-adjacent gaps.  Hence
+the value of gap0 = 250104703.  (For smaller arrays,  this will swiftly
+be brought down to a "reasonable" size.)  The following explicitly lists
+the gap sequence and their factorizations.
+
+31011856950330734 = 2 193 80341598316919
+11629446356374025 = 5 5 31 15005737234031
+4361042383640259 = 3 1453680794546753
+1635390893865097 = 1635390893865097
+613271585199411 = 3 3 3 29 1229 15661 40693
+229976844449779 = 7 7 4693404988771
+86241316668667 = 103 1069 1709 458309
+32340493750750 = 2 5 5 5 457 283067779
+12127685156531 = 7 109891 15765863
+4547881933699 = 13 31 1531 1721 4283
+1705455725137 = 23 83 893376493
+639545896926 = 2 3 3 17 61 281 121931
+239829711347 = 97 3067 806153
+89936141755 = 5 19 53 17862193
+33726053158 = 2 7 2409003797
+12647269934 = 2 13 19 61 419701
+4742726225 = 5 5 189709049
+1778522334 = 2 3 23 23 560341
+666945875 = 5 5 5 5335567
+250104703 = 97 103 25033
+93789263 = 19 41 120397
+35170973 = 35170973
+13189114 = 2 6594557
+4945917 = 3 223 7393
+1854718 = 2 83 11173
+695519 = 11 53 1193
+260819 = 13 20063
+97807 = 47 2081
+36677 = 36677
+13753 = 17 809
+5157 = 3 3 3 191
+1933 = 1933
+724 = 2 2 181
+271 = 271
+101 = 101
+37 = 37
+13 = 13
+4 = 2 2
+1 = 1                    */
 
 #if defined _GNU_SOURCE
    #define HAVE_REENTRANT_QSORT
@@ -45,7 +95,7 @@ void shellsort_r( void *base, const size_t n_elements, const size_t elem_size,
 #ifdef HAVE_REENTRANT_QSORT
    qsort_r( base, n_elements, elem_size, compare, context);
 #else
-   size_t gap = 724;
+   size_t gap = 250104703;
    char *data = (char *)base;
    char *pivot = (char *)alloca( elem_size);
 
