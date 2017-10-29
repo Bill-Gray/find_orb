@@ -2872,12 +2872,11 @@ static void observer_link_substitutions( char *buff)
       }
 }
 
-static int write_observer_data_to_file( FILE *ofile, const char *ast_filename,
-                 const int n_obs, const OBSERVE FAR *obs_data)
+static unsigned get_list_of_stations( const unsigned n_obs,
+               const OBSERVE FAR *obs_data, const unsigned max_n_stations,
+               char stations[][5])
 {
-   int n_stations = 0, i, j;
-   int try_ast_file = 1, try_details_file = 1, try_scope_file = 1;
-   char stations[500][5];
+   unsigned n_stations = 0, i, j;
 
    for( i = 0; i < n_obs; i++)
       {
@@ -2893,9 +2892,20 @@ static int write_observer_data_to_file( FILE *ofile, const char *ast_filename,
          memmove( stations + j + 1, stations + j, (n_stations - j)  * sizeof( stations[0]));
          strcpy( stations[j], obs_data[i].mpc_code);
          n_stations++;
-         assert( n_stations < 400);
+         assert( n_stations < max_n_stations);
          }
       }
+   return( n_stations);
+}
+
+static int write_observer_data_to_file( FILE *ofile, const char *ast_filename,
+                 const int n_obs, const OBSERVE FAR *obs_data)
+{
+   unsigned n_stations = 0, i, j;
+   int try_ast_file = 1, try_details_file = 1, try_scope_file = 1;
+   char stations[400][5];
+
+   n_stations = get_list_of_stations( n_obs, obs_data, 400, stations);
    for( i = 0; i < n_stations; i++)
       {
       char buff[200], tbuff[100];
