@@ -4259,7 +4259,6 @@ NET Gaiadr1       */
 
 static void reduce_net_name( char *reduced, const char *ibuff)
 {
-
    strncpy( reduced, ibuff, 79);
    text_search_and_replace( reduced, "-", "");
    text_search_and_replace( reduced, " ", "");
@@ -4342,7 +4341,7 @@ static char get_net_used_from_obs_header( const char *mpc_code)
             reduce_net_name( net1, lines[i] + 4);
             for( j = 0; net_codes[j]; j++)
                {
-               reduce_net_name( net1, net_codes[j] + 1);
+               reduce_net_name( net2, net_codes[j] + 1);
                if( !strcasecmp( net1, net2))
                   rval = net_codes[j][0];
                }
