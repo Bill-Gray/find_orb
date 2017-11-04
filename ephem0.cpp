@@ -1768,7 +1768,10 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
             if( computer_friendly)
                snprintf( dec_buff, sizeof( dec_buff), "%9.5f", dec);
             else
+               {
                output_signed_angle_to_buff( dec_buff, dec, 2);
+               dec_buff[12] = '\0';
+               }
 
             if( computer_friendly)
                {
