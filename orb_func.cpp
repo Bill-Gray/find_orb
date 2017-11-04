@@ -180,6 +180,7 @@ void compute_error_ellipse_adjusted_for_motion( double *sigma1, double *sigma2,
                   const MOTION_DETAILS *m);                  /* orb_func.cpp */
 double n_nearby_obs( const OBSERVE FAR *obs, const unsigned n_obs,
           const unsigned idx, const double time_span);       /* orb_func.cpp */
+double find_parabolic_minimum_point( const double x[3], const double y[3]);
 
 void set_distance( OBSERVE FAR *obs, double r)
 {
@@ -1312,7 +1313,7 @@ int find_trial_orbit( double *orbit, OBSERVE FAR *obs, int n_obs,
    return( rval);
 }
 
-static double find_parabolic_minimum_point( const double x[3], const double y[3])
+double find_parabolic_minimum_point( const double x[3], const double y[3])
 {
    const double x1 = x[1] - x[0], x2 = x[2] - x[0];
    const double y1 = y[1] - y[0], y2 = y[2] - y[0];
@@ -4200,17 +4201,17 @@ static void attempt_extensions( OBSERVE *obs, const int n_obs, double *orbit)
                      start, end, obs[end].jd - obs[start].jd);
 //                printf( "   Try extend %d to %d (%f day arc)\n",
 //                   start, end, obs[end].jd - obs[start].jd);
-         if( obs[end].jd - obs[start].jd > 100.)
-            perturbers |= (1 << 5);       /* add Jupiter for >100-day arc */
-         if( obs[end].jd - obs[start].jd > 400.)
-            perturbers |= (1 << 6);       /* add Saturn for >400-day arc */
-         if( obs[end].jd - obs[start].jd > 2000.)
-            perturbers |= 0x19e;
-                    /* after six years, merc, venus,  earth,  mars,  */
-                    /* uranus,  and neptune can matter */
-         if( obs[end].jd - obs[start].jd > 365. * 20.)
+         if( obs[end].jd - obs[start].jd > 10.)
+            perturbers |= (1 << 5);       /* add Jupiter for >10-day arc */
+         if( obs[end].jd - obs[start].jd > 40.)
+            perturbers |= (1 << 6);       /* add Saturn for >40-day arc */
+         if( obs[end].jd - obs[start].jd > 200.)
+            perturbers |= (1 << 2) | (1 << 3) | (1 << 4) | (1 << 7);
+                    /* after 200 days,  venus,  earth,  mars,  */
+                    /* and uranus can matter */
+         if( obs[end].jd - obs[start].jd > 365. * 5.)
             perturbers |= (1 << 1) | (1 << 8);
-                    /* after twenty years,  include Merc, Nept too */
+                    /* after five years,  include Merc, Nept too */
          for( i = 0; i < 5 && !result; i++)
             {
             perturbers |= (perturbers_automatically_found & (~AUTOMATIC_PERTURBERS));
@@ -4218,15 +4219,9 @@ static void attempt_extensions( OBSERVE *obs, const int n_obs, double *orbit)
 //                       compute_rms( obs, n_obs));
             if( available_sigmas == COVARIANCE_AVAILABLE)
                {
-               int loop;
-
-               for( loop = 0; loop < 3; loop++)
-                  {
-                  improve_along_lov( orbit, epoch, eigenvects[0],
+               set_locs( orbit, epoch, obs, n_obs);
+               improve_along_lov( orbit, epoch, eigenvects[0],
                                             n_extra_params + 6, n_obs, obs);
-//                printf( "Loop %d, rms %f\n", loop,
-//                       compute_rms( obs, n_obs));
-                  }
                }
             if( full_improvement( obs, n_obs, orbit, epoch, NULL,
                            NO_ORBIT_SIGMAS_REQUESTED, epoch))
