@@ -3688,6 +3688,8 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
       if( *buff == '<')
          remove_html_tags( buff);
       convert_com_to_pound_sign( buff);
+      if( !strcmp( buff, "#Combine all"))
+         combine_all_observations = 1;
       if( !n || *mpc_code_from_neocp)
          is_neocp = get_neocp_data( buff, desig_from_neocp,
                                                  mpc_code_from_neocp);
