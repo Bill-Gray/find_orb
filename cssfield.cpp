@@ -87,6 +87,7 @@ static void get_field_size( double *width, double *height, const double jd,
 {
    const double dec_01_2016 = 2457723.5;
    const double may_01_2016 = 2457509.5;
+   static char bad_code[10];
 
    switch( *obs_code)
       {
@@ -104,7 +105,11 @@ static void get_field_size( double *width, double *height, const double jd,
          break;
       default:
          *width = 0.;
-         printf( "Bad code '%s', shouldn't be here\n", obs_code);
+         if( memcmp( bad_code, obs_code, 4))
+            {
+            printf( "Bad code '%.3s', shouldn't be here\n", obs_code);
+            memcpy( bad_code, obs_code, 4);
+            }
          break;
       }
    *width *= PI / 180.;
@@ -143,6 +148,7 @@ int main( const int argc, const char **argv)
       if( ifile)
          {
          uint32_t file_loc = 0;
+         double min_jd = 1e+10, max_jd = 0.;
 
          printf( "%s opened;  reading fields\n", buff);
          while( fgets( buff, sizeof( buff), ifile))
@@ -172,6 +178,10 @@ int main( const int argc, const char **argv)
                rval[n].file_number = (char)file_number;
                get_field_size( &rval[n].width, &rval[n].height, rval[n].jd,
                                     rval[n].obscode);
+               if( min_jd > rval[n].jd)
+                  min_jd = rval[n].jd;
+               if( max_jd < rval[n].jd)
+                  max_jd = rval[n].jd;
                n++;
                }
             file_loc += strlen( buff);
@@ -180,13 +190,24 @@ int main( const int argc, const char **argv)
             }
          fclose( ifile);
          printf( "\n%d fields found\n", n);
+         full_ctime( buff, min_jd, 0);
+         printf( "Fields run from %.21s to ", buff);
+         full_ctime( buff, max_jd, 0);
+         printf( "%.21s\n", buff);
          }
       }
    if( verbose)
-      for( i = 0; i < 20; i++)
+      for( i = 0; i < 20 && i < n; i++)
          printf( "%f %f %f: %ld %s %f\n", rval[i].jd,
                      rval[i].ra, rval[i].dec, (long)rval[i].file_offset, rval[i].obscode,
                      rval[i].height);
+   if( !n)
+      {
+      printf( "No fields were actually read in.  Check to see that at least one\n"
+              "of the files css0.csv, css1.csv, ... exists and has valid field\n"
+              "data in it.\n");
+      return( -2);
+      }
    printf( "Sorting...\n");
    qsort( rval, n, sizeof( rval[0]), field_compare);
    if( verbose)
@@ -194,9 +215,9 @@ int main( const int argc, const char **argv)
          printf( "%f %f %f: %ld %s\n", rval[i].jd,
                      rval[i].ra, rval[i].dec, (long)rval[i].file_offset, rval[i].obscode);
    full_ctime( buff, rval[n - 1].jd, 0);
-   printf( "Fields span %.30s", buff);
+   printf( "Full time span is %.21s", buff);
    full_ctime( buff, rval[  0  ].jd, 0);
-   printf( " to %.30s\n", buff);
+   printf( " to %.21s\n", buff);
    ofile = fopen( "css.idx", "wb");
    if( !ofile)
       perror( "opening ofile failed");
