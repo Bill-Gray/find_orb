@@ -661,17 +661,149 @@ int find_circular_orbits( OBSERVE FAR *obs1, OBSERVE FAR *obs2,
    return( 0);
 }
 
+/* In computing the inverse of the error function,  it helps that the
+derivative of erf( ) is easily computed.  Easy derivatives mean easy
+Newton-Raphson root-finding.  An easy second derivative,  in this case,
+means an easy Halley's root-finder,  with cubic convergence.
+
+d erf(x)
+-------- = (2/sqrt(pi)) exp( -x^2)
+  dx
+
+d2 erf(x)      d erf(x)
+-------- = -2x --------
+  d2x            dx
+
+   Some cancelling out of terms happens with the second derivative
+that make it particularly well-suited to Halley's method.
+
+   We start out with a rough approximation for inverf( y),  and
+then do a root search for y = erf( x) with Halley's method.  At
+most,  four iterations are required,  near y = +/- erf_limit.   */
+
+static double inverf( const double y)
+{
+   double x, diff;
+   const double erf_limit = .95;
+
+   if( y < -erf_limit)
+      return( -inverf( -y));
+   else if( y > erf_limit)
+      x = sqrt( -log( 1. - y)) - .34;
+   else         /* a passable cubic approximation for -.9 < y < .9 */
+      x = y * (.8963 + y * y * (.0889 + .494 * y * y));
+   do
+      {
+      const double SQRT_PI =
+   1.7724538509055160272981674833411451827975494561223871282138077898529113;
+      const double dy = erf( x) - y;
+      const double slope = (2. / SQRT_PI) * exp( -x * x);
+
+      diff = -dy / slope;   /* Just doing this would be Newton-Raphson */
+      diff = -dy / (slope + x * dy);   /* This gets us Halley's method */
+      x += diff;
+      }
+      while( fabs( diff) > 1e-14);
+   return( x);
+}
+
+/* Convert the incoming J2000 vector into the system where the z-axis
+is along the observed ray,  the x-axis is perpendicular to it and in
+the plane of the ecliptic,  and the y-axis is perpendicular to both.
+In this system,  x/z and y/z are decent approximations to the
+residuals... which we'll try to minimize in the subsequent code. */
+
+static void rotate_obs_vect( const OBSERVE *obs, double *vect)
+{
+   double sideways[3], xprod[3], x, y, z;
+   const double r = sqrt( obs->vect[0] * obs->vect[0]
+                        + obs->vect[1] * obs->vect[1]);
+
+   sideways[0] =  obs->vect[1] / r;
+   sideways[1] = -obs->vect[0] / r;
+   sideways[2] = 0.;
+   vector_cross_product( xprod, sideways, obs->vect);
+            /* obs->vect, sideways,  xprod now form an orthonormal matrix */
+   x = dot_product( sideways, vect);
+   y = dot_product( xprod, vect);
+   z = dot_product( obs->vect, vect);
+   *vect++ = x;
+   *vect++ = y;
+   *vect++ = z;
+}
+
+static double search_score( const double *loc, const double *deriv, size_t n_obs,
+                             const double sigmas)
+{
+   double rval = 0.;
+
+   while( n_obs--)
+      {
+      double xyz[3], dx, dy;
+      size_t i;
+
+      for( i = 0; i < 3; i++)
+         xyz[i] = loc[i] + sigmas * deriv[i];
+      dx = xyz[0] / xyz[2];
+      dy = xyz[1] / xyz[2];
+      loc += 3;
+      deriv += 3;
+      rval += dx * dx + dy * dy;
+      }
+   return( rval);
+}
+
+double find_parabolic_minimum_point( const double x[3], const double y[3]);
+
+/* Theoretically speaking,  this one-dimensional minimization should use
+something like Brent's method.  But the minimum really is nearly parabolic
+here;  convergence is quite fast and (nearly) guaranteed. */
+
+static double find_score_minimum( const double *xyz, const double *slopes,
+               const int n_obs,
+               const double start_x[3], const double start_y[3], double *xmin)
+{
+   double x[3], y[3];
+   int iter = 5;
+
+   memcpy( x, start_x, 3 * sizeof( double));
+   memcpy( y, start_y, 3 * sizeof( double));
+   while( iter--)
+      {
+      double new_x = find_parabolic_minimum_point( x, y);
+
+      x[0] = x[1];
+      y[0] = y[1];
+      x[1] = x[2];
+      y[1] = y[2];
+      x[2] = new_x;
+      y[2] = search_score( xyz, slopes, n_obs, new_x);
+      }
+   *xmin = x[2];
+   return( y[2]);
+}
+
+/* The logic for searching for a "best fit" along the line of improvement
+is as follows.  We sample at N_DIVS points,  using the above inverse of
+the cumulative error function so that most of the searching is near
+the center,  with sparser searching toward the tails of the distribution.
+If,  between those points,  we find a minimum "score" (sum of the squares
+of the residuals,  unweighted),  we do a parabolic search for the real
+minimum.  We may find multiple minima.  We take the lowest of them.  */
+
+#define N_DIVS 100
+
 double improve_along_lov( double *orbit, const double epoch, const double *lov,
           const unsigned n_params, const unsigned n_obs, OBSERVE *obs)
 {
-   double *xyz = (double *)calloc( n_obs * 3, sizeof( double));
-   const double delta = 0.0001;
-   double rval = 0.;
    unsigned i, j;
+   double x[N_DIVS], score[N_DIVS];
+   double *xyz = (double *)calloc( n_obs * 6, sizeof( double));
+   double *slopes = xyz + n_obs * 3;
+   const double delta = 0.0001;
+   double rval, lowest_score;
 
    assert( xyz);
-   if( !xyz)
-      return( 0.);
    for( i = 0; i < n_obs; i++)
       for( j = 0; j < 3; j++)
          xyz[i * 3 + j] = obs[i].obj_posn[j] - obs[i].obs_posn[j];
@@ -679,23 +811,45 @@ double improve_along_lov( double *orbit, const double epoch, const double *lov,
       orbit[i] += delta * lov[i];
    set_locs( orbit, epoch, obs, n_obs);
    for( i = 0; i < n_obs; i++)
-//    if( obs[i].flags & OBS_IS_SELECTED)
+      for( j = 0; j < 3; j++)
+         slopes[i * 3 + j] = obs[i].obj_posn[j] - obs[i].obs_posn[j];
+   for( i = 0; i < n_obs * 3; i++)
+      slopes[i] = (slopes[i] - xyz[i]) / delta;
+   for( i = 0; i < n_obs; i++)
       if( obs[i].is_included)
          {
-         double dvect[3], *xptr = xyz + i * 3;
-         double temp_vect[3], xprod[3];
-
-         for( j = 0; j < 3; j++)
-            dvect[j] = (obs[i].obj_posn[j] - obs[i].obs_posn[j]
-                                 - xptr[j]) / delta;
-         vector_cross_product( temp_vect, dvect, obs[i].vect);
-         vector_cross_product( xprod, temp_vect, obs[i].vect);
-         rval = -dot_product( xprod, xptr) / dot_product( xprod, dvect);
+         rotate_obs_vect( obs + i, xyz + i * 3);
+         rotate_obs_vect( obs + i, slopes + i * 3);
          }
-   free( xyz);
+      else
+         for( j = 0; j < 3; j++)
+            slopes[i * 3 + j] = 0.;
+
+   for( i = 0; i < N_DIVS; i++)
+      {
+      x[i] = inverf( 2. * ((double)i + .5) / (double)N_DIVS - 1.);
+      x[i] *= 3.;
+      score[i] = search_score( xyz, slopes, n_obs, x[i]);
+      }
+   rval = 0.;
+   lowest_score = 1e+200;
+   for( i = 0; i < N_DIVS - 2; i++)
+      if( score[i + 1] < score[i] && score[i + 1] < score[i + 2])
+         {
+         double new_x;
+         double new_score = find_score_minimum( xyz, slopes, n_obs,
+                                       x + i, score + i, &new_x);
+
+         if( lowest_score > new_score)
+            {
+            lowest_score = new_score;
+            rval = new_x;
+            }
+         }
    for( i = 0; i < n_params; i++)
       orbit[i] += (rval - delta) * lov[i];
    set_locs( orbit, epoch, obs, n_obs);
+   free( xyz);
    return( rval);
 }
 
