@@ -71,7 +71,8 @@ int field_compare( const void *a, const void *b)
 }                 /* sort in _descending_ order by date */
 
 /*
-CSS field sizes,  from Eric Christensen,  2017 Mar :
+CSS field sizes,  from Eric Christensen,  2017 Mar.  Updated by
+Rob Seaman,  2017 Nov 04.
 
 703 field size, 2003-2016: 2.85 x 2.85 deg.
 G96, 2004 - May 2016: 1.1 x 1.1 deg.
@@ -85,23 +86,26 @@ G96 - May 2016 - present: 2.2 x 2.2 deg.
 static void get_field_size( double *width, double *height, const double jd,
                         const char *obs_code)
 {
-   const double dec_01_2016 = 2457723.5;
-   const double may_01_2016 = 2457509.5;
+   const double dec_02_2016 = 2457724.5;
+   const double may_26_2016 = 2457534.5;
    static char bad_code[10];
 
    switch( *obs_code)
       {
       case '7':         /* 703 */
-         *width = (jd < dec_01_2016 ? 2.85 : 4.4);
+         *width = (jd < dec_02_2016 ? 2.85 : 4.4);
          break;
       case 'G':         /* G96 */
-         *width = (jd < may_01_2016 ? 1.1 : 2.25);
+         *width = (jd < may_26_2016 ? 1.1 : 2.25);
          break;
       case 'E':         /* E12 */
          *width = 2.05;
          break;
       case 'I':         /* I52:  33' field of view;  some loss in corners */
          *width = 33. / 60.;
+         break;
+      case 'V':         /* V06:  580" field of view */
+         *width = 580. / 3600.;
          break;
       default:
          *width = 0.;
