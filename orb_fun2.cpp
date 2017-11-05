@@ -661,6 +661,30 @@ int find_circular_orbits( OBSERVE FAR *obs1, OBSERVE FAR *obs2,
    return( 0);
 }
 
+/* Shamelessly copied (with minor changes) from
+
+https://siliconandlithium.blogspot.com/2014/05/msvc-c99-mathh-header.html
+https://en.wikipedia.org/wiki/Error_function#Approximation_with_elementary_functions
+
+   As described at the second link,  this has maximum error of 1.5x10^-7.
+(Which isn't a problem here,  but some caution would be appropriate.)
+It's only used in early MSVCs which lack erf(),  and in OpenWATCOM.  */
+
+#if defined( _MSC_VER) && (_MSC_VER < 1800) || defined( __WATCOMC__)
+double erf( double x)
+{
+    const double a1 = 0.254829592, a2 = -0.284496736, a3 = 1.421413741;
+    const double a4 = -1.453152027, a5 = 1.061405429, p = 0.3275911;
+    const int sign = (x >= 0) ? 1 : -1;
+    double t, y;
+
+    x = fabs(x);
+    t = 1.0 / (1.0 + p*x);
+    y = 1.0 - (((((a5 * t + a4 ) * t) + a3) * t + a2) * t + a1) * t * exp(-x * x);
+    return sign*y;
+}
+#endif
+
 /* In computing the inverse of the error function,  it helps that the
 derivative of erf( ) is easily computed.  Easy derivatives mean easy
 Newton-Raphson root-finding.  An easy second derivative,  in this case,

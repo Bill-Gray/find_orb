@@ -562,6 +562,12 @@ static void put_ephemeris_posn_angle_sigma( char *obuff, const double dist,
    snprintf( obuff, 13, "%s %3d", resid_buff + 1, integer_posn_ang);
 }
 
+/* Old MSVCs and OpenWATCOM lack erf() and many other math functions: */
+
+#if defined( _MSC_VER) && (_MSC_VER < 1800) || defined( __WATCOMC__)
+double erf( double x);     /* orb_fun2.cpp */
+#endif
+
 #define SWAP( A, B, TEMP)   { TEMP = A;  A = B;  B = TEMP; }
 
 /* At present,  this assumes a 'nominal' position in p[0] and a one-sigma
