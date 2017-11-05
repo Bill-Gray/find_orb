@@ -4322,6 +4322,10 @@ static const char *net_codes[] = {
            "WUCAC-5",
            NULL };
 
+#ifdef _MSC_VER
+   #define strcasecmp _stricmp
+#endif
+
 /* get_net_used_from_obs_header( ) looks through the observation header
 for the given MPC code for a line starting with 'NET '.  It then looks
 through the above 'net_codes' array in hopes of finding a match to the
@@ -4733,7 +4737,7 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff)
          strcpy( tptr, "(No observation header available)\n");
          i = 1;
          }
-      n_lines = i;
+      n_lines = (int)i;
       }
    else        /* "standard",  computed details */
       {
@@ -4746,7 +4750,7 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff)
       for( i = 0; i < 5; i++)
 #endif
          {
-         generate_observation_text( obs, first, n_obs, (int)i, tptr, alt_info);
+         generate_observation_text( obs, (int)first, n_obs, (int)i, tptr, alt_info);
          if( *tptr)
             {
             strcat( tptr, "\n");
