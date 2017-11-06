@@ -595,9 +595,8 @@ int main( const int argc, const char **argv)
          OBSERVE FAR *obs;
          const int n_obs = ids[i].n_obs;
 
-         if( n_processes > 1 && show_processing_steps)
-            printf( "(%d) ", process_count);
-         printf( "%d: %s", i + 1, ids[i].obj_name);
+         if( n_processes == 1 && show_processing_steps)
+            printf( "%d: %s", i + 1, ids[i].obj_name);
          if( n_obs < 2)
             printf( "; skipping\n");
          else
@@ -630,7 +629,11 @@ int main( const int argc, const char **argv)
                if( use_colors)
                   colorize_text( tbuff);
                if( show_processing_steps)
+                  {
+                  if( n_processes > 1)
+                     printf( "(%d) %d: %s", process_count, i + 1, ids[i].obj_name);
                   printf( "; %s ", tbuff);
+                  }
                if( separate_residual_file_name)
                   {
                   extern bool residual_file_in_config_dir;
@@ -729,7 +732,8 @@ int main( const int argc, const char **argv)
                   char fullpath[100];
 
                   sscanf( obs->packed_id, "%s", tbuff);
-                  sprintf( fullpath, "%s/%s.txt", precovery_dir, tbuff);
+                  snprintf( fullpath, sizeof( fullpath), "%s/%s.txt",
+                                       precovery_dir, tbuff);
                   find_precovery_plates( obs, n_obs_actually_loaded,
                            fullpath, orbit, 1, curr_epoch);  /* ephem0.cpp */
                   }
