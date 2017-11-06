@@ -1917,7 +1917,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                {
                            /* FIX someday:  this only works if planet_no == 3, */
                            /* i.e.,  topocentric ephemerides */
-               snprintf_append( buff, strlen( buff), " %c%02d %03d",
+               snprintf_append( buff, sizeof( buff), " %c%02d %03d",
                                     (alt_az[0].y > 0. ? '+' : '-'),
                                     (int)( fabs( alt_az[0].y * 180. / PI) + .5),
                                     (int)( alt_az[0].x * 180. / PI + .5));
@@ -2009,7 +2009,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                calc_classical_elements( &elem, orbi, curr_jd, 1);
                setup_planet_elem( &planet_elem, j, (curr_jd - J2000) / 36525.);
                moid = find_moid( &planet_elem, &elem, NULL);
-               snprintf_append( buff, strlen( buff), "%8.4f", moid);
+               snprintf_append( buff, sizeof( buff), "%8.4f", moid);
                }
          prev_radial_vel = radial_vel;
          if( !obj_n && *buff)
@@ -2160,7 +2160,6 @@ static void output_angle_to_buff( char *obuff, const double angle,
       if( precision < 307 || precision > 312)   /* omit decimal point for */
          strcat( obuff, ".");                    /* super-precise formats */
       snprintf( format, sizeof( format), "%%0%dd", n_digits_to_show);
-//    sprintf( obuff + strlen( obuff), format, fraction);
       snprintf_append( obuff, 13, format, fraction);
       }
    for( i = strlen( obuff); i < 12; i++)
