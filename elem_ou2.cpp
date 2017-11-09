@@ -38,11 +38,19 @@ int add_sof_to_file( const char *filename,         /* elem_ou2.cpp */
              const ELEMENTS *elem,
              const int n_obs, const OBSERVE *obs);
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
+double curr_jd( void);                             /* elem_ou2.cpp */
 
 const double PI = 3.1415926535897932384626433832795028841971693993751058209749445923;
-const double jd_1970 = 2440587.5;
 
-int64_t nanoseconds_since_1970( void);                      /* mpc_obs.c */
+
+double curr_jd( void)
+{
+   const double jd_1970 = 2440587.5;
+   int64_t nanoseconds_since_1970( void);              /* mpc_obs.c */
+
+   return( jd_1970
+          + (double)nanoseconds_since_1970( ) * 1e-9 / seconds_per_day);
+}
 
 int put_comet_data_into_sof( char *obuff, const char *templat,
          const ELEMENTS *elem,
@@ -131,8 +139,7 @@ int put_comet_data_into_sof( char *obuff, const char *templat,
                      }
                break;
             case 'w':        /* Twritten */
-               date_to_put = jd_1970 +
-                        (double)nanoseconds_since_1970( ) * 1e-9 / seconds_per_day;
+               date_to_put = curr_jd( );
                break;
             default:
                break;
