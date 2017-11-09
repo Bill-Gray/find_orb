@@ -86,6 +86,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name);
                                                /* ephem0.cpp */
 void set_environment_ptr( const char *env_ptr, const char *new_value);
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
+double curr_jd( void);                             /* elem_ou2.cpp */
 
 /* In this non-interactive version of Find_Orb,  we just print out warning
 messages such as "3 observations were made in daylight" or "couldn't find
@@ -659,7 +660,7 @@ int main( const int argc, const char **argv)
                   extern int available_sigmas;
                   extern double ephemeris_mag_limit;
                   double *orbits_to_use = orbit;
-                  const double jd_start = get_time_from_string( 0.,
+                  const double jd_start = get_time_from_string( curr_jd( ),
                            get_environment_ptr( "EPHEM_START"),
                            CALENDAR_JULIAN_GREGORIAN | FULL_CTIME_YMD
                            | FULL_CTIME_TWO_DIGIT_YEAR, NULL);
