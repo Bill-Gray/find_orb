@@ -33,7 +33,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 
 int generate_mc_variant_from_covariance( double *orbit);    /* orb_fun2.cpp */
 double improve_along_lov( double *orbit, const double epoch, const double *lov,
-          const unsigned n_params, const unsigned n_obs, OBSERVE *obs);
+          const unsigned n_params, unsigned n_obs, OBSERVE *obs);
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 int adjust_herget_results( OBSERVE FAR *obs, int n_obs, double *orbit);
 double evaluate_for_simplex_method( const OBSERVE FAR *obs,
@@ -756,6 +756,14 @@ static void rotate_obs_vect( const OBSERVE *obs, double *vect)
    *vect++ = z;
 }
 
+static inline double pseudo_resid( const double y, const double x)
+{
+   if( y < x && y > -x)
+      return( y / x);
+   else
+      return( 2. - x / fabs(y));
+}
+
 static double search_score( const double *loc, const double *deriv, size_t n_obs,
                              const double sigmas)
 {
@@ -768,8 +776,8 @@ static double search_score( const double *loc, const double *deriv, size_t n_obs
 
       for( i = 0; i < 3; i++)
          xyz[i] = loc[i] + sigmas * deriv[i];
-      dx = xyz[0] / xyz[2];
-      dy = xyz[1] / xyz[2];
+      dx = pseudo_resid( xyz[0], xyz[2]);
+      dy = pseudo_resid( xyz[1], xyz[2]);
       loc += 3;
       deriv += 3;
       rval += dx * dx + dy * dy;
@@ -818,16 +826,27 @@ minimum.  We may find multiple minima.  We take the lowest of them.  */
 #define N_DIVS 100
 
 double improve_along_lov( double *orbit, const double epoch, const double *lov,
-          const unsigned n_params, const unsigned n_obs, OBSERVE *obs)
+          const unsigned n_params, unsigned n_obs, OBSERVE *obs)
 {
    unsigned i, j;
    double x[N_DIVS], score[N_DIVS];
-   double *xyz = (double *)calloc( n_obs * 6, sizeof( double));
-   double *slopes = xyz + n_obs * 3;
+   double *xyz, *slopes;
    const double delta = 0.0001;
    double rval, lowest_score;
 
+   while( !obs->is_included && n_obs)
+      {
+      n_obs--;
+      obs++;
+      }
+   while( !obs[n_obs - 1].is_included && n_obs)
+      n_obs--;
+   if( !n_obs)
+      return( 0.);
+
+   xyz = (double *)calloc( n_obs * 6, sizeof( double));
    assert( xyz);
+   slopes = xyz + n_obs * 3;
    for( i = 0; i < n_obs; i++)
       for( j = 0; j < 3; j++)
          xyz[i * 3 + j] = obs[i].obj_posn[j] - obs[i].obs_posn[j];
@@ -847,7 +866,7 @@ double improve_along_lov( double *orbit, const double epoch, const double *lov,
          }
       else
          for( j = 0; j < 3; j++)
-            slopes[i * 3 + j] = 0.;
+            xyz[i * 3 + j] = 0.;
 
    for( i = 0; i < N_DIVS; i++)
       {

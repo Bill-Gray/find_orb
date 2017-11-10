@@ -172,7 +172,7 @@ int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
 ;
 void set_obs_vect( OBSERVE FAR *obs);        /* mpc_obs.h */
 double improve_along_lov( double *orbit, const double epoch, const double *lov,
-          const unsigned n_params, const unsigned n_obs, OBSERVE *obs);
+          const unsigned n_params, unsigned n_obs, OBSERVE *obs);
 void adjust_error_ellipse_for_timing_error( double *sigma_a, double *sigma_b,
          double *angle, const double vx, const double vy);   /* errors.cpp */
 void compute_error_ellipse_adjusted_for_motion( double *sigma1, double *sigma2,

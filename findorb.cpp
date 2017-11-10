@@ -176,7 +176,7 @@ int find_parabolic_orbit( OBSERVE FAR *obs, const int n_obs,
             double *orbit, const int direction);         /* orb_func.cpp */
 int format_jpl_ephemeris_info( char *buff);
 double improve_along_lov( double *orbit, const double epoch, const double *lov,
-          const unsigned n_params, const unsigned n_obs, OBSERVE *obs);
+          const unsigned n_params, unsigned n_obs, OBSERVE *obs);
 #ifdef _MSC_VER   /* MSVC/C++ lacks snprintf.  See 'ephem0.cpp' for details. */
 int snprintf( char *string, const size_t max_len, const char *format, ...);
 #endif
