@@ -660,7 +660,7 @@ CON D. Rankin, P. O. Box 410313, Big Water, Utah U. S. A.
 CON [david (at) rankinstudio (dot) com]
 OBS D. Rankin
 NET PPMXL
-TEL 0.30-m refractor + CCD
+TEL 0.30-m reflector + CCD
 
 COD W34
 OBS R. L. Flynn
