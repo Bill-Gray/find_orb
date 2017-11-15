@@ -210,3 +210,4 @@ ORX          2016-055A    2016-055A = OSIRIS-REx
      YUA31FA      YS18A5C YS185AC = YS16534 = A104ayW = unid artsat
      YUA31FA      YS18A5C YS185AC = YS16534 = A104ayW = unid artsat
      A104F4L      YS18A5C YS185AC = YS16534 = A104ayW = unid artsat
+0001I            AK17U010 1I/`Oumuamua
