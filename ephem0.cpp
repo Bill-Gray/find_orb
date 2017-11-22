@@ -34,6 +34,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "vislimit.h"
 
 #define J2000 2451545.0
+#define JD_TO_YEAR(jd)  (2000. + ((jd)-J2000) / 365.25)
 #define EARTH_MAJOR_AXIS 6378140.
 #define EARTH_MAJOR_AXIS_IN_AU (EARTH_MAJOR_AXIS / AU_IN_METERS)
 #define PI 3.1415926535897932384626433832795028841971693993751058209749445923
@@ -3232,7 +3233,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
                   ;        /* search for matching $ */
                if( i < 20 && tptr[i] == '$')
                   {
-                  char search_str[80], replace_str[80];
+                  char search_str[80], replace_str[180];
 
                   memcpy( search_str, tptr, i);
                   search_str[i] = '\0';
@@ -3249,6 +3250,35 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
                      else if( !strcmp( search_str, "$Name"))
                         {
                         strcpy( replace_str, obj_name);
+                        got_it = 1;
+                        }
+                     else if( !strcmp( search_str, "$SV"))   /* state vect */
+                        {                           /* for Orbit Simulator */
+                        extern double helio_ecliptic_j2000_vect[];
+                        int year = (int)JD_TO_YEAR(
+                                          helio_ecliptic_j2000_vect[6] + 182.6);
+
+                        if( year < 1950)    /* Orbit Simul has precomputed */
+                           year = 1950;     /* solar syst data from 1950   */
+                        if( year > 2050)    /* to 2050 */
+                           year = 2050;
+                        snprintf( replace_str, sizeof( replace_str),
+                                        "%d.html?sv,1,%s,", year, obj_name);
+                        full_ctime( tbuff, helio_ecliptic_j2000_vect[6],
+                                 FULL_CTIME_YMD | FULL_CTIME_MONTHS_AS_DIGITS
+                                 | FULL_CTIME_LEADING_ZEROES);
+                        tbuff[4] = tbuff[7] = '/';
+                        strcat( replace_str, tbuff);
+                        text_search_and_replace( replace_str, " ", "%20");
+                        for( i = 0; i < 6; i++)
+                           {
+                           double oval = helio_ecliptic_j2000_vect[i] * AU_IN_METERS;
+
+                           if( i >= 3)    /* velocity,  in km/s,  is desired */
+                              oval /= seconds_per_day;
+                           snprintf_append( replace_str, sizeof( replace_str),
+                                    ",%f", oval);
+                           }
                         got_it = 1;
                         }
 

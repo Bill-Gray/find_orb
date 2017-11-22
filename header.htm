@@ -33,21 +33,9 @@ $Error      # The server flavor of Find_Orb inserts error messages here.
 <li> <a href="http://skyview.gsfc.nasa.gov/cgi-bin/skymorph/mobssel.pl?target=&amp;Spacewatch=on&amp;OE_EPOCH=$EpJD$&amp;OE_EC=$ecc$&amp;OE_QR=$q$&amp;OE_TP=$T$&amp;OE_OM=$Node$&amp;OE_W=$Peri$&amp;OE_IN=$Incl$&amp;OE_H=$H$"> Click here to search Spacewatch images for this object using Skymorph </a> </li>
 # helio_only 0
 </ul>
-# helio_only 1
-<FORM METHOD="POST" ACTION="http://www.astroarts.com/simulation/cometary-orbit.php">
 <p>
-    <INPUT TYPE="hidden" NAME="NAME" VALUE="$Name$">
-    <INPUT TYPE="hidden" NAME="TYEAR" VALUE="$Ty$">
-    <INPUT TYPE="hidden" NAME="TMONTH" VALUE="$Tm$">
-    <INPUT TYPE="hidden" NAME="TDAY" VALUE="$Td$">
-    <INPUT TYPE="hidden" NAME="PERI" VALUE="$Peri$">
-    <INPUT TYPE="hidden" NAME="E"    VALUE="$ecc$">
-    <INPUT TYPE="hidden" NAME="NODE" VALUE="$Node$">
-    <INPUT TYPE="hidden" NAME="Q"     VALUE="$q$">
-    <INPUT TYPE="hidden" NAME="INCL"  VALUE="$Incl$">
-    <INPUT TYPE="hidden" NAME="EQUINOX" VALUE="$Eqnx$">
-    <INPUT TYPE="submit" VALUE=" Show Orbit in OrbitViewer " NAME="SHOW">
-</p> </FORM>
+<input type = "button" value = "Orbit Simulator View" onclick = "window.open('http://orbitsimulator.com/gravitySimulatorCloud/yr/gsim$SV$,0,0,00FF00,90,65,,16000,0,12,1,0,')">
+</p>
 # helio_only 0
 <pre>
 <a name="ast_xx"></a><b>Astrometry:</b>

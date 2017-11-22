@@ -758,6 +758,11 @@ static double encounter_velocity( const ELEMENTS *elem, const double a0)
    return( rval);
 }
 
+/* Used to provide a link to Tony Dunn's Orbit Simulator when making
+pseudo-MPECs.  Epoch is stored in the sixth element of the array. */
+
+double helio_ecliptic_j2000_vect[7];
+
 /* The results from write_out_elements_to_file() can be somewhat
 varied.  The output for elliptical and parabolic/hyperbolic orbits are
 very different.  Asteroids and comets differ in whether H and G are
@@ -911,6 +916,8 @@ int write_out_elements_to_file( const double *orbit,
       }
    memcpy( orbit2, orbit, 6 * sizeof( double));
    integrate_orbit( orbit2, curr_epoch, epoch_shown);
+   memcpy( helio_ecliptic_j2000_vect, orbit2, 6 * sizeof( double));
+   helio_ecliptic_j2000_vect[6] = epoch_shown;
    if( options & ELEM_OUT_HELIOCENTRIC_ONLY)
       {
       planet_orbiting = forced_central_body;
