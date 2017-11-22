@@ -12,6 +12,9 @@ methods to enter an epoch or to search for observations by date.)
 'h',  's',  'd',  or nothing (which defaults to days).  For example,
 if you wanted the ephemeris to have a ten minute stepsize,  use '10m'.
 
+   Hit '-' to reverse the sign of the step size.  Hit 'Alt-D' to get a
+default start time ("now") and geocentric observable ephemerides.
+
    If you specify the start time and step size and then hit 'e',  you can
 enter an end time.  Find_Orb will adjust the number of steps to match.
 

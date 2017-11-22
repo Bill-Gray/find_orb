@@ -703,6 +703,10 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                strcpy( mpc_code, buff);
                }
             break;
+         case ALT_D:
+            strcpy( ephemeris_start, "+0");
+            ephemeris_output_options &= ~7;
+                     /* FALLTHRU */
          case ALT_G:
             strcpy( mpc_code, "500");
             break;
@@ -742,6 +746,16 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
          case 's': case 'S': case KEY_F( 5):
             inquire( "Enter step size in days: ",
                   ephemeris_step_size, sizeof( ephemeris_step_size), COLOR_MESSAGE_TO_USER);
+            break;
+         case '-':         /* reverse ephemeris direction */
+            {
+            const size_t loc = (ephemeris_step_size[0] == '-' ? 1 : 0);
+
+            memmove( ephemeris_step_size + 1 - loc, ephemeris_step_size + loc,
+                           strlen( ephemeris_step_size) + 1);
+            if( !loc)
+               *ephemeris_step_size = '-';
+            }
             break;
          case 't': case 'T': case KEY_F( 1): case KEY_F( 3):
             inquire( "Enter start of ephemeris (YYYY MM DD, or JD, or 'now'):",
@@ -1043,7 +1057,7 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
                break;
             case '!':
                force_bogus_orbit = true;
-                     /* fall-thru */
+                     /* FALLTHRU */
             case ' ':
             case 13:
                rval = choice;
