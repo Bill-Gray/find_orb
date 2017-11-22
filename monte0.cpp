@@ -457,9 +457,15 @@ RUNOFF = 3 * 3600 * 360 * (sigma_Ty * e + 10 * sigma_Py / P) / P
        = 3 * 3600 * 360 * (sigma_Ty * e + 10 * 1.5 * sigma_a / a) / P
 
    To avoid singularities,  we're actually calculating
-sigma(1/a) = sigma_a / a^2,  so
+sigma(1/a) = sigma_a / a^2,  so (all of the following are equivalent)
 
 RUNOFF = 3 * 3600 * 180 * (sigma_Ty * e     + 10 * 1.5 * sigma(1/a) * a) / P
 RUNOFF = 3 * 3600 * 360 * (sigma_Ty * e / P + 10 * 1.5 * sigma(1/a) / sqrt( a))
+RUNOFF = 3 * 3600 * 360 * (sigma_Ty * e / a + 10 * 1.5 * sigma(1/a)) / sqrt( a)
 
+   Note that RUNOFF approaches zero as the semimajor axis approaches
+infinity (i.e.,  a parabolic orbit),  and is a purely imaginary
+(i.e.,  no real part) number for hyperbolic orbits.  It would be
+nice to have an 'orbit quality' code that would produce useful
+results for all orbits.
 */
