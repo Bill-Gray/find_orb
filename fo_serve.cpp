@@ -221,23 +221,47 @@ int main( const int argc, const char **argv)
                debug_level = atoi( tptr + 12);
             }
          }
-      else if( !strcmp( field, "obj_name"))
+      else if( !strcmp( field, "obj_name") && *buff)
          {
-         if( is_neocp_desig( buff))
-            {
-            char tbuff[100];
-            FILE *ifile = fopen( "../../neocp2/neocp.txt", "rb");
-            FILE *ofile = fopen( temp_obs_filename,
+         char tbuff[100];
+         size_t neocp_bytes_found = 0;
+         FILE *ofile = fopen( temp_obs_filename,
                                (bytes_written ? "ab" : "wb"));
 
+         assert( ofile);
+         if( is_neocp_desig( buff))
+            {
+            FILE *ifile = fopen( "../../neocp2/neocp.txt", "rb");
+
             assert( ifile);
-            assert( ofile);
             while( fgets( tbuff, sizeof( tbuff), ifile))
                if( desig_matches( tbuff, buff))
-                  bytes_written += fwrite( tbuff, 1, strlen( tbuff), ofile);
-            fclose( ofile);
+                  neocp_bytes_found += fwrite( tbuff, 1, strlen( tbuff), ofile);
             fclose( ifile);
             }
+         bytes_written += neocp_bytes_found;
+         if( !neocp_bytes_found)   /* not an NEOCP object;  let's see if */
+            {                      /* we can get astrometry elsewhere    */
+            unsigned j = 0;
+            char filename[40];
+
+            for( i = 0; buff[i]; i++)
+               j = j * 314159u + (unsigned)buff[i];
+            sprintf( filename, "temp%02d.ast", j % 100);
+            sprintf( tbuff, "./grab_mpc %s %s", filename, buff);
+            i = system( tbuff);
+            debug_printf( "'%s': %d\n", tbuff, i);
+            if( !i)
+               {
+               FILE *ifile = fopen( filename, "rb");
+
+               assert( ifile);
+               while( fgets( tbuff, sizeof( tbuff), ifile))
+                  bytes_written += fwrite( tbuff, 1, strlen( tbuff), ofile);
+               fclose( ifile);
+               }
+            }
+         fclose( ofile);
          }
       else if( !strcmp( field, "year"))
          {
