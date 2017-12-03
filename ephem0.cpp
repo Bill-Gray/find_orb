@@ -89,9 +89,6 @@ int setup_planet_elem( ELEMENTS *elem, const int planet_idx,
 char *mpc_station_name( char *station_data);       /* mpc_obs.cpp */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 int remove_rgb_code( char *buff);                              /* ephem0.cpp */
-int find_precovery_plates( OBSERVE *obs, const int n_obs,      /* ephem0.cpp */
-                           const char *filename, const double *orbit,
-                           const int n_orbits, double epoch_jd);
 static void output_signed_angle_to_buff( char *obuff, const double angle,
                                const int precision);         /* ephem0.cpp */
 static void output_angle_to_buff( char *obuff, const double angle,
@@ -645,22 +642,18 @@ static void show_precovery_extent( char *obuff, const obj_location_t *objs,
 
 /* See 'precover.txt' for information on what's going on here. */
 
-int find_precovery_plates( OBSERVE *obs, const int n_obs,
-                           const char *filename, const double *orbit,
-                           const int n_orbits, double epoch_jd)
+static int find_precovery_plates( OBSERVE *obs, const int n_obs,
+                           FILE *ofile, const double *orbit,
+                           const int n_orbits, double epoch_jd,
+                           const double min_jd, const double max_jd,
+                           const double limiting_mag)
 {
-   FILE *ofile = fopen( filename, "w");
    FILE *ifile, *original_file = NULL;
    int current_file_number = -1;
    double *orbi, stepsize = 1.;
    obj_location_t *p1, *p2, *p3;
    const double abs_mag = calc_absolute_magnitude( obs, n_obs);
    field_location_t field;
-   double min_jd = 0., max_jd = 1e+30;
-   double limiting_mag = 26.;
-   const char *min_jd_text = get_environment_ptr( "FIELD_TMIN");
-   const char *max_jd_text = get_environment_ptr( "FIELD_TMAX");
-   const char *mag_limit_text = get_environment_ptr( "FIELD_MAG_LIMIT");
         /* Slightly easier to work with 'bit set means included' : */
    const int inclusion = atoi( get_environment_ptr( "FIELD_INCLUSION")) ^ 3;
    const bool show_base_60 = (*get_environment_ptr( "FIELD_DEBUG") != '\0');
@@ -680,14 +673,6 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
    setvbuf( ofile, NULL, _IONBF, 0);
    orbi = (double *)malloc( 12 * n_orbits * sizeof( double));
    memcpy( orbi, orbit,     6 * n_orbits * sizeof( double));
-   if( *min_jd_text)
-      min_jd = get_time_from_string( 0, min_jd_text,
-                     FULL_CTIME_YMD | CALENDAR_JULIAN_GREGORIAN, NULL);
-   if( *max_jd_text)
-      max_jd = get_time_from_string( 0, max_jd_text,
-                     FULL_CTIME_YMD | CALENDAR_JULIAN_GREGORIAN, NULL);
-   if( *mag_limit_text)
-      limiting_mag = atof( mag_limit_text);
    while( fread( &field, sizeof( field), 1, ifile) == 1)
       if( jd_is_in_range( field.jd, min_jd, max_jd))
          {
@@ -774,7 +759,7 @@ int find_precovery_plates( OBSERVE *obs, const int n_obs,
                   buff[12] = ' ';
                   output_signed_angle_to_buff( buff + 13, obj_dec, 2);
                   }
-               fprintf( ofile, "%c %s%4.1f %s %s",
+               fprintf( ofile, "%c %s %4.1f %s %s",
                         (matches_an_observation ? '*' : ' '), buff, mag,
                         time_buff, field.obscode);
                if( current_file_number != field.file_number)
@@ -1307,14 +1292,28 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    const double planet_radius_in_au =
           planet_radius_in_meters( planet_no) / AU_IN_METERS;
 
-   if( planet_no < 0)      /* bad observatory code or satellite */
-      return( -3);
    step = get_step_size( stepsize, &step_units, &n_step_digits);
    if( !step)
       return( -2);
    ofile = fopen_ext( filename, is_default_ephem ? "fcw" : "fw");
    if( !ofile)
       return( -1);
+   if( !memcmp( note_text, "(CSS)", 5))
+      {
+      double min_jd = jd_start;
+      double max_jd = jd_start + step * (double)n_steps;
+
+      if( max_jd < min_jd)
+         {
+         min_jd = max_jd;
+         max_jd = jd_start;
+         }
+      return( find_precovery_plates( obs, n_obs, ofile, orbit,
+                           n_objects, epoch_jd, min_jd, max_jd,
+                           ephemeris_mag_limit));
+      }
+   if( planet_no < 0)      /* bad observatory code or satellite */
+      return( -3);
    if( !abs_mag)
       abs_mag = atof( get_environment_ptr( "ABS_MAG"));
    orbits_at_epoch = (double *)calloc( n_objects, 8 * sizeof( double));

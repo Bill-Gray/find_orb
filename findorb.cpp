@@ -162,9 +162,6 @@ int add_ephemeris_details( FILE *ofile, const double start_jd,  /* b32_eph.c */
 void set_distance( OBSERVE FAR *obs, double r);             /* orb_func.c */
 int filter_obs( OBSERVE FAR *obs, const int n_obs,          /* mpc_obs.c */
                   const double max_residual_in_arcseconds);
-int find_precovery_plates( OBSERVE *obs, const int n_obs,      /* ephem0.cpp */
-                           const char *filename, const double *orbit,
-                           const int n_orbits, double epoch_jd);
 void set_statistical_ranging( const int new_using_sr);      /* elem_out.cpp */
 int link_arcs( OBSERVE *obs, int n_obs, const double r1, const double r2);
 int find_circular_orbits( OBSERVE FAR *obs1, OBSERVE FAR *obs2,
@@ -4101,16 +4098,6 @@ int main( const int argc, const char **argv)
                }
             }
             break;
-         case '&':
-            {
-            unsigned n_orbits;
-            double *orbits_to_use = set_up_alt_orbits( orbit, &n_orbits);
-
-            if( !find_precovery_plates( obs, n_obs, "fields.txt",
-                                 orbits_to_use, n_orbits, curr_epoch))
-               show_a_file( "fields.txt");
-            }
-            break;
          case ';':
             observation_display ^= DISPLAY_RESIDUAL_LEGEND;
             strcpy( message_to_user,"Residual legend");
@@ -4391,7 +4378,7 @@ int main( const int argc, const char **argv)
             }
             break;
          case ALT_A: case 9:
-         case ALT_P:
+         case ALT_P: case '&':
          case ALT_R: case ALT_X: case ALT_Y:
          case ALT_Z: case '\'':
          default:
