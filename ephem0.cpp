@@ -657,6 +657,9 @@ static int find_precovery_plates( OBSERVE *obs, const int n_obs,
         /* Slightly easier to work with 'bit set means included' : */
    const int inclusion = atoi( get_environment_ptr( "FIELD_INCLUSION")) ^ 3;
    const bool show_base_60 = (*get_environment_ptr( "FIELD_DEBUG") != '\0');
+   const char *precovery_header_line =
+               "    RA (J2000) dec  Mag  YYYY MM DD HH:MM:SS.s Code"
+               " Sigma  PA Prob   Directory  Image Filename\n";
 
    if( !ofile)
       return( -1);
@@ -671,6 +674,8 @@ static int find_precovery_plates( OBSERVE *obs, const int n_obs,
    p2 = p1 + n_orbits;
    p3 = p2 + n_orbits;
    setvbuf( ofile, NULL, _IONBF, 0);
+   fprintf( ofile, "#CSS precovery fields\n");
+   fprintf( ofile, "%s", precovery_header_line);
    orbi = (double *)malloc( 12 * n_orbits * sizeof( double));
    memcpy( orbi, orbit,     6 * n_orbits * sizeof( double));
    while( fread( &field, sizeof( field), 1, ifile) == 1)
