@@ -226,16 +226,7 @@ IOD_TIMEOUT=20
    By default,  it's blank and planet states are not written out.
 PLANET_STATES=
 
-   When looking for precoveries,  one may wish to look only within a certain
-   range of dates,  and (usually) only to a certain magnitude depth (not
-   usually much point in looking for an object if it's expected to be at 34th
-   magnitude.)  The following lines let you set such limits.  Swap TMAX and
-   TMIN if what you actually want are observations _outside_ a given range.
-FIELD_TMIN=1800 Jan 1
-FIELD_TMAX=2200 Jan 1
-FIELD_MAG_LIMIT=23
-
-   Also when looking for precoveries,  one may want to list only images that
+   When looking for precoveries,  one may want to list only images that
    haven't been measured yet,  or only those that have been measured.  (Note
    that the only way Find_Orb knows which images have been measured is by
    looking at the astrometry.  That is to say,  if the astrometry you've used
