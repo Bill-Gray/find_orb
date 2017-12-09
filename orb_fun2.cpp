@@ -50,8 +50,11 @@ SIMPLEX
 
 extern int available_sigmas;
 extern int debug_level;
-int debug_printf( const char *format, ...);
-
+int debug_printf( const char *format, ...)                 /* runge.cpp */
+#ifdef __GNUC__
+         __attribute__ (( format( printf, 1, 2)))
+#endif
+;
 
 static double try_simplex_reflection( OBSERVE FAR *obs, int n_obs,
                SIMPLEX simplex[3], const double reflect, const char *constraints)
@@ -123,7 +126,7 @@ int simplex_method( OBSERVE FAR *obs, int n_obs, double *orbit,
                            (simplex[2].r1 - simplex[0].r1) *
                            (simplex[1].r2 - simplex[0].r2);
 
-         debug_printf( "Simplex %d: %lg\n", iter, dot_prod);
+         debug_printf( "Simplex %d: %g\n", iter, dot_prod);
          for( i = 0; i < 3; i++)
             debug_printf( "   r1 = %f, r2 = %f: score %f (%f %f)\n",
                         simplex[i].r1, simplex[i].r2, simplex[i].score,

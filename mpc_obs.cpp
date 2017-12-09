@@ -77,7 +77,11 @@ int compute_observer_vel( const double jde, const int planet_no,
              const double rho_sin_phi, const double lon, double FAR *vel);
 int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid);
 static int xref_designation( char *desig);
-int debug_printf( const char *format, ...);                 /* mpc_obs.c */
+int debug_printf( const char *format, ...)                 /* runge.cpp */
+#ifdef __GNUC__
+         __attribute__ (( format( printf, 1, 2)))
+#endif
+;
 char **load_file_into_memory( const char *filename, size_t *n_lines);
 void shellsort_r( void *base, const size_t n_elements, const size_t esize,
          int (*compare)(const void *, const void *, void *), void *context);
@@ -2090,7 +2094,7 @@ static bool get_neocp_data( char *buff, char *desig, char *mpc_code)
    for( len = 0; buff[len] >= ' '; len++)
       ;
    if( debug_level > 9)
-      debug_printf( "get_neocp_data len: %zd\n", len);
+      debug_printf( "get_neocp_data len: %d\n", (int)len);
    while( len && buff[len - 1] == ' ')    /* eliminate trailing spaces */
       len--;
    if( len < 10 && len > 2 && *buff == '*' && buff[len - 1] == '*')
@@ -3684,7 +3688,7 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
       double jd;
 
       if( debug_level > 8)
-         debug_printf( "Input line len %zd\n", strlen( buff));
+         debug_printf( "Input line len %d\n", (int)strlen( buff));
       if( *buff == '<')
          remove_html_tags( buff);
       convert_com_to_pound_sign( buff);
@@ -3705,7 +3709,7 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
       if( fixing_trailing_and_leading_spaces)
          fix_up_mpc_observation( buff);
       if( debug_level > 8)
-         debug_printf( "After fixup: %zd\n", strlen( buff));
+         debug_printf( "After fixup: %d\n", (int)strlen( buff));
       jd = observation_jd( buff);
       if( jd != 0. && !is_second_line( buff))
          if( !station || !memcmp( buff + 76, station, 3))

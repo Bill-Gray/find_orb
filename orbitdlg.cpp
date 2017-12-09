@@ -90,7 +90,11 @@ const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 void set_environment_ptr( const char *env_ptr, const char *new_value);
 double convenient_gauss( const OBSERVE FAR *obs, int n_obs, double *orbit,
                   const double mu, const int desired_soln); /* gauss.cpp */
-int debug_printf( const char *format, ...);                /* runge.cpp */
+int debug_printf( const char *format, ...)                 /* runge.cpp */
+#ifdef __GNUC__
+         __attribute__ (( format( printf, 1, 2)))
+#endif
+;
 char *fgets_trimmed( char *buff, size_t max_bytes, FILE *ifile); /*elem_out.c*/
 int get_jpl_ephemeris_info( int *de_version, double *jd_start, double *jd_end);
 void set_statistical_ranging( const int new_using_sr);      /* elem_out.cpp */

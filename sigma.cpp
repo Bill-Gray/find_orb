@@ -40,7 +40,11 @@ SIGMA_RECORD
 static int n_sigma_recs;
 static SIGMA_RECORD *sigma_recs;
 
-int debug_printf( const char *format, ...);                /* runge.cpp */
+int debug_printf( const char *format, ...)                 /* runge.cpp */
+#ifdef __GNUC__
+         __attribute__ (( format( printf, 1, 2)))
+#endif
+;
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 
 static int parse_sigma_record( SIGMA_RECORD *w, const char *buff)
@@ -115,6 +119,7 @@ int load_up_sigma_records( const char *filename)
          }
       fclose( ifile);
       }
+   assert( n_sigma_recs > 0);
    return( n_sigma_recs);
 }
 
@@ -155,6 +160,9 @@ double get_observation_sigma( const double jd, const int mag_in_tenths,
       *mag_sigma = 0.;
    if( time_sigma)
       *time_sigma = 0.;
+   assert( n_sigma_recs);
+   assert( jd > 0.);
+   assert( jd < 3e+6);
    for( i = 0; i < n_sigma_recs; i++)
       {
       SIGMA_RECORD *w = sigma_recs + i;

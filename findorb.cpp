@@ -138,7 +138,11 @@ int search_for_trial_orbit( double *orbit, OBSERVE FAR *obs, int n_obs,
 int find_nth_sr_orbit( double *orbit, OBSERVE FAR *obs, int n_obs,
                             const int orbit_number);       /* orb_func.cpp */
 char *fgets_trimmed( char *buff, size_t max_bytes, FILE *ifile);
-int debug_printf( const char *format, ...);                /* runge.cpp */
+int debug_printf( const char *format, ...)                 /* runge.cpp */
+#ifdef __GNUC__
+         __attribute__ (( format( printf, 1, 2)))
+#endif
+;
 static void get_mouse_data( int *mouse_x, int *mouse_y, int *mouse_z, unsigned long *button);
 int get_object_name( char *obuff, const char *packed_desig);   /* mpc_obs.c */
 int make_pseudo_mpec( const char *mpec_filename, const char *obj_name);
@@ -2212,7 +2216,6 @@ int main( const int argc, const char **argv)
    bool show_commented_elements = false;
    bool drop_single_obs = true;
 
-   setlocale( LC_ALL, "");
    if( !strcmp( argv[0], "find_orb"))
       use_config_directory = true;
    else
@@ -2554,7 +2557,7 @@ int main( const int argc, const char **argv)
             n_obs = ids[id_number].n_obs;
             if( !curr_epoch || !epoch_shown || !obs || n_obs < 2)
                debug_printf( "Curr epoch %f; shown %f; obs %p; %d obs\n",
-                              curr_epoch, epoch_shown, obs, n_obs);
+                              curr_epoch, epoch_shown, (void *)obs, n_obs);
             if( debug_level)
                debug_printf( "got obs; ");
             if( mpc_color_codes)

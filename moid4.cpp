@@ -30,7 +30,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 
 #define PI 3.1415926535897932384626433832795028841971693993751058209749445923
 
-int debug_printf( const char *format, ...);                 /* mpc_obs.c */
+int debug_printf( const char *format, ...)                 /* runge.cpp */
+#ifdef __GNUC__
+         __attribute__ (( format( printf, 1, 2)))
+#endif
+;
 double find_moid( const ELEMENTS *elem1, const ELEMENTS *elem2,  /* moid4.c */
                                      double *barbee_style_delta_v);
 int setup_planet_elem( ELEMENTS *elem, const int planet_idx,

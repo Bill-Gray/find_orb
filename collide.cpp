@@ -41,7 +41,11 @@ double find_lat_lon_alt( const double ut, const double *ivect,
 void calc_approx_planet_orientation( const int planet,        /* runge.cpp */
          const int system_number, const double jde, double *matrix);
 
-int debug_printf( const char *format, ...);                /* runge.cpp */
+int debug_printf( const char *format, ...)                 /* runge.cpp */
+#ifdef __GNUC__
+         __attribute__ (( format( printf, 1, 2)))
+#endif
+;
 
 double planet_radius_in_meters( const int planet_idx)
 {

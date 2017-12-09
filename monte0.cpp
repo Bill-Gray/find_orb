@@ -11,7 +11,11 @@
 #include "mt64.h"
 
 double gaussian_random( void);                           /* monte0.c */
-int debug_printf( const char *format, ...);                /* runge.cpp */
+int debug_printf( const char *format, ...)                 /* runge.cpp */
+#ifdef __GNUC__
+         __attribute__ (( format( printf, 1, 2)))
+#endif
+;
 double get_planet_mass( const int planet_idx);                /* orb_func.c */
 void remove_insignificant_digits( char *tbuff);          /* monte0.c */
 void set_up_observation( OBSERVE FAR *obs);                 /* mpc_obs.c */

@@ -62,7 +62,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 
    Code is also included for approximate lunar and Plutonian ephemerides.  */
 
-int debug_printf( const char *format, ...);
 int compute_rough_planet_loc( const double t_cen, const int planet_idx,
                                           double *vect);    /* sm_vsop.c */
 int check_for_perturbers( const double t_cen, const double *vect); /* sm_vsop*/

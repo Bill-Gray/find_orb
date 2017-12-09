@@ -112,7 +112,11 @@ static bool fail_on_hitting_planet = false;
 
 double gaussian_random( void);                           /* monte0.c */
 int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid);
-int debug_printf( const char *format, ...);
+int debug_printf( const char *format, ...)                 /* runge.cpp */
+#ifdef __GNUC__
+         __attribute__ (( format( printf, 1, 2)))
+#endif
+;
 double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit);
 int adjust_herget_results( OBSERVE FAR *obs, int n_obs, double *orbit);
 int find_trial_orbit( double *orbit, OBSERVE FAR *obs, int n_obs,
@@ -1456,7 +1460,7 @@ int compute_available_sigmas_hash( const OBSERVE FAR *obs, const int n_obs,
          rval = simple_hash( rval, (const char *)temp_darray, 5 * sizeof( double));
          }
    if( debug_level)
-      debug_printf( "Hash result: %8lx\n", rval);
+      debug_printf( "Hash result: %8x\n", (unsigned)rval);
    return( rval);
 }
 

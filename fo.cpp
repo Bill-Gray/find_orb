@@ -65,7 +65,11 @@ extern const char *sof_filename;
 
 char *get_file_name( char *filename, const char *template_file_name);
 int sanity_test_observations( const char *filename);
-int debug_printf( const char *format, ...);                /* runge.cpp */
+int debug_printf( const char *format, ...)                 /* runge.cpp */
+#ifdef __GNUC__
+         __attribute__ (( format( printf, 1, 2)))
+#endif
+;
 int text_search_and_replace( char FAR *str, const char *oldstr,
                                      const char *newstr);   /* ephem0.cpp */
 int get_defaults( int *ephemeris_output_options, int *element_format,

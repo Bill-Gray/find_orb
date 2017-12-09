@@ -68,7 +68,11 @@ int text_search_and_replace( char FAR *str, const char *oldstr,
                                      const char *newstr);   /* ephem0.cpp */
 void format_dist_in_buff( char *buff, const double dist_in_au); /* ephem0.c */
 char int_to_mutant_hex_char( const int ival);              /* mpc_obs.c */
-int debug_printf( const char *format, ...);                /* mpc_obs.c */
+int debug_printf( const char *format, ...)                 /* runge.cpp */
+#ifdef __GNUC__
+         __attribute__ (( format( printf, 1, 2)))
+#endif
+;
 double planet_axis_ratio( const int planet_idx);            /* collide.cpp */
 double planet_radius_in_meters( const int planet_idx);      /* collide.cpp */
 double mag_band_shift( const char mag_band);                /* elem_out.c */
@@ -3267,12 +3271,8 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
                         if( year > 2050)    /* to 2050 */
                            year = 2050;
                         snprintf( replace_str, sizeof( replace_str),
-                                        "%d.html?sv,1,%s,", year, obj_name);
-                        full_ctime( tbuff, helio_ecliptic_j2000_vect[6],
-                                 FULL_CTIME_YMD | FULL_CTIME_MONTHS_AS_DIGITS
-                                 | FULL_CTIME_LEADING_ZEROES);
-                        tbuff[4] = tbuff[7] = '/';
-                        strcat( replace_str, tbuff);
+                                        "%d.html?sv,1,%s,%.2f", year, obj_name,
+                                        helio_ecliptic_j2000_vect[6]);
                         text_search_and_replace( replace_str, " ", "%20");
                         for( i = 0; i < 6; i++)
                            {

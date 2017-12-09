@@ -40,7 +40,11 @@ const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 void set_environment_ptr( const char *env_ptr, const char *new_value);
 char *get_file_name( char *filename, const char *template_file_name);
 int sanity_test_observations( const char *filename);
-int debug_printf( const char *format, ...);                /* runge.cpp */
+int debug_printf( const char *format, ...)                 /* runge.cpp */
+#ifdef __GNUC__
+         __attribute__ (( format( printf, 1, 2)))
+#endif
+;
 int text_search_and_replace( char FAR *str, const char *oldstr,
                                      const char *newstr);   /* ephem0.cpp */
 int get_defaults( int *ephemeris_output_options, int *element_format,
@@ -250,7 +254,7 @@ int main( const int argc, const char **argv)
             sprintf( filename, "temp%02d.ast", j % 100);
             sprintf( tbuff, "./grab_mpc %s %s", filename, buff);
             i = system( tbuff);
-            debug_printf( "'%s': %d\n", tbuff, i);
+            debug_printf( "'%s': %ld\n", tbuff, (long)i);
             if( !i)
                {
                FILE *ifile = fopen( filename, "rb");

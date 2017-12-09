@@ -38,7 +38,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "jpleph.h"
 
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
-int debug_printf( const char *format, ...);                /* runge.cpp */
+int debug_printf( const char *format, ...)                 /* runge.cpp */
+#ifdef __GNUC__
+         __attribute__ (( format( printf, 1, 2)))
+#endif
+;
 extern int debug_level;
 
 int64_t planet_ns;
@@ -131,12 +135,12 @@ static int planet_posn_raw( int planet_no, const double jd,
          debug_printf( "\nEphemeris time span years %.3f to %.3f\n",
                (jpl_get_double( jpl_eph, JPL_EPHEM_START_JD) - J0) / 365.25,
                (jpl_get_double( jpl_eph, JPL_EPHEM_END_JD)   - J0) / 365.25);
-         debug_printf( "Ephemeris version %d\n", jpl_get_long( jpl_eph, JPL_EPHEM_EPHEMERIS_VERSION));
-         debug_printf( "Kernel size %d, record size %d, swap_bytes %d\n",
+         debug_printf( "Ephemeris version %ld\n", jpl_get_long( jpl_eph, JPL_EPHEM_EPHEMERIS_VERSION));
+         debug_printf( "Kernel size %ld, record size %ld, swap_bytes %ld\n",
                jpl_get_long( jpl_eph, JPL_EPHEM_KERNEL_SIZE),
                jpl_get_long( jpl_eph, JPL_EPHEM_KERNEL_RECORD_SIZE),
                jpl_get_long( jpl_eph, JPL_EPHEM_KERNEL_SWAP_BYTES));
-         debug_printf( "ncon = %d AU=%f emrat = %f\n",
+         debug_printf( "ncon = %ld AU=%f emrat = %f\n",
                jpl_get_long( jpl_eph, JPL_EPHEM_N_CONSTANTS),
                jpl_get_double( jpl_eph, JPL_EPHEM_AU_IN_KM),
                jpl_get_double( jpl_eph, JPL_EPHEM_EARTH_MOON_RATIO));

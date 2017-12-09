@@ -69,7 +69,11 @@ double j2_multiplier = 1.;
 extern unsigned perturbers;
 
 extern int debug_level;
-int debug_printf( const char *format, ...);                /* runge.cpp */
+int debug_printf( const char *format, ...)                 /* runge.cpp */
+#ifdef __GNUC__
+         __attribute__ (( format( printf, 1, 2)))
+#endif
+;
 int planet_posn( const int planet_no, const double jd, double *vect_2000);
                                                 /* mpc_obs.cpp */
 int earth_lunar_posn( const double jd, double FAR *earth_loc, double FAR *lunar_loc);

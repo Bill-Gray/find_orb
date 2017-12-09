@@ -128,7 +128,11 @@ int add_sof_to_file( const char *filename,         /* elem_ou2.cpp */
              const int n_obs, const OBSERVE *obs);
 void make_config_dir_name( char *oname, const char *iname);  /* miscell.cpp */
 
-int debug_printf( const char *format, ...);                /* runge.cpp */
+int debug_printf( const char *format, ...)                 /* runge.cpp */
+#ifdef __GNUC__
+         __attribute__ (( format( printf, 1, 2)))
+#endif
+;
 
 char *fgets_trimmed( char *buff, size_t max_bytes, FILE *ifile)
 {
