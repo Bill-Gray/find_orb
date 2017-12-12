@@ -177,7 +177,7 @@ int main( const int argc, const char **argv)
 #ifndef _WIN32
    extern char **environ;
 
-   avoid_runaway_process( 15);
+   avoid_runaway_process( 45);
 #endif         /* _WIN32 */
    setvbuf( lock_file, NULL, _IONBF, 0);
    neocp_redaction_turned_on = false;
