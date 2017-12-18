@@ -2,6 +2,8 @@
 
 #if defined( _WIN32) || defined( __WATCOMC__)
 #include <malloc.h>     /* for alloca() prototype */
+#else
+#include <stdlib.h>
 #endif
 
 /* The re-entrant version of qsort(),  qsort_r(),  is implemented in
