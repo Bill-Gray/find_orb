@@ -1273,6 +1273,10 @@ static MPC_STATION *mpc_color_codes = NULL;
    are shown in COLOR_EXCLUDED_OBS.  The three-character MPC code
    is also shown in a separate color. */
 
+#ifdef HAVE_UNICODE
+static int make_unicode_substitutions = 1;
+#endif
+
 int mpc_column, resid_column;
 
 static void show_residual_text( char *buff, const int line_no,
@@ -1302,7 +1306,8 @@ static void show_residual_text( char *buff, const int line_no,
       tbuff[residual_field_size] = '\0';
 #ifdef HAVE_UNICODE
                /* cvt 'u' = 'micro' = 'mu' to the Unicode U+00B5,  in UTF-8: */
-      text_search_and_replace( tbuff, "u", "\xc2\xb5");
+      if( make_unicode_substitutions)
+         text_search_and_replace( tbuff, "u", "\xc2\xb5");
 #endif
       put_colored_text( tbuff, line_no, column + resid_column - 2,
                residual_field_size, resid_color);
@@ -2220,6 +2225,8 @@ int main( const int argc, const char **argv)
       use_config_directory = true;
    else
       use_config_directory = false;
+   if( !setlocale( LC_ALL, "C.UTF-8") && !setlocale( LC_ALL, "en_US.utf8"))
+      debug_printf( "Couldn't set a UTF-8 locale\n");
    for( i = 1; i < argc; i++)       /* check to see if we're debugging: */
       if( argv[i][0] == '-')
          switch( argv[i][1])
@@ -2269,6 +2276,10 @@ int main( const int argc, const char **argv)
                findorb_language = argv[i][2];
                }
                break;
+            case 'L':
+               if( !setlocale( LC_ALL, argv[i] + 2))
+                  debug_printf( "Couldn't set locale '%s'\n", argv[i] + 2);
+               break;
             case 'm':
                {
                extern int integration_method;
@@ -2307,6 +2318,9 @@ int main( const int argc, const char **argv)
 
                sanity_check_observations = 0;
                }
+               break;
+            case 'u':
+               make_unicode_substitutions = 0;
                break;
             case 'z':
                {
@@ -2637,10 +2651,13 @@ int main( const int argc, const char **argv)
          if( i == n_obs)      /* no observation selected */
             obs[curr_obs].flags ^= OBS_IS_SELECTED;
 #ifdef HAVE_UNICODE
+         if( make_unicode_substitutions)
+            {
                      /* cvt +/- to the Unicode U+00B1,  in UTF-8: */
                text_search_and_replace( tbuff, " +/- ", " \xc2\xb1 ");
                      /* cvt OEM degree symbol (0xf8) to U+00B0,  in UTF-8: */
                text_search_and_replace( tbuff, "\xf8", "\xc2\xb0 ");
+            }
 #endif
          while( *tptr)
             {
@@ -2712,7 +2729,8 @@ int main( const int argc, const char **argv)
                      elem_color = COLOR_ATTENTION + 256;
 #endif
 #ifdef HAVE_UNICODE
-                  text_search_and_replace( tbuff, " +/- ", " \xc2\xb1 ");
+                  if( make_unicode_substitutions)
+                     text_search_and_replace( tbuff, " +/- ", " \xc2\xb1 ");
 #endif
                   put_colored_text( tbuff, line_no + iline, 0, -1, elem_color);
                   if( right_side_col < (unsigned)strlen( tbuff) + spacing)
