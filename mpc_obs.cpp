@@ -3269,6 +3269,8 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                     /* 'sigma.txt' (q.v.)                                   */
                const char *mpc_code_to_use = (use_sigmas ? rval[i].mpc_code : "***");
 
+               if( rval[i].jd < 2e+6 || rval[i].jd > 3e+6)
+                  debug_printf( "Weird obs JD %f:\n%s\n", rval[i].jd, buff);
                posn_sigma_1 = get_observation_sigma( rval[i].jd,
                        (int)( rval[i].obs_mag * 10. + .001),
                        mpc_code_to_use, &mag_sigma, &time_sigma, rval[i].note1);
