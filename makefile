@@ -75,7 +75,7 @@ OBJS=b32_eph.o bc405.o bias.o collide.o conv_ele.o details.o eigen.o \
 	elem2tle.o elem_out.o elem_ou2.o ephem0.o errors.o gauss.o   \
 	geo_pot.o healpix.o lsquare.o miscell.o moid4.o monte0.o mpc_fmt.o \
 	mpc_obs.o mt64.o nanosecs.o orb_func.o orb_fun2.o pl_cache.o roots.o  \
-	runge.o shellsor.o sigma.o sm_vsop.o sr.o stackall.o $(OBJSADDED)
+	runge.o shellsor.o sigma.o simplex.o sm_vsop.o sr.o stackall.o $(OBJSADDED)
 
 LIBS=$(LIBSADDED) -llunar -ljpl -lsatell
 

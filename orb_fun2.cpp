@@ -40,13 +40,12 @@ double evaluate_for_simplex_method( const OBSERVE FAR *obs,
                     const int n_obs, const double *orbit,
                     const int planet_orbiting,
                     const char *limited_orbit);     /* orb_func.cpp */
-
-#define SIMPLEX struct simplex
-
-SIMPLEX
-   {
-   double r1, r2, score;
-   };
+void init_simplex( double **vects, double *fvals,
+         double (*f)( void *context, const double *vect),
+               void *context, const int n);        /* simplex.c */
+int simplex_step( double **vects, double *fvals,
+         double (*f)( void *context, const double *vect),
+               void *context, const int n);        /* simplex.c */
 
 extern int available_sigmas;
 extern int debug_level;
@@ -56,118 +55,55 @@ int debug_printf( const char *format, ...)                 /* runge.cpp */
 #endif
 ;
 
-static double try_simplex_reflection( OBSERVE FAR *obs, int n_obs,
-               SIMPLEX simplex[3], const double reflect, const char *constraints)
+typedef struct
+   {
+   OBSERVE FAR *obs;
+   int n_obs;
+   const char *constraints;
+   double orbit[6];
+   } simplex_context_t;
+
+static double simplex_scoring( void *icontext, const double *ivect)
 {
-   double r1 = (simplex[0].r1 + simplex[1].r1) * (1. - reflect) / 2.
-                     + reflect * simplex[2].r1;
-   double r2 = (simplex[0].r2 + simplex[1].r2) * (1. - reflect) / 2.
-                     + reflect * simplex[2].r2;
-   double orbit[6], new_score;
-   int i;
+   simplex_context_t *context = (simplex_context_t *)icontext;
+   double rval;
 
-                   /* guard against negative/artificially low values */
-   for( i = 0; i < 3; i++)
-      {
-      if( r1 < simplex[i].r1 / 2.)
-         r1 = simplex[i].r1 / 2.;
-      if( r2 < simplex[i].r2 / 2.)
-         r2 = simplex[i].r2 / 2.;
-      }
-
-   herget_method( obs, n_obs, r1, r2, orbit, NULL, NULL, NULL);
-   adjust_herget_results( obs, n_obs, orbit);
-   new_score = evaluate_for_simplex_method( obs, n_obs, orbit, 0, constraints);
-   if( new_score <= simplex[2].score)         /* step is an improvement */
-      {
-      simplex[2].r1 = r1;
-      simplex[2].r2 = r2;
-      simplex[2].score = new_score;
-      }
-   return( new_score);
+   herget_method( context->obs, context->n_obs, ivect[0], ivect[1],
+                           context->orbit, NULL, NULL, NULL);
+   adjust_herget_results( context->obs, context->n_obs, context->orbit);
+   rval = evaluate_for_simplex_method( context->obs, context->n_obs,
+                        context->orbit, 0, context->constraints);
+// printf( "Radii %f, %f: score %f\n", ivect[0], ivect[1], rval);
+   return( rval);
 }
 
 int simplex_method( OBSERVE FAR *obs, int n_obs, double *orbit,
                const double r1, const double r2, const char *constraints)
 {
-   SIMPLEX simplex[3];
-   int i, j, iter;
+   int i, iter;
    int max_iter = atoi( get_environment_ptr( "SIMPLEX_ITER"));
-   double temp_orbit[6];
+   double rvals[6], *rptr[3], scores[3];
+   simplex_context_t context;
+
+   for( i = 0; i < 3; i++)
+      {
+      rptr[i] = rvals + i * 2;
+      rptr[i][0] = r1 * (i == 1 ? 1.1 : 1);
+      rptr[i][1] = r2 * (i == 2 ? 1.1 : 1);
+      }
+   context.obs = obs;
+   context.n_obs = n_obs;
+   context.constraints = constraints;
+   init_simplex( rptr, scores, simplex_scoring, &context, 2);
 
    if( !max_iter)
       max_iter = 70;
-   for( i = 0; i < 3; i++)
-      {
-      simplex[i].r1 = r1 * ((i & 1) ? 1. : 1.1);
-      simplex[i].r2 = r2 * ((i & 2) ? 1. : 1.1);
-      herget_method( obs, n_obs, simplex[i].r1, simplex[i].r2,
-                                temp_orbit, NULL, NULL, NULL);
-      adjust_herget_results( obs, n_obs, orbit);
-      simplex[i].score = evaluate_for_simplex_method( obs, n_obs, temp_orbit, 0, constraints);
-      }
    for( iter = 0; iter < max_iter; iter++)
       {
-      double new_score;
-
-      for( i = 1; i < 3; i++)
-         for( j = 0; j < i; j++)    /* sort so simplex[0] = lowest-score, */
-            if( simplex[i].score < simplex[j].score)  /* simplex[2] = highest */
-               {
-               SIMPLEX temp_simp = simplex[i];
-
-               simplex[i] = simplex[j];
-               simplex[j] = temp_simp;
-               }
-      if( debug_level > 2)
-         {
-         double dot_prod = (simplex[1].r1 - simplex[0].r1) *
-                           (simplex[2].r2 - simplex[0].r2) -
-                           (simplex[2].r1 - simplex[0].r1) *
-                           (simplex[1].r2 - simplex[0].r2);
-
-         debug_printf( "Simplex %d: %g\n", iter, dot_prod);
-         for( i = 0; i < 3; i++)
-            debug_printf( "   r1 = %f, r2 = %f: score %f (%f %f)\n",
-                        simplex[i].r1, simplex[i].r2, simplex[i].score,
-                        simplex[i].r1 - simplex[0].r1,
-                        simplex[i].r2 - simplex[0].r2);
-         }
-      new_score = try_simplex_reflection( obs, n_obs, simplex, -1., constraints);
-                  /* If step was a new 'best',  try doubling it: */
-      if( new_score < simplex[0].score)
-         {
-         try_simplex_reflection( obs, n_obs, simplex, 2., constraints);
-         if( debug_level > 2)
-            debug_printf( "Doubled\n");
-         }
-      else if( new_score > simplex[1].score)
-         {
-         const double contracted =
-               try_simplex_reflection( obs, n_obs, simplex, .5, constraints);
-
-         if( debug_level > 2)
-            debug_printf( contracted > new_score ?
-                              "Contracting\n" : "Half-con\n");
-         if( contracted > new_score)   /* can't get rid of it;  try  */
-            for( i = 1; i < 3; i++)     /* contracting around our best point */
-               {
-               simplex[i].r1 += .5 * (simplex[0].r1 - simplex[i].r1);
-               simplex[i].r2 += .5 * (simplex[0].r2 - simplex[i].r2);
-               herget_method( obs, n_obs, simplex[i].r1, simplex[i].r2,
-                                temp_orbit, NULL, NULL, NULL);
-               adjust_herget_results( obs, n_obs, orbit);
-               simplex[i].score = evaluate_for_simplex_method( obs, n_obs,
-                                                   temp_orbit, 0, constraints);
-               }
-         }
-      else
-         if( debug_level > 2)
-            debug_printf( "Simple step\n");
+//    printf( "Iter %d\n", iter);
+      simplex_step( rptr, scores, simplex_scoring, &context, 2);
       }
-   herget_method( obs, n_obs, simplex[0].r1, simplex[0].r2,
-                                orbit, NULL, NULL, NULL);
-   adjust_herget_results( obs, n_obs, orbit);
+   memcpy( orbit, context.orbit, 6 * sizeof( double));
    return( iter);
 }
 
