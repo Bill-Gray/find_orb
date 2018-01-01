@@ -91,14 +91,14 @@ eph2tle$(EXE):          eph2tle.o conv_ele.o elem2tle.o lsquare.o
 cssfield$(EXE):          cssfield.o
 	$(CC) -o cssfield$(EXE) cssfield.o $(LIBS)
 
-fo_serve.cgi:          fo_serve.o cgi_func.o $(OBJS)
-	$(CC) -o fo_serve.cgi fo_serve.o cgi_func.o $(OBJS) $(LIBS)
+fo_serve.cgi:          fo_serve.o $(OBJS)
+	$(CC) -o fo_serve.cgi fo_serve.o $(OBJS) $(LIBS)
 
 IDIR=$(HOME)/.find_orb
 
 clean:
 	$(RM) $(OBJS) fo.o findorb.o fo_serve.o find_orb$(EXE) fo$(EXE)
-	$(RM) fo_serve.cgi eph2tle.o eph2tle$(EXE) cssfield$(EXE) cgi_func.o
+	$(RM) fo_serve.cgi eph2tle.o eph2tle$(EXE) cssfield$(EXE)
 	$(RM) cssfield.o
 	cd $(IDIR)
 	$(RM) covar.txt covar?.txt debug.txt eleme?.txt elements.txt
