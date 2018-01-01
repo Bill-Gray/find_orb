@@ -58,7 +58,7 @@ int debug_printf( const char *format, ...)                 /* runge.cpp */
 typedef struct
    {
    OBSERVE FAR *obs;
-   int n_obs;
+   int n_obs, n_params;
    const char *constraints;
    double orbit[6];
    } simplex_context_t;
@@ -68,9 +68,18 @@ static double simplex_scoring( void *icontext, const double *ivect)
    simplex_context_t *context = (simplex_context_t *)icontext;
    double rval;
 
-   herget_method( context->obs, context->n_obs, ivect[0], ivect[1],
+   if( context->n_params == 2)
+      {
+      herget_method( context->obs, context->n_obs, ivect[0], ivect[1],
                            context->orbit, NULL, NULL, NULL);
-   adjust_herget_results( context->obs, context->n_obs, context->orbit);
+      adjust_herget_results( context->obs, context->n_obs, context->orbit);
+      }
+   else
+      {
+      memcpy( context->orbit, ivect, 6 * sizeof( double));
+      set_locs( context->orbit, context->obs[0].jd, context->obs,
+                                                    context->n_obs);
+      }
    rval = evaluate_for_simplex_method( context->obs, context->n_obs,
                         context->orbit, 0, context->constraints);
 // printf( "Radii %f, %f: score %f\n", ivect[0], ivect[1], rval);
@@ -93,20 +102,23 @@ int simplex_method( OBSERVE FAR *obs, int n_obs, double *orbit,
       }
    context.obs = obs;
    context.n_obs = n_obs;
+   context.n_params = 2;
    context.constraints = constraints;
-   init_simplex( rptr, scores, simplex_scoring, &context, 2);
+   init_simplex( rptr, scores, simplex_scoring, &context, context.n_params);
 
    if( !max_iter)
       max_iter = 70;
    for( iter = 0; iter < max_iter; iter++)
       {
 //    printf( "Iter %d\n", iter);
-      simplex_step( rptr, scores, simplex_scoring, &context, 2);
+      simplex_step( rptr, scores, simplex_scoring, &context, context.n_params);
       }
    memcpy( orbit, context.orbit, 6 * sizeof( double));
+   available_sigmas = NO_SIGMAS_AVAILABLE;
    return( iter);
 }
 
+#ifdef NOT_USED_YET
 static void adjust_orbit_to_constraints( double *orbit, const char *constraints)
 {
    if( constraints && !strcmp( constraints, "e=1"))
@@ -121,129 +133,36 @@ static void adjust_orbit_to_constraints( double *orbit, const char *constraints)
          orbit[i] *= rescale;
       }
 }
-
-#define SUPERPLEX struct superplex
-
-SUPERPLEX
-   {
-   double orbit[6];
-   double score;
-   };
-
-int set_locs( const double *orbit, double t0, OBSERVE FAR *obs, int n_obs);
-
-static double try_superplex_reflection( OBSERVE FAR *obs, int n_obs,
-               SUPERPLEX superplex[7], const double reflect,
-               const char *constraints)
-{
-   double orbit[6], new_score;
-   int i, j;
-   const int n_reflect = 6;
-
-   for( i = 0; i < 6; i++)
-      {
-      orbit[i] = superplex[6].orbit[i] * reflect;
-      for( j = 0; j < n_reflect; j++)
-         orbit[i] += (1. - reflect) * superplex[j].orbit[i] / (double)n_reflect;
-      }
-
-   adjust_orbit_to_constraints( orbit, constraints);
-   set_locs( orbit, obs[0].jd, obs, n_obs);
-   new_score = evaluate_for_simplex_method( obs, n_obs, orbit, 0, constraints);
-   if( new_score <= superplex[6].score)         /* step is an improvement */
-      {
-      memcpy( superplex[6].orbit, orbit, 6 * sizeof( double));
-      superplex[6].score = new_score;
-      }
-   return( new_score);
-}
-
-extern int debug_level;
-int debug_printf( const char *format, ...);
+#endif
 
 int superplex_method( OBSERVE FAR *obs, int n_obs, double *orbit, const char *constraints)
 {
-   SUPERPLEX superplex[7];
-   int iter, i;
+   int i, iter;
    int max_iter = atoi( get_environment_ptr( "SUPERPLEX_ITER"));
+   double rvals[42], *rptr[7], scores[7];
+   simplex_context_t context;
+
+   for( i = 0; i < 7; i++)
+      {
+      rptr[i] = rvals + i * 6;
+      memcpy( rptr[i], orbit, 6 * sizeof( double));
+      if( i < 6)
+         rptr[i][i] += (i < 3 ? .01 : .0003);
+      }
+   context.obs = obs;
+   context.n_obs = n_obs;
+   context.n_params = 6;
+   context.constraints = constraints;
+   init_simplex( rptr, scores, simplex_scoring, &context, context.n_params);
 
    if( !max_iter)
       max_iter = 70;
-   while( n_obs && !obs[n_obs - 1].is_included)
-      n_obs--;
-   for( i = 0; i < 7; i++)
-      {
-      memcpy( superplex[i].orbit, orbit, 6 * sizeof( double));
-      if( i < 6)
-         superplex[i].orbit[i] *= .9999;
-      adjust_orbit_to_constraints( superplex[i].orbit, constraints);
-      set_locs( superplex[i].orbit, obs[0].jd, obs, n_obs);
-      superplex[i].score = evaluate_for_simplex_method( obs, n_obs,
-                                  superplex[i].orbit, 0, constraints);
-      }
    for( iter = 0; iter < max_iter; iter++)
       {
-      int j;
-      double new_score;
-
-      for( i = 1; i < 7; i++)       /* sort in increasing order of score */
-         {
-         for( j = i; j && superplex[j - 1].score > superplex[i].score;
-                              j--)
-            ;
-         if( j != i)
-            {
-            SUPERPLEX temp_simp = superplex[i];
-
-            memmove( superplex + j + 1, superplex + j,
-                        (i - j) * sizeof( SUPERPLEX));
-            superplex[j] = temp_simp;
-            }
-         }
-      new_score = try_superplex_reflection( obs, n_obs, superplex, -1., constraints);
-      if( debug_level > 2)
-         debug_printf( "Iter %d: score %f\n", iter, superplex[6].score);
-      if( debug_level > 3)
-         for( i = 0; i < 7; i++)
-            {
-            debug_printf( "%d (%f): ", i, superplex[i].score);
-            for( j = 0; j < 6; j++)
-               debug_printf( "%11.6f", superplex[i].orbit[j]);
-            debug_printf( "\n");
-            }
-                  /* If step was a new 'best',  try doubling it: */
-      if( new_score < superplex[0].score)
-         {
-         try_superplex_reflection( obs, n_obs, superplex, 2., constraints);
-         if( debug_level > 2)
-            debug_printf( "Doubled\n");
-         }
-      else if( new_score >= superplex[5].score)
-         {
-         const double contracted =
-               try_superplex_reflection( obs, n_obs, superplex, .5, constraints);
-
-         if( debug_level > 2)
-            debug_printf( contracted > new_score ?
-                              "Contracting\n" : "Half-con\n");
-         if( contracted > new_score)   /* can't get rid of it;  try  */
-            for( i = 1; i < 6; i++)     /* contracting around our best point */
-               {
-               for( j = 0; j < 6; j++)
-                  superplex[i].orbit[j] =
-                        (superplex[i].orbit[j] + superplex[0].orbit[j]) * .5;
-               adjust_orbit_to_constraints( superplex[i].orbit, constraints);
-               set_locs( superplex[i].orbit, obs[0].jd, obs, n_obs);
-               superplex[i].score = evaluate_for_simplex_method( obs, n_obs,
-                                  superplex[i].orbit, 0, constraints);
-               }
-         }
-      else
-         if( debug_level > 2)
-            debug_printf( "Simple step\n");
+//    printf( "Iter %d\n", iter);
+      simplex_step( rptr, scores, simplex_scoring, &context, context.n_params);
       }
-   memcpy( orbit, superplex[0].orbit, 6 * sizeof( double));
-   set_locs( superplex[0].orbit, obs[0].jd, obs, n_obs);
+   memcpy( orbit, context.orbit, 6 * sizeof( double));
    available_sigmas = NO_SIGMAS_AVAILABLE;
    return( iter);
 }
