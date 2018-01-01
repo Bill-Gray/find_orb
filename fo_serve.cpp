@@ -31,6 +31,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "mpc_obs.h"
 #include "date.h"
 #include "monte0.h"
+#include "cgi_func.h"
 
 extern int debug_level;
 
@@ -57,9 +58,6 @@ int inquire( const char *prompt, char *buff, const int max_len,
 void refresh_console( void);                    /* fo_serve.cpp */
 void move_add_nstr( const int col, const int row, const char *msg,
                      const int n_bytes);        /* fo_serve.cpp */
-void avoid_runaway_process( const int max_time_to_run);   /* cgi_func.c */
-int get_multipart_form_data( const char *boundary, char *field,
-                char *buff, char *filename, const size_t max_len);
 
 /* In the server flavor of Find_Orb,  warning messages such as "3
 observations were made in daylight" or "couldn't find thus-and-such file"
