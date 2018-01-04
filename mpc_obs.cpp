@@ -39,6 +39,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "lunar.h"
 #include "afuncs.h"
 #include "mpc_obs.h"
+#include "mpc_fmt.h"
 #include "sigma.h"
 #include "date.h"
 
@@ -49,10 +50,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #define EARTH_MINOR_AXIS_IN_AU (EARTH_MINOR_AXIS / AU_IN_METERS)
 #define J2000 2451545.
 
-double extract_date_from_mpc_report( const char *buff, unsigned *format);
-int get_ra_dec_from_mpc_report( const char *ibuff,    /* mpc_fmt.cpp */
-                       int *ra_format, double *ra, double *ra_precision,
-                       int *dec_format, double *dec, double *dec_precision);
 void set_up_observation( OBSERVE FAR *obs);                 /* mpc_obs.c */
 static double observation_jd( const char *buff);
 double centralize_ang( double ang);             /* elem_out.cpp */
@@ -1627,8 +1624,6 @@ void set_up_observation( OBSERVE FAR *obs)
 }
 
 static char get_net_used_from_obs_header( const char *mpc_code);
-
-bool is_valid_mpc_code( const char *mpc_code);        /* mpc_fmt.cpp */
 
 /* Some historical observations are provided in apparent coordinates of date.
 When that happens,  they have to be adjusted for both aberration of light

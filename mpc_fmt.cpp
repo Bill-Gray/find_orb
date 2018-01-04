@@ -5,12 +5,7 @@
 #include "watdefs.h"
 #include "afuncs.h"
 #include "date.h"
-
-bool is_valid_mpc_code( const char *mpc_code);        /* mpc_fmt.cpp */
-double extract_date_from_mpc_report( const char *buff, unsigned *format);
-int get_ra_dec_from_mpc_report( const char *ibuff,    /* mpc_fmt.cpp */
-                       int *ra_format, double *ra, double *ra_precision,
-                       int *dec_format, double *dec, double *dec_precision);
+#include "mpc_fmt.h"
 
 /* MPC has,  at least thus far,  only assigned MPC codes that are an uppercase
 letter followed by two digits.  Look at 'rovers.txt',  and you'll see that
