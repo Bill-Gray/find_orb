@@ -32,9 +32,7 @@ const double earth_mass_over_sun_mass = 2.98994e-6;
 #define GAUSS_K .01720209895
 #define SOLAR_GM (GAUSS_K * GAUSS_K)
 #define PI 3.141592653589793238462643383279502884197169399375105
-#define MINUTES_PER_DAY 1440.
 #define J2000 2451545.0
-#define J0 (J2000 - 2000. * 365.25)
 
 int elements_to_tle( tle_t *tle, const ELEMENTS *elem);
 int vector_to_tle( tle_t *tle, const double *state_vect, const double epoch);
@@ -52,7 +50,7 @@ int elements_to_tle( tle_t *tle, const ELEMENTS *elem)
 {
    int rval = -1;
 
-   if( elem->ecc < .99)
+   if( elem->ecc < .9999)
       {
       const double t0 =
           elem->major_axis * sqrt( elem->major_axis / earth_mass_over_sun_mass);
@@ -64,13 +62,13 @@ int elements_to_tle( tle_t *tle, const ELEMENTS *elem)
       tle->epoch = elem->epoch;
             /* The elements are in J2000,  but TLEs are given  */
             /* in epoch of date: */
-      convert_elements( 2000., (elem->epoch - J0) / 365.25,
+      convert_elements( 2000., 2000. + (elem->epoch - J2000) / 365.25,
                        &incl, &asc_node, &arg_per);     /* conv_ele.cpp */
       tle->xincl = centralize_angle( incl);
       tle->xnodeo = centralize_angle( asc_node);
       tle->omegao = centralize_angle( arg_per);
       tle->xmo = centralize_angle( mean_anomaly);
-      tle->xno = (PI * 2.) / (t0 * 365.25 * MINUTES_PER_DAY);
+      tle->xno = (PI * 2.) / (t0 * 365.25 * minutes_per_day);
                      /* xno is now in radians per minute */
       tle->eo = elem->ecc;
             /* Address these three values later: */
