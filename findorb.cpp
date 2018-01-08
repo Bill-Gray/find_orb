@@ -2402,9 +2402,6 @@ int main( const int argc, const char **argv)
    clear( );
    if( debug_level > 7)
       debug_printf( "clear, ");
-   refresh( );
-   if( debug_level > 7)
-      debug_printf( "refresh, ");
    curses_running = true;
    if( debug_level > 2)
       debug_printf( "(2), ");
@@ -2740,7 +2737,6 @@ int main( const int argc, const char **argv)
                         put_colored_text( tptr, line_no + iline, (int)( tptr - tbuff),
                                        20, COLOR_ATTENTION + 256);
                   iline++;
-                  refresh( );
                   }
                else
                   if( *tbuff == '#' && (unsigned)getmaxx( stdscr)
