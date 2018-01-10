@@ -420,13 +420,11 @@ int inquire( const char *prompt, char *buff, const int max_len,
              real_width, color);
       move( line, col);
       echo( );
-      refresh( );
       rval = getnstr( buff, max_len);
       noecho( );
       }
    else
       {
-      refresh( );
       do
          {
          rval = extended_getch( );
@@ -982,7 +980,6 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
          put_colored_text( "Prev", n_lines + 2, 65, 4, COLOR_HIGHLIT_BUTTON);
          put_colored_text( "End", n_lines + 2, 61, 3, COLOR_HIGHLIT_BUTTON);
          put_colored_text( "Start", n_lines + 2, 55, 5, COLOR_HIGHLIT_BUTTON);
-         refresh( );
          flushinp( );
          c = extended_getch( );
          err_message = 0;
@@ -1740,7 +1737,6 @@ static void show_a_file( const char *filename)
       put_colored_text( buff, i, 0, (int)strlen( buff), msgs[msg_num][0] - '0');
       *err_text = '\0';
       msg_num = 0;
-      refresh( );
       flushinp( );
       c = extended_getch( );
       if( c == KEY_MOUSE)
@@ -1888,7 +1884,6 @@ static void show_a_file( const char *filename)
       }
    fclose( ifile);
    free( index);
-   refresh( );
 }
 
 static int get_epoch_range_of_included_obs( const OBSERVE FAR *obs,
@@ -2812,7 +2807,6 @@ int main( const int argc, const char **argv)
                            (xloc < 0 ? 0 : xloc), -1, COLOR_MESSAGE_TO_USER);
          }
       add_off_on = -1;
-      refresh( );
       move( getmaxy( stdscr) - 1, 0);
       if( c == AUTO_REPEATING)
          if( curses_kbhit( ) != ERR)
