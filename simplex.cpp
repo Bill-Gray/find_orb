@@ -104,10 +104,17 @@ int simplex_step( double **vects, double *fvals,
 {
    double cent[MAX_DIM];
    int i, j, n_evals = 1;
+#ifndef ANMS    /* "accelerated" Nelder-Mead params */
    const double alpha = 1.;
    const double beta = 1. + 2. / (double)n;
    double gamma = 0.75 - 0.5 / (double)n;
    const double delta = 1. - 1. / (double)n;
+#else       /* original params from Nelder-Mead */
+   const double alpha = 1.;
+   const double beta = 2.;
+   double gamma = 0.5;
+   const double delta = 0.5;
+#endif
 
    sort_simplex( fvals, vects, n + 1);
    for( i = 0; i < n; i++)   /* find centroid of first n points */
