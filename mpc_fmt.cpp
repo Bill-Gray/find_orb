@@ -396,3 +396,108 @@ int get_ra_dec_from_mpc_report( const char *ibuff,
       rval -= 2;
    return( rval);
 }
+
+static const char *net_codes[] = {
+    /* http://www.minorplanetcenter.net/iau/info/CatalogueCodes.html
+         G. V. Williams, 2012, ``Minor Planet Astrophotometry'', PhD
+         thesis, Open University. [2012PhDT.........7W] */
+           "aUSNO-A1",
+           "bUSNO-SA1",
+           "cUSNO-A2",
+           "dUSNO-SA2",
+           "eUCAC-1",
+           "fTycho-1",
+           "gTycho-2",
+           "hGSC-1.0",
+           "iGSC-1.1",
+           "jGSC-1.2",
+           "kGSC-2.2",
+           "lACT",
+           "mGSC-ACT",
+           "nSDSS-DR8",       /* was TRC */
+           "oUSNO-B1",
+           "pPPM",
+           "qUCAC-4",     /* also UCAC2-beta for earlier obs */
+           "rUCAC-2",
+           "sUSNO-B2",
+           "tPPMXL",
+           "uUCAC-3",
+           "vNOMAD",
+           "wCMC-14",
+           "xHIP-2",
+           "yHIP",
+           "zGSC-1.x",
+           "AAC",
+           "BSAO 1984",
+           "CSAO",
+           "DAGK 3",
+           "EFK4",
+           "FACRS",
+           "GLick Gaspra Catalogue",
+           "HIda93 Catalogue",
+           "IPerth 70",
+           "JCOSMOS/UKST Southern Sky Catalogue",
+           "KYale",
+           "L2MASS", /* used for WISE & PanSTARRS astrometry */
+           "MGSC-2.3",
+           "NSDSS-DR7",
+           "OSST-RC1",
+           "PMPOSC3",
+           "QCMC-15",
+           "RSST-RC4",
+           "SURAT-1",
+           "TURAT-2",
+           "UGAIA-DR1",
+           "VGAIA-DR2",
+           "WUCAC-5",
+           NULL };
+
+const char *byte_code_to_net_name( const char byte_code)
+{
+   size_t i;
+
+   for( i = 0; net_codes[i]; i++)
+      if( byte_code == net_codes[i][0])
+         return( net_codes[i] + 1);
+   return( NULL);
+}
+
+/* Code to get around the fact that people (probably shouldn't,  but do)
+specify NETs in a variety of nonstandard ways,  such as
+
+NET Gaia DR1.0
+NET Gaia DR1
+NET Gaia-DR1
+NET Gaiadr1
+
+   If the names match after ignoring '.0', '-',  and spaces and
+upper/lower case,  we've almost assuredly got the right catalog.   */
+
+static void reduce_net_name( char *obuff, const char *ibuff)
+{
+   while( *ibuff)
+      if( *ibuff == '-' || *ibuff == ' ')
+         ibuff++;
+      else if( ibuff[0] == '.' && ibuff[1] == '0')
+         ibuff += 2;
+      else
+         *obuff++ = toupper( *ibuff++);
+   *obuff = '\0';
+}
+
+char net_name_to_byte_code( const char *net_name)
+{
+   char net1[80], net2[80], rval = 0;
+   size_t i;
+
+   reduce_net_name( net1, net_name);
+   for( i = 0; net_codes[i]; i++)
+      {
+      reduce_net_name( net2, net_codes[i] + 1);
+      if( !strcmp( net1, net2))
+         rval = net_codes[i][0];
+      }
+   if( !rval)     /* didn't find it */
+      rval = '?';
+   return( rval);
+}

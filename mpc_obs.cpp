@@ -4249,83 +4249,6 @@ static size_t strip_trailing_zeroes( char *buff)
    return( i);
 }
 
-int text_search_and_replace( char FAR *str, const char *oldstr,
-                                     const char *newstr);   /* ephem0.cpp */
-
-/* Code to get around the fact that people (probably shouldn't,  but do)
-specify NETs in a variety of nonstandard ways,  such as
-
-NET Gaia DR1.0
-NET Gaia DR1
-NET Gaia-DR1
-NET Gaiadr1       */
-
-static void reduce_net_name( char *reduced, const char *ibuff)
-{
-   strncpy( reduced, ibuff, 79);
-   text_search_and_replace( reduced, "-", "");
-   text_search_and_replace( reduced, " ", "");
-   text_search_and_replace( reduced, ".0", "");
-}
-
-static const char *net_codes[] = {
-    /* http://www.minorplanetcenter.net/iau/info/CatalogueCodes.html
-         G. V. Williams, 2012, ``Minor Planet Astrophotometry'', PhD
-         thesis, Open University. [2012PhDT.........7W] */
-           "aUSNO-A1",
-           "bUSNO-SA1",
-           "cUSNO-A2",
-           "dUSNO-SA2",
-           "eUCAC-1",
-           "fTycho-1",
-           "gTycho-2",
-           "hGSC-1.0",
-           "iGSC-1.1",
-           "jGSC-1.2",
-           "kGSC-2.2",
-           "lACT",
-           "mGSC-ACT",
-           "nSDSS-DR8",       /* was TRC */
-           "oUSNO-B1",
-           "pPPM",
-           "qUCAC-4",     /* also UCAC2-beta for earlier obs */
-           "rUCAC-2",
-           "sUSNO-B2",
-           "tPPMXL",
-           "uUCAC-3",
-           "vNOMAD",
-           "wCMC-14",
-           "xHIP-2",
-           "yHIP",
-           "zGSC-1.x",
-           "AAC",
-           "BSAO 1984",
-           "CSAO",
-           "DAGK 3",
-           "EFK4",
-           "FACRS",
-           "GLick Gaspra Catalogue",
-           "HIda93 Catalogue",
-           "IPerth 70",
-           "JCOSMOS/UKST Southern Sky Catalogue",
-           "KYale",
-           "L2MASS", /* used for WISE & PanSTARRS astrometry */
-           "MGSC-2.3",
-           "NSDSS-DR7",
-           "OSST-RC1",
-           "PMPOSC3",
-           "QCMC-15",
-           "RSST-RC4",
-           "SURAT-1",
-           "TURAT-2",
-           "UGAIA-DR1",
-           "VGAIA-DR2",
-           "WUCAC-5",
-           NULL };
-
-#ifdef _MSC_VER
-   #define strcasecmp _stricmp
-#endif
 
 /* get_net_used_from_obs_header( ) looks through the observation header
 for the given MPC code for a line starting with 'NET '.  It then looks
@@ -4337,22 +4260,12 @@ static char get_net_used_from_obs_header( const char *mpc_code)
 {
    const char **lines;
    char rval = ' ';
-   size_t i, j;
+   size_t i;
 
    if( obs_details && (lines = get_code_details( obs_details, mpc_code)) != NULL)
       for( i = 0; lines[i] && rval == ' '; i++)
          if( !memcmp( lines[i], "NET ", 4))
-            {
-            char net1[80], net2[80];
-
-            reduce_net_name( net1, lines[i] + 4);
-            for( j = 0; net_codes[j]; j++)
-               {
-               reduce_net_name( net2, net_codes[j] + 1);
-               if( !strcasecmp( net1, net2))
-                  rval = net_codes[j][0];
-               }
-            }
+            rval = net_name_to_byte_code( lines[i] + 4);
    return( rval);
 }
 
@@ -4531,7 +4444,7 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
       case 3:
          {
          DPT sun_alt_az, object_alt_az;
-         int i;
+         const char *net_name = byte_code_to_net_name( optr->mag_band2);
 
          if( optr->posn_sigma_1 > 1.01 || optr->posn_sigma_1 < .99
                   || optr->posn_sigma_1 != optr->posn_sigma_2)
@@ -4560,6 +4473,7 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
             strcat( buff, "  ");
          if( !get_obs_alt_azzes( optr, &sun_alt_az, &object_alt_az))
             {
+
             sprintf( buff + strlen( buff), "Obj alt %.1f",
                       object_alt_az.y);
             if( object_alt_az.x > -1.)
@@ -4603,12 +4517,11 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
                }
 #endif
             }
-         for( i = 0; net_codes[i]; i++)
-            if( optr->mag_band2 == net_codes[i][0])
-               {
-               strcat( buff, "  ");
-               strcat( buff, net_codes[i] + 1);
-               }
+         if( net_name)
+            {
+            strcat( buff, "  ");
+            strcat( buff, net_name);
+            }
          }
          break;
       case 4:
