@@ -469,7 +469,7 @@ int main( const int argc, const char **argv)
    double *slopes = (double *)calloc( max_n_params * 6, sizeof( double));
    double *vectors, worst_resid_in_run = 0., worst_mjd = 0.;
    double tdt = 0., *computed_vects;
-   int ephem;
+   int ephem, progress_bar_freq = 2;
    tle_t tle;
    const time_t t0 = time( NULL);
    double step;
@@ -855,12 +855,20 @@ int main( const int argc, const char **argv)
       tles_written++;
       count++;
       line++;
-      if( ofile != stdout && !(line % 50))
+      if( ofile != stdout && !(line % progress_bar_freq))
          {
-         printf( "Line %d of %u (%u%% done): %d written, JD %f\r",
+         static clock_t t0;
+         const clock_t t1 = clock( );
+
+         printf( "Line %d of %u (%u%% done): %d written, JD %f   \r",
                   line, total_lines, line * 100 * output_freq / total_lines,
                   tles_written, tdt);
          fflush( stdout);
+         if( t1 - t0 < CLOCKS_PER_SEC / 2)
+            progress_bar_freq <<= 1;
+         else if( progress_bar_freq > 1)
+            progress_bar_freq >>= 1;
+         t0 = t1;
          }
       tdt += step * (double)output_freq;
       }
