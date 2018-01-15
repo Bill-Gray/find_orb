@@ -187,14 +187,10 @@ static int iterated_vector_to_tle( tle_t *tle, const double *state_vect,
             {
             if( tle->xmo > PI)
                tle->xmo -= PI + PI;
-            printf( "Orig epoch: %f;  MA %f;  period %f days\n",
-                        tle->epoch, tle->xmo * 180. / PI,
-                        2. * PI / (tle->xno * minutes_per_day));
             if( tle->xmo > 0.)
                tle->epoch += (PI - tle->xmo) / (tle->xno * minutes_per_day);
             else
                tle->epoch -= (PI + tle->xmo) / (tle->xno * minutes_per_day);
-            printf( "Result : %f\n", tle->epoch);
             tle->xmo = PI;
             }
          if( iter < 4)
@@ -309,7 +305,6 @@ params[5] = log( mean_motion)
 any set of six real values put into params[] will map to a TLE.
 */
 
-
 static void set_params_from_tle( double *params, const tle_t *tle)
 {
    const double lon_perih = tle->omegao + tle->xnodeo;
@@ -353,127 +348,96 @@ static void set_tle_from_params( tle_t *tle, const double *params)
    tle->omegao = zero_to_two_pi( tle->omegao);
 }
 
-static void set_simplex_value( tle_t *tle, double *simp,
-                  const double *state_vect, const int ephem,
-                  const unsigned n_steps, const double step_size)
+void init_simplex( double **vects, double *fvals,
+         double (*f)( void *context, const double *vect),
+               void *context, const int n);        /* simplex.c */
+int simplex_step( double **vects, double *fvals,
+         double (*f)( void *context, const double *vect),
+               void *context, const int n);        /* simplex.c */
+
+typedef struct
+   {
+   unsigned n_steps;
+   int ephem;
+   double step_size;
+   const double *state_vect;
+   double *tle_vect;
+   tle_t *base_tle;
+   } simplex_context_t;
+
+static void evaluate_tle( const tle_t *tle, double *ivect,
+            const double step_size, const int ephem, const unsigned n_steps,
+            const double *ref)
 {
-   double err = 0.;
    unsigned j;
 
-   set_tle_from_params( tle, simp);
    for( j = 0; j < n_steps; j++)
-      {
-      double state_out[6];
-      size_t i;
-
-      get_sxpx( ephem, tle, state_out, (double)(int)(j - n_steps / 2) * step_size);
-      for( i = 0; i < (n_steps > 1 ? 3 : 6); i++)
-         {
-         const double delta = state_out[i] - state_vect[i];
-
-         err += delta * delta;
-         }
-      state_vect += 6;
-      }
-   simp[6] = err;
+      get_sxpx( ephem, tle, ivect + j * 6,
+               (double)(int)(j - n_steps / 2) * step_size);
+   if( ref)
+      for( j = 6 * n_steps; j; j--)
+         *ivect++ -= *ref++;
 }
 
-/* Tries a simplex 'extrapolation'.  If the result is an improvement,
-the sixth ("high") point is replaced.   */
+static double simplex_scoring( void *icontext, const double *ivect)
+{
+   const simplex_context_t *context = (const simplex_context_t *)icontext;
+   double err = 0.;
+   unsigned i, j;
+   tle_t tle = *(context->base_tle);
+
+   set_tle_from_params( &tle, ivect);
+   evaluate_tle( &tle, context->tle_vect, context->step_size,
+                  context->ephem, context->n_steps, context->state_vect);
+   for( j = 0; j < context->n_steps; j++)
+      {
+      double *tptr = context->tle_vect + j * 6;
+
+      for( i = 0; i < (context->n_steps > 1 ? 3 : 6); i++)
+         err += tptr[i] * tptr[i];
+      }
+   err /= (double)context->n_steps;
+   return( err);
+}
 
 #define MAX_PARAMS 10
-
-static double try_new_simplex( tle_t *tle, double simp[MAX_PARAMS][MAX_PARAMS],
-             const double *state_vect, const double extrap, const int ephem,
-                        const unsigned n_steps, const double step_size)
-{
-   size_t i, j;
-   const double frac = (1. - extrap) / 6.;
-   double new_simplex[MAX_PARAMS];
-
-   for( i = 0; i < 6; i++)
-      new_simplex[i] = extrap * simp[6][i];
-   for( i = 0; i < 6; i++)
-      for( j = 0; j < 6; j++)
-         new_simplex[i] += frac * simp[j][i];
-   set_simplex_value( tle, new_simplex, state_vect, ephem, n_steps, step_size);
-   if( new_simplex[6] < simp[6][6])   /* it's a "better" (lower) point */
-      memcpy( simp[6], new_simplex, 7 * sizeof( double));
-   return( new_simplex[6]);
-}
-
-static void sort_simplices( double simp[MAX_PARAMS][MAX_PARAMS])
-{
-   size_t i = 0;
-
-   while( i < 6)     /* sort simplices,  low to high */
-      if( simp[i][6] > simp[i + 1][6])
-         {
-         double swap_array[MAX_PARAMS];
-
-         memcpy( swap_array, simp[i], 7 * sizeof( double));
-         memcpy( simp[i], simp[i + 1], 7 * sizeof( double));
-         memcpy( simp[i + 1], swap_array, 7 * sizeof( double));
-         if( i)
-            i--;
-         }
-      else
-         i++;
-}
 
 int simplex_search( tle_t *tle, const double *starting_params,
                         const double *state_vect, const int ephem,
                         const unsigned n_steps, const double step_size)
 {
-   double simp[MAX_PARAMS][MAX_PARAMS];
-   size_t i, j, iter;
+   double simp[MAX_PARAMS * MAX_PARAMS];
+   double *vects[MAX_PARAMS], fvals[MAX_PARAMS];
+   size_t i, iter;
    const size_t max_iter = 3000;
    bool done = false;
+   simplex_context_t context;
 
+   for( i = 0; i < MAX_PARAMS; i++)
+      vects[i] = simp + i * MAX_PARAMS;
    for( i = 0; i < 7; i++)
       {
-      const double delta = .1;
+      const double delta = .4;
 
-      memcpy( simp[i], starting_params, 6 * sizeof( double));
-      if( i == 1 || i == 2)      /* terms involving eccentricity; */
-         simp[i][i - 1] *= 1. - delta;    /* nudge to smaller e */
+      memcpy( vects[i], starting_params, 6 * sizeof( double));
       if( i)
-         simp[i][i - 1] += delta;
-      set_simplex_value( tle, simp[i], state_vect, ephem, n_steps, step_size);
+         vects[i][i - 1] += delta;
       }
+   context.n_steps = n_steps;
+   context.ephem = ephem;
+   context.step_size = step_size;
+   context.state_vect = state_vect;
+   context.tle_vect = (double *)calloc( 6 * n_steps, sizeof( double));
+   context.base_tle = tle;
+   init_simplex( vects, fvals, simplex_scoring, &context, 6);
    for( iter = 0; !done && iter < max_iter; iter++)
       {
-      double new_score, orig_score;
-
-      sort_simplices( simp);
-      orig_score = simp[6][6];
-      if( orig_score / simp[0][6] < 1.00001 || simp[0][6] < MIN_DELTA_SQUARED)
+      simplex_step( vects, fvals, simplex_scoring, &context, 6);
+      if( fvals[6] / fvals[0] < 1.01 || fvals[0] < MIN_DELTA_SQUARED)
          done = true;
-      new_score = try_new_simplex( tle, simp, state_vect, -1., ephem,
-                                                      n_steps, step_size);
-      if( new_score < simp[0][6])     /* best point so far;  try an extrap */
-         {
-         try_new_simplex( tle, simp, state_vect, 2., ephem,
-                        n_steps, step_size);  /* try expansion */
-         }
-      else if( new_score >= simp[5][6])
-         {
-         const double fraction = (new_score < orig_score ? .5 : -.5);
-
-         if( try_new_simplex( tle, simp, state_vect, fraction, ephem,
-                        n_steps, step_size) > simp[5][6])
-            {
-//          printf( "Contract (iter %d)\n", (int)iter);
-            for( i = 1; i < 7; i++)
-               {              /* contract around lowest point */
-               for( j = 0; j < 6; j++)
-                  simp[i][j] = (simp[i][j] + simp[0][j]) / 2.;
-               set_simplex_value( tle, simp[i], state_vect, ephem, n_steps, step_size);
-               }
-            }
-         }
       }
-   set_tle_from_params( tle, simp[0]);
+   free( context.tle_vect);
+   set_tle_from_params( tle, vects[0]);
    return( 0);
 }
 
@@ -499,7 +463,7 @@ int main( const int argc, const char **argv)
    const char *intl_desig = default_intl_desig;
    double *slopes = (double *)calloc( max_n_params * 6, sizeof( double));
    double *vectors, worst_resid_in_run = 0., worst_mjd = 0.;
-   double tdt = 0.;
+   double tdt = 0., *computed_vects;
    int ephem;
    tle_t tle;
    const time_t t0 = time( NULL);
@@ -508,7 +472,6 @@ int main( const int argc, const char **argv)
    int histo_counts[N_HIST_BINS];
    static int histo_divs[N_HIST_BINS] = { 1, 3, 10, 30, 100, 300, 1000, 3000, 10000, 30000 };
    double levenberg_marquardt_lambda0 = 0.;
-   int n_damped = 0;
 
    if( argc < 2)
       error_exit( -1);
@@ -561,8 +524,7 @@ int main( const int argc, const char **argv)
                intl_desig = argv[i] + 2;
                break;
             case 'l': case 'L':
-               sscanf( argv[i] + 2, "%lf,%d",
-                  &levenberg_marquardt_lambda0, &n_damped);
+               sscanf( argv[i] + 2, "%lf", &levenberg_marquardt_lambda0);
                break;
             case 'r':
                srand( atoi( argv[i] + 2));
@@ -581,7 +543,9 @@ int main( const int argc, const char **argv)
                error_exit( -2);
             }
 
-   vectors = (double *)calloc( 6 * output_freq, sizeof( double));
+   vectors = (double *)calloc( 12 * output_freq, sizeof( double));
+   assert( vectors);
+   computed_vects = vectors + 6 * output_freq;
    tle.norad_number = atoi( norad_desig);
    strcpy( tle.intl_desig, intl_desig);
    if( !ifile)
@@ -717,16 +681,16 @@ int main( const int argc, const char **argv)
                      output_freq, step * minutes_per_day);
          }
 
-      int lsquare_rval, failure = 0, iter;
+      int lsquare_rval, use_damping = 1, iter;
       char obuff[200];
       double worst_resid = 1e+20;
       tle_t tle_to_output = tle;
 
       if( verbose)
          printf( "   least-square fitting\n");
-      if( ephem == -1)     /* failed from the get-go */
-         failure = -1;
-      for( iter = 0; iter < n_iterations && !failure; iter++)
+//    if( ephem == -1)     /* failed from the get-go */
+//       failure = -1;
+      for( iter = 0; iter < n_iterations; iter++)
          {
          void *lsquare = lsquare_init( n_params);
          double state0[6], params[max_n_params];
@@ -734,16 +698,27 @@ int main( const int argc, const char **argv)
          double this_worst_resid = 0.;
          extern double levenberg_marquardt_lambda;
 
-         if( !iter)
-            levenberg_marquardt_lambda = levenberg_marquardt_lambda0;
-         else if( iter == n_damped)
+         evaluate_tle( &tle, computed_vects, step * minutes_per_day, ephem, output_freq,
+                           vectors);
+         for( i = 0; i < output_freq * 6; i += 6)
+            for( j = 0; j < 3; j++)
+               if( this_worst_resid < fabs( computed_vects[i + j]))
+                  this_worst_resid = fabs( computed_vects[i + j]);
+         this_worst_resid *= AU_IN_KM;
+         if( this_worst_resid < worst_resid)
+            {        /* improvement,  or at least minor worsening */
+            worst_resid = this_worst_resid;
+            tle_to_output = tle;
             levenberg_marquardt_lambda = 0.;
+            }
+         else     /* not doing well:  let's try dampened iterations */
+            levenberg_marquardt_lambda += levenberg_marquardt_lambda0;
+         if( use_damping)
+            levenberg_marquardt_lambda += levenberg_marquardt_lambda0;
          if( verbose)
             {
             write_elements_in_tle_format( obuff, &tle);
-            printf( "Iter %d:\n%s\n", iter, obuff);
-//          if( verbose > 1)
-//             getch( );
+            printf( "Iter %d: worst resid %f\n%s\n", iter, this_worst_resid, obuff);
             }
          set_params_from_tle( params, &tle);
          for( j = 0; j < output_freq; j++)
@@ -803,19 +778,14 @@ int main( const int argc, const char **argv)
                printf( "\n");
             }
 
-         rms_change = sqrt( rms_change / (double)output_freq);
-         this_worst_resid = sqrt( this_worst_resid) * AU_IN_KM;
-         if( verbose)
-            printf( "Change = %f; worst = %f;  bstar %f\n",
-                           rms_change * AU_IN_KM,
-                           this_worst_resid, tle.bstar);
          lsquare_rval = lsquare_solve( lsquare, differences);
          lsquare_free( lsquare);
+         use_damping = 0;
          if( lsquare_rval)
             {
             printf( "ERROR %d in lsquare soln: MJD %f\n",
                            lsquare_rval, tdt - 2400000.5);
-            failure = 1;
+            use_damping = 1;
             }
          else if( tle.ephemeris_type == EPHEM_TYPE_HIGH)
             {
@@ -834,11 +804,6 @@ int main( const int argc, const char **argv)
             set_tle_from_params( &tle, params);
             if( verbose)
                printf( "  change in TLE = %f\n", rms_change);
-            }
-         if( !iter || (!failure && this_worst_resid < worst_resid))
-            {     /* this is 'our best TLE yet' */
-            tle_to_output = tle;
-            worst_resid = this_worst_resid;
             }
          }
 
@@ -899,11 +864,9 @@ int main( const int argc, const char **argv)
       {
       fprintf( ofile, "Worst residual in entire run: %.2f km on MJD %.1f\n",
                                    worst_resid_in_run, worst_mjd);
-      fprintf( ofile, "       ");
-      for( i = 0; i < N_HIST_BINS - 2; i++)
-         fprintf( ofile, "%-6d", histo_divs[i]);
-      fprintf( ofile, "km\n");
-      for( i = 0; i < N_HIST_BINS - 1; i++)
+      fprintf( ofile, "       1     3     10    30    100   300"
+                      "   1K    3K    10K   km\n");
+      for( i = 0; i < N_HIST_BINS; i++)
          fprintf( ofile, "%6d", histo_counts[i]);
       fprintf( ofile, "\n");
       if( ofile != stdout)

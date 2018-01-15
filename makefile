@@ -85,8 +85,8 @@ find_orb$(EXE):          findorb.o $(OBJS)
 fo$(EXE):          fo.o $(OBJS)
 	$(CC) -o fo$(EXE) fo.o $(OBJS) $(LIBS)
 
-eph2tle$(EXE):          eph2tle.o conv_ele.o elem2tle.o lsquare.o
-	$(CC) -o eph2tle$(EXE) eph2tle.o conv_ele.o elem2tle.o lsquare.o $(LIBS)
+eph2tle$(EXE):          eph2tle.o conv_ele.o elem2tle.o simplex.o lsquare.o
+	$(CC) -o eph2tle$(EXE) eph2tle.o conv_ele.o elem2tle.o simplex.o lsquare.o $(LIBS)
 
 cssfield$(EXE):          cssfield.o
 	$(CC) -o cssfield$(EXE) cssfield.o $(LIBS)
