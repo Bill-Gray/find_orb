@@ -446,8 +446,13 @@ of date.  I _think_ that's right,  but it's possible that nutation should be
 included as well,  and even possible that SxPx assumes true orientation of
 date:  i.e.,  the full set of earth orientation parameters,  including
 proper motions and offsets from the IAU nutation theories,  ought to be used.
-*/
 
+  The 'bulletin number' is in days since 2018 Jan 0,  or zero for TLEs
+computed before then.  Hence,  BULLETIN_EPOCH = days from 1970 Jan 1
+to 2018 Jan 0.  This will work until 2045 May 18.  At that point... well,
+I'm not using the 'revolution number at epoch' field at present.  */
+
+#define BULLETIN_EPOCH 17531
 #define N_HIST_BINS 10
 
 int main( const int argc, const char **argv)
@@ -480,6 +485,7 @@ int main( const int argc, const char **argv)
    memset( &tle, 0, sizeof( tle_t));
    tle.classification = 'U';
    tle.ephemeris_type = EPHEM_TYPE_DEFAULT;
+   tle.bulletin_number = (int)( t0 / seconds_per_day - BULLETIN_EPOCH);
    for( i = 1; i < argc; i++)
       if( argv[i][0] == '-')
          switch( argv[i][1])
