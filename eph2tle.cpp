@@ -359,21 +359,22 @@ typedef struct
    {
    unsigned n_steps;
    int ephem;
-   double step_size;
+   double step_size, ephem_start;
    const double *state_vect;
    double *tle_vect;
    tle_t *base_tle;
    } simplex_context_t;
 
 static void evaluate_tle( const tle_t *tle, double *ivect,
-            const double step_size, const int ephem, const unsigned n_steps,
+            const double step_size, const double ephem_start,
+            const int ephem, const unsigned n_steps,
             const double *ref)
 {
    unsigned j;
 
    for( j = 0; j < n_steps; j++)
       get_sxpx( ephem, tle, ivect + j * 6,
-               (double)(int)(j - n_steps / 2) * step_size);
+               (ephem_start - tle->epoch) * minutes_per_day + (double)j * step_size);
    if( ref)
       for( j = 6 * n_steps; j; j--)
          *ivect++ -= *ref++;
@@ -387,7 +388,7 @@ static double simplex_scoring( void *icontext, const double *ivect)
    tle_t tle = *(context->base_tle);
 
    set_tle_from_params( &tle, ivect);
-   evaluate_tle( &tle, context->tle_vect, context->step_size,
+   evaluate_tle( &tle, context->tle_vect, context->step_size, context->ephem_start,
                   context->ephem, context->n_steps, context->state_vect);
    for( j = 0; j < context->n_steps; j++)
       {
@@ -404,7 +405,8 @@ static double simplex_scoring( void *icontext, const double *ivect)
 
 int simplex_search( tle_t *tle, const double *starting_params,
                         const double *state_vect, const int ephem,
-                        const unsigned n_steps, const double step_size)
+                        const unsigned n_steps, const double step_size,
+                        const double ephem_start)
 {
    double simp[MAX_PARAMS * MAX_PARAMS];
    double *vects[MAX_PARAMS], fvals[MAX_PARAMS];
@@ -429,6 +431,7 @@ int simplex_search( tle_t *tle, const double *starting_params,
    context.state_vect = state_vect;
    context.tle_vect = (double *)calloc( 6 * n_steps, sizeof( double));
    context.base_tle = tle;
+   context.ephem_start = ephem_start;
    init_simplex( vects, fvals, simplex_scoring, &context, 6);
    for( iter = 0; !done && iter < max_iter; iter++)
       {
@@ -684,7 +687,7 @@ int main( const int argc, const char **argv)
             ephem = 0;
          set_params_from_tle( start_params, &tle);
          simplex_search( &tle, start_params, vectors, ephem,
-                     output_freq, step * minutes_per_day);
+                     output_freq, step * minutes_per_day, jd_utc);
          }
 
       int lsquare_rval, use_damping = 1, iter;
@@ -704,8 +707,8 @@ int main( const int argc, const char **argv)
          double this_worst_resid = 0.;
          extern double levenberg_marquardt_lambda;
 
-         evaluate_tle( &tle, computed_vects, step * minutes_per_day, ephem, output_freq,
-                           vectors);
+         evaluate_tle( &tle, computed_vects, step * minutes_per_day, jd_utc,
+                     ephem, output_freq, vectors);
          for( i = 0; i < output_freq * 6; i += 6)
             for( j = 0; j < 3; j++)
                if( this_worst_resid < fabs( computed_vects[i + j]))
