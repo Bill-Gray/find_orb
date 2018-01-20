@@ -76,10 +76,16 @@ doing a sufficiently exhaustive search in such cases. */
 #define AU_IN_METERS (AU_IN_KM * 1000.)
 #define PI 3.1415926535897932384626433832795028841971693993751058209749445923078
 
+#define FIT_DEFAULTS 0
+#define FIT_BSTAR    1
+#define FIT_EPOCH    2
+#define FIT_BOTH     3
+
 int vector_to_tle( tle_t *tle, const double *state_vect, const double epoch);
 
 int verbose = 0;
 int use_eight = 0, params_to_set = N_SAT_PARAMS;
+int fitted = FIT_DEFAULTS;
 
 #define EPHEM_TYPE_DEFAULT    '0'
 #define EPHEM_TYPE_SGP        '1'
@@ -318,7 +324,10 @@ static void set_params_from_tle( double *params, const tle_t *tle)
    params[3] = tan_half_incl * cos( tle->xnodeo);     /* q */
    params[4] = mean_lon;
    params[5] = log( tle->xno);
-// params[6] = tle->bstar;
+   if( fitted & FIT_BSTAR)
+      params[6] = tle->bstar;
+   if( fitted & FIT_EPOCH)
+      params[6 + (fitted & 1)] = tle->epoch;
 }
 
 static double zero_to_two_pi( double ival)
@@ -342,10 +351,13 @@ static void set_tle_from_params( tle_t *tle, const double *params)
    tle->omegao = lon_perih - tle->xnodeo;
    tle->xmo    = params[4] - lon_perih;
    tle->xno    = exp( params[5]);
-// tle->bstar  = params[6];
    tle->xmo = zero_to_two_pi( tle->xmo);
    tle->xnodeo = zero_to_two_pi( tle->xnodeo);
    tle->omegao = zero_to_two_pi( tle->omegao);
+   if( fitted & FIT_BSTAR)
+      tle->bstar = params[6];
+   if( fitted & FIT_EPOCH)
+      tle->epoch = params[6 + (fitted & 1)];
 }
 
 void init_simplex( double **vects, double *fvals,
@@ -414,14 +426,19 @@ int simplex_search( tle_t *tle, const double *starting_params,
    const size_t max_iter = 3000;
    bool done = false;
    simplex_context_t context;
+   size_t n_params = 6;
 
+   if( fitted == FIT_BOTH)
+      n_params = 8;
+   else if( fitted)
+      n_params = 7;
    for( i = 0; i < MAX_PARAMS; i++)
       vects[i] = simp + i * MAX_PARAMS;
-   for( i = 0; i < 7; i++)
+   for( i = 0; i <= n_params; i++)
       {
       const double delta = .4;
 
-      memcpy( vects[i], starting_params, 6 * sizeof( double));
+      memcpy( vects[i], starting_params, n_params * sizeof( double));
       if( i)
          vects[i][i - 1] += delta;
       }
@@ -432,11 +449,11 @@ int simplex_search( tle_t *tle, const double *starting_params,
    context.tle_vect = (double *)calloc( 6 * n_steps, sizeof( double));
    context.base_tle = tle;
    context.ephem_start = ephem_start;
-   init_simplex( vects, fvals, simplex_scoring, &context, 6);
+   init_simplex( vects, fvals, simplex_scoring, &context, (int)n_params);
    for( iter = 0; !done && iter < max_iter; iter++)
       {
-      simplex_step( vects, fvals, simplex_scoring, &context, 6);
-      if( fvals[6] / fvals[0] < 1.01 || fvals[0] < MIN_DELTA_SQUARED)
+      simplex_step( vects, fvals, simplex_scoring, &context, (int)n_params);
+      if( fvals[n_params] / fvals[0] < 1.01 || fvals[0] < MIN_DELTA_SQUARED)
          done = true;
       }
    free( context.tle_vect);
@@ -499,8 +516,13 @@ int main( const int argc, const char **argv)
             case 'v': case 'V':
                verbose = 1 + atoi( argv[i] + 2);
                break;
-            case '7':
-               n_params = 7;        /* fit bstar,  too */
+            case 'b':
+               fitted |= FIT_BSTAR;
+               n_params++;
+               break;
+            case 'e':
+               fitted |= FIT_EPOCH;
+               n_params++;
                break;
             case '8':
                use_eight = 1;
@@ -674,7 +696,7 @@ int main( const int argc, const char **argv)
          }
       else
          {
-         double start_params[6];
+         double start_params[max_n_params];
 
          i = output_freq / 2;    /* use middle vector;  it improves the */
          tle.epoch += (double)i * step;      /* convergence for simplex */
@@ -689,6 +711,7 @@ int main( const int argc, const char **argv)
          simplex_search( &tle, start_params, vectors, ephem,
                      output_freq, step * minutes_per_day, jd_utc);
          }
+
 
       int lsquare_rval, use_damping = 1, iter;
       char obuff[200];
