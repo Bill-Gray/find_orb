@@ -883,7 +883,7 @@ int write_out_elements_to_file( const double *orbit,
    double rel_orbit[6], orbit2[6];
    int planet_orbiting, n_lines, i, bad_elements;
    ELEMENTS elem, helio_elem;
-   char *tptr, *tbuff = (char *)malloc( 80 * 9);
+   char *tptr, *tbuff;
    char impact_buff[80];
    int n_more_moids = 0;
    int output_format = (precision | SHOWELEM_PERIH_TIME_MASK);
@@ -913,8 +913,8 @@ int write_out_elements_to_file( const double *orbit,
    if( !curr_epoch || !epoch_shown)
       {
       fprintf( ofile, "%s\nNo elements available\n", object_name);
-      observation_summary_data( tbuff, obs, n_obs, options);
-      fprintf( ofile, "%s\n", tbuff);
+      observation_summary_data( buff, obs, n_obs, options);
+      fprintf( ofile, "%s\n", buff);
       fclose( ofile);
       return( -1);
       }
@@ -1010,6 +1010,7 @@ int write_out_elements_to_file( const double *orbit,
    helio_elem.central_obj = 0;
    helio_elem.gm = SOLAR_GM;
    calc_classical_elements( &helio_elem, orbit2, epoch_shown, 1);
+   tbuff = (char *)malloc( 80 * 9);
    n_lines = elements_in_mpc_format( tbuff, &elem, object_name,
                is_cometary( constraints) && fabs( elem.ecc - 1.) < 1.e-6,
                output_format);
