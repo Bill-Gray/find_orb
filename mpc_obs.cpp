@@ -967,13 +967,15 @@ static int get_obs_alt_azzes( const OBSERVE FAR *obs, DPT *sun_alt_az,
       object_alt_az->x = sun_alt_az->x = -99.;  /* flag azimuths as meaningless */
       rval = 0;
       }
-   sun_alt_az->x *= 180. / PI;
-   sun_alt_az->x += 180.;
-   sun_alt_az->y *= 180. / PI;
-   object_alt_az->x *= 180. / PI;
-   object_alt_az->x += 180.;
-   object_alt_az->y *= 180. / PI;
-
+   if( !rval)
+      {
+      sun_alt_az->x *= 180. / PI;
+      sun_alt_az->x += 180.;
+      sun_alt_az->y *= 180. / PI;
+      object_alt_az->x *= 180. / PI;
+      object_alt_az->x += 180.;
+      object_alt_az->y *= 180. / PI;
+      }
    return( rval);
 }
 
@@ -1935,6 +1937,7 @@ static int xref_designation( char *desig)
       while( fgets( buff, sizeof( buff), ifile))
          if( *buff != ';' && *buff >= ' ')
             n_lines++;
+      assert( n_lines);
       xlate_table = (char *)malloc( n_lines * 26);
 
       fseek( ifile, 0L, SEEK_SET);
@@ -3164,7 +3167,6 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
          if( sscanf( buff + 80, "%lf%lf%n", &sig1, &sig2, &bytes_read) >= 2
                      && bytes_read >= 10)
             {
-            ilen = 80;
             buff[80] = '\0';
             rwo_posn_sigma_1 = sig1;
             rwo_posn_sigma_2 = sig2;
