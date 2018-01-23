@@ -581,7 +581,7 @@ static double inverf( const double y)
       const double dy = erf( x) - y;
       const double slope = (2. / SQRT_PI) * exp( -x * x);
 
-      diff = -dy / slope;   /* Just doing this would be Newton-Raphson */
+/*    diff = -dy / slope;      Just doing this would be Newton-Raphson */
       diff = -dy / (slope + x * dy);   /* This gets us Halley's method */
       x += diff;
       }
