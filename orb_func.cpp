@@ -1127,7 +1127,7 @@ int extended_orbit_fit( double *orbit, OBSERVE *obs, int n_obs,
    int n_selected;
    const int n_params = (int)( fit_type & 0xf);
    double orbit_at_epoch[6];
-   void *lsquare = lsquare_init( n_params);
+   void *lsquare;
    double *resids, *slopes;
    double params[10];
    const double delta_val = 1e-6;
