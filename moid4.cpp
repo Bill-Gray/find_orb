@@ -169,7 +169,7 @@ double find_moid( const ELEMENTS *elem1, const ELEMENTS *elem2,
       const ELEMENTS *tptr = elem1;
 
       elem1 = elem2;
-      elem1 = tptr;
+      elem2 = tptr;
       }
    fill_matrix( mat1, elem1);
    fill_matrix( mat2, elem2);
