@@ -566,13 +566,13 @@ most,  four iterations are required,  near y = +/- erf_limit.   */
 static double inverf( const double y)
 {
    double x, diff;
-   const double erf_limit = .95;
+   const double erf_limit = .915;
 
    if( y < -erf_limit)
       return( -inverf( -y));
    else if( y > erf_limit)
       x = sqrt( -log( 1. - y)) - .34;
-   else         /* a passable cubic approximation for -.9 < y < .9 */
+   else         /* a passable cubic approximation for -.915 < y < .915 */
       x = y * (.8963 + y * y * (.0889 + .494 * y * y));
    do
       {
