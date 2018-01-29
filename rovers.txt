@@ -250,3 +250,10 @@ d66 !3554454.89654 +402547.90955  849.87404    DSS 66 Madrid 26-meter
 253 !2430637.66245 +352533.24313 1001.39054    Goldstone DSS 14, Fort Irwin
 257 !2430728.69246 +352015.40307  959.63401    Goldstone DSS 25, Fort Irwin
 
+   Coordinates for proposed LSST and its auxiliary telescope,  from
+   https://arxiv.org/abs/1210.1616 .  Note that this lists several other
+   observatories,  some with coordinates that don't match those given
+   by MPC's ObsCodes.html.
+
+LSS !-704457.90    -301440.68    2663.         Large Synoptic Survey Telescope
+LSA !-704451.80    -301441.27    2663.         LSST Auxiliary 1.4-m
