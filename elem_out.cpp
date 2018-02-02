@@ -123,10 +123,10 @@ const char *sof_filename = "sof.txt";
 extern int forced_central_body;
 void compute_variant_orbit( double *variant, const double *ref_orbit,
                      const double n_sigmas);       /* orb_func.cpp */
-int add_sof_to_file( const char *filename,         /* elem_ou2.cpp */
-             const ELEMENTS *elem,
-             const int n_obs, const OBSERVE *obs);
 void make_config_dir_name( char *oname, const char *iname);  /* miscell.cpp */
+int put_comet_data_into_sof( char *obuff, const char *templat,
+         const ELEMENTS *elem,
+         const int n_obs, const OBSERVE *obs);                /* elem_ou2.cpp */
 
 int debug_printf( const char *format, ...)                 /* runge.cpp */
 #ifdef __GNUC__
@@ -680,6 +680,44 @@ static void clobber_leading_zeroes_in_exponent( char *buff)
                }
       buff++;
       }
+}
+
+#define MAX_SOF_LEN 400
+
+char *get_file_name( char *filename, const char *template_file_name);
+
+/* Write out the elements in SOF (Standard Orbit Format) at the end of an
+existing file,  one in which the first line is the header.      */
+
+static int add_sof_to_file( const char *filename,
+             const ELEMENTS *elem,
+             const int n_obs, const OBSERVE *obs)
+{
+   char templat[MAX_SOF_LEN], obuff[MAX_SOF_LEN];
+   char output_filename[100];
+   FILE *fp;
+   int rval = -1, forking;
+
+   fp = fopen_ext( filename, "ca+b");
+   get_file_name( output_filename, filename);
+   forking = strcmp( output_filename, filename);
+   if( fp)
+      {
+      fseek( fp, 0L, SEEK_SET);
+      if( !fgets( templat, sizeof( templat), fp))
+         assert( 1);
+      if( forking)
+         {
+         fclose( fp);
+         fp = fopen_ext( output_filename, "ca+b");
+         assert( fp);
+         }
+      fseek( fp, 0L, SEEK_END);
+      rval = put_comet_data_into_sof( obuff, templat, elem, n_obs, obs);
+      fwrite( obuff, strlen( obuff), 1, fp);
+      fclose( fp);
+      }
+   return( rval);
 }
 
 /* Code to figure out the delta-V required to rendezvous with an object

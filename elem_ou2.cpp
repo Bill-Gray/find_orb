@@ -34,14 +34,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #ifdef _MSC_VER   /* MSVC/C++ lacks snprintf.  See 'ephem0.cpp' for details. */
 int snprintf( char *string, const size_t max_len, const char *format, ...);
 #endif
-int add_sof_to_file( const char *filename,         /* elem_ou2.cpp */
-             const ELEMENTS *elem,
-             const int n_obs, const OBSERVE *obs);
-FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
-double curr_jd( void);                             /* elem_ou2.cpp */
+double curr_jd( void);
+int put_comet_data_into_sof( char *obuff, const char *templat,
+         const ELEMENTS *elem,
+         const int n_obs, const OBSERVE *obs);                /* elem_ou2.cpp */
 
 const double PI = 3.1415926535897932384626433832795028841971693993751058209749445923;
-
 
 double curr_jd( void)
 {
@@ -211,37 +209,3 @@ int put_comet_data_into_sof( char *obuff, const char *templat,
    return( rval);    /* indicates number of failed fields */
 }
 
-#define MAX_SOF_LEN 400
-
-char *get_file_name( char *filename, const char *template_file_name);
-
-int add_sof_to_file( const char *filename,
-             const ELEMENTS *elem,
-             const int n_obs, const OBSERVE *obs)
-{
-   char templat[MAX_SOF_LEN], obuff[MAX_SOF_LEN];
-   char output_filename[100];
-   FILE *fp;
-   int rval = -1, forking;
-
-   fp = fopen_ext( filename, "ca+b");
-   get_file_name( output_filename, filename);
-   forking = strcmp( output_filename, filename);
-   if( fp)
-      {
-      fseek( fp, 0L, SEEK_SET);
-      if( !fgets( templat, sizeof( templat), fp))
-         assert( 1);
-      if( forking)
-         {
-         fclose( fp);
-         fp = fopen_ext( output_filename, "ca+b");
-         assert( fp);
-         }
-      fseek( fp, 0L, SEEK_END);
-      rval = put_comet_data_into_sof( obuff, templat, elem, n_obs, obs);
-      fwrite( obuff, strlen( obuff), 1, fp);
-      fclose( fp);
-      }
-   return( rval);
-}
