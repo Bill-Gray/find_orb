@@ -18,6 +18,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301, USA.    */
 
 #include <math.h>
+#include <time.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -34,21 +35,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #ifdef _MSC_VER   /* MSVC/C++ lacks snprintf.  See 'ephem0.cpp' for details. */
 int snprintf( char *string, const size_t max_len, const char *format, ...);
 #endif
-double curr_jd( void);
 int put_comet_data_into_sof( char *obuff, const char *templat,
          const ELEMENTS *elem,
          const int n_obs, const OBSERVE *obs);                /* elem_ou2.cpp */
 
 const double PI = 3.1415926535897932384626433832795028841971693993751058209749445923;
-
-double curr_jd( void)
-{
-   const double jd_1970 = 2440587.5;
-   int64_t nanoseconds_since_1970( void);              /* mpc_obs.c */
-
-   return( jd_1970
-          + (double)nanoseconds_since_1970( ) * 1e-9 / seconds_per_day);
-}
 
 int put_comet_data_into_sof( char *obuff, const char *templat,
          const ELEMENTS *elem,
@@ -137,7 +128,11 @@ int put_comet_data_into_sof( char *obuff, const char *templat,
                      }
                break;
             case 'w':        /* Twritten */
-               date_to_put = curr_jd( );
+               {
+               const double jd_1970 = 2440587.5;
+
+               date_to_put = jd_1970 + (double)time( NULL) / seconds_per_day;
+               }
                break;
             default:
                break;

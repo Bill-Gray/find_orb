@@ -87,7 +87,6 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name);
                                                /* ephem0.cpp */
 void set_environment_ptr( const char *env_ptr, const char *new_value);
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
-double curr_jd( void);                             /* elem_ou2.cpp */
 
 /* In this non-interactive version of Find_Orb,  we just print out warning
 messages such as "3 observations were made in daylight" or "couldn't find
@@ -117,6 +116,13 @@ void refresh_console( void)
 
 void move_add_nstr( const int col, const int row, const char *msg, const int n_bytes)
 {
+}
+
+static double curr_jd( void)
+{
+   const double jd_1970 = 2440587.5;
+
+   return( jd_1970 + (double)time( NULL) / seconds_per_day);
 }
 
 static int remove_single_observation_objects( OBJECT_INFO *ids, const int n_ids)
