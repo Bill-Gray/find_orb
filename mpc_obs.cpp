@@ -3078,6 +3078,31 @@ inline int spacewatch_duplication( OBSERVE FAR *obs)
    return( rval);
 }
 
+static inline void check_for_star( const OBSERVE *obs, const int n_obs)
+{
+   double min_ra, max_ra, min_dec, max_dec;
+   int i;
+   const double tolerance = 2. * (PI / 180.) / 3600.;
+
+   min_ra = max_ra = obs[0].ra;
+   min_dec = max_dec = obs[0].dec;
+   for( i = 1; i < n_obs; i++)
+      {
+      if( min_ra > obs[i].ra)
+         min_ra = obs[i].ra;
+      else if( max_ra < obs[i].ra)
+         max_ra = obs[i].ra;
+      if( min_dec > obs[i].dec)
+         min_dec = obs[i].dec;
+      else if( max_dec < obs[i].dec)
+         max_dec = obs[i].dec;
+      }
+   if( max_ra - min_ra < tolerance && max_dec - min_dec < tolerance)
+      generic_message_box(
+            "This shows very little motion and is probably a star.", "o");
+}
+
+
    /* By default,  Find_Orb will only handle arcs up to 200 years */
    /* long.  If the arc is longer than that,  observations will be */
    /* dropped to get an arc that fits.  The max arc length can be */
@@ -3597,6 +3622,7 @@ may have further information.  These observations will be excluded.\n",
       if( rval[0].note2 == 'X' && rval[1].note2 != 'X')
          rval[0].flags |= OBS_DONT_USE;
       }
+   check_for_star( rval, n_obs);
    return( rval);
 }
 
