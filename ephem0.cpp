@@ -2856,6 +2856,43 @@ static int get_observer_details( const char *observation_filename,
    return( rval);
 }
 
+static int get_observer_details_from_obs( const OBSERVE *obs,
+      size_t n_obs, const char *mpc_code, char *observers,
+      char *measurers, char *scope)
+{
+   int rval = 0;
+   size_t i;
+   const char *tptr;
+
+   *observers = *measurers = *scope = '\0';
+   while( n_obs--)
+      {
+      if( obs->obs_details && !strcmp( mpc_code, obs->mpc_code))
+         for( i = 0; (tptr = obs->obs_details[i]) != NULL; i++)
+            {
+            if( !memcmp( tptr, "OBS ", 4))
+               tack_on_names( observers, tptr + 4);
+            if( !memcmp( tptr, "MEA ", 4))
+               tack_on_names( measurers, tptr + 4);
+            if( !memcmp( tptr, "TEL ", 4))  /* allow for only one scope */
+               tack_on_names( scope, tptr + 4);
+            }
+      obs++;
+      }
+   add_final_period( observers);
+   add_final_period( measurers);
+   add_final_period( scope);
+   if( *observers)
+      rval = 1;
+   if( *measurers)
+      rval |= 2;
+   if( *scope)
+      rval |= 4;
+   if( !strcmp( observers, measurers))
+      *measurers = '\0';
+   return( rval);
+}
+
 #define REPLACEMENT_COLUMN 42
 
 static void observer_link_substitutions( char *buff)
@@ -2936,9 +2973,8 @@ static int write_observer_data_to_file( FILE *ofile, const char *ast_filename,
 
       if( try_ast_file)
          {
-         details_found = get_observer_details( ast_filename, tbuff,
-                                 details[1], details[2], details[3],
-                                 obs_data->packed_id);
+         details_found = get_observer_details_from_obs( obs_data, n_obs, tbuff,
+                                 details[1], details[2], details[3]);
          if( details_found == -1)       /* file wasn't found,  or it has */
             {                           /* no observational details.  In */
             details_found = 0;          /* either case,  ignore it for   */
