@@ -898,7 +898,6 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
    int rval = -1;
    int sort_order = OBJECT_INFO_COMPARE_PACKED;
    char search_text[20];
-   int64_t t_last_key = (clock_t)0;
 
    *search_text = '\0';
    if( ids && n_ids)
@@ -980,6 +979,9 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
          put_colored_text( "Prev", n_lines + 2, 65, 4, COLOR_HIGHLIT_BUTTON);
          put_colored_text( "End", n_lines + 2, 61, 3, COLOR_HIGHLIT_BUTTON);
          put_colored_text( "Start", n_lines + 2, 55, 5, COLOR_HIGHLIT_BUTTON);
+         if( *search_text)
+            put_colored_text( search_text, n_lines + 1, 55,
+                           strlen( search_text), COLOR_FINAL_LINE);
          flushinp( );
          c = extended_getch( );
          err_message = 0;
@@ -1018,19 +1020,14 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
             }
                      /* if a letter/number is hit,  look for an obj that */
                      /* starts with that letter/number: */
-         if( c >= ' ' && c <= 'z')
+         if( (c >= ' ' && c <= 'z') || c == 8)
             {
-            const int64_t t = nanoseconds_since_1970( );
-            const int64_t one_billion = 1000000000;
-            int len;
+            int len = strlen( search_text);
 
-            if( t > t_last_key + one_billion)
-               *search_text = '\0';
-            t_last_key = t;
-            len = 0;
-            while( search_text[len] && len < 15)
-               len++;
-            search_text[len++] = (char)c;
+            if( c != 8)
+               search_text[len++] = (char)c;
+            else if( len)
+               len--;
             search_text[len] = '\0';
             for( i = 0; i < n_ids; i++)
                if( !memcmp( search_text, ids[i].obj_name, len))
@@ -1040,6 +1037,8 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
                   break;
                   }
             }
+         else
+            *search_text = '\0';
 #ifdef ALT_0
          if( c >= ALT_0 && c <= ALT_9)
             choice = (n_ids - 1) * (c - ALT_0 + 1) / 11;
@@ -3636,6 +3635,18 @@ int main( const int argc, const char **argv)
             free( orbits);
             }
             break;
+#ifdef __PDCURSES__
+         case CTRL( 'E'):
+            {
+            FILE *ifile =
+                 fopen_ext( get_file_name( tbuff, elements_filename), "fcrb");
+
+            while( fgets( tbuff, sizeof( tbuff), ifile))
+               printf( "%s", tbuff);
+            fclose( ifile);
+            }
+         break;
+#endif
          case CTRL( 'R'):
             {
             extern double sr_min_r, sr_max_r;
