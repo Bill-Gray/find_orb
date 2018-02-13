@@ -380,7 +380,11 @@ COM Long. 69 54 00 W, Lat. 44 01 10 N, Alt. 50m, approximate
 
    would cause Find_Orb to add a new observatory code (Bow),  corresponding
 to Bowdoinham,  Maine,  where the corporate headquarters of Project Pluto
-are located.
+are located.  Also (again Find_Orb only),  the degrees or minutes can be
+expressed as decimals,  so the above example for Bowdoinham could be
+
+COD Bow
+COM Long. 69.9 0 0 W, Lat. 44.019444 0 0 N, Alt. 50m, approximate
 
    You _can_ use this to override the existing codes,  but the only case
 I can think of where you'd do that would be if you thought there might
@@ -394,7 +398,8 @@ static double get_lat_lon( const char *ibuff, char *compass)
    double deg = 0., min = 0., sec = 0.;
 
    *compass = '\0';
-   sscanf( ibuff, "%lf %lf %lf %c", &deg, &min, &sec, compass);
+   if( sscanf( ibuff, "%lf %lf %lf %c", &deg, &min, &sec, compass) != 4)
+      *compass = '!';         /* didn't get all the fields */
    deg += min / 60. + sec / 3600.;
    return( deg);
 }
@@ -411,22 +416,43 @@ static inline int get_lat_lon_from_header( double *lat,
          {
          char compass;
          const char *tptr = strstr( lines[i], "Lat.");
+         static bool warning_shown = false;
+         bool show_warning = false;
 
          *lon = get_lat_lon( lines[i] + 9, &compass);
          if( *lon > 180.)
             *lon -= 360.;
          if( compass == 'W')
             *lon *= -1.;
+         else
+            show_warning = (compass != 'E');
          if( tptr)
             {
             *lat = get_lat_lon( tptr + 4, &compass);
-            if( compass == 'S' || compass == 's')
+            if( compass == 'S')
                *lat = -*lat;
+            else
+               show_warning = (compass != 'N');
             }
+         else
+            show_warning = true;
          tptr = strstr( lines[i], "Alt.");
          if( tptr)
             *alt = atof( tptr + 4);
+         else
+            show_warning = true;
          rval = 1;
+         if( show_warning && !warning_shown)
+            {
+            char tbuff[200];
+
+            warning_shown = true;      /* just do this once */
+            snprintf( tbuff, sizeof( tbuff),
+                  "The lat/lon specified for code (%s) in the header is malformed.\n"
+                  "See https://www.projectpluto.com/find_orb.htm#obs_codes for\n"
+                  "information about how to fix this.\n", mpc_code);
+            generic_message_box( tbuff, "o");
+            }
          }
    return( rval);
 }
