@@ -3037,8 +3037,7 @@ static int write_observer_data_to_file( FILE *ofile, const char *ast_filename,
                   len = k;
                   while( k && outtext[k - 1] == ' ')
                      k--;
-                  outtext[k] = '\0';
-                  fprintf( ofile, "%s\n   ", outtext);
+                  fprintf( ofile, "%.*s\n   ", k, outtext);
                   loc = 3;
                   }
               else
