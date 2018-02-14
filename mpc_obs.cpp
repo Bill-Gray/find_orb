@@ -405,12 +405,14 @@ static double get_lat_lon( const char *ibuff, char *compass)
 }
 
 static inline int get_lat_lon_from_header( double *lat,
-            double *lon, double *alt, const char *mpc_code)
+            double *lon, double *alt, const char *mpc_code,
+            const char **name_from_header)
 {
    const char **lines = get_code_details( obs_details, mpc_code);
    size_t i;
    int rval = 0;
 
+   *name_from_header = NULL;
    for( i = 0; !rval && lines && lines[i]; i++)
       if( !memcmp( lines[i], "COM Long.", 9))
          {
@@ -454,6 +456,10 @@ static inline int get_lat_lon_from_header( double *lat,
             generic_message_box( tbuff, "o");
             }
          }
+      else if( !i && strlen( lines[0]) > 8)
+         *name_from_header = lines[0] + 8;
+               /* if observatory name is specified in header,  e.g., */
+               /* COD Bow Generic Observatory,  Bowdoinham */
    return( rval);
 }
 
@@ -666,6 +672,7 @@ int get_observer_data( const char FAR *mpc_code, char *buff,
    int rval = -1;
    size_t i;
    const char *format_string = NULL;
+   const char *name_from_header = NULL;
    double lat0 = 0., lon0 = 0., alt0 = 0.;
 
    if( !mpc_code)    /* freeing up resources */
@@ -712,7 +719,7 @@ int get_observer_data( const char FAR *mpc_code, char *buff,
       }
 
 
-   if( get_lat_lon_from_header( &lat0, &lon0, &alt0, mpc_code))
+   if( get_lat_lon_from_header( &lat0, &lon0, &alt0, mpc_code, &name_from_header))
       format_string = "%11.5f%9.5f%7.1fTemporary MPC code";
 
    if( !strcmp( mpc_code, "247"))
@@ -755,6 +762,8 @@ int get_observer_data( const char FAR *mpc_code, char *buff,
 
       strcpy( tbuff, mpc_code);
       sprintf( tbuff + 3, format_string, lon0, lat0, alt0);
+      if( name_from_header)
+         strcpy( tbuff + 30, name_from_header);
       if( buff)
          strcpy( buff, tbuff);
       rval = extract_mpc_station_data( tbuff, lon_in_radians,
