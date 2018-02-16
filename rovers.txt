@@ -76,6 +76,7 @@ Tim !  20.01361      47.18278        10        Andras Timar, Hungary
 Tu1 ! -95.983429    +36.139208      201        Tulsa-1
 Tu2 ! -96.1411      +35.8311        330        Tulsa-2
 VMe !  27.543306    +53.904694      217        Vitaly Mechinsky
+DBr ! -121.702778   +37.113278      282        Derek Breit
 
 RPa !-71.0000        43.6666        200        Ralph Pass
 Var !  6.6814       +44.5736       1850        Vars,  southern Alps
@@ -252,3 +253,6 @@ d66 ! 3554454.89654  +402547.90955   849.87404 DSS 66 Madrid 26-meter
 
 LSS ! -704457.90     -301440.68     2663.      Large Synoptic Survey Telescope
 LSA ! -704451.80     -301441.27     2663.      LSST Auxiliary 1.4-m
+
+War ! 149.1930      -31.2763        552.       Warrumbungle Observatory
+Dub ! 148.58525     -31.29358       300.       Dubbo Observatory
