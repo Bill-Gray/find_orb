@@ -26,6 +26,7 @@
  Crni Vrh                                  &#x10c;rni Vrh
  Christensen                               <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0013858">Christensen</a>
  Cremaschini                               <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0014062">Cremaschini</a>
+ Crinklaw                                  <a href="https://www.skyhound.com/sh/gc.htm">Crinklaw</a>
  Concari                                   <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0006671">Concari</a>
  Cutri                                     <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0241529">Cutri</a>
  Dailey                                    <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0249522">Dailey</a>
@@ -79,7 +80,7 @@
  Mainzer                                   <a href="http://science.jpl.nasa.gov/people/Mainzer/">Mainzer</a>
  Manca                                     <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0015460">Manca</a>
  Marinello                                 <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0229836">Marinello</a>
- Masek                                     Ma&#353;ek
+ Masek                                     <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0009841">Ma&#353;ek</a>
  Masiero                                   <a href="http://twitter.com/joemasiero">Masiero</a>
  Matson                                    <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0073491">Matson</a>
  Micheli                                   <a href="http://www.spacedys.com/images/cv_pdf/micheli.pdf">Micheli</a>
