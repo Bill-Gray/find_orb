@@ -164,7 +164,7 @@ ENCKE=1
 
    By default,  the DRAG_SHUTOFF=1 tells Find_Orb not to include the effects
    of atmospheric drag.  Set it to zero if you want objects entering the
-   earth's atmosphere (only one handled thus far) to be affected by drag.
+   earth's atmosphere to be affected by drag.
 DRAG_SHUTOFF=1
 
    By default,  Find_Orb will look for an orbit covering,  at most,  20
