@@ -17,11 +17,11 @@ https://github.com/noporpoise/sort_r
 https://sourceware.org/ml/libc-alpha/2008-12/msg00007.html
 
    makes an interesting argument that the Linux qsort_r,  which has the
-"context" pointer in the comparison function as the third argument,  is
-the "right" way of doing things.  (*BSD and Windows have the context
-pointer as the first argument.)  The reason is that it means your
-non-recursive sort can basically just call the recursive sort,  with
-an ignored NULL context pointer.  (Which,  you'll see,  I've done below.)
+"context" pointer in the comparison function as the third argument,  is the
+"right" way of doing things.  (*BSD and Windows have the context pointer as
+the first argument.)  The reason is that it means your non-reentrant
+qsort() can basically just call the reentrant qsort_r(), with an ignored
+NULL context pointer.  (Which,  you'll see,  I've done below.)
 
    Note that Shellsort is decently fast,  but not nearly as fast as Quicksort.
 If sorting speed matters in your application,  either ignore this or modify
