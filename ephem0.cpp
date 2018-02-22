@@ -3207,6 +3207,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
    extern char findorb_language;
    unsigned redacted_line_number = 0, n_redacted_lines = 0;
    unsigned n_neocp_lines = 0;
+   static const char *explanations_url = "https://www.projectpluto.com/mpec_xpl.htm";
 
    assert( ofile);
    setvbuf( ofile, NULL, _IONBF, 0);
@@ -3246,8 +3247,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
 
    if( header_htm_ifile)                 /* copy header data to pseudo-MPEC */
       {
-      while( fgets( buff, sizeof( buff), header_htm_ifile) &&
-                           memcmp( buff, "(End of header)", 15))
+      while( fgets( buff, sizeof( buff), header_htm_ifile))
          if( *buff != '#')
             {
             char *tptr = strstr( buff, "_xx");
@@ -3453,7 +3453,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
       while( fgets( buff, sizeof( buff), residuals_ifile) && memcmp( buff, "Station", 7))
          ;
       fprintf( ofile, "<a name=\"stations\"></a>\n");
-      fprintf( ofile, "<b>%s</b>", buff);
+      fprintf( ofile, "<a href=\"%s#stns\"><b>%s</b></a>", explanations_url, buff);
       while( fgets_trimmed( buff, sizeof( buff), residuals_ifile))
          if( *buff == ' ')
             {
@@ -3574,7 +3574,8 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
             if( buff[27] == 'H')
                h_ptr = buff + 28;
             if( !line_no)
-               fprintf( ofile, "<b>%s</b>\n", buff);
+               fprintf( ofile, "<a href=\"%s#elems\"><b>%s</b></a>\n",
+                                explanations_url, buff);
             else if( *buff == 'P' && h_ptr)
                {
                const double abs_mag = atof( h_ptr);
@@ -3629,8 +3630,10 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
    if( residuals_ifile)
       {
       fseek( residuals_ifile, 0L, SEEK_SET);
-      fprintf( ofile, "<pre><b><a name=\"residuals%s\">Residuals in arcseconds:</a> </b>\n",
-                                                         mpec_buff);
+      fprintf( ofile, "<pre><b><a name=\"residuals%s\"></a>"
+                      "<a href=\"%s#resids\">"
+                      "Residuals in arcseconds:</a> </b>\n",
+                           mpec_buff, explanations_url);
       line_no = 0;
       while( fgets( buff, sizeof( buff), residuals_ifile) && *buff > ' ')
          {
@@ -3666,12 +3669,13 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
    if( ephemeris_ifile && fgets_trimmed( buff, sizeof( buff), ephemeris_ifile))
       {
       fprintf( ofile, "\n<a name=\"eph%s\"></a>", mpec_buff);
+      fprintf( ofile, "<a href=\"%s#ephems\">", explanations_url);
       if( *buff != '#')        /* non-observables ephemeris,  no MPC code */
-         fprintf( ofile, "<b>Ephemerides:</b>\n");
+         fprintf( ofile, "<b>Ephemerides:</b></a>\n");
       else if( !memcmp( buff + 2, "500", 3))
-         fprintf( ofile, "<b>Ephemerides (geocentric):</b>\n");
+         fprintf( ofile, "<b>Ephemerides (geocentric):</b></a>\n");
       else
-         fprintf( ofile, "<b>Ephemerides for %s:</b>\n", buff + 1);
+         fprintf( ofile, "<b>Ephemerides for %s:</b></a>\n", buff + 1);
 
       while( fgets( buff, sizeof( buff), ephemeris_ifile))
          {
