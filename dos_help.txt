@@ -1,4 +1,4 @@
-   Version date: 2017 May 26
+   Version date: 2018 Feb 22
 
    The parameters shown in this software are basically the same as those
 shown in the Windows software,  as described at
