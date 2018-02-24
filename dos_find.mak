@@ -9,8 +9,8 @@ OBJS=b32_eph.obj bc405.obj bias.obj collide.obj conv_ele.obj details.obj  \
   errors.obj gauss.obj geo_pot.obj \
   healpix.obj lsquare.obj miscell.obj moid4.obj monte0.obj \
   mpc_fmt.obj mpc_obs.obj mt64.obj nanosecs.obj \
-  orb_func.obj orb_fun2.obj pl_cache.obj roots.obj \
-  runge.obj shellsor.obj sigma.obj sm_vsop.obj sr.obj stackall.obj
+  orb_func.obj orb_fun2.obj pl_cache.obj roots.obj runge.obj \
+  shellsor.obj sigma.obj simplex.obj sm_vsop.obj sr.obj stackall.obj
 
 CCLIBS      = user32.lib gdi32.lib advapi32.lib shell32.lib comdlg32.lib
 ADD_LIBS    = pdcurses.lib sat_code.lib jpleph.lib
@@ -24,7 +24,6 @@ CFLAGS=-c -Ot -W3 -nologo -MT -DCONSOLE -D_CRT_SECURE_NO_WARNINGS
 RM=del
 !endif
 
-
 find_orb.exe:               findorb.obj $(OBJS) clipfunc.obj
      link /out:find_orb.exe findorb.obj $(OBJS) clipfunc.obj $(ADD_LIBS) \
                        user32.lib $(CCLIBS)
@@ -32,8 +31,8 @@ find_orb.exe:               findorb.obj $(OBJS) clipfunc.obj
 fo.exe:                     fo.obj $(OBJS)
      link /out:fo.exe       fo.obj $(OBJS) $(ADD_LIBS)
 
-fo_serve.exe:               fo_serve.obj $(OBJS) cgi_func.obj
-     link /out:fo_serve.exe fo_serve.obj $(OBJS) cgi_func.obj $(ADD_LIBS)
+fo_serve.exe:               fo_serve.obj $(OBJS)
+     link /out:fo_serve.exe fo_serve.obj $(OBJS) $(ADD_LIBS)
 
 .cpp.obj:
    cl $(CFLAGS) $<
@@ -47,6 +46,6 @@ clean:
    $(RM) residual.txt state.txt state?.txt virtu?.txt virtual.txt
    $(RM) sr_elems.txt mpcorb.dat fo_serve.cgi find_orb.res
    $(RM) mpc_fmt.txt elements.txt covar.txt gauss.out
-   $(RM) find_orb.exp vc50.pdb obs_temp.txt guide.txt
-   $(RM) find_orb.map find_orb.pdb find_orb.lib vc50.idb
+   $(RM) find_orb.exp vc*.pdb obs_temp.txt guide.txt
+   $(RM) find_orb.map find_orb.pdb find_orb.lib vc*.idb
 

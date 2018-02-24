@@ -10,7 +10,7 @@ OBJS=about.obj b32_eph.obj bc405.obj bias.obj clipfunc.obj \
   mpc_obs.obj mt64.obj nanosecs.obj orbitdlg.obj \
   orb_func.obj orb_fun2.obj pl_cache.obj roots.obj  \
   runge.obj settings.obj shellsor.obj stackall.obj \
-  sigma.obj sm_vsop.obj sr.obj stdafx.obj
+  sigma.obj simplex.obj sm_vsop.obj sr.obj stdafx.obj
 
 !ifdef BITS_32
 COMMON_FLAGS=-nologo -W3 -EHsc -c -FD
@@ -52,5 +52,15 @@ clean:
    $(RM) sr_elems.txt mpcorb.dat fo_serve.cgi find_orb.res
    $(RM) mpc_fmt.txt elements.txt covar.txt gauss.out
    $(RM) find_orb.exp vc50.pdb obs_temp.txt guide.txt
-   $(RM) find_orb.map find_orb.pdb find_orb.lib vc50.idb
+   $(RM) find_orb.map find_orb.pdb find_orb.lib vc*.idb
+
+clean_temp:
+   $(RM) covar.txt covar?.txt debug.txt eleme?.txt elements.txt
+   $(RM) ephemeri.txt                         gauss.out monte.txt monte?.txt
+   $(RM) mpc_f?.txt mpc_fmt.txt mpec.htm obser?.txt observe.txt
+   $(RM) residual.txt state.txt state?.txt virtu?.txt virtual.txt
+   $(RM) sr_elems.txt mpcorb.dat              find_orb.res
+   $(RM) mpc_fmt.txt elements.txt covar.txt gauss.out
+   $(RM) find_orb.exp vc50.pdb obs_temp.txt guide.txt
+   $(RM) find_orb.map find_orb.pdb find_orb.lib vc*.idb
 
