@@ -981,7 +981,7 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
          put_colored_text( "Start", n_lines + 2, 55, 5, COLOR_HIGHLIT_BUTTON);
          if( *search_text)
             put_colored_text( search_text, n_lines + 1, 55,
-                           strlen( search_text), COLOR_FINAL_LINE);
+                      (int)strlen( search_text), COLOR_FINAL_LINE);
          flushinp( );
          c = extended_getch( );
          err_message = 0;
@@ -1022,7 +1022,7 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
                      /* starts with that letter/number: */
          if( (c >= ' ' && c <= 'z') || c == 8)
             {
-            int len = strlen( search_text);
+            size_t len = strlen( search_text);
 
             if( c != 8)
                search_text[len++] = (char)c;
