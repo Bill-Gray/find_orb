@@ -73,8 +73,6 @@ int debug_printf( const char *format, ...)                 /* runge.cpp */
          __attribute__ (( format( printf, 1, 2)))
 #endif
 ;
-double planet_axis_ratio( const int planet_idx);            /* collide.cpp */
-double planet_radius_in_meters( const int planet_idx);      /* collide.cpp */
 double mag_band_shift( const char mag_band);                /* elem_out.c */
 char *get_file_name( char *filename, const char *template_file_name);
 double current_jd( void);                       /* elem_out.cpp */

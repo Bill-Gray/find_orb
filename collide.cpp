@@ -34,8 +34,6 @@ int parallax_to_lat_alt( const double rho_cos_phi, const double rho_sin_phi,
        double *lat, double *ht_in_meters, const int planet_idx); /* ephem0.c */
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 double find_collision_time( ELEMENTS *elem, double *latlon, const int is_impact);
-double planet_axis_ratio( const int planet_idx);            /* collide.cpp */
-double planet_radius_in_meters( const int planet_idx);      /* collide.cpp */
 double find_lat_lon_alt( const double ut, const double *ivect,
                   const int planet_no, double *lat_lon, const bool geometric);
 void calc_approx_planet_orientation( const int planet,        /* runge.cpp */
@@ -46,35 +44,6 @@ int debug_printf( const char *format, ...)                 /* runge.cpp */
          __attribute__ (( format( printf, 1, 2)))
 #endif
 ;
-
-double planet_radius_in_meters( const int planet_idx)
-{
-   static const double planet_radius[15] = { 695992000., 2439000., 6051000.,
-/* earth-saturn */         6378140, 3393000., 71492000., 60268000.,
-/* uranus-pluto, luna */   25559000., 24764000., 1195000., 1737400,
-/* jupiter moons */        1821300, 1565000., 2634000., 2403000. };
-
-   return( planet_radius[planet_idx]);
-}
-
-/* NOTE that for the Earth,  I'm using the IAU1976 ellipsoid,  with
-major axis 6378.140 km (see above) and flattening 1/f = 298.257.
-The GRS80 and WGS84 ellipsoids have a major axis of 6378.137 meters
-(three meters less than the IAU1976 value) and 1/f = 298.257223563
-and 298.257222101 respectively (making for semimajor axes also about
-three meters less than the IAU1976 value).      */
-
-#define N_FLATTENINGS 9
-
-double planet_axis_ratio( const int planet_idx)
-{
-   static const double flattenings[N_FLATTENINGS] = {
-            0., 0., 0., 1. / 298.257,           /* Sun Mer Ven Earth */
-            .00647630, .0647630, .0979624,      /* Mars Jup Satu */
-            .0229273, .0171 };                  /* Uran Nep */
-
-   return( planet_idx >= N_FLATTENINGS ? 1. : 1. - flattenings[planet_idx]);
-}
 
 double find_lat_lon_alt( const double ut, const double *ivect,
                   const int planet_no, double *lat_lon, const bool geometric)

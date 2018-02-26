@@ -30,6 +30,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "lsquare.h"
 #include "date.h"
 #include "afuncs.h"
+#include "lunar.h"
 #include "monte0.h"
 
 #ifndef _MSC_VER
@@ -165,7 +166,6 @@ static int find_transfer_orbit( double *orbit, OBSERVE FAR *obs1,
 double observation_rms( const OBSERVE FAR *obs);            /* elem_out.cpp */
 double compute_weighted_rms( const OBSERVE FAR *obs, const int n_obs,
                            int *n_resids);                  /* orb_func.cpp */
-double planet_radius_in_meters( const int planet_idx);      /* collide.cpp */
 double find_epoch_shown( const OBSERVE *obs, const int n_obs); /* elem_out */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
