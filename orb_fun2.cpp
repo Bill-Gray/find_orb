@@ -723,14 +723,29 @@ double improve_along_lov( double *orbit, const double epoch, const double *lov,
          rotate_obs_vect( obs + i, slopes + i * 3);
          }
       else
+         {
          for( j = 0; j < 3; j++)
-            xyz[i * 3 + j] = 0.;
+            xyz[i * 3 + j] = slopes[i * 3 + j] = 0.;
+         xyz[i * 3 + 2] = 1.;
+         }
 
    for( i = 0; i < N_DIVS; i++)
       {
       x[i] = inverf( 2. * ((double)i + .5) / (double)N_DIVS - 1.);
       x[i] *= 3.;
       score[i] = search_score( xyz, slopes, n_obs, x[i]);
+      }
+   i = 0;
+   while( score[0] < score[1] && score[0] < score[2] && i++ < 20)
+      {
+      x[0] += x[0] - x[1];
+      score[0] = search_score( xyz, slopes, n_obs, x[0]);
+      }
+   while( score[N_DIVS - 1] < score[N_DIVS - 2] && score[N_DIVS - 1] < score[N_DIVS - 3]
+                     && i++ < 20)
+      {
+      x[N_DIVS - 1] += x[N_DIVS - 1] - x[N_DIVS - 2];
+      score[N_DIVS - 1] = search_score( xyz, slopes, n_obs, x[N_DIVS - 1]);
       }
    rval = 0.;
    lowest_score = 1e+200;
