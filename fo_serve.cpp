@@ -99,6 +99,26 @@ void move_add_nstr( const int col, const int row, const char *msg, const int n_b
 {
 }
 
+static void show_problem_message( void)
+{
+   FILE *ifile = fopen( "problem.htm", "rb");
+
+   if( !ifile)
+      {
+      printf( "<h2> Internal error:  no 'problem.htm' </h2>\n");
+      printf( "<p> Please report this to Project Pluto;  if this happens,\n"
+              "a fix <i>really</i> needs to be made!</p>\n");
+      }
+   else
+      {
+      char buff[200];
+
+      while( fgets( buff, sizeof( buff), ifile))
+         printf( "%s", buff);
+      fclose( ifile);
+      }
+}
+
 #ifndef strlcpy
 
       /* Some systems (BSD, Solaris,  others) offer this handy function. */
@@ -198,8 +218,8 @@ int main( const int argc, const char **argv)
 
    if( !fgets( boundary, sizeof( boundary), stdin))
       {
-      printf( "<b> No info read from stdin</b>");
-      printf( "This isn't supposed to happen.\n");
+      printf( "<p> <b> No info read from stdin</b>");
+      printf( "This isn't supposed to happen.</p>\n");
       return( 0);
       }
    fprintf( lock_file, "Got boundary line: %s", boundary);
@@ -271,9 +291,9 @@ int main( const int argc, const char **argv)
              CALENDAR_JULIAN_GREGORIAN | FULL_CTIME_YMD | FULL_CTIME_TWO_DIGIT_YEAR, NULL);
          if( jd_start < min_jd || jd_start > max_jd)
             {
-            printf( "Ephemeris date out of range\n");
-            printf( "'%s' parsed as JD %f\n", buff, jd_start);
-            printf( "The ephemeris starting date must be between JD %.1f and %.1f.\n",
+            printf( "<b>Ephemeris date out of range</b>\n");
+            printf( "<p>'%s' parsed as JD %f\n", buff, jd_start);
+            printf( "The ephemeris starting date must be between JD %.1f and %.1f.</p>\n",
                               min_jd, max_jd);
             return( 0);
             }
@@ -353,10 +373,7 @@ int main( const int argc, const char **argv)
    fprintf( lock_file, "Options read and parsed\n");
    if( !bytes_written)
       {
-      printf( "<p> No observations were found.  Click on the browser back arrow\n"
-              "and make sure valid 80-column observations are provided in the\n"
-              "text box or the uploaded file,  or that a valid object name was\n"
-              "given for which MPC has observations. </p>");
+      show_problem_message( );
       return( 0);
       }
 
@@ -425,7 +442,10 @@ int main( const int argc, const char **argv)
             0, element_format);
       }
    else
-      printf( "Problem loading observations\n");
+      {
+      show_problem_message( );
+      return( 0);
+      }
 
    create_obs_file( obs, n_obs_actually_loaded, 0);
    if( available_sigmas == COVARIANCE_AVAILABLE)
