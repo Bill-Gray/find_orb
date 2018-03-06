@@ -694,7 +694,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             break;
          case 'l': case 'L':
             inquire( "Enter MPC code: ", buff, sizeof( buff), COLOR_MESSAGE_TO_USER);
-            if( strlen( buff) == 3 || !memcmp( buff, "Ast", 3))
+            if( strlen( buff) < 5 || !memcmp( buff, "Ast", 3))
                strcpy( mpc_code, buff);
             else if( !get_observer_data( buff, buff, NULL, NULL, NULL))
                {

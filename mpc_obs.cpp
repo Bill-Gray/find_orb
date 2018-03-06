@@ -637,6 +637,20 @@ char *mpc_station_name( char *station_data)
    return( station_data + (station_data[4] == '!' ? 47 : 30));
 }
 
+static int mpc_code_cmp( const char *ptr1, const char *ptr2)
+{
+   int rval = memcmp( ptr1, ptr2, 3);
+
+   if( !rval)
+      {
+      const char c1 = (ptr1[3] == ' ' ? '\0' : ptr1[3]);
+      const char c2 = (ptr2[3] == ' ' ? '\0' : ptr2[3]);
+
+      rval = c1 - c2;
+      }
+   return( rval);
+}
+
 /* The following function paws through the STATIONS.TXT file (or the
    ObsCodes.html or .htm file),  looking for the observer code in
    question.  When it finds it,  it just copies the entire line into
@@ -778,7 +792,7 @@ int get_observer_data( const char FAR *mpc_code, char *buff,
       return( get_asteroid_observer_data( mpc_code, buff));
       }
 
-   if( !curr_station || memcmp( curr_station, mpc_code, 3))
+   if( !curr_station || mpc_code_cmp( curr_station, mpc_code))
       {
       int step, loc = -1, loc1;
 
@@ -786,7 +800,7 @@ int get_observer_data( const char FAR *mpc_code, char *buff,
       for( step = 0x8000; step; step >>= 1)
          if( (loc1 = loc + step) < n_stations)
             {
-            const int compare = memcmp( station_data[loc1], mpc_code, 3);
+            const int compare = mpc_code_cmp( station_data[loc1], mpc_code);
 
             if( compare <= 0)
                loc = loc1;
