@@ -284,16 +284,6 @@ int set_tholen_style_sigmas( OBSERVE *obs, const char *buff)
    return( n_scanned);
 }
 
-
-static double grab_double( const char *iptr, const int field_size)
-{
-   char tbuff[20];
-
-   memcpy( tbuff, iptr, field_size);
-   tbuff[field_size] = '\0';
-   return( atof( tbuff));
-}
-
 int generic_message_box( const char *message, const char *box_type)
 {
    int rval = 0;
@@ -348,21 +338,6 @@ static bool extract_region_data_for_mpc_station( char *buff,
       fclose( ifile);
       }
    return( *buff ? true : false);
-}
-
-/* You can store locations in 'rovers.txt' in base-60 form,  with the lat */
-/* and longitude smashed together;  e.g.,  19 13' 33.1" would be stored   */
-/* as 191333.1.  The following code would take 191331.1 as input and return */
-/* 19 + 13/60 + 33.1/3600 = 19.22586111.   */
-
-static double convert_base_60_to_decimal( const double ival)
-{
-   const int deg = (int)( ival / 10000.);
-   const int min = (int)( fmod( ival / 100., 100.));
-   const double sec = fmod( ival, 100.);
-   const double rval = (double)deg + (double)min / 60. + sec / 3600.;
-
-   return( rval);
 }
 
 /* http://www.minorplanetcenter.net/iau/info/Astrometry.html#HowObsCode
@@ -474,68 +449,21 @@ extern int debug_level;
 static int extract_mpc_station_data( const char *buff, double *lon_in_radians,
                             double *rho_cos_phi, double *rho_sin_phi)
 {
-   int i, rval = -1;       /* assume no valid data */
-   double tlon = 0.;
+   mpc_code_t cinfo;
+   const int rval = get_mpc_code_info( &cinfo, buff);
 
-                    /* A valid station code line must have,  for starters, */
-                    /* a three-character code followed by a space,  and at */
-                    /* least 22 bytes:                                     */
-   if( strlen( buff) < 22)
-      return( -1);
-   for( i = 0; i < 3; i++)
-      if( buff[i] <= ' ' || buff[i] > 'z')
-         return( -1);
-   if( lon_in_radians && rho_cos_phi && rho_sin_phi)
-      *lon_in_radians = *rho_cos_phi = *rho_sin_phi = 0.;
-
-   if( buff[7] == '.' && buff[14] == '.' && buff[23] == '.')
-      {              /* for-real MPC data,  with parallax constants: */
-      tlon = grab_double( buff + 4, 9) * PI / 180.;
-      if( rho_cos_phi && rho_sin_phi)
-         {
-         *rho_cos_phi = grab_double( buff + 13, 8) * EARTH_MAJOR_AXIS_IN_AU;
-         *rho_sin_phi = grab_double( buff + 21, 9) * EARTH_MAJOR_AXIS_IN_AU;
-         }
-      rval = 3;
-      }
-   else if( !memcmp( buff + 3, "                           ", 27)
-            && buff[30] > ' ')    /* satellite stations (SOHO, */
-      rval = -2;                  /* WISE,  etc.:  all blanks) */
-   else        /* latitude & altitude,  not parallaxes: */
-      {
-      double lat_in_radians, alt_in_meters;
-
-      buff += 4;
-      if( *buff == '!')       /* "long format" */
-         buff++;
-      if( sscanf( buff, "%lf %lf %lf", &tlon, &lat_in_radians,
-                                     &alt_in_meters) == 3)
-         {
-         rval = 3;
-         if( fabs( tlon) > 361. || fabs( lat_in_radians) > 91.)
-            {     /* lat/lon are actually in dddmmss.sss form: */
-            tlon = convert_base_60_to_decimal( tlon);
-            lat_in_radians = convert_base_60_to_decimal( lat_in_radians);
-            }
-         tlon *= PI / 180.;
-         lat_in_radians *= PI / 180.;
-         if( rho_cos_phi && rho_sin_phi)
-            lat_alt_to_parallax( lat_in_radians, alt_in_meters,
-                     rho_cos_phi, rho_sin_phi, rval);   /* ephem0.cpp */
-         }
-      }
    if( lon_in_radians)           /* keep longitude in -180 to +180 */
       {
-      *lon_in_radians = centralize_ang( tlon);
+      *lon_in_radians = cinfo.lon;
       if( *lon_in_radians > PI)
-         *lon_in_radians -= PI + PI;
-      }
-   if( rval == 3)       /* are we _really_ on Earth? */
-      {
-      const char *tptr = strchr( buff, '@');
+          *lon_in_radians -= PI + PI;
+      if( rval >= 0)
+         {
+         const double scale = planet_radius_in_meters( rval) / AU_IN_METERS;
 
-      if( tptr)
-         rval = atoi( tptr + 1);
+         *rho_cos_phi = cinfo.rho_cos_phi * scale;
+         *rho_sin_phi = cinfo.rho_sin_phi * scale;
+         }
       }
    return( rval);
 }
