@@ -31,6 +31,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "date.h"
 #include "comets.h"
 #include "mpc_obs.h"
+#include "mpc_func.h"
 #include "vislimit.h"
 
 #define J2000 2451545.0
@@ -121,43 +122,20 @@ int lat_alt_to_parallax( const double lat, const double ht_in_meters,
    return( 0);
 }
 
-/* Takes parallax constants (rho_cos_phi, rho_sin_phi) in units of the
-equatorial radius.  The previous non-iterative version of this function,
-used before 2016 Oct, was taken from Meeus' _Astronomical Algorithms_.  It
-could be off by as much as 16 meters in altitude and wrong in latitude by
-about three meters for each km of altitude (i.e.,  about 25 meters at the
-top of Everest).  Things are worse for planets more oblate than the earth.
-
-   An exact non-iterative solution exists,  but is somewhat complicated
-(requires finding zeroes of a quartic polynomial).  The iterative
-solution given below is faster and simpler.  It starts out with a
-laughably poor guess,  but convergence is fast;  eight iterations gets
-sub-micron accuracy. */
+/* Parallax constants (rho_cos_phi, rho_sin_phi) should be in units of the
+planet's equatorial radius.  */
 
 int parallax_to_lat_alt( const double rho_cos_phi, const double rho_sin_phi,
                double *lat, double *ht_in_meters, const int planet_idx)
 {
-   const double major_axis_in_meters = planet_radius_in_meters( planet_idx);
-   const double lat0 = atan2( rho_sin_phi, rho_cos_phi);
-   const double rho0 = sqrt( rho_sin_phi * rho_sin_phi + rho_cos_phi * rho_cos_phi)
-                     * major_axis_in_meters / AU_IN_METERS;
-   double tlat = lat0, talt = 0.;
-   int iter;
+   double talt = 0.;
+   const double tlat = point_to_ellipse( 1., planet_axis_ratio( planet_idx),
+                  rho_cos_phi, rho_sin_phi, &talt);
 
-// printf( "Input parallax constants : %+.9f %.9f\n", rho_sin_phi, rho_cos_phi);
-   for( iter = 0; iter < 8; iter++)
-      {
-      double rc2, rs2;
-
-//    printf( "Curr lat/alt: %.9f %.9f\n", tlat * 180. / PI, talt);
-      lat_alt_to_parallax( tlat, talt, &rc2, &rs2, planet_idx);
-      talt -= (sqrt( rs2 * rs2 + rc2 * rc2) - rho0) * AU_IN_METERS;
-      tlat -= atan2( rs2, rc2) - lat0;
-      }
    if( lat)
       *lat = tlat;
    if( ht_in_meters)
-      *ht_in_meters = talt;
+      *ht_in_meters = talt * planet_radius_in_meters( planet_idx);
    return( 0);
 }
 
