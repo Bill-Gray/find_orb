@@ -61,7 +61,7 @@ for Windows and other non-*nix systems. */
 extern int debug_level;
 
 int debug_level = 0;
-extern const char *sof_filename;
+extern const char *sof_filename, *sofv_filename;
 
 char *get_file_name( char *filename, const char *template_file_name);
 int sanity_test_observations( const char *filename);
@@ -173,7 +173,7 @@ static void combine_element_files( const char *filename, const int n_processes)
    FILE *ofile;
    extern int process_count;
 
-   if( !strcmp( filename, sof_filename))
+   if( !strcmp( filename, sof_filename) || !strcmp( filename, sofv_filename))
       {
       FILE *ifile = fopen_ext( filename, "fclr");
 
@@ -381,6 +381,7 @@ int main( const int argc, const char **argv)
    bool use_colors = true;
    bool show_processing_steps = true;
    int ephemeris_output_options = OPTION_SHOW_SIGMAS | OPTION_ROUND_TO_NEAREST_STEP;
+   time_t update_time, t0;
 #ifdef FORKING
    int child_status;
 #endif
@@ -560,6 +561,7 @@ int main( const int argc, const char **argv)
    if( !total_objects)
       total_objects = n_ids;
 
+   t0 = update_time = time( NULL);
 #ifdef FORKING
    while( process_count < n_processes - 1)
       {
@@ -589,7 +591,9 @@ int main( const int argc, const char **argv)
       summary_lines = (char **)calloc( n_ids - starting_object + 1,
                                                     sizeof( char *));
    ifile = fopen( argv[1], "rb");
-   for( i = starting_object; i < n_ids && i < starting_object + total_objects; i++)
+   if( total_objects > n_ids - starting_object)
+      total_objects = n_ids - starting_object;
+   for( i = starting_object; i < starting_object + total_objects; i++)
       if( n_processes == 1 || i % n_processes == process_count - 1)
          {
          const char *orbit_constraints = "";
@@ -632,7 +636,18 @@ int main( const int argc, const char **argv)
                if( show_processing_steps)
                   {
                   if( n_processes > 1)
+                     {
+                     if( process_count == 1 && time( NULL) != update_time)
+                        {
+                        int elapsed, n_done = i - starting_object + 1;
+
+                        update_time = time( NULL);
+                        elapsed = (int)update_time - (int)t0;
+                        printf( "%d seconds elapsed, %d remain\n", elapsed,
+                               elapsed * (total_objects - n_done) / n_done);
+                        }
                      printf( "(%d) %d: %s", process_count, i + 1, ids[i].obj_name);
+                     }
                   printf( "; %s ", tbuff);
                   }
                if( separate_residual_file_name)
@@ -802,6 +817,7 @@ int main( const int argc, const char **argv)
       combine_element_files( elements_filename, n_processes);
       combine_element_files( mpc_fmt_filename, n_processes);
       combine_element_files( sof_filename, n_processes);
+      combine_element_files( sofv_filename, n_processes);
       for( i = 0; i < n_processes; i++)
          {                             /* clean up temp files: */
          process_count = i + 1;
