@@ -613,8 +613,7 @@ int get_observer_data( const char FAR *mpc_code, char *buff,
    const char *blank_line = "!!!   0.0000 0.000000 0.000000Unknown Station Code";
    int rval = -1;
    size_t i;
-   const char *format_string = NULL;
-   const char *name_from_header = NULL;
+   const char *override_observatory_name = NULL;
    double lat0 = 0., lon0 = 0., alt0 = 0.;
 
    if( !mpc_code)    /* freeing up resources */
@@ -661,15 +660,17 @@ int get_observer_data( const char FAR *mpc_code, char *buff,
       }
 
 
-   if( get_lat_lon_from_header( &lat0, &lon0, &alt0, mpc_code, &name_from_header))
-      format_string = "%11.5f%9.5f%7.1fTemporary MPC code";
+   if( get_lat_lon_from_header( &lat0, &lon0, &alt0, mpc_code,
+                                             &override_observatory_name))
+      if( !override_observatory_name)
+         override_observatory_name = "Temporary MPC code";
 
    if( !strcmp( mpc_code, "247"))
       {
       lat0 = roving_lat;
       lon0 = roving_lon;
       alt0 = roving_ht_in_meters;
-      format_string = "%11.5f%9.5f%7.1fRoving observer";
+      override_observatory_name = "Roving observer";
       }
 
 #ifdef TRY_THIS_SOME_OTHER_TIME
@@ -698,14 +699,14 @@ int get_observer_data( const char FAR *mpc_code, char *buff,
       }
 #endif
 
-   if( format_string)
+   if( override_observatory_name)
       {
       char tbuff[90];
 
       strcpy( tbuff, mpc_code);
-      sprintf( tbuff + 3, format_string, lon0, lat0, alt0);
-      if( name_from_header)
-         strcpy( tbuff + 30, name_from_header);
+      strcat( tbuff, "   ");
+      sprintf( tbuff + 4, "!%15.9f%13.9f%10.3f    %s",
+                    lon0, lat0, alt0, override_observatory_name);
       if( buff)
          strcpy( buff, tbuff);
       rval = extract_mpc_station_data( tbuff, lon_in_radians,
