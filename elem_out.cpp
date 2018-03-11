@@ -120,6 +120,7 @@ double comet_magnitude_slope_param = 10.;
 char default_comet_magnitude_type = 'N';
 const char *mpc_fmt_filename = "mpc_fmt.txt";
 const char *sof_filename = "sof.txt";
+const char *sofv_filename = "sofv.txt";
 extern int forced_central_body;
 void compute_variant_orbit( double *variant, const double *ref_orbit,
                      const double n_sigmas);       /* orb_func.cpp */
@@ -705,7 +706,7 @@ static int add_sof_to_file( const char *filename,
       {
       fseek( fp, 0L, SEEK_SET);
       if( !fgets( templat, sizeof( templat), fp))
-         assert( 1);
+         return( -1);
       if( forking)
          {
          fclose( fp);
@@ -1035,14 +1036,19 @@ int write_out_elements_to_file( const double *orbit,
 
    add_sof_to_file( (n_extra_params >= 2 ? "cmt_sof.txt" : sof_filename),
                     &elem, n_obs, obs);            /* elem_ou2.cpp */
-   if( showing_sigmas == COVARIANCE_AVAILABLE)
-      {
+/* if( showing_sigmas == COVARIANCE_AVAILABLE)
+*/    {
       ELEMENTS elem2 = elem;
       double rel_orbit2[6];
 
-      compute_variant_orbit( rel_orbit2, rel_orbit, 1.);    /* orb_func.cpp */
-      calc_classical_elements( &elem2, rel_orbit2, epoch_shown, 1);
-      add_sof_to_file( "sofv.txt", &elem2, n_obs, obs);     /* elem_ou2.cpp */
+      if( showing_sigmas == COVARIANCE_AVAILABLE)
+         {
+         compute_variant_orbit( rel_orbit2, rel_orbit, 1.);    /* orb_func.cpp */
+         calc_classical_elements( &elem2, rel_orbit2, epoch_shown, 1);
+         }
+      else        /* insert dummy elements */
+         elem2.q = elem2.ecc = elem2.incl = elem2.arg_per = elem2.asc_node = 0.;
+      add_sof_to_file( sofv_filename, &elem2, n_obs, obs);     /* elem_ou2.cpp */
       }
    helio_elem = elem;            /* Heliocentric J2000 ecliptic elems */
    helio_elem.central_obj = 0;
