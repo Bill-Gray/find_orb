@@ -59,47 +59,47 @@
 
    Some artificial satellite observers :
 
-Alm !   5.258        52.3713         -3.       Almere (satellite observatory)
-AMa !  33.9701       44.3932         68.7      Andriy Makeyev
-AOO !  30.75564      46.47778        56.       Astronomical Observatory of Odessa Univ
-Bag !-118.5          34.              0.       S Hutcheon obs
-Ber ! 138.6333        0.82043     -0.56986     Anthony Beresford, Adelaide, South Australia
-CBa !   6.3785       52.8344         10        Cees Bassa
-Cro !   4.499947     52.13878         0        Cronesteyn (Marco Langbroek)
-Fet ! -75.6910       44.6062        100        Kevin Fetter, Brockville, Ontario, Canada
-GRR !  18.5129      -33.94058        10        Greg Roberts, South Africa
-Hol !   8.6558       49.8822        135        Gerhard Holtkamp, Germany
-IHN ! -81.081444     41.547806      300        Indian Hill North
-ITE !   8.87444      46.178771      210        Marco Iten Gaggiole
-Lei !   4.49081      52.15412         0        Leiden (Marco Langbroek)
-MMc ! 262.1339        0.86573     +0.49912     Mike McCants
-PGa ! -98.2161       26.24316        36        Paul Gabriel, McAllen, Texas USA 78504-2940
-PWa !  -1.1188       51.0945        120        Peter Wakelin
-Ran !  12.4545       41.9683         80        Alberto Rango, Italy
-ScT !-123.6685       49.4348         40        Roberts Creek 1 (Scott Tilley)
-SGu !  94.5546      +56.1016        170        Sergey Guryanov
-SOb !  -2.24377     +53.3199         86        Unknown satellite observer
-Tim !  20.01361      47.18278        10        Andras Timar, Hungary
-Tu1 ! -95.983429    +36.139208      201        Tulsa-1
-Tu2 ! -96.1411      +35.8311        330        Tulsa-2
-VMe !  27.543306    +53.904694      217        Vitaly Mechinsky
-DBr ! -121.702778   +37.113278      282        Derek Breit
+Alm !   5.258        +52.3713         -3.      Almere (satellite observatory)
+AMa !  33.9701       +44.3932         68.7     Andriy Makeyev
+AOO !  30.75564      +46.47778        56.      Astronomical Observatory of Odessa Univ
+Bag !-118.5          +34.              0.      S Hutcheon obs
+Ber ! 138.6333       0.82043   -0.56986        Anthony Beresford, Adelaide, South Australia
+CBa !   6.3785       +52.8344         10       Cees Bassa
+Cro !   4.499947     +52.13878         0       Cronesteyn (Marco Langbroek)
+Fet ! -75.6910       +44.6062        100       Kevin Fetter, Brockville, Ontario, Canada
+GRR !  18.5129       -33.94058        10       Greg Roberts, South Africa
+Hol !   8.6558       +49.8822        135       Gerhard Holtkamp, Germany
+IHN ! -81.081444     +41.547806      300       Indian Hill North
+ITE !   8.87444      +46.178771      210       Marco Iten Gaggiole
+Lei !   4.49081      +52.15412         0       Leiden (Marco Langbroek)
+MMc ! 262.1339       0.86573   +0.49912        Mike McCants
+PGa ! -98.2161       +26.24316        36       Paul Gabriel, McAllen, Texas USA 78504-2940
+PWa !  -1.1188       +51.0945        120       Peter Wakelin
+Ran !  12.4545       +41.9683         80       Alberto Rango, Italy
+ScT !-123.6685       +49.4348         40       Roberts Creek 1 (Scott Tilley)
+SGu !  94.5546       +56.1016        170       Sergey Guryanov
+SOb !  -2.24377      +53.3199         86       Unknown satellite observer
+Tim !  20.01361      +47.18278        10       Andras Timar, Hungary
+Tu1 ! -95.983429     +36.139208      201       Tulsa-1
+Tu2 ! -96.1411       +35.8311        330       Tulsa-2
+VMe !  27.543306     +53.904694      217       Vitaly Mechinsky
+DBr !-121.702778     +37.113278      282       Derek Breit
 
-RPa !-71.0000        43.6666        200        Ralph Pass
-Var !  6.6814       +44.5736       1850        Vars,  southern Alps
+RPa ! -71.0000       +43.6666        200       Ralph Pass
+Var !   6.6814       +44.5736       1850       Vars,  southern Alps
 
    When 2008 TC3 impacted the earth on 7 Oct 2008,  I added the impact point
    as an "observatory" so I could get impact-centered ephemerides easily.
    Similarly for the 2014 AA estimated impact coordinates,  100 km above
    the Atlantic Ocean.
 
-Sud ! 33.11952       20.59777        10        Sudan impact site
-Atl !-43.2           12.5        100000        2014 AA impact location
+Sud !  33.11952      +20.59777       10        Sudan impact site
+Atl ! -43.2          +12.5       100000        2014 AA impact location
 
    Bowdoinham,  Maine,  my home town in the northeastern United States,
    added so I could get topocentric ephemerides readily :
 
-Bow ! -69.9          44.01          100        Bowdoinham
+Bow ! -69.9          +44.01         100        Bowdoinham
 
     The centers of the Sun,  moon,  and planets are treated as 'rovers'.
     (You'll see below Spirit and Opportunity set up as 'rovers' on Mars,
@@ -107,30 +107,30 @@ Bow ! -69.9          44.01          100        Bowdoinham
     ephems from that viewpoint,  showing the distance dwindling to zero at
     the time of impact.)
 
-Bar ! 0.0000 0.00000  0.00000           @12    SS Barycenter
-Sun ! 0.0000 0.00000  0.00000           @0     Sun
-Mer ! 0.0000 0.00000  0.00000           @1     Mercury
-Ven ! 0.0000 0.00000  0.00000           @2     Venus
-Mar ! 0.0000 0.00000  0.00000           @4     Mars
-Jup ! 0.0000 0.00000  0.00000           @5     Jupiter
-Sat ! 0.0000 0.00000  0.00000           @6     Saturn
-Ura ! 0.0000 0.00000  0.00000           @7     Uranus
-Nep ! 0.0000 0.00000  0.00000           @8     Neptune
-Plu ! 0.0000 0.00000  0.00000           @9     Pluto
-Lun ! 0.0000 0.00000  0.00000           @10    Luna
+Bar !   0.0000       0.00000   +0.00000    @12 SS Barycenter
+Sun !   0.0000       0.00000   +0.00000    @0  Sun
+Mer !   0.0000       0.00000   +0.00000    @1  Mercury
+Ven !   0.0000       0.00000   +0.00000    @2  Venus
+Mar !   0.0000       0.00000   +0.00000    @4  Mars
+Jup !   0.0000       0.00000   +0.00000    @5  Jupiter
+Sat !   0.0000       0.00000   +0.00000    @6  Saturn
+Ura !   0.0000       0.00000   +0.00000    @7  Uranus
+Nep !   0.0000       0.00000   +0.00000    @8  Neptune
+Plu !   0.0000       0.00000   +0.00000    @9  Pluto
+Lun !   0.0000       0.00000   +0.00000    @10 Luna
 
-MEx !  0.0000 0.00000  0.00000          @4     Mars Express
-LCO !311.75834 -84.56139 10             @10    LCROSS impact site
+MEx !   0.0000       0.00000   +0.00000    @4  Mars Express
+LCO ! 311.75834      -84.56139        10   @10 LCROSS impact site
 
-Met !   7.212778     51.520802       54        Bernd Brinkmann meteor site
-JSt !   8.32         52.02          300        Joerg Strunk meteor site
+Met !   7.212778     +51.520802       54       Bernd Brinkmann meteor site
+JSt !   8.32         +52.02          300       Joerg Strunk meteor site
 
-SBo !   8.327722     47.525778      450        Sandro Boschetti
+SBo !   8.327722     +47.525778      450       Sandro Boschetti
 
    TAROT positions from http://tarot.obs-hp.fr/tarot/infos/ :
 
-Tar !   6.92389      43.75222      1270        TAROT Calern Observatory
-Ta2 ! -70.7322      -29.2608       2347        TAROT La Silla ESO
+Tar !   6.92389      +43.75222      1270       TAROT Calern Observatory
+Ta2 ! -70.7322       -29.2608       2347       TAROT La Silla ESO
 
    There are at least eleven telescopes on Mauna Kea,  all currently lumped
    as (568).  Some are not very close to the position specified for (568)
@@ -174,35 +174,35 @@ Ke2 !-1552827.24268  +194935.61788  4159.581   Keck 2, Mauna Kea
 Sub !-1552833.66719  +194931.81425  4163.001   Subaru, Mauna Kea
 Gem !-1552808.56831  +194925.68521  4213.439   Gemini North, Mauna Kea
 
-Ce1 !  -2.566025     37.982840     1532        Centu1 (J75 scope)
+Ce1 !  -2.566025     +37.982840     1532       Centu1 (J75 scope)
 
    At one time,  it looked as if there might be some Dawn-based astrometry,
    with coordinates relative to Ceres.
-Daw !                        @100              Dawn spacecraft
+Daw !   0.0000       0.00000   +0.00000    @10 Dawn spacecraft
 
    I found some observations of Phobos transiting the Sun as seen from
    Spirit and Opportunity,  and wanted to compute ephems from the rovers:
-Spi ! 175.47263     -14.5684          0    @4  Spirit
-Opp ! 354.4734       -1.9462          0    @4  Opportunity
-MSL ! 137.4417       -4.5895          0    @4  MSL (Curiosity)
+Spi ! 175.47263      -14.5684          0   @4  Spirit
+Opp ! 354.4734       -01.9462          0   @4  Opportunity
+MSL ! 137.4417       -04.5895          0   @4  MSL (Curiosity)
 
    Shortly after the Chelyabinsk meteor impacted,  I computed a (_very) rough
    orbit based on the object coming in ten km above Chelyabinsk at 17.3 km/s
    from azimuth 97,  alt +18.  The following 'Che' code helped :
 
-Che !  61.42         55.1528      10000        Chelyabinsk meteor
+Che !  61.42         +55.1528      10000       Chelyabinsk meteor
 
-WT1 !  80.9004      +05.5488          0        WT1190F nominal impact point
+WT1 !  80.9004       +05.5488          0       WT1190F nominal impact point
 
-LNA ! -45.896527    -22.01097      1000        LNA (Laboratorio Nacional de Astrofisica)
+LNA ! -45.896527     -22.01097      1000       LNA (Laboratorio Nacional de Astrofisica)
 
    There has been one radar observation,  of (367943) Duende (2012 DA14),
    made from the following station.  It's at E 19 13' 33.1", N 69 35' 11.3",
    altitude 89.16 meters,  in Norway. The formatting should be obvious :
 
-273 ! 191333.10 +693511.3 89.16                EISCAT Tromso UHF (32-m)
+273 !  191333.10     +693511.3        89.16    EISCAT Tromso UHF (32-m)
 
-Jah ! 008.351507    +54.652323       10        Jost Jahn's home observatory
+Jah ! 008.351507     +54.652323       10       Jost Jahn's home observatory
 
    Coordinates for DSN Stations,  added 2016 Sep 27,  from
    ftp://ssd.jpl.nasa.gov/pub/eph/planets/stations/dsn.itrf93/dsn.itrf93_geodetic_19sep2016.txt
@@ -289,8 +289,8 @@ LSST! -704457.90     -301440.68     2647       LSST 8.4-m (site)
 LSA ! -704451.80     -301441.27     2647       LSST Aux. 1.4-m (site)
 ALO ! -704417.50     -301506.37     2552       Andes LIDAR Obs. (ALO)
 
-War ! 149.1930      -31.2763        552.       Warrumbungle Observatory
-Dub ! 148.58525     -31.29358       300.       Dubbo Observatory
+War ! 149.1930       -31.2763        552.      Warrumbungle Observatory
+Dub ! 148.58525      -31.29358       300.      Dubbo Observatory
 
    Coords from http://www.ls.eso.org/sci/facilities/lasilla/telescopes/d1p5/
    (Danish 1.52-m),
@@ -301,10 +301,10 @@ Dub ! 148.58525     -31.29358       300.       Dubbo Observatory
    http://www.eso.org/sci/facilities/lasilla/telescopes/national/2p2.html
    (ESO/MPG 2.2-m).  MPC lumps these at (809) La Silla
 
-Dan ! -704407.662   -291514.235     2340       Danish Telescope, La Silla
-NTT ! -704401.5     -291532.1       2375       New Technology Telescope, La Silla
-MPG ! -704004.543   -291515.433     2335       Max Planck Gesellschaft, La Silla
-ESO ! -704354.1     -291539.5       2400       ESO 3.6-m, La Silla
+Dan ! -704407.662    -291514.235    2340       Danish Telescope, La Silla
+NTT ! -704401.5      -291532.1      2375       New Technology Telescope, La Silla
+MPG ! -704004.543    -291515.433    2335       Max Planck Gesellschaft, La Silla
+ESO ! -704354.1      -291539.5      2400       ESO 3.6-m, La Silla
 
    https://www.eso.org/sci/facilities/paranal/astroclimate/site.html gives
    latitude/longitude for not only each of the four "unit telescopes"
@@ -314,39 +314,39 @@ ESO ! -704354.1     -291539.5       2400       ESO 3.6-m, La Silla
    EGM96),  resulting in an ellipsoidal height of 2369.34 meters.
    I'll go with that until we get better data...
 
-UT1 !   -702418.27   -243739.44     2369.34    VLT UT1 (Antu)
-UT2 !   -702417.39   -243737.80     2369.34    VLT UT2 (Kueyen)
-UT3 !   -702416.32   -243736.64     2369.34    VLT UT3 (Melipal)
-UT4 !   -702414.25   -243737.36     2369.34    VLT UT4 (Yepun)
-VST !   -702414.27   -243734.79     2369.34    VLT VST
-VIST!   -702351.36   -243656.52     2369.34    VLT VISTA
-CPA0!   -702418.44   -243740.59     2369.34    VLT A0
-CPA1!   -702418.26   -243741.08     2369.34    VLT A1
-CPB0!   -702418.17   -243740.50     2369.34    VLT B0
-CPB1!   -702417.99   -243740.99     2369.34    VLT B1
-CPB2!   -702417.89   -243741.24     2369.34    VLT B2
-CPB3!   -702417.80   -243741.48     2369.34    VLT B3
-CPB4!   -702417.71   -243741.73     2369.34    VLT B4
-CPB5!   -702417.62   -243741.97     2369.34    VLT B5
-CPC0!   -702417.90   -243740.42     2369.34    VLT C0
-CPC1!   -702417.72   -243740.91     2369.34    VLT C1
-CPC2!   -702417.63   -243741.15     2369.34    VLT C2
-CPC3!   -702417.53   -243741.40     2369.34    VLT C3
-CPD0!   -702417.36   -243740.25     2369.34    VLT D0
-CPD1!   -702416.99   -243741.23     2369.34    VLT D1
-CPD2!   -702416.81   -243741.72     2369.34    VLT D2
-CPE0!   -702416.83   -243740.08     2369.34    VLT E0
-CPG0!   -702416.29   -243739.91     2369.34    VLT G0
-CPG1!   -702415.55   -243741.87     2369.34    VLT G1
-CPG2!   -702416.57   -243739.18     2369.34    VLT G2
-CPH0!   -702415.21   -243739.58     2369.34    VLT H0
-CPI1!   -702414.48   -243740.72     2369.34    VLT I1
-CPJ1!   -702414.13   -243740.06     2369.34    VLT J1
-CPJ2!   -702413.85   -243740.79     2369.34    VLT J2
-CPJ3!   -702415.05   -243737.61     2369.34    VLT J3
-CPJ4!   -702415.24   -243737.12     2369.34    VLT J4
-CPJ5!   -702415.52   -243736.39     2369.34    VLT J5
-CPJ6!   -702415.79   -243735.65     2369.34    VLT J6
-CPK0!   -702414.14   -243739.24     2369.34    VLT K0
-CPL0!   -702413.87   -243739.16     2369.34    VLT L0
-CPM0!   -702413.60   -243739.07     2369.34    VLT M0
+UT1 ! -702418.27     -243739.44     2369.34    VLT UT1 (Antu)
+UT2 ! -702417.39     -243737.80     2369.34    VLT UT2 (Kueyen)
+UT3 ! -702416.32     -243736.64     2369.34    VLT UT3 (Melipal)
+UT4 ! -702414.25     -243737.36     2369.34    VLT UT4 (Yepun)
+VST ! -702414.27     -243734.79     2369.34    VLT VST
+VIST! -702351.36     -243656.52     2369.34    VLT VISTA
+CPA0! -702418.44     -243740.59     2369.34    VLT A0
+CPA1! -702418.26     -243741.08     2369.34    VLT A1
+CPB0! -702418.17     -243740.50     2369.34    VLT B0
+CPB1! -702417.99     -243740.99     2369.34    VLT B1
+CPB2! -702417.89     -243741.24     2369.34    VLT B2
+CPB3! -702417.80     -243741.48     2369.34    VLT B3
+CPB4! -702417.71     -243741.73     2369.34    VLT B4
+CPB5! -702417.62     -243741.97     2369.34    VLT B5
+CPC0! -702417.90     -243740.42     2369.34    VLT C0
+CPC1! -702417.72     -243740.91     2369.34    VLT C1
+CPC2! -702417.63     -243741.15     2369.34    VLT C2
+CPC3! -702417.53     -243741.40     2369.34    VLT C3
+CPD0! -702417.36     -243740.25     2369.34    VLT D0
+CPD1! -702416.99     -243741.23     2369.34    VLT D1
+CPD2! -702416.81     -243741.72     2369.34    VLT D2
+CPE0! -702416.83     -243740.08     2369.34    VLT E0
+CPG0! -702416.29     -243739.91     2369.34    VLT G0
+CPG1! -702415.55     -243741.87     2369.34    VLT G1
+CPG2! -702416.57     -243739.18     2369.34    VLT G2
+CPH0! -702415.21     -243739.58     2369.34    VLT H0
+CPI1! -702414.48     -243740.72     2369.34    VLT I1
+CPJ1! -702414.13     -243740.06     2369.34    VLT J1
+CPJ2! -702413.85     -243740.79     2369.34    VLT J2
+CPJ3! -702415.05     -243737.61     2369.34    VLT J3
+CPJ4! -702415.24     -243737.12     2369.34    VLT J4
+CPJ5! -702415.52     -243736.39     2369.34    VLT J5
+CPJ6! -702415.79     -243735.65     2369.34    VLT J6
+CPK0! -702414.14     -243739.24     2369.34    VLT K0
+CPL0! -702413.87     -243739.16     2369.34    VLT L0
+CPM0! -702413.60     -243739.07     2369.34    VLT M0
