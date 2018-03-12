@@ -253,13 +253,41 @@ d66 ! 3554454.89654  +402547.90955   849.87404 DSS 66 Madrid 26-meter
 253 ! 2430637.66245  +352533.24313  1001.39054 Goldstone DSS 14, Fort Irwin
 257 ! 2430728.69246  +352015.40307   959.63401 Goldstone DSS 25, Fort Irwin
 
-   Coordinates for proposed LSST and its auxiliary telescope,  from
-   https://arxiv.org/abs/1210.1616 .  Note that this lists several other
-   observatories,  some with coordinates that don't match those given
-   by MPC's ObsCodes.html.
+   Coordinates for Cerro Tololo and Cerro Pachon telescopes,  from
+   https://arxiv.org/abs/1210.1616 , Table 6.  Note that some positions
+   given here don't match those given by MPC's ObsCodes.html.  In case
+   of disagreement,  I'd think these positions should be trusted.
 
-LSS ! -704457.90     -301440.68     2663.      Large Synoptic Survey Telescope
-LSA ! -704451.80     -301441.27     2663.      LSST Auxiliary 1.4-m
+Blan! -704823.49     -301010.78     2241.4     Blanco 4-m
+S1.5! -704824.44     -301009.42     2241.9     SMARTS 1.5-m
+S1.0! -704821.83     -301007.92     2240.5     SMARTS 1.0-m
+S0.9! -704823.86     -301007.90     2241.4     SMARTS 0.9-m
+C0.6! -704822.63     -301008.60     2240.9     Curtis Schmidt 0.6-m
+UCAC! -704822.82     -301006.95     2241.2     Former UCAC
+CHAS! -704821.65     -301006.97     2240.5     Former CHASE
+RASI! -704825.11     -301008.03     2238       RASICAM
+WHAM! -704812.85     -301005.92     2188       WHAM
+KASI! -704814.39     -301001.84     2182       KASI
+LCOA! -704817.24     -301002.58     2198       LCOGT Stellan-A
+LCOB! -704816.78     -301002.39     2198       LCOGT Stellan-B
+LCOC! -704816.85     -301002.81     2198       LCOGT Stellan-C
+S1.3! -704817.92     -301002.81     2200       SMARTS 1.3-m
+PRO1! -704818.91     -301003.52     2207       PROMPT #1
+PRO2! -704819.56     -301003.49     2207       PROMPT #2
+PRO3! -704818.85     -301003.17     2207       PROMPT #3
+PRO4! -704819.32     -301003.56     2207       PROMPT #4
+PRO5! -704819.16     -301003.16     2207       PROMPT #5
+PRO6! -704818.96     -301003.82     2207       PROMPT #6
+PRO7! -704819.36     -301004.33     2208       PROMPT #7
+GONG! -704819.84     -301003.92     2209       GONG
+SSIA! -704819.56     -301005.28     2212       SSI Airglow
+SARA! -704820.48     -301004.31     2212       T80-South (site)
+T80S! -704757.13     -301019.72     2151       SARA South 0.6-m
+GemS! -704412.06     -301426.67     2748       Gemini South 8.2-m
+SOAR! -704401.11     -301416.41     2738       SOAR 4.1-m
+LSST! -704457.90     -301440.68     2647       LSST 8.4-m (site)
+LSA ! -704451.80     -301441.27     2647       LSST Aux. 1.4-m (site)
+ALO ! -704417.50     -301506.37     2552       Andes LIDAR Obs. (ALO)
 
 War ! 149.1930      -31.2763        552.       Warrumbungle Observatory
 Dub ! 148.58525     -31.29358       300.       Dubbo Observatory
