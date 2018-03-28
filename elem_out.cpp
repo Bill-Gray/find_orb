@@ -125,7 +125,7 @@ extern int forced_central_body;
 void compute_variant_orbit( double *variant, const double *ref_orbit,
                      const double n_sigmas);       /* orb_func.cpp */
 void make_config_dir_name( char *oname, const char *iname);  /* miscell.cpp */
-int put_comet_data_into_sof( char *obuff, const char *templat,
+int put_elements_into_sof( char *obuff, const char *templat,
          const ELEMENTS *elem,
          const int n_obs, const OBSERVE *obs);                /* elem_ou2.cpp */
 
@@ -714,7 +714,7 @@ static int add_sof_to_file( const char *filename,
          assert( fp);
          }
       fseek( fp, 0L, SEEK_END);
-      rval = put_comet_data_into_sof( obuff, templat, elem, n_obs, obs);
+      rval = put_elements_into_sof( obuff, templat, elem, n_obs, obs);
       fwrite( obuff, strlen( obuff), 1, fp);
       fclose( fp);
       }

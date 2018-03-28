@@ -35,13 +35,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #ifdef _MSC_VER   /* MSVC/C++ lacks snprintf.  See 'ephem0.cpp' for details. */
 int snprintf( char *string, const size_t max_len, const char *format, ...);
 #endif
-int put_comet_data_into_sof( char *obuff, const char *templat,
+int put_elements_into_sof( char *obuff, const char *templat,
          const ELEMENTS *elem,
          const int n_obs, const OBSERVE *obs);                /* elem_ou2.cpp */
 
 const double PI = 3.1415926535897932384626433832795028841971693993751058209749445923;
 
-int put_comet_data_into_sof( char *obuff, const char *templat,
+int put_elements_into_sof( char *obuff, const char *templat,
          const ELEMENTS *elem,
          const int n_obs, const OBSERVE *obs)
 {
