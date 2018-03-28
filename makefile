@@ -100,21 +100,39 @@ clean:
 	$(RM) $(OBJS) fo.o findorb.o fo_serve.o find_orb$(EXE) fo$(EXE)
 	$(RM) fo_serve.cgi eph2tle.o eph2tle$(EXE) cssfield$(EXE)
 	$(RM) cssfield.o
-	cd $(IDIR)
-	$(RM) covar.txt covar?.txt debug.txt eleme?.txt elements.txt
-	$(RM) ephemeri.txt gauss.out guide.txt guide?.txt monte.txt monte?.txt
-	$(RM) mpc_f?.txt mpc_fmt.txt mpc_s?.txt mpec.htm obser?.txt observe.txt
-	$(RM) residual.txt sr_el?.txt state.txt state?.txt virtu?.txt virtual.txt
-	$(RM) sr_elems.txt mpcorb.dat
 
 clean_temp:
-	cd $(IDIR)
-	$(RM) covar.txt covar?.txt debug.txt eleme?.txt elements.txt
-	$(RM) ephemeri.txt gauss.out guide.txt guide?.txt monte.txt monte?.txt
-	$(RM) mpc_f?.txt mpc_fmt.txt mpc_s?.txt mpec.htm obser?.txt observe.txt
-	$(RM) residual.txt sr_el?.txt state.txt state?.txt virtu?.txt virtual.txt
-	$(RM) sr_elems.txt mpcorb.dat
-	$(RM) sof?.txt sof1s?.txt
+	$(RM) $(IDIR)/bc405pre.txt
+	$(RM) $(IDIR)/cmt_sof.txt
+	$(RM) $(IDIR)/covar.txt
+	$(RM) $(IDIR)/covar?.txt
+	$(RM) $(IDIR)/debug.txt
+	$(RM) $(IDIR)/eleme?.txt
+	$(RM) $(IDIR)/elements.txt
+	$(RM) $(IDIR)/ephemeri.txt
+	$(RM) $(IDIR)/gauss.out
+	$(RM) $(IDIR)/guide.txt
+	$(RM) $(IDIR)/guide?.txt
+	$(RM) $(IDIR)/monte.txt
+	$(RM) $(IDIR)/monte?.txt
+	$(RM) $(IDIR)/mpcorb.dat
+	$(RM) $(IDIR)/mpc_f?.txt
+	$(RM) $(IDIR)/mpc_fmt.txt
+	$(RM) $(IDIR)/mpc_s?.txt
+	$(RM) $(IDIR)/mpec.htm
+	$(RM) $(IDIR)/obser?.txt
+	$(RM) $(IDIR)/observe.txt
+	$(RM) $(IDIR)/residual.txt
+	$(RM) $(IDIR)/sof.txt
+	$(RM) $(IDIR)/sof?.txt
+	$(RM) $(IDIR)/sofv?.txt
+	$(RM) $(IDIR)/sr_el?.txt
+	$(RM) $(IDIR)/sr_elems.txt
+	$(RM) $(IDIR)/state.txt
+	$(RM) $(IDIR)/state?.txt
+	$(RM) $(IDIR)/vectors.txt
+	$(RM) $(IDIR)/virtu?.txt
+	$(RM) $(IDIR)/virtual.txt
 
 install:
 	-cp find_orb $(HOME)/bin
