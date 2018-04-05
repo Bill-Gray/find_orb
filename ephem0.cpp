@@ -1646,12 +1646,6 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
             double cos_elong, solar_r, elong;
             bool moon_more_than_half_lit = false;
             bool is_in_shadow = false;
-            const double arcsec_to_radians = PI / (180. * 3600.);
-//          const double span = 0.01512;
-//          const double ra_offset = ((utc - 2457361.64226) * -15. / span - 2342.) * arcsec_to_radians;
-//          const double dec_offset = ((utc - 2457361.64226) * -149. / span + 4563.) * arcsec_to_radians;
-            const double ra_offset = atof( get_environment_ptr( "RA_OFFSET")) * arcsec_to_radians;
-            const double dec_offset = atof( get_environment_ptr( "DEC_OFFSET")) * arcsec_to_radians;
 
             strcpy( buff, "Nothing to see here... move along... uninteresting... who cares?...");
             solar_r = vector3_length( orbi_after_light_lag);
@@ -1660,7 +1654,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
             cos_elong /= 2. * earth_r * r;
             elong = acose( cos_elong);
 
-            ra_dec.x = atan2( topo[1], topo[0]) + ra_offset;
+            ra_dec.x = atan2( topo[1], topo[0]);
             ra = ra_dec.x * 12. / PI;
             if( ra < 0.) ra += 24.;
             if( ra >= 24.) ra -= 24.;
@@ -1669,7 +1663,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
             else
                output_angle_to_buff( ra_buff, ra, 3);
 
-            ra_dec.y = asin( topo[2] / r) + dec_offset;
+            ra_dec.y = asin( topo[2] / r);
             stored_ra_decs[obj_n] = ra_dec;
             if( n_objects > 1 && obj_n == n_objects - 1 && show_this_line)
                {
