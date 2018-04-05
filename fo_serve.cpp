@@ -120,21 +120,7 @@ static void show_problem_message( void)
 }
 
 #ifndef strlcpy
-
-      /* Some systems (BSD, Solaris,  others) offer this handy function. */
-      /* Linux and Windows don't.                                        */
-
-size_t strlcpy(char *dest, const char *src, size_t size)
-{
-   size_t i;
-
-   for( i = 0; i < size && *src; i++)
-      *dest++ = *src++;
-   if( i == size)
-      dest--;
-   *dest = '\0';
-   return( i);
-}
+size_t strlcpy(char *dest, const char *src, size_t size);   /* miscell.cpp */
 #endif
 
 static int desig_matches( const char *iline, const char *desig)
