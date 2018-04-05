@@ -1722,40 +1722,46 @@ void set_solutions_found( OBJECT_INFO *ids, const int n_ids)
 ELEMENTS.COMET,  Find_Orb can sometimes flounder about a bit in its
 efforts to determine an orbit. */
 
-static int get_orbit_from_dastcom( const char *object_name, double *orbit, double *epoch)
+
+int extract_sof_data( ELEMENTS *elem, const char *buff, const char *header);
+
+static int get_orbit_from_mpcorb_sof( const char *object_name, double *orbit, double *epoch)
 {
-   FILE *ifile = fopen_ext( "ELEMENTS.COMET", "crb");
+   FILE *ifile = fopen_ext( "mpcorb.sof", "crb");
    int got_vectors = 0;
 
    if( ifile)
       {
-      char buff[200];
+      char buff[300], header[300], tname[15];
 
-      while( !got_vectors && fgets_trimmed( buff, sizeof( buff), ifile))
+      if( !fgets_trimmed( header, sizeof( header), ifile))
          {
-         char *loc;
-
-         buff[45] = buff[119] = '\0';
-         if( (loc = strstr( buff, object_name)) != NULL &&
-                       loc[strlen( object_name)] == ' ')
+         fprintf( stderr, "Error in mpcorb.sof header\n");
+         exit( -1);
+         }
+      while( *object_name == ' ')
+         object_name++;
+      if( *object_name == '(')         /* numbered obj */
+         snprintf( tname, sizeof( tname), "%12d", atoi( object_name + 1));
+      else
+         snprintf( tname, sizeof( tname), "%-12s", object_name);
+      debug_printf( "Header (looking for '%s'):\n%s", tname, header);
+      while( !got_vectors && fgets_trimmed( buff, sizeof( buff), ifile))
+         if( !memcmp( tname, buff, 12))
             {
             ELEMENTS elem;
 
+            debug_printf( "Elems:\n%s\n", buff);
             memset( &elem, 0, sizeof( ELEMENTS));
-            elem.q = atof( buff + 51);
-            elem.epoch = *epoch = atof( buff + 46) + 2400000.5;
-            elem.ecc = atof( buff + 64);
-            elem.incl = atof( buff + 75) * PI / 180.;
-            elem.arg_per = atof( buff + 85) * PI / 180.;
-            elem.asc_node = atof( buff + 95) * PI / 180.;
-            elem.perih_time = get_time_from_string( 0., buff + 105, 0, NULL);
+            extract_sof_data( &elem, buff, header);
+            assert( elem.epoch > 2400000.);
             derive_quantities( &elem, SOLAR_GM);
             comet_posn_and_vel( &elem, elem.epoch, orbit, orbit + 3);
+            *epoch = elem.epoch;
             got_vectors = 1;
             if( elem.ecc == 1.)     /* indicate parabolic-constraint orbit */
                got_vectors = 2;
             }
-         }
       fclose( ifile);
       }
    return( got_vectors);
@@ -1856,7 +1862,7 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
       }
    if( !got_vectors && !ignore_prev_solns)
       {
-      got_vectors = get_orbit_from_dastcom( object_name, orbit, orbit_epoch);
+      got_vectors = get_orbit_from_mpcorb_sof( object_name, orbit, orbit_epoch);
       if( got_vectors)
          set_locs( orbit, *orbit_epoch, obs, n_obs);
       }
