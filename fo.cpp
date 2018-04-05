@@ -60,6 +60,10 @@ for Windows and other non-*nix systems. */
 
 extern int debug_level;
 
+#ifndef strlcpy
+size_t strlcpy(char *dest, const char *src, size_t size);   /* miscell.cpp */
+#endif
+
 int debug_level = 0;
 extern const char *sof_filename, *sofv_filename;
 
@@ -362,7 +366,7 @@ static void colorize_text( char *text)
 
 int main( const int argc, const char **argv)
 {
-   char tbuff[300];
+   char tbuff[300], mpc_code[20];
    char **summary_lines = NULL;
    const char *separate_residual_file_name = NULL;
    const char *mpec_path = NULL;
@@ -382,6 +386,7 @@ int main( const int argc, const char **argv)
    bool show_processing_steps = true;
    int ephemeris_output_options = OPTION_SHOW_SIGMAS | OPTION_ROUND_TO_NEAREST_STEP;
    time_t update_time, t0;
+   double ephem_end_jd = 0.;
 #ifdef FORKING
    int child_status;
 #endif
@@ -390,6 +395,7 @@ int main( const int argc, const char **argv)
       use_config_directory = true;
    else
       use_config_directory = false;
+   *mpc_code = '\0';
    for( i = 1; i < argc; i++)       /* check to see if we're debugging: */
       if( argv[i][0] == '-')
          switch( argv[i][1])
@@ -413,6 +419,9 @@ int main( const int argc, const char **argv)
 
                combine_all_observations = 1;
                }
+               break;
+            case 'C':
+               strlcpy( mpc_code, argv[i] + 2, sizeof( mpc_code));
                break;
             case 'd':
                debug_level = atoi( argv[i] + 2);
@@ -495,7 +504,13 @@ int main( const int argc, const char **argv)
                }
                break;
             case 't':
-               total_objects = atoi( argv[i] + 2);
+               if( argv[i][2] == 'e')
+                  ephem_end_jd = get_time_from_string( curr_jd( ),
+                           argv[i] + 3,
+                           CALENDAR_JULIAN_GREGORIAN | FULL_CTIME_YMD
+                           | FULL_CTIME_TWO_DIGIT_YEAR, NULL);
+               else
+                  total_objects = atoi( argv[i] + 2);
                break;
             case 'v':
                use_colors = false;
@@ -669,7 +684,7 @@ int main( const int argc, const char **argv)
                   char fullpath[100];
                   int n_orbits_in_ephem = 1;
                   int n_ephemeris_steps = 50;
-                  char ephemeris_step_size[20], mpc_code[20];
+                  char ephemeris_step_size[20];
                   extern const char *ephemeris_filename;
                   extern const char *residual_filename;
                   extern int available_sigmas;
@@ -682,7 +697,15 @@ int main( const int argc, const char **argv)
 
                   sscanf( get_environment_ptr( "EPHEM_STEPS"), "%d %9s",
                          &n_ephemeris_steps, ephemeris_step_size);
-                  sscanf( get_environment_ptr( "CONSOLE_OPTS"), "%9s",
+                  if( ephem_end_jd)
+                     {
+                     n_ephemeris_steps = 1;
+                     snprintf( ephemeris_step_size,
+                           sizeof( ephemeris_step_size),
+                           "%f", ephem_end_jd - jd_start);
+                     }
+                  if( !*mpc_code)
+                     sscanf( get_environment_ptr( "CONSOLE_OPTS"), "%9s",
                                  mpc_code);
                   create_obs_file( obs, n_obs_actually_loaded, 0);
                   ephemeris_mag_limit = 999.;
