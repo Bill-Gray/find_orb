@@ -1002,8 +1002,6 @@ y = |off-axis vector|
    And if y < shadow_radius,  we're in the umbra.
 */
 
-
-
 static bool shadow_check( const double *earth_loc, const double *obs_posn)
 {
    const double earth_r = vector3_length( earth_loc);
@@ -1056,73 +1054,7 @@ static void format_motion( char *buff, const double motion)
    snprintf( buff, 7, motion_format, motion);
 }
 
-void **calloc_double_dimension_array( const size_t x, const size_t y,
-                                    const size_t obj_size);
-
-#ifdef ENABLE_SCATTERPLOTS
-
-static inline char **make_text_scattergram( const double *x, const double *y,
-         const unsigned n_pts,
-         const int xsize, const int ysize, double range)
-{
-   int i;
-   char **histo = (char **)calloc_double_dimension_array(
-                                    ysize + 1, xsize + 10, 1);
-   double scale = range / (double)ysize;
-   int iscale = 1, spacing = 0, n_marks;
-
-   for( i = 0; iscale < 1000000 && spacing < 3; i++)
-      {                 /* iscale will run as 1, 2, 4, 5, 10, 20, 40, ... */
-      if( i % 4 == 2)
-         iscale += iscale / 4;
-      else
-         iscale += iscale;
-      spacing = iscale / (int)( scale + 1.);
-      }
-   range = (double)ysize * (double)iscale / (double)spacing;
-
-   for( i = 0; i <= ysize; i++)
-      memset( histo[i], ' ', xsize);
-
-   for( i = 0; i < (int)n_pts; i++)
-      {        /* RA runs "backward" on x-axis */
-      const int ix = (xsize - (int)floor( x[i] * (double)xsize / range)) / 2;
-      const int iy = (ysize + (int)floor( y[i] * (double)ysize / range)) / 2;
-
-      if( ix >= 0 && ix < xsize && iy > 0 && iy < ysize)
-         {
-         if( histo[iy][ix] == ' ')
-            histo[iy][ix] = '1';
-         else if( histo[iy][ix] < 'Z')
-            histo[iy][ix]++;
-         }
-      }
-   n_marks = (ysize / 2) / spacing;
-   for( i = -n_marks; i <= n_marks; i++)
-      {
-      char text[10];
-      int j, num = i * iscale;
-      int yloc = ysize / 2 + i * spacing, xloc;
-
-      for( j = -n_marks; j <= n_marks; j++)
-         histo[yloc][xsize / 2 + 2 * j * spacing] = '+';
-      if( !num)
-         strcpy( text, "-0");
-      else if( abs( num) < 1000)
-         snprintf( text, sizeof( text), "-%+d", num);
-      else if( !(num % 1000))
-         snprintf( text, sizeof( text), "-%+dK", num / 1000);
-      else
-         strcpy( text, "-");
-      strcat( histo[yloc], text);
-      xloc = yloc * 2 - (int)strlen( text + 1) / 2;
-      if( xloc >= 0)
-         memcpy( histo[0] + xloc, text + 1, strlen( text + 1));
-      }
-   histo[ysize / 2][xsize / 2] = '*';       /* mark center */
-   strcpy( histo[ysize], histo[0]);         /* copy top line to bottom */
-   return( histo);
-}
+#ifdef NOT_CURRENTLY_USED
 
    /* In displaying an SR scatterplot,  we might want to size it */
    /* such that,  say,  17 of 20 points appear,  with the three  */
@@ -1156,11 +1088,10 @@ static inline double find_cutoff_point( const double *x, const double *y,
       }
    return( lim * 1.1);
 }
-
 #endif        /* #ifdef ENABLE_SCATTERPLOTS */
 
 inline void calc_sr_dist_and_posn_ang( const DPT *ra_decs, const unsigned n_objects,
-                     double *dist, double *posn_ang)
+                     double *dist, double *posn_ang, FILE *ofile)
 {
    unsigned i;
    double mean_x = 0., mean_y = 0.;
@@ -1216,6 +1147,8 @@ inline void calc_sr_dist_and_posn_ang( const DPT *ra_decs, const unsigned n_obje
    *dist = sqrt( z1);
    assert( z1 > z2);    /* z1 should be the _major_ axis */
    *posn_ang = atan2( sum_xy, sum_x2 - z2);
+    if( *posn_ang < 0.)
+      *posn_ang += PI;
 #ifdef ENABLE_SCATTERPLOTS
 // debug_printf( "Posn angles   : %f %f\n", *posn_ang * 180. / PI,
 //          atan2( sum_xy, sum_x2 - z1) * 180. / PI);
@@ -1234,6 +1167,13 @@ inline void calc_sr_dist_and_posn_ang( const DPT *ra_decs, const unsigned n_obje
       free( histo);
       }
 #endif
+   if( ofile)
+      {
+      fprintf( ofile, "# %u points; %.1f x %.1f ellipse at %.1f\n",
+                     n_objects, *dist, sqrt( z2), 180. - *posn_ang * 180. / PI);
+      for( i = 0; i < n_objects; i++)
+         fprintf( ofile, "%.1f %.1f\n", x[i], y[i]);
+      }
    *dist /= radians_to_arcsecs;
    free( x);
 }
@@ -1675,8 +1615,27 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                                        (const double *)&ra_dec,
                                        &dist, &posn_ang);
                else
+                  {
+                  char filename[80];
+                  FILE *ofile;
+
+                  strcpy( filename, "/tmp/obj_");
+                  full_ctime( date_buff, curr_jd,
+                        FULL_CTIME_FORMAT_HH_MM | FULL_CTIME_YMD
+                      | FULL_CTIME_MONTHS_AS_DIGITS | FULL_CTIME_NO_SPACES
+                      | FULL_CTIME_NO_COLONS | FULL_CTIME_LEADING_ZEROES);
+                  strcat( filename, date_buff);
+                  strcat( filename, ".off");
+                  ofile = fopen( filename, "wb");
+                  assert( ofile);
+                  full_ctime( date_buff, curr_jd,
+                        FULL_CTIME_FORMAT_HH_MM | FULL_CTIME_YMD);
+                  fprintf( ofile, "# JD %f = %s\n", curr_jd, date_buff);
+                  fprintf( ofile, "# %s\n", obs->packed_id);
                   calc_sr_dist_and_posn_ang( stored_ra_decs, n_objects,
-                                       &dist, &posn_ang);
+                                       &dist, &posn_ang, ofile);
+                  fclose( ofile);
+                  }
                put_ephemeris_posn_angle_sigma( tbuff, dist, posn_ang, computer_friendly);
                fprintf( ofile, " %s", tbuff);
                }
