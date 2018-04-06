@@ -53,7 +53,35 @@ It may be useful to split the above data among two or more files.  (For
 example, one may have a list of fields from first light up to a week ago,
 and a smaller file that just has the last few nights.  You update the latter,
 but the big file stays unchanged.)  For this reason,  the index actually
-covers up to ten files,  css0.csv through css9.csv.   */
+covers up to ten files,  css0.csv through css9.csv.  Adding more would not
+be particularly difficult.
+
+By default,  the field sizes are determined by get_field_size(),  which knows
+about CSS history and can figure it out based on station code and image date.
+Similar lines can be added for other codes,  given suitable data.  This can
+be overridden by appending,  after the image file name,
+
+,!(height),(width),(tilt angle)
+
+The ! serves to notify this program that any default height/width will be
+overridden by the subsequent values.  If there's just one such value,  the
+field is assumed to be square.  If there are only two,  the (rectangular)
+field is assumed to be aligned with the RA/dec axes of date.  If there are
+three,  it's assumed that the image was tilted by that angle relative to the
+RA/dec axes of date.
+
+For Spacetwatch,  for example,  three out of four fields will be in the
+default "landscape" orientation.  The remaining quarter will probably use
+the above scheme to specify the image height and width,  or possibly the
+same height/width and a 90 degree rotation angle.
+
+Also,  note that a generic time/date parser is used.  CSS gave FITS-style
+times,  and that's what is shown in the above examples.  But one can
+instead specify JD,  MJD,  and a variety of unlikely formats.  See
+
+https://projectpluto.com/update8d.htm#time_entry
+
+for a full list of time specification options.  */
 
 #include <stdio.h>
 #include <stdint.h>
@@ -137,6 +165,28 @@ static void get_field_size( double *width, double *height, const double jd,
    *height = *width;    /* all square fields thus far */
 }
 
+static void get_field_size_from_input( double *width, double *height,
+                   double *tilt, const char *buff)
+{
+   const char *bang = strchr( buff, '!');
+
+   if( bang)
+      {
+      const int n_scanned = sscanf( bang + 1, "%lf %lf %lf", width, height, tilt);
+
+      if( n_scanned < 1 || *width <= 0.)
+         {
+         printf( "Error reading field sizes\n%s\n", buff);
+         exit( -1);
+         }
+      assert( n_scanned >= 1 && n_scanned <= 3);
+      if( n_scanned == 1)     /* only one dimension given */
+         *height = *width;
+      *width *= PI / 180.;
+      *height *= PI / 180.;
+      *tilt *= PI / 180.;
+      }
+}
 
 int main( const int argc, const char **argv)
 {
@@ -195,10 +245,13 @@ int main( const int argc, const char **argv)
                {
                rval[n].ra  *= PI / 180.;
                rval[n].dec *= PI / 180.;
+               rval[n].tilt = 0.;
                rval[n].file_offset = file_loc;
                rval[n].file_number = (char)file_number;
                get_field_size( &rval[n].width, &rval[n].height, rval[n].jd,
                                     rval[n].obscode);
+               get_field_size_from_input( &rval[n].width, &rval[n].height,
+                                 &rval[n].tilt, buff);
                if( min_jd > rval[n].jd)
                   min_jd = rval[n].jd;
                if( max_jd < rval[n].jd)
