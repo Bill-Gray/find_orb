@@ -193,9 +193,10 @@ int find_vaisala_orbit( double *orbit, const OBSERVE *obs1,   /* orb_func.c */
                      const OBSERVE *obs2, const double solar_r);
 int extended_orbit_fit( double *orbit, OBSERVE *obs, int n_obs,
                   const unsigned fit_type, double epoch);     /* orb_func.c */
-int generate_mc_variant_from_covariance( double *orbit);    /* orb_fun2.cpp */
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 void set_environment_ptr( const char *env_ptr, const char *new_value);
+int orbital_monte_carlo( const double *orbit, OBSERVE *obs, const int n_obs,
+         const double curr_epoch, const double epoch_shown);   /* orb_func.cpp */
 
 extern double maximum_jd, minimum_jd;        /* orb_func.cpp */
 
@@ -4345,35 +4346,9 @@ int main( const int argc, const char **argv)
             update_element_display = 1;
             break;
          case ALT_G:
-            {
-            int n_variants;
-
-            inquire( "Number orbital MC variants: ",
-                               tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY);
-            n_variants = atoi( tbuff);
-            if( n_variants > 0)
-               {
-               extern int append_elements_to_element_file;
-               const clock_t t0 = clock( );
-
-               for( i = 0; i < n_variants; i++)
-                  {
-                  push_orbit( curr_epoch, orbit);
-                  generate_mc_variant_from_covariance( orbit);
-                  if( tbuff[strlen( tbuff) - 1] == 'z')
-                     set_locs( orbit, curr_epoch, obs, n_obs);
-                  write_out_elements_to_file( orbit, curr_epoch, epoch_shown,
-                       obs, n_obs, orbit_constraints, element_precision,
-                       1, element_format);
-                  append_elements_to_element_file = 1;
-                  pop_orbit( &curr_epoch, orbit);
-                  }
-               set_locs( orbit, curr_epoch, obs, n_obs);
-               append_elements_to_element_file = 0;
-               sprintf( message_to_user, "Time: %.3f seconds",
-                      (double)( clock( ) - t0) / (double)CLOCKS_PER_SEC);
-               }
-            }
+            orbital_monte_carlo( orbit, obs, n_obs, curr_epoch, epoch_shown);
+            update_element_display = 1;
+            strcpy( message_to_user, "Orbital MC generated");
             break;
 #ifdef GOT_CLIPBOARD_FUNCTIONS
          case ALT_I:
