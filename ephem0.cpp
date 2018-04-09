@@ -1764,7 +1764,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   date_buff, ra_buff, dec_buff, r_buff, solar_r_buff);
 
             if( !(options & OPTION_SUPPRESS_ELONG))
-               snprintf_append( buff, sizeof( buff), "% 5.1f", elong * 180. / PI);
+               snprintf_append( buff, sizeof( buff), " %5.1f", elong * 180. / PI);
 
             if( show_visibility)
                {
