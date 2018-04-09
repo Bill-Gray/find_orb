@@ -1314,9 +1314,16 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                            guessed_rotation_period_in_hours( abs_mag),
                            diameter_from_abs_mag( abs_mag, optical_albedo));
             }
-         fprintf( ofile, "Date %s%s   RA              ",
+         fprintf( ofile, "Date %s%s  ",
                         (*timescale ? "(TT)"  : "(UTC)"), hr_min_text);
-         fprintf( ofile, "Dec         delta   r     elong ");
+         if( !(options & OPTION_SUPPRESS_RA_DEC))
+            fprintf( ofile, " RA              Dec         ");
+         if( !(options & OPTION_SUPPRESS_DELTA))
+            fprintf( ofile, "delta  ");
+         if( !(options & OPTION_SUPPRESS_SOLAR_R))
+            fprintf( ofile, " r     ");
+         if( !(options & OPTION_SUPPRESS_ELONG))
+            fprintf( ofile, "elong ");
          if( show_visibility)
             fprintf( ofile, "SM ");
          if( options & OPTION_PHASE_ANGLE_OUTPUT)
@@ -1351,8 +1358,15 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
          for( i = 0; hr_min_text[i]; i++)
             if( hr_min_text[i] != ' ')
                hr_min_text[i] = '-';
-         fprintf( ofile, "---- -- --%s  ------------   ",  hr_min_text);
-         fprintf( ofile, "------------  ------ ------ ----- ");
+         fprintf( ofile, "---- -- --%s  ",  hr_min_text);
+         if( !(options & OPTION_SUPPRESS_RA_DEC))
+            fprintf( ofile, "-------------   -----------  ");
+         if( !(options & OPTION_SUPPRESS_DELTA))
+            fprintf( ofile, "------ ");
+         if( !(options & OPTION_SUPPRESS_SOLAR_R))
+            fprintf( ofile, "------ ");
+         if( !(options & OPTION_SUPPRESS_ELONG))
+            fprintf( ofile, "----- ");
          if( show_visibility)
             fprintf( ofile, "-- ");
          if( options & OPTION_PHASE_ANGLE_OUTPUT)
@@ -1716,7 +1730,15 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                output_signed_angle_to_buff( dec_buff, dec, 2);
                dec_buff[12] = '\0';
                }
-
+            if( options & OPTION_SUPPRESS_RA_DEC)
+               *dec_buff = *ra_buff = '\0';
+            else
+               {
+               memmove( ra_buff + 1, ra_buff, strlen( ra_buff) + 1);
+               *ra_buff = ' ';
+               strcat( ra_buff, "   ");
+               strcat( dec_buff, " ");
+               }
             if( computer_friendly)
                {
                snprintf( date_buff, sizeof( date_buff), "%13.5f", curr_jd);
@@ -1733,9 +1755,15 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                use_au_only = false;
                format_dist_in_buff( solar_r_buff, solar_r);
                }
-            snprintf( buff, sizeof( buff), "%s  %s   %s %s%s %5.1f",
-                  date_buff, ra_buff, dec_buff, r_buff, solar_r_buff,
-                  elong * 180. / PI);
+            if( options & OPTION_SUPPRESS_DELTA)
+                *r_buff = '\0';
+            if( options & OPTION_SUPPRESS_SOLAR_R)
+                *solar_r_buff = '\0';
+            snprintf( buff, sizeof( buff), "%s %s%s%s%s",
+                  date_buff, ra_buff, dec_buff, r_buff, solar_r_buff);
+
+            if( !(options & OPTION_SUPPRESS_ELONG))
+               snprintf_append( buff, sizeof( buff), "% 5.1f", elong * 180. / PI);
 
             if( show_visibility)
                {

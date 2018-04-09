@@ -593,45 +593,53 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
       strcat( buff, "\n");
       if( ephem_type == OPTION_OBSERVABLES)    /* for other tables,        */
          {                          /* these options are irrelevant:       */
-         sprintf( buff + strlen( buff), "Z  Motion info in ephemerides: %s\n",
-                  (ephemeris_output_options & OPTION_MOTION_OUTPUT) ? "On" : "Off");
+         sprintf( buff + strlen( buff), "Z [%c] Motion info\n",
+                  (ephemeris_output_options & OPTION_MOTION_OUTPUT) ? '*' : ' ');
          if( ephemeris_output_options & OPTION_MOTION_OUTPUT)
-            sprintf( buff + strlen( buff), "O  Separate motions: %s\n",
-                  (ephemeris_output_options & OPTION_SEPARATE_MOTIONS) ? "On" : "Off");
+            sprintf( buff + strlen( buff), "O [%c] Separate motions\n",
+                  (ephemeris_output_options & OPTION_SEPARATE_MOTIONS) ? '*' : ' ');
          if( is_topocentric)
-            sprintf( buff + strlen( buff), "A  Alt/az info in ephemerides: %s\n",
-                  (ephemeris_output_options & OPTION_ALT_AZ_OUTPUT) ? "On" : "Off");
-         sprintf( buff + strlen( buff), "R  Radial velocity in ephemerides: %s\n",
-                  (ephemeris_output_options & OPTION_RADIAL_VEL_OUTPUT) ? "On" : "Off");
-         sprintf( buff + strlen( buff), "P  Phase angle in ephemerides: %s\n",
-                  (ephemeris_output_options & OPTION_PHASE_ANGLE_OUTPUT) ? "On" : "Off");
-         sprintf( buff + strlen( buff), "B  Phase angle bisector: %s\n",
-                  (ephemeris_output_options & OPTION_PHASE_ANGLE_BISECTOR) ? "On" : "Off");
-         sprintf( buff + strlen( buff), "H  Heliocentric ecliptic: %s\n",
-                  (ephemeris_output_options & OPTION_HELIO_ECLIPTIC) ? "On" : "Off");
-         sprintf( buff + strlen( buff), "X  Topocentric ecliptic: %s\n",
-                  (ephemeris_output_options & OPTION_TOPO_ECLIPTIC) ? "On" : "Off");
-         sprintf( buff + strlen( buff), "G  Ground track: %s\n",
-                  (ephemeris_output_options & OPTION_GROUND_TRACK) ? "On" : "Off");
+            sprintf( buff + strlen( buff), "A [%c] Alt/az info\n",
+                  (ephemeris_output_options & OPTION_ALT_AZ_OUTPUT) ? '*' : ' ');
+         sprintf( buff + strlen( buff), "R [%c] Radial velocity\n",
+                  (ephemeris_output_options & OPTION_RADIAL_VEL_OUTPUT) ? '*' : ' ');
+         sprintf( buff + strlen( buff), "P [%c] Phase angle\n",
+                  (ephemeris_output_options & OPTION_PHASE_ANGLE_OUTPUT) ? '*' : ' ');
+         sprintf( buff + strlen( buff), "B [%c] Phase angle bisector\n",
+                  (ephemeris_output_options & OPTION_PHASE_ANGLE_BISECTOR) ? '*' : ' ');
+         sprintf( buff + strlen( buff), "H [%c] Heliocentric ecliptic\n",
+                  (ephemeris_output_options & OPTION_HELIO_ECLIPTIC) ? '*' : ' ');
+         sprintf( buff + strlen( buff), "X [%c] Topocentric ecliptic\n",
+                  (ephemeris_output_options & OPTION_TOPO_ECLIPTIC) ? '*' : ' ');
+         sprintf( buff + strlen( buff), "G [%c] Ground track\n",
+                  (ephemeris_output_options & OPTION_GROUND_TRACK) ? '*' : ' ');
          if( is_topocentric)
             {
-            sprintf( buff + strlen( buff), "V  Visibility indicator: %s\n",
-                  (ephemeris_output_options & OPTION_VISIBILITY) ? "On" : "Off");
-            sprintf( buff + strlen( buff), "U  Suppress unobservables: %s\n",
-                  (ephemeris_output_options & OPTION_SUPPRESS_UNOBSERVABLE) ? "On" : "Off");
+            sprintf( buff + strlen( buff), "V [%c] Visibility indicator\n",
+                  (ephemeris_output_options & OPTION_VISIBILITY) ? '*' : ' ');
+            sprintf( buff + strlen( buff), "U [%c] Suppress unobservables\n",
+                  (ephemeris_output_options & OPTION_SUPPRESS_UNOBSERVABLE) ? '*' : ' ');
             }
-         sprintf( buff + strlen( buff), "F  Suppress when fainter than mag: %.1f\n",
+         sprintf( buff + strlen( buff), "F Suppress when fainter than mag: %.1f\n",
                   ephemeris_mag_limit);
-         sprintf( buff + strlen( buff), "J  Lunar elongation: %s\n",
-                  (ephemeris_output_options & OPTION_LUNAR_ELONGATION) ? "On" : "Off");
-         sprintf( buff + strlen( buff), "D  Positional sigmas: %s\n",
-                  (ephemeris_output_options & OPTION_SHOW_SIGMAS) ? "On" : "Off");
-         sprintf( buff + strlen( buff), "Y  Computer-friendly output: %s\n",
-                  (ephemeris_output_options & OPTION_COMPUTER_FRIENDLY) ? "On" : "Off");
-         sprintf( buff + strlen( buff), "W  Round to nearest step: %s\n",
-                  (ephemeris_output_options & OPTION_ROUND_TO_NEAREST_STEP) ? "On" : "Off");
-         sprintf( buff + strlen( buff), "I  Space velocity in ephemerides: %s\n",
-                  (ephemeris_output_options & OPTION_SPACE_VEL_OUTPUT) ? "On" : "Off");
+         sprintf( buff + strlen( buff), "J [%c] Lunar elongation\n",
+                  (ephemeris_output_options & OPTION_LUNAR_ELONGATION) ? '*' : ' ');
+         sprintf( buff + strlen( buff), "D [%c] Positional sigmas\n",
+                  (ephemeris_output_options & OPTION_SHOW_SIGMAS) ? '*' : ' ');
+         sprintf( buff + strlen( buff), "Y [%c] Computer-friendly output\n",
+                  (ephemeris_output_options & OPTION_COMPUTER_FRIENDLY) ? '*' : ' ');
+         sprintf( buff + strlen( buff), "W [%c] Round to nearest step\n",
+                  (ephemeris_output_options & OPTION_ROUND_TO_NEAREST_STEP) ? '*' : ' ');
+         sprintf( buff + strlen( buff), "I [%c] Space velocity\n",
+                  (ephemeris_output_options & OPTION_SPACE_VEL_OUTPUT) ? '*' : ' ');
+         sprintf( buff + strlen( buff), "1 [%c] RA/decs\n",
+                  (ephemeris_output_options & OPTION_SUPPRESS_RA_DEC) ? ' ' : '*');
+         sprintf( buff + strlen( buff), "2 [%c] delta (dist from observer)\n",
+                  (ephemeris_output_options & OPTION_SUPPRESS_DELTA) ? ' ' : '*');
+         sprintf( buff + strlen( buff), "3 [%c] r (dist from sun)\n",
+                  (ephemeris_output_options & OPTION_SUPPRESS_SOLAR_R) ? ' ' : '*');
+         sprintf( buff + strlen( buff), "4 [%c] elong\n",
+                  (ephemeris_output_options & OPTION_SUPPRESS_ELONG) ? ' ' : '*');
          }
       sprintf( buff + strlen( buff), "C  %s\n", ephem_type_strings[ephem_type]);
       sprintf( buff + strlen( buff), "?  Help about making ephemerides\n");
@@ -653,6 +661,18 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
          }
       switch( c)
          {
+         case '1':
+            ephemeris_output_options ^= OPTION_SUPPRESS_RA_DEC;
+            break;
+         case '2':
+            ephemeris_output_options ^= OPTION_SUPPRESS_DELTA;
+            break;
+         case '3':
+            ephemeris_output_options ^= OPTION_SUPPRESS_SOLAR_R;
+            break;
+         case '4':
+            ephemeris_output_options ^= OPTION_SUPPRESS_ELONG;
+            break;
          case 'a': case 'A':
             ephemeris_output_options ^= OPTION_ALT_AZ_OUTPUT;
             break;

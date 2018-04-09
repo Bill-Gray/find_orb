@@ -128,6 +128,11 @@ parameters in Find_Orb.  This may get bumped up at some point. */
 #define OPTION_SPACE_VEL_OUTPUT       0x80000
 #define OPTION_LUNAR_ELONGATION      0x100000
 
+#define OPTION_SUPPRESS_RA_DEC       0x200000
+#define OPTION_SUPPRESS_DELTA        0x400000
+#define OPTION_SUPPRESS_SOLAR_R      0x800000
+#define OPTION_SUPPRESS_ELONG        0x1000000
+
 #define HELIOCENTRIC_SIGMAS_ONLY       0
 #define ORBIT_SIGMAS_REQUESTED         1
 #define NO_ORBIT_SIGMAS_REQUESTED    (-1)
