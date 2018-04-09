@@ -2683,23 +2683,25 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
       unit_vector_dimension = 0;
       return( 0);
       }
-   if( unit_vector_dimension != n_params)
-      {          /* force a reset to default values */
-      if( unit_vectors)
-         free( unit_vectors);
-      unit_vectors = (double **)calloc_double_dimension_array(
-                     n_params, n_params, sizeof( double));
-      for( i = 0; i < n_params; i++)
-         unit_vectors[i][i] = 1.;
-      memcpy( delta_vals, default_delta_vals, sizeof( delta_vals));
-      unit_vector_dimension = n_params;
-      set_fixed_unit_vectors( unit_vectors, obs);
-      }
-   available_sigmas = NO_SIGMAS_AVAILABLE;
    if( get_idx1_and_idx2( n_obs, obs, &i, &j) < 3)
       return( -1);
    if( is_unreasonable_orbit( orbit))
       return( -2);
+   if( unit_vector_dimension != n_params)
+      {          /* force a reset to default values */
+      int k;
+
+      if( unit_vectors)
+         free( unit_vectors);
+      unit_vectors = (double **)calloc_double_dimension_array(
+                     n_params, n_params, sizeof( double));
+      for( k = 0; k < n_params; k++)
+         unit_vectors[k][k] = 1.;
+      memcpy( delta_vals, default_delta_vals, sizeof( delta_vals));
+      unit_vector_dimension = n_params;
+      set_fixed_unit_vectors( unit_vectors, obs + i);
+      }
+   available_sigmas = NO_SIGMAS_AVAILABLE;
                /* We save the input orbit;  if there's an error,  we can */
                /* restore it:         */
    memcpy( original_orbit, orbit, 6 * sizeof( double));

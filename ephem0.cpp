@@ -79,6 +79,7 @@ char *get_file_name( char *filename, const char *template_file_name);
 double current_jd( void);                       /* elem_out.cpp */
 double diameter_from_abs_mag( const double abs_mag,      /* ephem0.cpp */
                                      const double optical_albedo);
+int get_object_name( char *obuff, const char *packed_desig);   /* mpc_obs.c */
 int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
                                    const char *format, ...)
 #ifdef __GNUC__
@@ -2033,6 +2034,8 @@ int ephemeris_in_a_file_from_mpc_code( const char *filename,
 
    snprintf( note_text, sizeof( note_text),
                     "(%s) %s", mpc_code, mpc_station_name( buff));
+   get_object_name( buff, obs->packed_id);
+   snprintf_append( note_text, sizeof( note_text), ": %s", buff);
    return( ephemeris_in_a_file( filename, orbit, obs, n_obs, planet_no,
                epoch_jd, jd_start, stepsize, lon, rho_cos_phi, rho_sin_phi,
                n_steps, note_text, options, n_objects));
