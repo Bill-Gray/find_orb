@@ -146,7 +146,7 @@ static void remove_html_tags( char *buff)
 
 static void fix_up_mpc_observation( char *buff)
 {
-   const size_t len = strlen( buff);
+   size_t len = strlen( buff);
 
    if( len == 80 && observation_jd( buff))      /* doesn't need fixing */
       {                                      /* except maybe for desig */
@@ -241,7 +241,10 @@ static void fix_up_mpc_observation( char *buff)
                obuff[70] = buff[bytes_read + 1];
                }
                      /* figure out mag bands later... */
-            memcpy( obuff + 77, buff + strlen( buff) - 3, 3);
+            while( len > 3 && buff[len - 1] <= ' ')
+               len--;
+            memcpy( obuff + 77, buff + len - 3, 3);
+            obuff[80] = '\0';
 //          printf( "Line in:\n'%s'\n", buff);
             strcpy( buff, obuff);
 //          printf( "Line out:\n'%s'\n", buff);
