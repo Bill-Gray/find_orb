@@ -198,6 +198,12 @@ void set_environment_ptr( const char *env_ptr, const char *new_value);
 int orbital_monte_carlo( const double *orbit, OBSERVE *obs, const int n_obs,
          const double curr_epoch, const double epoch_shown);   /* orb_func.cpp */
 void make_config_dir_name( char *oname, const char *iname);    /* miscell.cpp */
+int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
+                                   const char *format, ...)
+#ifdef __GNUC__
+         __attribute__ (( format( printf, 3, 4)))
+#endif
+;
 
 extern double maximum_jd, minimum_jd;        /* orb_func.cpp */
 
@@ -573,7 +579,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                     FULL_CTIME_DAY_OF_WEEK_FIRST | CALENDAR_JULIAN_GREGORIAN);
          strcat( buff, ")\n");
          jd_end = jd_start + step * (double)n_ephemeris_steps;
-         sprintf( buff + strlen( buff), " (Ephem end:   JD %.5f = ", jd_end);
+         snprintf_append( buff, sizeof( buff), " (Ephem end:   JD %.5f = ", jd_end);
          full_ctime( buff + strlen( buff), jd_end,
                     FULL_CTIME_DAY_OF_WEEK_FIRST | CALENDAR_JULIAN_GREGORIAN);
          strcat( buff, ")\n");
@@ -584,67 +590,67 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
          jd_start = jd_end = 0.;
          }
 
-      sprintf( buff + strlen( buff), "T  Ephem start: %s\n", ephemeris_start);
-      sprintf( buff + strlen( buff), "N  Number steps: %d\n",
+      snprintf_append( buff, sizeof( buff), "T  Ephem start: %s\n", ephemeris_start);
+      snprintf_append( buff, sizeof( buff), "N  Number steps: %d\n",
                                         n_ephemeris_steps);
-      sprintf( buff + strlen( buff), "S  Step size: %s\n", ephemeris_step_size);
-      sprintf( buff + strlen( buff), "L  Location: (%s) ", mpc_code);
+      snprintf_append( buff, sizeof( buff) , "S  Step size: %s\n", ephemeris_step_size);
+      snprintf_append( buff, sizeof( buff), "L  Location: (%s) ", mpc_code);
       put_observer_data_in_text( mpc_code, buff + strlen( buff));
       strcat( buff, "\n");
       if( ephem_type == OPTION_OBSERVABLES)    /* for other tables,        */
          {                          /* these options are irrelevant:       */
-         sprintf( buff + strlen( buff), "Z [%c] Motion info\n",
+         snprintf_append( buff, sizeof( buff), "Z [%c] Motion info\n",
                   (ephemeris_output_options & OPTION_MOTION_OUTPUT) ? '*' : ' ');
          if( ephemeris_output_options & OPTION_MOTION_OUTPUT)
-            sprintf( buff + strlen( buff), "O [%c] Separate motions\n",
+            snprintf_append( buff, sizeof( buff), "O [%c] Separate motions\n",
                   (ephemeris_output_options & OPTION_SEPARATE_MOTIONS) ? '*' : ' ');
          if( is_topocentric)
-            sprintf( buff + strlen( buff), "A [%c] Alt/az info\n",
+            snprintf_append( buff, sizeof( buff), "A [%c] Alt/az info\n",
                   (ephemeris_output_options & OPTION_ALT_AZ_OUTPUT) ? '*' : ' ');
-         sprintf( buff + strlen( buff), "R [%c] Radial velocity\n",
+         snprintf_append( buff, sizeof( buff), "R [%c] Radial velocity\n",
                   (ephemeris_output_options & OPTION_RADIAL_VEL_OUTPUT) ? '*' : ' ');
-         sprintf( buff + strlen( buff), "P [%c] Phase angle\n",
+         snprintf_append( buff, sizeof( buff), "P [%c] Phase angle\n",
                   (ephemeris_output_options & OPTION_PHASE_ANGLE_OUTPUT) ? '*' : ' ');
-         sprintf( buff + strlen( buff), "B [%c] Phase angle bisector\n",
+         snprintf_append( buff, sizeof( buff), "B [%c] Phase angle bisector\n",
                   (ephemeris_output_options & OPTION_PHASE_ANGLE_BISECTOR) ? '*' : ' ');
-         sprintf( buff + strlen( buff), "H [%c] Heliocentric ecliptic\n",
+         snprintf_append( buff, sizeof( buff), "H [%c] Heliocentric ecliptic\n",
                   (ephemeris_output_options & OPTION_HELIO_ECLIPTIC) ? '*' : ' ');
-         sprintf( buff + strlen( buff), "X [%c] Topocentric ecliptic\n",
+         snprintf_append( buff, sizeof( buff), "X [%c] Topocentric ecliptic\n",
                   (ephemeris_output_options & OPTION_TOPO_ECLIPTIC) ? '*' : ' ');
-         sprintf( buff + strlen( buff), "G [%c] Ground track\n",
+         snprintf_append( buff, sizeof( buff), "G [%c] Ground track\n",
                   (ephemeris_output_options & OPTION_GROUND_TRACK) ? '*' : ' ');
          if( is_topocentric)
             {
-            sprintf( buff + strlen( buff), "V [%c] Visibility indicator\n",
+            snprintf_append( buff, sizeof( buff), "V [%c] Visibility indicator\n",
                   (ephemeris_output_options & OPTION_VISIBILITY) ? '*' : ' ');
-            sprintf( buff + strlen( buff), "U [%c] Suppress unobservables\n",
+            snprintf_append( buff, sizeof( buff), "U [%c] Suppress unobservables\n",
                   (ephemeris_output_options & OPTION_SUPPRESS_UNOBSERVABLE) ? '*' : ' ');
             }
-         sprintf( buff + strlen( buff), "F Suppress when fainter than mag: %.1f\n",
+         snprintf_append( buff, sizeof( buff), "F Suppress when fainter than mag: %.1f\n",
                   ephemeris_mag_limit);
-         sprintf( buff + strlen( buff), "J [%c] Lunar elongation\n",
+         snprintf_append( buff, sizeof( buff), "J [%c] Lunar elongation\n",
                   (ephemeris_output_options & OPTION_LUNAR_ELONGATION) ? '*' : ' ');
-         sprintf( buff + strlen( buff), "D [%c] Positional sigmas\n",
+         snprintf_append( buff, sizeof( buff), "D [%c] Positional sigmas\n",
                   (ephemeris_output_options & OPTION_SHOW_SIGMAS) ? '*' : ' ');
-         sprintf( buff + strlen( buff), "Y [%c] Computer-friendly output\n",
+         snprintf_append( buff, sizeof( buff), "Y [%c] Computer-friendly output\n",
                   (ephemeris_output_options & OPTION_COMPUTER_FRIENDLY) ? '*' : ' ');
-         sprintf( buff + strlen( buff), "W [%c] Round to nearest step\n",
+         snprintf_append( buff, sizeof( buff), "W [%c] Round to nearest step\n",
                   (ephemeris_output_options & OPTION_ROUND_TO_NEAREST_STEP) ? '*' : ' ');
-         sprintf( buff + strlen( buff), "I [%c] Space velocity\n",
+         snprintf_append( buff, sizeof( buff), "I [%c] Space velocity\n",
                   (ephemeris_output_options & OPTION_SPACE_VEL_OUTPUT) ? '*' : ' ');
-         sprintf( buff + strlen( buff), "1 [%c] RA/decs\n",
+         snprintf_append( buff, sizeof( buff), "1 [%c] RA/decs\n",
                   (ephemeris_output_options & OPTION_SUPPRESS_RA_DEC) ? ' ' : '*');
-         sprintf( buff + strlen( buff), "2 [%c] delta (dist from observer)\n",
+         snprintf_append( buff, sizeof( buff), "2 [%c] delta (dist from observer)\n",
                   (ephemeris_output_options & OPTION_SUPPRESS_DELTA) ? ' ' : '*');
-         sprintf( buff + strlen( buff), "3 [%c] r (dist from sun)\n",
+         snprintf_append( buff, sizeof( buff), "3 [%c] r (dist from sun)\n",
                   (ephemeris_output_options & OPTION_SUPPRESS_SOLAR_R) ? ' ' : '*');
-         sprintf( buff + strlen( buff), "4 [%c] elong\n",
+         snprintf_append( buff, sizeof( buff), "4 [%c] elong\n",
                   (ephemeris_output_options & OPTION_SUPPRESS_ELONG) ? ' ' : '*');
          }
-      sprintf( buff + strlen( buff), "C  %s\n", ephem_type_strings[ephem_type]);
-      sprintf( buff + strlen( buff), "?  Help about making ephemerides\n");
-      sprintf( buff + strlen( buff), "M  Make ephemeris\n");
-      sprintf( buff + strlen( buff), "Q  Quit/return to main display");
+      snprintf_append( buff, sizeof( buff), "C  %s\n", ephem_type_strings[ephem_type]);
+      snprintf_append( buff, sizeof( buff), "?  Help about making ephemerides\n");
+      snprintf_append( buff, sizeof( buff), "M  Make ephemeris\n");
+      snprintf_append( buff, sizeof( buff), "Q  Quit/return to main display");
       c = inquire( buff, NULL, 0, COLOR_DEFAULT_INQUIRY);
                      /* Convert mouse clicks inside the 'dialog box'     */
                      /* to the corresponding first letter on that line   */
