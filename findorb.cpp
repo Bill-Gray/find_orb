@@ -197,6 +197,7 @@ const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 void set_environment_ptr( const char *env_ptr, const char *new_value);
 int orbital_monte_carlo( const double *orbit, OBSERVE *obs, const int n_obs,
          const double curr_epoch, const double epoch_shown);   /* orb_func.cpp */
+void make_config_dir_name( char *oname, const char *iname);    /* miscell.cpp */
 
 extern double maximum_jd, minimum_jd;        /* orb_func.cpp */
 
@@ -293,20 +294,17 @@ static int extended_getch( void)
 }
 
 #ifdef _WIN32
-#define GOT_CLIPBOARD_FUNCTIONS
 int clipboard_to_file( const char *filename, const int append); /* clipfunc.cpp */
 int copy_file_to_clipboard( const char *filename);    /* clipfunc.cpp */
 
 #elif defined __PDCURSES__
 
-#define GOT_CLIPBOARD_FUNCTIONS
 int clipboard_to_file( const char *filename, const int append)
 {
    long size = -99;
    char *contents;
    int err_code;
 
-   printf( "Getting clipboard\n");
    err_code = PDC_getclipboard( &contents, &size);
    if( err_code == PDC_CLIP_SUCCESS)
       {
@@ -347,6 +345,22 @@ int copy_file_to_clipboard( const char *filename)
       free( buff);
       }
    return( err_code);
+}
+#else    /* non-PDCurses, non-Windows:  use xclip */
+int clipboard_to_file( const char *filename, const int append)
+{
+   char cmd[80];
+
+   snprintf( cmd, sizeof( cmd), "xclip -o >%c %s", (append ? '>' : ' '), filename);
+   return( system( cmd));
+}
+
+int copy_file_to_clipboard( const char *filename)
+{
+   char cmd[80];
+
+   snprintf( cmd, sizeof( cmd), "xclip -i %s", filename);
+   return( system( cmd));
 }
 #endif
 
@@ -2401,15 +2415,13 @@ int main( const int argc, const char **argv)
    if( debug_level > 2)
       debug_printf( "(2), ");
 
-#ifdef GOT_CLIPBOARD_FUNCTIONS
    if( !strcmp( argv[1], "c") || !strcmp( argv[1], "c+"))
       {
-      const char *temp_clipboard_filename = "obs_temp.txt";
+      const char *temp_clipboard_filename = "/tmp/obs_temp.txt";
 
       clipboard_to_file( temp_clipboard_filename, argv[1][1] == '+');
       argv[1] = temp_clipboard_filename;
       }
-#endif
 #ifdef __PDCURSES__
    original_xmax = getmaxx( stdscr);
    original_ymax = getmaxy( stdscr);
@@ -4350,16 +4362,17 @@ int main( const int argc, const char **argv)
             update_element_display = 1;
             strcpy( message_to_user, "Orbital MC generated");
             break;
-#ifdef GOT_CLIPBOARD_FUNCTIONS
          case ALT_I:
-            i = copy_file_to_clipboard( elements_filename);
+            {
+            make_config_dir_name( tbuff, elements_filename);
+            i = copy_file_to_clipboard( tbuff);
             if( i)
                sprintf( message_to_user,
                               "Error %d in copying elements to clipboard", i);
             else
                strcpy( message_to_user, "Elements copied to clipboard");
+            }
             break;
-#endif
          case ALT_K:
             {
             extern int sigmas_in_columns_57_to_65;
