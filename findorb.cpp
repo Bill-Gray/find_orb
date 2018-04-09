@@ -1649,6 +1649,11 @@ static void show_residual_legend( const int line_no, const int residual_format)
    if( residual_format & RESIDUAL_FORMAT_HMS)
       text_search_and_replace( buff, "YYYY MM DD.DDDDD ",
                                      "CYYMMDD:HHMMSSsss");
+   if( (residual_format & RESIDUAL_FORMAT_EXTRA)
+               && base_format != RESIDUAL_FORMAT_SHORT)
+      strcat( buff, (residual_format & RESIDUAL_FORMAT_TIME_RESIDS)
+                  ? "      Xres  Yres  total Mres"
+                  : "      Tres  Cres  total Mres");
 
    if( line_no >= 0)
       {
