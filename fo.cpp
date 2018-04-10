@@ -91,6 +91,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name);
                                                /* ephem0.cpp */
 void set_environment_ptr( const char *env_ptr, const char *new_value);
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
+int fetch_astrometry_from_mpc( FILE *ofile, const char *desig); /* miscell.c */
 
 /* In this non-interactive version of Find_Orb,  we just print out warning
 messages such as "3 observations were made in daylight" or "couldn't find
@@ -442,6 +443,8 @@ int main( const int argc, const char **argv)
                is_default_ephem = false;
                }
                break;
+            case 'f':                     /* obj desig specified;  fall through */
+               break;
             case 'h':                     /* show planet-centric orbits */
                all_heliocentric = false;
                break;
@@ -535,6 +538,26 @@ int main( const int argc, const char **argv)
          tbuff[len] = '\0';
          set_environment_ptr( tbuff, argv[i] + len + 1);
          }
+      }
+
+   if( !memcmp( argv[1], "-f", 2))
+      {
+      const char *temp_filename = "/tmp/obs_temp.ast";
+      FILE *ofile = fopen( temp_filename, "wb");
+
+      if( argv[1][2])
+         strcpy( tbuff, argv[1] + 2);
+      else
+         *tbuff = '\0';
+      for( i = 2; i < argc && argv[i][0] != '-' && !strchr( argv[i], '='); i++)
+         {
+         if( *tbuff)
+            strcat( tbuff, " ");
+         strcat( tbuff, argv[i]);
+         }
+      fetch_astrometry_from_mpc( ofile, tbuff);
+      fclose( ofile);
+      argv[1] = temp_filename;
       }
 
                /* get_defaults( ) collects a lot of data that's for the  */

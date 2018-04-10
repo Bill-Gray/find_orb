@@ -197,6 +197,7 @@ const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 void set_environment_ptr( const char *env_ptr, const char *new_value);
 int orbital_monte_carlo( const double *orbit, OBSERVE *obs, const int n_obs,
          const double curr_epoch, const double epoch_shown);   /* orb_func.cpp */
+int fetch_astrometry_from_mpc( FILE *ofile, const char *desig); /* miscell.c */
 void make_config_dir_name( char *oname, const char *iname);    /* miscell.cpp */
 int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
                                    const char *format, ...)
@@ -2295,13 +2296,8 @@ int main( const int argc, const char **argv)
                debug_printf( "findorb: debug_level = %d; %s %s\n",
                            debug_level, __DATE__, __TIME__);
                break;
-            case 'f':
-               {
-               extern bool take_first_soln;
-
-               take_first_soln = true;
-               }
-               break;
+            case 'f':            /* obj designation;  fall through, */
+               break;            /* handle below */
             case 'i':
                {
                extern int ignore_prev_solns;
@@ -2335,6 +2331,13 @@ int main( const int argc, const char **argv)
                extern int process_count;
 
                process_count = atoi( argv[i] + 2);
+               }
+               break;
+            case 'q':
+               {
+               extern bool take_first_soln;
+
+               take_first_soln = true;
                }
                break;
             case 'r':
@@ -2392,6 +2395,26 @@ int main( const int argc, const char **argv)
          tbuff[len] = '\0';
          set_environment_ptr( tbuff, argv[i] + len + 1);
          }
+      }
+
+   if( !memcmp( argv[1], "-f", 2))
+      {
+      const char *temp_filename = "/tmp/obs_temp.ast";
+      FILE *ofile = fopen( temp_filename, "wb");
+
+      if( argv[1][2])
+         strcpy( tbuff, argv[1] + 2);
+      else
+         *tbuff = '\0';
+      for( i = 2; i < argc && argv[i][0] != '-' && !strchr( argv[i], '='); i++)
+         {
+         if( *tbuff)
+            strcat( tbuff, " ");
+         strcat( tbuff, argv[i]);
+         }
+      fetch_astrometry_from_mpc( ofile, tbuff);
+      fclose( ofile);
+      argv[1] = temp_filename;
       }
 
    get_defaults( &ephemeris_output_options, &element_format,
