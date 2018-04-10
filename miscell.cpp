@@ -19,6 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include <string.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <assert.h>
 #include <errno.h>
 
 /* This function allows one to put the following options in front of
@@ -48,6 +49,7 @@ can turn it back to 'false'.
 int generic_message_box( const char *message, const char *box_type);
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 void make_config_dir_name( char *oname, const char *iname);  /* miscell.cpp */
+int fetch_astrometry_from_mpc( FILE *ofile, const char *desig); /* miscell.c */
 
 int use_config_directory = false;
 const char *alt_config_directory;
@@ -144,3 +146,85 @@ size_t strlcpy(char *dest, const char *src, size_t size)
 }
 #endif
 
+static int desig_matches( const char *iline, const char *desig)
+{
+   const size_t len = strlen( desig);
+   int rval = 0;
+
+   while( *iline == ' ')
+      iline++;
+   if( !memcmp( iline, desig, len) && iline[len] == ' ')
+      rval = 1;
+   return( rval);
+}
+
+static int is_neocp_desig( const char *buff)
+{
+   const size_t len = strlen( buff);
+   int rval = 0;
+
+   if( len > 2 && len < 8 && !strchr( buff, ' '))
+      {
+      int unused, n_bytes;
+
+      rval = 1;
+      if( sscanf( buff, "%d%n", &unused, &n_bytes) == 1
+                  && n_bytes == (int)len)    /* oops!  numbered object */
+         rval = 0;
+      }
+   return( rval);
+}
+
+
+/* If astrometry is desired for a particular designation,  we hunt for it
+in several possible locations.  If it looks like a temporary designation,
+we look through 'neocp.txt'.  If that doesn't turn up anything,  we use
+the 'grab_mpc' program :
+
+https://github.com/Bill-Gray/miscell/blob/master/grab_mpc.c
+
+to download astrometry from MPC.  As described in 'grab_mpc.c',  some
+steps are taken to cache downloads to avoid hammering MPC servers. The
+temp*.ast files are time-stamped,  and we only get new data if three
+hours have elapsed;  see 'grab_mpc.c' for details.       */
+
+int fetch_astrometry_from_mpc( FILE *ofile, const char *desig)
+{
+   char tbuff[100];
+   int bytes_written = 0;
+
+   assert( ofile);
+   if( is_neocp_desig( desig))
+      {
+      FILE *ifile = fopen( "../../neocp2/neocp.txt", "rb");
+
+      if( ifile)
+         {
+         while( fgets( tbuff, sizeof( tbuff), ifile))
+            if( desig_matches( tbuff, desig))
+               bytes_written += fwrite( tbuff, 1, strlen( tbuff), ofile);
+         fclose( ifile);
+         }
+      }
+   if( !bytes_written)    /* no NEOCP data;  maybe MPC has astrometry */
+      {
+      unsigned j = 0;
+      size_t i;
+      char filename[40];
+
+      for( i = 0; desig[i]; i++)
+         j = j * 314159u + (unsigned)desig[i];
+      snprintf( filename, sizeof( filename), "/tmp/temp%02u.ast", j % 100);
+      snprintf( tbuff, sizeof( tbuff), "grab_mpc %s %s", filename, desig);
+      if( !system( tbuff))
+         {
+         FILE *ifile = fopen( filename, "rb");
+
+         assert( ifile);
+         while( fgets( tbuff, sizeof( tbuff), ifile))
+            bytes_written += fwrite( tbuff, 1, strlen( tbuff), ofile);
+         fclose( ifile);
+         }
+      }
+   return( bytes_written);
+}
