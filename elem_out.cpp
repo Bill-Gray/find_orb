@@ -706,7 +706,10 @@ static int add_sof_to_file( const char *filename,
       {
       fseek( fp, 0L, SEEK_SET);
       if( !fgets( templat, sizeof( templat), fp))
+         {
+         fclose( fp);
          return( -1);
+         }
       if( forking)
          {
          fclose( fp);
