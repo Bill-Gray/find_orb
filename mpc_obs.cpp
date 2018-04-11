@@ -3603,7 +3603,8 @@ may have further information.  These observations will be excluded.\n",
       if( rval[0].note2 == 'X' && rval[1].note2 != 'X')
          rval[0].flags |= OBS_DONT_USE;
       }
-   check_for_star( rval, n_obs);
+   if( n_obs > 1)
+      check_for_star( rval, n_obs);
    return( rval);
 }
 
