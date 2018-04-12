@@ -550,6 +550,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
    int c = 1;
    char buff[2000];
    double jd_start = 0., jd_end = 0., step = 0.;
+   bool show_advanced_options = false;
 
    while( c > 0)
       {
@@ -612,14 +613,6 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                   (ephemeris_output_options & OPTION_RADIAL_VEL_OUTPUT) ? '*' : ' ');
          snprintf_append( buff, sizeof( buff), "P [%c] Phase angle\n",
                   (ephemeris_output_options & OPTION_PHASE_ANGLE_OUTPUT) ? '*' : ' ');
-         snprintf_append( buff, sizeof( buff), "B [%c] Phase angle bisector\n",
-                  (ephemeris_output_options & OPTION_PHASE_ANGLE_BISECTOR) ? '*' : ' ');
-         snprintf_append( buff, sizeof( buff), "H [%c] Heliocentric ecliptic\n",
-                  (ephemeris_output_options & OPTION_HELIO_ECLIPTIC) ? '*' : ' ');
-         snprintf_append( buff, sizeof( buff), "X [%c] Topocentric ecliptic\n",
-                  (ephemeris_output_options & OPTION_TOPO_ECLIPTIC) ? '*' : ' ');
-         snprintf_append( buff, sizeof( buff), "G [%c] Ground track\n",
-                  (ephemeris_output_options & OPTION_GROUND_TRACK) ? '*' : ' ');
          if( is_topocentric)
             {
             snprintf_append( buff, sizeof( buff), "V [%c] Visibility indicator\n",
@@ -629,24 +622,37 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             }
          snprintf_append( buff, sizeof( buff), "F Suppress when fainter than mag: %.1f\n",
                   ephemeris_mag_limit);
-         snprintf_append( buff, sizeof( buff), "J [%c] Lunar elongation\n",
-                  (ephemeris_output_options & OPTION_LUNAR_ELONGATION) ? '*' : ' ');
          snprintf_append( buff, sizeof( buff), "D [%c] Positional sigmas\n",
                   (ephemeris_output_options & OPTION_SHOW_SIGMAS) ? '*' : ' ');
-         snprintf_append( buff, sizeof( buff), "Y [%c] Computer-friendly output\n",
+         snprintf_append( buff, sizeof( buff), "0 [%c] Show advanced options\n",
+                  show_advanced_options ? '*' : ' ');
+         if( show_advanced_options)
+            {
+            snprintf_append( buff, sizeof( buff), "B [%c] Phase angle bisector\n",
+                  (ephemeris_output_options & OPTION_PHASE_ANGLE_BISECTOR) ? '*' : ' ');
+            snprintf_append( buff, sizeof( buff), "H [%c] Heliocentric ecliptic\n",
+                  (ephemeris_output_options & OPTION_HELIO_ECLIPTIC) ? '*' : ' ');
+            snprintf_append( buff, sizeof( buff), "X [%c] Topocentric ecliptic\n",
+                  (ephemeris_output_options & OPTION_TOPO_ECLIPTIC) ? '*' : ' ');
+            snprintf_append( buff, sizeof( buff), "G [%c] Ground track\n",
+                  (ephemeris_output_options & OPTION_GROUND_TRACK) ? '*' : ' ');
+            snprintf_append( buff, sizeof( buff), "J [%c] Lunar elongation\n",
+                  (ephemeris_output_options & OPTION_LUNAR_ELONGATION) ? '*' : ' ');
+            snprintf_append( buff, sizeof( buff), "Y [%c] Computer-friendly output\n",
                   (ephemeris_output_options & OPTION_COMPUTER_FRIENDLY) ? '*' : ' ');
-         snprintf_append( buff, sizeof( buff), "W [%c] Round to nearest step\n",
+            snprintf_append( buff, sizeof( buff), "W [%c] Round to nearest step\n",
                   (ephemeris_output_options & OPTION_ROUND_TO_NEAREST_STEP) ? '*' : ' ');
-         snprintf_append( buff, sizeof( buff), "I [%c] Space velocity\n",
+            snprintf_append( buff, sizeof( buff), "I [%c] Space velocity\n",
                   (ephemeris_output_options & OPTION_SPACE_VEL_OUTPUT) ? '*' : ' ');
-         snprintf_append( buff, sizeof( buff), "1 [%c] RA/decs\n",
+            snprintf_append( buff, sizeof( buff), "1 [%c] RA/decs\n",
                   (ephemeris_output_options & OPTION_SUPPRESS_RA_DEC) ? ' ' : '*');
-         snprintf_append( buff, sizeof( buff), "2 [%c] delta (dist from observer)\n",
+            snprintf_append( buff, sizeof( buff), "2 [%c] delta (dist from observer)\n",
                   (ephemeris_output_options & OPTION_SUPPRESS_DELTA) ? ' ' : '*');
-         snprintf_append( buff, sizeof( buff), "3 [%c] r (dist from sun)\n",
+            snprintf_append( buff, sizeof( buff), "3 [%c] r (dist from sun)\n",
                   (ephemeris_output_options & OPTION_SUPPRESS_SOLAR_R) ? ' ' : '*');
-         snprintf_append( buff, sizeof( buff), "4 [%c] elong\n",
+            snprintf_append( buff, sizeof( buff), "4 [%c] elong\n",
                   (ephemeris_output_options & OPTION_SUPPRESS_ELONG) ? ' ' : '*');
+            }
          }
       snprintf_append( buff, sizeof( buff), "C  %s\n", ephem_type_strings[ephem_type]);
       snprintf_append( buff, sizeof( buff), "?  Help about making ephemerides\n");
@@ -668,6 +674,9 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
          }
       switch( c)
          {
+         case '0':
+            show_advanced_options = !show_advanced_options;
+            break;
          case '1':
             ephemeris_output_options ^= OPTION_SUPPRESS_RA_DEC;
             break;
@@ -1424,6 +1433,7 @@ static void show_right_hand_scroll_bar( const int line_start,
 }
 
 int first_residual_shown, n_stations_shown;
+static bool show_traditional_format = false;
 
 void show_residuals( const OBSERVE FAR *obs, const int n_obs,
               const int residual_format, const int curr_obs,
@@ -1478,6 +1488,12 @@ void show_residuals( const OBSERVE FAR *obs, const int n_obs,
                OBSERVE temp_obs = obs[line_start + i];
                const int time_prec = temp_obs.time_precision;
 
+               if( show_traditional_format && temp_obs.time_precision > 6)
+                  {
+                  temp_obs.ra_precision = 3;
+                  temp_obs.dec_precision = 2;
+                  temp_obs.time_precision = 6;
+                  }
                format_observation( &temp_obs, buff,
                            (residual_format & ~(3 | RESIDUAL_FORMAT_HMS)));
                strcpy( resid_data, buff + 39);
@@ -4441,8 +4457,11 @@ int main( const int argc, const char **argv)
             show_observational_details ^= 1;
             }
             break;
+         case '&':
+            show_traditional_format = !show_traditional_format;
+            break;
          case ALT_A: case 9:
-         case ALT_P: case '&':
+         case ALT_P:
          case ALT_R: case ALT_X: case ALT_Y:
          case ALT_Z: case '\'':
          default:
