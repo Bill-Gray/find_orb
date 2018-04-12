@@ -1495,15 +1495,17 @@ void show_residuals( const OBSERVE FAR *obs, const int n_obs,
                   temp_obs.time_precision = 6;
                   }
                format_observation( &temp_obs, buff,
-                           (residual_format & ~(3 | RESIDUAL_FORMAT_HMS)));
-               strcpy( resid_data, buff + 39);
+                           (residual_format & ~(3 | RESIDUAL_FORMAT_HMS))
+                           | RESIDUAL_FORMAT_FOUR_DIGIT_YEARS);
+               strcpy( resid_data, buff + 49);
+               *resid_data = ' ';
                if( residual_format & RESIDUAL_FORMAT_HMS)
                   if( time_prec == 5 || time_prec == 6)  /* 1e-5 or 1e-6 day */
                      temp_obs.time_precision += 16;
                               /* show corresponding 1s or 0.1s HHMMSS fmt */
                recreate_observation_line( buff, &temp_obs);
                memmove( buff, buff + dropped_start, strlen( buff + dropped_start) + 1);
-               strcpy( buff + strlen( buff), resid_data + 10);
+               strcat( buff, resid_data);
                if( temp_obs.flags & OBS_IS_SELECTED)
                   buff[51] = 'o';
                }
