@@ -243,6 +243,11 @@ static void fix_up_mpc_observation( char *buff)
                      /* figure out mag bands later... */
             while( len > 3 && buff[len - 1] <= ' ')
                len--;
+            if( len == 81 && buff[80] == 'x')
+               {               /* CSS folk sometimes add 'x' to a */
+               len = 80;       /* line to mark it as deleted. */
+               obuff[64] = 'x';
+               }
             memcpy( obuff + 77, buff + len - 3, 3);
             obuff[80] = '\0';
 //          printf( "Line in:\n'%s'\n", buff);
