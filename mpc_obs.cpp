@@ -146,7 +146,7 @@ static void remove_html_tags( char *buff)
 
 static void fix_up_mpc_observation( char *buff)
 {
-   const size_t len = strlen( buff);
+   size_t len = strlen( buff);
 
    if( len == 80 && observation_jd( buff))      /* doesn't need fixing */
       {                                      /* except maybe for desig */
@@ -241,7 +241,15 @@ static void fix_up_mpc_observation( char *buff)
                obuff[70] = buff[bytes_read + 1];
                }
                      /* figure out mag bands later... */
-            memcpy( obuff + 77, buff + strlen( buff) - 3, 3);
+            while( len > 3 && buff[len - 1] <= ' ')
+               len--;
+            if( len == 81 && buff[80] == 'x')
+               {               /* CSS folk sometimes add 'x' to a */
+               len = 80;       /* line to mark it as deleted. */
+               obuff[64] = 'x';
+               }
+            memcpy( obuff + 77, buff + len - 3, 3);
+            obuff[80] = '\0';
 //          printf( "Line in:\n'%s'\n", buff);
             strcpy( buff, obuff);
 //          printf( "Line out:\n'%s'\n", buff);
@@ -3600,7 +3608,8 @@ may have further information.  These observations will be excluded.\n",
       if( rval[0].note2 == 'X' && rval[1].note2 != 'X')
          rval[0].flags |= OBS_DONT_USE;
       }
-   check_for_star( rval, n_obs);
+   if( n_obs > 1)
+      check_for_star( rval, n_obs);
    return( rval);
 }
 

@@ -193,9 +193,18 @@ int find_vaisala_orbit( double *orbit, const OBSERVE *obs1,   /* orb_func.c */
                      const OBSERVE *obs2, const double solar_r);
 int extended_orbit_fit( double *orbit, OBSERVE *obs, int n_obs,
                   const unsigned fit_type, double epoch);     /* orb_func.c */
-int generate_mc_variant_from_covariance( double *orbit);    /* orb_fun2.cpp */
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 void set_environment_ptr( const char *env_ptr, const char *new_value);
+int orbital_monte_carlo( const double *orbit, OBSERVE *obs, const int n_obs,
+         const double curr_epoch, const double epoch_shown);   /* orb_func.cpp */
+int fetch_astrometry_from_mpc( FILE *ofile, const char *desig); /* miscell.c */
+void make_config_dir_name( char *oname, const char *iname);    /* miscell.cpp */
+int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
+                                   const char *format, ...)
+#ifdef __GNUC__
+         __attribute__ (( format( printf, 3, 4)))
+#endif
+;
 
 extern double maximum_jd, minimum_jd;        /* orb_func.cpp */
 
@@ -292,20 +301,17 @@ static int extended_getch( void)
 }
 
 #ifdef _WIN32
-#define GOT_CLIPBOARD_FUNCTIONS
 int clipboard_to_file( const char *filename, const int append); /* clipfunc.cpp */
 int copy_file_to_clipboard( const char *filename);    /* clipfunc.cpp */
 
 #elif defined __PDCURSES__
 
-#define GOT_CLIPBOARD_FUNCTIONS
 int clipboard_to_file( const char *filename, const int append)
 {
    long size = -99;
    char *contents;
    int err_code;
 
-   printf( "Getting clipboard\n");
    err_code = PDC_getclipboard( &contents, &size);
    if( err_code == PDC_CLIP_SUCCESS)
       {
@@ -346,6 +352,22 @@ int copy_file_to_clipboard( const char *filename)
       free( buff);
       }
    return( err_code);
+}
+#else    /* non-PDCurses, non-Windows:  use xclip */
+int clipboard_to_file( const char *filename, const int append)
+{
+   char cmd[80];
+
+   snprintf( cmd, sizeof( cmd), "xclip -o >%c %s", (append ? '>' : ' '), filename);
+   return( system( cmd));
+}
+
+int copy_file_to_clipboard( const char *filename)
+{
+   char cmd[80];
+
+   snprintf( cmd, sizeof( cmd), "xclip -i %s", filename);
+   return( system( cmd));
 }
 #endif
 
@@ -528,6 +550,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
    int c = 1;
    char buff[2000];
    double jd_start = 0., jd_end = 0., step = 0.;
+   bool show_advanced_options = false;
 
    while( c > 0)
       {
@@ -558,7 +581,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                     FULL_CTIME_DAY_OF_WEEK_FIRST | CALENDAR_JULIAN_GREGORIAN);
          strcat( buff, ")\n");
          jd_end = jd_start + step * (double)n_ephemeris_steps;
-         sprintf( buff + strlen( buff), " (Ephem end:   JD %.5f = ", jd_end);
+         snprintf_append( buff, sizeof( buff), " (Ephem end:   JD %.5f = ", jd_end);
          full_ctime( buff + strlen( buff), jd_end,
                     FULL_CTIME_DAY_OF_WEEK_FIRST | CALENDAR_JULIAN_GREGORIAN);
          strcat( buff, ")\n");
@@ -569,59 +592,72 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
          jd_start = jd_end = 0.;
          }
 
-      sprintf( buff + strlen( buff), "T  Ephem start: %s\n", ephemeris_start);
-      sprintf( buff + strlen( buff), "N  Number steps: %d\n",
+      snprintf_append( buff, sizeof( buff), "T  Ephem start: %s\n", ephemeris_start);
+      snprintf_append( buff, sizeof( buff), "N  Number steps: %d\n",
                                         n_ephemeris_steps);
-      sprintf( buff + strlen( buff), "S  Step size: %s\n", ephemeris_step_size);
-      sprintf( buff + strlen( buff), "L  Location: (%s) ", mpc_code);
+      snprintf_append( buff, sizeof( buff) , "S  Step size: %s\n", ephemeris_step_size);
+      snprintf_append( buff, sizeof( buff), "L  Location: (%s) ", mpc_code);
       put_observer_data_in_text( mpc_code, buff + strlen( buff));
       strcat( buff, "\n");
       if( ephem_type == OPTION_OBSERVABLES)    /* for other tables,        */
          {                          /* these options are irrelevant:       */
-         sprintf( buff + strlen( buff), "Z  Motion info in ephemerides: %s\n",
-                  (ephemeris_output_options & OPTION_MOTION_OUTPUT) ? "On" : "Off");
+         snprintf_append( buff, sizeof( buff), "Z [%c] Motion info\n",
+                  (ephemeris_output_options & OPTION_MOTION_OUTPUT) ? '*' : ' ');
          if( ephemeris_output_options & OPTION_MOTION_OUTPUT)
-            sprintf( buff + strlen( buff), "O  Separate motions: %s\n",
-                  (ephemeris_output_options & OPTION_SEPARATE_MOTIONS) ? "On" : "Off");
+            snprintf_append( buff, sizeof( buff), "O [%c] Separate motions\n",
+                  (ephemeris_output_options & OPTION_SEPARATE_MOTIONS) ? '*' : ' ');
          if( is_topocentric)
-            sprintf( buff + strlen( buff), "A  Alt/az info in ephemerides: %s\n",
-                  (ephemeris_output_options & OPTION_ALT_AZ_OUTPUT) ? "On" : "Off");
-         sprintf( buff + strlen( buff), "R  Radial velocity in ephemerides: %s\n",
-                  (ephemeris_output_options & OPTION_RADIAL_VEL_OUTPUT) ? "On" : "Off");
-         sprintf( buff + strlen( buff), "P  Phase angle in ephemerides: %s\n",
-                  (ephemeris_output_options & OPTION_PHASE_ANGLE_OUTPUT) ? "On" : "Off");
-         sprintf( buff + strlen( buff), "B  Phase angle bisector: %s\n",
-                  (ephemeris_output_options & OPTION_PHASE_ANGLE_BISECTOR) ? "On" : "Off");
-         sprintf( buff + strlen( buff), "H  Heliocentric ecliptic: %s\n",
-                  (ephemeris_output_options & OPTION_HELIO_ECLIPTIC) ? "On" : "Off");
-         sprintf( buff + strlen( buff), "X  Topocentric ecliptic: %s\n",
-                  (ephemeris_output_options & OPTION_TOPO_ECLIPTIC) ? "On" : "Off");
-         sprintf( buff + strlen( buff), "G  Ground track: %s\n",
-                  (ephemeris_output_options & OPTION_GROUND_TRACK) ? "On" : "Off");
+            snprintf_append( buff, sizeof( buff), "A [%c] Alt/az info\n",
+                  (ephemeris_output_options & OPTION_ALT_AZ_OUTPUT) ? '*' : ' ');
+         snprintf_append( buff, sizeof( buff), "R [%c] Radial velocity\n",
+                  (ephemeris_output_options & OPTION_RADIAL_VEL_OUTPUT) ? '*' : ' ');
+         snprintf_append( buff, sizeof( buff), "P [%c] Phase angle\n",
+                  (ephemeris_output_options & OPTION_PHASE_ANGLE_OUTPUT) ? '*' : ' ');
          if( is_topocentric)
             {
-            sprintf( buff + strlen( buff), "V  Visibility indicator: %s\n",
-                  (ephemeris_output_options & OPTION_VISIBILITY) ? "On" : "Off");
-            sprintf( buff + strlen( buff), "U  Suppress unobservables: %s\n",
-                  (ephemeris_output_options & OPTION_SUPPRESS_UNOBSERVABLE) ? "On" : "Off");
+            snprintf_append( buff, sizeof( buff), "V [%c] Visibility indicator\n",
+                  (ephemeris_output_options & OPTION_VISIBILITY) ? '*' : ' ');
+            snprintf_append( buff, sizeof( buff), "U [%c] Suppress unobservables\n",
+                  (ephemeris_output_options & OPTION_SUPPRESS_UNOBSERVABLE) ? '*' : ' ');
             }
-         sprintf( buff + strlen( buff), "F  Suppress when fainter than mag: %.1f\n",
+         snprintf_append( buff, sizeof( buff), "F Suppress when fainter than mag: %.1f\n",
                   ephemeris_mag_limit);
-         sprintf( buff + strlen( buff), "J  Lunar elongation: %s\n",
-                  (ephemeris_output_options & OPTION_LUNAR_ELONGATION) ? "On" : "Off");
-         sprintf( buff + strlen( buff), "D  Positional sigmas: %s\n",
-                  (ephemeris_output_options & OPTION_SHOW_SIGMAS) ? "On" : "Off");
-         sprintf( buff + strlen( buff), "Y  Computer-friendly output: %s\n",
-                  (ephemeris_output_options & OPTION_COMPUTER_FRIENDLY) ? "On" : "Off");
-         sprintf( buff + strlen( buff), "W  Round to nearest step: %s\n",
-                  (ephemeris_output_options & OPTION_ROUND_TO_NEAREST_STEP) ? "On" : "Off");
-         sprintf( buff + strlen( buff), "I  Space velocity in ephemerides: %s\n",
-                  (ephemeris_output_options & OPTION_SPACE_VEL_OUTPUT) ? "On" : "Off");
+         snprintf_append( buff, sizeof( buff), "D [%c] Positional sigmas\n",
+                  (ephemeris_output_options & OPTION_SHOW_SIGMAS) ? '*' : ' ');
+         snprintf_append( buff, sizeof( buff), "0 [%c] Show advanced options\n",
+                  show_advanced_options ? '*' : ' ');
+         if( show_advanced_options)
+            {
+            snprintf_append( buff, sizeof( buff), "B [%c] Phase angle bisector\n",
+                  (ephemeris_output_options & OPTION_PHASE_ANGLE_BISECTOR) ? '*' : ' ');
+            snprintf_append( buff, sizeof( buff), "H [%c] Heliocentric ecliptic\n",
+                  (ephemeris_output_options & OPTION_HELIO_ECLIPTIC) ? '*' : ' ');
+            snprintf_append( buff, sizeof( buff), "X [%c] Topocentric ecliptic\n",
+                  (ephemeris_output_options & OPTION_TOPO_ECLIPTIC) ? '*' : ' ');
+            snprintf_append( buff, sizeof( buff), "G [%c] Ground track\n",
+                  (ephemeris_output_options & OPTION_GROUND_TRACK) ? '*' : ' ');
+            snprintf_append( buff, sizeof( buff), "J [%c] Lunar elongation\n",
+                  (ephemeris_output_options & OPTION_LUNAR_ELONGATION) ? '*' : ' ');
+            snprintf_append( buff, sizeof( buff), "Y [%c] Computer-friendly output\n",
+                  (ephemeris_output_options & OPTION_COMPUTER_FRIENDLY) ? '*' : ' ');
+            snprintf_append( buff, sizeof( buff), "W [%c] Round to nearest step\n",
+                  (ephemeris_output_options & OPTION_ROUND_TO_NEAREST_STEP) ? '*' : ' ');
+            snprintf_append( buff, sizeof( buff), "I [%c] Space velocity\n",
+                  (ephemeris_output_options & OPTION_SPACE_VEL_OUTPUT) ? '*' : ' ');
+            snprintf_append( buff, sizeof( buff), "1 [%c] RA/decs\n",
+                  (ephemeris_output_options & OPTION_SUPPRESS_RA_DEC) ? ' ' : '*');
+            snprintf_append( buff, sizeof( buff), "2 [%c] delta (dist from observer)\n",
+                  (ephemeris_output_options & OPTION_SUPPRESS_DELTA) ? ' ' : '*');
+            snprintf_append( buff, sizeof( buff), "3 [%c] r (dist from sun)\n",
+                  (ephemeris_output_options & OPTION_SUPPRESS_SOLAR_R) ? ' ' : '*');
+            snprintf_append( buff, sizeof( buff), "4 [%c] elong\n",
+                  (ephemeris_output_options & OPTION_SUPPRESS_ELONG) ? ' ' : '*');
+            }
          }
-      sprintf( buff + strlen( buff), "C  %s\n", ephem_type_strings[ephem_type]);
-      sprintf( buff + strlen( buff), "?  Help about making ephemerides\n");
-      sprintf( buff + strlen( buff), "M  Make ephemeris\n");
-      sprintf( buff + strlen( buff), "Q  Quit/return to main display");
+      snprintf_append( buff, sizeof( buff), "C  %s\n", ephem_type_strings[ephem_type]);
+      snprintf_append( buff, sizeof( buff), "?  Help about making ephemerides\n");
+      snprintf_append( buff, sizeof( buff), "M  Make ephemeris\n");
+      snprintf_append( buff, sizeof( buff), "Q  Quit/return to main display");
       c = inquire( buff, NULL, 0, COLOR_DEFAULT_INQUIRY);
                      /* Convert mouse clicks inside the 'dialog box'     */
                      /* to the corresponding first letter on that line   */
@@ -638,6 +674,21 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
          }
       switch( c)
          {
+         case '0':
+            show_advanced_options = !show_advanced_options;
+            break;
+         case '1':
+            ephemeris_output_options ^= OPTION_SUPPRESS_RA_DEC;
+            break;
+         case '2':
+            ephemeris_output_options ^= OPTION_SUPPRESS_DELTA;
+            break;
+         case '3':
+            ephemeris_output_options ^= OPTION_SUPPRESS_SOLAR_R;
+            break;
+         case '4':
+            ephemeris_output_options ^= OPTION_SUPPRESS_ELONG;
+            break;
          case 'a': case 'A':
             ephemeris_output_options ^= OPTION_ALT_AZ_OUTPUT;
             break;
@@ -1382,6 +1433,7 @@ static void show_right_hand_scroll_bar( const int line_start,
 }
 
 int first_residual_shown, n_stations_shown;
+static bool show_traditional_format = false;
 
 void show_residuals( const OBSERVE FAR *obs, const int n_obs,
               const int residual_format, const int curr_obs,
@@ -1436,16 +1488,24 @@ void show_residuals( const OBSERVE FAR *obs, const int n_obs,
                OBSERVE temp_obs = obs[line_start + i];
                const int time_prec = temp_obs.time_precision;
 
+               if( show_traditional_format && temp_obs.time_precision > 6)
+                  {
+                  temp_obs.ra_precision = 3;
+                  temp_obs.dec_precision = 2;
+                  temp_obs.time_precision = 6;
+                  }
                format_observation( &temp_obs, buff,
-                           (residual_format & ~(3 | RESIDUAL_FORMAT_HMS)));
-               strcpy( resid_data, buff + 39);
+                           (residual_format & ~(3 | RESIDUAL_FORMAT_HMS))
+                           | RESIDUAL_FORMAT_FOUR_DIGIT_YEARS);
+               strcpy( resid_data, buff + 49);
+               *resid_data = ' ';
                if( residual_format & RESIDUAL_FORMAT_HMS)
                   if( time_prec == 5 || time_prec == 6)  /* 1e-5 or 1e-6 day */
                      temp_obs.time_precision += 16;
                               /* show corresponding 1s or 0.1s HHMMSS fmt */
                recreate_observation_line( buff, &temp_obs);
                memmove( buff, buff + dropped_start, strlen( buff + dropped_start) + 1);
-               strcpy( buff + strlen( buff), resid_data + 10);
+               strcat( buff, resid_data);
                if( temp_obs.flags & OBS_IS_SELECTED)
                   buff[51] = 'o';
                }
@@ -1608,6 +1668,11 @@ static void show_residual_legend( const int line_no, const int residual_format)
    if( residual_format & RESIDUAL_FORMAT_HMS)
       text_search_and_replace( buff, "YYYY MM DD.DDDDD ",
                                      "CYYMMDD:HHMMSSsss");
+   if( (residual_format & RESIDUAL_FORMAT_EXTRA)
+               && base_format != RESIDUAL_FORMAT_SHORT)
+      strcat( buff, (residual_format & RESIDUAL_FORMAT_TIME_RESIDS)
+                  ? "      Xres  Yres  total Mres"
+                  : "      Tres  Cres  total Mres");
 
    if( line_no >= 0)
       {
@@ -2249,13 +2314,8 @@ int main( const int argc, const char **argv)
                debug_printf( "findorb: debug_level = %d; %s %s\n",
                            debug_level, __DATE__, __TIME__);
                break;
-            case 'f':
-               {
-               extern bool take_first_soln;
-
-               take_first_soln = true;
-               }
-               break;
+            case 'f':            /* obj designation;  fall through, */
+               break;            /* handle below */
             case 'i':
                {
                extern int ignore_prev_solns;
@@ -2289,6 +2349,13 @@ int main( const int argc, const char **argv)
                extern int process_count;
 
                process_count = atoi( argv[i] + 2);
+               }
+               break;
+            case 'q':
+               {
+               extern bool take_first_soln;
+
+               take_first_soln = true;
                }
                break;
             case 'r':
@@ -2348,6 +2415,26 @@ int main( const int argc, const char **argv)
          }
       }
 
+   if( !memcmp( argv[1], "-f", 2))
+      {
+      const char *temp_filename = "/tmp/obs_temp.ast";
+      FILE *ofile = fopen( temp_filename, "wb");
+
+      if( argv[1][2])
+         strcpy( tbuff, argv[1] + 2);
+      else
+         *tbuff = '\0';
+      for( i = 2; i < argc && argv[i][0] != '-' && !strchr( argv[i], '='); i++)
+         {
+         if( *tbuff)
+            strcat( tbuff, " ");
+         strcat( tbuff, argv[i]);
+         }
+      fetch_astrometry_from_mpc( ofile, tbuff);
+      fclose( ofile);
+      argv[1] = temp_filename;
+      }
+
    get_defaults( &ephemeris_output_options, &element_format,
          &element_precision, &max_residual_for_filtering,
          &noise_in_arcseconds);
@@ -2400,15 +2487,13 @@ int main( const int argc, const char **argv)
    if( debug_level > 2)
       debug_printf( "(2), ");
 
-#ifdef GOT_CLIPBOARD_FUNCTIONS
    if( !strcmp( argv[1], "c") || !strcmp( argv[1], "c+"))
       {
-      const char *temp_clipboard_filename = "obs_temp.txt";
+      const char *temp_clipboard_filename = "/tmp/obs_temp.txt";
 
       clipboard_to_file( temp_clipboard_filename, argv[1][1] == '+');
       argv[1] = temp_clipboard_filename;
       }
-#endif
 #ifdef __PDCURSES__
    original_xmax = getmaxx( stdscr);
    original_ymax = getmaxy( stdscr);
@@ -4345,46 +4430,21 @@ int main( const int argc, const char **argv)
             update_element_display = 1;
             break;
          case ALT_G:
-            {
-            int n_variants;
-
-            inquire( "Number orbital MC variants: ",
-                               tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY);
-            n_variants = atoi( tbuff);
-            if( n_variants > 0)
-               {
-               extern int append_elements_to_element_file;
-               const clock_t t0 = clock( );
-
-               for( i = 0; i < n_variants; i++)
-                  {
-                  push_orbit( curr_epoch, orbit);
-                  generate_mc_variant_from_covariance( orbit);
-                  if( tbuff[strlen( tbuff) - 1] == 'z')
-                     set_locs( orbit, curr_epoch, obs, n_obs);
-                  write_out_elements_to_file( orbit, curr_epoch, epoch_shown,
-                       obs, n_obs, orbit_constraints, element_precision,
-                       1, element_format);
-                  append_elements_to_element_file = 1;
-                  pop_orbit( &curr_epoch, orbit);
-                  }
-               set_locs( orbit, curr_epoch, obs, n_obs);
-               append_elements_to_element_file = 0;
-               sprintf( message_to_user, "Time: %.3f seconds",
-                      (double)( clock( ) - t0) / (double)CLOCKS_PER_SEC);
-               }
-            }
+            orbital_monte_carlo( orbit, obs, n_obs, curr_epoch, epoch_shown);
+            update_element_display = 1;
+            strcpy( message_to_user, "Orbital MC generated");
             break;
-#ifdef GOT_CLIPBOARD_FUNCTIONS
          case ALT_I:
-            i = copy_file_to_clipboard( elements_filename);
+            {
+            make_config_dir_name( tbuff, elements_filename);
+            i = copy_file_to_clipboard( tbuff);
             if( i)
                sprintf( message_to_user,
                               "Error %d in copying elements to clipboard", i);
             else
                strcpy( message_to_user, "Elements copied to clipboard");
+            }
             break;
-#endif
          case ALT_K:
             {
             extern int sigmas_in_columns_57_to_65;
@@ -4399,8 +4459,11 @@ int main( const int argc, const char **argv)
             show_observational_details ^= 1;
             }
             break;
+         case '&':
+            show_traditional_format = !show_traditional_format;
+            break;
          case ALT_A: case 9:
-         case ALT_P: case '&':
+         case ALT_P:
          case ALT_R: case ALT_X: case ALT_Y:
          case ALT_Z: case '\'':
          default:

@@ -706,7 +706,10 @@ static int add_sof_to_file( const char *filename,
       {
       fseek( fp, 0L, SEEK_SET);
       if( !fgets( templat, sizeof( templat), fp))
+         {
+         fclose( fp);
          return( -1);
+         }
       if( forking)
          {
          fclose( fp);
@@ -1722,40 +1725,47 @@ void set_solutions_found( OBJECT_INFO *ids, const int n_ids)
 ELEMENTS.COMET,  Find_Orb can sometimes flounder about a bit in its
 efforts to determine an orbit. */
 
-static int get_orbit_from_dastcom( const char *object_name, double *orbit, double *epoch)
+
+int extract_sof_data( ELEMENTS *elem, const char *buff, const char *header);
+
+static int get_orbit_from_mpcorb_sof( const char *object_name, double *orbit,
+                                          ELEMENTS *elems)
 {
-   FILE *ifile = fopen_ext( "ELEMENTS.COMET", "crb");
+   FILE *ifile = fopen_ext( "mpcorb.sof", "crb");
    int got_vectors = 0;
 
+   memset( elems, 0, sizeof( ELEMENTS));
    if( ifile)
       {
-      char buff[200];
+      char buff[300], header[300], tname[15];
 
-      while( !got_vectors && fgets_trimmed( buff, sizeof( buff), ifile))
+      if( !fgets_trimmed( header, sizeof( header), ifile))
          {
-         char *loc;
-
-         buff[45] = buff[119] = '\0';
-         if( (loc = strstr( buff, object_name)) != NULL &&
-                       loc[strlen( object_name)] == ' ')
+         fprintf( stderr, "Error in mpcorb.sof header\n");
+         exit( -1);
+         }
+      while( *object_name == ' ')
+         object_name++;
+      if( *object_name == '(')         /* numbered asteroid */
+         snprintf( tname, sizeof( tname), "%12d", atoi( object_name + 1));
+      else if( *object_name == 'P' && object_name[1] == '/'
+                  && atoi( object_name + 2) < 1000)      /* numbered comet */
+         snprintf( tname, sizeof( tname), "%3uP        ",
+                  atoi( object_name + 2));
+      else
+         snprintf( tname, sizeof( tname), "%-12s", object_name);
+      debug_printf( "Header (looking for '%s'):\n%s", tname, header);
+      while( !got_vectors && fgets_trimmed( buff, sizeof( buff), ifile))
+         if( !memcmp( tname, buff, 12))
             {
-            ELEMENTS elem;
-
-            memset( &elem, 0, sizeof( ELEMENTS));
-            elem.q = atof( buff + 51);
-            elem.epoch = *epoch = atof( buff + 46) + 2400000.5;
-            elem.ecc = atof( buff + 64);
-            elem.incl = atof( buff + 75) * PI / 180.;
-            elem.arg_per = atof( buff + 85) * PI / 180.;
-            elem.asc_node = atof( buff + 95) * PI / 180.;
-            elem.perih_time = get_time_from_string( 0., buff + 105, 0, NULL);
-            derive_quantities( &elem, SOLAR_GM);
-            comet_posn_and_vel( &elem, elem.epoch, orbit, orbit + 3);
+            extract_sof_data( elems, buff, header);
+            assert( elems->epoch > 2400000.);
+            derive_quantities( elems, SOLAR_GM);
+            comet_posn_and_vel( elems, elems->epoch, orbit, orbit + 3);
             got_vectors = 1;
-            if( elem.ecc == 1.)     /* indicate parabolic-constraint orbit */
+            if( elems->ecc == 1.)     /* indicate parabolic-constraint orbit */
                got_vectors = 2;
             }
-         }
       fclose( ifile);
       }
    return( got_vectors);
@@ -1856,9 +1866,27 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
       }
    if( !got_vectors && !ignore_prev_solns)
       {
-      got_vectors = get_orbit_from_dastcom( object_name, orbit, orbit_epoch);
+      ELEMENTS elems;
+
+      got_vectors = get_orbit_from_mpcorb_sof( object_name, orbit, &elems);
       if( got_vectors)
+         {
+         const bool ephem_mode =
+                     (n_obs == 1 && !strcmp( obs->reference, "Dummy"));
+
+         *orbit_epoch = elems.epoch;
+         if( ephem_mode)
+            obs->jd = *orbit_epoch + td_minus_ut( *orbit_epoch) / seconds_per_day;
          set_locs( orbit, *orbit_epoch, obs, n_obs);
+         if( ephem_mode)
+            {
+            obs->ra = obs->computed_ra;
+            obs->dec = obs->computed_dec;
+            obs->obs_mag = elems.abs_mag + calc_obs_magnitude( obs->solar_r,
+                       obs->r, vector3_length( obs->obs_posn), NULL);
+            obs->obs_mag = floor( obs->obs_mag * 10.) * .1;
+            }
+         }
       }
    if( !got_vectors)
       {

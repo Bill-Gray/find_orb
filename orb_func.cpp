@@ -185,6 +185,8 @@ void compute_error_ellipse_adjusted_for_motion( double *sigma1, double *sigma2,
 double n_nearby_obs( const OBSERVE FAR *obs, const unsigned n_obs,
           const unsigned idx, const double time_span);       /* orb_func.cpp */
 double find_parabolic_minimum_point( const double x[3], const double y[3]);
+int orbital_monte_carlo( const double *orbit, OBSERVE *obs, const int n_obs,
+         const double curr_epoch, const double epoch_shown);   /* orb_func.cpp */
 
 void set_distance( OBSERVE FAR *obs, double r)
 {
@@ -1659,7 +1661,7 @@ static inline void compute_sr_sigmas( const double *sr_orbits,
       ELEMENTS elem;
 
       elem.gm = SOLAR_GM;
-      memcpy( orbit, sr_orbits + 7 * i, 6 * sizeof( double));
+      memcpy( orbit, sr_orbits + 6 * i, 6 * sizeof( double));
       integrate_orbit( orbit, epoch, epoch_shown);
       calc_classical_elements( &elem, orbit, epoch_shown, 1);
       add_monte_orbit( monte_data, &elem, i);
@@ -2681,23 +2683,25 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
       unit_vector_dimension = 0;
       return( 0);
       }
-   if( unit_vector_dimension != n_params)
-      {          /* force a reset to default values */
-      if( unit_vectors)
-         free( unit_vectors);
-      unit_vectors = (double **)calloc_double_dimension_array(
-                     n_params, n_params, sizeof( double));
-      for( i = 0; i < n_params; i++)
-         unit_vectors[i][i] = 1.;
-      memcpy( delta_vals, default_delta_vals, sizeof( delta_vals));
-      unit_vector_dimension = n_params;
-      set_fixed_unit_vectors( unit_vectors, obs);
-      }
-   available_sigmas = NO_SIGMAS_AVAILABLE;
    if( get_idx1_and_idx2( n_obs, obs, &i, &j) < 3)
       return( -1);
    if( is_unreasonable_orbit( orbit))
       return( -2);
+   if( unit_vector_dimension != n_params)
+      {          /* force a reset to default values */
+      int k;
+
+      if( unit_vectors)
+         free( unit_vectors);
+      unit_vectors = (double **)calloc_double_dimension_array(
+                     n_params, n_params, sizeof( double));
+      for( k = 0; k < n_params; k++)
+         unit_vectors[k][k] = 1.;
+      memcpy( delta_vals, default_delta_vals, sizeof( delta_vals));
+      unit_vector_dimension = n_params;
+      set_fixed_unit_vectors( unit_vectors, obs + i);
+      }
+   available_sigmas = NO_SIGMAS_AVAILABLE;
                /* We save the input orbit;  if there's an error,  we can */
                /* restore it:         */
    memcpy( original_orbit, orbit, 6 * sizeof( double));
@@ -3871,14 +3875,14 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
       {               /* accept the SR solution */
       const double epoch_shown = find_epoch_shown( obs, n_obs);
 
+              /* SR orbits are stored in seven doubles,  including a score. */
+      for( i = 1; i < (int)n_sr_orbits; i++)  /* Shift 'em to remove the score. */
+         memmove( sr_orbits + i * 6, sr_orbits + i * 7, 6 * sizeof( double));
       memcpy( orbit, sr_orbits, 6 * sizeof( double));
       compute_sr_sigmas( sr_orbits, n_sr_orbits, obs[0].jd, epoch_shown);
       available_sigmas_hash = compute_available_sigmas_hash( obs, n_obs,
                   epoch_shown, perturbers, 0);
       set_locs( orbit, obs[0].jd, obs, n_obs);
-              /* SR orbits are stored in seven doubles,  including a score. */
-      for( i = 1; i < (int)n_sr_orbits; i++)  /* Shift 'em to remove the score. */
-         memmove( sr_orbits + i * 6, sr_orbits + i * 7, 6 * sizeof( double));
       integration_timeout = 0;
       return( obs[0].jd);
       }
@@ -4057,6 +4061,39 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
 // available_sigmas = NO_SIGMAS_AVAILABLE;
    integration_timeout = 0;
    return( obs[start].jd);    /* ...and return epoch = JD of first observation */
+}
+
+int generate_mc_variant_from_covariance( double *orbit);    /* orb_fun2.cpp */
+
+int orbital_monte_carlo( const double *orbit, OBSERVE *obs, const int n_obs,
+         const double curr_epoch, const double epoch_shown)
+{
+   unsigned i;
+   extern int append_elements_to_element_file;
+   extern const char *elements_filename;
+   const char *saved_name = elements_filename;
+
+   assert( sr_orbits);
+   n_sr_orbits = max_n_sr_orbits;
+   available_sigmas = NO_SIGMAS_AVAILABLE;
+   elements_filename = "sr_elems.txt";
+   for( i = 0; i < n_sr_orbits; i++)
+      {
+      double *torbit = sr_orbits + i * 6;
+
+      memcpy( torbit, orbit, 6 * sizeof( double));
+      generate_mc_variant_from_covariance( torbit);
+      write_out_elements_to_file( torbit, curr_epoch, epoch_shown,
+           obs, n_obs, "", 6, 1, ELEM_OUT_ALTERNATIVE_FORMAT);
+      append_elements_to_element_file = 1;
+      }
+// set_locs( orbit, curr_epoch, obs, n_obs);
+   compute_sr_sigmas( sr_orbits, n_sr_orbits, curr_epoch, epoch_shown);
+   available_sigmas_hash = compute_available_sigmas_hash( obs, n_obs,
+         epoch_shown, perturbers, 0);
+   append_elements_to_element_file = 0;
+   elements_filename = saved_name;
+   return( 0);
 }
 
 static int count_observations_used( const OBSERVE *obs, int n_obs)
