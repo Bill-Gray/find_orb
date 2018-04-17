@@ -506,6 +506,7 @@ int main( const int argc, const char **argv)
    tle.classification = 'U';
    tle.ephemeris_type = EPHEM_TYPE_DEFAULT;
    tle.bulletin_number = (int)( t0 / seconds_per_day - BULLETIN_EPOCH);
+   *obj_name = '\0';
    for( i = 1; i < argc; i++)
       if( argv[i][0] == '-')
          switch( argv[i][1])
@@ -519,6 +520,12 @@ int main( const int argc, const char **argv)
             case 'b':
                fitted |= FIT_BSTAR;
                n_params++;
+               break;
+            case 'd':
+               if( argv[i][2])
+                  strcpy( obj_name, argv[i] + 2);
+               else if( i < argc - 1)
+                  strcpy( obj_name, argv[i + 1]);
                break;
             case 'e':
                fitted |= FIT_EPOCH;
