@@ -1433,7 +1433,6 @@ static void show_right_hand_scroll_bar( const int line_start,
 }
 
 int first_residual_shown, n_stations_shown;
-static bool show_traditional_format = false;
 
 void show_residuals( const OBSERVE FAR *obs, const int n_obs,
               const int residual_format, const int curr_obs,
@@ -1488,12 +1487,6 @@ void show_residuals( const OBSERVE FAR *obs, const int n_obs,
                OBSERVE temp_obs = obs[line_start + i];
                const int time_prec = temp_obs.time_precision;
 
-               if( show_traditional_format && temp_obs.time_precision > 6)
-                  {
-                  temp_obs.ra_precision = 3;
-                  temp_obs.dec_precision = 2;
-                  temp_obs.time_precision = 6;
-                  }
                format_observation( &temp_obs, buff,
                            (residual_format & ~(3 | RESIDUAL_FORMAT_HMS))
                            | RESIDUAL_FORMAT_FOUR_DIGIT_YEARS);
@@ -4460,7 +4453,13 @@ int main( const int argc, const char **argv)
             }
             break;
          case '&':
-            show_traditional_format = !show_traditional_format;
+            {
+            extern bool force_traditional_format;
+
+            force_traditional_format = !force_traditional_format;
+            strcpy( message_to_user, "Force punched-card format");
+            add_off_on = force_traditional_format;
+            }
             break;
          case ALT_A: case 9:
          case ALT_P:

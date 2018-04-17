@@ -2553,6 +2553,11 @@ static void put_sigma( char *buff, const double val)
 
 
 int sigmas_in_columns_57_to_65 = 0;
+bool force_traditional_format = false;
+      /* The above causes 'extended' time and position formats to
+      be shown in punched-card format.  This can help if you want
+      to create data for use in (most) software that doesn't support
+      Find_Orb's extensions to the MPC format. */
 
 void recreate_observation_line( char *obuff, const OBSERVE FAR *obs)
 {
@@ -2566,6 +2571,12 @@ void recreate_observation_line( char *obuff, const OBSERVE FAR *obs)
       return;
       }
 // set_obs_to_microday( &tobs);
+   if( force_traditional_format && tobs.time_precision > 6)
+      {
+      tobs.ra_precision = 3;
+      tobs.dec_precision = 2;
+      tobs.time_precision = 6;
+      }
    format_observation( &tobs, buff, 4);
    memcpy( obuff, obs->packed_id, 12);
    obuff[12] = obs->discovery_asterisk;
