@@ -40,6 +40,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "afuncs.h"
 #include "mpc_obs.h"
 #include "mpc_func.h"
+#include "stackall.h"
 #include "sigma.h"
 #include "date.h"
 
@@ -3659,10 +3660,12 @@ void sort_object_info( OBJECT_INFO *ids, const int n_ids,
    When we're done,  the new table is sorted by name (this puts any blank
    entries at the end of the table).   */
 
+
 OBJECT_INFO *find_objects_in_file( const char *filename,
                                          int *n_found, const char *station)
 {
-   FILE *ifile = fopen( filename, "rb");
+   static void *obj_name_stack;
+   FILE *ifile = (filename ? fopen( filename, "rb") : NULL);
    OBJECT_INFO *rval;
    int i, n = 0, n_alloced = 20, prev_loc = -1;
    const int fixing_trailing_and_leading_spaces =
@@ -3680,10 +3683,16 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
       fseek( ifile, 0L, SEEK_SET);
       }
 #endif
+   if( obj_name_stack)
+      {
+      destroy_stack( obj_name_stack);
+      obj_name_stack = NULL;
+      }
 
    if( !ifile)
       {
-      *n_found = -1;
+      if( n_found)
+         *n_found = -1;
       return( NULL);
       }
    *mpc_code_from_neocp = '\0';
@@ -3691,6 +3700,7 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
    strcpy( mpc_code_from_neocp, "500");   /* default is geocenter */
    neocp_file_type = NEOCP_FILE_TYPE_UNKNOWN;
    rval = (OBJECT_INFO *)calloc( n_alloced + 1, sizeof( OBJECT_INFO));
+   obj_name_stack = create_stack( 2000);
    if( debug_level > 8)
       debug_printf( "About to read input\n");
    while( fgets_trimmed( buff, sizeof( buff), ifile))
@@ -3728,7 +3738,6 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
             {
             int loc;
 
-
             if( *buff == '#')
                *buff = ' ';           /* handle remarked-out lines,  too */
             xref_designation( buff);
@@ -3743,9 +3752,14 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
                loc = 0;
             else if( !rval[loc].packed_desig[0])   /* it's a new one */
                {
+               char obj_name[80];
+
                memcpy( rval[loc].packed_desig, buff, 12);
                rval[loc].packed_desig[12] = '\0';
-               get_object_name( rval[loc].obj_name, rval[loc].packed_desig);
+               get_object_name( obj_name, rval[loc].packed_desig);
+               rval[loc].obj_name = (char *)stack_alloc(
+                          obj_name_stack, strlen( obj_name) + 1);
+               strcpy( rval[loc].obj_name, obj_name);
                rval[loc].n_obs = 0;
                rval[loc].jd_start = rval[loc].jd_end = jd;
                if( is_neocp)   /* for NEOCP obs,  we need to start at the */
@@ -3822,6 +3836,7 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
       if( rval[i].packed_desig[0])
          rval[n++] = rval[i];
    assert( n == *n_found);
+   rval = (OBJECT_INFO *)realloc( rval, n * sizeof( OBJECT_INFO));
    sort_object_info( rval, n, OBJECT_INFO_COMPARE_PACKED);
    return( rval);
 }

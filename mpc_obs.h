@@ -43,10 +43,9 @@ OBJECT_INFO
    {
    double jd_start, jd_end;
    long file_offset;
+   char *obj_name;
    int n_obs;
-   char packed_desig[13], obj_name[80];
-   char solution_exists;
-   char unused_padding_bytes_to_avoid_compiler_warning[6];
+   char packed_desig[13], solution_exists;
    };
 
 #define OBJECT_INFO_COMPARE_PACKED           0
