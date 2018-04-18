@@ -61,16 +61,19 @@ void *create_stack( const size_t stack_size)
 void *stack_alloc( void *stack, const size_t nbytes)
 {
    STACK *sptr = (STACK *)stack;
+   const size_t size0 = sptr->size;
    char *rval;
-   size_t default_size = sptr->size;
 
-   while( sptr->next)
+   if( sptr->used + nbytes > size0)
       sptr = sptr->next;
-   if( sptr->size - sptr->used < nbytes)
+   if( !sptr || sptr->used + nbytes > size0)
       {
-      sptr->next = (STACK *)create_stack( (default_size > nbytes) ?
-                                          default_size : nbytes);
-      sptr = sptr->next;
+      STACK *tptr = (STACK *)create_stack( (size0 > nbytes) ? size0 : nbytes);
+
+      sptr = (STACK *)stack;
+      tptr->next = sptr->next;
+      sptr->next = tptr;
+      sptr = tptr;
       }
    rval = (char *)( sptr + 1) + sptr->used;
    sptr->used += nbytes;
