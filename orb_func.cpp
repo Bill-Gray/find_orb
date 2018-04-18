@@ -4383,5 +4383,6 @@ int clean_up_find_orb_memory( void)
       free( sr_orbits);
       sr_orbits = NULL;
       }
+   find_objects_in_file( NULL, NULL, NULL);
    return( 0);
 }
