@@ -104,6 +104,9 @@ void compute_error_ellipse_adjusted_for_motion( double *sigma1, double *sigma2,
                   const MOTION_DETAILS *m);                  /* orb_func.cpp */
 double n_nearby_obs( const OBSERVE FAR *obs, const unsigned n_obs,
           const unsigned idx, const double time_span);       /* orb_func.cpp */
+#ifndef strlcpy
+size_t strlcpy(char *dest, const char *src, size_t size);   /* miscell.cpp */
+#endif
 
 int debug_printf( const char *format, ...)
 {
@@ -1897,6 +1900,8 @@ int qsort_strcmp( const void *a, const void *b, void *ignored_context)
    return( strcmp( (const char *)a, (const char *)b));
 }
 
+static const char *new_xdesig_indicator = "New xdesig";
+
 static int xref_designation( char *desig)
 {
    static char *xlate_table = NULL;
@@ -1942,6 +1947,20 @@ static int xref_designation( char *desig)
             }
       fclose( ifile);
       shellsort_r( xlate_table, n_lines, 26, qsort_strcmp, NULL);
+      }
+
+   if( strlen( desig) > 34 && !strcmp( desig + 26, new_xdesig_indicator))
+      {                /* expand xdesig table by one,  add entry,  re-sort */
+      char *tptr;
+
+      xlate_table = (char *)realloc( xlate_table, (n_lines + 1) * 26);
+      assert( xlate_table);
+      tptr = xlate_table + n_lines * 26;
+      n_lines++;
+      memcpy( tptr, desig, 25);
+      tptr[25] = '\0';
+      shellsort_r( xlate_table, n_lines, 26, qsort_strcmp, NULL);
+      return( 0);
       }
 
             /* Frequently,  this function is given the same designation */
@@ -3666,6 +3685,7 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
 {
    static void *obj_name_stack;
    FILE *ifile = (filename ? fopen( filename, "rb") : NULL);
+   char new_xdesig[50];
    OBJECT_INFO *rval;
    int i, n = 0, n_alloced = 20, prev_loc = -1;
    const int fixing_trailing_and_leading_spaces =
@@ -3676,6 +3696,7 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
    int next_output = 20000, n_obs_read = 0;
    long filesize;
 
+   *new_xdesig = '\0';
    if( ifile)
       {
       fseek( ifile, 0L, SEEK_END);
@@ -3732,6 +3753,16 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
          fix_up_mpc_observation( buff);
       if( debug_level > 8)
          debug_printf( "After fixup: %d\n", (int)strlen( buff));
+      if( *new_xdesig)        /* previous line was "COM = (xdesig)";  add */
+         {                    /* a new cross-designation to the table */
+         memcpy( new_xdesig, buff, 12);
+         new_xdesig[12] = ' ';
+         for( i = strlen( new_xdesig); i < 26; i++)
+            new_xdesig[i] = ' ';
+         strcpy( new_xdesig + 26, new_xdesig_indicator);
+         xref_designation( new_xdesig);
+         *new_xdesig = '\0';
+         }
       jd = observation_jd( buff);
       if( jd != 0. && !is_second_line( buff))
          if( !station || !memcmp( buff + 76, station, 3))
@@ -3821,6 +3852,11 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
                }
 #endif
             }
+      if( !memcmp( buff, "#= ", 3))
+         {
+         *new_xdesig = '!';
+         strlcpy( new_xdesig + 13, buff + 3, 20);
+         }
       if( !strcmp( buff, "#ignore obs"))
          while( fgets_trimmed( buff, sizeof( buff), ifile)
                     && !strstr( buff, "end ignore obs"))
