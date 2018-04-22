@@ -226,7 +226,6 @@ int compute_observer_vel( const double jde, const int planet_no,
                const double rho_cos_phi,                    /* mpc_obs.cpp */
                const double rho_sin_phi, const double lon, double FAR *offset);
 int get_findorb_text( char *buff, const int ival);    /* ephem.cpp */
-int create_mpc_packed_desig( char *packed_desig, const char *obj_name);
 int write_out_elements_to_file( const double *orbit,
             const double curr_epoch,
             const double epoch_shown,
