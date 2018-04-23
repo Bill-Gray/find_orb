@@ -2722,51 +2722,12 @@ static void tack_on_names( char *list, const char *names)
       }
 }
 
-/* It's fairly common for artificial satellite IDs to start in
-somewhat arbitrary columns.  This checks to see if two packed IDs
-match,  after allowing for the possibility that one is "shifted"
-relative to the other.        */
-
-static bool packed_ids_match( const char *id1, const char *id2)
-{
-   size_t len1 = 12, len2 = 12;
-
-   while( *id1 == ' ' && len1)
-      {
-      id1++;
-      len1--;
-      }
-   while( len1 && id1[len1 - 1] == ' ')
-      len1--;
-
-   while( *id2 == ' ' && len2)
-      {
-      id2++;
-      len2--;
-      }
-   while( len2 && id2[len2 - 1] == ' ')
-      len2--;
-   return( len1 == len2 && !memcmp( id1, id2, len1));
-}
-
-/* In getting 'details',  there are really two scenarios.  Either we're
-getting the COD/OBS/MEA/TEL data from the observation file (best case),
-or we don't have those and are instead trawling for the default
-observer/measurer names and telescope data from the files 'details.txt'
-and 'scopes.txt' (which you should look at).
-
-   In the first case,  'packed_id' is non-NULL.  Success consists of
-reading through the file of astrometric data,  locating the correct
-COD line,  getting OBS/MEA/TEL data,  and then finding a matching
-'packed_id' before hitting another COD.
-
-   In the other cases,  'packed_id' is NULL.  Again,  we read through
-the file until we hit the right COD line,  again get OBS/MEA/TEL data.
-But we keep on reading until we hit the next COD line.   */
+/* For getting default observer/telescope details from 'details.txt' and/or
+'scopes.txt',  we look through those files for the MPC observatory code
+in question,  then look for OBS/MEA/TEL data. */
 
 static int get_observer_details( const char *observation_filename,
-      const char *mpc_code, char *observers, char *measurers, char *scope,
-      const char *packed_id)
+      const char *mpc_code, char *observers, char *measurers, char *scope)
 {
    FILE *ifile = fopen_ext( observation_filename, "fclrb");
    int rval = 0, n_codes_found = 0;
@@ -2793,15 +2754,12 @@ static int get_observer_details( const char *observation_filename,
                      tack_on_names( measurers, buff + 4);
                   if( !memcmp( buff, "TEL ", 4))  /* allow for only one scope */
                      strcpy( scope, buff + 4);
-                  if( packed_id && packed_ids_match( packed_id, buff))
-                     done = true;
                   if( !memcmp( buff, "COD ", 4))
                      {
                      if( memcmp( buff + 4, mpc_code, 3))
                         {
                         new_code_found = true;
-                        if( !packed_id)
-                           done = true;
+                        done = true;
                         }
                      else
                         *observers = *measurers = *scope = '\0';
@@ -2956,7 +2914,7 @@ static int write_observer_data_to_file( FILE *ofile, const char *ast_filename,
       if( !details_found && try_details_file)
          {
          details_found = get_observer_details( "details.txt", tbuff,
-                                 details[1], details[2], details[3], NULL);
+                                 details[1], details[2], details[3]);
          if( details_found == -1)       /* file wasn't found,  or it has */
             {                           /* no observational details.  In */
             details_found = 0;          /* either case,  ignore it for   */
@@ -2967,7 +2925,7 @@ static int write_observer_data_to_file( FILE *ofile, const char *ast_filename,
       if( !details_found && try_scope_file)
          {
          details_found = get_observer_details( "scopes.txt", tbuff,
-                                 details[1], details[2], details[3], NULL);
+                                 details[1], details[2], details[3]);
          if( details_found == -1)       /* file wasn't found,  or it has */
             {                           /* no observational details.  In */
       /*    details_found = 0;   */     /* either case,  ignore it for   */
