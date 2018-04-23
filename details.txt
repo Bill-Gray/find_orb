@@ -587,6 +587,10 @@ COD K93
 OBS R. Miles
 TEL 1.0-m f/8.0 Ritchey-Chretien + CCD
 
+COD L01
+OBS K. Korlevic
+TEL 1.0-m f/2.9 reflector + CCD
+
 COD O75
 OBS T. Namkhai, S. Schmalz
 MEA S. Schmalz
@@ -661,6 +665,13 @@ CON [david (at) rankinstudio (dot) com]
 OBS D. Rankin
 NET PPMXL
 TEL 0.30-m reflector + CCD
+
+COD V06
+OBS E. J. Christensen
+MEA E. J. Christensen, D. C. Fuls, A. R. Gibbs, A. D. Grauer, J. A. Johnson
+MEA R. A. Kowalski, S. M. Larson, G. J. Leonard, R. G. Matheny, R. L. Seaman
+MEA F. C. Shelly
+TEL 1.55-m reflector + CCD
 
 COD W34
 OBS R. L. Flynn
