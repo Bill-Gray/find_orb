@@ -2671,6 +2671,8 @@ static void correct_differences( OBSERVE *obs1, const OBSERVE *obs2)
       }
    if( obs1->mag_band2 == ' ' && obs2->mag_band2 != ' ')
       obs1->mag_band2 = obs2->mag_band2;
+   if( obs1->mag_band == ' ' && obs2->mag_band != ' ')
+      obs1->mag_band = obs2->mag_band;
 }
 
 static int compare_observations( const void *a, const void *b, void *unused_context)
