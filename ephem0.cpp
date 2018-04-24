@@ -2786,8 +2786,8 @@ static int get_observer_details( const char *observation_filename,
                      tack_on_names( observers, buff + 4);
                   if( use_lines && !memcmp( buff, "MEA ", 4))
                      tack_on_names( measurers, buff + 4);
-                  if( use_lines && !memcmp( buff, "TEL ", 4))  /* allow for only one scope */
-                     strcpy( scope, buff + 4);
+                  if( use_lines && !memcmp( buff, "TEL ", 4))
+                     strcat( scope, buff + 4);
                   if( !memcmp( buff, "COD ", 4))
                      {
                      if( memcmp( buff + 4, mpc_code, 3))
