@@ -2722,11 +2722,32 @@ static void tack_on_names( char *list, const char *names)
       }
 }
 
+static bool got_obs_in_range( const OBSERVE *obs, int n_obs,
+               const double jd_start, const double jd_end)
+{
+   bool rval = false;
+
+   while( !rval && n_obs)
+      {
+      rval = (obs->jd > jd_start && obs->jd < jd_end);
+      n_obs--;
+      obs++;
+      }
+   return( rval);
+}
+
 /* For getting default observer/telescope details from 'details.txt' and/or
 'scopes.txt',  we look through those files for the MPC observatory code
-in question,  then look for OBS/MEA/TEL data. */
+in question,  then look for OBS/MEA/TEL data.  In some cases,  observers or
+measurers or telescopes may change.  A comment line such as
+
+COM Valid 1993 Mar 4 - 2012 Dec 25
+
+tells the program:  "Don't pay any attention to the following lines unless
+observations were made at this code during this time span." */
 
 static int get_observer_details( const char *observation_filename,
+      const OBSERVE *obs, const int n_obs,
       const char *mpc_code, char *observers, char *measurers, char *scope)
 {
    FILE *ifile = fopen_ext( observation_filename, "fclrb");
@@ -2741,18 +2762,31 @@ static int get_observer_details( const char *observation_filename,
       while( !done && fgets( buff, sizeof( buff), ifile))
          if( !memcmp( buff, "COD ", 4))
             {
-            bool new_code_found = false;
+            bool new_code_found = false, use_lines = true;
 
             *observers = *measurers = *scope = '\0';
             n_codes_found++;
             if( !memcmp( buff + 4, mpc_code, 3))
                while( !done && fgets_trimmed( buff, sizeof( buff), ifile) && !new_code_found)
                   {
-                  if( !memcmp( buff, "OBS ", 4))
+                  if( !memcmp( buff, "COM Valid:", 10))
+                     {
+                     char *tptr = strchr( buff, '-');
+                     double jd_start, jd_end;
+
+                     assert( tptr);
+                     *tptr = '\0';
+                     jd_start = get_time_from_string( 0., buff + 10, 0, NULL);
+                     jd_end = get_time_from_string( 0., tptr + 1, 0, NULL);
+                     assert( jd_start > 2000000. && jd_start < 3000000.);
+                     assert( jd_end > 2000000. && jd_end < 3000000.);
+                     use_lines = got_obs_in_range( obs, n_obs, jd_start, jd_end);
+                     }
+                  if( use_lines && !memcmp( buff, "OBS ", 4))
                      tack_on_names( observers, buff + 4);
-                  if( !memcmp( buff, "MEA ", 4))
+                  if( use_lines && !memcmp( buff, "MEA ", 4))
                      tack_on_names( measurers, buff + 4);
-                  if( !memcmp( buff, "TEL ", 4))  /* allow for only one scope */
+                  if( use_lines && !memcmp( buff, "TEL ", 4))  /* allow for only one scope */
                      strcpy( scope, buff + 4);
                   if( !memcmp( buff, "COD ", 4))
                      {
@@ -2913,8 +2947,8 @@ static int write_observer_data_to_file( FILE *ofile, const char *ast_filename,
 
       if( !details_found && try_details_file)
          {
-         details_found = get_observer_details( "details.txt", tbuff,
-                                 details[1], details[2], details[3]);
+         details_found = get_observer_details( "details.txt", obs_data,
+                   n_obs, tbuff, details[1], details[2], details[3]);
          if( details_found == -1)       /* file wasn't found,  or it has */
             {                           /* no observational details.  In */
             details_found = 0;          /* either case,  ignore it for   */
@@ -2924,8 +2958,8 @@ static int write_observer_data_to_file( FILE *ofile, const char *ast_filename,
 
       if( !details_found && try_scope_file)
          {
-         details_found = get_observer_details( "scopes.txt", tbuff,
-                                 details[1], details[2], details[3]);
+         details_found = get_observer_details( "scopes.txt", obs_data,
+                   n_obs, tbuff, details[1], details[2], details[3]);
          if( details_found == -1)       /* file wasn't found,  or it has */
             {                           /* no observational details.  In */
       /*    details_found = 0;   */     /* either case,  ignore it for   */
