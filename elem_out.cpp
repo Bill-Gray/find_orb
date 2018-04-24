@@ -122,6 +122,8 @@ const char *mpc_fmt_filename = "mpc_fmt.txt";
 const char *sof_filename = "sof.txt";
 const char *sofv_filename = "sofv.txt";
 extern int forced_central_body;
+int get_planet_posn_vel( const double jd, const int planet_no,
+                     double *posn, double *vel);         /* runge.cpp */
 void compute_variant_orbit( double *variant, const double *ref_orbit,
                      const double n_sigmas);       /* orb_func.cpp */
 void make_config_dir_name( char *oname, const char *iname);  /* miscell.cpp */
@@ -1759,9 +1761,26 @@ static int get_orbit_from_mpcorb_sof( const char *object_name, double *orbit,
          if( !memcmp( tname, buff, 12))
             {
             extract_sof_data( elems, buff, header);
+            if( elems->epoch < 2400000.)
+               printf( "JD %f\n", elems->epoch);
             assert( elems->epoch > 2400000.);
-            derive_quantities( elems, SOLAR_GM);
+            derive_quantities( elems, get_planet_mass( elems->central_obj));
             comet_posn_and_vel( elems, elems->epoch, orbit, orbit + 3);
+            if( elems->central_obj == 3)
+               {
+               equatorial_to_ecliptic( orbit);
+               equatorial_to_ecliptic( orbit + 3);
+               }
+            if( elems->central_obj)
+               {
+               double planet_state[6];
+               int i;
+
+               get_planet_posn_vel( elems->epoch, elems->central_obj,
+                                       planet_state, planet_state + 3);
+               for( i = 0; i < 6; i++)
+                  orbit[i] += planet_state[i];
+               }
             got_vectors = 1;
             if( elems->ecc == 1.)     /* indicate parabolic-constraint orbit */
                got_vectors = 2;
