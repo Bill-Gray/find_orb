@@ -86,7 +86,7 @@ double take_pd89_step( const double jd, ELEMENTS *ref_orbit,
                  const int n_vals, const double step);      /* runge.cpp */
 int symplectic_6( double jd, ELEMENTS *ref_orbit, double *vect,
                                           const double dt);
-static int get_planet_posn_vel( const double jd, const int planet_no,
+int get_planet_posn_vel( const double jd, const int planet_no,
                      double *posn, double *vel);         /* runge.cpp */
 int find_best_fit_planet( const double jd, const double *ivect,
                                  double *rel_vect);      /* runge.cpp */
@@ -1053,7 +1053,7 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
    return( rval);
 }
 
-static int get_planet_posn_vel( const double jd, const int planet_no,
+int get_planet_posn_vel( const double jd, const int planet_no,
                      double *posn, double *vel)
 {
    assert( fabs( jd) < 1e+9);
