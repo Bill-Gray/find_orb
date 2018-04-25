@@ -3151,6 +3151,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
    const bool fixing_trailing_and_leading_spaces =
                (*get_environment_ptr( "FIX_OBSERVATIONS") != '\0');
    bool is_fcct14_data = false;
+   void *ades_context;
 
    *desig_from_neocp = '\0';
    strcpy( mpc_code_from_neocp, "500");   /* default is geocenter */
@@ -3166,7 +3167,9 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
    object_type = OBJECT_TYPE_ASTEROID;
    assert( !obs_details);
    obs_details = init_observation_details( );
-   while( fgets_trimmed( buff, sizeof( buff), ifile) && i != n_obs)
+   ades_context = init_ades2mpc( );
+   while( fgets_with_ades_xlation( buff, sizeof( buff), ades_context, ifile)
+                  && i != n_obs)
       {
       int is_rwo = 0;
       double rwo_posn_sigma_1 = 0., rwo_posn_sigma_2 = 0., rwo_mag_sigma = 0.;
@@ -3455,7 +3458,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                ;     /* deliberately empty loop */
          }
       }
-
+   free_ades2mpc_context( ades_context);
    n_obs_actually_loaded = i;
    if( debug_level)
       debug_printf( "%u obs found in file\n",  n_obs_actually_loaded);
@@ -3693,6 +3696,7 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
    const int fixing_trailing_and_leading_spaces =
                *get_environment_ptr( "FIX_OBSERVATIONS");
    char buff[250], mpc_code_from_neocp[4], desig_from_neocp[15];
+   void *ades_context;
 #ifdef CONSOLE
    const clock_t t0 = clock( );
    int next_output = 20000, n_obs_read = 0;
@@ -3726,7 +3730,8 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
    obj_name_stack = create_stack( 2000);
    if( debug_level > 8)
       debug_printf( "About to read input\n");
-   while( fgets_trimmed( buff, sizeof( buff), ifile))
+   ades_context = init_ades2mpc( );
+   while( fgets_with_ades_xlation( buff, sizeof( buff), ades_context, ifile))
       {
       size_t iline_len = strlen( buff);
       bool is_neocp = false;
@@ -3865,6 +3870,7 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
             ;     /* deliberately empty loop */
       }
    fclose( ifile);
+   free_ades2mpc_context( ades_context);
    *n_found = n;
                /* The allocated hash table is,  at most,  80% full,  with */
                /* plenty of empty entries.  Sorting the entries will put  */
