@@ -1357,7 +1357,7 @@ static void show_residual_text( char *buff, const int line_no,
          text_search_and_replace( tbuff, "u", "\xc2\xb5");
 #endif
       put_colored_text( tbuff, line_no, column + resid_column - 2,
-               residual_field_size, resid_color);
+               strlen( tbuff), resid_color);
       }
    if( mpc_column >= 0)
       {
