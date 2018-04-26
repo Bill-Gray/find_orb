@@ -177,6 +177,8 @@ int add_line_to_observation_details( void *obs_details, const char *iline)
    const char *valid_lines = "COD CON OBS MEA TEL NET BND COM NUM ACK AC2 ";
    int i, compare = 1, rval;
 
+   if( !memcmp( iline, "COM Sigmas", 10))    /* skip ADES comment lines */
+      return( OBS_DETAILS_IRRELEVANT_LINE);
    while( len && (iline[len - 1] == 10 || iline[len - 1] == 13))
       len--;               /* drop trailing carriage returns/line feeds */
    if( !memcmp( iline, "COD ", 4))
