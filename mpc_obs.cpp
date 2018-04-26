@@ -3110,6 +3110,59 @@ static inline void check_for_star( const OBSERVE *obs, const int n_obs)
             "This shows very little motion and is probably a star.", "o");
 }
 
+/* ADES sigmas are converted into a punched-card compatible format such as
+
+COM Sigmas 0.34x0.42,-0.15 m:0.22 t:1.3
+
+   In the above case,  the RA uncertainty is 0.34 arcsec,  dec 0.42,  with a
+correlation of -0.15.  The magnitude sigma is 0.22;  the time sigma, 1.3.
+Not all of these must be present,  except that a single RA/dec sigma does
+have to be given. */
+
+static inline int extract_ades_sigmas( const char *buff,
+         double *posn1, double *posn2, double *theta,
+         double *mag_sigma, double *time_sigma)
+{
+   int loc, rval = -1;
+
+   if( sscanf( buff, "%lf%n", posn1, &loc) == 1)
+      {
+      const char *tptr;
+
+      rval = 0;
+      *theta = 0.;
+      if( buff[loc] == 'x')
+         {
+         *posn2 = atof( buff + loc + 1);
+#ifdef NOT_TESTED_YET
+         while( buff[loc] >= ' ' && buff[loc] != ',')
+            loc++;
+         if( buff[loc] == ',')
+            {
+            const double correlation = atof( buff + loc + 1);
+            const double diag = correlation * *posn1 * *posn2;
+            double a, b;
+
+            convert_quadratic_form_to_error_ellipse( *posn1 * *posn1,
+                     *posn2 * *posn2, diag, posn1, posn2, theta);
+            }
+#endif
+         }
+      else        /* circular position error */
+         *posn2 = *posn1;
+      tptr = strstr( buff + loc, "m:");
+      if( tptr)
+         *mag_sigma = atof( tptr + 2);
+      tptr = strstr( buff + loc, "t:");
+      if( tptr)
+         *time_sigma = atof( tptr + 2) / seconds_per_day;
+      }
+   if( rval)
+      debug_printf( "Malformed ADES sigma: '%s'\n", buff);
+   return( rval);
+}
+
+
 
    /* By default,  Find_Orb will only handle arcs up to 200 years */
    /* long.  If the arc is longer than that,  observations will be */
@@ -3150,7 +3203,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
    extern int n_monte_carlo_impactors;   /* and this,  too */
    const bool fixing_trailing_and_leading_spaces =
                (*get_environment_ptr( "FIX_OBSERVATIONS") != '\0');
-   bool is_fcct14_data = false;
+   bool is_fcct14_data = false, apply_sigmas_once = false;
    void *ades_context;
 
    *desig_from_neocp = '\0';
@@ -3366,6 +3419,13 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                      posn_sigma_theta = 0.;
                      }
                   }
+               if( apply_sigmas_once)
+                  {
+                  override_posn_sigma_1 = override_posn_sigma_2
+                     = override_posn_sigma_theta = override_mag_sigma
+                     = override_time_sigma = 0.;
+                  apply_sigmas_once = false;
+                  }
                            /* The observation data's precision has already been */
                            /* used to figure out a minimum sigma;  e.g.,  a mag */
                            /* of '16.3' results in a sigma of 0.1.  If the above */
@@ -3421,6 +3481,14 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                override_posn_sigma_2 = tmp.posn_sigma_2;
                override_posn_sigma_theta = tmp.posn_sigma_theta;
                }
+            }
+         else if( !memcmp( buff, "#Sigmas ", 8))
+            {
+            apply_sigmas_once = true;
+            extract_ades_sigmas( buff + 8, &override_posn_sigma_1,
+                        &override_posn_sigma_2,
+                        &override_posn_sigma_theta,
+                        &override_mag_sigma, &override_time_sigma);
             }
          else if( !memcmp( buff, "#Mag sigma ", 11))
             override_mag_sigma = atof( buff + 11);
