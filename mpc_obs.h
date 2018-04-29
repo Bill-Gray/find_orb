@@ -33,7 +33,7 @@ OBSERVE
    int time_precision, ra_precision, dec_precision, mag_precision;
    char mpc_code[4], packed_id[13], reference[6];
    char columns_57_to_65[10];
-   char mag_band, mag_band2, discovery_asterisk, note1, note2, satellite_obs;
+   char mag_band, astrometric_net_code, discovery_asterisk, note1, note2, satellite_obs;
    const char **obs_details;
    };
 

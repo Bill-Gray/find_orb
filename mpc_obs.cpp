@@ -1674,7 +1674,7 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
    obs->jd = utc + td_minus_utc( utc) / seconds_per_day;
 
    obs->mag_band = buff[70];
-   obs->mag_band2 = buff[71];
+   obs->astrometric_net_code = buff[71];
    obs->discovery_asterisk = buff[12];
    obs->note1 = buff[13];
    obs->note2 = buff[14];
@@ -1713,8 +1713,8 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
    obs->is_included = (buff[64] != 'x' && buff[12] != '-');
    FMEMCPY( obs->mpc_code, buff + 77, 3);
    obs->mpc_code[3] = '\0';
-   if( obs->mag_band2 == ' ' && obs_details)
-      obs->mag_band2 = get_net_used_from_obs_header( obs->mpc_code);
+   if( obs->astrometric_net_code == ' ' && obs_details)
+      obs->astrometric_net_code = get_net_used_from_obs_header( obs->mpc_code);
    FMEMCPY( obs->columns_57_to_65, buff + 56, 9);
    obs->columns_57_to_65[9] = '\0';
    if( !strcmp( obs->columns_57_to_65, "Apparent "))
@@ -1768,7 +1768,7 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
    FMEMCPY( obs->reference, buff + 72, 5);
    obs->reference[5] = '\0';
    if( memcmp( buff + 72, ".rwo ", 5) &&
-          find_fcct_biases( obs->ra, obs->dec, obs->mag_band2, obs->jd,
+          find_fcct_biases( obs->ra, obs->dec, obs->astrometric_net_code, obs->jd,
                                 &obs->ra_bias, &obs->dec_bias) == -2)
       {        /* i.e.,  we tried to get FCCT14 debiasing and failed */
       if( !fcct_error_message_shown && apply_debiasing)
@@ -2669,8 +2669,8 @@ static void correct_differences( OBSERVE *obs1, const OBSERVE *obs2)
       obs1->mag_precision = obs2->mag_precision;
       obs1->mag_band = obs2->mag_band;
       }
-   if( obs1->mag_band2 == ' ' && obs2->mag_band2 != ' ')
-      obs1->mag_band2 = obs2->mag_band2;
+   if( obs1->astrometric_net_code == ' ' && obs2->astrometric_net_code != ' ')
+      obs1->astrometric_net_code = obs2->astrometric_net_code;
    if( obs1->mag_band == ' ' && obs2->mag_band != ' ')
       obs1->mag_band = obs2->mag_band;
 }
@@ -4586,7 +4586,7 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
       case 3:
          {
          DPT sun_alt_az, object_alt_az;
-         const char *net_name = byte_code_to_net_name( optr->mag_band2);
+         const char *net_name = byte_code_to_net_name( optr->astrometric_net_code);
 
          if( optr->posn_sigma_1 > 1.01 || optr->posn_sigma_1 < .99
                   || optr->posn_sigma_1 != optr->posn_sigma_2)

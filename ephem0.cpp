@@ -2586,7 +2586,7 @@ void recreate_observation_line( char *obuff, const OBSERVE FAR *obs)
    memcpy( obuff + 32, buff + 24, 12);      /* RA */
    memcpy( obuff + 44, buff + 38, 13);      /* dec */
    snprintf( obuff + 57, 24, "%13.2f%c%c%s%s", obs->obs_mag,
-              obs->mag_band, obs->mag_band2, obs->reference, obs->mpc_code);
+              obs->mag_band, obs->astrometric_net_code, obs->reference, obs->mpc_code);
    if( obs->obs_mag == BLANK_MAG)        /* no mag given;  clean out that value */
       mag_digits_to_erase = 5;
    else
