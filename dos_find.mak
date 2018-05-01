@@ -8,7 +8,7 @@ OBJS=b32_eph.obj bc405.obj bias.obj collide.obj conv_ele.obj details.obj  \
   eigen.obj elem2tle.obj elem_out.obj elem_ou2.obj ephem0.obj \
   errors.obj gauss.obj geo_pot.obj \
   healpix.obj lsquare.obj miscell.obj moid4.obj monte0.obj \
-  mpc_fmt.obj mpc_obs.obj mt64.obj nanosecs.obj \
+  mpc_obs.obj mt64.obj nanosecs.obj \
   orb_func.obj orb_fun2.obj pl_cache.obj roots.obj runge.obj \
   shellsor.obj sigma.obj simplex.obj sm_vsop.obj sr.obj stackall.obj
 
@@ -45,7 +45,7 @@ clean:
    $(RM) mpc_f?.txt mpc_fmt.txt mpec.htm obser?.txt observe.txt
    $(RM) residual.txt state.txt state?.txt virtu?.txt virtual.txt
    $(RM) sr_elems.txt mpcorb.dat fo_serve.cgi find_orb.res
-   $(RM) mpc_fmt.txt elements.txt covar.txt gauss.out
+   $(RM) elements.txt covar.txt gauss.out
    $(RM) find_orb.exp vc*.pdb obs_temp.txt guide.txt
    $(RM) find_orb.map find_orb.pdb find_orb.lib vc*.idb
 
