@@ -6,7 +6,7 @@ OBJS=about.obj b32_eph.obj bc405.obj bias.obj clipfunc.obj \
   collide.obj conv_ele.obj details.obj eigen.obj elem2tle.obj elem_ou2.obj \
   elem_out.obj ephem0.obj ephem.obj generic.obj gauss.obj \
   geo_pot.obj healpix.obj lsquare.obj miscell.obj \
-  moid4.obj monte0.obj errors.obj monte.obj mpc_fmt.obj \
+  moid4.obj monte0.obj errors.obj monte.obj  \
   mpc_obs.obj mt64.obj nanosecs.obj orbitdlg.obj \
   orb_func.obj orb_fun2.obj pl_cache.obj roots.obj  \
   runge.obj settings.obj shellsor.obj stackall.obj \
@@ -50,7 +50,7 @@ clean:
    $(RM) mpc_f?.txt mpc_fmt.txt mpec.htm obser?.txt observe.txt
    $(RM) residual.txt state.txt state?.txt virtu?.txt virtual.txt
    $(RM) sr_elems.txt mpcorb.dat fo_serve.cgi find_orb.res
-   $(RM) mpc_fmt.txt elements.txt covar.txt gauss.out
+   $(RM) elements.txt covar.txt gauss.out
    $(RM) find_orb.exp vc50.pdb obs_temp.txt guide.txt
    $(RM) find_orb.map find_orb.pdb find_orb.lib vc*.idb
 
@@ -60,7 +60,7 @@ clean_temp:
    $(RM) mpc_f?.txt mpc_fmt.txt mpec.htm obser?.txt observe.txt
    $(RM) residual.txt state.txt state?.txt virtu?.txt virtual.txt
    $(RM) sr_elems.txt mpcorb.dat              find_orb.res
-   $(RM) mpc_fmt.txt elements.txt covar.txt gauss.out
+   $(RM) elements.txt covar.txt gauss.out
    $(RM) find_orb.exp vc50.pdb obs_temp.txt guide.txt
    $(RM) find_orb.map find_orb.pdb find_orb.lib vc*.idb
 
