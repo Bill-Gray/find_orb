@@ -2373,9 +2373,11 @@ int main( const int argc, const char **argv)
                sanity_check_observations = 0;
                }
                break;
+#ifdef HAVE_UNICODE
             case 'u':
                make_unicode_substitutions = 0;
                break;
+#endif
             case 'z':
                {
                extern const char *alt_config_directory;
