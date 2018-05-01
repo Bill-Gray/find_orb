@@ -3832,7 +3832,7 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
          {                    /* a new cross-designation to the table */
          memcpy( new_xdesig, buff, 12);
          new_xdesig[12] = ' ';
-         for( i = strlen( new_xdesig); i < 26; i++)
+         for( i = (int)strlen( new_xdesig); i < 26; i++)
             new_xdesig[i] = ' ';
          strcpy( new_xdesig + 26, new_xdesig_indicator);
          xref_designation( new_xdesig);

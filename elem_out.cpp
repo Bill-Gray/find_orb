@@ -49,6 +49,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #define JD_TO_YEAR(jd)  (2000. + ((jd)-J2000) / 365.25)
 #define YEAR_TO_JD( year) (J2000 + (year - 2000.) * 365.25)
 
+#ifdef _MSC_VER   /* MSVC/C++ lacks snprintf.  See 'ephem0.cpp' for details. */
+int snprintf( char *string, const size_t max_len, const char *format, ...);
+#endif
 // void elements_in_tle_format( char *buff, const ELEMENTS *elem);
 int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
                                    const char *format, ...)

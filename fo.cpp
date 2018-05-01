@@ -64,6 +64,11 @@ extern int debug_level;
 size_t strlcpy(char *dest, const char *src, size_t size);   /* miscell.cpp */
 #endif
 
+   /* MSVC/C++ lacks snprintf.  See 'ephem0.cpp' for details. */
+#if defined(_MSC_VER) && _MSC_VER < 1900
+int snprintf( char *string, const size_t max_len, const char *format, ...);
+#endif
+
 int debug_level = 0;
 extern const char *sof_filename, *sofv_filename;
 

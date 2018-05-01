@@ -22,6 +22,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include <assert.h>
 #include <errno.h>
 
+   /* MSVC/C++ lacks snprintf.  See 'ephem0.cpp' for details. */
+#if defined(_MSC_VER) && _MSC_VER < 1900
+int snprintf( char *string, const size_t max_len, const char *format, ...);
+#endif
+
 /* This function allows one to put the following options in front of
 the 'permits' string :
 
@@ -202,7 +207,7 @@ int fetch_astrometry_from_mpc( FILE *ofile, const char *desig)
          {
          while( fgets( tbuff, sizeof( tbuff), ifile))
             if( desig_matches( tbuff, desig))
-               bytes_written += fwrite( tbuff, 1, strlen( tbuff), ofile);
+               bytes_written += (int)fwrite( tbuff, 1, strlen( tbuff), ofile);
          fclose( ifile);
          }
       }
@@ -222,7 +227,7 @@ int fetch_astrometry_from_mpc( FILE *ofile, const char *desig)
 
          assert( ifile);
          while( fgets( tbuff, sizeof( tbuff), ifile))
-            bytes_written += fwrite( tbuff, 1, strlen( tbuff), ofile);
+            bytes_written += (int)fwrite( tbuff, 1, strlen( tbuff), ofile);
          fclose( ifile);
          }
       }

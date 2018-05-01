@@ -141,7 +141,7 @@ int parallax_to_lat_alt( const double rho_cos_phi, const double rho_sin_phi,
 }
 
 #include <stdarg.h>
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && _MSC_VER < 1900
      /* Microsoft Visual C/C++ has no snprintf.  Yes,  you read that      */
      /* correctly.  MSVC has an _snprintf which doesn't add a '\0' at the */
      /* end if max_len bytes are written.  You can't pass a NULL string   */
