@@ -773,7 +773,7 @@ void COrbitDlg::LoadAnObject( const int obj_idx)
    SetCursor( AfxGetApp( )->LoadStandardCursor( IDC_WAIT));
             /* Start a bit ahead of the actual data,  just in case */
             /* there's a #Sigma or similar command in there: */
-   file_offset = obj_info[obj_idx].file_offset - 40L;
+   file_offset = obj_info[obj_idx].file_offset - 4000L;
    if( file_offset < 0L)
       file_offset = 0L;
    fseek( ifile, file_offset, SEEK_SET);
