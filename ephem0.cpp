@@ -1642,14 +1642,16 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   strcat( filename, date_buff);
                   strcat( filename, ".off");
                   ofile = fopen( filename, "wb");
-                  assert( ofile);
-                  full_ctime( date_buff, curr_jd,
-                        FULL_CTIME_FORMAT_HH_MM | FULL_CTIME_YMD);
-                  fprintf( ofile, "# JD %f = %s\n", curr_jd, date_buff);
-                  fprintf( ofile, "# %s\n", obs->packed_id);
-                  calc_sr_dist_and_posn_ang( stored_ra_decs, n_objects,
+                  if( ofile)
+                     {
+                     full_ctime( date_buff, curr_jd,
+                            FULL_CTIME_FORMAT_HH_MM | FULL_CTIME_YMD);
+                     fprintf( ofile, "# JD %f = %s\n", curr_jd, date_buff);
+                     fprintf( ofile, "# %s\n", obs->packed_id);
+                     calc_sr_dist_and_posn_ang( stored_ra_decs, n_objects,
                                        &dist, &posn_ang, ofile);
-                  fclose( ofile);
+                     fclose( ofile);
+                     }
                   }
                put_ephemeris_posn_angle_sigma( tbuff, dist, posn_ang, computer_friendly);
                fprintf( ofile, " %s", tbuff);
