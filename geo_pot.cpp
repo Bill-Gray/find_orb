@@ -56,7 +56,13 @@ static long double sqrtl( const long double ival)
 http://www.csr.utexas.edu/grace/gravity/
 THE COMBINATION GRAVITY FIELD MODEL GGM03C
 B. Tapley, J. Ries, S. Bettadpur, D. Chambers, M. Cheng, F. Condi, S. Poole
-Eos Trans. AGU 88(52), Fall Meet. Suppl., Abstract G42A-03, 2007.    */
+Eos Trans. AGU 88(52), Fall Meet. Suppl., Abstract G42A-03, 2007.
+
+   See 'gfc_xvt.c' from the 'miscell' project for the code that reads
+in the gravitational field coefficient (GFC) data and outputs it in the
+convenient C array below.  Note that data in the same format is available
+for the Moon,  Mars,  and Venus;  it should be quite easy to add them to
+Find_Orb in the same way,  if we ever decide that would matter.   */
 
    static long double ggm03c_terms[] = {
 //      1.000000000000E+00,  0.000000000000E+00,   /* 0 0 */
