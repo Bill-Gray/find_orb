@@ -70,7 +70,7 @@ field is assumed to be aligned with the RA/dec axes of date.  If there are
 three,  it's assumed that the image was tilted by that angle relative to the
 RA/dec axes of date.
 
-For Spacetwatch,  for example,  three out of four fields will be in the
+For Spacewatch,  for example,  three out of four fields will be in the
 default "landscape" orientation.  The remaining quarter will probably use
 the above scheme to specify the image height and width,  or possibly the
 same height/width and a 90 degree rotation angle.
@@ -126,7 +126,12 @@ E12 : 2.05 x 2.05 deg.
 10K cameras:
 G96 - May 2016 - present: 2.2 x 2.2 deg.
 703 - Dec. 2016 - present: 4.4 x 4.4 deg.
-*/
+
+(691) Spacewatch size roughly from MPC sky coverage files,  plus
+some info from Bob McMillan.  The actual shape is a little more
+complicated than this -- it's a mosaic of eight chips --  but
+the 1.85 x 1.73 degree rectangle is close enough to do a rough
+cut as to whether we got the object.  */
 
 static void get_field_size( double *width, double *height, const double jd,
                         const char *obs_code)
@@ -135,8 +140,13 @@ static void get_field_size( double *width, double *height, const double jd,
    const double may_26_2016 = 2457534.5;
    static char bad_code[10];
 
+   *height = 0.;
    switch( *obs_code)
       {
+      case '6':         /* Spacewatch */
+         *width = 1.85;
+         *height = 1.73;
+         break;
       case '7':         /* 703 */
          *width = (jd < dec_02_2016 ? 2.85 : 4.4);
          break;
@@ -161,8 +171,10 @@ static void get_field_size( double *width, double *height, const double jd,
             }
          break;
       }
+   if( !*height)           /* square field indicated */
+      *height = *width;
    *width *= PI / 180.;
-   *height = *width;    /* all square fields thus far */
+   *height *= PI / 180.;
 }
 
 static void get_field_size_from_input( double *width, double *height,
@@ -223,45 +235,46 @@ int main( const int argc, const char **argv)
 
          printf( "%s opened;  reading fields\n", buff);
          while( fgets( buff, sizeof( buff), ifile))
-            {
-            char timestr[80];
-            size_t i;
-            int n_scanned;
+            if( *buff != '#')       /* allow for comments */
+               {
+               char timestr[80];
+               size_t i;
+               int n_scanned;
 
-            for( i = 0; buff[i]; i++)
-               if( buff[i] == ',')
-                  buff[i] = ' ';
-            if( n >= n_alloced)
-               {
-               n_alloced += 200 + n_alloced / 2;
-               rval = (field_location_t *)realloc( rval,
-                                     n_alloced * sizeof( field_location_t));
+               for( i = 0; buff[i]; i++)
+                  if( buff[i] == ',')
+                     buff[i] = ' ';
+               if( n >= n_alloced)
+                  {
+                  n_alloced += 200 + n_alloced / 2;
+                  rval = (field_location_t *)realloc( rval,
+                                        n_alloced * sizeof( field_location_t));
+                  }
+               n_scanned = sscanf( buff, "%lf %lf %70s %3s", &rval[n].ra,
+                           &rval[n].dec, timestr, (char *)&rval[n].obscode);
+               assert( n_scanned == 4);
+               rval[n].jd = get_time_from_string( 0., timestr, 0, NULL);
+               if( rval[n].jd)      /* some lines have 'time=NULL' */
+                  {
+                  rval[n].ra  *= PI / 180.;
+                  rval[n].dec *= PI / 180.;
+                  rval[n].tilt = 0.;
+                  rval[n].file_offset = file_loc;
+                  rval[n].file_number = (char)file_number;
+                  get_field_size( &rval[n].width, &rval[n].height, rval[n].jd,
+                                       rval[n].obscode);
+                  get_field_size_from_input( &rval[n].width, &rval[n].height,
+                                    &rval[n].tilt, buff);
+                  if( min_jd > rval[n].jd)
+                     min_jd = rval[n].jd;
+                  if( max_jd < rval[n].jd)
+                     max_jd = rval[n].jd;
+                  n++;
+                  }
+               file_loc += strlen( buff);
+               if( n < 10 || n % 100000 == 0)
+                  printf( "%d fields read and parsed\r", n);
                }
-            n_scanned = sscanf( buff, "%lf %lf %70s %3s", &rval[n].ra,
-                        &rval[n].dec, timestr, (char *)&rval[n].obscode);
-            assert( n_scanned == 4);
-            rval[n].jd = get_time_from_string( 0., timestr, 0, NULL);
-            if( rval[n].jd)      /* some lines have 'time=NULL' */
-               {
-               rval[n].ra  *= PI / 180.;
-               rval[n].dec *= PI / 180.;
-               rval[n].tilt = 0.;
-               rval[n].file_offset = file_loc;
-               rval[n].file_number = (char)file_number;
-               get_field_size( &rval[n].width, &rval[n].height, rval[n].jd,
-                                    rval[n].obscode);
-               get_field_size_from_input( &rval[n].width, &rval[n].height,
-                                 &rval[n].tilt, buff);
-               if( min_jd > rval[n].jd)
-                  min_jd = rval[n].jd;
-               if( max_jd < rval[n].jd)
-                  max_jd = rval[n].jd;
-               n++;
-               }
-            file_loc += strlen( buff);
-            if( n < 10 || n % 100000 == 0)
-               printf( "%d fields read and parsed\r", n);
-            }
          fclose( ifile);
          printf( "\n%d fields found\n", n);
          full_ctime( buff, min_jd, 0);
