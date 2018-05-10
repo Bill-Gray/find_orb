@@ -1634,7 +1634,7 @@ static const char *legends[] = {
 "YYYY MM DD.DDDDD    Obs   RA (J2000)     dec          Xres  Yres   delta  R",
 NULL,       /* this is the 'with tabs' format used in Windows Find_Orb */
 " YYMMDD Obs  Xres  Yres     ",
-"   YYYY MM DD.DDDDD   RA (J2000)   dec      sigmas   mag     ref Obs   Xres  Yres   delta  R" };
+"   YYYY MM DD.DDDDD   RA (J2000)   dec      sigmas   mag     ref Obs     Xres  Yres   delta  R" };
 
 static void show_residual_legend( const int line_no, const int residual_format)
 {
