@@ -2216,6 +2216,17 @@ static int blink_state( void)
 }
 #endif
 
+/* I really should use getopt() or a portable variant.  However,  this has
+been sufficiently effective thus far... */
+
+static const char *get_arg( const int argc, const char **argv, const int idx)
+{
+   if( argv[idx][2] || idx == argc - 1)
+      return( argv[idx] + 2);
+   else
+      return( argv[idx + 1]);
+}
+
 extern const char *elements_filename;
 
 #define DISPLAY_BASIC_INFO           1
@@ -2281,6 +2292,10 @@ int main( const int argc, const char **argv)
       debug_printf( "Couldn't set a UTF-8 locale\n");
    for( i = 1; i < argc; i++)       /* check to see if we're debugging: */
       if( argv[i][0] == '-')
+         {
+         const char *arg = get_arg( argc, argv, i);
+
+         assert( arg);
          switch( argv[i][1])
             {
             case '1':
@@ -2301,7 +2316,7 @@ int main( const int argc, const char **argv)
                }
                break;
             case 'd':
-               debug_level = atoi( argv[i] + 2);
+               debug_level = atoi( arg);
                if( !debug_level)
                   debug_level = 1;
                debug_printf( "findorb: debug_level = %d; %s %s\n",
@@ -2320,28 +2335,28 @@ int main( const int argc, const char **argv)
                {
                extern char findorb_language;
 
-               findorb_language = argv[i][2];
+               findorb_language = *arg;
                }
                break;
             case 'L':
-               if( !setlocale( LC_ALL, argv[i] + 2))
-                  debug_printf( "Couldn't set locale '%s'\n", argv[i] + 2);
+               if( !setlocale( LC_ALL, arg))
+                  debug_printf( "Couldn't set locale '%s'\n", arg);
                break;
             case 'm':
                {
                extern int integration_method;
 
-               integration_method = atoi( argv[i] + 2);
+               integration_method = atoi( arg);
                }
                break;
             case 'n':
-               max_mpc_color_codes = atoi( argv[i] + 2);
+               max_mpc_color_codes = atoi( arg);
                break;
             case 'p':
                {
                extern int process_count;
 
-               process_count = atoi( argv[i] + 2);
+               process_count = atoi( arg);
                }
                break;
             case 'q':
@@ -2356,7 +2371,7 @@ int main( const int argc, const char **argv)
                extern double minimum_observation_year;  /* default is -1e+9 */
                extern double maximum_observation_year;  /* default is +1e+9. */
 
-               sscanf( argv[i] + 2, "%lf,%lf",
+               sscanf( arg, "%lf,%lf",
                              &minimum_observation_year,
                              &maximum_observation_year);
                }
@@ -2383,16 +2398,14 @@ int main( const int argc, const char **argv)
                extern const char *alt_config_directory;
 
                use_config_directory = true;
-               alt_config_directory = argv[i] + 2;
-               if( !*alt_config_directory && i < argc - 1
-                           && argv[i + 1][0] != '-')
-                  alt_config_directory = argv[i + 1];
+               alt_config_directory = arg;
                }
                break;
             default:
                printf( "Unknown command-line option '%s'\n", argv[i]);
                return( -1);
             }
+         }
    sscanf( get_environment_ptr( "CONSOLE_OPTS"), "%9s %d %d %u",
                mpc_code, &observation_display, &residual_format, &list_codes);
 
