@@ -370,6 +370,17 @@ static void colorize_text( char *text)
       add_vt100_colors( tptr, 10, VT100_RED);
 }
 
+/* I really should use getopt() or a portable variant.  However,  this has
+been sufficiently effective thus far... */
+
+static const char *get_arg( const int argc, const char **argv, const int idx)
+{
+   if( argv[idx][2] || idx == argc - 1)
+      return( argv[idx] + 2);
+   else
+      return( argv[idx + 1]);
+}
+
 int main( const int argc, const char **argv)
 {
    char tbuff[300], mpc_code[20];
@@ -405,6 +416,9 @@ int main( const int argc, const char **argv)
    *mpc_code = '\0';
    for( i = 1; i < argc; i++)       /* check to see if we're debugging: */
       if( argv[i][0] == '-')
+         {
+         const char *arg = get_arg( argc, argv, i);
+
          switch( argv[i][1])
             {
             case 'a':
@@ -415,10 +429,7 @@ int main( const int argc, const char **argv)
                }
                break;
             case 'b':
-               if( !argv[i][2] && i < argc - 1 && argv[i + 1][0] != '-')
-                  separate_residual_file_name = argv[i + 1];
-               else
-                  separate_residual_file_name = argv[i] + 2;
+               separate_residual_file_name = arg;
                break;
             case 'c':
                {
@@ -428,10 +439,10 @@ int main( const int argc, const char **argv)
                }
                break;
             case 'C':
-               strlcpy( mpc_code, argv[i] + 2, sizeof( mpc_code));
+               strlcpy( mpc_code, arg, sizeof( mpc_code));
                break;
             case 'd':
-               debug_level = atoi( argv[i] + 2);
+               debug_level = atoi( arg);
                if( !debug_level)
                   debug_level = 1;
                debug_printf( "fo: debug_level = %d; %s %s\n",
@@ -441,10 +452,7 @@ int main( const int argc, const char **argv)
                {
                extern const char *ephemeris_filename;
 
-               if( !argv[i][2] && i < argc - 1 && argv[i + 1][0] != '-')
-                  ephemeris_filename = argv[i + 1];
-               else
-                  ephemeris_filename = argv[i] + 2;
+               ephemeris_filename = arg;
                is_default_ephem = false;
                }
                break;
@@ -461,16 +469,13 @@ int main( const int argc, const char **argv)
                }
                break;
             case 'm':
-               if( argv[i][2] == '\0' && i < argc - 1)
-                  mpec_path = argv[i + 1];
-               else
-                  mpec_path = argv[i] + 2;
+               mpec_path = arg;
                break;
             case 'n':
-               starting_object = atoi( argv[i] + 2);
+               starting_object = atoi( arg);
                break;
             case 'p':
-               n_processes = atoi( argv[i] + 2);
+               n_processes = atoi( arg);
                break;
             case 'q':            /* "quiet" */
                show_processing_steps = false;
@@ -481,7 +486,7 @@ int main( const int argc, const char **argv)
                struct rlimit r;     /* run time,  in seconds,  to avoid   */
                int soft_limit, hard_limit;      /* runaway processes */
 
-               if( sscanf( argv[i] + 2, "%d,%d", &soft_limit, &hard_limit) == 2)
+               if( sscanf( arg, "%d,%d", &soft_limit, &hard_limit) == 2)
                   {
                   r.rlim_cur = (rlim_t)soft_limit;
                   r.rlim_max = (rlim_t)hard_limit;
@@ -499,7 +504,7 @@ int main( const int argc, const char **argv)
                char curr_time[50];
 
                full_ctime( curr_time, current_jd( ), FULL_CTIME_YMD);
-               summary_ofile = fopen( argv[i] + 2, "wb");
+               summary_ofile = fopen( arg, "wb");
                assert( summary_ofile);
                ifile = fopen_ext( "summ.htm", "fcrb");
                assert( ifile);
@@ -518,7 +523,7 @@ int main( const int argc, const char **argv)
                            CALENDAR_JULIAN_GREGORIAN | FULL_CTIME_YMD
                            | FULL_CTIME_TWO_DIGIT_YEAR, NULL);
                else
-                  total_objects = atoi( argv[i] + 2);
+                  total_objects = atoi( arg);
                break;
             case 'v':
                use_colors = false;
@@ -530,7 +535,7 @@ int main( const int argc, const char **argv)
                printf( "Unknown command-line option '%s'\n", argv[i]);
                return( -1);
             }
-
+         }
    for( i = 1; i < argc; i++)
       {
       const char *tptr = strchr( argv[i], '=');
