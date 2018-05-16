@@ -197,8 +197,8 @@ const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 void set_environment_ptr( const char *env_ptr, const char *new_value);
 int orbital_monte_carlo( const double *orbit, OBSERVE *obs, const int n_obs,
          const double curr_epoch, const double epoch_shown);   /* orb_func.cpp */
-int fetch_astrometry_from_mpc( FILE *ofile, const char *desig); /* miscell.c */
 void make_config_dir_name( char *oname, const char *iname);    /* miscell.cpp */
+int reset_astrometry_filename( const int argc, const char **argv);
 int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
                                    const char *format, ...)
 #ifdef __GNUC__
@@ -2352,6 +2352,8 @@ int main( const int argc, const char **argv)
             case 'n':
                max_mpc_color_codes = atoi( arg);
                break;
+            case 'o':            /* obj designation / ephemeris from orbital */
+               break;            /* elems:  fall through, handle below */
             case 'p':
                {
                extern int process_count;
@@ -2423,26 +2425,6 @@ int main( const int argc, const char **argv)
          }
       }
 
-   if( !memcmp( argv[1], "-f", 2))
-      {
-      const char *temp_filename = "/tmp/obs_temp.ast";
-      FILE *ofile = fopen( temp_filename, "wb");
-
-      if( argv[1][2])
-         strcpy( tbuff, argv[1] + 2);
-      else
-         *tbuff = '\0';
-      for( i = 2; i < argc && argv[i][0] != '-' && !strchr( argv[i], '='); i++)
-         {
-         if( *tbuff)
-            strcat( tbuff, " ");
-         strcat( tbuff, argv[i]);
-         }
-      fetch_astrometry_from_mpc( ofile, tbuff);
-      fclose( ofile);
-      argv[1] = temp_filename;
-      }
-
    get_defaults( &ephemeris_output_options, &element_format,
          &element_precision, &max_residual_for_filtering,
          &noise_in_arcseconds);
@@ -2466,6 +2448,8 @@ int main( const int argc, const char **argv)
       }
 
    *message_to_user = '\0';
+   if( reset_astrometry_filename( argc, argv))
+      drop_single_obs = false;
 
 #ifdef __PDCURSES__
    ttytype[0] = 20;    /* Window must have at least 20 lines in Win32a */
