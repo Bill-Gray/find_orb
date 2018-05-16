@@ -96,7 +96,8 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name);
                                                /* ephem0.cpp */
 void set_environment_ptr( const char *env_ptr, const char *new_value);
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
-int fetch_astrometry_from_mpc( FILE *ofile, const char *desig); /* miscell.c */
+int reset_astrometry_filename( const int argc, const char **argv);
+uint64_t parse_bit_string( const char *istr);                /* miscell.cpp */
 
 /* In this non-interactive version of Find_Orb,  we just print out warning
 messages such as "3 observations were made in daylight" or "couldn't find
@@ -405,6 +406,8 @@ int main( const int argc, const char **argv)
    time_t update_time, t0;
    double ephem_end_jd = 0.;
    extern bool is_default_ephem;
+   bool drop_single_obs = true;
+   const char *ephem_option_string = NULL;
 #ifdef FORKING
    int child_status;
 #endif
@@ -456,6 +459,9 @@ int main( const int argc, const char **argv)
                is_default_ephem = false;
                }
                break;
+            case 'E':
+               ephem_option_string = arg;
+               break;
             case 'f':                     /* obj desig specified;  fall through */
                break;
             case 'h':                     /* show planet-centric orbits */
@@ -474,6 +480,8 @@ int main( const int argc, const char **argv)
             case 'n':
                starting_object = atoi( arg);
                break;
+            case 'o':            /* obj designation / ephemeris from orbital */
+               break;            /* elems:  fall through, handle below */
             case 'p':
                n_processes = atoi( arg);
                break;
@@ -550,26 +558,6 @@ int main( const int argc, const char **argv)
          }
       }
 
-   if( !memcmp( argv[1], "-f", 2))
-      {
-      const char *temp_filename = "/tmp/obs_temp.ast";
-      FILE *ofile = fopen( temp_filename, "wb");
-
-      if( argv[1][2])
-         strcpy( tbuff, argv[1] + 2);
-      else
-         *tbuff = '\0';
-      for( i = 2; i < argc && argv[i][0] != '-' && !strchr( argv[i], '='); i++)
-         {
-         if( *tbuff)
-            strcat( tbuff, " ");
-         strcat( tbuff, argv[i]);
-         }
-      fetch_astrometry_from_mpc( ofile, tbuff);
-      fclose( ofile);
-      argv[1] = temp_filename;
-      }
-
                /* get_defaults( ) collects a lot of data that's for the  */
                /* interactive find_orb program.  But it also sets some   */
                /* important internal values for blunder detection,  etc. */
@@ -578,6 +566,8 @@ int main( const int argc, const char **argv)
                          NULL, &element_precision, NULL, NULL);
    if( all_heliocentric)
       forced_central_body = 0;
+   if( ephem_option_string)
+      ephemeris_output_options = (int)parse_bit_string( ephem_option_string);
 
    load_up_sigma_records( "sigma.txt");
    if( debug_level)
@@ -589,6 +579,9 @@ int main( const int argc, const char **argv)
       printf( "astrometry as a command-line argument.\n");
       return( -2);
       }
+
+   if( reset_astrometry_filename( argc, argv))
+      drop_single_obs = false;
 
    ids = find_objects_in_file( argv[1], &n_ids, NULL);
    if( n_ids <= 0)
@@ -603,7 +596,8 @@ int main( const int argc, const char **argv)
       return( -1);
       }
 
-   n_ids = remove_single_observation_objects( ids, n_ids);
+   if( drop_single_obs)
+      n_ids = remove_single_observation_objects( ids, n_ids);
    if( show_processing_steps)
       printf( "Processing %d objects\n", n_ids);
    if( !total_objects)
@@ -650,7 +644,7 @@ int main( const int argc, const char **argv)
 
          if( n_processes == 1 && show_processing_steps)
             printf( "%d: %s", i + 1, ids[i].obj_name);
-         if( n_obs < 2)
+         if( n_obs < 2 && drop_single_obs)
             printf( "; skipping\n");
          else
             {
@@ -670,7 +664,7 @@ int main( const int argc, const char **argv)
             fseek( ifile, file_offset, SEEK_SET);
             obs = load_object( ifile, ids + i, &curr_epoch, &epoch_shown, orbit);
 
-            if( n_obs_actually_loaded > 1 && curr_epoch > 0.)
+            if( (n_obs_actually_loaded > 1 || !drop_single_obs) && curr_epoch > 0.)
                {
                int n_obs_included = 0;
                unsigned j = 0;
