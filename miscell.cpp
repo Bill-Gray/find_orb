@@ -19,8 +19,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include <string.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <assert.h>
 #include <errno.h>
+#include "mpc_func.h"
 
    /* MSVC/C++ lacks snprintf.  See 'ephem0.cpp' for details. */
 #if defined(_MSC_VER) && _MSC_VER < 1900
@@ -54,7 +56,8 @@ can turn it back to 'false'.
 int generic_message_box( const char *message, const char *box_type);
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 void make_config_dir_name( char *oname, const char *iname);  /* miscell.cpp */
-int fetch_astrometry_from_mpc( FILE *ofile, const char *desig); /* miscell.c */
+int reset_astrometry_filename( const int argc, const char **argv);
+uint64_t parse_bit_string( const char *istr);                /* miscell.cpp */
 
 int use_config_directory = false;
 const char *alt_config_directory;
@@ -193,7 +196,7 @@ steps are taken to cache downloads to avoid hammering MPC servers. The
 temp*.ast files are time-stamped,  and we only get new data if three
 hours have elapsed;  see 'grab_mpc.c' for details.       */
 
-int fetch_astrometry_from_mpc( FILE *ofile, const char *desig)
+static int fetch_astrometry_from_mpc( FILE *ofile, const char *desig)
 {
    char tbuff[100];
    int bytes_written = 0;
@@ -232,4 +235,106 @@ int fetch_astrometry_from_mpc( FILE *ofile, const char *desig)
          }
       }
    return( bytes_written);
+}
+
+/* Code to write a single valid,  but completely meaningless observation
+to a temporary file for a specified object.  This can then be read in
+and used to get around the fact that Find_Orb essentially assumes that
+there's astrometry available for the object(s) under consideration.
+(If you search for 'Dummy' in elem_ou2.cpp,  you'll see that the date/time
+is replaced with the epoch of the elements,  and the RA/dec is replaced
+with that for the object at the epoch.  The values given below are just
+placeholders to ensure that one valid observation gets read in.) */
+
+static int make_fake_astrometry( const char *obj_name, const char *filename)
+{
+   FILE *ofile = fopen( filename, "wb");
+   int rval = -1;
+
+   assert( ofile);
+   if( ofile)
+      {
+      const char *dummy_line =
+        "  C2000 01 01.00000 00 00 00.00 +00 00 00.0                 Dummy500";
+      char packed_desig[20];
+
+      create_mpc_packed_desig( packed_desig, obj_name);
+      fprintf( ofile, "%s%s\n", packed_desig, dummy_line);
+      fclose( ofile);
+      rval = 0;
+      }
+   return( rval);
+}
+
+/* The various flavors of Find_Orb have some similar logic in place
+to allow the programs to either download astrometry,  or to create
+a dummy file to generate ephemerides from stored orbital elements. */
+
+int reset_astrometry_filename( const int argc, const char **argv)
+{
+   int rval = 0;
+
+   if( argv[1][0] == '-' && (argv[1][1] == 'o' || argv[1][1] == 'f'))
+      {
+      const char *filename = "/tmp/temp_obs.txt";
+      char obj_name[50];
+      int i;
+
+      if( argv[1][2])
+         strcpy( obj_name, argv[1] + 2);
+      else
+         *obj_name = '\0';
+      for( i = 2; i < argc && argv[i][0] != '-' && !strchr( argv[i], '='); i++)
+         {
+         if( *obj_name)
+            strcat( obj_name, " ");
+         strcat( obj_name, argv[i]);
+         argv[i] = "";
+         }
+      if( argv[1][1] == 'f')
+         {
+         FILE *ofile = fopen( filename, "wb");
+
+         assert( ofile);
+         fetch_astrometry_from_mpc( ofile, obj_name);
+         fclose( ofile);
+         }
+      else
+         make_fake_astrometry( obj_name, filename);
+      argv[1] = filename;
+      rval = 1;
+      }
+   return( rval);
+}
+
+/* Reads a string such as,  say,  "1,12,3-6,9" and returns a 64-bit
+integer with (in this case) bits 1, 12,  3-6,  and 9 turned on:
+hex 127A = binary 0001 0010 0111 1010.  Note that bits are toggled,
+so "4-9,6" would turn bits 4-9 on,  then turn off bit 6.  This also
+means that the order is unimportant;  "6,4-9" would give the same result. */
+
+uint64_t parse_bit_string( const char *istr)
+{
+   uint64_t rval = 0;
+   int bytes_scanned, bit1;
+   int prev_bit1 = -1;
+
+   while( sscanf( istr, "%d%n", &bit1, &bytes_scanned) == 1)
+      {
+      assert( bit1 >= 0 && bit1 < 64);
+      if( prev_bit1 >= 0)     /* we're doing a range here */
+         rval ^= (((uint64_t)2 << bit1) - ((uint64_t)2 << prev_bit1));
+      else
+         rval ^= (uint64_t)1 << bit1;
+      istr += bytes_scanned;
+      prev_bit1 = -1;
+      if( *istr == ',')
+         istr++;
+      else if( *istr == '-')
+         {
+         prev_bit1 = bit1;
+         istr++;
+         }
+      }
+   return( rval);
 }
