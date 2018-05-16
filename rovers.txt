@@ -87,6 +87,8 @@ Tu2 ! -96.1411       +35.8311        330       Tulsa-2
 Var !   6.6814       +44.5736       1850       Vars,  southern Alps
 VMe !  27.543306     +53.904694      217       Vitaly Mechinsky
 
+M-M !  145111.11     +403655.78       51       M. Mollica, Salerno
+
    When 2008 TC3 impacted the earth on 7 Oct 2008,  I added the impact point
    as an "observatory" so I could get impact-centered ephemerides easily.
    Similarly for the 2014 AA estimated impact coordinates,  100 km above
@@ -137,7 +139,8 @@ Ta2 ! -70.7322       -29.2608       2347       TAROT La Silla ESO
    matters -- admittedly unusual,  involving a close-in artificial object)
    and in any case,  it's sometimes convenient for an observatory code to
    tell you exactly which scope was used.  The following list is from:
-   http://irtfweb.ifa.hawaii.edu/IRrefdata/telescope_ref_data.php
+   http://irtfweb.ifa.hawaii.edu/IRrefdata/telescope_ref_data.php,  and/or
+   http://www.ifa.hawaii.edu/mko/coordinates.shtml (same data).
       I had doubts about these lat/lon/alts,  derived from an aerial survey
    and in NAD83 datum,  with altitudes in feet (data given in non-metric
    units always makes me worry) and given to a meaningless precision of
@@ -145,33 +148,44 @@ Ta2 ! -70.7322       -29.2608       2347       TAROT La Silla ESO
    -- but checks with people who have actually been on Mauna Kea with GPS
    units have assuaged those worries.
       Lat/lon/alts in this file are supposed to be on the WGS84 ellipsoid.
-   But here,  I just took the NAD83 coordinates and ignored the difference
-   (about two meters).
-      No altitudes were given for JCMT and CSO.  4190 meters seemed at least
-   roughly in the ballpark of the altitudes for the other telescopes.
-      NOTE that codes (267) = CFHT and (266) = Subaru were added after I did
-   all this.  The positions given there differ from those given here by about
-   50 meters,  _including vertically_.  I think the (267)/(266) positions
-   may have been measured using Google Earth or a similar mediocre-accuracy
-   method.
+   I just took the NAD83 lat/longs and ignored the difference (about two
+   meters).  I increased altitudes by 26 meters,  the approximate geoid
+   height given by
+
+   https://geographiclib.sourceforge.io/cgi-bin/GeoidEval?input=19.82528+-155.46887&option=Submit
+
+      to convert heights above sea level (or,  equivalently,  above the geoid)
+   to heights above the WGS84 ellipsoid.
+      No altitudes were given for JCMT and CSO.  4190 meters (increased by
+   26 meters) seemed at least roughly in the ballpark of the altitudes for
+   the other telescopes.
       Note also that the MPC position for (568) corresponds to longitude
-   -155.4722,  lat 19.8262,  4202 meters,  the position for IRTF (though
-   34 meters above the position given below).  Again,  these may be due to
-   confusion about ellipsoidal vs. above-sea-level altitudes.
+   -155.4722,  lat 19.8262,  4202 meters.  After allowing for roundoff
+   (only five digits on parallaxes!),  this looks like the correct
+   position for IRTF.
 
         longitude    latitude       height
       DDDmmss.sssss   DDmmss.sssss       (m)
-0.6 !-1552815.46587  +194917.81149  4186.327   Univ of Hawaii 0.6-m, Mauna Kea
-2.2 !-1552809.96073  +194922.76784  4213.555   Univ of Hawaii 2.2-m, Mauna Kea
-CFH !-1552807.95258  +194930.90648  4204.106   Canada-France-Hawaii Telescope, Mauna Kea (CFHT)
-IRT !-1552819.19564  +194934.38594  4168.067   Infrared Telescope Facility (IRTF)
-UKI !-1552813.17630  +194920.75334  4198.498   UK Infrared Telescope (UKIRT)
-JCM !-1552837.20394  +194922.10741  4190       James Clerke Maxwell Telescope (JCMT)
-CSO !-1552831.78945  +194920.77658  4190       Caltech Submillimeter Observatory (CSO)
-Ke1 !-1552828.98665  +194933.40757  4159.581   Keck 1, Mauna Kea
-Ke2 !-1552827.24268  +194935.61788  4159.581   Keck 2, Mauna Kea
-Sub !-1552833.66719  +194931.81425  4163.001   Subaru, Mauna Kea
-Gem !-1552808.56831  +194925.68521  4213.439   Gemini North, Mauna Kea
+0.6 !-1552815.46587  +194917.81149  4212.327   Univ of Hawaii 0.6-m, Mauna Kea
+2.2 !-1552809.96073  +194922.76784  4239.555   Univ of Hawaii 2.2-m, Mauna Kea
+CFH !-1552807.95258  +194930.90648  4230.106   Canada-France-Hawaii Telescope, Mauna Kea (CFHT)
+IRT !-1552819.19564  +194934.38594  4194.067   Infrared Telescope Facility (IRTF)
+UKI !-1552813.17630  +194920.75334  4224.498   UK Infrared Telescope (UKIRT)
+JCM !-1552837.20394  +194922.10741  4216       James Clerke Maxwell Telescope (JCMT)
+CSO !-1552831.78945  +194920.77658  4216       Caltech Submillimeter Observatory (CSO)
+Ke1 !-1552828.98665  +194933.40757  4185.581   Keck 1, Mauna Kea
+Ke2 !-1552827.24268  +194935.61788  4185.581   Keck 2, Mauna Kea
+Sub !-1552833.66719  +194931.81425  4189.001   Subaru, Mauna Kea
+Gem !-1552808.56831  +194925.68521  4239.439   Gemini North, Mauna Kea
+
+      The following five (official) MPC sites have corrected positions,
+   copy/pasted from the above.
+
+266 !-1552833.66719  +194931.81425  4189.001   New Horizons KBO Search-Subaru
+267 !-1552807.95258  +194930.90648  4230.106   New Horizons KBO Search-CFHT
+T09 !-1552833.66719  +194931.81425  4189.001   Mauna Kea-UH/Tholen NEO Follow-Up (Subaru)
+T12 !-1552809.96073  +194922.76784  4239.555   Mauna Kea-UH/Tholen NEO Follow-Up (2.24-m)
+T14 !-1552807.95258  +194930.90648  4230.106   Mauna Kea-UH/Tholen NEO Follow-Up (CFHT)
 
 Ce1 !  -2.566025     +37.982840     1532       Centu1 (J75 scope)
 
@@ -362,3 +376,7 @@ J95 ! 358.552997     51.474969       152.6     Great Shefford
 
 CSS !   0.0000       0.00000   +0.00000        CSS precoveries
 
+   Fixed position for (H01), private communication from Bill Ryan.
+Height above geoid 3250 m, geoid height -23 meters.
+
+H01 !-1071121.6      +335905.4      3227       Magdalena Ridge Observatory, Socorro
