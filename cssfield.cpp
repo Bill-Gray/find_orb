@@ -127,6 +127,15 @@ E12 : 2.05 x 2.05 deg.
 G96 - May 2016 - present: 2.2 x 2.2 deg.
 703 - Dec. 2016 - present: 4.4 x 4.4 deg.
 
+(566) had a 4096-square CCD at 1.43 arcsec/pixel.
+
+(644): The Palomar NEAT "Tri-Camera" had three separate 4096x4096
+pixel CCDs, running north to south,  pixel scale 1.01 arcsec/pixel.
+The images have similar RAs (probably almost identical in RA of
+date),  and decs spaced out by about 1.3 degrees.  The pointing log
+gives three lines for any given time,  corresponding to the northern,
+middle,  and southern images.
+
 (691) Spacewatch size roughly from MPC sky coverage files,  plus
 some info from Bob McMillan.  The actual shape is a little more
 complicated than this -- it's a mosaic of eight chips --  but
@@ -143,9 +152,17 @@ static void get_field_size( double *width, double *height, const double jd,
    *height = 0.;
    switch( *obs_code)
       {
-      case '6':         /* Spacewatch */
-         *width = 1.85;
-         *height = 1.73;
+      case '5':         /* (566) Haleakala-NEAT/GEODSS  */
+         *width = 4096. * 1.43 / 3600.;
+         break;
+      case '6':
+         if( obs_code[1] == '9')       /* (691) Spacewatch */
+            {
+            *width = 1.85;
+            *height = 1.73;
+            }
+         else            /* (644) NEAT at Palomar Sam'l Oschbin Schmidt */
+            *width = 4096. * 1.01 / 3600.;
          break;
       case '7':         /* 703 */
          *width = (jd < dec_02_2016 ? 2.85 : 4.4);
