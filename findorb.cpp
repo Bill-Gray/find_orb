@@ -567,6 +567,8 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                "MPCORB output",
                "8-line elements",
                "Close approaches",
+               "Fake astrometry",
+               "Unused",
                NULL };
 
       jd_start = 0.;
@@ -672,7 +674,12 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                n--;
          c = buff[i];
          }
-      switch( c)
+      if( c >= ALT_0 && c <= ALT_7)
+         {
+         ephemeris_output_options &= ~7;
+         ephemeris_output_options |= (c - ALT_0);
+         }
+      else switch( c)
          {
          case '0':
             show_advanced_options = !show_advanced_options;
