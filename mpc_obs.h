@@ -102,6 +102,7 @@ parameters in Find_Orb.  This may get bumped up at some point. */
 #define OPTION_MPCORB_OUTPUT           3
 #define OPTION_8_LINE_OUTPUT           4
 #define OPTION_CLOSE_APPROACHES        5
+#define OPTION_FAKE_ASTROMETRY         6
 
 #define OPTION_ALT_AZ_OUTPUT            0x008
 #define OPTION_RADIAL_VEL_OUTPUT        0x010

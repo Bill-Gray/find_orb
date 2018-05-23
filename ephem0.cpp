@@ -1195,7 +1195,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    double prev_ephem_t = epoch_jd, prev_radial_vel = 0.;
    int i, hh_mm, n_step_digits;
    unsigned date_format;
-   const int ephem_type = (options & 7);
+   const int ephem_type = ((options & 7) == 6 ? 0 : (options & 7));
    FILE *ofile;
    const bool computer_friendly = ((options & OPTION_COMPUTER_FRIENDLY) ? true : false);
    char step_units;
@@ -1217,6 +1217,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    bool show_radar_data = (get_radar_data( note_text + 1, &rdata) == 0);
    const double planet_radius_in_au =
           planet_radius_in_meters( planet_no) / AU_IN_METERS;
+   const bool fake_astrometry = ((options & 7) == OPTION_FAKE_ASTROMETRY);
 
    step = get_step_size( stepsize, &step_units, &n_step_digits);
    if( !step)
@@ -1597,7 +1598,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
             double lunar_elong = 0.;
             double ra, dec, earth_r = 0.;
             char ra_buff[80], dec_buff[80], date_buff[80];
-            char r_buff[20], solar_r_buff[20];
+            char r_buff[20], solar_r_buff[20], fake_line[81];
             double cos_elong, solar_r, elong;
             bool moon_more_than_half_lit = false;
             bool is_in_shadow = false;
@@ -1733,6 +1734,17 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                output_signed_angle_to_buff( dec_buff, dec, 2);
                dec_buff[12] = '\0';
                }
+            if( fake_astrometry)
+               {
+               strcpy( fake_line, obs->packed_id);
+               strcpy( fake_line + 12, "  C");
+               full_ctime( fake_line + 15, curr_jd,
+                        FULL_CTIME_MICRODAYS | FULL_CTIME_YMD
+                      | FULL_CTIME_MONTHS_AS_DIGITS | FULL_CTIME_LEADING_ZEROES);
+               strcat( fake_line, ra_buff);
+               strcat( fake_line, dec_buff);
+               strcat( fake_line, "         ");      /* columns 57 to 65 */
+               }
             if( options & OPTION_SUPPRESS_RA_DEC)
                *dec_buff = *ra_buff = '\0';
             else
@@ -1802,6 +1814,15 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                if( curr_mag > ephemeris_mag_limit)
                   show_this_line = false;
 
+               if( fake_astrometry)
+                  {
+                  if( abs_mag && curr_mag < 99.)
+                     snprintf_append( fake_line, sizeof( fake_line), "%4.1f V", curr_mag);
+                  else
+                     strcat( fake_line, "      ");
+                  snprintf_append( fake_line, sizeof( fake_line), "      %.3s",
+                                           note_text + 1);
+                  }
                if( options & OPTION_PHASE_ANGLE_OUTPUT)
                   snprintf_append( buff, sizeof( buff), " %8.4f", phase_ang * 180. / PI);
 
@@ -1953,6 +1974,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   }
                }
 
+            if( fake_astrometry)
+               strcpy( buff, fake_line);
             if( !show_this_line)
                {
                if( last_line_shown)
