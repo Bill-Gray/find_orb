@@ -247,7 +247,6 @@ int main( const int argc, const char **argv)
       ifile = fopen( buff, "rb");
       if( ifile)
          {
-         uint32_t file_loc = 0;
          double min_jd = 1e+10, max_jd = 0.;
 
          printf( "%s opened;  reading fields\n", buff);
@@ -276,7 +275,7 @@ int main( const int argc, const char **argv)
                   rval[n].ra  *= PI / 180.;
                   rval[n].dec *= PI / 180.;
                   rval[n].tilt = 0.;
-                  rval[n].file_offset = file_loc;
+                  rval[n].file_offset = (uint32_t)( ftell( ifile) - strlen( buff));
                   rval[n].file_number = (char)file_number;
                   get_field_size( &rval[n].width, &rval[n].height, rval[n].jd,
                                        rval[n].obscode);
@@ -288,7 +287,6 @@ int main( const int argc, const char **argv)
                      max_jd = rval[n].jd;
                   n++;
                   }
-               file_loc += strlen( buff);
                if( n < 10 || n % 100000 == 0)
                   printf( "%d fields read and parsed\r", n);
                }
