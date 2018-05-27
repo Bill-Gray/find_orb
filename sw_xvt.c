@@ -23,10 +23,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include <assert.h>
 #include <ctype.h>
 
-/* Code to convert Spacewatch pointing log into the form expected
-by 'cssfield.c'.   Note comments at bottom of this file on the format
-of that log. Also see 'cssfield.c' for comments on the format of the
-output from this program.  Compile with
+/* Code to convert "old format" Spacewatch pointing log into the form
+expected by 'cssfield.c'.   Bob McMillan tells me the last log using
+this format was the 2016 December 24 one;  see 'sw_xvt2.c' for code to
+handle the subsequent format.  Note comments at bottom of this file on
+the format of these logs.  Also see 'cssfield.c' for comments on the
+format of the output from this program.  Compile with
 
 gcc -Wall -O3 -o sw_xvt sw_xvt.c
 
@@ -126,6 +128,13 @@ int main( const int argc, const char **argv)
 
    assert( ifile);
    *iso_date = '\0';
+   printf( "# Spacewatch 'old formula' logs,  processed with sw_xvt.c (q.v.)\n");
+#ifdef __TIMESTAMP__
+   printf( "# Version %s\n", __TIMESTAMP__);
+#else
+   printf( "# Version %s %s\n", __DATE__, __TIME__);
+#endif
+   printf( "# Input file '%s'\n", filename);
    while( fgets( buff, sizeof( buff), ifile))
       if( strlen( buff) > 40 && buff[1] != ':')
          {
