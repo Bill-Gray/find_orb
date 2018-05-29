@@ -12,6 +12,12 @@ a given observer/measurer was present between certain dates,  and/or
 that certain telescope gear was used for certain date ranges.  See
 details for (703), (E12), (G96) for examples.
 
+   I've indented some codes/details by a space,  effectively commenting
+them out.  That happens if I know those details are used at that site,
+but that others also use it and I've no way of knowing which details
+ought to be shown.  (For example,  (568) Mauna Kea has eleven scopes
+and a bazillion observers;  I've no idea what to show there.)
+
 COD 048
 OBS M. Lekhy
 TEL 0.40-m f/5 reflector + CCD
@@ -197,9 +203,9 @@ OBS P. Pravec, P. Kusnirak
 TEL 0.65-m f/3.6 reflector + CCD
 NET USNO-SA 2.0
 
-COD 568
-OBS D. J. Tholen
-TEL 2.24-m University of Hawaii reflector
+ COD 568
+ OBS D. J. Tholen
+ TEL 2.24-m University of Hawaii reflector
 
 COD 587
 OBS F. Manca, A. Testa
@@ -351,10 +357,10 @@ COD 785
 OBS J. Maffei
 TEL 0.91-m f/13.6 Cassegrain + CCD
 
-COD 807
-OBS M. Holman, J. Kavelaars, T. Grav, W. Fraser.
-MEA M. Holman
-TEL 4-m Blanco reflector + CCD
+ COD 807
+ OBS M. Holman, J. Kavelaars, T. Grav, W. Fraser.
+ MEA M. Holman
+ TEL 4-m Blanco reflector + CCD
 
 COD 834
 OBS R. Mackintosh, R. Caprio, P. Kelis
@@ -809,21 +815,30 @@ TEL 0.5-m f/2.0 Schmidt + CCD
 COD T09
 CON D. J. Tholen, Institute for Astronomy, 2680 Woodlawn Drive, Honolulu, HI 96822
 CON [tholen (at) ifa (dot) hawaii (dot) edu]
-NET Gaia-DR1
 TEL 8.2-m Subaru reflector
+COM Valid: 2016-2018 mar 1
+NET Gaia-DR1
+COM Valid: 2018 mar 1-2100
+NET Gaia-DR2
 
 COD T12
 CON D. J. Tholen, Institute for Astronomy, 2680 Woodlawn Drive, Honolulu, HI 96822
 CON [tholen (at) ifa (dot) hawaii (dot) edu]
 OBS D. Fohring, D. Hung, Y. Ramanjooloo, Z. Claytor, D. J. Tholen
-NET Gaia-DR1
 TEL 2.24-m University of Hawaii reflector
+COM Valid: 2016-2018 mar 1
+NET Gaia-DR1
+COM Valid: 2018 mar 1-2100
+NET Gaia-DR2
 
 COD T14
 CON D. J. Tholen, Institute for Astronomy, 2680 Woodlawn Drive, Honolulu, HI 96822
 CON [tholen (at) ifa (dot) hawaii (dot) edu]
-NET Gaia-DR1
 TEL 3.6-m Canada-France-Hawaii Telescope
+COM Valid: 2016-2018 mar 1
+NET Gaia-DR1
+COM Valid: 2018 mar 1-2100
+NET Gaia-DR2
 
 COD U69
 TEL 0.61-m f/6.5 astrograph + CCD
