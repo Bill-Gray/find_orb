@@ -3541,7 +3541,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
       rval[i].jd = 0.;
 
    i = sort_obs_by_date_and_remove_duplicates( rval, n_obs_actually_loaded);
-   if( rval[i - 1].jd - rval[0].jd > maximum_observation_span * days_per_year)
+   if( i && rval[i - 1].jd - rval[0].jd > maximum_observation_span * days_per_year)
       {
       sprintf( buff, "The observations span %.1f years,  greater than Find_Orb's\n"
                      "maximum span of %.1f years.  If you really want the whole\n"
