@@ -480,7 +480,7 @@ static void setup_obj_loc( obj_location_t *p, double *orbit,
       if( !mpc_code)
          p[i].r = 0.;
       assert( p[i].r >= 0.);
-      assert( p[i].r < 10.);
+      assert( p[i].r < 100.);
       integrate_orbit( orbit, epoch_jd, p->jd - p[i].r / AU_PER_DAY);
       for( j = 0; j < 3; j++)
          topo[j] = orbit[j] - obs_posn[j];
