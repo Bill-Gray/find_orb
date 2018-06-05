@@ -380,3 +380,56 @@ CSS !   0.0000       0.00000   +0.00000        CSS precoveries
 Height above geoid 3250 m, geoid height -23 meters.
 
 H01 !-1071121.6      +335905.4      3227       Magdalena Ridge Observatory, Socorro
+
+   Spacewatch telescope positions are off.  (691) is wrong by
+almost half a kilometer.  I expect a corrected position will
+eventually appear in the MPC list,  but in the meantime,  these
+positions,  measured from Google Maps,  are probably good to
+about ten meters.  The altitudes come from
+
+https://spacewatch.lpl.arizona.edu/telescopes
+
+   with 30 meters subtracted for geoid height.
+
+291 !-111.599905     +31.961669     2045.      LPL/Spacewatch II
+691 !-111.600327     +31.962174     2061.      Steward Observatory, Kitt Peak-Spacewatch
+
+   Other scopes measured while looking at Kitt Peak in Google Maps.
+Google Maps doesn't give me altitudes.  I used the altitude from (691).
+
+Bok !-111.600140     +31.963110     2061.      Bok 2.3-m telescope, Kitt Peak
+May !-111.599895     +31.964027     2061.      Mayall telescope,  Kitt Peak
+1.3 !-111.598406     +31.959634     2061.      1.3-m telescope, Kitt Peak
+2.1 !-111.598296     +31.958175     2061.      2.1-m telescope, Kitt Peak
+WIY !-111.600586     +31.958052     2061.      WIYN telescope, Kitt Peak
+Bur !-111.599203     +31.960597     2061.      Burrell Schmidt, Kitt Peak
+Unk1!-111.598157     +31.960070     2061.      Near visitor center, Kitt Peak
+Unk2!-111.599620     +31.958041     2061.      Unkn 2.1-m 90 meters east of WIYN
+WIY2!-111.600237     +31.958013     2061.      WIYN 0.9-m, Kitt Peak
+
+   From http://kp12m.as.arizona.edu/12m_docs/12_meter_description.htm .
+Again,  I subtracted 30 meters for geoid height.  The odd mismatch in
+precision for latitude and longitude makes me suspect mistakes.
+
+12m !-1113653.475    +315712.0      1884.      ARO 12 Meter Telescope
+
+   The MDM Observatory at Kitt Peak has the 1.3-m McGraw-Hill Telescope and
+the 2.4-m Hiltner Telescope,  separated by roughly 60 meters. The MPC
+coordinates for (697) appear to come from
+http://mdm.kpno.noao.edu/13_manual/mgh03.html , and are given to arcminute
+precision,  about 1.5 km from the positions below. I've measured both scopes
+on Google Maps;  Eric Galayda provided altitudes and IDs as to which scope was
+which (not really apparent otherwise). As with other Kitt Peak scopes, 30
+meters is subtracted from the geoid heights to get ellipsoidal heights.
+
+Hil !-111.615864     +31.951503     1908.5     Kitt Peak, Hiltner
+697 !-111.616685     +31.951754     1895.      Kitt Peak, McGraw-Hill
+
+   Positions for the Jacobus Kapteyn Telescope from Keel et. al :
+   http://iopscience.iop.org/article/10.1088/1538-3873/129/971/015002/pdf
+   (SARA-Cerro Tololo is given above from its original source;  SARA-Kitt Peak
+   corrected via private communication from Bill Keel)
+G82 !-111.599597     +31.960596     2043       SARA Observatory, Kitt Peak
+JKT ! -175241.1      +284540.2      2369       Jacobus Kapteyn Telescope
+
+ZLA ! 16.38807       -20.57413         0       ZLAF9B2 impact point
