@@ -81,6 +81,7 @@ int debug_printf( const char *format, ...)                 /* runge.cpp */
 #endif
 ;
 char **load_file_into_memory( const char *filename, size_t *n_lines);
+int compare_observations( const void *a, const void *b, void *context);
 void shellsort_r( void *base, const size_t n_elements, const size_t esize,
          int (*compare)(const void *, const void *, void *), void *context);
 int string_compare_for_sort( const void *a, const void *b, void *context);
@@ -254,9 +255,7 @@ static void fix_up_mpc_observation( char *buff)
                }
             memcpy( obuff + 77, buff + len - 3, 3);
             obuff[80] = '\0';
-//          printf( "Line in:\n'%s'\n", buff);
             strcpy( buff, obuff);
-//          printf( "Line out:\n'%s'\n", buff);
             }
          }
       }
@@ -2675,18 +2674,18 @@ static void correct_differences( OBSERVE *obs1, const OBSERVE *obs2)
       obs1->mag_band = obs2->mag_band;
 }
 
-static int compare_observations( const void *a, const void *b, void *unused_context)
+int compare_observations( const void *a, const void *b, void *context)
 {
    const OBSERVE *obs1 = (const OBSERVE *)a;
    const OBSERVE *obs2 = (const OBSERVE *)b;
-   int rval;
+   int rval = FMEMCMP( obs1->mpc_code, obs2->mpc_code, 3);
 
+   if( context && rval)    /* non-null context -> sort by code first */
+      return( rval);
    if( obs1->jd < obs2->jd)
       rval = -1;
    else if( obs1->jd > obs2->jd)
       rval = 1;
-   else
-      rval = FMEMCMP( obs1->mpc_code, obs2->mpc_code, 3);
    if( !rval)
       rval = obs1->note1 - obs2->note1;
    if( !rval && obs1->ra != obs2->ra)
@@ -3231,7 +3230,6 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
 
       line_no++;
       lines_actually_read++;
-
       if( *buff == '<')
          remove_html_tags( buff);
       if( !memcmp( buff, "errmod  = 'fcct14'", 18))

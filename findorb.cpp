@@ -199,6 +199,9 @@ int orbital_monte_carlo( const double *orbit, OBSERVE *obs, const int n_obs,
          const double curr_epoch, const double epoch_shown);   /* orb_func.cpp */
 void make_config_dir_name( char *oname, const char *iname);    /* miscell.cpp */
 int reset_astrometry_filename( const int argc, const char **argv);
+int compare_observations( const void *a, const void *b, void *context);
+void shellsort_r( void *base, const size_t n_elements, const size_t esize,
+         int (*compare)(const void *, const void *, void *), void *context);
 int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
                                    const char *format, ...)
 #ifdef __GNUC__
@@ -2290,6 +2293,7 @@ int main( const int argc, const char **argv)
    double max_residual_for_filtering = 2.5;
    bool show_commented_elements = false;
    bool drop_single_obs = true;
+   bool sort_obs_by_code = false;
 
    if( !strcmp( argv[0], "find_orb"))
       use_config_directory = true;
@@ -2718,6 +2722,8 @@ int main( const int argc, const char **argv)
          char *tptr = tbuff;
          int i = 0;
 
+         if( sort_obs_by_code)
+            shellsort_r( obs, n_obs, sizeof( OBSERVE), compare_observations, &i);
          while( i < n_obs && !(obs[i].flags & OBS_IS_SELECTED))
             i++;
          if( i == n_obs)      /* no observation selected */
@@ -2734,6 +2740,8 @@ int main( const int argc, const char **argv)
                text_search_and_replace( tbuff, "\xf8", "\xc2\xb0 ");
             }
 #endif
+         if( sort_obs_by_code)
+            shellsort_r( obs, n_obs, sizeof( OBSERVE), compare_observations, NULL);
          while( *tptr)
             {
             size_t i;
@@ -2855,6 +2863,9 @@ int main( const int argc, const char **argv)
       if( debug_level > 2)
          debug_printf( "resid legend shown\n");
 
+      if( sort_obs_by_code)
+         shellsort_r( obs, n_obs, sizeof( OBSERVE), compare_observations, &i);
+
       top_line_residuals = line_no;
       if( c != KEY_MOUSE_MOVE && c != KEY_TIMER)
          show_residuals( obs, n_obs, residual_format, curr_obs, line_no,
@@ -2877,6 +2888,8 @@ int main( const int argc, const char **argv)
          refresh( );
       if( c != KEY_MOUSE_MOVE && c != KEY_TIMER)
          show_final_line( n_obs, curr_obs, COLOR_FINAL_LINE);
+      if( sort_obs_by_code)
+         shellsort_r( obs, n_obs, sizeof( OBSERVE), compare_observations, NULL);
       if( debug_level)
          refresh( );
       if( *message_to_user)
@@ -4467,8 +4480,10 @@ int main( const int argc, const char **argv)
             add_off_on = force_traditional_format;
             }
             break;
-         case ALT_A: case 9:
-         case ALT_P:
+         case 9:
+            sort_obs_by_code = !sort_obs_by_code;
+            break;
+         case ALT_A: case ALT_P:
          case ALT_R: case ALT_X: case ALT_Y:
          case ALT_Z: case '\'':
          default:
