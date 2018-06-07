@@ -543,7 +543,7 @@ static size_t space_pad_buffer( char *buff, const size_t length)
 static int show_reference( char *buff)
 {
    const size_t reference_loc = 62;
-   int rval = (space_pad_buffer( buff, reference_loc) <= reference_loc);
+   const int rval = (space_pad_buffer( buff, reference_loc) <= reference_loc);
 
    if( rval)
       {
@@ -798,8 +798,8 @@ is the usual Tisserand criterion.           */
 static double encounter_velocity( const ELEMENTS *elem, const double a0)
 {
    const double a = elem->major_axis;
-   double tval = sqrt( a * (1. - elem->ecc * elem->ecc) / a0);
-   double tisserand = a0 / a + 2. * tval * cos( elem->incl);
+   const double tval = sqrt( a * (1. - elem->ecc * elem->ecc) / a0);
+   const double tisserand = a0 / a + 2. * tval * cos( elem->incl);
    double rval;
 
    if( tisserand > 3.)    /* can happen if the orbits can't really */
@@ -1666,7 +1666,7 @@ int string_compare_for_sort( const void *a, const void *b, void *context)
 {
    const char **a1 = (const char **)a;
    const char **b1 = (const char **)b;
-   int *sort_column = (int *)context;
+   const int *sort_column = (int *)context;
 
    if( *sort_column == -11)
       return( names_compare( a1[0] + 11, b1[0] + 11));
