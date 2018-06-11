@@ -1759,7 +1759,6 @@ static int get_orbit_from_mpcorb_sof( const char *object_name, double *orbit,
                   atoi( object_name + 2));
       else
          snprintf( tname, sizeof( tname), "%-12s", object_name);
-      debug_printf( "Header (looking for '%s'):\n%s", tname, header);
       while( !got_vectors && fgets_trimmed( buff, sizeof( buff), ifile))
          if( !memcmp( tname, buff, 12))
             {
