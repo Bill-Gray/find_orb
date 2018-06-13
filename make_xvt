@@ -1,0 +1,13 @@
+# Makefile for various utilities to convert 'other' pointing log formats
+# into the format used by CSS.
+
+all: sw_xvt$(EXE) sw_xvt2$(EXE) neat_xvt$(EXE)
+
+EXE=
+CFLAGS=-O3 -Wall -pedantic -Wextra
+
+clean:
+	rm -f sw_xvt$(EXE) sw_xvt2$(EXE)  neat_xvt$(EXE)
+
+%$(EXE) : %.c
+	$(CC) $(CFLAGS) -o $@ $< -lm
