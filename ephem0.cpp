@@ -1805,6 +1805,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                }
             if( !obj_n)
                {
+               const bool two_place_mags =
+                            (*get_environment_ptr( "MAG_DIGITS") == '2');
                double phase_ang;
                double curr_mag = abs_mag + calc_obs_magnitude(
                           solar_r, r, earth_r, &phase_ang);  /* elem_out.cpp */
@@ -1861,7 +1863,9 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
 
                if( abs_mag)           /* don't show a mag if you dunno how bright */
                   {                   /* the object really is! */
-                  if( is_in_shadow)
+                  if( two_place_mags)
+                     snprintf_append( buff, sizeof( buff), " %5.2f", curr_mag + .005);
+                  else if( is_in_shadow)
                      strcat( buff, " Sha ");
                   else if( curr_mag < 99 && curr_mag > -9.9)
                      snprintf_append( buff, sizeof( buff), " %4.1f", curr_mag + .05);
