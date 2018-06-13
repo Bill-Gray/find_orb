@@ -204,7 +204,7 @@ static void combine_element_files( const char *filename, const int n_processes)
    for( i = 0; i < n_processes; i++)
       {
       process_count = i + 1;
-      input_files[i] = fopen_ext( get_file_name( buff, filename), "fclr");
+      input_files[i] = fopen_ext( get_file_name( buff, filename), "tfclr");
       }
    for( i = quit = 0; !quit; i = (i + 1) % n_processes)
       if( !fgets( buff, sizeof( buff), input_files[i]))
@@ -477,13 +477,25 @@ int main( const int argc, const char **argv)
             case 'm':
                mpec_path = arg;
                break;
+            case 'M':
+               {
+               extern const char *mpcorb_dot_sof_filename;
+
+               mpcorb_dot_sof_filename = arg;
+               }
+               break;
             case 'n':
                starting_object = atoi( arg);
                break;
             case 'o':            /* obj designation / ephemeris from orbital */
                break;            /* elems:  fall through, handle below */
             case 'p':
+               {
+               FILE *ifile = fopen_ext( "dummy.txt", "tfcw");
+
+               fclose( ifile);
                n_processes = atoi( arg);
+               }
                break;
             case 'q':            /* "quiet" */
                show_processing_steps = false;
@@ -768,7 +780,7 @@ int main( const int argc, const char **argv)
                         get_summary_info( tbuff, fullpath);
                         if( summary_ofile)
                            {
-                           FILE *ephemeris_ifile = fopen_ext( ephemeris_filename, "fcrb");
+                           FILE *ephemeris_ifile = fopen_ext( ephemeris_filename, "tfcrb");
                            char new_line[300];
 
                            tbuff[14] = '\0';

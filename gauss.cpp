@@ -105,7 +105,7 @@ double gauss_method( const OBSERVE FAR *obs1, const OBSERVE FAR *obs2,
    double poly[9], roots[8], r2;
    int i, n_roots, iteration, keep_iterating = 1;
    extern int process_count;
-   FILE *ofile = (process_count? NULL : fopen_ext( "gauss.out", "fcwb"));
+   FILE *ofile = (process_count? NULL : fopen_ext( "gauss.out", "tfcwb"));
 
    if( ofile)
       {

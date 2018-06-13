@@ -24,6 +24,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include <errno.h>
 #include "mpc_func.h"
 
+#ifndef _WIN32
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+#endif
+
    /* MSVC/C++ lacks snprintf.  See 'ephem0.cpp' for details. */
 #if defined(_MSC_VER) && _MSC_VER < 1900
 int snprintf( char *string, const size_t max_len, const char *format, ...);
@@ -88,20 +94,34 @@ void make_config_dir_name( char *oname, const char *iname)
 #endif
 }
 
+/* We use a lock file to determine if Find_Orb is already running,  and
+therefore putting some temporary files (ephemerides,  elements,  etc.)
+into the config directory ~/.find_orb.   If that's happening,  we ought
+to put our temporary files elsewhere,  in a directories of the form
+/tmp/find_orb(process ID). */
+
 FILE *fopen_ext( const char *filename, const char *permits)
 {
    FILE *rval = NULL;
    bool is_fatal = false;
    bool try_local = true;
+   bool is_temporary = false;
 
    if( *permits == 't')
+      {
+#ifndef _WIN32
+      extern bool findorb_already_running;
+
+      is_temporary = findorb_already_running;
+#endif
       permits++;
+      }
    if( *permits == 'f')
       {
       is_fatal = true;
       permits++;
       }
-   if( !use_config_directory)
+   if( !use_config_directory || is_temporary)
       while( *permits == 'l' || *permits == 'c')
          permits++;
    if( permits[0] == 'l' && permits[1] == 'c')
@@ -110,7 +130,25 @@ FILE *fopen_ext( const char *filename, const char *permits)
       permits++;
       rval = fopen( filename, permits + 1);
       }
-   if( !rval && *permits == 'c')
+#ifndef _WIN32
+   if( is_temporary)
+      {
+      char tname[255];
+      static int process_id = 0;
+
+      if( !process_id)
+         {
+         process_id = getpid( );
+         snprintf( tname, sizeof( tname),
+                 "/tmp/find_orb%d", process_id);
+         mkdir( tname, 0777);
+         }
+      snprintf( tname, sizeof( tname),
+                 "/tmp/find_orb%d/%s", process_id, filename);
+      rval = fopen( tname, permits);
+      }
+#endif
+   if( !rval && *permits == 'c' && !is_temporary)
       {
       char tname[255];
 
@@ -122,7 +160,7 @@ FILE *fopen_ext( const char *filename, const char *permits)
          try_local = false;
       rval = fopen( tname, permits);
       }
-   if( try_local && !rval)
+   if( try_local && !rval && !is_temporary)
       rval = fopen( filename, permits);
    if( !rval && is_fatal)
       {

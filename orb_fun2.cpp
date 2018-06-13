@@ -333,7 +333,7 @@ int link_arcs( OBSERVE *obs, int n_obs, const double r1, const double r2)
       rlen = -rlen;
    for( i = 0; i < 3; i++)
       rvect[i] /= rlen;
-   ofile = fopen_ext( "gauss.out", "fcwb");
+   ofile = fopen_ext( "gauss.out", "tfcwb");
    fprintf( ofile, "%.10f %.10f %.10f\n",
             rvect[0], rvect[1], rvect[2]);
    rlen = sqrt( rvect[0] * rvect[0] + rvect[1] * rvect[1]);

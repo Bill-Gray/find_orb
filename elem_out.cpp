@@ -33,6 +33,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "monte0.h"     /* for put_double_in_buff() proto */
 #include "showelem.h"
 
+#ifndef _WIN32
+#include <sys/file.h>
+
+bool findorb_already_running = false;
+#endif
+
             /* Pretty much every platform I've run into supports */
             /* Unicode display,  except OpenWATCOM and early     */
             /* versions of MSVC.                                 */
@@ -570,7 +576,7 @@ static int get_uncertainty( const char *key, char *obuff, const bool in_km)
 
    *obuff = '\0';
    if( available_sigmas && (ifile = fopen_ext(
-                  get_file_name( buff, filenames[available_sigmas]), "crb")) != NULL)
+                  get_file_name( buff, filenames[available_sigmas]), "tcrb")) != NULL)
       {
       const size_t keylen = strlen( key);
 
@@ -924,7 +930,7 @@ int write_out_elements_to_file( const double *orbit,
             const int options)
 {
    char object_name[80], buff[260], more_moids[80];
-   const char *file_permits = (append_elements_to_element_file ? "fca" : "fcw+");
+   const char *file_permits = (append_elements_to_element_file ? "tfca" : "tfcw+");
    extern const char *elements_filename;
    FILE *ofile = fopen_ext( get_file_name( buff, elements_filename), file_permits);
    double rel_orbit[6], orbit2[6];
@@ -1381,7 +1387,7 @@ int write_out_elements_to_file( const double *orbit,
          n_clones_accepted++;
       }
 
-   monte_carlo_permits = (n_clones_accepted == 1 ? "fcwb" : "fcab");
+   monte_carlo_permits = (n_clones_accepted == 1 ? "tfcwb" : "tfcab");
    if( monte_carlo && rms_ok)
       {
       FILE *ofile2 = fopen_ext( get_file_name( buff, "state.txt"), monte_carlo_permits);
@@ -1649,7 +1655,7 @@ int write_out_elements_to_file( const double *orbit,
 //       set_statistical_ranging( 1);
       }
 
-   if( (ofile = fopen_ext( get_file_name( tbuff, "guide.txt"), "fcwb")) != NULL)
+   if( (ofile = fopen_ext( get_file_name( tbuff, "guide.txt"), "tfcwb")) != NULL)
       {
       elements_in_guide_format( tbuff, &elem, object_name, obs, n_obs);
       fprintf( ofile, "%s%s\n", tbuff, impact_buff);
@@ -1730,13 +1736,14 @@ void set_solutions_found( OBJECT_INFO *ids, const int n_ids)
 ELEMENTS.COMET,  Find_Orb can sometimes flounder about a bit in its
 efforts to determine an orbit. */
 
+const char *mpcorb_dot_sof_filename = "mpcorb.sof";
 
 int extract_sof_data( ELEMENTS *elem, const char *buff, const char *header);
 
 static int get_orbit_from_mpcorb_sof( const char *object_name, double *orbit,
                                           ELEMENTS *elems)
 {
-   FILE *ifile = fopen_ext( "mpcorb.sof", "crb");
+   FILE *ifile = fopen_ext( mpcorb_dot_sof_filename, "crb");
    int got_vectors = 0;
 
    memset( elems, 0, sizeof( ELEMENTS));
@@ -2352,6 +2359,13 @@ int get_defaults( int *ephemeris_output_options, int *element_format,
    int i, use_sigmas_int;
    const char *override_fcct14_filename = get_environment_ptr( "FCCT14_FILE");
 
+#ifndef _WIN32
+   FILE *lock_file = fopen( "/tmp/fo_lock", "w");
+
+   assert( lock_file);
+   if( flock( fileno( lock_file), LOCK_EX | LOCK_NB))
+      findorb_already_running = true;
+#endif
    if( *language)
       findorb_language = *language;
    if( *override_fcct14_filename)

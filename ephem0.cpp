@@ -1222,7 +1222,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    step = get_step_size( stepsize, &step_units, &n_step_digits);
    if( !step)
       return( -2);
-   ofile = fopen_ext( filename, is_default_ephem ? "fcw" : "fw");
+   ofile = fopen_ext( filename, is_default_ephem ? "tfcw" : "fw");
    if( !ofile)
       return( -1);
    if( !memcmp( note_text, "(CSS)", 5))
@@ -1557,7 +1557,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                           obs, n_obs, "", 5, 0, output_options);
                ifile = fopen_ext( get_file_name( buff,
                         (ephem_type == OPTION_8_LINE_OUTPUT) ? elements_filename : "mpc_fmt.txt"),
-                        "fcrb");
+                        "tfcrb");
                while( fgets( buff, sizeof( buff), ifile))
                   fputs( buff, ofile);
                fclose( ifile);
@@ -2681,7 +2681,7 @@ void create_obs_file( const OBSERVE FAR *obs, int n_obs, const int append)
 {
    char filename[81], curr_sigma_text[81];
    FILE *ofile = fopen_ext( get_file_name( filename, observe_filename),
-                           append ? "fcab" : "fcwb");
+                           append ? "tfcab" : "tfcwb");
 
    *curr_sigma_text = '\0';
    while( n_obs--)
@@ -3047,7 +3047,7 @@ int write_residuals_to_file( const char *filename, const char *ast_filename,
        const int n_obs, const OBSERVE FAR *obs_data, const int resid_format)
 {
    FILE *ofile = fopen_ext( filename,
-               residual_file_in_config_dir ? "fcw" : "fw");
+               residual_file_in_config_dir ? "tfcw" : "fw");
    int rval = 0;
 
    if( ofile )
@@ -3092,7 +3092,7 @@ int create_residual_scattergram( const char *filename, const int n_obs,
    const int xspacing = 12, yspacing = 5,
    short *remap_table = (short *)calloc( tbl_height * tbl_width, sizeof( short));
    int i, j;
-   FILE *ofile = fopen_ext( filename, "fcwb");
+   FILE *ofile = fopen_ext( filename, "tfcwb");
 
    for( i = 0; i < n_obs; i++, obs++)
       {
@@ -3184,11 +3184,11 @@ char *mpec_error_message = NULL;
 int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
 {
    char buff[500], mpec_buff[7];
-   const char *mpec_permits = (strchr( mpec_filename, '/') ? "fwb" : "fcwb");
+   const char *mpec_permits = (strchr( mpec_filename, '/') ? "fwb" : "tfcwb");
    FILE *ofile = fopen_ext( mpec_filename, mpec_permits);
    FILE *header_htm_ifile;
    FILE *residuals_ifile, *ephemeris_ifile, *observations_ifile;
-   FILE *elements_file = fopen_ext( get_file_name( buff, elements_filename), "fcrb");
+   FILE *elements_file = fopen_ext( get_file_name( buff, elements_filename), "tfcrb");
    int line_no = 0, rval = 0, total_lines = 0;
    unsigned mpec_no = atoi( get_environment_ptr( "MPEC"));
    bool orbit_is_heliocentric = true, suppressed = false;
@@ -3220,7 +3220,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
       header_htm_ifile = fopen_ext( buff + 1, "fcrb");
    assert( header_htm_ifile);
 
-   observations_ifile = fopen_ext( get_file_name( buff, observe_filename), "fcrb");
+   observations_ifile = fopen_ext( get_file_name( buff, observe_filename), "tfcrb");
    assert( observations_ifile);
 
                   /* Count number of redacted and (current) NEOCP lines : */
@@ -3417,7 +3417,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
       fclose( observations_ifile);
       }
 
-   residuals_ifile = fopen_ext( get_file_name( buff, residual_filename), "fcrb");
+   residuals_ifile = fopen_ext( get_file_name( buff, residual_filename), "tfcrb");
    if( residuals_ifile)
       {
       FILE *obslinks_file = fopen_ext( "obslinks.htm", "fcrb");
@@ -3653,7 +3653,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
 
                /* ...and now,  the ephemeris: */
    ephemeris_ifile = fopen_ext( get_file_name( buff, ephemeris_filename),
-               is_default_ephem ? "cr" : "r");
+               is_default_ephem ? "tcr" : "r");
    if( ephemeris_ifile && fgets_trimmed( buff, sizeof( buff), ephemeris_ifile))
       {
       fprintf( ofile, "\n<a name=\"eph%s\"></a>", mpec_buff);

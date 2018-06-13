@@ -64,7 +64,7 @@ int add_ephemeris_details( FILE *ofile, const double start_jd,
    fprintf( ofile, "Positions/velocities are in %s J2000\n",
                       atoi( vector_options) ? "ecliptic" : "equatorial");
 
-   ifile = fopen_ext( get_file_name( tbuff, elements_filename), "fcrb");
+   ifile = fopen_ext( get_file_name( tbuff, elements_filename), "tfcrb");
    while( fgets( tbuff, sizeof( tbuff), ifile))
       fwrite( tbuff, strlen( tbuff), 1, ofile);
    fclose( ifile);

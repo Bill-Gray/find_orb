@@ -1668,7 +1668,7 @@ static inline void compute_sr_sigmas( const double *sr_orbits,
       if( !i)
          elem0 = elem;
       }
-   monte_file = fopen_ext( get_file_name( filename, "monte.txt"), "fcwb");
+   monte_file = fopen_ext( get_file_name( filename, "monte.txt"), "tfcwb");
 
    fprintf( monte_file, "Computed from %u SR orbits\n", n_orbits);
    compute_monte_sigmas( sigmas, monte_data, n_orbits);
@@ -3037,7 +3037,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
    if( !err_code && *covariance_filename)
       {
       char tbuff[200];
-      FILE *ofile = fopen_ext( get_file_name( tbuff, covariance_filename), "fcwb");
+      FILE *ofile = fopen_ext( get_file_name( tbuff, covariance_filename), "tfcwb");
       double *matrix = lsquare_covariance_matrix( lsquare);
       double *wtw = lsquare_wtw_matrix( lsquare);
       double eigenvals[10], eigenvectors[100], element_sigmas[MONTE_N_ENTRIES];

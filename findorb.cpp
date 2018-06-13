@@ -904,7 +904,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             if( ephemeris_output_options
                      & (OPTION_STATE_VECTOR_OUTPUT | OPTION_POSITION_OUTPUT))
                {
-               FILE *ofile = fopen_ext( ephemeris_filename, "fca");
+               FILE *ofile = fopen_ext( ephemeris_filename, "tfca");
 
                add_ephemeris_details( ofile, jd_start, jd_end);
                fclose( ofile);
@@ -1700,7 +1700,7 @@ static void show_residual_legend( const int line_no, const int residual_format)
 
 static void show_a_file( const char *filename)
 {
-   FILE *ifile = fopen_ext( filename, "fclrb");
+   FILE *ifile = fopen_ext( filename, "tclrb");
    char buff[260], err_text[100];
    int line_no = 0, keep_going = 1;
    int n_lines = 0, msg_num = 0;
@@ -1710,7 +1710,7 @@ static void show_a_file( const char *filename)
    char search_text[100];
 
    if( !ifile)
-      return;
+      ifile = fopen_ext( filename, "fclrb");
    *search_text = '\0';
    while( fgets( buff, sizeof( buff), ifile))
       {
@@ -2772,7 +2772,7 @@ int main( const int argc, const char **argv)
          {
          FILE *ifile;
 
-         ifile = fopen_ext( get_file_name( tbuff, elements_filename), "fcrb");
+         ifile = fopen_ext( get_file_name( tbuff, elements_filename), "tfcrb");
          if( ifile)
             {
             unsigned iline = 0;
@@ -3478,7 +3478,7 @@ int main( const int argc, const char **argv)
                if( monte_carlo_object_count > 3)
                   {
                   double sigmas[MONTE_N_ENTRIES];
-                  FILE *monte_file = fopen_ext( get_file_name( tbuff, "monte.txt"), "fcwb");
+                  FILE *monte_file = fopen_ext( get_file_name( tbuff, "monte.txt"), "tfcwb");
 
                   fprintf( monte_file,
                           "Computed from %d orbits around object %d\n",
@@ -3736,7 +3736,7 @@ int main( const int argc, const char **argv)
          case CTRL( 'E'):
             {
             FILE *ifile =
-                 fopen_ext( get_file_name( tbuff, elements_filename), "fcrb");
+                 fopen_ext( get_file_name( tbuff, elements_filename), "tfcrb");
 
             while( fgets( tbuff, sizeof( tbuff), ifile))
                printf( "%s", tbuff);
@@ -3813,7 +3813,7 @@ int main( const int argc, const char **argv)
                ofile = fopen( filename, "wb");
                if( ofile)
                   {
-                  FILE *ifile = fopen_ext( get_file_name( tbuff, elements_filename), "fcrb");
+                  FILE *ifile = fopen_ext( get_file_name( tbuff, elements_filename), "tfcrb");
 
                   while( fgets( tbuff, sizeof( tbuff), ifile))
                      fputs( tbuff, ofile);
