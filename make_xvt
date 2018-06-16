@@ -11,3 +11,6 @@ clean:
 
 %$(EXE) : %.c
 	$(CC) $(CFLAGS) -o $@ $< -lm
+
+j95_xvt: j95_xvt.c
+	$(CC) $(CFLAGS) -o j95_xvt j95_xvt.c -I../lunar -L../lib -llunar -lm
