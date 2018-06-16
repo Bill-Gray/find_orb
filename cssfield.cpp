@@ -147,6 +147,7 @@ static void get_field_size( double *width, double *height, const double jd,
 {
    const double dec_02_2016 = 2457724.5;
    const double may_26_2016 = 2457534.5;
+   const double jun_24_2005 = 2453545.5;     /* see J95 */
    static char bad_code[10];
 
    *height = 0.;
@@ -175,6 +176,9 @@ static void get_field_size( double *width, double *height, const double jd,
          break;
       case 'I':         /* I52:  33' field of view;  some loss in corners */
          *width = 33. / 60.;
+         break;
+      case 'J':         /* J95:  25' to 2005 jun 22, 18' for 2005 jun 27 on */
+         *width = (jd < jun_24_2005 ? 25. / 60. : 18. / 60.);
          break;
       case 'V':         /* V06:  580" field of view */
          *width = 580. / 3600.;
@@ -248,6 +252,7 @@ int main( const int argc, const char **argv)
       if( ifile)
          {
          double min_jd = 1e+10, max_jd = 0.;
+         double tilt = 0.;
 
          printf( "%s opened;  reading fields\n", buff);
          while( fgets( buff, sizeof( buff), ifile))
@@ -274,7 +279,7 @@ int main( const int argc, const char **argv)
                   {
                   rval[n].ra  *= PI / 180.;
                   rval[n].dec *= PI / 180.;
-                  rval[n].tilt = 0.;
+                  rval[n].tilt = tilt;
                   rval[n].file_offset = (uint32_t)( ftell( ifile) - strlen( buff));
                   rval[n].file_number = (char)file_number;
                   get_field_size( &rval[n].width, &rval[n].height, rval[n].jd,
@@ -290,6 +295,8 @@ int main( const int argc, const char **argv)
                if( n < 10 || n % 100000 == 0)
                   printf( "%d fields read and parsed\r", n);
                }
+            else if( !memcmp( buff, "# Tilt: ", 8))
+               tilt = atof( buff + 8);
          fclose( ifile);
          printf( "\n%d fields found\n", n);
          full_ctime( buff, min_jd, 0);
