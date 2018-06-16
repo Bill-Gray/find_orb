@@ -2665,6 +2665,7 @@ static void correct_differences( OBSERVE *obs1, const OBSERVE *obs2)
    if( obs1->obs_mag == BLANK_MAG && obs2->obs_mag != BLANK_MAG)
       {
       obs1->obs_mag = obs2->obs_mag;
+      obs1->mag_sigma = obs2->mag_sigma;
       obs1->mag_precision = obs2->mag_precision;
       obs1->mag_band = obs2->mag_band;
       }
@@ -2708,7 +2709,10 @@ int sort_obs_by_date_and_remove_duplicates( OBSERVE *obs, const int n_obs)
    if( debug_level)
       debug_printf( "%d obs sorted by date\n", n_obs);
    for( i = j = 1; i < n_obs; i++)
-      if( memcmp( obs + i, obs + i - 1, sizeof( OBSERVE)))
+      if( obs[i].jd != obs[i - 1].jd || strcmp( obs[i].mpc_code,
+                                                obs[i - 1].mpc_code))
+         obs[j++] = obs[i];
+      else if( memcmp( obs + i, obs + i - 1, sizeof( OBSERVE)))
          {
          OBSERVE temp1 = obs[i], temp2 = obs[i - 1];
 
@@ -2723,10 +2727,13 @@ int sort_obs_by_date_and_remove_duplicates( OBSERVE *obs, const int n_obs)
             debug_printf( "Observation %d from %s on %s is effectively a duplicate\n",
                                       j, temp1.mpc_code, buff);
             obs[j - 1] = temp1;
+            comment_observation( obs + j - 1, "NearDup  ");
             }
-         else
-            {
+         else                    /* Is still really a duplicate,  but the  */
+            {                    /* differences couldn't be fixed          */
             obs[j] = obs[i];
+            comment_observation( obs + j - 1, "FixDup   ");
+            comment_observation( obs + j,     "FixDup   ");
             j++;
             }
          }
