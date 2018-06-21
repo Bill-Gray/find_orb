@@ -136,31 +136,69 @@ double geo_potential_in_au( const double x, const double y, const double z,
 #define EARTH_J3 (J3_IN_EARTH_UNITS * EARTH_R2 * EARTH_R)
 #define EARTH_J4 (J4_IN_EARTH_UNITS * EARTH_R2 * EARTH_R2)
 
-#define J2_IN_MARS_UNITS (1.964e-3)
-#define MARS_R (3397.2 / AU_IN_KM)
+
+         /* From MGM1025 Mars gravity model */
+#define J2_IN_MARS_UNITS (1.95545132e-3)
+#define J3_IN_MARS_UNITS (3.14558811e-5)
+#define J4_IN_MARS_UNITS (-1.5369417e-5)
+#define MARS_R (3397.0 / AU_IN_KM)
 #define MARS_J2 (J2_IN_MARS_UNITS*MARS_R * MARS_R)
-#define MARS_J3 0.
-#define MARS_J4 0.
+#define MARS_J3 (J3_IN_MARS_UNITS*MARS_R * MARS_R * MARS_R)
+#define MARS_J4 (J4_IN_MARS_UNITS*MARS_R * MARS_R * MARS_R * MARS_R)
 
 #define SUN_R     (696000. / AU_IN_KM)
-#define MERCURY_R   (2439. / AU_IN_KM)
+#define MERCURY_R   (2439.4 / AU_IN_KM)
 #define VENUS_R     (6051. / AU_IN_KM)
 #define PLUTO_R     (1500. / AU_IN_KM)
-#define MOON_R      (1738. / AU_IN_KM)
+#define MOON_R      (1748.2 / AU_IN_KM)
+
+#ifdef NOT_USED_YET
+   /* I'm in no rush to include oblateness of the Moon,  Mercury,  or Venus,
+   They rotate so slowly that it's almost as if they have no oblateness
+   anyway,  and I'm tracking no objects that orbit them.  But it would be
+   easy to add them.  Full spherical harmonic expansions are available for
+   all three objects (and the following were extracted from such expansions.)
+   See 'gfc_xvt.c' from the 'miscell' project for links to models.   */
+
+#define J2_IN_MERCURY_UNITS 6e-5
+
+            /* From MGNP180U model,  based on Magellan data */
+#define J2_IN_VENUS_UNITS   4.40443532e-6
+#define J3_IN_VENUS_UNITS  -2.10819981e-6
+#define J4_IN_VENUS_UNITS  -2.14742625e-6
+
+            /* From RFM_Moon_2520  */
+#define J2_IN_LUNAR_UNITS   3.8917294e-4
+#define J3_IN_LUNAR_UNITS  -3.0394781e-5
+#define J4_IN_LUNAR_UNITS  -9.2829444e-5
+
+            /* From MESSENGER 100x100 gravity model */
+#define J2_IN_MERCURY_UNITS      5.0354217e-5
+#define J3_IN_MERCURY_UNITS      1.2587789e-5
+#define J4_IN_MERCURY_UNITS      1.7600889e-5
+
+#define MERCURY_J2   (J2_IN_MERCURY_UNITS * MERCURY_R * MERCURY_R)
+#define VENUS_J2     (J2_IN_VENUS_UNITS * VENUS_R * VENUS_R)
+#define MOON_J2      (J2_IN_MOON_UNITS * MOON_R * MOON_R)
+#endif         /* #ifdef NOT_USED_YET */
 
 /* Start considering atmospheric drag if within 500 km of earth: */
 
 #define ATMOSPHERIC_LIMIT (EARTH_R + 500. / AU_IN_KM)
 // #define ATMOSPHERIC_LIMIT 0
 
-/* 2016 Jul 25:  updated all the following gas giant J2/3/4 data using */
-/* data from http://ssd.jpl.nasa.gov/?gravity_fields_op */
+/*  Jupiter field is now from doi:10.1038/nature25776, "Measurement of
+Jupiter's asymmetric gravity field".   Saturn,  Uranus, and Neptune
+fields are from http://ssd.jpl.nasa.gov/?gravity_fields_op .*/
 
-#define J2_IN_JUPITER_UNITS (.01469562)
-#define J3_IN_JUPITER_UNITS 0.
-#define J4_IN_JUPITER_UNITS (-5.9131e-4)
+#define J2_IN_JUPITER_UNITS (.0146956572)      /* +/- 1.4e-8 */
+#define J3_IN_JUPITER_UNITS (-0.042e-6)        /* +/- 0.010e-6 */
+#define J4_IN_JUPITER_UNITS (-5.86609e-4)      /* +/- 4e-8 */
 #ifdef NOT_USING_ANYTHING_PAST_J4_YET
-   #define J6_IN_JUPITER_UNITS   20.78e-6
+   #define J5_IN_JUPITER_UNITS   (-6.9e-8)     /* +/- 0.8e-8 */
+   #define J6_IN_JUPITER_UNITS   34.198e-6     /* +/- 0.9e-8 */
+   #define J7_IN_JUPITER_UNITS   1.24e-7       /* +/- 0.17e-7 */
+
    #define J6_IN_SATURN_UNITS    86.14e-6
    #define J8_IN_SATURN_UNITS   -10.e-6
 #endif
