@@ -45,7 +45,22 @@ slightly past 24 hours/360 degrees.  Which is why we allow RAs of 24 hours
 and do an fmod( ) on the RA to put it in the 0 to 360 range.
 
 ALSO NOTE that some files have extension ',fit' and others '.fit'.  I think
-the former is an error.          */
+the former is an error.
+
+The times in NEAT logs are for the _start_ of the image,  so we have to
+add half the exposure time to get the mid-point of the exposure.  Lucky
+us,  Haleakala and Palomar are in daylight at 0:00:00 UTC.   */
+
+static void adjust_time( char *time_buff, const int half_exposure)
+{
+   unsigned sec = atoi( time_buff + 11) * 3600
+               + atoi( time_buff + 14) * 60 + atoi( time_buff + 17);
+
+   sec += half_exposure;
+   snprintf( time_buff + 11, 9, "%02u:%02u:%02u",
+               sec / 3600, (sec / 60) % 60, sec % 60);
+   time_buff[19] = ' ';
+}
 
 int main( const int argc, const char **argv)
 {
@@ -60,6 +75,7 @@ int main( const int argc, const char **argv)
    for( i = 1; i < argc; i++)
       {
       FILE *ifile = fopen( argv[i], "rb");
+      double exposure = 0.;
 
       if( ifile)
          {
@@ -71,6 +87,7 @@ int main( const int argc, const char **argv)
                {
                const double ra = fmod( atof( buff + 26), 360.);
                const double dec = atof( buff + 38);
+               const double new_exposure = atof( buff + 53);
                char *filename = buff + 61, *tptr;
                const char *mpc_code = NULL;
 
@@ -79,6 +96,11 @@ int main( const int argc, const char **argv)
                if( !memcmp( buff + 132, "Tri-Cam", 7))
                   mpc_code = "644";       /* Tri-Cam at Palomar  */
                assert( mpc_code);
+               if( exposure != new_exposure)
+                  {
+                  exposure = new_exposure;
+                  printf( "# Exposure: %.2f\n", exposure);
+                  }
                while( *filename == ' ')
                   filename++;
                tptr = strstr( filename, ".fit");
@@ -92,6 +114,7 @@ int main( const int argc, const char **argv)
                if( !tptr)
                   fprintf( stderr, "No /: \n%s", buff);
                *tptr = ',';
+               adjust_time( buff + 107, (int)( exposure / 2.));
                printf( "%.3f,%.3f,%.19s,%3s,%s\n", ra, dec, buff + 107, mpc_code, filename);
                }
          fclose( ifile);
