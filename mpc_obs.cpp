@@ -105,6 +105,9 @@ void compute_error_ellipse_adjusted_for_motion( double *sigma1, double *sigma2,
                   const MOTION_DETAILS *m);                  /* orb_func.cpp */
 double n_nearby_obs( const OBSERVE FAR *obs, const unsigned n_obs,
           const unsigned idx, const double time_span);       /* orb_func.cpp */
+void convert_ades_sigmas_to_error_ellipse( const double sig_ra,
+         const double sig_dec, const double correl, double *major,
+         double *minor, double *angle);                      /* errors.cpp */
 #ifndef strlcpy
 size_t strlcpy(char *dest, const char *src, size_t size);   /* miscell.cpp */
 #endif
@@ -1607,6 +1610,8 @@ void set_up_observation( OBSERVE FAR *obs)
       }
    if( observer_planet == -2)          /* satellite observation,  with  */
       observer_planet = 3;             /* sat posn relative to earth    */
+   if( !strcmp( obs->mpc_code, "258"))    /* Gaia offsets are relative to SSB */
+      observer_planet = 12;
    compute_observer_loc( obs->jd, observer_planet,
                rho_cos_phi, rho_sin_phi, lon, obs->obs_posn);
    compute_observer_vel( obs->jd, observer_planet,
@@ -3140,19 +3145,16 @@ static inline int extract_ades_sigmas( const char *buff,
       if( buff[loc] == 'x')
          {
          *posn2 = atof( buff + loc + 1);
-#ifdef NOT_TESTED_YET
          while( buff[loc] >= ' ' && buff[loc] != ',')
             loc++;
          if( buff[loc] == ',')
             {
             const double correlation = atof( buff + loc + 1);
-            const double diag = correlation * *posn1 * *posn2;
-            double a, b;
 
-            convert_quadratic_form_to_error_ellipse( *posn1 * *posn1,
-                     *posn2 * *posn2, diag, posn1, posn2, theta);
+            convert_ades_sigmas_to_error_ellipse( *posn1, *posn2,
+                              correlation, posn1, posn2, theta);
+            *theta = PI / 2. + *theta;
             }
-#endif
          }
       else        /* circular position error */
          *posn2 = *posn1;
@@ -3167,8 +3169,6 @@ static inline int extract_ades_sigmas( const char *buff,
       debug_printf( "Malformed ADES sigma: '%s'\n", buff);
    return( rval);
 }
-
-
 
    /* By default,  Find_Orb will only handle arcs up to 200 years */
    /* long.  If the arc is longer than that,  observations will be */

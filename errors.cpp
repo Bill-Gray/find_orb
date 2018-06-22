@@ -156,6 +156,9 @@ of the following.)
 
 void adjust_error_ellipse_for_timing_error( double *sigma_a, double *sigma_b,
          double *angle, const double vx, const double vy);   /* errors.cpp */
+void convert_ades_sigmas_to_error_ellipse( const double sig_ra,
+         const double sig_dec, const double correl, double *major,
+         double *minor, double *angle);                      /* errors.cpp */
 
 static void adjust_quadratic_form_for_timing_error( const double A,
          const double B, const double C, const double vx, const double vy,
@@ -214,9 +217,40 @@ static void convert_quadratic_form_to_error_ellipse( const double A,
    *angle = atan2( eigenval1 - A, B);
 }
 
+/* ADES gives uncertainties in RA and dec,  plus their correlation
+(between -1 and +1).  That becomes the correlation matrix
+
+/ a  b \    a = -sig_ra^2     b = -correl * sig_ra * sig_dec
+|      |
+\ b  c /    c = -sig_dec^2
+
+   Then the quadratic form we want is the inverse of the above
+matrix,
+
+/ A B \       / a b \      1    / c b \
+|     | = inv |     | =  ------ |     |
+\ B C /       \ b c /    ac-b^2 \ b a /
+
+   and we can feed said quadratic form through the above function
+to get the error ellipse,  which is what Find_Orb actually wants. */
+
+void convert_ades_sigmas_to_error_ellipse( const double sig_ra,
+         const double sig_dec, const double correl, double *major,
+         double *minor, double *angle)
+{
+   const double a = -sig_ra * sig_ra;
+   const double b = -sig_ra * sig_dec * correl;
+   const double c = -sig_dec * sig_dec;
+   const double det = a * c - b * b;
+   const double A = c / det;
+   const double B = b / det;
+   const double C = a / det;
+
+   convert_quadratic_form_to_error_ellipse( A, B, C, major, minor, angle);
+}
+
 /* adjust_error_ellipse_for_timing_error( ) puts the above pieces
-together to do the only thing that matters from the viewpoint of
-Find_Orb:  given the estimated error ellipse and the uncertainty
+together : given the estimated error ellipse and the uncertainty
 vector from timing,  it computes an adjusted error ellipse "stretched
 out" in the direction of motion.   */
 
