@@ -80,6 +80,7 @@ double current_jd( void);                       /* elem_out.cpp */
 double diameter_from_abs_mag( const double abs_mag,      /* ephem0.cpp */
                                      const double optical_albedo);
 int get_object_name( char *obuff, const char *packed_desig);   /* mpc_obs.c */
+int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid);
 int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
                                    const char *format, ...)
 #ifdef __GNUC__
@@ -770,14 +771,14 @@ static int find_precovery_plates( OBSERVE *obs, const int n_obs,
                   fseek( original_file, field.file_offset, SEEK_SET);
                   if( fgets_trimmed( buff, sizeof( buff), original_file))
                      {
-                     char filename[100];
+                     int loc;
 
                      for( i = 0; buff[i]; i++)
                         if( buff[i] == ',')
                            buff[i] = ' ';
-                     if( sscanf( buff, "%*f %*f %*s %*s %24s %90s",
-                                        time_buff, filename) == 2)
-                        fprintf( ofile, " %s %s", time_buff, filename);
+                     if( sscanf( buff, "%*f %*f %*s %*s %24s%n",
+                                        time_buff, &loc) == 1)
+                        fprintf( ofile, " %s %s", time_buff, buff + loc);
                      }
                   else
                      fprintf( ofile, "File %d: seeked to %ld and failed",
@@ -2460,6 +2461,14 @@ void format_observation( const OBSERVE FAR *obs, char *text,
       {
       put_residual_into_text( xresid, m.xresid, resid_format);
       put_residual_into_text( yresid, m.yresid, resid_format);
+      if( !strcmp( obs->mpc_code, "258"))
+         {
+         double resid1, resid2;
+
+         get_residual_data( obs, &resid1, &resid2);
+         show_resid_in_sigmas( xresid, resid1);
+         show_resid_in_sigmas( yresid, resid2);
+         }
       }
    if( base_format != RESIDUAL_FORMAT_SHORT)
       {
