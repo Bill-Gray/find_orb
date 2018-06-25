@@ -94,6 +94,9 @@
  256                                     7         1e-9   Green Bank
  257                                     7         1e-9   Goldstone DSS 25, Fort Irwin
  259                                     7         1e-9   EISCAT Tromso UHF
+#  Gaia data will carry its own sigmas,  except for time.  We'll set that
+# to be effectively zero,  same as for radar.
+ 258                                     7         1e-9   Gaia
 #  You MUST have some final "catchall" lines that assign sigmas to all
 # observations not otherwise catalogued.  Here,  we'll say that if the
 # observation predates 1993,  we'll assume a sigma of 3",  no matter

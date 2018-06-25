@@ -537,7 +537,8 @@ static void put_ephemeris_posn_angle_sigma( char *obuff, const double dist,
                            (unsigned)dist_in_arcsec);
    else
       {
-      put_residual_into_text( resid_buff, dist_in_arcsec, 0);
+      put_residual_into_text( resid_buff, dist_in_arcsec,
+                                    RESIDUAL_FORMAT_OVERPRECISE);
       resid_buff[5] = '\0';
       }
    snprintf( obuff, 13, "%s %3d", resid_buff + 1, integer_posn_ang);

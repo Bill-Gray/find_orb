@@ -354,7 +354,11 @@ double dump_monte_data_to_file( FILE *ofile, const double *sigmas,
 
          sprintf( zbuff, "%.8f", sigmas[i]);
          if( !*full_sigmas)
+            {
             remove_insignificant_digits( zbuff);
+            if( strlen( zbuff) == 10)   /* very low value */
+               put_double_in_buff( zbuff, sigmas[i]);
+            }
          else
             zbuff[9] = '\0';
          sprintf( tbuff, "%10s", zbuff);
