@@ -198,6 +198,11 @@ void set_distance( OBSERVE FAR *obs, double r)
    obs->solar_r = vector3_length( obs->obj_posn);
 }
 
+static double dot_prod( const double *a, const double *b)
+{
+   return( a[0] * b[0] + a[1] * b[1] + a[2] * b[2]);
+}
+
 double vector3_dist( const double *a, const double *b)
 {
    const double dx = a[0] - b[0];
@@ -663,6 +668,42 @@ static int is_unreasonable_orbit( const double *orbit)
    return( rval);
 }
 
+/* See Explanatory Supplement,  3.26, p. 135, "Gravitational Light
+Bending."  For our purposes,  what matters is the difference between
+how much the object's light is bent and how much the light of
+background stars is bent.  So we compute phi1 = angle between
+observer,  sun,  and 'result';  and phi2 = angle between observer,
+sun,  and background stars = 180 minus elongation of the object as
+seen by 'observer'.  */
+
+static void light_bending( const double *observer, double *result)
+{
+   const double bend_factor = 2. * SOLAR_GM / (AU_PER_DAY * AU_PER_DAY)
+               * (1. + atof( get_environment_ptr( "BENDING")));
+   size_t i;
+   double p[3], plen, xprod[3], dir[3], dlen;
+   const double olen = vector3_length( observer);
+   const double rlen = vector3_length( result);
+   double phi1, phi2, bending;
+
+   for( i = 0; i < 3; i++)
+      p[i] = result[i] - observer[i];
+   plen = vector3_length( p);
+   vector_cross_product( xprod, observer, result);
+   vector_cross_product( dir, xprod, p);
+   dlen = vector3_length( dir);
+   for( i = 0; i < 3; i++)
+      dir[i] /= dlen;
+     /* "dir" is now a unit vector perpendicular to p,  aimed away */
+     /* from the sun */
+   phi1 = acos( dot_prod( result, observer) / (rlen * olen));
+   phi2 = acos( -dot_prod( p, observer) / (plen * olen));
+   bending = bend_factor * (tan( phi1 / 2.) - tan( phi2 / 2.));
+   bending *= plen;
+   for( i = 0; i < 3; i++)
+      result[i] += bending * dir[i];
+}
+
 static void light_time_lag( const double *orbit, const double *observer, double *result)
 {
    const double solar_r = vector3_length( orbit);
@@ -683,6 +724,7 @@ static void light_time_lag( const double *orbit, const double *observer, double 
          }
 //    debug_printf( "iter %d: r = %.15f\n", iter, r);
       }
+   light_bending( observer, result);
 }
 
 static void set_solar_r( OBSERVE FAR *ob)
@@ -2299,11 +2341,6 @@ void **calloc_double_dimension_array( const size_t x, const size_t y,
          rval[i] = (void *)( (char *)rval[0] + i * y * obj_size);
       }
    return( rval);
-}
-
-static double dot_prod( const double *a, const double *b)
-{
-   return( a[0] * b[0] + a[1] * b[1] + a[2] * b[2]);
 }
 
 static double dotted_dist( OBSERVE FAR *obs)
