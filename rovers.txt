@@ -432,4 +432,26 @@ Hil !-111.615864     +31.951503     1908.5     Kitt Peak, Hiltner
 G82 !-111.599597     +31.960596     2043       SARA Observatory, Kitt Peak
 JKT ! -175241.1      +284540.2      2369       Jacobus Kapteyn Telescope
 
-ZLA ! 16.38807       -20.57413         0       ZLAF9B2 impact point
+   Positions for some Haleakala scopes.  Sorting out which was which was done
+   thanks to input from people who have worked there over the decades.  Positions
+   measured from Google Earth.  Altitude for (T05) is from the MPC file and is
+   good to 1e-6 Earth radius = 6.3 meters.  Altitudes for (F65) and (608) are
+   from the same source,  but given to one less digit = 63 meter precision.
+   DKIST alt is from https://dkist.nso.edu/faq,  with a 17 meter geoid height
+   added.  Which puts it pretty high up above everything else.  Everybody else
+   has a 'guessed' altitude of 3050 meters above the ellipsoid.
+DKI !-156.256154     +20.706789     3101       Daniel K. Inouye Solar Telescope (DKIST)
+F65 !-156.257496     +20.707009     3055.001   Faulkes Telescope North
+AMO !-156.256713     +20.708171     3050       AMOS 3.67m satellite surv, Haleakala
+Mee !-156.256575     +20.706542     3050       Mees Solar Telescope,  Haleakala
+2IR !-156.257308     +20.708390     3050       2.5m IR sat surveillance, Haleakala
+T05 !-156.257008     +20.707582     3040.957   ATLAS-HKO, Haleakala
+Geo1!-156.257395     +20.708569     3050       GEODSS #1, Haleakala
+Geo2!-156.257749     +20.708083     3050       GEODSS #2, Haleakala
+Geo3!-156.257440     +20.708078     3050       GEODSS #3, Haleakala
+608 !-156.257768     +20.708536     3040.446   Haleakala-AMOS
+h241!-156.257855     +20.708404     3050       Haleakala 24" #1
+h242!-156.257794     +20.708286     3050       Haleakala 24" #2
+hOld!-156.257659     +20.708291     3050       Dome formerly at Haleakala
+Zod !-156.256624     +20.707240     3050       Zodiacal light, Haleakala
+HAA !-156.257185     +20.707308     3050       Haleakala Amateur Astronomers
