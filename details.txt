@@ -288,6 +288,8 @@ COM Valid: 2004 jul 1-2011
 OBS G. J. Garradd
 COM Valid: 2006-2100
 OBS A. R. Gibbs, A. D. Grauer
+COM Valid: 2018 may 1 - 2100
+OBS H. Groeller
 COM Valid: 1999 jan 1 - 2015 Oct 1
 OBS R. E. Hill
 COM Valid: 2014-2100
@@ -336,7 +338,10 @@ CON Farpoint Observatory Rte.1 Box 35 C Eskridge, Ks. 66423
 OBS G. Hug
 MEA G. Hug
 NET USNO-SA2.0
+COM Valid: 1900 - 2010
 TEL .3 meter s-c + CCD
+COM Valid: 2010 - 2100
+TEL 0.69-m reflector + CCD
 
 COD 735
 CON William G. Dillon, 4703 Birkenhead Circle, Missouri City, TX 77459, USA
@@ -481,6 +486,8 @@ COM Valid: 2004 jul 1-2011
 OBS G. J. Garradd
 COM Valid: 2006-2100
 OBS A. R. Gibbs, A. D. Grauer
+COM Valid: 2018 may 1 - 2100
+OBS H. Groeller
 COM Valid: 1999 jan 1 - 2015 Oct 1
 OBS R. E. Hill
 COM Valid: 2014-2100
@@ -560,6 +567,8 @@ COM Valid: 2004 jul 1-2011
 OBS G. J. Garradd
 COM Valid: 2006-2100
 OBS A. R. Gibbs, A. D. Grauer
+COM Valid: 2018 may 1 - 2100
+OBS H. Groeller
 COM Valid: 1999 jan 1 - 2015 Oct 1
 OBS R. E. Hill
 COM Valid: 2014-2100
@@ -603,6 +612,8 @@ TEL 0.76-m f/3.0 astrograph + CCD
 COD H36
 OBS G. Hug
 TEL 0.56-m reflector + CCD
+COM Valid: 2018 Jul 1 - 2100
+NET Gaia-DR1
 
 COD H41
 OBS P. C. Sherrod
@@ -659,6 +670,8 @@ COM Valid: 2004 jul 1-2011
 OBS G. J. Garradd
 COM Valid: 2006-2100
 OBS A. R. Gibbs, A. D. Grauer
+COM Valid: 2018 may 1 - 2100
+OBS H. Groeller
 COM Valid: 1999 jan 1 - 2015 Oct 1
 OBS R. E. Hill
 COM Valid: 2014-2100
@@ -763,7 +776,8 @@ OBS R. Miles
 TEL 1.0-m f/8.0 Ritchey-Chretien + CCD
 
 COD L01
-OBS K. Korlevic
+OBS K. Korlevic, E. Pettarin
+MEA E. Pettarin
 TEL 1.0-m f/2.9 reflector + CCD
 
 COD O75
@@ -807,8 +821,13 @@ OBS T. Lovejoy
 TEL 0.20-m f/2.1 Schmidt-Cassegrain + CCD
 
 COD T05
-OBS L. Denneau, A. Heinze, H. Weiland, B. Stalder, J. Tonry, A. Sherstyuk
+OBS L. Denneau, A. Heinze, H. Weiland,  J. Tonry
 MEA L. Denneau, A. Heinze, J. Tonry
+COM Valid: 2000 - 2018 May 1
+OBS B. Stalder, A. Sherstyuk
+COM Valid: 2018 May 1 - 2100
+OBS H. Flewelling
+OBS H. Flewelling, A. Fitzsimmons, D. Young
 NET 2MASS
 TEL 0.5-m f/2.0 Schmidt + CCD
 
@@ -869,6 +888,8 @@ COM Valid: 2004 jul 1-2011
 OBS G. J. Garradd
 COM Valid: 2006-2100
 OBS A. R. Gibbs, A. D. Grauer
+COM Valid: 2018 may 1 - 2100
+OBS H. Groeller
 COM Valid: 1999 jan 1 - 2015 Oct 1
 OBS R. E. Hill
 COM Valid: 2014-2100
@@ -933,6 +954,38 @@ OBS J. Licandro, A. Cabrera-Lavers
 MEA M. Micheli, F. J. Pozuelos, D. Farnocchia
 TEL 10.40-m reflector + CCD
 
+COD Z37
+COM Details from D. Bamberger for Z37, Z48, Z80, 2018 Jul 7
+OBS G. Wells
+MEA D. Bamberger
+TEL 0.15-m f/10 Schmidt-Cassegrain + CCD + f/6.3 focal reducer
+COM Valid: 2015 Aug 20 - 2016 Jul 4
+NET USNO-B1.0
+COM Valid: 2016 Jul 4 - 2017 Jul 10
+NET UCAC-4
+COM Valid: 2017 Jul 10 - 2018 Jun 4
+NET Gaia-DR1
+COM Valid: 2018 Jun 4 - 2018 Jun 12
+NET UCAC-4
+COM Valid: 2018 Jun 12 - 2100
+NET Gaia-DR2
+
+COD Z48
+COM Details from D. Bamberger for Z37, Z48, Z80, 2018 Jul 7
+OBS J. Tobrak
+MEA D. Bamberger
+TEL 0.30-m f/8 Ritchey-Chretien + CCD
+COM Valid: 2015 Aug 20 - 2016 Jul 4
+NET USNO-B1.0
+COM Valid: 2016 Jul 4 - 2017 Jul 10
+NET UCAC-4
+COM Valid: 2017 Jul 10 - 2018 Jun 4
+NET Gaia-DR1
+COM Valid: 2018 Jun 4 - 2018 Jun 12
+NET UCAC-4
+COM Valid: 2018 Jun 12 - 2100
+NET Gaia-DR2
+
 COD Z58
 CON M. Micheli
 CON [marco (dot) micheli (at) esa.int]
@@ -951,3 +1004,23 @@ ACK WT1190F second sensor
 AC2 [jaime (dot) nomen (at) deimos-space (dot) com]
 NET UCAC-2
 
+COD Z80
+COM Details from D. Bamberger for Z37, Z48, Z80, 2018 Jul 7
+OBS G. Wells
+MEA D. Bamberger
+COM Valid: 2015 Aug 20 - 2015 Nov 1
+TEL 0.15-m f/10 Schmidt-Cassegrain + photographic
+COM Valid: 2015 Nov 1 - 2016 Dec 1
+TEL 0.15-m f/10 Schmidt-Cassegrain + CCD + f/6.3 focal reducer
+COM Valid: 2016 Dec 1 - 2100
+TEL 0.25-m f/8 Ritchey-Chretien + CCD
+COM Valid: 2015 Aug 20 - 2016 Jul 4
+NET USNO-B1.0
+COM Valid: 2016 Jul 4 - 2017 Jul 10
+NET UCAC-4
+COM Valid: 2017 Jul 10 - 2018 Jun 4
+NET Gaia-DR1
+COM Valid: 2018 Jun 4 - 2018 Jun 12
+NET UCAC-4
+COM Valid: 2018 Jun 12 - 2100
+NET Gaia-DR2
