@@ -159,6 +159,7 @@ void get_file_from_dialog( int is_open, const char *default_ext,
 // CEphem message handlers
 
 extern const char *ephemeris_filename;         /* "ephemeri.txt" */
+int save_ephemeris_file( const char *filename);   /* ephem0.cpp */
 
 void CEphem::OnClickedSave()
 {
@@ -170,10 +171,7 @@ void CEphem::OnClickedSave()
       if( *m_lat == 'b')
          CreateB32Ephemeris( filename);
       else
-         {
-         _unlink( filename);
-         rename( ephemeris_filename, filename);
-         }
+         save_ephemeris_file( filename);
 }
 
 void CEphem::set_jd_from_xtrols( char *err_msg)
@@ -487,8 +485,11 @@ void CEphem::OnCopy()
                   _T( "Find_Orb"), MB_OK);
    else
       {
-      const int rval = copy_file_to_clipboard( ephemeris_filename);
+      int rval;
+      const char *temp_name = "ephem.tmp";
 
+      save_ephemeris_file( temp_name);
+      rval = copy_file_to_clipboard(  temp_name);
       if( rval)
          {
          char buff[80];
@@ -496,6 +497,7 @@ void CEphem::OnCopy()
          sprintf( buff, "rval %d", rval);
          MessageBox( CA2T( buff), _T( "Find_Orb"), MB_OK);
          }
+      _unlink( temp_name);
       }
 }
 
