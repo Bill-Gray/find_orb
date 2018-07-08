@@ -368,7 +368,9 @@ CPM0! -702413.60     -243739.07     2369.34    VLT M0
    a _geoid_ height (from Google Earth) of 105 metres;  this was
    misinterpreted as an _ellipsoid_ altitude in the MPC's file.
    The following will override that mistake,  adding in the
-   47.6-m geoid height for Peter's location :
+   47.6-m geoid height for Peter's location.  (MPC has fixed this.
+   But the following coordinates are more precise,  and Peter
+   observes a lot of artsats,  where the added precision matters.)
 J95 ! 358.552997     51.474969       152.6     Great Shefford
 
    "MPC code" used in Find_Orb's ephemeris code when generating a
