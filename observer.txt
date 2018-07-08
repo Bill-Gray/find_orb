@@ -6,6 +6,7 @@
 ; these can be found with the JPL Small Body Database Browser,  and
 ; a citation describing the honoree is usually included.
 ;
+ Bamberger                                 <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0128345">Bamberger</a>
  Bedient                                   <a href="http://www.ifa.hawaii.edu/tops/bedient.html">Bedient</a>
  Bauer                                     <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0019494">Bauer</a>
  Bell                                      <a href="http://www.corvus.com/adastra2002/bell.htm">Bell</a>
@@ -145,6 +146,7 @@
  Vorobjov                                  <a href="http://scibuff.com/">Vorobjov</a>
  Wainscoat                                 <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0009725">Wainscoat</a>
  Watters                                   <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0133009">Watters</a>
+ Wells                                     <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0072834">Wells</a>
  Weryk                                     <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0009281">Weryk</a>
  Wiggins                                   <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0004099">Wiggins</a>
  Zolnowski                                 <a href="http://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0384815">&#379;o&#322;nowski</a>
