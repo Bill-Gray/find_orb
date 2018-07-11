@@ -224,11 +224,13 @@ void get_file_from_dialog( int is_open, const char *default_ext,
    CFileDialog dlg( is_open, CA2T( default_ext, CP_UTF8),
             NULL,       /* don't set a default file name */
             OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
-            NULL,
-//          CA2T( filter, CP_UTF8),
+            NULL        /* don't set a filter */
+#ifndef BITS_32         /* and now for parameters not found in older MSVC: */
             NULL,       /* don't set a parent window */
             0,          /* default OPENFILENAME struct size */
-            FALSE);     /* don't try for Vista-style dialog */
+            FALSE       /* don't try for Vista-style dialog */
+#endif
+            );
    if( dlg.DoModal( ) == IDOK)
       strcpy( buff, CT2A( dlg.GetPathName( )));
 
