@@ -221,7 +221,14 @@ void get_file_from_dialog( int is_open, const char *default_ext,
       path2[i] = '\0';
       _chdir( path2);
       }
-   CFileDialog dlg( is_open, CA2T( default_ext, CP_UTF8), CA2T( filter, CP_UTF8));
+   CFileDialog dlg( is_open, CA2T( default_ext, CP_UTF8),
+            NULL,       /* don't set a default file name */
+            OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
+            NULL,
+//          CA2T( filter, CP_UTF8),
+            NULL,       /* don't set a parent window */
+            0,          /* default OPENFILENAME struct size */
+            FALSE);     /* don't try for Vista-style dialog */
    if( dlg.DoModal( ) == IDOK)
       strcpy( buff, CT2A( dlg.GetPathName( )));
 
@@ -508,7 +515,11 @@ void COrbitDlg::LoadAFile( const char *filename)
          LoadAnObject( 0);
       }
    else
+      {
+      debug_printf( "Err loading astrometry: '%s' %p %d\n",
+              filename, obj_info, n_objects);
       MessageBox( tget_find_orb_text( obj_info ? 10 : 11), program_name, MB_OK);
+      }
 }
 
 void COrbitDlg::OnClickedOpen()
@@ -593,21 +604,25 @@ BOOL COrbitDlg::OnInitDialog()
    // TODO: Add extra initialization here
    FILE *startup;
    const char FAR *cmd_line = CT2A( AfxGetApp( )->m_lpCmdLine);
-   const char FAR *cmd_language = NULL;
    int i;
    extern char findorb_language;       /* defaults to 'e' for English */
+   extern int debug_level;
 
    GetWindowRect( &OriginalDlgRect);
    ScreenToClient( &OriginalDlgRect);
    set_window_placement( this->m_hWnd,
                   get_environment_ptr( "WINDOW_PLACEMENT"));
 
-   for( i = 0; cmd_line[i] && !cmd_language; i++)
-      if( cmd_line[i] == '-' && cmd_line[i + 1] == 'l')
-         cmd_language = cmd_line + i;
-   if( cmd_language)
-      findorb_language = cmd_language[2];
-   else if( startup = fopen( "startup.mar", "rb"))
+   for( i = 0; cmd_line[i]; i++)
+      if( cmd_line[i] == '-' && (!i || cmd_line[i - 1] == ' '))
+         {
+         if( cmd_line[i + 1] == 'l')
+            findorb_language = cmd_line[i + 2];
+         if( cmd_line[i + 1] == 'd')
+            debug_level = atoi( cmd_line + i + 2);
+         }
+   if( findorb_language == 'e' &&
+              (startup = fopen( "startup.mar", "rb")))
       {
       char buff[140];
 
