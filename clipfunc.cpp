@@ -119,9 +119,12 @@ int clipboard_to_file( const char *filename, const int append)
         char *text;
         FILE *ofile;
         const char *permits = (append ? "ab" : "wb");
+        HANDLE handle = GetClipboardData( CF_OEMTEXT);
 
-        if( (text = (char *)GetClipboardData( CF_OEMTEXT)) == NULL)
+        if( !handle)
             rval = -2;
+        else if( (text = GlobalLock( handle)) == NULL)
+            rval = -4;
         else if( (ofile = fopen( filename, permits)) != NULL)
             {
             rval = 0;
