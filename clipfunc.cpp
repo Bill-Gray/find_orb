@@ -115,7 +115,7 @@ int clipboard_to_file( const char *filename, const int append)
         rval =  -1;
     else
         {
-        char *text;
+        void *text;
         FILE *ofile;
         const char *permits = (append ? "ab" : "wb");
         HANDLE handle = GetClipboardData( CF_OEMTEXT);
@@ -127,7 +127,7 @@ int clipboard_to_file( const char *filename, const int append)
         else if( (ofile = fopen( filename, permits)) != NULL)
             {
             rval = 0;
-            fwrite( text, 1, strlen( text), ofile);
+            fwrite( text, 1, strlen( (char *)text), ofile);
             fclose( ofile);
             }
         else
