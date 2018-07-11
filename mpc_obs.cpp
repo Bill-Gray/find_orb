@@ -33,6 +33,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #endif
 #include <stdarg.h>
 #include <assert.h>
+#include <errno.h>
 #include "watdefs.h"
 #include "details.h"
 #include "comets.h"
@@ -3775,7 +3776,6 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
    int next_output = 20000, n_obs_read = 0;
    long filesize;
 
-   *new_xdesig = '\0';
    if( ifile)
       {
       fseek( ifile, 0L, SEEK_END);
@@ -3791,12 +3791,15 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
 
    if( !ifile)
       {
+      debug_printf( "find_objects_in_file: error opening %s: %s\n",
+                 filename, strerror( errno));
       if( n_found)
          *n_found = -1;
       return( NULL);
       }
    *mpc_code_from_neocp = '\0';
    *desig_from_neocp = '\0';
+   *new_xdesig = '\0';
    strcpy( mpc_code_from_neocp, "500");   /* default is geocenter */
    neocp_file_type = NEOCP_FILE_TYPE_UNKNOWN;
    rval = (OBJECT_INFO *)calloc( n_alloced + 1, sizeof( OBJECT_INFO));
