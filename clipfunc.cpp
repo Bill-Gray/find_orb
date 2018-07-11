@@ -74,7 +74,6 @@ int copy_buffer_to_clipboard( const char *contents, const long length)
    }
 
    CloseClipboard();
-   GlobalFree(ptr1);
 
    return 0;
 }
