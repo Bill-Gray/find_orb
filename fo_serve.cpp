@@ -180,18 +180,13 @@ int main( const int argc, const char **argv)
    int center_object = -2;
 #ifndef _WIN32
    extern char **environ;
+   extern bool findorb_already_running;
 
    avoid_runaway_process( 45);
 #endif         /* _WIN32 */
    setvbuf( lock_file, NULL, _IONBF, 0);
    neocp_redaction_turned_on = false;
    printf( "Content-type: text/html\n\n");
-   if( !lock_file)
-      {
-      printf( "<p> Server is busy.  Try again in a minute or two. </p>");
-      printf( "<p> Your orbit is very important to us! </p>");
-      return( 0);
-      }
    fprintf( lock_file, "We're in\n");
    combine_all_observations = 1;
 #ifndef _WIN32
@@ -201,6 +196,26 @@ int main( const int argc, const char **argv)
 
    fprintf( lock_file, "setrlimit called\n");
    strcpy( mpc_code, "500");
+
+               /* get_defaults( ) collects a lot of data that's for the  */
+               /* interactive find_orb program.  But it also sets some   */
+               /* important internal values for blunder detection,  etc. */
+               /* So we still call it:                                   */
+   get_defaults( NULL, NULL, NULL, NULL, NULL);
+#ifndef _WIN32
+   if( findorb_already_running)
+      {
+      printf( "<h1> Server is busy.  Try again in a minute or two. </h1>");
+      printf( "<h3> Your orbit is very important to us! </h3>");
+      printf( "<p> I've had some problems with this server suddenly getting a few hundred\n");
+      printf( "sets of astrometry thrown at it at once.  It doesn't have the computational\n");
+      printf( "power to keep up.  It's now throttled to handling one orbit at a time. </p>\n");
+      printf( "<p> The above 'try again in a minute' is about right:  try again,  and\n");
+      printf( "it'll probably work. </p>\n");
+      return( 0);
+      }
+#endif
+   fprintf( lock_file, "defaults loaded\n");
 
    if( !fgets( boundary, sizeof( boundary), stdin))
       {
@@ -362,13 +377,6 @@ int main( const int argc, const char **argv)
       show_problem_message( );
       return( 0);
       }
-
-               /* get_defaults( ) collects a lot of data that's for the  */
-               /* interactive find_orb program.  But it also sets some   */
-               /* important internal values for blunder detection,  etc. */
-               /* So we still call it:                                   */
-   get_defaults( NULL, NULL, NULL, NULL, NULL);
-   fprintf( lock_file, "defaults loaded\n");
    ephemeris_mag_limit = mag_limit;
    if( center_object == -2)
       element_format &= ~ELEM_OUT_HELIOCENTRIC_ONLY;
