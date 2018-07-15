@@ -3791,7 +3791,8 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
 
    if( !ifile)
       {
-      debug_printf( "find_objects_in_file: error opening %s: %s\n",
+      if( filename)
+         debug_printf( "find_objects_in_file: error opening %s: %s\n",
                  filename, strerror( errno));
       if( n_found)
          *n_found = -1;
