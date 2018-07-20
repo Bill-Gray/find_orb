@@ -4519,8 +4519,5 @@ Shutdown_program:
    if( mpc_color_codes)
       free( mpc_color_codes);
    clean_up_find_orb_memory( );
-#ifdef XCURSES
-   XCursesExit();
-#endif
    return( 0);
 }
