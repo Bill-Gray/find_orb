@@ -158,7 +158,7 @@ void compute_variant_orbit( double *variant, const double *ref_orbit,
 
 int main( const int argc, const char **argv)
 {
-   const size_t max_buff_size = 40000;       /* room for 500 obs */
+   const size_t max_buff_size = 400000;       /* room for 5000 obs */
    char *buff = (char *)malloc( max_buff_size);
    char boundary[100], mpec_name[100];
    char ephemeris_step_size[80], mpc_code[20];
