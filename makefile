@@ -2,7 +2,7 @@
 # Use 'bsdmake' for BSD
 # GNU MAKE Makefile for Find_Orb
 #
-# Usage: make -f [path/]linmake [CLANG=Y] [XCOMPILE=Y] [MSWIN=Y] [X=Y] [tgt]
+# Usage: make -f [path/]linmake [CLANG=Y] [XCOMPILE=Y] [MSWIN=Y] [X=Y] [VT=Y] [tgt]
 #
 #	where tgt can be any of:
 # [all|find_orb|fo|fo_serve|clean|clean_temp|eph2tle|cssfield]
@@ -11,6 +11,7 @@
 #	'MSWIN' = compile for Windows,  using MinGW and PDCurses,  on a Windows machine
 #	'CLANG' = use clang instead of GCC;  Linux only
 # 'X' = use PDCurses instead of ncurses
+# 'VT' = use PDCurses with VT platform (see github.com/Bill-Gray/PDCurses/vt)
 # None of these: compile using g++ on Linux,  for Linux
 #
 # 'clean_temp' removes various temporary files made by Find_Orb and friends:
@@ -56,6 +57,11 @@ endif
 ifdef X
 	ADDED_CFLAGS=-DXCURSES -DPDC_WIDE -I../PDCurses
 	CURSES_LIB=-lXCurses -lXaw -lXmu -lXt -lX11 -lSM -lICE -lXext -lXpm
+endif
+
+ifdef VT
+	ADDED_CFLAGS=-DPDC_WIDE -I$(HOME)/PDCurses
+	CURSES_LIB=$(HOME)/PDCurses/vt/libpdcurses.a
 endif
 
 ifdef XCOMPILE
