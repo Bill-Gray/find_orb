@@ -457,3 +457,5 @@ h242!-156.257794     +20.708286     3050       Haleakala 24" #2
 hOld!-156.257659     +20.708291     3050       Dome formerly at Haleakala
 Zod !-156.256624     +20.707240     3050       Zodiacal light, Haleakala
 HAA !-156.257185     +20.707308     3050       Haleakala Amateur Astronomers
+
+BO3 ! 169.68363      -45.03816       370       BOOTES-3,  Blenheim
