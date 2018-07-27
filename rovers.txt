@@ -9,6 +9,8 @@
   used three letter codes,  often mixed-case,  ideally giving a hint as
   to the observatory.  One is not limited to alphanumerics;  note the use
   of '2.2' and '0.6' for the Mauna Kea 2.2-meter and 0.6-meter scopes.
+  Characters from ASCII 33 = '!' to 126='~' can be used,  for 94^3=830584
+  possible observatory codes.  That should last for a while.
 
      The '!' in column 5 indicates that the data depart from the usual MPC
   format.  The observatory name starts in column 48,  rather than column
@@ -458,4 +460,10 @@ hOld!-156.257659     +20.708291     3050       Dome formerly at Haleakala
 Zod !-156.256624     +20.707240     3050       Zodiacal light, Haleakala
 HAA !-156.257185     +20.707308     3050       Haleakala Amateur Astronomers
 
-BO3 ! 169.68363      -45.03816       370       BOOTES-3,  Blenheim
+   Private communication,  Carlos Jesus Perez Del Pulgar Mancebo,  from
+   Google Maps. Note that (Z82) is a correction of the MPC position;  Carlos
+   gave an altitude of 60 meters above the geoid,  with 49 meters added for
+   geoid height; 370 meters above the geoid for (B03),  7 meters added.
+
+BO3 ! 169.68363      -45.03816       377       BOOTES-3,  Blenheim
+Z82 !  -4.040972     +36.759222      109       BOOTES-2 Observatory, Algarrobo
