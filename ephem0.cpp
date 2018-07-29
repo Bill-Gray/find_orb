@@ -2662,8 +2662,15 @@ void recreate_observation_line( char *obuff, const OBSERVE FAR *obs)
          put_sigma( obuff + 59, obs->posn_sigma_1);
       else
          {
-         put_sigma( obuff + 57, obs->posn_sigma_1);
-         put_sigma( obuff + 61, obs->posn_sigma_2);
+         double multiplier = 1.;
+
+         if( obs->posn_sigma_1 < .9 && obs->posn_sigma_2 < .9)
+            {
+            multiplier = 1000.;    /* show small sigmas as milliarcsec */
+            obuff[64] = 'm';
+            }
+         put_sigma( obuff + 57, obs->posn_sigma_1 * multiplier);
+         put_sigma( obuff + 61, obs->posn_sigma_2 * multiplier);
          }
       }
    if( !obs->is_included)
