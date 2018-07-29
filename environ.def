@@ -242,3 +242,11 @@ FIELD_INCLUSION=0
    can compute an orbit based on all the observations without having to
    change the designations to all be the same.
 COMBINE_ALL=
+
+   In computing impact points on the earth,  we're really mostly interested
+   in the point where the object 'collides' with the upper atmosphere and
+   is slowed down/explodes.  Rob Matson tells me that for a 2-3 meter object,
+   it should become visible at about 90 km and drop below 3 km/s by the time
+   it gets down to 20-25 km.  That's a bit of a range;  let's go with 50 km.
+   (The collision altitude is actually specified in meters,  though.)
+COLLISION_ALTITUDE=50000
