@@ -463,7 +463,7 @@ HAA !-156.257185     +20.707308     3050       Haleakala Amateur Astronomers
    Private communication,  Carlos Jesus Perez Del Pulgar Mancebo,  from
    Google Maps. Note that (Z82) is a correction of the MPC position;  Carlos
    gave an altitude of 60 meters above the geoid,  with 49 meters added for
-   geoid height; 370 meters above the geoid for (B03),  7 meters added.
+   geoid height; 370 meters above the geoid for (BO3),  7 meters added.
 
-BO3 ! 169.68363      -45.03816       377       BOOTES-3,  Blenheim
+BO3 ! 169.68363      -45.03816       377       BOOTES-3,  Lauder
 Z82 !  -4.040972     +36.759222      109       BOOTES-2 Observatory, Algarrobo
