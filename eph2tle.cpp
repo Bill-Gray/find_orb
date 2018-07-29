@@ -607,9 +607,12 @@ int main( const int argc, const char **argv)
       {
       bool writing_data = false;
       double mjdt;
+      char *tptr = strstr( buff, "(500) Geocentric: ");
 
       sscanf( buff, "%lf %lf %u\n", &tdt, &step, &total_lines);
       mjdt = tdt - 2400000.5;
+      if( tptr)
+         strcpy( obj_name, tptr + 18);
       fprintf( ofile, "# Ephem range: %f %f %f\n",
             mjdt, mjdt + step * (double)total_lines, step * (double)output_freq);
       while( fgets_trimmed( buff, sizeof( buff), ifile))
@@ -619,27 +622,26 @@ int main( const int argc, const char **argv)
          if( writing_data && *buff != '#')
             fprintf( ofile, "# %s\n", buff);
          if( !memcmp( buff, "Orbital elements: ", 18))
-            {
-            char *tptr;
-
             strcpy( obj_name, buff + 19);
-            printf( "Object: %s\n", obj_name);
-            if( tle.norad_number == 99999)
-               {
-               tptr = strstr( obj_name, "NORAD ");
-               if( tptr)
-                  tle.norad_number = atoi( tptr + 6);
-               }
-            if( intl_desig == default_intl_desig)
-               for( tptr = obj_name; *tptr; tptr++)
-                  if( atoi( tptr) > 1900 && tptr[4] == '-' &&
-                        atoi( tptr + 5) > 0)
-                     {
-                     memcpy( tle.intl_desig, tptr + 2, 2);    /* get year */
-                     memcpy( tle.intl_desig + 2, tptr + 5, 4); /* launch # */
-                     tle.intl_desig[6] = '\0';
-                     }
+         }
+      if( *obj_name)
+         {
+         printf( "Object: %s\n", obj_name);
+         if( tle.norad_number == 99999)
+            {
+            tptr = strstr( obj_name, "NORAD ");
+            if( tptr)
+               tle.norad_number = atoi( tptr + 6);
             }
+         if( intl_desig == default_intl_desig)
+            for( tptr = obj_name; *tptr; tptr++)
+               if( atoi( tptr) > 1900 && tptr[4] == '-' &&
+                     atoi( tptr + 5) > 0)
+                  {
+                  memcpy( tle.intl_desig, tptr + 2, 2);    /* get year */
+                  memcpy( tle.intl_desig + 2, tptr + 5, 4); /* launch # */
+                  tle.intl_desig[6] = '\0';
+                  }
          }
       }
    for( i = 0; i < N_HIST_BINS; i++)
