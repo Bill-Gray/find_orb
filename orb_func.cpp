@@ -2396,6 +2396,8 @@ static double reweight_for_overobserving( const OBSERVE FAR *obs,
    const double n_nearby = n_nearby_obs( obs, n_obs, idx,
                                    overobserving_time_span);
 
+   if( !strcmp( obs->mpc_code, "258"))    /* Gaia comes already corrected */
+      return( 1.);                        /* for over-observing           */
 #ifdef PREVIOUS_METHOD_SEE_ABOVE_COMMENTS
    if( n_nearby > overobserving_ceiling)
       rval = sqrt( (double)overobserving_ceiling / n_nearby);
@@ -2556,7 +2558,7 @@ int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid)
    int n_residuals = 0;
 
    *xresid = *yresid = 0.;
-   if( obs->is_included)
+/* if( obs->is_included)   */
       {
       if( obs->note2 == 'R')
          {
