@@ -151,6 +151,58 @@ unsigned xy_to_healpix( const double x, const double y, const unsigned N)
    return( rval);
 }
 
+/* Above is for the 'ring' form of HEALPix,  used in FCCT14.  That's the
+only version used in Find_Orb.  For Gaia-DR1,  I ran into the need to handle
+the 'nested' HEALPix scheme,  which looks more like this :
+
+                                    2f 2d 27 25
+                                    2e 2c 26 24 8e
+                                    2b 29 23 21 8b 89
+                                    2a 28 22 20 8a 88 82
+                        1f 1d 17 15 7f 7d 77 75 bf bd b7 b5
+i=0 1  2  3  4  5  6    1e 1c 16 14 7e 7c 76 74 be bc b6 b4
+                        1b 19 13 11 7b 79 73 71 bb b9 b3 b1
+                        1a 18 12 10 7a 78 72 70 ba b8 b2 b0
+            1f 1d 17 15 6f 6d 67 65 af ad a7 a5
+            1e 1c 16 14 6e 6c 66 64 ae ac a6 a4
+            1b 19 13 11 6b 69 63 61 ab a9 a3 a1      -2     (i, j) rotated to keep cell
+            1a 18 12 10 6a 68 62 60 aa a8 a2 a0      -1     00 at the origin
+0f 0d 07 05 5f 5d 57 55 9f 9d 97 95                 j=0
+0e 0c 06 04 5e 5c 56 54 9e 9c 96 04                   1
+0b 09 03 01 5b 59 53 51 9b 99 93 01                   2        N = 4 = power of 2
+0a 08 02 00 5a 58 52 50 9a 98 92 00                   3
+4f 4d 47 45 8f 8d 87 85                               4
+   4c 46 44 8e 8c 86 84
+      43 41 8b 89 83 81
+         40 8a 88 82 80
+
+   One gets a "tile number",  shifts it up by 2N,  and fits in the position
+within the tile with bits interleaved.  That does lose us the rotational
+symmetry we previously had.  (Its benefit is that tiles close together in
+numbering are a little more likely to also be close together spatially.) */
+
+unsigned xy_to_healpix_nested( const double x, const double y, const unsigned N)
+{
+   int i, j, line;
+   unsigned rval = 0;
+
+// x -= 1.;       /* translate to top of first polar triangle,  tile 00 */
+// y -= 2.;
+   i =  (int)floor(  (double)N * (x - y + 1.) / 2.);
+   j =  (int)floor( -(double)N * (x + y - 3.) / 2.);
+   line = i + j;
+   if( (unsigned)line < N)       /* north polar triangles */
+      rval = line * (line + 1) * 2 + i % N + (i / N) * (line + 1);
+   else
+      {                          /* equatorial region */
+      const unsigned offset_along_line =
+               (unsigned)( i - (line + 1 - N) / 2) % (4 * N);
+
+      rval = N * (1 - N) * 2 + 4 * line * N + offset_along_line;
+      }
+   return( rval);
+}
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -160,13 +212,14 @@ int main( const int argc, const char **argv)
 {
    const double ra  = atof( argv[1]) * pi / 180;
    const double dec = atof( argv[2]) * pi / 180;
+   const int n_pow = (argc < 3 ? 2 : atoi( argv[3]));
    double x, y;
    unsigned hp;
 
    ra_dec_to_xy( ra, dec, &x, &y);
    printf( "x = %f  y = %f\n", x, y);
-   hp = xy_to_healpix( x, y, 4);
-   printf( "hp = %u\n", hp);
+   hp = xy_to_healpix( x, y, 1 << n_pow);
+   printf( "hp = %u (%x)\n", hp, hp);
    return( 0);
 }
 #endif      /* #ifdef OLD_TEST_MAIN */
