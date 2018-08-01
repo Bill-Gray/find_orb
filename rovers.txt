@@ -467,3 +467,9 @@ HAA !-156.257185     +20.707308     3050       Haleakala Amateur Astronomers
 
 BO3 ! 169.68363      -45.03816       377       BOOTES-3,  Lauder
 Z82 !  -4.040972     +36.759222      109       BOOTES-2 Observatory, Algarrobo
+
+   Private communication,  2018 Jul 30,  Giorgio Baj: "K38, 008 55 05.654 E,
+   45 52 25.533 N, 0484 m, GPS altitude referred MSL."  Added 47 meters
+   for geoid height.
+
+K38 !   8.9182372    +45.8737592     531       M57 Observatory, Saltrio
