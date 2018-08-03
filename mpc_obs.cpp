@@ -1231,6 +1231,13 @@ int get_object_name( char *obuff, const char *packed_desig)
                }
             }
 
+   if( *xdesig == '~')         /* Find_Orb extension to allow storing of */
+      {                        /* an unpacked name,  up to 11 chars */
+      if( obuff)
+         strcpy( obuff, xdesig + 1);
+      return( OBJ_DESIG_ASTEROID_NUMBERED);     /* fix later... will be a project! */
+      }
+
    if( xdesig[4] == 'S')   /* Possible natural satellite */
       {
       if( strchr( "MVEJSUNP", *xdesig) && isdigit( xdesig[1])
