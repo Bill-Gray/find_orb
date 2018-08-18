@@ -5,7 +5,7 @@
 # Usage: make -f [path/]linmake [CLANG=Y] [XCOMPILE=Y] [MSWIN=Y] [X=Y] [VT=Y] [tgt]
 #
 #	where tgt can be any of:
-# [all|find_orb|fo|fo_serve|clean|clean_temp|eph2tle|cssfield]
+# [all|find_orb|fo|fo_serve|clean|clean_temp|eph2tle|cssfield|neat_xvt]
 #
 #	'XCOMPILE' = cross-compile for Windows,  using MinGW,  on a Linux box
 #	'MSWIN' = compile for Windows,  using MinGW and PDCurses,  on a Windows machine
@@ -97,6 +97,9 @@ eph2tle$(EXE):          eph2tle.o conv_ele.o elem2tle.o simplex.o lsquare.o
 cssfield$(EXE):          cssfield.o
 	$(CC) -o cssfield$(EXE) cssfield.o $(LIBS)
 
+neat_xvt$(EXE):          neat_xvt.o
+	$(CC) -o neat_xvt$(EXE) neat_xvt.o
+
 fo_serve.cgi:          fo_serve.o $(OBJS)
 	$(CC) -o fo_serve.cgi fo_serve.o $(OBJS) $(LIBS)
 
@@ -105,7 +108,7 @@ IDIR=$(HOME)/.find_orb
 clean:
 	$(RM) $(OBJS) fo.o findorb.o fo_serve.o find_orb$(EXE) fo$(EXE)
 	$(RM) fo_serve.cgi eph2tle.o eph2tle$(EXE) cssfield$(EXE)
-	$(RM) cssfield.o
+	$(RM) cssfield.o neat_xvt.o neat_xvt$(EXE)
 
 clean_temp:
 	$(RM) $(IDIR)/bc405pre.txt
