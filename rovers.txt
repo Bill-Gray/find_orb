@@ -473,3 +473,73 @@ Z82 !  -4.040972     +36.759222      109       BOOTES-2 Observatory, Algarrobo
    for geoid height.
 
 K38 !   8.9182372    +45.8737592     531       M57 Observatory, Saltrio
+
+TRT !  98.485555     +18.586944     2559       TRT (Thai Robotic Observatory)
+
+   Artsat observers,  from
+   https://github.com/cbassa/sattools/blob/master/data/sites.txt
+
+1111!-104.5614       +38.9478       2073       Ron Lee
+4171!   6.3785       +52.8344         10       Cees Bassa
+4172!   5.2580       +52.3713         -3       Leo Barhorst
+4553!  -2.2330       +53.3210         86       Cees Bassa
+0001! -97.7610       +30.3340        160       Mike McCants
+0002! -97.8661       +30.3138        280       Mike McCants
+0030!  18.9727       +47.4857        400       Ivan Artner
+0031!  18.7366       +47.5612        149       Ivan Artner
+0070!  -0.6003       +53.2233         30       Bob Christy
+0100!  17.9138       +59.4627          0       Sven Grahn
+0110! -96.8906       +32.5408        200       Lyn Kennedy
+0433!  18.5129       -33.9406         10       Greg Roberts
+0434!  27.9288       -26.1030       1646       Ian Roberts
+0435!  18.5101       -33.9369         25       Greg Roberts
+0710!  10.6756       +52.3261         85       Lutz Schindler
+0899! -56.1227       -34.8961         30       Fernando Mederos
+1056!  23.9833       +57.0122          4       Martins Keruss
+1086!  30.7556       +46.4778         56       Nikolay Koshkin
+1244!  33.9701       +44.3932         69       Andriy Makeyev
+1747! -72.3526       +45.7275        191       Daniel Deak
+1775! -75.6910       +44.6062        200       Kevin Fetter
+2018!  -1.1188       +51.0945        124       Peter Wakelin
+2115!  -0.7950       +51.3286         75       Mike Waterman
+2414!  -1.8800       +50.7468         34       David Hopkins
+2420!  -3.1386       +55.9486         40       Russell Eberst
+2563!   2.4043       +51.0524         10       Pierre Nierinck
+2675!  -2.3264       +52.1358         70       David Brierley
+2701! -79.3924       +43.6876        230       Ted Molczan
+2751!  -1.9849       +51.3440        125       Bruce MacDonald
+2756!  -3.1623       +56.0907         25       Andy Kirkham
+4353!   4.4908       +52.1541          0       Marco Langbroek
+4354!   4.5602       +52.1168         -2       Marco Langbroek
+4355!   4.4994       +52.1388         -2       Marco Langbroek
+4541!  12.4531       +41.9639         80       Alberto Rango
+4542!  12.4545       +41.9683         80       Alberto Rango
+4641!  16.9010       +41.1060         70       Alberto Rango
+5555!  94.5533       +56.1019        154       Sergey Guryanov
+5918!  18.1045       +59.2985         40       Bjorn Gimle
+5919!  18.6206       +59.2615         30       Bjorn Gimle
+6226! -97.8194       +28.4861        110       Scott Campbell
+7777!  -2.3267       +38.1656       1608       Brad Young remote
+7778! 149.0644       -31.2733       1122       Brad Young SSO
+7779!-105.5283       +32.9204       2225       Brad Young NM
+8048!-123.6420       +49.4175          1.      Scott Tilley
+8049!-123.6685       +49.4348         40.      Scott Tilley
+8305! -98.2163       +26.2431         30       Paul Gabriel
+8335! -95.9838       +36.1397        205       Brad Young
+8336! -95.9838       +36.1397        205       Brad Young
+8438!-119.7750       +38.8108       1545       Sierra Stars
+8536! -76.5010       +36.8479          4       Tim Luton
+8539! -79.3388       +39.4707        839       Steve Newcomb
+8597! 138.6333       -34.9638        100       Tony Beresford
+8600! 151.6477       -32.9770         18       Paul Camilleri
+0699! 132.2369       -14.4733        108       Paul Camilleri
+8730! -97.7279       +30.3086        150       Ed Cannon
+8739!-121.7028       +37.1133        282       Derek Breit
+9461!  19.89365      +47.9175        938       Konkoly Obs
+9633! -96.9982       +33.0206        153       Jim Nix
+9730! -97.8660       +30.3150        280       Mike McCants
+6242!  -2.8284       +42.9453        623       Jon Mikel
+6241!  -2.8203       +42.9565        619       Jon Mikel
+4160!   5.4768       +51.2793         35       Bram Dorreman
+9998!   6.3961       +52.8119         10       Dwingeloo telescoop
+9999!   5.5151       +47.348         100       Graves
