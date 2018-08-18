@@ -2515,13 +2515,13 @@ void format_observation( const OBSERVE FAR *obs, char *text,
          }
       output_angle_to_buff( text, angle, obs->dec_precision);
 
-      snprintf_append( text, 80, "\t%s%s%s\t", xresid, tab_separator, yresid);
+      snprintf_append( text, 50, "\t%s%s%s\t", xresid, tab_separator, yresid);
       format_dist_in_buff( xresid, obs->r);
       if( resid_format & RESIDUAL_FORMAT_MAG_RESIDS)
          put_mag_resid( yresid, obs->obs_mag, obs->computed_mag, obs->mag_band);
       else
          format_dist_in_buff( yresid, obs->solar_r);
-      snprintf_append( text, 80, "%s%s%s", xresid, tab_separator, yresid);
+      snprintf_append( text, 50, "%s%s%s", xresid, tab_separator, yresid);
       }
    else        /* 'short' MPC format */
       {
