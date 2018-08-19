@@ -2337,6 +2337,10 @@ int store_defaults( const int ephemeris_output_options,
                                  forced_central_body,
                                  apply_debiasing);
    set_environment_ptr( "SETTINGS2", buff);
+
+   buff[0] = findorb_language;
+   buff[1] = '\0';
+   set_environment_ptr( "LANGUAGE", buff);
    return( 0);
 }
 

@@ -250,3 +250,9 @@ COMBINE_ALL=
    it gets down to 20-25 km.  That's a bit of a range;  let's go with 50 km.
    (The collision altitude is actually specified in meters,  though.)
 COLLISION_ALTITUDE=50000
+
+   Current available language settings are e (English), f (French), i
+   (Italian), d (German), r (Russian), s (Spanish).  More could be added,
+   and the current not-very-complete translations improved;  please let
+   me know if you're interested.
+LANGUAGE=e
