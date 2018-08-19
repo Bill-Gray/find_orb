@@ -54,6 +54,7 @@ public:
    BOOL   m_use_weights;
    int      m_element_center;
    BOOL   m_debiasing;
+   int      m_language;
    //}}AFX_DATA
 
 

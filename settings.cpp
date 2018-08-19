@@ -56,6 +56,7 @@ CSettings::CSettings(CWnd* pParent /*=NULL*/)
    m_use_weights = FALSE;
    m_element_center = -1;
    m_debiasing = FALSE;
+   m_language = -1;
    //}}AFX_DATA_INIT
 }
 
@@ -80,6 +81,7 @@ void CSettings::DoDataExchange(CDataExchange* pDX)
    DDX_Check(pDX, IDC_USE_WEIGHTS, m_use_weights);
    DDX_CBIndex(pDX, IDC_COMBO1, m_element_center);
    DDX_Check(pDX, IDC_DEBIASING, m_debiasing);
+   DDX_Radio(pDX, IDC_RADIO8, m_language);
    //}}AFX_DATA_MAP
 }
 

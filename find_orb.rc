@@ -320,13 +320,13 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
 // Dialog
 //
 
-IDD_SETTINGS DIALOG DISCARDABLE  0, 0, 175, 271
+IDD_SETTINGS DIALOG DISCARDABLE  0, 0, 176, 327
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Settings"
 FONT 8, "MS Sans Serif"
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,15,257,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,89,257,50,14
+    DEFPUSHBUTTON   "OK",IDOK,15,312,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,89,312,50,14
     RTEXT           "Constraints:",IDC_STATIC1,0,3,65,8
     EDITTEXT        IDC_CONSTRAINTS,69,2,91,12,ES_AUTOHSCROLL
     RTEXT           "Reference:",IDC_STATIC2,0,18,66,8
@@ -372,6 +372,19 @@ BEGIN
     RTEXT           "Element center:",IDC_STATIC13,1,59,100,8
     CONTROL         "Apply debiasing",IDC_DEBIASING,"Button",BS_AUTOCHECKBOX |
                     WS_TABSTOP,6,89,154,10
+    GROUPBOX        "Language",IDC_LANGUAGE,9,258,161,50
+    CONTROL         "English",IDC_RADIO8,"Button",BS_AUTORADIOBUTTON |
+                    WS_GROUP,14,269,74,10
+    CONTROL         "Francais",IDC_RADIO9,"Button",BS_AUTORADIOBUTTON,14,282,
+                    74,10
+    CONTROL         "Deutsch",IDC_RADIO10,"Button",BS_AUTORADIOBUTTON,14,295,
+                    74,10
+    CONTROL         "Italiano",IDC_RADIO11,"Button",BS_AUTORADIOBUTTON,91,
+                    269,74,10
+    CONTROL         "Russian",IDC_RADIO12,"Button",BS_AUTORADIOBUTTON,91,282,
+                    74,10
+    CONTROL         "Espanol",IDC_RADIO13,"Button",BS_AUTORADIOBUTTON,91,295,
+                    74,10
 END
 
 
@@ -386,9 +399,9 @@ BEGIN
     IDD_SETTINGS, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 168
+        RIGHTMARGIN, 169
         TOPMARGIN, 7
-        BOTTOMMARGIN, 264
+        BOTTOMMARGIN, 320
     END
 END
 #endif    // APSTUDIO_INVOKED

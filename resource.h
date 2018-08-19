@@ -131,8 +131,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #define IDC_RADIO8                      188
 #define IDC_ROUND_STEP                  188
 #define IDC_GROUND_TRACK                189
+#define IDC_RADIO9                      189
+#define IDC_RADIO10                     190
+#define IDC_RADIO11                     191
 #define IDC_SUPPRESS_UNOBSERVABLE       192
+#define IDC_RADIO12                     192
 #define IDC_VISIBILITY                  193
+#define IDC_RADIO13                     193
 #define IDC_PRECISE_RESIDUALS           194
 #define IDC_SIGMAS                      194
 #define IDC_PROBABILITY_OF_BLUNDER      195
@@ -153,6 +158,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #define IDC_MPC_CODE                    207
 #define IDC_MAG_LIMIT                   208
 #define IDC_COMBO1                      209
+#define IDC_LANGUAGE                    210
 #define IDM_COPY_TO_CLIPBOARD           32770
 #define IDM_SAVE_TO_FILE                32771
 #define IDM_READ_CLIPBOARD              32774
@@ -163,7 +169,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        109
 #define _APS_NEXT_COMMAND_VALUE         32775
-#define _APS_NEXT_CONTROL_VALUE         210
+#define _APS_NEXT_CONTROL_VALUE         211
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

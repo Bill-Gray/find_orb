@@ -74,7 +74,6 @@ static const TCHAR *program_name = _T( "Find_Orb");
 #ifndef _UNICODE
 void utf8_to_win1252( char *text);                    /* elem_out.cpp */
 #endif
-int format_jpl_ephemeris_info( char *buff);           /* pl_cache.cpp */
 int adjust_herget_results( OBSERVE FAR *obs, int n_obs, double *orbit);
 int find_trial_orbit( double *orbit, OBSERVE FAR *obs, int n_obs,
                  const double r1, const double angle_param);
@@ -751,7 +750,7 @@ void COrbitDlg::UpdateElementDisplay( int update_orbit)
          tobs.dec_precision = 2;
          tobs.time_precision = 6;
          }
-      format_observation( obs + i, obuff, obs_format);
+      format_observation( &tobs, obuff, obs_format);
       pListBox->AddString( CA2T( obuff, CP_UTF8));
       }
 
@@ -1429,6 +1428,9 @@ void COrbitDlg::OnSettings()
    extern bool use_sigmas;
    extern int forced_central_body;
    extern int apply_debiasing;
+   extern char findorb_language;       /* defaults to 'e' for English */
+   const char *languages = "efdirs";   /* engl french deutsch ital russ spa */
+   const char *lptr = strchr( languages, findorb_language);
 
    if( element_format & ELEM_OUT_HELIOCENTRIC_ONLY)
       dlg.m_element_center = forced_central_body + 2;
@@ -1450,6 +1452,10 @@ void COrbitDlg::OnSettings()
    dlg.m_alternative_elements = ((element_format & ELEM_OUT_ALTERNATIVE_FORMAT) != 0);
    dlg.m_use_weights = use_sigmas;
    dlg.m_debiasing = apply_debiasing;
+   if( lptr)
+      dlg.m_language = (int)( lptr - languages);
+   else
+      dlg.m_language = 0;
    if( dlg.DoModal( ) == IDOK)
       {
       element_precision = dlg.m_element_precision;
@@ -1478,7 +1484,10 @@ void COrbitDlg::OnSettings()
       use_blunder_method = dlg.m_use_blunder_method;
       use_sigmas = (dlg.m_use_weights ? true : false);
       apply_debiasing = dlg.m_debiasing;
+      findorb_language = languages[dlg.m_language];
+      reset_dialog_language( this, 99000);
       UpdateElementDisplay( 1);
+      AdjustControls( );
       }
 }
 
