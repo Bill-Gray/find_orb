@@ -743,13 +743,15 @@ void COrbitDlg::UpdateElementDisplay( int update_orbit)
 
    for( i = 0; i < n_obs; i++)
       {
-//    if( !obs_format)
-//       {
-//       recreate_observation_line( obuff, obs + i);
-//       memmove( obuff, obuff + 12, strlen( obuff + 11));
-//       }
-//    else
-         format_observation( obs + i, obuff, obs_format);
+      OBSERVE tobs = obs[i];
+
+      if( tobs.time_precision > 6)        /* show ADES data in 'traditional' */
+         {                                /* punched-card form here          */
+         tobs.ra_precision = 3;
+         tobs.dec_precision = 2;
+         tobs.time_precision = 6;
+         }
+      format_observation( obs + i, obuff, obs_format);
       pListBox->AddString( CA2T( obuff, CP_UTF8));
       }
 
