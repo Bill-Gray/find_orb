@@ -10,44 +10,45 @@
 99000   FIND_ORB Orbit Determination Software
 99105   &Herget step
 99106   &Full step
-99108   Меркурий
-99109   Венера
-99110   Земля
-99111   Марс
-99112   Юпитер
-99113   Сатурн
-99114   Уран
-99115   Нептун
-99116   Плутон
-99117   Moon
+99108   Mercurio
+99109   Venus
+99110   Earth
+99111   Marte
+99112   Jupiter
+99113   Saturno
+99114   Urano
+99115   Neptuno
+99116   Pluton
+99117   Luna
 99118   Asteroids
-99129   Sa&ve Элементы
+99129   Sa&ve elements
 99136   &Auto-Solve
 99137   Save &Residuals...
 99138   &Ephemeris...
 99142   &Open...
 99148   About...
 99149   R2:
-99150   AU
-99151   AU
+99150   UA
+99151   UA
 99153   R1:
-99174   Элементы орбиты:
-99156   Epoch
+99174   Elementos orbitales:
+99156   Epoca
 99157   Perturbers:
 99140   &Gauss
 99141   Worst o&bs
 99143   F&ilter obs
 99139   &Monte Carlo...
-99144   &Settings
+99144   &Ajustes
 99145   &Toggle Obs
 99146   Set Sigma(s)
+99179   (Will fill in Find_Orb & DE version info)
 99180   All Perturbers On
-99001   Exit
+99001   Salir
 
 # about
 98000   About FIND_ORB
 98153   FIND_ORB Orbital Determination Software
-98149   GPL'ed software by Project Pluto (C)1997-2016
+98149   GPL'ed software by Project Pluto (C)1997-2017
 98150   Updates and information about other astronomy
 98152   software can be found at:
 98155   https://www.projectpluto.com
@@ -64,8 +65,8 @@
 97151   # steps:
 97152   Stepsize
 97153   Start:
-97154   Latitude
-97155   Longitude
+97154   Latitud
+97155   Longitud
 97175   Show &Motion details
 97176   Show &Alt/az
 97182   &Radial velocity
@@ -81,18 +82,18 @@
 97194   Ephem u&ncertainty
 97195   Human-readable output
 97196   Speed
-97199   Latitude
+97199   Latitud
 97200   &Observables
 97201   State &vectors
 97202   Car&tesian coords
-97203   MP&CORB Элементы
-97204   &8-line Элементы
+97203   MP&CORB elements
+97204   &8-line elements
 97205   C&lose approaches
-97206   код в МРС
+97206   MPC code
 96999   Suppress output below mag:
 
 # settings
-96000   Settings
+96000   Ajustes
 96149   Reference:
 96150   Monte Carlo noise:
 96151   Max filtered residual:
@@ -128,23 +129,23 @@
 21      All Perturbers On
 22      All Perturbers Off
 
-900     English
-901     French
-902     Italian
-903     Russian
-904     Spanish
-905     German
+900     Ingles
+901     Frances
+902     Italiano
+903     Ruso
+904     Español
+905     Deutsch
 
 # months
-1000    январь
-1001    февраль
-1002    март
-1003    апрель
-1004    май
-1005    июнь
-1006    июль
-1007    август
-1008    сентябрь
-1009    октябрь
-1010    ноябрь
-1011    декабрь
+1000    enero
+1001    febrero
+1002    marzo
+1003    abril
+1004    mayo
+1005    junio
+1006    julio
+1007    agosto
+1008    septiembre
+1009    octubre
+1010    noviembre
+1011    diciembre
