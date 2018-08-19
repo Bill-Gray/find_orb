@@ -133,6 +133,8 @@
 901     Français
 902     Italien
 903     Russe
+904     Espagnol
+905     Allemand
 
 # months
 1000    Jan
