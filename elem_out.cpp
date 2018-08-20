@@ -302,18 +302,7 @@ const char *get_find_orb_text( const int index)
 
    for( i = 0; i < n_lines; i++)
       if( atoi( text[i]) == index)
-#if 1
          return( text[i] + 8);
-#else
-         {
-         static char tbuff[100];
-
-         assert( 1);
-         strcpy( tbuff, text[i] + 8);
-         utf8_to_win1252( tbuff);
-         return( tbuff);
-         }
-#endif
    assert( 1);             /* i.e.,  should never get here */
    return( NULL);
 }
