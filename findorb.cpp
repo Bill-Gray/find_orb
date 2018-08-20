@@ -200,6 +200,7 @@ int orbital_monte_carlo( const double *orbit, OBSERVE *obs, const int n_obs,
 void make_config_dir_name( char *oname, const char *iname);    /* miscell.cpp */
 int reset_astrometry_filename( const int argc, const char **argv);
 int compare_observations( const void *a, const void *b, void *context);
+int set_language( const int language);                      /* elem_out.cpp */
 void shellsort_r( void *base, const size_t n_elements, const size_t esize,
          int (*compare)(const void *, const void *, void *), void *context);
 int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
@@ -4408,12 +4409,9 @@ int main( const int argc, const char **argv)
             show_commented_elements = !show_commented_elements;
             break;
          case ALT_L:
-            {
-            extern char findorb_language;
-
-            findorb_language = extended_getch( );
+            c = extended_getch( );
+            set_language( c);
             update_element_display = 1;
-            }
             break;
          case CTRL( 'K'):
             {
