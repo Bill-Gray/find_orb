@@ -134,6 +134,8 @@
 901     French
 902     Italian
 903     Russian
+904     Spanish
+905     German
 
 # months
 1000    Gen
