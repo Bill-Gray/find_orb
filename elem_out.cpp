@@ -119,6 +119,7 @@ double diameter_from_abs_mag( const double abs_mag,      /* ephem0.cpp */
                                      const double optical_albedo);
 char **load_file_into_memory( const char *filename, size_t *n_lines);
 const char *get_find_orb_text( const int index);      /* elem_out.cpp */
+int set_language( const int language);                      /* elem_out.cpp */
 void get_find_orb_text_filename( char *filename);     /* elem_out.cpp */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 static int names_compare( const char *name1, const char *name2);
@@ -2344,6 +2345,26 @@ int store_defaults( const int ephemeris_output_options,
    return( 0);
 }
 
+int set_language( const int language)
+{
+   int i;
+
+   findorb_language = language;
+   for( i = 0; i < 12; i++)
+      {                          /* create abbreviated month names */
+      static char month_names[12][17];
+      char tbuff[100], *tptr;
+
+      strcpy( tbuff, get_find_orb_text( i + 1000));
+      tptr = (char *)find_nth_utf8_char( tbuff, 3);
+      *tptr = '\0';        /* truncate month name at third char */
+      assert( strlen( tbuff) < 16);
+      strcpy( month_names[i], tbuff);
+      set_month_name( i + 1, month_names[i]);
+      }
+   return( 0);
+}
+
 int get_defaults( int *ephemeris_output_options, int *element_format,
          int *element_precision, double *max_residual_for_filtering,
          double *noise_in_arcseconds)
@@ -2354,13 +2375,12 @@ int get_defaults( int *ephemeris_output_options, int *element_format,
    double unused_max_residual_for_filtering;
    double unused_noise_in_arcseconds;
    const char *language = get_environment_ptr( "LANGUAGE");
-   static char month_names[12][17];
    extern double minimum_jd, maximum_jd;
    extern double maximum_observation_span;
    extern int use_config_directory;
    extern double *sr_orbits;
    extern unsigned max_n_sr_orbits;
-   int i, use_sigmas_int;
+   int use_sigmas_int;
    const char *override_fcct14_filename = get_environment_ptr( "FCCT14_FILE");
 
 #ifndef _WIN32
@@ -2371,7 +2391,7 @@ int get_defaults( int *ephemeris_output_options, int *element_format,
       findorb_already_running = true;
 #endif
    if( *language)
-      findorb_language = *language;
+      set_language( *language);
    if( *override_fcct14_filename)
       {
       extern const char *fcct14_bias_file_name;
@@ -2379,17 +2399,6 @@ int get_defaults( int *ephemeris_output_options, int *element_format,
       fcct14_bias_file_name = override_fcct14_filename;
       }
    reset_td_minus_dt_string( get_environment_ptr( "DELTA_T"));
-   for( i = 0; i < 12; i++)
-      {                          /* create abbreviated month names */
-      char tbuff[100], *tptr;
-
-      strcpy( tbuff, get_find_orb_text( i + 1000));
-      tptr = (char *)find_nth_utf8_char( tbuff, 3);
-      *tptr = '\0';        /* truncate month name at third char */
-      assert( strlen( tbuff) < 16);
-      strcpy( month_names[i], tbuff);
-      set_month_name( i + 1, month_names[i]);
-      }
    sscanf( get_environment_ptr( "MAX_OBSERVATION_SPAN"), "%lf",
                                   &maximum_observation_span);
    if( !ephemeris_output_options)
