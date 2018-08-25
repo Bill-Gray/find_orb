@@ -272,37 +272,45 @@ void utf8_to_win1252( char *text)
 
 const char *get_find_orb_text( const int index)
 {
-   static char **text = NULL;
-   static size_t n_lines;
+   static char **text = NULL, **default_text = NULL;
    size_t i;
    static char currently_loaded_language = '\0';
+   char filename[20];
 
    if( !index)          /* clean up */
       {
       if( text)
          free( text);
-      text = NULL;
+      if( default_text)
+         free( default_text);
+      default_text = text = NULL;
       return( NULL);
       }
-   if( currently_loaded_language != findorb_language
-               && text)
+   get_find_orb_text_filename( filename);
+   if( findorb_language != 'e' &&
+               currently_loaded_language != findorb_language)
       {
-      free( text);
-      text = NULL;
-      }
-   if( !text)
-      {
-      char filename[20];
-
-      get_find_orb_text_filename( filename);
-      text = load_file_into_memory( filename, &n_lines);
+      if( text)          /* 'text' = pointer to strings for current language */
+         free( text);
+      text = load_file_into_memory( filename, NULL);
       assert( text);
       currently_loaded_language = findorb_language;
       }
-
-   for( i = 0; i < n_lines; i++)
-      if( atoi( text[i]) == index)
-         return( text[i] + 8);
+   if( !default_text)     /* 'default_text' = strings for English,  and as */
+      {                   /* a backstop when something isn't translated    */
+      *filename = 'e';
+      default_text = load_file_into_memory( filename, NULL);
+      assert( default_text);
+      }
+   if( text)         /* try non-default language first... */
+      {
+      for( i = 0; text[i]; i++)
+         if( atoi( text[i]) == index)
+            return( text[i] + 8);
+      }              /* ...if that fails,  search strings for English : */
+   for( i = 0; default_text[i]; i++)
+      if( atoi( default_text[i]) == index)
+         return( default_text[i] + 8);
    assert( 1);             /* i.e.,  should never get here */
    return( NULL);
 }
