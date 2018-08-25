@@ -110,6 +110,7 @@ int get_defaults( int *ephemeris_output_options, int *element_format,
          double *noise_in_arcseconds);                /* elem_out.cpp */
 const char *get_find_orb_text( const int index);      /* elem_out.cpp */
 void get_find_orb_text_filename( char *filename);     /* elem_out.cpp */
+int set_language( const int language);                      /* elem_out.cpp */
 int reset_dialog_language( CDialog *dlg, const int dlg_number);  /* elem_out.cpp */
 
 /////////////////////////////////////////////////////////////////////////////
@@ -575,6 +576,13 @@ int reset_dialog_language( CDialog *dlg, const int dlg_number)
          }
       }
    fclose( ifile);
+   if( dlg_number == 99000)
+      dlg->SetDlgItemText( IDC_ORBIT1, CA2T(
+               "Orbital elements will appear here after you open a file,\n"
+               "select an object from it,  and an orbit is computed.\n\n"
+               "Click in this area to toggle between orbital elements\n"
+               "and extra details (state vectors,  MOIDs,  etc.)\n",
+               CP_UTF8));
    return( 0);
 }
 
@@ -603,10 +611,8 @@ BOOL COrbitDlg::OnInitDialog()
    CDialog::OnInitDialog();
 
    // TODO: Add extra initialization here
-   FILE *startup;
    const char FAR *cmd_line = CT2A( AfxGetApp( )->m_lpCmdLine);
    int i;
-   extern char findorb_language;       /* defaults to 'e' for English */
    extern int debug_level;
 
    GetWindowRect( &OriginalDlgRect);
@@ -617,21 +623,9 @@ BOOL COrbitDlg::OnInitDialog()
    for( i = 0; cmd_line[i]; i++)
       if( cmd_line[i] == '-' && (!i || cmd_line[i - 1] == ' '))
          {
-         if( cmd_line[i + 1] == 'l')
-            findorb_language = cmd_line[i + 2];
          if( cmd_line[i + 1] == 'd')
             debug_level = atoi( cmd_line + i + 2);
          }
-   if( findorb_language == 'e' &&
-              (startup = fopen( "startup.mar", "rb")))
-      {
-      char buff[140];
-
-      while( fgets( buff, 140, startup))
-         if( !memcmp( buff, "51 language", 11))
-            findorb_language = buff[12];
-      fclose( startup);
-      }
    reset_dialog_language( this, 99000);
    perturbers = 0;
    m_step_size = 3.;
@@ -642,12 +636,6 @@ BOOL COrbitDlg::OnInitDialog()
    UpdateData( FALSE);     /* 'False' indicates 'move data to edit boxes' */
    ResetPerturbers( );
    SetTimer( 1, 500, NULL);
-   SetDlgItemText( IDC_ORBIT1, CA2T(
-               "Orbital elements will appear here after you open a file,\n"
-               "select an object from it,  and an orbit is computed.\n\n"
-               "Click in this area to toggle between orbital elements\n"
-               "and extra details (state vectors,  MOIDs,  etc.)\n",
-               CP_UTF8));
    if( *cmd_line != '-' && *cmd_line)
       LoadAFile( cmd_line);
    AdjustControls( );
@@ -1484,8 +1472,11 @@ void COrbitDlg::OnSettings()
       use_blunder_method = dlg.m_use_blunder_method;
       use_sigmas = (dlg.m_use_weights ? true : false);
       apply_debiasing = dlg.m_debiasing;
-      findorb_language = languages[dlg.m_language];
-      reset_dialog_language( this, 99000);
+      if( findorb_language != languages[dlg.m_language])
+         {           /* only reset everything if language actually changed */
+         set_language( languages[dlg.m_language]);
+         reset_dialog_language( this, 99000);
+         }
       UpdateElementDisplay( 1);
       AdjustControls( );
       }
