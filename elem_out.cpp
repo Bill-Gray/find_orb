@@ -270,6 +270,32 @@ void utf8_to_win1252( char *text)
 }
 #endif
 
+/* Multi-line text in ?findorb.txt files is 'joined' by this function.
+If two or more consecutive lines have the same index,  we concatenate
+them, with a line feed in between them.  */
+
+static void collapse_findorb_txt( char **text)
+{
+   size_t i, j;
+
+   for( i = 0; text[i]; i++)
+      text_search_and_replace( text[i], "\\n", "\n");
+   for( i = 0; text[i]; i++)
+      {
+      const int idx = atoi( text[i]);
+
+      if( text[i + 1] && idx && idx == atoi( text[i + 1]))
+         {
+         strcat( text[i], "\n");
+         memmove( text[i] + strlen( text[i]), text[i + 1] + 8,
+                          strlen( text[i + 1] + 7));
+         for( j = i + 1; text[j + 1]; j++)
+            text[j] = text[j + 1];
+         text[j] = NULL;
+         }
+      }
+}
+
 const char *get_find_orb_text( const int index)
 {
    static char **text = NULL, **default_text = NULL;
@@ -294,6 +320,7 @@ const char *get_find_orb_text( const int index)
          free( text);
       text = load_file_into_memory( filename, NULL);
       assert( text);
+      collapse_findorb_txt( text);
       currently_loaded_language = findorb_language;
       }
    if( !default_text)     /* 'default_text' = strings for English,  and as */
@@ -301,6 +328,7 @@ const char *get_find_orb_text( const int index)
       *filename = 'e';
       default_text = load_file_into_memory( filename, NULL);
       assert( default_text);
+      collapse_findorb_txt( default_text);
       }
    if( text)         /* try non-default language first... */
       {
