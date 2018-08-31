@@ -1172,6 +1172,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    DPT *stored_ra_decs;
    double prev_ephem_t = epoch_jd, prev_radial_vel = 0.;
    int i, hh_mm, n_step_digits;
+   int n_lines_shown = 0;
    unsigned date_format;
    const int ephem_type = ((options & 7) == 6 ? 0 : (options & 7));
    FILE *ofile;
@@ -1988,12 +1989,17 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
          prev_radial_vel = radial_vel;
          if( !obj_n && *buff)
             fprintf( ofile, "%s", buff);
+         if( !obj_n && show_this_line)
+            n_lines_shown++;
          }
       if( last_line_shown)
          fprintf( ofile, "\n");
       prev_ephem_t = ephemeris_t;
       }
    free( orbits_at_epoch);
+   if( ephem_type == OPTION_OBSERVABLES && !n_lines_shown)
+      fprintf( ofile, "No ephemeris output.  Object was too faint,  or in daylight,\n"
+                   "or below horizon for the specified times.  Check ephem options.\n");
    fclose( ofile);
    return( 0);
 }
