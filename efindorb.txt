@@ -149,3 +149,9 @@
 1009    October
 1010    November
 1011    December
+
+2000    The lat/lon specified for code (%s) in the header is malformed.\n
+2000    See https://www.projectpluto.com/find_orb.htm#obs_codes for\n
+2000    information about how to fix this.\n
+
+2001    This shows very little motion and is probably a star.\n

@@ -87,6 +87,7 @@ void shellsort_r( void *base, const size_t n_elements, const size_t esize,
          int (*compare)(const void *, const void *, void *), void *context);
 int string_compare_for_sort( const void *a, const void *b, void *context);
 int format_jpl_ephemeris_info( char *buff);                 /* pl_cache.c */
+const char *get_find_orb_text( const int index);      /* elem_out.cpp */
 int set_tholen_style_sigmas( OBSERVE *obs, const char *buff);  /* mpc_obs.c */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 #ifdef _MSC_VER
@@ -439,10 +440,8 @@ static inline int get_lat_lon_from_header( double *lat,
             char tbuff[200];
 
             warning_shown = true;      /* just do this once */
-            snprintf( tbuff, sizeof( tbuff),
-                  "The lat/lon specified for code (%s) in the header is malformed.\n"
-                  "See https://www.projectpluto.com/find_orb.htm#obs_codes for\n"
-                  "information about how to fix this.\n", mpc_code);
+            snprintf( tbuff, sizeof( tbuff),            /* see efindorb.txt */
+                  get_find_orb_text( 2000), mpc_code);
             generic_message_box( tbuff, "o");
             }
          }
@@ -3125,8 +3124,7 @@ static inline void check_for_star( const OBSERVE *obs, const int n_obs)
          max_dec = obs[i].dec;
       }
    if( max_ra - min_ra < tolerance && max_dec - min_dec < tolerance)
-      generic_message_box(
-            "This shows very little motion and is probably a star.", "o");
+      generic_message_box( get_find_orb_text( 2001), "o");
 }
 
 /* ADES sigmas are converted into a punched-card compatible format such as
@@ -3780,7 +3778,7 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
    void *ades_context;
 #ifdef CONSOLE
    const clock_t t0 = clock( );
-   int next_output = 20000, n_obs_read = 0;
+   int next_output = 2000, n_obs_read = 0;
    long filesize;
 
    if( ifile)
@@ -3929,7 +3927,7 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
                         (double)ftell( ifile) / (double)filesize;
                const double t_total = t_elapsed / (fraction_file_read + .01);
 
-               next_output += (int)((double)n_obs_read / (t_elapsed + 1.));
+               next_output += (int)((double)n_obs_read / (t_elapsed + 1.)) / 3;
                snprintf( msg_buff, sizeof( msg_buff),
                        "%4.1f%% complete; %.0f seconds elapsed, %.0f remain",
                                     fraction_file_read * 100.,
