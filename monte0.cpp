@@ -425,7 +425,7 @@ double dump_monte_data_to_file( FILE *ofile, const double *sigmas,
    return( uparam);
 }
 
-/* From http://www.minorplanetcenter.net/iau/info/UValue.html ,  slightly
+/* From https://www.minorplanetcenter.net/iau/info/UValue.html ,  slightly
 modified for clarity (there were operator-precedence issues) :
 ---------- (mostly) quoted begin ----------
 The U value is calculated in the following manner. First, calculate:

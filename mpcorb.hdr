@@ -3,7 +3,7 @@
 MPCORB dataset. Each object's elements are stored on a single line,
 the format of which is described at:
 
-          http://www.minorplanetcenter.org/iau/info/MPOrbitFormat.html
+          https://www.minorplanetcenter.org/iau/info/MPOrbitFormat.html
 
    Note that certain parameters such as the number of oppositions and
 internal MPC data are replaced in the following with spaces or asterisks.

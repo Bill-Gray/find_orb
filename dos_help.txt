@@ -227,7 +227,7 @@ Mouse actions:
 
 The following table was shamelessly copied from:
 
-http://www.minorplanetcenter.net/iau/lists/Sizes.html
+https://www.minorplanetcenter.net/iau/lists/Sizes.html
 
 It lists the diameters of minor planets corresponding to the given values of
 the absolute magnitude, H.  The diameter is to be read as kilometers when H

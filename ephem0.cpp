@@ -3415,7 +3415,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
                         text_search_and_replace( tptr, terms[i], tbuff);
                         if( i == 3)
                            text_search_and_replace( tptr, terms[i],
-                                 "<a href=\"http://www.minorplanetcenter.net/iau/NEO/ToConfirm.html\">NEOCP</a>");
+                                 "<a href=\"https://www.minorplanetcenter.net/iau/NEO/ToConfirm.html\">NEOCP</a>");
                         }
                   for( i = 0; tptr[i]; i++)  /* replace all the tildes with */
                      if( tptr[i] == '~')     /* pseudorandom text, but skip */
@@ -3596,7 +3596,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
                double upper_size = 940. * exp( (4. - abs_mag) * LOG_10 / 5.);
                const char *units = "km";
                const char *size_url =
-                   "href=\"http://www.minorplanetcenter.net/iau/lists/Sizes.html\">";
+                   "href=\"https://www.minorplanetcenter.net/iau/lists/Sizes.html\">";
                char title[50];
 
                h_ptr[-1] = '\0';

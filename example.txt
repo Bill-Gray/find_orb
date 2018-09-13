@@ -1,5 +1,5 @@
 COM Lines not in the MPC's 80-column format are ignored.
-COM See http://www.minorplanetcenter.net/iau/info/OpticalObs.html for a
+COM See https://www.minorplanetcenter.net/iau/info/OpticalObs.html for a
 COM format specification.  In the following header line, 'nn' = notes 1
 COM and 2; 'B' = photometric band; 'z' = astrometric catalog used for the
 COM reduction; '<ref'> = reference; 'COD' = MPC three-character

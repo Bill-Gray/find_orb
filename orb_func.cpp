@@ -3491,7 +3491,7 @@ at the bottom),  and 60 bins across representing .1 AU in semimajor
 axis (from 0 AU to 6 AU).  The natural logarithm of the counts in
 each bin are shown;  those ranged from zero to 9,  so I didn't need
 to do any scaling.  This basically reflects the scatterplot provided
-by MPC at http://www.minorplanetcenter.net/iau/plot/OrbEls51.gif
+by MPC at https://www.minorplanetcenter.net/iau/plot/OrbEls51.gif
 (except that the vertical axis is flipped).   */
 
 /*           0 AU      1         2         3         4         5         6 */

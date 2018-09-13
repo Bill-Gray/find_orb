@@ -42,11 +42,11 @@
    NOTE that rather than add codes here,  one can use code (247),  the
    "roving observer",  as described at
 
-   http://www.minorplanetcenter.net/iau/info/RovingObs.html
+   https://www.minorplanetcenter.net/iau/info/RovingObs.html
 
    _Or_,  one can use code (XXX),  as described at
 
-   http://www.minorplanetcenter.net/iau/info/Astrometry.html#HowObsCode
+   https://www.minorplanetcenter.net/iau/info/Astrometry.html#HowObsCode
 
    For this last,  one uses code XXX,  and inserts a line at the top of the
    observations such as
@@ -474,7 +474,10 @@ Z82 !  -4.040972     +36.759222      109       BOOTES-2 Observatory, Algarrobo
 
 K38 !   8.9182372    +45.8737592     531       M57 Observatory, Saltrio
 
+   National Astronomical Research Institute of Thailand telescopes.
+
 TRT !  98.485555     +18.586944     2559       TRT (Thai Robotic Observatory)
+Nar !  98.4856944    +18.589972     2559       NARIT, Chiangmai
 
    Artsat observers,  from
    https://github.com/cbassa/sattools/blob/master/data/sites.txt
@@ -543,3 +546,9 @@ TRT !  98.485555     +18.586944     2559       TRT (Thai Robotic Observatory)
 4160!   5.4768       +51.2793         35       Bram Dorreman
 9998!   6.3961       +52.8119         10       Dwingeloo telescoop
 9999!   5.5151       +47.348         100       Graves
+
+   Luca Buzzi supplied coordinates for the two telescopes at (204),
+both about 1230m above sea level (geoid height is 48 meters).
+
+Sch !   8.76993      +45.86833      1278       Schiaparelli Observatory, 0.85-m scope
+Sc2 !   8.77061      +45.86845      1278       Schiaparelli Observatory, 0.60-m scope

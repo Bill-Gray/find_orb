@@ -356,7 +356,7 @@ static bool extract_region_data_for_mpc_station( char *buff,
    return( *buff ? true : false);
 }
 
-/* http://www.minorplanetcenter.net/iau/info/Astrometry.html#HowObsCode
+/* https://www.minorplanetcenter.net/iau/info/Astrometry.html#HowObsCode
 suggests that you start out using "observatory code" (XXX),  whilst
 including a comment such as
 
@@ -801,7 +801,7 @@ static int get_observer_data_latlon( const char FAR *mpc_code,
 
 /*   The offset between a satellite observation and the earth or sun    */
 /* is stored in a second line,  as described at                         */
-/* http://www.minorplanetcenter.net/iau/info/SatelliteObs.html          */
+/* https://www.minorplanetcenter.net/iau/info/SatelliteObs.html         */
 /*    This format allows parallax type '1' in kilometers or type '2'    */
 /* in AU.  If the input file contains the line '#relax_xyz',  Find_Orb  */
 /* is less picky about where decimal points and +/- signs appear.       */
@@ -1172,7 +1172,7 @@ static int is_artsat_desig( const char *desig)
    on the MPC Web site,  which is probably the best place to look to
    understand why the following bizarre code does what it does:
 
-   http://www.minorplanetcenter.org/iau/info/PackedDes.html
+   https://www.minorplanetcenter.org/iau/info/PackedDes.html
 
    Return values are as follows.  Note that 'other' includes artsats and
    temporary designations.        */
@@ -1597,7 +1597,7 @@ void set_up_observation( OBSERVE FAR *obs)
          if( strcmp( obs->mpc_code, "XXX"))
             strcat( tbuff, " You can fix this by downloading the\n"
                         "current list of MPC stations at\n\n"
-                        "http://www.minorplanetcenter.net/iau/lists/ObsCodes.html\n\n"
+                        "https://www.minorplanetcenter.net/iau/lists/ObsCodes.html\n\n"
                         "and saving it to the folder in which Find_Orb runs.\n");
          else
             strcat( tbuff, " You can read about how to add an XXX\n"
@@ -3690,7 +3690,7 @@ may have further information.  These observations will be excluded.\n",
       sprintf( buff, "%u observations are from spacecraft,  but aren't marked\n",
                         n_sat_obs_without_offsets);
       strcat( buff, "as such and lack the 'second line' offset data.  See\n\n");
-      strcat( buff, "http://www.minorplanetcenter.net/iau/info/SatelliteObs.html\n");
+      strcat( buff, "https://www.minorplanetcenter.net/iau/info/SatelliteObs.html\n");
       strcat( buff, "\nfor info on how to handle spacecraft-based observations.\n");
       generic_message_box( buff, "o");
       }
@@ -4141,7 +4141,7 @@ static int get_year_and_mpc_half_month_letter( const double jd, char *letter)
 /* MPC references are stored in five characters in each 80-byte record,
    in columns 73-77,  in an highly packed manner described at
 
-   http://www.minorplanetcenter.net/iau/info/References.html
+   https://www.minorplanetcenter.net/iau/info/References.html
 
    The following function converts those five bytes to human-readable form.
 
@@ -4304,7 +4304,7 @@ static double relative_velocity( const double *loc1, const double *vel1,
    a +/- sign (for the Doppler shift),  or an 'S' or 'C' (for the
    uncertainty in time delay).  There may also be trailing spaces,
    or the whole thing may be blank.  See
-   http://www.minorplanetcenter.net/iau/info/RadarObs.html */
+   https://www.minorplanetcenter.net/iau/info/RadarObs.html */
 
 static double extract_radar_value( const char *ibuff)
 {
