@@ -3842,8 +3842,9 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
          fix_up_mpc_observation( buff);
       if( debug_level > 8)
          debug_printf( "After fixup: %d\n", (int)strlen( buff));
-      if( *new_xdesig)        /* previous line was "COM = (xdesig)";  add */
-         {                    /* a new cross-designation to the table */
+      jd = observation_jd( buff);
+      if( jd && *new_xdesig)   /* previous line was "COM = (xdesig)";   */
+         {                    /* add a new cross-designation to the table */
          memcpy( new_xdesig, buff, 12);
          new_xdesig[12] = ' ';
          for( i = (int)strlen( new_xdesig); i < 26; i++)
@@ -3852,7 +3853,6 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
          xref_designation( new_xdesig);
          *new_xdesig = '\0';
          }
-      jd = observation_jd( buff);
       if( jd != 0. && !is_second_line( buff))
          if( !station || !memcmp( buff + 76, station, 3))
             {
