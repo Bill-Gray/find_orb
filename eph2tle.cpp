@@ -461,6 +461,36 @@ int simplex_search( tle_t *tle, const double *starting_params,
    return( 0);
 }
 
+/* Certain objects have names (preliminary designations from surveys),  but
+no NORAD or international designation.  The following ensures they get one,
+which won't (we lightheartedly hope) conflict with other designations.  The
+amateurs tracking classified objects use NORAD desigs starting at 90000,
+so I'll use 89999 and count down. */
+
+static void reset_desigs_by_name( const char *obj_name, tle_t *tle)
+{
+   const char *remaps[] = {
+         "89999 00000AAA ZR3BAD8",
+         "89998 00000AAB ZTF00V9",
+         "89997 00000AAC WT1190F = UDA34A3 = UW8551D = 9U01FF6",
+         "89996 00000AAD XL8D89E",
+         "89995 00000AAE ZGBD4BF = ZJ15031 = unknown",
+         "89994 00000AAF ZTF00Y9 = ZTF00Yp = ZTF00ah",
+         "89993 00000AAG ZTF00hf = ZTF00YB",
+         "89992 00000AAH ZTF00pm = ZTF01Ls",
+         "89991 00000AAI ZTF00V9 = ZTF00Vv = ZTF00Y5",
+         NULL };
+   size_t i;
+
+   for( i = 0; remaps[i]; i++)
+      if( !strcmp( obj_name, remaps[i] + 15))
+         {
+         tle->norad_number = atoi( remaps[i]);
+         memcpy( tle->intl_desig, remaps[i] + 6, 8);
+         tle->intl_desig[8] = '\0';
+         }
+}
+
 /* NOTE:  this precesses input J2000 state vectors to mean equator/ecliptic
 of date.  I _think_ that's right,  but it's possible that nutation should be
 included as well,  and even possible that SxPx assumes true orientation of
@@ -642,6 +672,8 @@ int main( const int argc, const char **argv)
                   memcpy( tle.intl_desig + 2, tptr + 5, 4); /* launch # */
                   tle.intl_desig[6] = '\0';
                   }
+         if( intl_desig == default_intl_desig)
+            reset_desigs_by_name( obj_name, &tle);
          }
       }
    for( i = 0; i < N_HIST_BINS; i++)
@@ -930,6 +962,8 @@ int main( const int argc, const char **argv)
    free( vectors);
    free( slopes);
    printf( "All done\n");
+   if( !strcmp( tle.intl_desig, default_intl_desig))
+      fprintf( stderr, "WARNING: International designation left at default!\n");
    return( 0);
 }
 
