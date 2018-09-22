@@ -904,7 +904,8 @@ int main( const int argc, const char **argv)
          fprintf( ofile, "# MJD %f (%s)\n", tdt - 2400000.5, buff);
          if( *obj_name)
             fprintf( ofile, "%s\n", obj_name);
-         fprintf( ofile, "%s", obuff);
+         obuff[69] = obuff[140] = '\0';
+         fprintf( ofile, "%s\n%s\n", obuff, obuff + 71);
          if( worst_resid_in_run < worst_resid)
             {
             worst_resid_in_run = worst_resid;
