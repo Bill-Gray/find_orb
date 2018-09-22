@@ -248,13 +248,24 @@ int main( const int argc, const char **argv)
          {
          char tbuff[100];
          size_t neocp_bytes_found = 0;
+         const char *neocp_filename = "../../neocp2/neocp.txt";
          FILE *ofile = fopen( temp_obs_filename,
                                (bytes_written ? "ab" : "wb"));
 
          assert( ofile);
+         if( !memcmp( buff, "Old_", 4))     /* hidden trickery to search old */
+            {                               /* NEOCP designations */
+            memmove( buff, buff + 4, strlen( buff + 3));
+            neocp_filename = "../../neocp2/neocp.old";
+            }
+         if( !memcmp( buff, "Ext_", 4))     /* allow for a supplemental file */
+            {                               /* for artsats,  etc.     */
+            memmove( buff, buff + 4, strlen( buff + 3));
+            neocp_filename = "ext_ast.txt";
+            }
          if( is_neocp_desig( buff))
             {
-            FILE *ifile = fopen( "../../neocp2/neocp.txt", "rb");
+            FILE *ifile = fopen( neocp_filename, "rb");
 
             assert( ifile);
             while( fgets( tbuff, sizeof( tbuff), ifile))
