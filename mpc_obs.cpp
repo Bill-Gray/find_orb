@@ -3774,7 +3774,7 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
    int i, n = 0, n_alloced = 20, prev_loc = -1;
    const int fixing_trailing_and_leading_spaces =
                *get_environment_ptr( "FIX_OBSERVATIONS");
-   char buff[250], mpc_code_from_neocp[4], desig_from_neocp[15];
+   char buff[550], mpc_code_from_neocp[4], desig_from_neocp[15];
    void *ades_context;
 #ifdef CONSOLE
    const clock_t t0 = clock( );
@@ -4607,21 +4607,22 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
             if( optr->note2 != 'R')
                {
                int tilt_angle = 0;
+               char sig1_buff[20], sig2_buff[10];
 
                strcpy( buff, "Sigma ");
-               sprintf( buff + 6, "%.6f", optr->posn_sigma_1);
-               remove_insignificant_digits( buff + 6);
-               if( optr->posn_sigma_1 != optr->posn_sigma_2)
+               sprintf( sig1_buff, "%.6f", optr->posn_sigma_1);
+               remove_insignificant_digits( sig1_buff);
+               sprintf( sig2_buff, "%.6f", optr->posn_sigma_2);
+               remove_insignificant_digits( sig2_buff);
+               if( strcmp( sig1_buff, sig2_buff))
                   {
-                  char *end_ptr = buff + strlen( buff);
-
-                  sprintf( end_ptr, "x%.6f", optr->posn_sigma_2);
-                  remove_insignificant_digits( end_ptr);
+                  strcat( sig1_buff, "x");
+                  strcat( sig1_buff, sig2_buff);
                   tilt_angle = (int)( optr->posn_sigma_theta * 180. / PI);
                   }
-               strcat( buff, "\" ");
-               if( tilt_angle)
-                  sprintf( buff + strlen( buff), "%d ", tilt_angle);
+               sprintf( buff, "Sigma %s\" ", sig1_buff);
+               if( tilt_angle % 180)
+                  snprintf_append( buff, sizeof( buff), "%d ", tilt_angle);
                }
          buff += strlen( buff);
          reference_to_text( buff, optr->reference, optr->jd);
