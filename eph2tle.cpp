@@ -626,6 +626,13 @@ int main( const int argc, const char **argv)
    while( fgets_trimmed( buff, sizeof( buff), ifile))
       if( *buff != ';')
          fprintf( ofile, "%s\n", buff);
+      else if( (memcmp( buff, "; HEX", 5) && tle.ephemeris_type != EPHEM_TYPE_HIGH)
+            || (memcmp( buff, "; SGP", 5) && tle.ephemeris_type != EPHEM_TYPE_SGP4))
+         {                 /* skip a section until we hit another comment */
+         while( fgets_trimmed( buff, sizeof( buff), ifile))
+            if( *buff == ';')
+               break;
+         }
    fclose( ifile);
    ifile = fopen( argv[1], "rb");
    if( !ifile)
