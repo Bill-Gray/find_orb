@@ -552,3 +552,5 @@ both about 1230m above sea level (geoid height is 48 meters).
 
 Sch !   8.76993      +45.86833      1278       Schiaparelli Observatory, 0.85-m scope
 Sc2 !   8.77061      +45.86845      1278       Schiaparelli Observatory, 0.60-m scope
+
+Kwa ! 167.733333     +08.716666        5       Kwajalein Island
