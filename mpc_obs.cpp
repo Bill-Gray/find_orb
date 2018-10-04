@@ -4622,7 +4622,7 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
                   }
                sprintf( buff, "Sigma %s\" ", sig1_buff);
                if( tilt_angle % 180)
-                  snprintf_append( buff, sizeof( buff), "%d ", tilt_angle);
+                  snprintf_append( buff, 90, "%d ", tilt_angle);
                }
          buff += strlen( buff);
          reference_to_text( buff, optr->reference, optr->jd);
