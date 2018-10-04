@@ -293,8 +293,10 @@ albedo... but no lower than that;  you can't reflect more than 100%.)
            17.5       1 -     1 -     2    32.5  47.5
 
    Important note:  residuals are O-C ("observed minus computed"),  so
-positive y residuals mean the object was observed to be _north_ of
-prediction, positive x _east_ of prediction.
+positive y (dec) residuals mean the object was observed to be _north_
+of prediction, positive x (RA) _east_ of prediction.  A positive time
+residual suggests your clock may be slow (should be set ahead by that
+many seconds).
 
 New moon dates for the next few years :
 
