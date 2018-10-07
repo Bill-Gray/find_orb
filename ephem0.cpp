@@ -3396,26 +3396,31 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
                   const size_t start_of_redacted_text = 25;
                   const size_t length_of_redacted_text = 77 - start_of_redacted_text;
                   char *tptr = buff + start_of_redacted_text;
+                  int max_term = 3;
+                  const char *terms[] = { "Astrometry", "redacted;",
+                                    "see", "NEOCP" };
+                  const char *terms2[] = { "Astrometry", "redacted;",
+                                  "click", "here", "for", "explanation" };
 
+                  if( n_redacted_lines > 2)
+                     max_term = 5;
                   strcpy( tptr, "<code class=\"neocp\">");
                   tptr += strlen( tptr);
                   memset( tptr, '~', length_of_redacted_text);
                   strcpy( tptr + length_of_redacted_text, "</code>");
-                  for( i = 3; i >= 0; i--)
-                     if( redacted_line_number == (i * (n_redacted_lines - 1) + 1) / 3)
+                  for( i = max_term; i >= 0; i--)
+                     if( redacted_line_number == (i * (n_redacted_lines - 1) + 1) / max_term)
                         {
-                        char tbuff[80];
-                        const char *terms[4] = { "Astrometry", "redacted;",
-                                    "see", "NEOCP" };
+                        char tbuff[180], *zptr;
+                        const char *term = (max_term == 3 ? terms : terms2)[i];
 
-                        strcpy( tbuff, "</code>");
-                        strcat( tbuff, terms[i]);
-                        strcat( tbuff, "<code class=\"neocp\">");
-                        memcpy( tptr + i * 15 + 2, terms[i], strlen( terms[i]));
-                        text_search_and_replace( tptr, terms[i], tbuff);
-                        if( i == 3)
-                           text_search_and_replace( tptr, terms[i],
-                                 "<a href=\"https://www.minorplanetcenter.net/iau/NEO/ToConfirm.html\">NEOCP</a>");
+                        strcpy( tbuff, "</code><a href='https://www.projectpluto.com/redacted.htm'>");
+                        strcat( tbuff, term);
+                        strcat( tbuff, "</a><code class=\"neocp\">");
+                        zptr = tptr + 2 + 15 * (i % 4);
+//                      zptr = tptr + 2 + (max_term == 3 ? 45 : 39) * i / max_term;
+                        memcpy( zptr, term, strlen( term));
+                        text_search_and_replace( tptr, term, tbuff);
                         }
                   for( i = 0; tptr[i]; i++)  /* replace all the tildes with */
                      if( tptr[i] == '~')     /* pseudorandom text, but skip */
