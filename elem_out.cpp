@@ -551,7 +551,7 @@ int monte_carlo_object_count = 0;
 int n_monte_carlo_impactors = 0;
 int append_elements_to_element_file = 0;
 int using_sr = 0;
-char orbit_summary_text[80];
+char orbit_summary_text[120];
 double max_monte_rms;
 
 void set_statistical_ranging( const int new_using_sr)
@@ -1052,13 +1052,15 @@ int write_out_elements_to_file( const double *orbit,
       sprintf( orbit_summary_text, "a=%.3f, ", elem.major_axis);
    else
       sprintf( orbit_summary_text, "q=%.3f, ", elem.q);
-   sprintf( orbit_summary_text + strlen( orbit_summary_text),
+   snprintf_append( orbit_summary_text, sizeof( orbit_summary_text),
             "e=%.3f, i=%d", elem.ecc, (int)( elem.incl * 180. / PI + .5));
    elem.is_asteroid = (object_type == OBJECT_TYPE_ASTEROID);
    if( elem.is_asteroid)
       {
       elem.slope_param = asteroid_magnitude_slope_param;
       elem.abs_mag = calc_absolute_magnitude( obs, n_obs);
+//    snprintf_append( orbit_summary_text, sizeof( orbit_summary_text),
+//                " H=%.1f", elem.abs_mag);
       }
    else              /* for comets, compute nuclear & total absolute mags */
       {
@@ -1225,7 +1227,8 @@ int write_out_elements_to_file( const double *orbit,
                      n_more_moids++;
                      }
                   if( !j && moid < .5)
-                      sprintf( orbit_summary_text + strlen( orbit_summary_text),
+                     snprintf_append( orbit_summary_text,
+                         sizeof( orbit_summary_text),
                          " MOID %.3f", moid);
                   }
                }
