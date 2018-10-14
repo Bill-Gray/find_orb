@@ -942,70 +942,110 @@ static double radar_snr_per_day( const RADAR_DATA *rdata,
    return( snr_per_day);
 }
 
+/* The following is a simple exercise in geometry:  if the sun and a
+planet have specified angular radii,  and are separated in the sky
+by 'sep' radians,  how much of the sun is blocked by the planet?
+Simple answers are handled first;  if sep > r_sun + r_planet,  there's
+no eclipse whatsoever,  and the planet is in full sunlight.  (Which
+happens about 99+% of the time,  even for most artsats.  So a quick
+check and returning 1 is all we usually need to do.)
 
-/*    Explanation of how 'shadow_check' determines if a given point is
-in the earth's shadow :
+   Next most common is the case where sep < r_planet - r_sun,  and
+the object is totally eclipsed and we return 0;  followed by the case
+where the earth/planet is fully on the sun's disk,  and the sunlight
+is just decreased by that fraction.
 
----_
-    \                     __
-     \                   /  \        . <- Obj_posn
- .    |                 |    |
-      |                  \__/
-     /
-____/
+   The rarest,  but most complicated,  case is where part of the planet's
+disk,  but not all of it,  is blocking some sunlight.  Even then,  the
+math to do the job is not rocket surgery... */
 
-radius Rsun             radius Rearth
-
-   To determine if an object is in the earth's shadow:  in the above
-diagram,  with the sun at the origin (0,0) and the earth along the x-axis
-at (earth_r, 0),  with earth_r = length of earth_loc vector,  the object
-is at
-
-x = (earth_loc . obj_posn) / earth_r
-
-   If x < earth_r,  we're closer to the sun than the earth is,  and are
-definitely not in the shadow.  If x > earth_r,  we can compute the radius
-of the earth's (umbral) shadow at that point as
-
-shadow_radius = Rearth - (x - earth_r) * (Rsun - Rearth) / earth_r
-
-   If shadow_radius < 0,  we're so far out from the sun that we can't
-possibly be in the umbra.  (Which is to say,  we're about four times
-further out than the moon,  at the point where the earth could just
-barely block the sun.)  But if x > earth_r and shadow_radius > 0,  we
-have to compute :
-
-off-axis vector = obj_posn - x * earth_loc / earth_r
-y = |off-axis vector|
-
-   And if y < shadow_radius,  we're in the umbra.
-*/
-
-static bool shadow_check( const double *earth_loc, const double *obs_posn)
+static double sunlight_visible( double r_sun, double r_planet, double sep)
 {
-   const double earth_r = vector3_length( earth_loc);
-   const double x = dot_product( earth_loc, obs_posn) / earth_r;
-   bool is_in_shadow = false;
+   double rval;
 
-   if( x > earth_r)
+   assert( sep > 0.);
+   assert( r_planet > 0.);
+   assert( r_sun > 0.);
+   if( sep > r_planet + r_sun)         /* not even a partial eclipse */
+      return( 1.);
+   else if( sep < r_planet - r_sun)    /* total eclipse */
+      return( 0.);
+
+   r_planet /= r_sun;      /* work in units of sun's apparent ang diam = 1 */
+   sep /= r_sun;
+   r_sun = 1.;
+   if( sep < r_sun - r_planet)         /* planet is transiting; */
+      rval = 1. - r_planet * r_planet;      /* "annular eclipse" */
+   else                  /* partial eclipse/transit */
       {
-      const double SUN_RADIUS_IN_AU = 696000. / AU_IN_KM;
-      const double shadow_radius = EARTH_MAJOR_AXIS_IN_AU
-              - (x - earth_r) * (SUN_RADIUS_IN_AU - EARTH_MAJOR_AXIS_IN_AU) / earth_r;
+      double x, y;      /* solve for x^2+y^2=1, (x-sep)^2+y^2=r_planet^2 */
+      double ang1, ang2;
+      const double r_planet2 = r_planet * r_planet;
 
-      if( shadow_radius > 0)
-         {
-         double off_axis_vector[3], y;
-         size_t i;
-
-         for( i = 0; i < 3; i++)
-            off_axis_vector[i] = obs_posn[i] - earth_loc[i] * x / earth_r;
-         y = vector3_length( off_axis_vector);
-         if( y < shadow_radius)
-            is_in_shadow = true;
-         }
+      x = (sep * sep + 1. - r_planet2) * .5 / sep;
+      assert( x >= -1.);
+      assert( x <= 1.);
+      y = sqrt( 1. - x * x);
+      ang1 = atan2( y, x);
+      ang2 = atan2( y, x - sep);
+      rval = 1 + (x * y - ang1) / PI;
+      rval -= (1. - ang2 / PI) * r_planet2 + (x - sep) * y / PI;
+      assert( rval > 0.);
+      assert( rval < 1.);
       }
-   return( is_in_shadow);
+   return( rval);
+}
+
+
+/*  'shadow_check' determines how much sunlight is blocked by a planet
+(thus far,  only the earth,  but could be extended to other planets and
+their moons).  This is used in ephems to show "Sha" instead of a
+magnitude if the object is in the earth's umbra;  to show a fainter
+magnitude if it's in the penumbra; and (eventually) will be used to
+decrease solar radiation pressure (SRP) in the force model as an
+object goes through a shadow.
+
+   To determine if an object is in the planet's shadow:  first,  we
+compute the elongation of the planet from the sun,  as seen from the
+object.  If that's more than a right angle,  we can say that we're
+on the daylit side and return 1.0 ("full sunlight").
+
+   Otherwise,  we compute the angular separation between the sun and
+planet as seen from the object,  and the angular radii of the sun
+and planet.  We can then use the above 'sunlight_visible' function
+to determine the fraction of the sun that is visible (not blocked),
+almost always 100% (you don't spend much time in the earth's shadow).
+
+   See http://www.minorplanet.info/MPB/issues/MPB_45-3.pdf for a discussion
+of two instances where this matters.  2008 TC3 and 2018 LA,  impactors,
+are other examples of objects passing through earth's shadow,  as are
+numerous artsats.    */
+
+static double shadow_check( const double *planet_loc,
+                            const double *obs_posn,
+                            const double planet_radius_in_au)
+{
+   const double r2 = dot_product( planet_loc, planet_loc);
+   const double dot = dot_product( planet_loc, obs_posn);
+   const double SUN_RADIUS_IN_AU = 696000. / AU_IN_KM;
+   double d = 0., angular_sep, r;
+   double ang_size_sun, ang_size_planet;
+   size_t i;
+
+   if( dot < r2)     /* object is 'sunside' of the planet */
+      return( 1.);
+   for( i = 0; i < 3; i++)
+      {
+      const double diff = obs_posn[i] - planet_loc[i];
+
+      d += diff * diff;
+      }
+   d = sqrt( d);        /* d = planet-object dist */
+   r = sqrt( r2);
+   angular_sep = acos( (dot - r2) / (d * r));
+   ang_size_sun = SUN_RADIUS_IN_AU / r;
+   ang_size_planet = planet_radius_in_au / d;
+   return( sunlight_visible( ang_size_sun, ang_size_planet, angular_sep));
 }
 
 double vector_to_polar( double *lon, double *lat, const double *vector)
@@ -1580,7 +1620,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
             char r_buff[20], solar_r_buff[20], fake_line[81];
             double cos_elong, solar_r, elong;
             bool moon_more_than_half_lit = false;
-            bool is_in_shadow = false;
+            double fraction_illum = 1.;    /* i.e.,  not in earth's shadow */
 
             strcpy( buff, "Nothing to see here... move along... uninteresting... who cares?...");
             solar_r = vector3_length( orbi_after_light_lag);
@@ -1639,7 +1679,6 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
             dec = ra_dec.y * 180. / PI;
             if( !obj_n)
                {
-
                for( j = 0; j < 3; j++)    /* compute alt/azzes of object (j=0), */
                   {                       /* sun (j=1), and moon (j=2)          */
                   DPT obj_ra_dec = ra_dec;
@@ -1660,7 +1699,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                         moon_more_than_half_lit =
                               (dot_product( earth_loc, vect) > 0.);
                         ecliptic_to_equatorial( vect);   /* mpc_obs.cpp */
-                        is_in_shadow = shadow_check( earth_loc, orbi_after_light_lag);
+                        fraction_illum = shadow_check( earth_loc, orbi_after_light_lag,
+                                    EARTH_MAJOR_AXIS_IN_AU);
                         cos_elong = dot_product( vect, geo)
                                  / (vector3_length( vect) * vector3_length( geo));
                         lunar_elong = acose( cos_elong);
@@ -1842,9 +1882,11 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
 
                if( abs_mag)           /* don't show a mag if you dunno how bright */
                   {                   /* the object really is! */
+                  if( fraction_illum && fraction_illum != 1.)
+                     curr_mag -= 2.5 * log10( fraction_illum);
                   if( two_place_mags)
                      snprintf_append( buff, sizeof( buff), " %5.2f", curr_mag + .005);
-                  else if( is_in_shadow)
+                  else if( fraction_illum == 0.)
                      strcat( buff, " Sha ");
                   else if( curr_mag < 99 && curr_mag > -9.9)
                      snprintf_append( buff, sizeof( buff), " %4.1f", curr_mag + .05);
