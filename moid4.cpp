@@ -29,6 +29,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "afuncs.h"
 
 #define PI 3.1415926535897932384626433832795028841971693993751058209749445923
+#define GAUSS_K .01720209895
+#define SOLAR_GM (GAUSS_K * GAUSS_K)
 
 int debug_printf( const char *format, ...)                 /* runge.cpp */
 #ifdef __GNUC__
@@ -61,15 +63,18 @@ static double compute_posn_and_derivative( const ELEMENTS *elem,
    const double true_r = elem->q * (1. + elem->ecc) / denom;
    const double x = true_r * cos_true_anom;
    const double y = true_r * sin_true_anom;
-   const double dx_dtheta = -y / denom;
-   const double dy_dtheta = (x + elem->ecc / denom) / denom;
    int i;
 
    for( i = 0; i < 3; i++)
       posn[i] = x * matrix[i][0] + y * matrix[i][1];
    if( vel)
+      {
+      const double dx_dtheta = -y / denom;
+      const double dy_dtheta = (x + elem->ecc * true_r) / denom;
+
       for( i = 0; i < 3; i++)
          vel[i] = dx_dtheta * matrix[i][0] + dy_dtheta * matrix[i][1];
+      }
    return( true_r);
 }
 
@@ -105,22 +110,26 @@ static double true_anomaly_to_eccentric( const double true_anom,
 /* In computing the MOID,  our "velocity" is really the derivative
 of the object's position with respect to true anomaly.  When it's time
 to compute the relative velocity of the two objects at the MOID point,
-we want a for-real,  true velocity:  the vector describing,  in km/s,
+we want a for-real,  true velocity:  the vector describing,  in AU/day,
 the velocity of each object relative to the center.  We can then
 subtract the vel2 vector from the vel1 vector,  and we'll know the
-velocity adjustment required to hop from one orbit to the other.  */
+velocity adjustment required to hop from one orbit to the other.
 
-static void set_true_velocity( double *vel_vect, const double r,
-                        const double semimajor_axis)
+   We computed dx/dtheta and dy/dtheta above.  Compute dtheta/dt,
+which (by Kepler's second law) runs as the inverse square of distance
+from the sun,  and we get dx/dt = dx/dtheta * dtheta/dt,  similarly
+for dy/dt. */
+
+static void set_true_velocity( double *vel_vect,
+            const double r, const double q, const double a)
 {
-   const double escape_velocity_at_one_au = 42.1219;     /* in km/s */
-   const double space_vel =
-               escape_velocity_at_one_au * sqrt( 1. / r - .5 / semimajor_axis);
-   const double vel_vect_length = vector3_length( vel_vect);
    size_t idx;
+   const double vel_at_perihelion =    /* in AU/day */
+            GAUSS_K * sqrt( 2. / q - 1. / a);
+   const double dtheta_dt = vel_at_perihelion * q / (r * r);
 
    for( idx = 0; idx < 3; idx++)
-      vel_vect[idx] *= space_vel / vel_vect_length;
+      vel_vect[idx] *= dtheta_dt;
 }
 
 #define N_STEPS 1080
@@ -226,11 +235,12 @@ double find_moid( const ELEMENTS *elem1, const ELEMENTS *elem2,
             {
             double delta_v[3];
 
-            set_true_velocity( deriv1, r1, elem1->major_axis);
-            set_true_velocity( deriv2, r2, elem2->major_axis);
+            set_true_velocity( deriv1, r1, elem1->q, elem1->major_axis);
+            set_true_velocity( deriv2, r2, elem2->q, elem2->major_axis);
             for( j = 0; j < 3; j++)
                delta_v[j] = deriv1[j] - deriv2[j];
-            *barbee_style_delta_v = vector3_length( delta_v);
+            *barbee_style_delta_v = vector3_length( delta_v);  /* in AU/day */
+            *barbee_style_delta_v *= AU_IN_KM / seconds_per_day;
             }
          }
 #ifdef TEST_VERSION
@@ -250,8 +260,6 @@ double find_moid( const ELEMENTS *elem1, const ELEMENTS *elem2,
    return( sqrt( least_dist_squared));
 }
 
-#define GAUSS_K .01720209895
-#define SOLAR_GM (GAUSS_K * GAUSS_K)
 
 #define N_PLANET_ELEMS 15
 #define N_PLANET_RATES 9
