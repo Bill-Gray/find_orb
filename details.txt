@@ -743,7 +743,9 @@ CON Phlox Cottage, Wantage Road, Gt Shefford
 CON Berkshire England RG17 7DA
 CON [peter (at) birtwhi (dot) demon.co (dot) uk]
 OBS P. Birtwhistle
-NET USNO-SA2.0
+COM Valid: 2002-2005 sep 15
+TEL 0.30-m f/6.3 Schmidt-Cassegrain + CCD
+COM Valid: 2005 sep 15-2100
 TEL 0.40-m f/6.0 Schmidt-Cassegrain + CCD
 
 COD J97 Alginet
