@@ -282,6 +282,8 @@ COM Valid: 2004 jul 1 - 2006
 OBS C. M. Casey
 COM Valid: 2011-2100
 OBS E. J. Christensen
+COM Valid: 2018 Jul 1 - 2300
+OBS G. A. Farneth
 COM Valid: 2014 Jan 1 - 2300
 OBS D. C. Fuls
 COM Valid: 2004 jul 1-2011
@@ -480,6 +482,8 @@ COM Valid: 2004 jul 1 - 2006
 OBS C. M. Casey
 COM Valid: 2011-2100
 OBS E. J. Christensen
+COM Valid: 2018 Jul 1 - 2300
+OBS G. A. Farneth
 COM Valid: 2014 Jan 1 - 2300
 OBS D. C. Fuls
 COM Valid: 2004 jul 1-2011
@@ -561,6 +565,8 @@ COM Valid: 2004 jul 1 - 2006
 OBS C. M. Casey
 COM Valid: 2011-2100
 OBS E. J. Christensen
+COM Valid: 2018 Jul 1 - 2300
+OBS G. A. Farneth
 COM Valid: 2014 Jan 1 - 2300
 OBS D. C. Fuls
 COM Valid: 2004 jul 1-2011
@@ -664,6 +670,8 @@ COM Valid: 2004 jul 1 - 2006
 OBS C. M. Casey
 COM Valid: 2011-2100
 OBS E. J. Christensen
+COM Valid: 2018 Jul 1 - 2300
+OBS G. A. Farneth
 COM Valid: 2014 Jan 1 - 2300
 OBS D. C. Fuls
 COM Valid: 2004 jul 1-2011
@@ -884,6 +892,8 @@ COM Valid: 2004 jul 1 - 2006
 OBS C. M. Casey
 COM Valid: 2011-2100
 OBS E. J. Christensen
+COM Valid: 2018 Jul 1 - 2300
+OBS G. A. Farneth
 COM Valid: 2014 Jan 1 - 2300
 OBS D. C. Fuls
 COM Valid: 2004 jul 1-2011
