@@ -948,6 +948,9 @@ double comet_nuclear_magnitude = 0.;        /* a.k.a. "M2" */
 #define ELEMENT_FRAME_J2000_EQUATORIAL          2
 #define ELEMENT_FRAME_BODY_FRAME                3
 
+#define ORBIT_SUMMARY_Q                1
+#define ORBIT_SUMMARY_H                2
+
 int write_out_elements_to_file( const double *orbit,
             const double curr_epoch,
             const double epoch_shown,
@@ -978,6 +981,7 @@ int write_out_elements_to_file( const double *orbit,
    const char *body_frame_note = NULL;
    int showing_sigmas = available_sigmas;
    int elements_frame = atoi( get_environment_ptr( "ELEMENTS_FRAME"));
+   const unsigned orbit_summary_options = atoi( get_environment_ptr( "ORBIT_SUMMARY_OPTIONS"));
 
    setvbuf( ofile, NULL, _IONBF, 0);
    setvbuf( stdout, NULL, _IONBF, 0);
@@ -1051,7 +1055,10 @@ int write_out_elements_to_file( const double *orbit,
    if( elem.ecc < .9)
       sprintf( orbit_summary_text, "a=%.3f, ", elem.major_axis);
    else
-      sprintf( orbit_summary_text, "q=%.3f, ", elem.q);
+      *orbit_summary_text = '\0';
+   if( elem.ecc >= .9 || (orbit_summary_options & ORBIT_SUMMARY_Q))
+      snprintf_append( orbit_summary_text, sizeof( orbit_summary_text),
+                                   "q=%.3f, ", elem.q);
    snprintf_append( orbit_summary_text, sizeof( orbit_summary_text),
             "e=%.3f, i=%d", elem.ecc, (int)( elem.incl * 180. / PI + .5));
    elem.is_asteroid = (object_type == OBJECT_TYPE_ASTEROID);
@@ -1059,8 +1066,9 @@ int write_out_elements_to_file( const double *orbit,
       {
       elem.slope_param = asteroid_magnitude_slope_param;
       elem.abs_mag = calc_absolute_magnitude( obs, n_obs);
-//    snprintf_append( orbit_summary_text, sizeof( orbit_summary_text),
-//                " H=%.1f", elem.abs_mag);
+      if( orbit_summary_options & ORBIT_SUMMARY_H)
+         snprintf_append( orbit_summary_text, sizeof( orbit_summary_text),
+                  " H=%.1f", elem.abs_mag);
       }
    else              /* for comets, compute nuclear & total absolute mags */
       {
@@ -1228,8 +1236,7 @@ int write_out_elements_to_file( const double *orbit,
                      }
                   if( !j && moid < .5)
                      snprintf_append( orbit_summary_text,
-                         sizeof( orbit_summary_text),
-                         " MOID %.3f", moid);
+                           sizeof( orbit_summary_text), " MOID %.3f", moid);
                   }
                }
          reference_shown = show_reference( buff);
