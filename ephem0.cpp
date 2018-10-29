@@ -3246,6 +3246,53 @@ static long round_off( const double ival, const double prec)
    return( rval);
 }
 
+/* Astrometry from NEOCP is not to be redistributed,  and is shown in
+pseudo-MPECs as being blacked out.  See
+
+https://www.projectpluto.com/redacted.htm
+
+   for some explanation of this,  and of the following code.  It figures
+out where in the redacted text to put links to the above explanation so
+people will understand why some data is removed in this seemingly
+strange manner.         */
+
+static inline void redacted_locations( const char *terms[],
+              const unsigned n_redacted_lines, unsigned *x, unsigned *y)
+{
+   unsigned i, n_terms = 0;
+
+   while( terms[n_terms])
+      n_terms++;
+   if( n_redacted_lines < 2)     /* can't do it */
+      {
+      for( i = 0; i < n_terms; i++)
+         x[i] = y[i] = 9;
+      return;
+      }
+   for( i = 0; i < n_terms; i++)
+      if( n_redacted_lines > 3)
+         y[i] = i * (n_redacted_lines - 1) / (n_terms - 1);
+      else
+         y[i] = i / (n_terms /  n_redacted_lines);
+   for( i = 0; i < n_terms; i++)
+      {
+      unsigned n_this_line = 0, start = 0, j;
+      const unsigned max_column = 49 - strlen( terms[i]);
+
+      for( j = 0; j < n_terms; j++)
+         if( y[j] == y[i])
+            {
+            if( !n_this_line)
+               start = j;
+            n_this_line++;
+            }
+      if( n_this_line == 1)      /* we've got the line to ourselves */
+         x[i] = rand( ) % max_column;     /* put the text anywhere */
+      else
+         x[i] = 1 + (i - start) * 47 / n_this_line + y[i] % 3;
+      }
+}
+
 char *mpec_error_message = NULL;
 
 int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
@@ -3438,31 +3485,26 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
                   const size_t start_of_redacted_text = 25;
                   const size_t length_of_redacted_text = 77 - start_of_redacted_text;
                   char *tptr = buff + start_of_redacted_text;
-                  int max_term = 3;
+                  unsigned max_term = 5, x[10], y[10];
                   const char *terms[] = { "Astrometry", "redacted;",
-                                    "see", "NEOCP" };
-                  const char *terms2[] = { "Astrometry", "redacted;",
-                                  "click", "here", "for", "explanation" };
+                                  "click", "here", "for", "explanation", NULL };
 
-                  if( n_redacted_lines > 2)
-                     max_term = 5;
                   strcpy( tptr, "<code class=\"neocp\">");
                   tptr += strlen( tptr);
                   memset( tptr, '~', length_of_redacted_text);
                   strcpy( tptr + length_of_redacted_text, "</code>");
+                  redacted_locations( terms, n_redacted_lines, x, y);
                   for( i = max_term; i >= 0; i--)
-                     if( redacted_line_number == (i * (n_redacted_lines - 1) + 1) / max_term)
+                     if( redacted_line_number == y[i])
                         {
                         char tbuff[180], *zptr;
-                        const char *term = (max_term == 3 ? terms : terms2)[i];
 
                         strcpy( tbuff, "</code><a href='https://www.projectpluto.com/redacted.htm'>");
-                        strcat( tbuff, term);
+                        strcat( tbuff, terms[i]);
                         strcat( tbuff, "</a><code class=\"neocp\">");
-                        zptr = tptr + 2 + 15 * (i % 4);
-//                      zptr = tptr + 2 + (max_term == 3 ? 45 : 39) * i / max_term;
-                        memcpy( zptr, term, strlen( term));
-                        text_search_and_replace( tptr, term, tbuff);
+                        zptr = tptr + 2 + x[i];
+                        memcpy( zptr, terms[i], strlen( terms[i]));
+                        text_search_and_replace( tptr, terms[i], tbuff);
                         }
                   for( i = 0; tptr[i]; i++)  /* replace all the tildes with */
                      if( tptr[i] == '~')     /* pseudorandom text, but skip */
