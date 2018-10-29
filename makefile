@@ -12,6 +12,7 @@
 #	'CLANG' = use clang instead of GCC;  Linux only
 # 'X' = use PDCurses instead of ncurses
 # 'VT' = use PDCurses with VT platform (see github.com/Bill-Gray/PDCurses/vt)
+# 'CC=g++-4.8' = use that version of g++;  helpful when testing older compilers
 # None of these: compile using g++ on Linux,  for Linux
 #
 # 'clean_temp' removes various temporary files made by Find_Orb and friends:
