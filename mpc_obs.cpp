@@ -4148,13 +4148,17 @@ static int get_year_and_mpc_half_month_letter( const double jd, char *letter)
    MPC references are stored as five-digit numbers.  The dreaded MPC 100K
 bug was triggered on 2016 May 21,  when MPCs 99895-100318 were issued.  MPC
 references past 99999 are now stored as '@' plus four digits.  Note that this
-doesn't buy us much;  we should hit the MPC 110K bug sometime in mid-2018.
+didn't buy us much;  we hit the MPC 110K bug sometime in mid-2018.
+
+   MPC references 110000 and up are stored as '#' plus four "mutant hex"
+(base 62) characters,  allowing us an additional 62^4 references.  At the
+current rate of using about 5000 MPC references a year,  this should last
+about 2900 years.
 
    MPS references are stored as 'a...z' plus four digits,  allowing 260K
 references.  To get beyond that,  MPC used a tilde (~) followed by four
 "mutant hex" digits (base 62),  to get us 260000+62^4 = 15 036 336
-references.  That oughta last us at least a little while.  I assume
-something similar will be done for MPC references when the time comes.
+references.
 
    MPEC references lack a year;  that's why they are often shown in the form
 'MPEC ????-whatever'.  But if the observation was made in the last year, we
@@ -4200,16 +4204,17 @@ static void reference_to_text( char *obuff, const char *reference,
       }
    else if( *reference == 'D' && isdigit( reference[1]))
       sprintf( obuff, "DASO %d", atoi( reference + 1));
-   else if( *reference == '~')      /* MPS number, packed as four digits */
-      {                             /* in base 62 "mutant hex"           */
-      unsigned i, mps_number = 0;
+   else if( *reference == '~' || *reference == '#')   /* MPS or MPC number, */
+      {                 /* packed as four "mutant hex" (base 62) digits */
+      unsigned i, number = 0;
 
       for( i = 1; i < 5; i++)
          {
-         mps_number *= 62;
-         mps_number += mutant_hex_char_to_int( reference[i]);
+         number *= 62;
+         number += mutant_hex_char_to_int( reference[i]);
          }
-      sprintf( obuff, "MPS %u", 260000 + mps_number);
+      sprintf( obuff, "MP%c %u", ((*reference == '~') ? 'S' : 'C'),
+                        number + ((*reference == '~') ? 260000 : 110000));
       }
    else           /* just copy it in,  but add a space */
       {
