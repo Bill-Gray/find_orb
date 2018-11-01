@@ -601,6 +601,8 @@ static void show_precovery_extent( char *obuff, const obj_location_t *objs,
 
 /* See 'precover.txt' for information on what's going on here. */
 
+#define FIELD_BUFF_N 1024
+
 static int find_precovery_plates( OBSERVE *obs, const int n_obs,
                            FILE *ofile, const double *orbit,
                            const int n_orbits, double epoch_jd,
@@ -611,8 +613,9 @@ static int find_precovery_plates( OBSERVE *obs, const int n_obs,
    int current_file_number = -1;
    double *orbi, stepsize = 1.;
    obj_location_t *p1, *p2, *p3;
+   int n_fields_read, n;
    const double abs_mag = calc_absolute_magnitude( obs, n_obs);
-   field_location_t field;
+   field_location_t *fbuff;
         /* Slightly easier to work with 'bit set means included' : */
    const int inclusion = atoi( get_environment_ptr( "FIELD_INCLUSION")) ^ 3;
    const bool show_base_60 = (*get_environment_ptr( "FIELD_DEBUG") != '\0');
@@ -635,137 +638,142 @@ static int find_precovery_plates( OBSERVE *obs, const int n_obs,
    setvbuf( ofile, NULL, _IONBF, 0);
    fprintf( ofile, "#CSS precovery fields\n");
    fprintf( ofile, "%s", precovery_header_line);
+   fbuff = (field_location_t *)calloc( FIELD_BUFF_N, sizeof( field_location_t));
+   assert( fbuff);
    orbi = (double *)malloc( 12 * n_orbits * sizeof( double));
    memcpy( orbi, orbit,     6 * n_orbits * sizeof( double));
-   while( fread( &field, sizeof( field), 1, ifile) == 1)
-      if( jd_is_in_range( field.jd, min_jd, max_jd))
-         {
-         double fraction, mag;
-         double margin = .1;
-         const double jdt = field.jd + td_minus_utc( field.jd) / seconds_per_day;
-         bool possibly_within_field = false;
-         double prob;
-         int i;
-
-         while( jdt < p1->jd || jdt > p2->jd)
+   while( (n_fields_read = fread( fbuff, sizeof( field_location_t), FIELD_BUFF_N, ifile)) > 0)
+      for( n = 0; n < n_fields_read; n++)
+         if( jd_is_in_range( fbuff[n].jd, min_jd, max_jd))
             {
-            const double new_p2_jd = ceil( (jdt - .5) / stepsize) * stepsize + .5;
-            const double scale_factor = 2.;
-
-            if( new_p2_jd == p1->jd)
-               memcpy( p2, p1, n_orbits * sizeof( obj_location_t));
-            else if( new_p2_jd != p2->jd)
-               {
-               p2->jd = new_p2_jd;
-               setup_obj_loc( p2, orbi, n_orbits, epoch_jd, NULL);
-               epoch_jd = p2->jd;
-               }
-            while( stepsize > p2->r * scale_factor)
-               stepsize /= 2.;
-            while( stepsize < p2->r * scale_factor)
-               stepsize *= 2.;
-            p1->jd = new_p2_jd - stepsize;
-            setup_obj_loc( p1, orbi, n_orbits, epoch_jd, NULL);
-            epoch_jd = p1->jd;
-            }
-         fraction = (jdt - p1->jd) / stepsize;
-         for( i = 0; i < n_orbits; i++)        /* compute approx RA/decs */
-            {
-            const double delta_ra = p2[i].ra - p1[i].ra;
-
-            p3[i].ra = p1[i].ra + fraction * centralize_ang_around_zero( delta_ra);
-            p3[i].dec = p1[i].dec + fraction * (p2[i].dec - p1[i].dec);
-            }
-         margin += EARTH_MAJOR_AXIS_IN_AU / p1->r;
-         mag = abs_mag + calc_obs_magnitude(
-                              p2->sun_obj, p2->r, p2->sun_earth, NULL);
-         if( mag < limiting_mag && precovery_in_field( &field, p3, n_orbits, margin) > .01)
-            {                          /* approx posn is on plate;  compute */
-            double *temp_orbit = orbi + 6 * n_orbits;
-
-            memcpy( temp_orbit, orbi, 6 * n_orbits * sizeof( double));
-            memcpy( p3, p2, n_orbits * sizeof( obj_location_t));
-            p3->jd = jdt;
-            setup_obj_loc( p3, temp_orbit, n_orbits, epoch_jd, field.obscode);
-            possibly_within_field = true;
-            }
-         if( mag < limiting_mag && possibly_within_field
-               && (prob = precovery_in_field( &field, p3, n_orbits, 0.)) > .1)
-            {
-            char time_buff[40], buff[200];
+            field_location_t field = fbuff[n];
+            double fraction, mag;
+            double margin = .1;
+            const double jdt = field.jd + td_minus_utc( field.jd) / seconds_per_day;
+            bool possibly_within_field = false;
+            double prob;
             int i;
-            bool matches_an_observation = false;
-            bool show_it = true;
-            double obj_ra = p3->ra, obj_dec = p3->dec;
 
-            full_ctime( time_buff, field.jd, FULL_CTIME_YMD
-                        | FULL_CTIME_LEADING_ZEROES
-                        | FULL_CTIME_MONTHS_AS_DIGITS | FULL_CTIME_TENTHS_SEC);
-            obj_ra = centralize_ang( obj_ra);
-            for( i = 0; i < n_obs; i++)
-               if( fabs( obs[i].jd - jdt) < 1.e-3
-                        && !strcmp( field.obscode, obs[i].mpc_code))
-                  matches_an_observation = true;
-            if( matches_an_observation)
-               show_it = ((inclusion & 2) != 0);
-            else
-               show_it = ((inclusion & 1) != 0);
-            if( show_it)
+            while( jdt < p1->jd || jdt > p2->jd)
                {
-               obj_ra *= 180. / PI;
-               obj_dec *= 180. / PI;
-               if( !show_base_60)
-                  snprintf( buff, sizeof( buff), "%8.4f %8.4f",
-                                    obj_ra, obj_dec);
+               const double new_p2_jd = ceil( (jdt - .5) / stepsize) * stepsize + .5;
+               const double scale_factor = 2.;
+
+               if( new_p2_jd == p1->jd)
+                  memcpy( p2, p1, n_orbits * sizeof( obj_location_t));
+               else if( new_p2_jd != p2->jd)
+                  {
+                  p2->jd = new_p2_jd;
+                  setup_obj_loc( p2, orbi, n_orbits, epoch_jd, NULL);
+                  epoch_jd = p2->jd;
+                  }
+               while( stepsize > p2->r * scale_factor)
+                  stepsize /= 2.;
+               while( stepsize < p2->r * scale_factor)
+                  stepsize *= 2.;
+               p1->jd = new_p2_jd - stepsize;
+               setup_obj_loc( p1, orbi, n_orbits, epoch_jd, NULL);
+               epoch_jd = p1->jd;
+               }
+            fraction = (jdt - p1->jd) / stepsize;
+            for( i = 0; i < n_orbits; i++)        /* compute approx RA/decs */
+               {
+               const double delta_ra = p2[i].ra - p1[i].ra;
+
+               p3[i].ra = p1[i].ra + fraction * centralize_ang_around_zero( delta_ra);
+               p3[i].dec = p1[i].dec + fraction * (p2[i].dec - p1[i].dec);
+               }
+            margin += EARTH_MAJOR_AXIS_IN_AU / p1->r;
+            mag = abs_mag + calc_obs_magnitude(
+                                 p2->sun_obj, p2->r, p2->sun_earth, NULL);
+            if( mag < limiting_mag && precovery_in_field( &field, p3, n_orbits, margin) > .01)
+               {                          /* approx posn is on plate;  compute */
+               double *temp_orbit = orbi + 6 * n_orbits;
+
+               memcpy( temp_orbit, orbi, 6 * n_orbits * sizeof( double));
+               memcpy( p3, p2, n_orbits * sizeof( obj_location_t));
+               p3->jd = jdt;
+               setup_obj_loc( p3, temp_orbit, n_orbits, epoch_jd, field.obscode);
+               possibly_within_field = true;
+               }
+            if( mag < limiting_mag && possibly_within_field
+                  && (prob = precovery_in_field( &field, p3, n_orbits, 0.)) > .1)
+               {
+               char time_buff[40], buff[200];
+               int i;
+               bool matches_an_observation = false;
+               bool show_it = true;
+               double obj_ra = p3->ra, obj_dec = p3->dec;
+
+               full_ctime( time_buff, field.jd, FULL_CTIME_YMD
+                           | FULL_CTIME_LEADING_ZEROES
+                           | FULL_CTIME_MONTHS_AS_DIGITS | FULL_CTIME_TENTHS_SEC);
+               obj_ra = centralize_ang( obj_ra);
+               for( i = 0; i < n_obs; i++)
+                  if( fabs( obs[i].jd - jdt) < 1.e-3
+                           && !strcmp( field.obscode, obs[i].mpc_code))
+                     matches_an_observation = true;
+               if( matches_an_observation)
+                  show_it = ((inclusion & 2) != 0);
                else
+                  show_it = ((inclusion & 1) != 0);
+               if( show_it)
                   {
-                  output_angle_to_buff( buff, obj_ra / 15., 3);
-                  buff[12] = ' ';
-                  output_signed_angle_to_buff( buff + 13, obj_dec, 2);
-                  }
-               fprintf( ofile, "%c %s %4.1f %s %s",
-                        (matches_an_observation ? '*' : ' '), buff, mag,
-                        time_buff, field.obscode);
-               if( current_file_number != field.file_number)
-                  {
-                  char filename[20];
-
-                  current_file_number = field.file_number;
-                  snprintf( filename, sizeof( filename), "css%d.csv",
-                                 current_file_number);
-                  if( original_file)
-                     fclose( original_file);
-                  original_file = fopen_ext( filename, "crb");
-                  if( !original_file)
-                     fprintf( ofile, "'%s' not opened\n", filename);
-                  }
-               show_precovery_extent( buff, p1, n_orbits);
-               snprintf_append( buff, sizeof( buff), " %.3f ", prob);
-               fprintf( ofile, "%s", buff);
-
-               if( original_file)
-                  {
-                  fseek( original_file, field.file_offset, SEEK_SET);
-                  if( fgets_trimmed( buff, sizeof( buff), original_file))
-                     {
-                     int loc;
-
-                     for( i = 0; buff[i]; i++)
-                        if( buff[i] == ',')
-                           buff[i] = ' ';
-                     if( sscanf( buff, "%*f %*f %*s %*s %24s%n",
-                                        time_buff, &loc) == 1)
-                        fprintf( ofile, " %s %s", time_buff, buff + loc);
-                     }
+                  obj_ra *= 180. / PI;
+                  obj_dec *= 180. / PI;
+                  if( !show_base_60)
+                     snprintf( buff, sizeof( buff), "%8.4f %8.4f",
+                                       obj_ra, obj_dec);
                   else
-                     fprintf( ofile, "File %d: seeked to %ld and failed",
-                              (int)field.file_number, (long)field.file_offset);
+                     {
+                     output_angle_to_buff( buff, obj_ra / 15., 3);
+                     buff[12] = ' ';
+                     output_signed_angle_to_buff( buff + 13, obj_dec, 2);
+                     }
+                  fprintf( ofile, "%c %s %4.1f %s %s",
+                           (matches_an_observation ? '*' : ' '), buff, mag,
+                           time_buff, field.obscode);
+                  if( current_file_number != field.file_number)
+                     {
+                     char filename[20];
+
+                     current_file_number = field.file_number;
+                     snprintf( filename, sizeof( filename), "css%d.csv",
+                                    current_file_number);
+                     if( original_file)
+                        fclose( original_file);
+                     original_file = fopen_ext( filename, "crb");
+                     if( !original_file)
+                        fprintf( ofile, "'%s' not opened\n", filename);
+                     }
+                  show_precovery_extent( buff, p1, n_orbits);
+                  snprintf_append( buff, sizeof( buff), " %.3f ", prob);
+                  fprintf( ofile, "%s", buff);
+
+                  if( original_file)
+                     {
+                     fseek( original_file, field.file_offset, SEEK_SET);
+                     if( fgets_trimmed( buff, sizeof( buff), original_file))
+                        {
+                        int loc;
+
+                        for( i = 0; buff[i]; i++)
+                           if( buff[i] == ',')
+                              buff[i] = ' ';
+                        if( sscanf( buff, "%*f %*f %*s %*s %24s%n",
+                                           time_buff, &loc) == 1)
+                           fprintf( ofile, " %s %s", time_buff, buff + loc);
+                        }
+                     else
+                        fprintf( ofile, "File %d: seeked to %ld and failed",
+                                 (int)field.file_number, (long)field.file_offset);
+                     }
+                  fprintf( ofile, "\n");
                   }
-               fprintf( ofile, "\n");
                }
             }
-         }
    fclose( ifile);
+   free( fbuff);
    if( original_file)
       fclose( original_file);
    free( orbi);
