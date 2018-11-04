@@ -169,7 +169,9 @@ int main( const int argc, const char **argv)
    FILE *lock_file = fopen( "lock.txt", "w");
    extern int combine_all_observations;
    const char *temp_obs_filename = "temp_obs.txt";
-   double jd_start = 0., user_selected_epoch = 0.;
+   double jd_start = 0., jd_end = 0., user_selected_epoch = 0.;
+   const double min_jd = 2400000.5;
+   const double max_jd = 2600000.5;
    int ephemeris_output_options = OPTION_ROUND_TO_NEAREST_STEP;
    int residual_format = RESIDUAL_FORMAT_SHORT;
    double mag_limit = 99.;
@@ -189,6 +191,7 @@ int main( const int argc, const char **argv)
    printf( "Content-type: text/html\n\n");
    fprintf( lock_file, "We're in\n");
    combine_all_observations = 1;
+   *ephemeris_step_size = '\0';
 #ifndef _WIN32
    for( i = 0; environ[i]; i++)
       fprintf( lock_file, "%s\n", environ[i]);
@@ -226,9 +229,6 @@ int main( const int argc, const char **argv)
    fprintf( lock_file, "Got boundary line: %s", boundary);
    while( get_multipart_form_data( boundary, field, buff, NULL, max_buff_size) >= 0)
       {
-      const double min_jd = 2400000.5;
-      const double max_jd = 2600000.5;
-
       if( !strcmp( field, "TextArea") || !strcmp( field, "upfile"))
          {
          if( strlen( buff) > 70)
@@ -297,18 +297,23 @@ int main( const int argc, const char **argv)
             }
          fclose( ofile);
          }
-      else if( !strcmp( field, "year"))
+      else if( !strcmp( field, "year") || !strcmp( field, "t_end"))
          {
-         jd_start = get_time_from_string( current_jd( ), buff,
+         const double jd = get_time_from_string( current_jd( ), buff,
              CALENDAR_JULIAN_GREGORIAN | FULL_CTIME_YMD | FULL_CTIME_TWO_DIGIT_YEAR, NULL);
-         if( jd_start < min_jd || jd_start > max_jd)
+
+         if( jd < min_jd || jd > max_jd)
             {
             printf( "<b>Ephemeris date out of range</b>\n");
-            printf( "<p>'%s' parsed as JD %f\n", buff, jd_start);
+            printf( "<p>'%s' parsed as JD %f\n", buff, jd);
             printf( "The ephemeris starting date must be between JD %.1f and %.1f.</p>\n",
                               min_jd, max_jd);
             return( 0);
             }
+         if( *field == 'y')
+            jd_start = jd;
+         else
+            jd_end = jd;
          }
       else if( !strcmp( field, "epoch"))
          {
@@ -465,6 +470,14 @@ int main( const int argc, const char **argv)
 
       orbits_to_use = sr_orbits;
       n_orbits_in_ephem = n_sr_orbits;
+      }
+   if( jd_end > min_jd)
+      {
+      if( !n_ephem_steps)
+         n_ephem_steps = 1;
+      if( !*ephemeris_step_size)
+         snprintf( ephemeris_step_size, sizeof( ephemeris_step_size),
+                  "%.6fd", (jd_end - jd_start) / (double)n_ephem_steps);
       }
    if( ephemeris_in_a_file_from_mpc_code( ephemeris_filename,
                orbits_to_use, obs, n_obs_actually_loaded,
