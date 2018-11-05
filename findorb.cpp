@@ -2364,6 +2364,13 @@ int main( const int argc, const char **argv)
             case 'n':
                max_mpc_color_codes = atoi( arg);
                break;
+            case 'O':          /* write output files to specified dir */
+               {
+               extern const char *output_directory;
+
+               output_directory = arg;
+               }
+               break;
             case 'o':            /* obj designation / ephemeris from orbital */
                break;            /* elems:  fall through, handle below */
             case 'p':
@@ -3645,19 +3652,14 @@ int main( const int argc, const char **argv)
             add_off_on = (observation_display & DISPLAY_ORBITAL_ELEMENTS);
             clear( );
             break;
-         case 'p':
-            if( element_precision < 15)
-               {
-               element_precision++;
-               update_element_display = 1;
-               }
-            break;
-         case 'P':
-            if( element_precision > 1)
-               {
+         case 'P':         /* show one less digit of precision in elements */
+         case 'p':         /* show one more digit of precision in elements */
+            if( c == 'P' && element_precision > 1)
                element_precision--;
-               update_element_display = 1;
-               }
+            else if( c == 'p' && element_precision < 15)
+               element_precision++;
+            update_element_display = 1;
+            sprintf( message_to_user, "%d digits\n", element_precision);
             break;
          case CTRL( 'P'):
             inquire( "Blunder probability: ", tbuff, sizeof( tbuff),
@@ -4481,7 +4483,10 @@ int main( const int argc, const char **argv)
          case 9:
             sort_obs_by_code = !sort_obs_by_code;
             break;
-         case ALT_A: case ALT_P:
+         case ALT_P:
+            obs[curr_obs].flags ^= OBS_IS_SELECTED;
+            break;
+         case ALT_A:
          case ALT_R: case ALT_X: case ALT_Y:
          case ALT_Z: case '\'':
          default:

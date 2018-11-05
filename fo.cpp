@@ -487,6 +487,13 @@ int main( const int argc, const char **argv)
             case 'n':
                starting_object = atoi( arg);
                break;
+            case 'O':          /* write output files to specified dir */
+               {
+               extern const char *output_directory;
+
+               output_directory = arg;
+               }
+               break;
             case 'o':            /* obj designation / ephemeris from orbital */
                break;            /* elems:  fall through, handle below */
             case 'p':

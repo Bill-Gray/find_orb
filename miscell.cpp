@@ -35,6 +35,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 int snprintf( char *string, const size_t max_len, const char *format, ...);
 #endif
 
+int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
+                                   const char *format, ...)
+#ifdef __GNUC__
+         __attribute__ (( format( printf, 3, 4)))
+#endif
+;
+
 /* This function allows one to put the following options in front of
 the 'permits' string :
 
@@ -98,7 +105,12 @@ void make_config_dir_name( char *oname, const char *iname)
 therefore putting some temporary files (ephemerides,  elements,  etc.)
 into the config directory ~/.find_orb.   If that's happening,  we ought
 to put our temporary files elsewhere,  in a directories of the form
-/tmp/find_orb(process ID). */
+/tmp/find_orb(process ID).
+
+   We can also deliberately put output files to a desired 'output_directory',
+via command-line options.    */
+
+const char *output_directory = NULL;
 
 FILE *fopen_ext( const char *filename, const char *permits)
 {
@@ -112,7 +124,7 @@ FILE *fopen_ext( const char *filename, const char *permits)
 #ifndef _WIN32
       extern bool findorb_already_running;
 
-      is_temporary = findorb_already_running;
+      is_temporary = findorb_already_running || (output_directory != NULL);
 #endif
       permits++;
       }
@@ -135,16 +147,17 @@ FILE *fopen_ext( const char *filename, const char *permits)
       {
       char tname[255];
       static int process_id = 0;
+      const bool first_time = (process_id == 0);
 
-      if( !process_id)
-         {
+      if( first_time)
          process_id = getpid( );
-         snprintf( tname, sizeof( tname),
-                 "/tmp/find_orb%d", process_id);
+      if( output_directory)
+         strcpy( tname, output_directory);
+      else
+         snprintf( tname, sizeof( tname), "/tmp/find_orb%d", process_id);
+      if( first_time)
          mkdir( tname, 0777);
-         }
-      snprintf( tname, sizeof( tname),
-                 "/tmp/find_orb%d/%s", process_id, filename);
+      snprintf_append( tname, sizeof( tname), "/%s",  filename);
       rval = fopen( tname, permits);
       }
 #endif
