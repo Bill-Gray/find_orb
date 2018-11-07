@@ -1098,6 +1098,21 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
                   c = 0;
                   break;
                   }
+            if( c)         /* you can also enter the number of the object */
+               {           /* within the on-screen list to select it */
+               i = 0;
+               while( isdigit( search_text[i]))
+                  i++;
+               if( !search_text[i])
+                  {
+                  i = atoi( search_text);
+                  if( i > 0 && i <= n_ids)
+                     {
+                     c = 0;
+                     choice = i - 1;
+                     }
+                  }
+               }
             }
          else
             *search_text = '\0';
