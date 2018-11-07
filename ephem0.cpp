@@ -2425,6 +2425,7 @@ void format_observation( const OBSERVE FAR *obs, char *text,
       snprintf_append( text, 40, "\t%c\t%s\t",
                    (obs->is_included ? ' ' : 'X'), obs->mpc_code);
       angle = obs->ra * 12. / PI;
+      angle += obs->ra_bias / (3600. * 15.);
       angle = fmod( angle, 24.);
       if( angle < 0.) angle += 24.;
       output_angle_to_buff( text + strlen( text), angle, obs->ra_precision);
@@ -2531,6 +2532,7 @@ void format_observation( const OBSERVE FAR *obs, char *text,
              ((base_format == RESIDUAL_FORMAT_FULL_WITH_TABS) ? "\t" : "");
 
       angle = obs->dec * 180. / PI;
+      angle += obs->dec_bias / 3600.;
       if( angle < 0.)
          {
          angle = -angle;
