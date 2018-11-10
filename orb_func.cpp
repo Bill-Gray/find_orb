@@ -2696,6 +2696,9 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
    const double r_mult = 1e+2;
    double orbit2[6];
    double max_allowed_error;
+   int set_locs_rval;
+   const bool saved_fail_on_hitting_planet =
+                                     fail_on_hitting_planet;
 
    perturbers_automatically_found = 0;
    if( asteroid_mass)                    /* If computing an asteroid mass, */
@@ -2788,7 +2791,10 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
       }
 
    sprintf( tstr, "fi/setting locs: %f  ", JD_TO_YEAR( epoch));
-   if( set_locs_extended( orbit, epoch, obs, n_obs, epoch2, orbit2))
+   fail_on_hitting_planet = true;
+   set_locs_rval = set_locs_extended( orbit, epoch, obs, n_obs, epoch2, orbit2);
+   fail_on_hitting_planet = saved_fail_on_hitting_planet;
+   if( set_locs_rval)
       {
       runtime_message = NULL;
       return( -4);
@@ -2872,7 +2878,6 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
          double original_solar_pressure[MAX_N_NONGRAV_PARAMS];
          double *slope_ptr;
          double rel_orbit[6];
-         int set_locs_rval;
 
                   /* for asteroid mass computations,  on first pass, */
                   /* try to set a "reasonable" delta :   */
@@ -2882,6 +2887,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
                                n_extra_params * sizeof( double));
          do
             {
+
             memcpy( tweaked_orbit, orbit, 6 * sizeof( double));
             memcpy( solar_pressure, original_solar_pressure,
                                 n_extra_params * sizeof( double));
@@ -2896,8 +2902,10 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
                                     n_params, n_iterations);
             if( debug_level > 4)
                debug_printf( "About to set locs #2: delta_val %f\n", delta_val);
+            fail_on_hitting_planet = true;
             set_locs_rval = set_locs_extended( tweaked_orbit, epoch, obs,
                        n_obs, epoch2, rel_orbit);
+            fail_on_hitting_planet = saved_fail_on_hitting_planet;
             if( debug_level > 4)
                debug_printf( "Second set done: %d\n", set_locs_rval);
             if( set_locs_rval == INTEGRATION_TIMED_OUT)
@@ -2960,7 +2968,9 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
                   solar_pressure[j] = 2. * original_solar_pressure[j] -
                                     solar_pressure[j];
             sprintf( tstr, "Evaluating %d of %d rev   ", i + 1, n_params);
+            fail_on_hitting_planet = true;
             set_locs( tweaked_orbit, epoch, obs, n_obs);
+            fail_on_hitting_planet = saved_fail_on_hitting_planet;
             }
          else
             memcpy( obs, orig_obs, n_obs * sizeof( OBSERVE));
