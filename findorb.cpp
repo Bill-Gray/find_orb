@@ -964,7 +964,8 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
    *search_text = '\0';
    if( ids && n_ids)
       {
-      int i, curr_page = 0, err_message = 0, force_full_width_display = 0;
+      int i, curr_page = 0, err_message = 0;
+      static int force_full_width_display = 0;
 
       clear( );
       while( rval == -1)
