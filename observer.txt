@@ -6,6 +6,7 @@
 ; these can be found with the JPL Small Body Database Browser,  and
 ; a citation describing the honoree is usually included.
 ;
+ Africano                                  <a href="https://catalina.lpl.arizona.edu/about/staff/brian-africano">Africano</a>
  Bamberger                                 <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0128345">Bamberger</a>
  Bedient                                   <a href="http://www.ifa.hawaii.edu/tops/bedient.html">Bedient</a>
  Bauer                                     <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0019494">Bauer</a>
@@ -74,6 +75,7 @@
  Larson                                    <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0003690">Larson</a>
  Lazzaro                                   <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0003602">Lazzaro</a>
  La Canada                                 La Ca&ntilde;ada
+ Leonard                                   <a href="https://catalina.lpl.arizona.edu/about/staff/greg-leonard">Leonard</a>
  Lipunov                                   <a href="http://xray.sai.msu.su/~lipunov/">Lipunov</a>
  Lovejoy                                   <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0061342">Lovejoy</a>
  Lowe                                      <a href="http://members.shaw.ca/andrewlowe/">Lowe</a>
@@ -122,6 +124,7 @@
  Sayer                                     <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0017853">Sayer</a>
  Schwab                                    <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0185638">Schwab</a>
  Schwartz                                  <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0013820">Schwartz</a>
+ Seaman                                    <a href="https://arxiv.org/find/all/1/all:+seaman_r/0/1/0/all/0/1">Seaman</a>
  Shelly                                    <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0017280">Shelly</a>
  Sherrod                                   <a href="http://www.arksky.org/pubs.htm">Sherrod</a>
  Shurpakov                                 <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0279274">Shurpakov</a>
