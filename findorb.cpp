@@ -3029,9 +3029,36 @@ int main( const int argc, const char **argv)
             const char *search_code =
                     mpc_color_codes[y - station_start_line].code;
 
-            curr_obs = (curr_obs + dir + n_obs) % n_obs;
-            while( FSTRCMP( obs[curr_obs].mpc_code, search_code))
+            if( button & button1_events)
+               {
                curr_obs = (curr_obs + dir + n_obs) % n_obs;
+               while( FSTRCMP( obs[curr_obs].mpc_code, search_code))
+                  curr_obs = (curr_obs + dir + n_obs) % n_obs;
+               }
+            else
+               {
+               int n_selected = 0, n_deselected = 0;
+
+               for( i = 0; i < n_obs; i++)
+                  if( !FSTRCMP( obs[i].mpc_code, search_code))
+                     {
+                     if( obs[i].flags & OBS_IS_SELECTED)
+                        n_selected++;
+                     else
+                        n_deselected++;
+                     }
+               for( i = 0; i < n_obs; i++)
+                  if( !FSTRCMP( obs[i].mpc_code, search_code))
+                     {
+                     if( n_selected < n_deselected)
+                        obs[i].flags |= OBS_IS_SELECTED;
+                     else
+                        obs[i].flags &= ~OBS_IS_SELECTED;
+                     }
+               snprintf( message_to_user, sizeof( message_to_user),
+                       "All obs from (%s) %sselected\n",
+                       search_code, (n_selected < n_deselected) ? "" : "de");
+               }
             }
          else if( y >= top_line_residuals)
             {
