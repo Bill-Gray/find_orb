@@ -2254,6 +2254,86 @@ static const char *get_arg( const int argc, const char **argv, const int idx)
       return( argv[idx + 1]);
 }
 
+static inline int initialize_curses( const int argc, const char **argv)
+{
+#ifdef __PDCURSES__
+   ttytype[0] = 20;    /* Window must have at least 20 lines in Win32a */
+   ttytype[1] = 55;    /* Window can have a max of 55 lines in Win32a */
+   ttytype[2] = 70;    /* Window must have at least 70 columns in Win32a */
+   ttytype[3] = (char)200; /* Window can have a max of 200 columns in Win32a */
+#endif
+
+#ifdef XCURSES
+   resize_term( 50, 98);
+   Xinitscr( argc, (char **)argv);
+#else
+   initscr( );
+#endif
+   if( debug_level > 2)
+      debug_printf( "Curses initialised, ");
+   cbreak( );
+   if( debug_level > 7)
+      debug_printf( "cbreak, ");
+   noecho( );
+   if( debug_level > 7)
+      debug_printf( "noecho, ");
+   clear( );
+   if( debug_level > 7)
+      debug_printf( "clear, ");
+   curses_running = true;
+   if( debug_level > 2)
+      debug_printf( "(2), ");
+#ifdef __PDCURSES__
+   PDC_set_blink( TRUE);
+   PDC_set_title( get_find_orb_text( 18));
+                              /* "Find_Orb -- Orbit Determination" */
+#endif
+   start_color( );
+   if( COLORS >= COLOR_FAINT_GRAY && can_change_color())
+      {
+      init_color( COLOR_GRAY, 500, 500, 500);
+      init_color( COLOR_BROWN, 500, 200, 0);
+      init_color( COLOR_ORANGE, 1000, 500, 0);
+      init_color( COLOR_FAINT_GREEN, 0, 500, 500);
+      init_color( COLOR_FAINT_BLUE, 0, 0, 500);
+      init_color( COLOR_FAINT_RED, 400, 0, 0);
+      init_color( COLOR_FAINT_GRAY, 300, 300, 300);
+      init_pair( COLOR_SCROLL_BAR, COLOR_GREEN, COLOR_GRAY);
+      init_pair( COLOR_MENU, COLOR_ORANGE, COLOR_FAINT_GRAY);
+      init_pair( COLOR_OBS_INFO, COLOR_WHITE, COLOR_FAINT_RED);
+      }
+   else
+      {
+      init_pair( COLOR_SCROLL_BAR, COLOR_GREEN, COLOR_CYAN);
+      init_pair( COLOR_MENU, COLOR_WHITE, COLOR_BLUE);
+      init_pair( COLOR_OBS_INFO, COLOR_WHITE, COLOR_RED);
+      }
+   init_pair( COLOR_BACKGROUND, COLOR_WHITE, COLOR_BLACK);
+   init_pair( COLOR_ORBITAL_ELEMENTS, COLOR_BLACK, COLOR_YELLOW);
+   init_pair( COLOR_FINAL_LINE, COLOR_WHITE, COLOR_BLUE);
+   init_pair( COLOR_SELECTED_OBS, COLOR_WHITE, COLOR_MAGENTA);
+   init_pair( COLOR_HIGHLIT_BUTTON, COLOR_BLACK, COLOR_GREEN);
+   init_pair( COLOR_EXCLUDED_OBS, COLOR_RED, COLOR_GREEN);
+   init_pair( COLOR_MESSAGE_TO_USER, COLOR_BLACK, COLOR_WHITE);
+   init_pair( COLOR_RESIDUAL_LEGEND, COLOR_BLACK, COLOR_CYAN);
+
+                  /* MPC color-coded station colors: */
+   init_pair( 16, COLOR_YELLOW, COLOR_BLACK);
+   init_pair( 17, COLOR_WHITE, COLOR_BLACK);
+   init_pair( 18, COLOR_MAGENTA, COLOR_BLACK);
+   init_pair( 19, COLOR_CYAN, COLOR_BLACK);
+   init_pair( 20, COLOR_GREEN, COLOR_BLACK);
+
+   if( debug_level > 2)
+      debug_printf( "(3)\n");
+   keypad( stdscr, 1);
+   mousemask( ALL_MOUSE_EVENTS, NULL);
+#ifdef USE_MYCURSES
+   initialize_global_bmouse( );
+#endif
+   return( 0);
+}
+
 extern const char *elements_filename;
 
 #define DISPLAY_BASIC_INFO           1
@@ -2486,33 +2566,11 @@ int main( const int argc, const char **argv)
    if( reset_astrometry_filename( argc, argv))
       drop_single_obs = false;
 
-#ifdef __PDCURSES__
-   ttytype[0] = 20;    /* Window must have at least 20 lines in Win32a */
-   ttytype[1] = 55;    /* Window can have a max of 55 lines in Win32a */
-   ttytype[2] = 70;    /* Window must have at least 70 columns in Win32a */
-   ttytype[3] = (char)200; /* Window can have a max of 200 columns in Win32a */
+   initialize_curses( argc, argv);
+#ifdef PDCURSES
+   original_xmax = getmaxx( stdscr);
+   original_ymax = getmaxy( stdscr);
 #endif
-
-#ifdef XCURSES
-   resize_term( 50, 98);
-   Xinitscr( argc, (char **)argv);
-#else
-   initscr( );
-#endif
-   if( debug_level > 2)
-      debug_printf( "Curses initialised, ");
-   cbreak( );
-   if( debug_level > 7)
-      debug_printf( "cbreak, ");
-   noecho( );
-   if( debug_level > 7)
-      debug_printf( "noecho, ");
-   clear( );
-   if( debug_level > 7)
-      debug_printf( "clear, ");
-   curses_running = true;
-   if( debug_level > 2)
-      debug_printf( "(2), ");
 
    if( !strcmp( argv[1], "c") || !strcmp( argv[1], "c+"))
       {
@@ -2521,17 +2579,6 @@ int main( const int argc, const char **argv)
       clipboard_to_file( temp_clipboard_filename, argv[1][1] == '+');
       argv[1] = temp_clipboard_filename;
       }
-#ifdef __PDCURSES__
-   original_xmax = getmaxx( stdscr);
-   original_ymax = getmaxy( stdscr);
-   PDC_set_blink( TRUE);
-   PDC_set_title( get_find_orb_text( 18));
-                              /* "Find_Orb -- Orbit Determination" */
-   if( strstr( longname( ), "SDL"))
-      resize_term( 40, 110);
-   if( !strcmp( longname( ), "Win32"))
-      resize_term( 52, 126);
-#endif
 
    ids = find_objects_in_file( argv[1], &n_ids, NULL);
    if( drop_single_obs)
@@ -2571,52 +2618,6 @@ int main( const int argc, const char **argv)
    if( debug_level > 2)
       debug_printf( "solutions set\n");
 
-   if( debug_level > 2)
-      debug_printf( "Initializing curses...");
-   start_color( );
-   if( COLORS >= COLOR_FAINT_GRAY && can_change_color())
-      {
-      init_color( COLOR_GRAY, 500, 500, 500);
-      init_color( COLOR_BROWN, 500, 200, 0);
-      init_color( COLOR_ORANGE, 1000, 500, 0);
-      init_color( COLOR_FAINT_GREEN, 0, 500, 500);
-      init_color( COLOR_FAINT_BLUE, 0, 0, 500);
-      init_color( COLOR_FAINT_RED, 400, 0, 0);
-      init_color( COLOR_FAINT_GRAY, 300, 300, 300);
-      init_pair( COLOR_SCROLL_BAR, COLOR_GREEN, COLOR_GRAY);
-      init_pair( COLOR_MENU, COLOR_ORANGE, COLOR_FAINT_GRAY);
-      init_pair( COLOR_OBS_INFO, COLOR_WHITE, COLOR_FAINT_RED);
-      }
-   else
-      {
-      init_pair( COLOR_SCROLL_BAR, COLOR_GREEN, COLOR_CYAN);
-      init_pair( COLOR_MENU, COLOR_WHITE, COLOR_BLUE);
-      init_pair( COLOR_OBS_INFO, COLOR_WHITE, COLOR_RED);
-      }
-   init_pair( COLOR_BACKGROUND, COLOR_WHITE, COLOR_BLACK);
-   init_pair( COLOR_ORBITAL_ELEMENTS, COLOR_BLACK, COLOR_YELLOW);
-   init_pair( COLOR_FINAL_LINE, COLOR_WHITE, COLOR_BLUE);
-   init_pair( COLOR_SELECTED_OBS, COLOR_WHITE, COLOR_MAGENTA);
-   init_pair( COLOR_HIGHLIT_BUTTON, COLOR_BLACK, COLOR_GREEN);
-   init_pair( COLOR_EXCLUDED_OBS, COLOR_RED, COLOR_GREEN);
-   init_pair( COLOR_MESSAGE_TO_USER, COLOR_BLACK, COLOR_WHITE);
-   init_pair( COLOR_RESIDUAL_LEGEND, COLOR_BLACK, COLOR_CYAN);
-
-                  /* MPC color-coded station colors: */
-   init_pair( 16, COLOR_YELLOW, COLOR_BLACK);
-   init_pair( 17, COLOR_WHITE, COLOR_BLACK);
-   init_pair( 18, COLOR_MAGENTA, COLOR_BLACK);
-   init_pair( 19, COLOR_CYAN, COLOR_BLACK);
-   init_pair( 20, COLOR_GREEN, COLOR_BLACK);
-
-
-   if( debug_level > 2)
-      debug_printf( "(3)\n");
-   keypad( stdscr, 1);
-   mousemask( ALL_MOUSE_EVENTS, NULL);
-#ifdef USE_MYCURSES
-   initialize_global_bmouse( );
-#endif
    while( !quit)
       {
       const int base_format = (residual_format & 3);
@@ -3331,13 +3332,11 @@ int main( const int argc, const char **argv)
                }
             solar_pressure[0] = solar_pressure[1] = solar_pressure[2] = 0.;
             break;
-#ifdef __WATCOMC__
          case KEY_F(8):     /* show original screens */
             endwin( );
             extended_getch( );
-            refresh( );
+            initialize_curses( argc, argv);
             break;
-#endif
          case 'a': case 'A':
             perturbers ^= (7 << 20);
             strcpy( message_to_user, "Asteroids toggled");
