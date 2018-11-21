@@ -432,9 +432,45 @@ Hil !-111.615864     +31.951503     1908.5     Kitt Peak, Hiltner
    Positions for the Jacobus Kapteyn Telescope from Keel et. al :
    http://iopscience.iop.org/article/10.1088/1538-3873/129/971/015002/pdf
    (SARA-Cerro Tololo is given above from its original source;  SARA-Kitt Peak
-   corrected via private communication from Bill Keel)
+   corrected via private communication from Bill Keel.) The 2369 meter altitude
+   given for JKT is above sea level; 40 meters is added to get an ellipsoidal
+   alt,  as it is for INT,  WHT,  and other Observatorio del Roque de Los
+   Muchachos (ORM) telescopes.
 G82 !-111.599597     +31.960596     2043       SARA Observatory, Kitt Peak
-JKT ! -175241.1      +284540.2      2369       Jacobus Kapteyn Telescope
+JKT ! -175241.1      +284540.2      2409       Jacobus Kapteyn Telescope
+
+   Source : http://www.ing.iac.es/Astronomy/telescopes/int/intcoord.html
+INT ! -17.877639     +28.762056     2376       Isaac Newton Telescope
+
+   Source : http://www.ing.iac.es/Astronomy/telescopes/wht/whtcoord.html
+WHT ! -17.881639     +28.760639     2372       William Herschel Telescope
+
+   Source : http://www.tng.iac.es/instruments/telescope_description.html
+Z19 ! -175320.6      +284514.4      2427.2     Telescopio Nazionale Galileo
+
+   Source : http://www.not.iac.es/telescope/tti/technical-details.html
+NOT ! -175306.3      +284526.2      2422       Nordic Optical Telescope
+
+   Source : http://telescope.livjm.ac.uk/TelInst/Spec/
+J13 ! -17.8792       +28.7624       2403       Liverpool Telescope, Canary Islands
+
+   Sources : http://www.mercator.iac.es/instruments/telescope/,
+   http://www.gtc.iac.es/gtc/gtc.php,  http://www.magic.iac.es/site/index.html
+   for altitudes.  For these scopes,   lat/lon is given to one arcsecond
+   = 30m precision,  so I'm sticking to G__gle Maps for that part.
+Z18 ! -175330.8      +284523.8      2340       Gran Telescopio Canarias
+Z20 ! -17.878484     +28.762366     2373       Mercator Telescope, Canary Islands
+Ma1 ! -17.890588     +28.761325     2271.38    MAGIC (southwest)
+Ma2 ! -17.890085     +28.761963     2271.38    MAGIC (northeast)
+
+   Various telescopes near JKT can be identified from
+   http://www.ing.iac.es/PR/visits/mapaorm.png (WARNING: South is _up_),
+   then measured via G__gle Maps.  I don't have altitudes for these scopes,
+   so they have the JKT altitude.
+
+SWw ! -17.880691     +28.759647     2409       Canary Islands Swedish Telescope (west)
+SWe ! -17.881313     +28.759634     2409       Canary Islands Swedish Telescope (east)
+J50 ! -17.882403     +27.759999     2409       La Palma-NEON
 
    Positions for some Haleakala scopes.  Sorting out which was which was done
    thanks to input from people who have worked there over the decades.  Positions
@@ -554,3 +590,4 @@ Sch !   8.76993      +45.86833      1278       Schiaparelli Observatory, 0.85-m 
 Sc2 !   8.77061      +45.86845      1278       Schiaparelli Observatory, 0.60-m scope
 
 Kwa ! 167.733333     +08.716666        5       Kwajalein Island
+G34 !  13.701403     +50.860289      490.67    Oberfrauendorf
