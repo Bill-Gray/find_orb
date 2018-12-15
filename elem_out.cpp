@@ -1941,6 +1941,8 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
          *orbit_epoch = elems.epoch;
          if( ephem_mode)
             obs->jd = *orbit_epoch + td_minus_ut( *orbit_epoch) / seconds_per_day;
+         if( ephem_mode || got_vectors == 1)
+            *perturbers = 0x7fe;    /* Merc-Pluto plus moon */
          set_locs( orbit, *orbit_epoch, obs, n_obs);
          if( ephem_mode)
             {
@@ -1954,7 +1956,7 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
       }
    if( !got_vectors)
       {
-      perturbers = 0;
+      *perturbers = 0;
       *orbit_epoch = initial_orbit( obs, n_obs, orbit);
       }
    return( got_vectors);
