@@ -1245,6 +1245,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    const double planet_radius_in_au =
           planet_radius_in_meters( planet_no) / AU_IN_METERS;
    const bool fake_astrometry = ((options & 7) == OPTION_FAKE_ASTROMETRY);
+   const int added_ra_dec_precision = atoi( get_environment_ptr( "ADDED_RA_DEC_PRECISION"));
 
    step = get_step_size( stepsize, &step_units, &n_step_digits);
    if( !step)
@@ -1312,10 +1313,12 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       }
    else if( ephem_type != OPTION_CLOSE_APPROACHES)
       {
-      char hr_min_text[80];
+      char hr_min_text[80], added_prec_text[10];
       const char *pre_texts[4] = { "", " HH", " HH:MM", " HH:MM:SS" };
 
       strcpy( hr_min_text, pre_texts[hh_mm]);
+      memset( added_prec_text, ' ', added_ra_dec_precision);
+      added_prec_text[added_ra_dec_precision] = '\0';
       if( n_step_digits)
          {
          strcat( hr_min_text, ".");
@@ -1346,7 +1349,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
          fprintf( ofile, "Date %s%s  ",
                         (*timescale ? "(TT)"  : "(UTC)"), hr_min_text);
          if( !(options & OPTION_SUPPRESS_RA_DEC))
-            fprintf( ofile, " RA              Dec         ");
+            fprintf( ofile, " RA%s              Dec%s         ",
+                                       added_prec_text, added_prec_text);
          if( !(options & OPTION_SUPPRESS_DELTA))
             fprintf( ofile, "delta  ");
          if( !(options & OPTION_SUPPRESS_SOLAR_R))
@@ -1389,7 +1393,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                hr_min_text[i] = '-';
          fprintf( ofile, "---- -- --%s  ",  hr_min_text);
          if( !(options & OPTION_SUPPRESS_RA_DEC))
-            fprintf( ofile, "-------------   -----------  ");
+            fprintf( ofile, "-------------%s   -----------%s  ",
+                                          added_prec_text, added_prec_text);
          if( !(options & OPTION_SUPPRESS_DELTA))
             fprintf( ofile, "------ ");
          if( !(options & OPTION_SUPPRESS_SOLAR_R))
@@ -1644,7 +1649,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
             if( computer_friendly)
                snprintf( ra_buff, sizeof( ra_buff), "%9.5f", ra * 15.);
             else
-               output_angle_to_buff( ra_buff, ra, 3);
+               output_angle_to_buff( ra_buff, ra, 3 + added_ra_dec_precision);
 
             ra_dec.y = asin( topo[2] / r);
             stored_ra_decs[obj_n] = ra_dec;
@@ -1759,8 +1764,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                snprintf( dec_buff, sizeof( dec_buff), "%9.5f", dec);
             else
                {
-               output_signed_angle_to_buff( dec_buff, dec, 2);
-               dec_buff[12] = '\0';
+               output_signed_angle_to_buff( dec_buff, dec, 2 + added_ra_dec_precision);
+               dec_buff[12 + added_ra_dec_precision] = '\0';
                }
             if( fake_astrometry)
                {
@@ -2144,7 +2149,7 @@ static void output_angle_to_buff( char *obuff, const double angle,
 {
    int n_digits_to_show = 0;
    int64_t power_mul, fraction;
-   size_t i;
+   size_t i, full_len = 12;
 
    if( (precision >= 100 && precision <= 109) /* decimal quantity, dd.dd... */
         || ( precision >= 200 && precision <= 208)) /* decimal ddd.dd... */
@@ -2182,6 +2187,8 @@ static void output_angle_to_buff( char *obuff, const double angle,
          case 1:        /* hh mm ss.s,  tenths of seconds */
          case 2:        /* hh mm ss.ss,  hundredths of seconds */
          case 3:        /* hh mm ss.sss,  thousands of seconds */
+         case 4: case 5: case 6:    /* possible extra digits in ephems */
+         case 7: case 8: case 9:
          case 307:      /* hhmmsss,  all packed together:  tenths */
          case 308:      /* hhmmssss,  all packed together: hundredths */
          case 309:      /* milliseconds (or milliarcseconds) */
@@ -2208,6 +2215,8 @@ static void output_angle_to_buff( char *obuff, const double angle,
                strcpy( obuff, "?");
             break;
          }
+   if( precision >= 4 && precision <= 11)
+      full_len += (size_t)( precision - 3);
    if( n_digits_to_show)
       {
       char format[7];
@@ -2215,11 +2224,11 @@ static void output_angle_to_buff( char *obuff, const double angle,
       if( precision < 307 || precision > 312)   /* omit decimal point for */
          strcat( obuff, ".");                    /* super-precise formats */
       snprintf( format, sizeof( format), "%%0%dd", n_digits_to_show);
-      snprintf_append( obuff, 13, format, fraction);
+      snprintf_append( obuff, full_len + 1, format, fraction);
       }
-   for( i = strlen( obuff); i < 12; i++)
+   for( i = strlen( obuff); i < full_len; i++)
       obuff[i] = ' ';
-   obuff[12] = '\0';
+   obuff[full_len] = '\0';
 }
 
 static void output_signed_angle_to_buff( char *obuff, const double angle,
