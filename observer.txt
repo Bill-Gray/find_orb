@@ -83,6 +83,7 @@
  Mainzer                                   <a href="http://science.jpl.nasa.gov/people/Mainzer/">Mainzer</a>
  Manca                                     <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0015460">Manca</a>
  Marinello                                 <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0229836">Marinello</a>
+ Masci                                     <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0438973">Masci</a>
  Masek                                     <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0009841">Ma&#353;ek</a>
  Masiero                                   <a href="http://twitter.com/joemasiero">Masiero</a>
  Matson                                    <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0073491">Matson</a>
@@ -152,4 +153,5 @@
  Wells                                     <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0072834">Wells</a>
  Weryk                                     <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0009281">Weryk</a>
  Wiggins                                   <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0004099">Wiggins</a>
+ Q.-Z. Ye                                  <a href="http://yeqzids.github.io/">Q.-Z. Ye</a>
  Zolnowski                                 <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0384815">&#379;o&#322;nowski</a>
