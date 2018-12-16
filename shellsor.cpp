@@ -150,9 +150,23 @@ void shellsort_r( void *base, const size_t n_elements, const size_t elem_size,
 /* printf( "Sort ends: %f\n", (double)clock( ) / (double)CLOCKS_PER_SEC); */
 }
 
+#ifdef NOT_CURRENTLY_USED
+/*  https://sourceware.org/ml/libc-alpha/2008-12/msg00007.html mentions
+that, with the arguments given in the order used in glibc,  a non-recursive
+sort can be (and,  in glibc,  is) implemented just by using the recursive
+version.  The last "context" parameter is simply ignored on all
+architectures of which the author was aware.
+
+   It seems like an excellent idea.  But it's a weird cast that produces a
+warning in GCC 8,  and I'm not actually calling the non-recursive sort
+anyway;  it's completely untested.  Hence the above #ifdef to remove both
+usused code and the warning. If I someday decide I need a non-recursive
+sort,  I'll deal with it all then. */
+
 void shellsort( void *base, const size_t n_elements, const size_t elem_size,
          int (*compare)(const void *, const void *))
 {
    shellsort_r( base, n_elements, elem_size,
                (int (*)(const void *, const void *, void *))compare, NULL);
 }
+#endif

@@ -3038,7 +3038,7 @@ static int write_observer_data_to_file( FILE *ofile, const char *ast_filename,
    for( i = 0; i < n_stations; i++)
       {
       char buff[200], tbuff[100];
-      char details[4][300];
+      char details[4][310];
       int details_found = 0;
       size_t loc;
 

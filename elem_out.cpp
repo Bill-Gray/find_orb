@@ -1535,7 +1535,8 @@ int write_out_elements_to_file( const double *orbit,
 
          full_ctime( buff, impact_time_utc,
                        FULL_CTIME_HUNDREDTH_SEC | CALENDAR_JULIAN_GREGORIAN);
-         sprintf( impact_buff, " %s lat %+9.5f lon ", buff,
+         snprintf( impact_buff, sizeof( impact_buff),
+               " %.55s lat %+9.5f lon ", buff,
                latlon[1] * 180. / PI);
          end_ptr = impact_buff + strlen( impact_buff);
                      /* 0 < longitude < 360;  for Earth,  show this in */

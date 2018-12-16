@@ -788,10 +788,10 @@ int main( const int argc, const char **argv)
                         if( summary_ofile)
                            {
                            FILE *ephemeris_ifile = fopen_ext( ephemeris_filename, "tfcrb");
-                           char new_line[300];
+                           char new_line[420];
 
                            tbuff[14] = '\0';
-                           sprintf( new_line, "<a href=\"%s\">%s</a>%s",
+                           snprintf( new_line, sizeof( new_line), "<a href=\"%s\">%s</a>%s",
                                     fullpath, tbuff, tbuff + 15);
                            memset( tbuff, 0, sizeof( tbuff));
                            while( j < 4 && fgets_trimmed( tbuff, sizeof( tbuff),
