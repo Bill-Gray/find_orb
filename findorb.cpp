@@ -308,7 +308,7 @@ static int extended_getch( void)
 int clipboard_to_file( const char *filename, const int append); /* clipfunc.cpp */
 int copy_file_to_clipboard( const char *filename);    /* clipfunc.cpp */
 
-#elif defined __PDCURSES__
+#elif defined __PDCURSES__ && !defined VT
 
 int clipboard_to_file( const char *filename, const int append)
 {
@@ -321,7 +321,6 @@ int clipboard_to_file( const char *filename, const int append)
       {
       FILE *ofile = fopen( filename, "wb");
 
-      printf( "Got %ld bytes\n", size);
       if( ofile)
          {
          fwrite( contents, size, 1, ofile);
@@ -344,7 +343,6 @@ int copy_file_to_clipboard( const char *filename)
 
       fseek( ifile, 0L, SEEK_END);
       length = (size_t)ftell( ifile);
-      printf( "Length is %d\n", (int)length);
       fseek( ifile, 0L, SEEK_SET);
       buff = (char *)malloc( length + 1);
       assert( buff);

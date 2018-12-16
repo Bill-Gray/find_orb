@@ -61,7 +61,7 @@ ifdef X
 endif
 
 ifdef VT
-	ADDED_CFLAGS=-DPDC_WIDE -I$(HOME)/PDCurses
+	ADDED_CFLAGS=-DPDC_WIDE -DVT -I$(HOME)/PDCurses
 	CURSES_LIB=$(HOME)/PDCurses/vt/libpdcurses.a
 endif
 
