@@ -258,7 +258,8 @@ COLLISION_ALTITUDE=50000
 LANGUAGE=e
 
    By default,  ephems show RAs to 0.001 seconds and decs to 0.01 arcseconds.  You
-   can reset the following to get up to six extra digits.  (At which point you've
-   a precision of ten nanoarcseconds,  which is essentially meaningless;  the last
-   few digits will be almost pure random numbers.)
+   can reset the following to be from -2 to 6,  to get two fewer digits (RA to
+   0.1 seconds,  dec to full arcseconds) to six extra digits.  For the latter,
+   the precision will be ten nanoarcseconds,  which is essentially meaningless;
+   the last few digits will be almost pure random numbers.
 ADDED_RA_DEC_PRECISION=0

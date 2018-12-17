@@ -1317,8 +1317,13 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       const char *pre_texts[4] = { "", " HH", " HH:MM", " HH:MM:SS" };
 
       strcpy( hr_min_text, pre_texts[hh_mm]);
-      memset( added_prec_text, ' ', added_ra_dec_precision);
-      added_prec_text[added_ra_dec_precision] = '\0';
+      if( added_ra_dec_precision > 0)
+         {
+         memset( added_prec_text, ' ', added_ra_dec_precision);
+         added_prec_text[added_ra_dec_precision] = '\0';
+         }
+      else
+         *added_prec_text = '\0';
       if( n_step_digits)
          {
          strcat( hr_min_text, ".");
@@ -1765,7 +1770,10 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
             else
                {
                output_signed_angle_to_buff( dec_buff, dec, 2 + added_ra_dec_precision);
-               dec_buff[12 + added_ra_dec_precision] = '\0';
+               if( added_ra_dec_precision < 0)
+                  dec_buff[12] = '\0';
+               else
+                  dec_buff[12 + added_ra_dec_precision] = '\0';
                }
             if( fake_astrometry)
                {
