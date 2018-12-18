@@ -123,6 +123,7 @@ devoted to station data.   */
 #define PI 3.1415926535897932384626433832795028841971693993751058209749445923
 
 #define RESIDUAL_FORMAT_SHOW_DELTAS              0x1000
+#define RESIDUAL_FORMAT_SHOW_DESIGS              0x2000
 
 double get_planet_mass( const int planet_idx);                /* orb_func.c */
 int simplex_method( OBSERVE FAR *obs, int n_obs, double *orbit,
@@ -1564,6 +1565,9 @@ void show_residuals( const OBSERVE FAR *obs, const int n_obs,
 
             show_residual_text( buff, line_no++, 0, color,
                                              obs[line_start + i].is_included);
+            if( residual_format & RESIDUAL_FORMAT_SHOW_DESIGS)
+               put_colored_text( obs[line_start + i].packed_id,
+                                   line_no - 1, strlen( buff) + 1, 12, color);
             }
       first_residual_shown = line_start;
       }
@@ -4527,6 +4531,8 @@ int main( const int argc, const char **argv)
             obs[curr_obs].flags ^= OBS_IS_SELECTED;
             break;
          case ALT_A:
+            residual_format ^= RESIDUAL_FORMAT_SHOW_DESIGS;
+            break;
          case ALT_R: case ALT_X: case ALT_Y:
          case ALT_Z: case '\'':
          default:
