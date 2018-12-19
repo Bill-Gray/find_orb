@@ -4040,7 +4040,7 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
             else                  /* (first) Vaisala pass */
                pseudo_r = .1;
 
-            while( pseudo_r < (i ? 5. : 100.) && orbit_looks_reasonable)
+            while( pseudo_r < (i ? 5. : 200.) && orbit_looks_reasonable)
                {
                double pseudo_r_to_use;
                int herget_rval;
