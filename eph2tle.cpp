@@ -688,6 +688,8 @@ int main( const int argc, const char **argv)
             reset_desigs_by_name( obj_name, &tle);
          }
       }
+   if( !strcmp( tle.intl_desig, default_intl_desig))
+      fprintf( stderr, "WARNING: International designation left at default!\n");
    for( i = 0; i < N_HIST_BINS; i++)
       histo_counts[i] = 0;
    if( tle.ephemeris_type == EPHEM_TYPE_SGP4)
@@ -975,8 +977,6 @@ int main( const int argc, const char **argv)
    free( vectors);
    free( slopes);
    printf( "All done\n");
-   if( !strcmp( tle.intl_desig, default_intl_desig))
-      fprintf( stderr, "WARNING: International designation left at default!\n");
    return( 0);
 }
 
