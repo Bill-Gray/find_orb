@@ -4698,11 +4698,24 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
                            optr->ra_bias, optr->dec_bias);
          if( show_alt_info)
             {
-            extern double overobserving_time_span;
+            if( !strcmp( optr->reference, "NEOCP") && optr->columns_57_to_65[3] == '~')
+               {
+               const int month = mutant_hex_char_to_int( optr->columns_57_to_65[4]);
 
-            snprintf_append( buff, 90, " Nnear=%.3f",
-                     n_nearby_obs( obs, n_obs, idx,
-                                  overobserving_time_span));
+               snprintf_append( buff, 90, "   %s %d %02d:%02d",
+                        set_month_name( month, NULL),
+                        mutant_hex_char_to_int( optr->columns_57_to_65[5]),
+                        mutant_hex_char_to_int( optr->columns_57_to_65[6]),
+                        mutant_hex_char_to_int( optr->columns_57_to_65[7]));
+               }
+            else
+               {
+               extern double overobserving_time_span;
+
+               snprintf_append( buff, 90, " Nnear=%.3f",
+                        n_nearby_obs( obs, n_obs, idx,
+                                     overobserving_time_span));
+               }
             }
          break;
       case 5:
