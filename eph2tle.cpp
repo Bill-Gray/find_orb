@@ -533,6 +533,7 @@ int main( const int argc, const char **argv)
    int histo_counts[N_HIST_BINS];
    static int histo_divs[N_HIST_BINS] = { 1, 3, 10, 30, 100, 300, 1000, 3000, 10000, 30000 };
    double levenberg_marquardt_lambda0 = 0.;
+   double sum_of_worst_resids = 0.;
 
    if( argc < 2)
       error_exit( -1);
@@ -669,6 +670,8 @@ int main( const int argc, const char **argv)
             fprintf( ofile, "# %s\n", buff);
          if( !memcmp( buff, "Orbital elements: ", 18))
             strcpy( obj_name, buff + 19);
+         if( !memcmp( buff, "Ephemeris", 9))
+            printf( "%s\n", buff);
          }
       if( *obj_name)
          {
@@ -924,6 +927,7 @@ int main( const int argc, const char **argv)
             fprintf( ofile, "%s\n", obj_name);
          obuff[69] = obuff[140] = '\0';
          fprintf( ofile, "%s\n%s\n", obuff, obuff + 71);
+         sum_of_worst_resids += worst_resid;
          if( worst_resid_in_run < worst_resid)
             {
             worst_resid_in_run = worst_resid;
@@ -962,6 +966,8 @@ int main( const int argc, const char **argv)
       fclose( ifile);
    while( 1)
       {
+      fprintf( ofile, "Avg worst resid: %.2f km                            \n",
+                                   sum_of_worst_resids / (double)tles_written);
       fprintf( ofile, "Worst residual in entire run: %.2f km on MJD %.1f\n",
                                    worst_resid_in_run, worst_mjd);
       fprintf( ofile, "       1     3     10    30    100   300"
