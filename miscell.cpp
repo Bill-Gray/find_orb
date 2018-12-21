@@ -319,7 +319,14 @@ static int make_fake_astrometry( const char *obj_name, const char *filename)
 
 /* The various flavors of Find_Orb have some similar logic in place
 to allow the programs to either download astrometry,  or to create
-a dummy file to generate ephemerides from stored orbital elements. */
+a dummy file to generate ephemerides from stored orbital elements.
+
+A command-line argument '-f' followed by an MPC designation causes the
+desired astrometry to be fetched from MPC,  and an orbit is computed.
+For a command-line argument '-o' followed by an MPC designation,  the
+orbital elements are _read_ (not computed) from 'mpcorb.sof',  and a
+single dummy observation is made that reflects the object's position
+at the epoch (see above 'make_fake_astrometry()' function).  */
 
 int reset_astrometry_filename( const int argc, const char **argv)
 {
