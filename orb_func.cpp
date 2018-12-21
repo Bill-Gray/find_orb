@@ -2679,7 +2679,6 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
    double sigma_squared = 0.;       /* see Danby, p. 243, (7.5.20) */
    double scale_factor = 1.;
    double integration_length;
-   double worst_error_in_sigmas;
    double before_rms;
    int planet_orbiting = forced_central_body, n_constraints = 0;
    int i, j, n_skipped_obs = 0, err_code = 0;
@@ -2864,6 +2863,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
    max_allowed_error = maximum_deltas( n_obs, obs);
    for( i = 0; i < n_params; i++)
       {
+      double worst_error_in_sigmas;
       int n_iterations = 0;
       const int max_iterations = 100;
 
