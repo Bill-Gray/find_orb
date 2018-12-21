@@ -2887,6 +2887,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
                                n_extra_params * sizeof( double));
          do
             {
+            bool orbit_changed = true;
 
             memcpy( tweaked_orbit, orbit, 6 * sizeof( double));
             memcpy( solar_pressure, original_solar_pressure,
@@ -2898,6 +2899,13 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
             else
                for( j = 6; j < n_params; j++)
                   solar_pressure[j - 6] -= unit_vectors[i][j] * delta_val;
+            if( !memcmp( tweaked_orbit, orbit, 6 * sizeof( double))
+                  && !memcmp( solar_pressure, original_solar_pressure,
+                                n_extra_params * sizeof( double)))
+               {
+               orbit_changed = false;
+               debug_printf( "Unchanged orbit\n");
+               }
             sprintf( tstr, "Evaluating %d of %d : iter %d   ", i + 1,
                                     n_params, n_iterations);
             if( debug_level > 4)
@@ -2908,7 +2916,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
             fail_on_hitting_planet = saved_fail_on_hitting_planet;
             if( debug_level > 4)
                debug_printf( "Second set done: %d\n", set_locs_rval);
-            if( set_locs_rval == INTEGRATION_TIMED_OUT)
+            if( set_locs_rval == INTEGRATION_TIMED_OUT || !orbit_changed)
                {
                free( xresids);
                memcpy( orbit, original_orbit, 6 * sizeof( double));
@@ -2967,7 +2975,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
                for( j = 0; j < n_extra_params; j++)
                   solar_pressure[j] = 2. * original_solar_pressure[j] -
                                     solar_pressure[j];
-            sprintf( tstr, "Evaluating %d of %d rev   ", i + 1, n_params);
+            memcpy( tstr, "Reverse   ", 10);
             fail_on_hitting_planet = true;
             set_locs( tweaked_orbit, epoch, obs, n_obs);
             fail_on_hitting_planet = saved_fail_on_hitting_planet;
