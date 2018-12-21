@@ -2977,7 +2977,9 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
                                     solar_pressure[j];
             memcpy( tstr, "Reverse   ", 10);
             fail_on_hitting_planet = true;
-            set_locs( tweaked_orbit, epoch, obs, n_obs);
+            set_locs_rval = set_locs( tweaked_orbit, epoch, obs, n_obs);
+            if( set_locs_rval)
+               debug_printf( "Symmetric fail : %d\n", set_locs_rval);
             fail_on_hitting_planet = saved_fail_on_hitting_planet;
             }
          else
