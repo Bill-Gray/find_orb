@@ -415,6 +415,8 @@ static double simplex_scoring( void *icontext, const double *ivect)
 
 #define MAX_PARAMS 10
 
+static size_t max_simplex_iter = 3000;
+
 int simplex_search( tle_t *tle, const double *starting_params,
                         const double *state_vect, const int ephem,
                         const unsigned n_steps, const double step_size,
@@ -423,7 +425,6 @@ int simplex_search( tle_t *tle, const double *starting_params,
    double simp[MAX_PARAMS * MAX_PARAMS];
    double *vects[MAX_PARAMS], fvals[MAX_PARAMS];
    size_t i, iter;
-   const size_t max_iter = 3000;
    bool done = false;
    simplex_context_t context;
    size_t n_params = 6;
@@ -450,7 +451,7 @@ int simplex_search( tle_t *tle, const double *starting_params,
    context.base_tle = tle;
    context.ephem_start = ephem_start;
    init_simplex( vects, fvals, simplex_scoring, &context, (int)n_params);
-   for( iter = 0; !done && iter < max_iter; iter++)
+   for( iter = 0; !done && iter < max_simplex_iter; iter++)
       {
       simplex_step( vects, fvals, simplex_scoring, &context, (int)n_params);
       if( fvals[n_params] / fvals[0] < 1.01 || fvals[0] < MIN_DELTA_SQUARED)
@@ -601,6 +602,9 @@ int main( const int argc, const char **argv)
                break;
             case 'r':
                srand( atoi( argv[i] + 2));
+               break;
+            case 'y':
+               max_simplex_iter = (size_t)atoi( argv[i] + 2);
                break;
             case 'z':
                n_iterations = atoi( argv[i] + 2);
