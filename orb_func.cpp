@@ -382,7 +382,7 @@ clock_t integration_timeout = (clock_t)0;
 
 int integrate_orbit( double *orbit, const double t0, const double t1)
 {
-   static double stepsize = 2.;
+   double stepsize = 2.;
    static double fixed_stepsize = -1.;
    const double chicken = .9;
    int reset_of_elements_needed = 1;
@@ -429,7 +429,6 @@ int integrate_orbit( double *orbit, const double t0, const double t1)
    ref_orbit.central_obj = -1;
    if( fixed_stepsize < 0.)
       fixed_stepsize = atof( get_environment_ptr( "FIXED_STEPSIZE"));
-   stepsize = fabs( stepsize);
    if( fixed_stepsize > 0.)
       stepsize = fixed_stepsize;
    if( going_backward)
