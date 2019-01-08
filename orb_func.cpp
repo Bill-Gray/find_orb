@@ -4175,6 +4175,14 @@ static int count_observations_used( const OBSERVE *obs, int n_obs)
 void get_first_and_last_included_obs( const OBSERVE *obs,
               const int n_obs, int *first, int *last);      /* elem_out.c */
 
+static double total_residual_err( const OBSERVE *obs)
+{
+   double xresid, yresid;
+
+   get_residual_data( obs, &xresid, &yresid);
+   return( sqrt( xresid * xresid + yresid * yresid));
+}
+
 /* extend_orbit_solution( ) is used if you have a solution covering part of
 the arc of observations,  and wish to extend it to cover more observations.
 To do this,  you might first look to see if the following or preceding
@@ -4210,7 +4218,7 @@ int extend_orbit_solution( OBSERVE FAR *obs, const int n_obs,
    initial_count = count_observations_used( obs, n_obs);
    get_first_and_last_included_obs( obs, n_obs, &first_idx, &last_idx);
    optr = obs + first_idx - 1;
-   while( first_idx > 0 && observation_rms( optr) < limit
+   while( first_idx > 0 && total_residual_err( optr) < limit
                 && obs[last_idx].jd - optr->jd < time_limit)
       {
       optr->is_included = 1;
@@ -4219,7 +4227,7 @@ int extend_orbit_solution( OBSERVE FAR *obs, const int n_obs,
       n_added++;
       }
    optr = obs + last_idx + 1;
-   while( last_idx < n_obs - 1 && observation_rms( optr) < limit
+   while( last_idx < n_obs - 1 && total_residual_err( optr) < limit
                 && optr->jd - obs[first_idx].jd < time_limit)
       {
       optr->is_included = 1;
