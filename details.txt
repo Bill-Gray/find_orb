@@ -464,6 +464,9 @@ COD C51
 MEA A. Mainzer, E. Wright, J. Bauer, T. Grav, J. Dailey
 MEA J. Masiero, R. Cutri, R. McMillan, R. Walker
 
+COD C95
+TEL 0.60-m f/3.2 Newtonian reflector + CCD
+
 COD D29
 OBS H. B. Zhao, B. Li, G. Zhaori, R. Q. Hong, L. F. Hu
 MEA H. B. Zhao, B. Li. H. Lu, G. Zhaori
@@ -795,6 +798,10 @@ OBS T. Namkhai, S. Schmalz
 MEA S. Schmalz
 TEL 0.4-m f/2.3 reflector + CCD
 
+COD P93
+OBS S. Okumura, T. Fujiwara
+TEL 1.0-m f/3.0 reflector + CCD
+
 COD Q38
 OBS M. Mattiazzo
 
@@ -836,9 +843,20 @@ MEA L. Denneau, A. Heinze, J. Tonry
 COM Valid: 2000 - 2018 May 1
 OBS B. Stalder, A. Sherstyuk
 COM Valid: 2018 May 1 - 2100
-OBS H. Flewelling
 OBS H. Flewelling, A. Fitzsimmons, D. Young
-NET 2MASS
+COM Valid: 2018 Sep 1 - 2100
+OBS B. Stalder
+TEL 0.5-m f/2.0 Schmidt + CCD
+
+COD T08
+OBS L. Denneau, A. Heinze, H. Weiland,  J. Tonry
+MEA L. Denneau, A. Heinze, J. Tonry
+COM Valid: 2000 - 2018 May 1
+OBS B. Stalder, A. Sherstyuk
+COM Valid: 2018 May 1 - 2100
+OBS H. Flewelling, A. Fitzsimmons, D. Young
+COM Valid: 2018 Sep 1 - 2100
+OBS B. Stalder
 TEL 0.5-m f/2.0 Schmidt + CCD
 
 COD T09
