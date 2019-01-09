@@ -385,18 +385,15 @@ Height above geoid 3250 m, geoid height -23 meters.
 
 H01 !-1071121.6      +335905.4      3227       Magdalena Ridge Observatory, Socorro
 
-   Spacewatch telescope positions are off.  (691) is wrong by
-almost half a kilometer.  I expect a corrected position will
-eventually appear in the MPC list,  but in the meantime,  these
-positions,  measured from Google Maps,  are probably good to
-about ten meters.  The altitudes come from
+   Spacewatch telescope positions are off.  (691) was wrong by
+almost half a kilometer,  but fixed January 2019.  (291) is still
+wrong,  though only by about 20 meters.  Altitude is from
 
 https://spacewatch.lpl.arizona.edu/telescopes
 
    with 30 meters subtracted for geoid height.
 
 291 !-111.599905     +31.961669     2045.      LPL/Spacewatch II
-691 !-111.600327     +31.962174     2061.      Steward Observatory, Kitt Peak-Spacewatch
 
    Other scopes measured while looking at Kitt Peak in Google Maps.
 Google Maps doesn't give me altitudes.  I used the altitude from (691).
