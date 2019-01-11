@@ -870,8 +870,9 @@ static int get_satellite_offset( const char *iline, double *xyz)
       if( observation_units == 1)         /* offset given in km */
          {
          xyz[i] /= AU_IN_KM;
-         if( strict_sat_xyz_format && decimal_loc != 6)
-            error_code = -1;
+         if( strict_sat_xyz_format)
+            if( decimal_loc < 6 || decimal_loc > 7)
+               error_code = -1;
          }
       else if( observation_units == 2)          /* offset in AU */
          {
