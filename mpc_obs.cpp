@@ -3231,8 +3231,8 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
             /* may tell you it's really a comet,  and the orbit may   */
             /* tell you it's an artsat.                               */
    object_type = OBJECT_TYPE_ASTEROID;
-   assert( !obs_details);
-   obs_details = init_observation_details( );
+   if( !obs_details)
+      obs_details = init_observation_details( );
    ades_context = init_ades2mpc( );
    while( fgets_with_ades_xlation( buff, sizeof( buff), ades_context, ifile)
                   && i != n_obs)
