@@ -2742,11 +2742,14 @@ int sort_obs_by_date_and_remove_duplicates( OBSERVE *obs, const int n_obs)
             obs[j - 1] = temp1;
             comment_observation( obs + j - 1, "NearDup  ");
             }
-         else                    /* Is still really a duplicate,  but the  */
-            {                    /* differences couldn't be fixed          */
-            obs[j] = obs[i];
-            comment_observation( obs + j - 1, "FixDup   ");
-            comment_observation( obs + j,     "FixDup   ");
+         else
+            {                    /* Is still really a duplicate,  but the  */
+            obs[j] = obs[i];     /* differences couldn't be fixed          */
+            if( tolower( obs[i].note2) != 'x' && tolower( obs[j].note2) != 'x')
+               {
+               comment_observation( obs + j - 1, "FixDup   ");
+               comment_observation( obs + j,     "FixDup   ");
+               }
             j++;
             }
          }
@@ -3685,7 +3688,8 @@ may have further information.  These observations will be excluded.\n",
       }
    for( i = 0; i < n_obs_actually_loaded; i++)
       if( rval[i].flags & OBS_NO_OFFSET)
-         n_sat_obs_without_offsets++;
+         if( tolower( rval[i].note2) != 'x')
+            n_sat_obs_without_offsets++;
    if( n_sat_obs_without_offsets)
       {
       sprintf( buff, "%u observations are from spacecraft,  but aren't marked\n",
