@@ -688,15 +688,19 @@ static void light_bending( const double *observer, double *result)
    for( i = 0; i < 3; i++)
       p[i] = result[i] - observer[i];
    plen = vector3_length( p);
+   if( plen < 1e-10)  /* don't do light-bending over really */
+      return;         /* short/meaningless distances */
    vector_cross_product( xprod, observer, result);
    vector_cross_product( dir, xprod, p);
    dlen = vector3_length( dir);
+   if( !dlen)
+      return;
    for( i = 0; i < 3; i++)
       dir[i] /= dlen;
      /* "dir" is now a unit vector perpendicular to p,  aimed away */
      /* from the sun */
-   phi1 = acos( dot_prod( result, observer) / (rlen * olen));
-   phi2 = acos( -dot_prod( p, observer) / (plen * olen));
+   phi1 = acose( dot_prod( result, observer) / (rlen * olen));
+   phi2 = acose( -dot_prod( p, observer) / (plen * olen));
    bending = bend_factor * (tan( phi1 / 2.) - tan( phi2 / 2.));
    bending *= plen;
    for( i = 0; i < 3; i++)
