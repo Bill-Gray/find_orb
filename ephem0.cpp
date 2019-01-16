@@ -642,7 +642,7 @@ static int find_precovery_plates( OBSERVE *obs, const int n_obs,
    assert( fbuff);
    orbi = (double *)malloc( 12 * n_orbits * sizeof( double));
    memcpy( orbi, orbit,     6 * n_orbits * sizeof( double));
-   while( (n_fields_read = fread( fbuff, sizeof( field_location_t), FIELD_BUFF_N, ifile)) > 0)
+   while( (n_fields_read = (int)fread( fbuff, sizeof( field_location_t), FIELD_BUFF_N, ifile)) > 0)
       for( n = 0; n < n_fields_read; n++)
          if( jd_is_in_range( fbuff[n].jd, min_jd, max_jd))
             {
@@ -3305,7 +3305,7 @@ static inline void redacted_locations( const char *terms[],
    for( i = 0; i < n_terms; i++)
       {
       unsigned n_this_line = 0, start = 0, j;
-      const unsigned max_column = 49 - strlen( terms[i]);
+      const unsigned max_column = 49 - (unsigned)strlen( terms[i]);
 
       for( j = 0; j < n_terms; j++)
          if( y[j] == y[i])
