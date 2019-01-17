@@ -176,6 +176,8 @@ static int unlink_config_file( const char *filename)
    return( err_code);
 }
 
+static bool unlink_partial_files = true;
+
 static void combine_element_files( const char *filename, const int n_processes)
 {
    FILE **input_files = (FILE **)calloc( (size_t)n_processes, sizeof( FILE *));
@@ -228,10 +230,13 @@ static void combine_element_files( const char *filename, const int n_processes)
 
       fclose( input_files[i]);
       process_count = i + 1;
-      err_code = unlink_config_file( filename);
-      if( err_code)
-         perror( buff);
-      assert( !err_code);
+      if( unlink_partial_files)
+         {
+         err_code = unlink_config_file( filename);
+         if( err_code)
+            perror( buff);
+         assert( !err_code);
+         }
       }
    free( input_files);
    fclose( ofile);
@@ -466,6 +471,9 @@ int main( const int argc, const char **argv)
                break;
             case 'h':                     /* show planet-centric orbits */
                all_heliocentric = false;
+               break;
+            case 'k':
+               unlink_partial_files = false;
                break;
             case 'i':
                {
