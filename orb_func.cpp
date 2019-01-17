@@ -2439,46 +2439,9 @@ cause trouble.  Too big,  and that O(h) or O(h^2) error will cause trouble.
    'full_improvement' attempts to address this issue dynamically.  It has
 to do six tweaks (sometimes seven or nine,  if you're solving for additional
 parameters such as non-gravitational params or an asteroid mass).  It looks
-at each tweak to make sure it had an effect of about 1.5 arcseconds.  If it
-didn't,  it re-scales the tweak (i.e.,  if the tweak only made a difference
-of 0.5 arcsec,  it'll triple the tweak size.)
-
-   However,  somewhat larger tweaks are usually OK.  The 'maximum' tweak
-computed below says that the limit should be one-twentieth of the entire
-span of the data.  That is,  if the arc is about five degrees long,  you
-don't want the tweaked orbit to differ by more than a quarter degree.  */
-
-static inline double maximum_deltas( int n_obs, const OBSERVE FAR *obs)
-{
-   double ra_min = obs->ra, ra_max = obs->ra;
-   double dec_min = obs->dec, dec_max = obs->dec;
-   double rval;
-
-   obs++;
-   while( n_obs--)
-      {
-      const double ra = fmod( obs->ra - ra_min + 7. * PI, 2. * PI) + ra_min - PI;
-      const double dec = obs->dec;
-
-      if( dec_max < dec)
-         dec_max = dec;
-      else if( dec_min > dec)
-         dec_min = dec;
-      if( ra_max < ra)
-         ra_max = ra;
-      else if( ra_min > ra)
-         ra_min = ra;
-      obs++;
-      }
-   rval = (ra_max - ra_min) * cos( (dec_max + dec_min) * .5);
-   if( rval < dec_max - dec_min)
-      rval = dec_max - dec_min;
-   rval *= (180. / PI) * 3600.;    /* cvt radians to arcseconds */
-   rval /= 20.;
-   if( rval > 3600.)
-      rval = 3600.;
-   return( rval + 2.);
-}
+at each tweak to make sure it had an effect somewhere between 'min_change' to
+'max_change' (see full_improvement() for those variables.)  If it fell outside
+that range,  the tweak is re-scaled and we try again.  */
 
 bool use_symmetric_derivatives = false;
 int forced_central_body = 0;
@@ -2697,7 +2660,6 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
                       atoi( get_environment_ptr( "DEBUG_DELTAS"));
    const double r_mult = 1e+2;
    double orbit2[6];
-   double max_allowed_error;
    int set_locs_rval;
    const bool saved_fail_on_hitting_planet =
                                      fail_on_hitting_planet;
@@ -2864,20 +2826,22 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
       memcpy( orig_obs, obs, n_obs * sizeof( OBSERVE));
       }
 
-   max_allowed_error = maximum_deltas( n_obs, obs);
    for( i = 0; i < n_params; i++)
       {
-      double worst_error_in_sigmas;
+      const double min_change = 0.3, max_change = 30.0, optimal_change = 1.0;
+      double low_delta = 0., high_delta = 0., low_change = 0., high_change = 0.;
       int n_iterations = 0;
       const int max_iterations = 100;
+      bool keep_iterating = true;
 
-      do
+      while( keep_iterating)
          {
          double tweaked_orbit[6];
          const double original_asteroid_mass = (asteroid_mass ? *asteroid_mass : 0.);
          double delta_val =
                       delta_vals[i] / (integration_length * integration_length);
-         double worst_error_squared = 0;
+         double worst_error_in_sigmas;
+         double worst_error_squared = 0, rescale;
          double original_solar_pressure[MAX_N_NONGRAV_PARAMS];
          double *slope_ptr;
          double rel_orbit[6];
@@ -3009,21 +2973,29 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
             debug_printf( "Iter %d, Change param %d: %f sigmas; delta %.3e (%.3e)\n",
                n_iterations,
                i, worst_error_in_sigmas, delta_val, delta_vals[i]);
-                        /* Attempt to keep the error at 1.5 sigmas: */
-         if( worst_error_in_sigmas)
+         worst_error_in_sigmas += 1e-10;        /* ensure _some change; */
+                           /* evades divide-by-zero/range errors below */
+         if( worst_error_in_sigmas > min_change && worst_error_in_sigmas < max_change)
+            keep_iterating = false;
+         if( worst_error_in_sigmas <= optimal_change)
             {
-//          double rescale = 1.5 / worst_error_in_sigmas;
-            double rescale = 1.0 / worst_error_in_sigmas;
-            const double max_rescale = (n_iterations ? 2. : 10.);
-
-            if( rescale > max_rescale)
-               rescale = max_rescale;
-            else if( rescale < 1. / max_rescale)
-               rescale = 1. / max_rescale;
-            delta_vals[i] *= rescale;
+            low_delta = delta_vals[i];
+            low_change = worst_error_in_sigmas;
             }
          else
-            delta_vals[i] *= 2.;
+            {
+            high_delta = delta_vals[i];
+            high_change = worst_error_in_sigmas;
+            }
+         rescale = optimal_change / worst_error_in_sigmas;
+         if( low_change && high_change)  /* we've got it bracketed */
+            {
+            const double slope = log( high_delta / low_delta)
+                               / log( high_change / low_change);
+
+            rescale = exp( log( rescale) * slope);
+            }
+         delta_vals[i] *= rescale;
          memcpy( solar_pressure, original_solar_pressure,
                                 n_extra_params * sizeof( double));
          if( asteroid_mass)
@@ -3039,8 +3011,6 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
             return( -4);
             }
          }
-         while( worst_error_in_sigmas > max_allowed_error
-                          || worst_error_in_sigmas < .3);
       }
    if( orig_obs)
       free( orig_obs);
@@ -3374,7 +3344,6 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
          const double after_rms = compute_rms( obs, n_obs);
 
          sprintf( tstr, "Half-stepping %d\n", 7 - i);
-         debug_printf( "'after' RMS %.4f; i %d\n", after_rms, i);
          if( after_rms > before_rms * 1.1 && !limited_orbit)
             {
             for( j = 0; j < 6; j++)
