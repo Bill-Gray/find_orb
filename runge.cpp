@@ -339,13 +339,6 @@ static void numerical_gradient( double *grad, const double *loc,
 
 double general_relativity_factor = 1.;
 
-   /* Somewhat artificially,  we set the relativistic effect to be zero */
-   /* when an object goes inside the sun (r < radius of the sun).  This */
-   /* just avoids a situation wherein the relativistic acceleration     */
-   /* explodes to infinity,  and the program drags to a crawl.  Similar */
-   /* trickery takes place for J2, J3, and J4 when an object runs inside */
-   /* a planet. */
-
 static void set_relativistic_accel( double *accel, const double *posnvel)
 {
    int i;
@@ -366,15 +359,11 @@ static void set_relativistic_accel( double *accel, const double *posnvel)
    const double r_component = 0.;
 #endif
 
-   if( r > SUN_R)
-      for( i = 0; i < 3; i++)
-         {
-         accel[i] = r_component * posnvel[i] + v_component * posnvel[i + 3];
-         accel[i] *= general_relativity_factor;
-         }
-   else                             /* shut off relativity inside the sun */
-      for( i = 0; i < 3; i++)
-         accel[i] = 0.;
+   for( i = 0; i < 3; i++)
+      {
+      accel[i] = r_component * posnvel[i] + v_component * posnvel[i + 3];
+      accel[i] *= general_relativity_factor;
+      }
 }
 
 /* This is explained on page 3 of
