@@ -256,7 +256,14 @@ static double jn_potential( const double *loc, const double j3,
 
 /* For an input planetocentric location in AU,  and a GM in AU^3/day^2,
 computes the planetocentric acceleration due to J2,  J3,  and J4,  in
-AU/day^2.  For the Earth,  the GGM03 model can be used;  see 'geo_pot.cpp'. */
+AU/day^2.  For the Earth,  the GGM03 model can be used;  see 'geo_pot.cpp'.
+
+   The number of needed terms appears to scale inversely (roughly) with
+height above the earth.  I put a somewhat arbitrary limit at 250 km;
+below this,  the number of terms can zoom upward with little real-world
+effect,  especially if the atmosphere matters.  Inside the earth,  we
+keep those three terms just to avoid a nasty numerical discontinuity,
+but recognize that the results are not actually meaningful.  */
 
 static void numerical_gradient( double *grad, const double *loc,
                    const double planet_gm,
@@ -281,13 +288,15 @@ static void numerical_gradient( double *grad, const double *loc,
       if( n_terms > 0)     /* n_term <= 0 -> use "usual" J2 & J3 & J4 */
          {
          double ht_above_ground = (r / EARTH_R) - 1.;
+         int n_added_terms = 0;
 
-         if( ht_above_ground < 0.)      /* inside of earth,  drop terms */
-            ht_above_ground = .04 - ht_above_ground * 10.;
-         if( ht_above_ground < 0.04)         /* less than about 250 km */
-            ht_above_ground = 0.04;
-         geo_potential_in_au( loc[0], loc[1], loc[2], grad,
-                      (int)( (double)n_terms / ht_above_ground) + 3);
+         if( ht_above_ground > 0.)
+            {
+            if( ht_above_ground < 0.04)         /* less than about 250 km */
+               ht_above_ground = 0.04;
+            n_added_terms =  (int)( (double)n_terms / ht_above_ground);
+            }
+         geo_potential_in_au( loc[0], loc[1], loc[2], grad, 3 + n_added_terms);
          return;
          }
       }
