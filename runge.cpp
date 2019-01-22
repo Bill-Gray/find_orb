@@ -282,6 +282,8 @@ static void numerical_gradient( double *grad, const double *loc,
          {
          double ht_above_ground = (r / EARTH_R) - 1.;
 
+         if( ht_above_ground < 0.)      /* inside of earth,  drop terms */
+            ht_above_ground = .04 - ht_above_ground * 10.;
          if( ht_above_ground < 0.04)         /* less than about 250 km */
             ht_above_ground = 0.04;
          geo_potential_in_au( loc[0], loc[1], loc[2], grad,
@@ -739,6 +741,7 @@ int calc_derivatives( const double jd, const double *ival, double *oval,
                            const int reference_planet)
 {
    double r, r2 = 0., solar_accel = 1. + object_mass;
+   double accel_multiplier = 1.;
    int i, j;
    unsigned local_perturbers = perturbers;
    double lunar_loc[3], jupiter_loc[3], saturn_loc[3];
@@ -773,11 +776,11 @@ int calc_derivatives( const double jd, const double *ival, double *oval,
       }
    if( r < planet_radius[0])     /* special fudge to keep acceleration from reaching */
       {                          /* infinity inside the sun;  see above notes        */
-      solar_accel *= compute_accel_multiplier( r / planet_radius[0]);
+      accel_multiplier = compute_accel_multiplier( r / planet_radius[0]);
       planet_hit = 0;
       if( debug_level)
          debug_printf( "Inside the sun: %f km\n", r * AU_IN_KM);
-      if( !solar_accel)
+      if( !accel_multiplier)
          {
          for( i = 3; i < 6; i++)
             oval[i] = 0.;
@@ -836,7 +839,6 @@ int calc_derivatives( const double jd, const double *ival, double *oval,
                    && !((excluded_perturbers >> i) & 1))
             {
             double planet_loc[15], accel[3], mass_to_use = planet_mass[i];
-            double accel_multiplier = 1.;
 
             r = r2 = 0.;
             if( i >= IDX_IO)       /* Galileans,  Titan */
@@ -926,9 +928,14 @@ int calc_derivatives( const double jd, const double *ival, double *oval,
                {
                accel_multiplier = compute_accel_multiplier( r / planet_radius[i]);
                planet_hit = i;
+               if( accel_multiplier == 0.)
+                  {
+                  for( i = 3; i < 6; i++)
+                     oval[i] = 0.;
+                  return( planet_hit);
+                  }
                }
-            if( i >= IDX_EARTH && i <= IDX_NEPTUNE && r < .015 && j2_multiplier
-                                 && accel_multiplier)
+            if( i >= IDX_EARTH && i <= IDX_NEPTUNE && r < .015 && j2_multiplier)
                {          /* Within .015 AU,  we take J2 into account: */
                double grad[3], delta_j2000[3], matrix[10], delta_planet[3];
                const double j2[6] = { EARTH_J2, MARS_J2, JUPITER_J2,
@@ -937,7 +944,6 @@ int calc_derivatives( const double jd, const double *ival, double *oval,
                         SATURN_J3, URANUS_J3, NEPTUNE_J3 };
                const double j4[6] = { EARTH_J4, MARS_J4, JUPITER_J4,
                         SATURN_J4, URANUS_J4, NEPTUNE_J4 };
-               const double total_j_mul = j2_multiplier * accel_multiplier;
 
                calc_approx_planet_orientation( i, 0, jd, matrix);
                            /* Remembering the 'accels' are 'deltas' now... */
@@ -947,7 +953,7 @@ int calc_derivatives( const double jd, const double *ival, double *oval,
                            /* ...then to planet-centered coords: */
                precess_vector( matrix, delta_j2000, delta_planet);
 
-               if( total_j_mul)
+               if( j2_multiplier)
                   numerical_gradient( grad, delta_planet,
                         planet_mass[i] * SOLAR_GM,
                         j2[i - 3], j3[i - 3], j4[i - 3]);
@@ -960,7 +966,7 @@ int calc_derivatives( const double jd, const double *ival, double *oval,
                equatorial_to_ecliptic( delta_j2000);
                            /* And add 'em to the output acceleration: */
                for( j = 0; j < 3; j++)
-                  oval[j + 3] -= total_j_mul * delta_j2000[j];
+                  oval[j + 3] -= j2_multiplier * delta_j2000[j];
                if( i == IDX_EARTH && r < ATMOSPHERIC_LIMIT && n_extra_params == 1
                            && !*get_environment_ptr( "DRAG_SHUTOFF"))
                   {
@@ -1026,10 +1032,10 @@ int calc_derivatives( const double jd, const double *ival, double *oval,
                best_fit_planet_dist = r;
                }
 
-            if( accel_multiplier)
+//          if( accel_multiplier)
                {
-               const double accel_factor = -SOLAR_GM * accel_multiplier
-                                         * mass_to_use / (r * r * r);
+               const double accel_factor =
+                               -SOLAR_GM * mass_to_use / (r * r * r);
 
                for( j = 0; j < 3; j++)
                   oval[j + 3] += accel_factor * accel[j];
@@ -1061,6 +1067,11 @@ int calc_derivatives( const double jd, const double *ival, double *oval,
                   oval[j + 3] += r * planet_loc[j + 12];
                }
             }
+   if( planet_hit != -1)
+      for( j = 3; j < 6; j++)
+         oval[j] *= accel_multiplier;
+   assert( (planet_hit != -1 && accel_multiplier != 1.)
+         || (planet_hit == -1 && accel_multiplier == 1.));
    return( planet_hit);
 }
 
