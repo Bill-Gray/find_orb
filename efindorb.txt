@@ -155,3 +155,32 @@
 2000    information about how to fix this.\n
 
 2001    This shows very little motion and is probably a star.\n
+
+2002    Didn't find observer (%s).  Observations will be excluded and
+2002    treated as geocentric.
+
+2003      You can fix this by downloading
+2003    the current list of MPC stations at\n
+2003    https://www.minorplanetcenter.net/iau/lists/ObsCodes.html\n
+2003    and saving it to the folder in which Find_Orb runs.
+
+2004      You can read about how to add
+2004    an XXX position for a new/temporary observer at\n
+2004    https://www.projectpluto.com/find_orb.htm#xxx_code
+
+2005    Didn't find observational bias data file
+2005    To include the FCCT14 bias data,  Find_Orb needs
+2005    the file 'bias.dat'.  There is more information
+2005    about this at https://www.projectpluto.com/bias.htm
+2005    Biases will not be applied until the file is available.
+
+2006    Find_Orb can use the NEOCP ephemeris you've given it.
+2006    However,  the ephemerides are geocentric.  You'll
+2006    get much better results if you select an observatory
+2006    code,  preferably one near the equator.  (781) Quito
+2006    is best for this purpose.
+
+2007    The observations span %.1f years,  greater than Find_Orb's
+2007    maximum span of %.1f years.  If you really want the whole
+2007    set of observations (which may not process correctly),  edit
+2007    'environ.dat' and look for the MAX_OBSERVATION_SPAN line.

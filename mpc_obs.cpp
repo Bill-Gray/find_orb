@@ -1654,7 +1654,6 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
 {
    unsigned time_format;
    double utc = extract_date_from_mpc_report( buff, &time_format);
-   char tbuff[300];
    const bool is_radar_obs = (buff[14] == 'R' || buff[14] == 'r');
    static bool fcct_error_message_shown = false;
    const double saved_ra_bias = obs->ra_bias;
@@ -1783,13 +1782,8 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
       {        /* i.e.,  we tried to get FCCT14 debiasing and failed */
       if( !fcct_error_message_shown && apply_debiasing)
          {
-         strcpy( tbuff, "Didn't find observational bias data file\n"
-                        "To include the FCCT14 bias data,  Find_Orb needs\n"
-                        "the file 'bias.dat'.  There is more information\n"
-                        "about this at https://www.projectpluto.com/bias.htm\n"
-                        "Biases will not be applied until the file is available.\n");
-         generic_message_box( tbuff, "o");
-         fcct_error_message_shown = true;
+         generic_message_box( get_find_orb_text( 2005), "o");
+         fcct_error_message_shown = true;   /* see efindorb.txt */
          }
       }
    set_up_observation( obs);
@@ -2136,16 +2130,9 @@ static bool get_neocp_data( char *buff, char *desig, char *mpc_code)
          memcpy( mpc_code, buff + 37, 3);
       else if( !already_warned)
          {
-         char msg[500];
-
-         already_warned = 1;
-         strcpy( msg, "Find_Orb can use the NEOCP ephemeris you've given it.\n");
-         strcat( msg, "However,  the ephemerides are geocentric.  You'll\n");
-         strcat( msg, "get much better results if you select an observatory\n");
-         strcat( msg, "code,  preferably one near the equator.  (781) Quito\n");
-         strcat( msg, "is best for this purpose.\n");
-         memcpy( mpc_code, "500", 3);
-         generic_message_box( msg, "o");
+         already_warned = 1;             /* warn about geocentric ephems */
+         memcpy( mpc_code, "500", 3);     /* see 'efindorb.txt' for more */
+         generic_message_box( get_find_orb_text( 2006), "o");
          }
       }
    else if( !memcmp( buff, " observatory code ", 18))
@@ -3556,10 +3543,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
    i = sort_obs_by_date_and_remove_duplicates( rval, n_obs_actually_loaded);
    if( i && rval[i - 1].jd - rval[0].jd > maximum_observation_span * days_per_year)
       {
-      sprintf( buff, "The observations span %.1f years,  greater than Find_Orb's\n"
-                     "maximum span of %.1f years.  If you really want the whole\n"
-                     "set of observations (which may not process correctly),  edit\n"
-                     "'environ.dat' and look for the MAX_OBSERVATION_SPAN line.",
+      snprintf( buff, sizeof( buff), get_find_orb_text( 2007),
                      (rval[i - 1].jd - rval[0].jd) /  days_per_year,
                      maximum_observation_span);
       generic_message_box( buff, "o");
