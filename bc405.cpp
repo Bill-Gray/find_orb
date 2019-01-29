@@ -44,6 +44,7 @@ is to convert the data to binary,  8-byte double-precision floats,  resulting
 in a file of 6 * 300 * 3654 = 52 617 600 bytes.  The input file is called
 'asteroid_ephemeris.txt';  we create 'bc405.dat'.    */
 
+const char *get_find_orb_text( const int index);      /* elem_out.cpp */
 int detect_perturbers( const double jd, const double * __restrict xyz,
                        double *accel);          /* bc405.cpp */
 double *get_asteroid_mass( const int astnum);   /* bc405.cpp */
@@ -124,14 +125,10 @@ static FILE *open_bc405_file( void)
          assert( ifile != NULL);
          }
       }
-   if( !ifile)
-      {
+   if( !ifile)             /* no asteroid ephems;  show err msg */
+      {                    /* (see efindorb.txt)                */
       failure_detected = 1;
-      generic_message_box(
-                  "No asteroid ephemeris data is available,  so\n"
-                  "asteroid perturbations cannot be included.  You can\n"
-                  "fix this by downloading the necessary files.  See\n"
-                  "https://www.projectpluto.com/ast_pert.htm for details.\n", "o");
+      generic_message_box( get_find_orb_text( 2021), "o");
       }
    return( ifile);
 }
