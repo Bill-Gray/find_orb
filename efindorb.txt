@@ -184,3 +184,54 @@
 2007    maximum span of %.1f years.  If you really want the whole
 2007    set of observations (which may not process correctly),  edit
 2007    'environ.dat' and look for the MAX_OBSERVATION_SPAN line.
+
+2008    Not all satellite observations were read correctly.
+2008    This shouldn't happen.  Please send your observation
+2008    file to pluto@projectpluto.com so it can be fixed.
+
+2009    %u observations were duplicates.  They have been removed.
+
+2010    %u satellite observations had incorrect offset data.  The file
+2010    'debug.txt' may have further information.  These observations
+2010    have been excluded.
+
+
+2011    %u observations were incorrectly formatted.  These observations
+2011    will be ignored.
+
+2012    %u observations are below the horizon.
+2013    %u observations were taken in sunlight.
+2014    These observations will be excluded.
+
+2015    %u observations match in date and observatory code,
+2015    but not in other regards.  They will be ignored.
+
+2016    %u observations match in date, RA/dec, magnitude, and MPC
+2016    code but not in other regards.  They will be ignored.
+
+2017    %u observations are from spacecraft,  but aren't marked
+2017    as such and lack the 'second line' offset data.  See\n
+2017    https://www.minorplanetcenter.net/iau/info/SatelliteObs.html
+2017    \nfor info on how to handle spacecraft-based observations.
+
+2018    The date/time for one or more observations is in the future.
+2018    If that's not what you expected,  you should check the data.
+
+2019    The file 'elp82.dat' is missing.  Without this file,
+2019    lunar positions will be very inaccurate and orbits will
+2019    be somewhat less accurate.  Either get the file,  or (better
+2019    solution) set up JPL ephemerides.  See
+2019    https://www.projectpluto.com/find_orb.htm#de_eph
+2019    for details on how to do this.
+
+2020    The file 'ps_1996.dat' is missing.  Without this file,
+2020    planetary positions will be inaccurate and orbits will
+2020    be somewhat less accurate.  Either get the file,  or (better
+2020    solution) set up JPL ephemerides.  See
+2020    https://www.projectpluto.com/find_orb.htm#de_eph
+2020    for details on how to do this.
+
+2021    No asteroid ephemeris data is available,  so
+2021    asteroid perturbations cannot be included.  You can
+2021    fix this by downloading the necessary files.  See
+2021    https://www.projectpluto.com/ast_pert.htm for details.
