@@ -3911,6 +3911,14 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
                }
 #endif
             }
+      if( *buff == '#')
+         {
+         i = 1;            /* check for CSS-style artsat cross-desig,  of */
+         while( isdigit( buff[i]))        /* form COM NORAD = Int'l desig */
+            i++;
+         if( i > 1 && i < 7 && !memcmp( buff + i, "U = ", 4))
+            memmove( buff + 1, buff + i + 2, strlen( buff + i + 1));
+         }
       if( !memcmp( buff, "#= ", 3))
          {
          *new_xdesig = '!';
