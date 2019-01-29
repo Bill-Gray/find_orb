@@ -112,6 +112,7 @@ void convert_ades_sigmas_to_error_ellipse( const double sig_ra,
          double *minor, double *angle);                      /* errors.cpp */
 #ifndef strlcpy
 size_t strlcpy(char *dest, const char *src, size_t size);   /* miscell.cpp */
+size_t strlcat(char *dest, const char *src, size_t size);   /* miscell.cpp */
 #endif
 
 int debug_printf( const char *format, ...)
@@ -1591,19 +1592,16 @@ void set_up_observation( OBSERVE FAR *obs)
          ;
       if( i == n_unfound && n_unfound < 10)     /* got a new one! */
          {
+         int text_to_add;
+
          FMEMCPY( unfound[n_unfound++], obs->mpc_code, 3);
-         sprintf( tbuff, "Didn't find observer %s\n", obs->mpc_code);
-         strcat( tbuff, "Observation(s) will be excluded and treated as\n"
-                        "geocentric.");
+         snprintf( tbuff, sizeof( tbuff), get_find_orb_text( 2002),
+                             obs->mpc_code);
          if( strcmp( obs->mpc_code, "XXX"))
-            strcat( tbuff, " You can fix this by downloading the\n"
-                        "current list of MPC stations at\n\n"
-                        "https://www.minorplanetcenter.net/iau/lists/ObsCodes.html\n\n"
-                        "and saving it to the folder in which Find_Orb runs.\n");
-         else
-            strcat( tbuff, " You can read about how to add an XXX\n"
-                    "position for a new/temporary observer at\n\n"
-                    "https://www.projectpluto.com/find_orb.htm#xxx_code\n");
+            text_to_add = 2003;   /* See efindorb.txt.  These reference */
+         else                     /* possible error messages.  */
+            text_to_add = 2004;
+         strlcat( tbuff, get_find_orb_text( text_to_add), sizeof( tbuff));
          generic_message_box( tbuff, "o");
          comment_observation( obs, "? NoCode");
          }
