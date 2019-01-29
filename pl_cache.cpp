@@ -37,6 +37,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "afuncs.h"
 #include "jpleph.h"
 
+const char *get_find_orb_text( const int index);          /* elem_out.cpp */
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 int debug_printf( const char *format, ...)                 /* runge.cpp */
 #ifdef __GNUC__
@@ -192,13 +193,7 @@ static int planet_posn_raw( int planet_no, const double jd,
 
          rval = -3;
          if( first_time)
-            generic_message_box( "\
-The file 'elp82.dat' is missing.  Without\n\
-this file,  lunar positions will be very inaccurate\n\
-and orbits will be somewhat less accurate.  Either\n\
-get the file,  or set up JPL ephemerides.  See\n\
-https://www.projectpluto.com/find_orb.htm#de_eph\n\
-for details on how to do this.", "o");
+            generic_message_box( get_find_orb_text( 2019), "o");
          first_time = 0;
          compute_rough_planet_loc( (jd - J2000) / 36525., 10, vect_2000);
          }
@@ -239,12 +234,7 @@ for details on how to do this.", "o");
 
       if( first_time)
          {
-         generic_message_box( "\
-The file 'ps_1996.dat' is missing.  Without it,\n\
-planetary positions will be of low accuracy.  Either\n\
-get the file,  or set up JPL ephemerides.  See\n\
-https://www.projectpluto.com/find_orb.htm#de_eph\n\
-for details on how to do this.", "o");
+         generic_message_box( get_find_orb_text( 2020), "o");
          debug_printf( "Loading ps_1996: rval %d, planet %d, JD %f\n",
                   rval, planet_no, jd);
          }
