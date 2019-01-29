@@ -292,6 +292,7 @@ static void collapse_findorb_txt( char **text)
          for( j = i + 1; text[j + 1]; j++)
             text[j] = text[j + 1];
          text[j] = NULL;
+         i--;        /* may be more lines to concatenate */
          }
       }
 }
