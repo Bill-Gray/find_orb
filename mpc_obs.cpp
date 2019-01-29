@@ -3558,35 +3558,28 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
    n_monte_carlo_impactors = 0;
    if( look_for_matching_line( NULL, NULL))
       {
-      strcpy( buff, "Not all satellite observations were read correctly.\n");
-      strcat( buff, "This shouldn't happen.  Please send your observation\n");
-      strcat( buff, "file to pluto@projectpluto.com so it can be fixed.\n");
       debug_printf( "%s:\n", rval->packed_id);
-      generic_message_box( buff, "o");
+      generic_message_box( get_find_orb_text( 2008), "o");
       }
    if( n_duplicate_obs_found)
       {
-      sprintf( buff, "%u observations were duplicates.\n",
+      snprintf( buff, sizeof( buff), get_find_orb_text( 2009),
                      n_duplicate_obs_found);
-      strcat( buff, "The duplicates have been removed.\n");
       debug_printf( "%s:\n", rval->packed_id);
       generic_message_box( buff, "o");
       }
    if( n_bad_satellite_offsets)
       {
       debug_printf( "%u bad sat offsets\n", n_bad_satellite_offsets);
-      snprintf( buff, sizeof( buff),
-          "%u satellite observations had incorrect offset data.  'debug.txt'\n\
-may have further information.  These observations will be excluded.\n",
+      snprintf( buff, sizeof( buff), get_find_orb_text( 2010),
                      n_bad_satellite_offsets);
       generic_message_box( buff, "o");
       }
 
    if( n_parse_failures)
       {
-      sprintf( buff, "%u observations were incorrectly formatted.\n",
+      snprintf( buff, sizeof( buff), get_find_orb_text( 2011),
                      n_parse_failures);
-      strcat( buff, "These observations will be ignored.\n");
       debug_printf( "%s:\n", rval->packed_id);
       generic_message_box( buff, "o");
       }
@@ -3620,13 +3613,12 @@ may have further information.  These observations will be excluded.\n",
       {
       *buff = '\0';
       if( n_below_horizon)
-         sprintf( buff, "%u observations are below the horizon.\n",
+         snprintf( buff, sizeof( buff), get_find_orb_text( 2012),
                         n_below_horizon);
       if( n_in_sunlight)
-         sprintf( buff + strlen( buff),
-                        "%u observations were taken in sunlight.\n",
+         snprintf( buff, sizeof( buff), get_find_orb_text( 2013),
                         n_in_sunlight);
-      sprintf( buff + strlen( buff), "These observations will be ignored.\n");
+      strlcat( buff, get_find_orb_text( 2014), sizeof( buff));
       debug_printf( "%s:\n", rval->packed_id);
       generic_message_box( buff, "o");
       }
@@ -3652,19 +3644,15 @@ may have further information.  These observations will be excluded.\n",
                }
    if( n_spurious_matches)
       {
-      sprintf( buff, "%u observations match in date and observatory code,\n",
+      snprintf( buff, sizeof( buff), get_find_orb_text( 2015),
                n_spurious_matches);
-      sprintf( buff + strlen( buff),
-                "but not in other regards.  They will be ignored.\n");
       debug_printf( "%s:\n", rval->packed_id);
       generic_message_box( buff, "o");
       }
    if( n_almost_duplicates_found)
       {
-      sprintf( buff, "%u observations match in date, RA/dec, magnitude, and MPC\n",
+      snprintf( buff, sizeof( buff), get_find_orb_text( 2016),
                n_almost_duplicates_found);
-      sprintf( buff + strlen( buff),
-                "code but not in other regards.  They will be ignored.\n");
       debug_printf( "%s:\n", rval->packed_id);
       generic_message_box( buff, "o");
       }
@@ -3674,17 +3662,12 @@ may have further information.  These observations will be excluded.\n",
             n_sat_obs_without_offsets++;
    if( n_sat_obs_without_offsets)
       {
-      sprintf( buff, "%u observations are from spacecraft,  but aren't marked\n",
+      snprintf( buff, sizeof( buff), get_find_orb_text( 2017),
                         n_sat_obs_without_offsets);
-      strcat( buff, "as such and lack the 'second line' offset data.  See\n\n");
-      strcat( buff, "https://www.minorplanetcenter.net/iau/info/SatelliteObs.html\n");
-      strcat( buff, "\nfor info on how to handle spacecraft-based observations.\n");
       generic_message_box( buff, "o");
       }
-   if( rval[n_obs_actually_loaded - 1].jd > current_jd( ))
-      generic_message_box(
-            "The date/time for one or more observations is in the future.\n"
-            "If that's not what you expected,  you should check the data.\n", "o");
+   if( rval[n_obs_actually_loaded - 1].jd > current_jd( ))   /* warn obs are */
+      generic_message_box( get_find_orb_text( 2018), "o");   /* in future */
 
    if( is_fcct14_data)
       remove_astdys_overobs_correction( n_obs, rval);
