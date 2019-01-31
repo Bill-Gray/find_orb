@@ -380,7 +380,8 @@ uint64_t parse_bit_string( const char *istr)
 }
 
 /* strlcat() and strlcpy() appear in some BSDs,  but I don't think they
-appear anyplace else (though in my opinion,  they should).   */
+appear anyplace else (though in my opinion,  they should).   The following
+is from http://www.openbsd.org/cgi-bin/cvsweb/src/lib/libc/string/ . */
 
 /* $OpenBSD: strlcpy.c,v 1.16 2019/01/25 00:19:25 millert Exp $   */
 
