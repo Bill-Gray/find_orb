@@ -3489,6 +3489,7 @@ int main( const int argc, const char **argv)
                   }
                if( err)    /* Full Monte Carlo isn't working.  Let's try SR, */
                   {        /* & recover from error by using the saved orbit */
+                  debug_printf( "Full improvement fail %d\n", err);
                   set_statistical_ranging( 1);
                   memcpy( orbit, saved_orbit, 6 * sizeof( double));
                   }
@@ -3557,8 +3558,15 @@ int main( const int argc, const char **argv)
 
             perturbers = 0;
             push_orbit( curr_epoch, orbit);
+            if( c == 'G')
+               {
+               inquire( "Initial Gauss rho: ", tbuff, sizeof( tbuff),
+                            COLOR_DEFAULT_INQUIRY);
+               orbit[0] = atof( tbuff);
+               gauss_soln = -1;
+               }
             new_epoch = convenient_gauss( obs, n_obs, orbit, 1., gauss_soln);
-            if( !new_epoch && gauss_soln)
+            if( !new_epoch && gauss_soln > 0)
                {
                gauss_soln = 0;
                new_epoch = convenient_gauss( obs, n_obs, orbit, 1., gauss_soln);

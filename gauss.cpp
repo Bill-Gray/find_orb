@@ -160,7 +160,12 @@ double gauss_method( const OBSERVE FAR *obs1, const OBSERVE FAR *obs2,
          fclose( ofile);
       return( 0.);
       }
-   r2 = roots[desired_soln];
+   if( desired_soln == -1)    /* we're supplying r2 */
+      r2 = orbit[0];
+   else
+      r2 = roots[desired_soln];
+   if( ofile)
+      fprintf( ofile, "Initial rho %f\n", r2);
 
    for( iteration = 0; keep_iterating && iteration < 96; iteration++)
       {
@@ -244,6 +249,9 @@ double gauss_method( const OBSERVE FAR *obs1, const OBSERVE FAR *obs2,
       if( ofile)
          fprintf( ofile, "%d: r2 = %f\np1 = %f   p2 = %f    p3 = %f\n",
                   iteration, r2, p1, p2, p3);
+      p1 = fabs( p1);
+      p2 = fabs( p2);
+      p3 = fabs( p3);
       if( p1 < 0. || p2 < 0. || p3 < 0.)
          keep_iterating = 0;
       else
@@ -328,7 +336,6 @@ static double find_best_obs_for_gauss( const OBSERVE FAR *obs,
          }
    return( max_d0);
 }
-
 
 /* The following function is,  as the name suggests,  "just for the sake
 of convenience."  Given an array of observations,  it finds the first
