@@ -472,9 +472,11 @@ int main( const int argc, const char **argv)
             case 'h':                     /* show planet-centric orbits */
                all_heliocentric = false;
                break;
+#ifdef FORKING
             case 'k':
                unlink_partial_files = false;
                break;
+#endif
             case 'i':
                {
                extern int ignore_prev_solns;
