@@ -3093,30 +3093,12 @@ int main( const int argc, const char **argv)
                            / (station_start_line - top_line_residuals - 1);
             else
                {              /* clicked among the observations */
-               const char *legnd = legends[residual_format & 3];
                int new_curr = first_residual_shown + (y - top_line_residuals);
 
                if( base_format == RESIDUAL_FORMAT_SHORT)  /* multi-obs per line */
                   new_curr += total_obs_lines * (x * obs_per_line / max_x);
 
-               if( (unsigned)x < strlen( legnd) && ( button & BUTTON_CTRL)
-                              && strchr( "YMD", legnd[x]))
-                  {
-                  double dt = 1., jd;
-
-                  if( legnd[x] == 'Y')
-                     dt = 365.;
-                  else if( legnd[x] == 'M')
-                     dt = 30.;
-                  jd = obs[curr_obs].jd + (double)dir * dt;
-                  if( dir < 0)
-                     while( curr_obs && obs[curr_obs].jd > jd)
-                        curr_obs--;
-                  else
-                     while( curr_obs < n_obs - 1 && obs[curr_obs].jd < jd)
-                        curr_obs++;
-                  }
-               else if( new_curr < n_obs)  /* "normal" click in the observations area */
+               if( new_curr < n_obs)  /* "normal" click in the observations area */
                   {
                   const int prev_curr_obs = new_curr;
 
