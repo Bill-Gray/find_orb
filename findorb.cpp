@@ -376,10 +376,10 @@ int copy_file_to_clipboard( const char *filename)
 
 static bool curses_running = false;
 
-int inquire( const char *prompt, char *buff, const int max_len,
-                     const int color)
+static int full_inquire( const char *prompt, char *buff, const int max_len,
+                     const int color, int line, int col)
 {
-   int i, j, rval, line, col, n_lines = 1, line_start = 0, box_size = 0;
+   int i, j, rval, n_lines = 1, line_start = 0, box_size = 0;
    const int side_borders = 1;   /* leave a blank on either side */
    int real_width;
    char tbuff[200];
@@ -405,9 +405,23 @@ int inquire( const char *prompt, char *buff, const int max_len,
    if( box_size > getmaxx( stdscr) - 2)
       box_size = getmaxx( stdscr) - 2;
 
-   line = (getmaxy( stdscr) - n_lines) / 2;
-   col = (getmaxx( stdscr) - box_size) / 2;
    real_width = side_borders * 2 + box_size;
+   if( line == -1)         /* just center the box */
+      {
+      line = (getmaxy( stdscr) - n_lines) / 2;
+      col = (getmaxx( stdscr) - box_size) / 2;
+      }
+   else              /* pop-up; may move above or below */
+      {
+      if( line + n_lines >= getmaxy( stdscr))
+         line -= n_lines;
+      else
+         line++;
+      if( col + real_width >= getmaxx( stdscr))
+         col -= real_width;
+      else
+         col++;
+      }
    tbuff[real_width] = '\0';
          /* Store rectangle behind the 'inquiry box': */
    buffered_screen = (chtype *)calloc( n_lines * real_width,
@@ -466,6 +480,7 @@ int inquire( const char *prompt, char *buff, const int max_len,
             get_mouse_data( &x, &y, &z, &button);
             x -= col - side_borders;
             y -= line - n_lines;
+            rval = 27;                 /* get this if outside box */
             if( y >= 0 && y < n_lines)
                if( x >= 0 && x < real_width)
                   rval = KEY_F( y + 1);
@@ -479,6 +494,12 @@ int inquire( const char *prompt, char *buff, const int max_len,
             buffered_screen + i * real_width, real_width);
    free( buffered_screen);
    return( rval);
+}
+
+int inquire( const char *prompt, char *buff, const int max_len,
+                     const int color)
+{
+   return( full_inquire( prompt, buff, max_len, color, -1, -1));
 }
 
 /* In the (interactive) console Find_Orb,  these allow some functions
@@ -3073,6 +3094,10 @@ int main( const int argc, const char **argv)
             else
                {              /* clicked among the observations */
                const char *legnd = legends[residual_format & 3];
+               int new_curr = first_residual_shown + (y - top_line_residuals);
+
+               if( base_format == RESIDUAL_FORMAT_SHORT)  /* multi-obs per line */
+                  new_curr += total_obs_lines * (x * obs_per_line / max_x);
 
                if( (unsigned)x < strlen( legnd) && ( button & BUTTON_CTRL)
                               && strchr( "YMD", legnd[x]))
@@ -3091,22 +3116,15 @@ int main( const int argc, const char **argv)
                      while( curr_obs < n_obs - 1 && obs[curr_obs].jd < jd)
                         curr_obs++;
                   }
-               else        /* "normal" click in the observations area */
+               else if( new_curr < n_obs)  /* "normal" click in the observations area */
                   {
-                  const int prev_curr_obs = curr_obs;
+                  const int prev_curr_obs = new_curr;
 
-                  curr_obs = first_residual_shown + (y - top_line_residuals);
-
-                  if( base_format == RESIDUAL_FORMAT_SHORT)  /* multi-obs per line */
-                     curr_obs += total_obs_lines * (x * obs_per_line / max_x);
+                  curr_obs = new_curr;
 #ifndef USE_MYCURSES
                   if( button & BUTTON1_DOUBLE_CLICKED)
                      obs[curr_obs].is_included ^= 1;
 #endif
-                  if( curr_obs < 0)
-                     curr_obs = 0;
-                  else if( curr_obs > n_obs - 1)
-                     curr_obs = n_obs - 1;
                   if( button & BUTTON_CTRL)
                      obs[curr_obs].flags ^= OBS_IS_SELECTED;
                   else if( dir == -1)    /* Non-left mouse button. Should */
@@ -3132,6 +3150,14 @@ int main( const int argc, const char **argv)
                                  obs[i].flags |= OBS_IS_SELECTED;
                               }
                           }
+                     i = full_inquire( get_find_orb_text( 2022), NULL, 0,
+                                 COLOR_MENU, y, x);
+                     if( i == KEY_F( 1))        /* toggle obs */
+                        c = 'x';
+                     if( i == KEY_F( 2))        /* set uncertainty */
+                        c = '%';
+                     snprintf( message_to_user, sizeof( message_to_user),
+                                 "opt %d selected", i);
                      }
                   else        /* "ordinary",  unshifted or ctrled click */
                      {

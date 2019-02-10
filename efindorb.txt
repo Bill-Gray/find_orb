@@ -235,3 +235,24 @@
 2021    asteroid perturbations cannot be included.  You can
 2021    fix this by downloading the necessary files.  See
 2021    https://www.projectpluto.com/ast_pert.htm for details.
+
+# Following pop-up shown when you right-click on an _observation_ :
+
+2022    Toggle observation
+2022    Set observation uncertainty
+
+# Following pop-up shown when you right-click on an _observatory code_ :
+
+2023    Toggle all this obscode
+2023    Find next from this obscode
+2023    Find prev from this obscode
+
+# Following pop-up shown when you right-click on the _orbital elements_ :
+
+2024    Get obs from clipboard
+2024    Open file
+2024    Select object
+2024    Save elements
+2024    Copy elements to clipboard
+2024    Toggle element details
+
