@@ -1079,8 +1079,6 @@ int calc_derivatives( const double jd, const double *ival, double *oval,
    if( planet_hit != -1)
       for( j = 3; j < 6; j++)
          oval[j] *= accel_multiplier;
-   assert( (planet_hit != -1 && accel_multiplier != 1.)
-         || (planet_hit == -1 && accel_multiplier == 1.));
    return( planet_hit);
 }
 
