@@ -452,7 +452,7 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
          i++;
       line++;
       }
-   if( buff)
+   if( buff)         /* we're asking for text from the user */
       {
       memset( tbuff, ' ', real_width);
       put_colored_text( tbuff, line, col - side_borders,
@@ -462,8 +462,15 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
       rval = getnstr( buff, max_len);
       noecho( );
       }
-   else
+   else        /* we just want the user to pick a line */
       {
+      int highlit_line = -1;     /* initially,  no line is highlit */
+
+      curs_set( 0);        /* turn cursor off */
+      mousemask( ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
+#ifndef PDCURSES
+      printf("\033[?1003h");   /* ] used in ncurses with xterm-like */
+#endif                         /* terms to enable mouse move events */
       do
          {
          rval = extended_getch( );
@@ -474,19 +481,37 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
                     /* on the second line,  etc.                    */
          if( rval == KEY_MOUSE)
             {
-            int x, y, z;
+            int x, y, z, curr_line;
             unsigned long button;
 
             get_mouse_data( &x, &y, &z, &button);
+            curr_line = y;
             x -= col - side_borders;
             y -= line - n_lines;
-            rval = 27;                 /* get this if outside box */
-            if( y >= 0 && y < n_lines)
-               if( x >= 0 && x < real_width)
-                  rval = KEY_F( y + 1);
+            if( y >= 0 && y < n_lines && x >= 0 && x < real_width)
+               rval = KEY_F( y + 1);
+            else
+               {
+               rval = 27;
+               curr_line = -1;
+               }
+            if( button & REPORT_MOUSE_POSITION)
+               rval = KEY_MOUSE;          /* ignore mouse moves */
+            if( curr_line != highlit_line)   /* move the highlight */
+               {
+               if( curr_line != -1)
+                  mvchgat( curr_line, col - side_borders, real_width,
+                                 A_REVERSE, color, NULL);
+               if( highlit_line != -1)
+                  mvchgat( highlit_line, col - side_borders, real_width,
+                                 A_NORMAL, color, NULL);
+               highlit_line = curr_line;
+               }
             }
          }
          while( rval == KEY_RESIZE || rval == KEY_MOUSE);
+      mousemask( ALL_MOUSE_EVENTS, NULL);
+      curs_set( 1);        /* turn cursor back on */
       }
    line -= n_lines;     /* put back to top of box */
    for( i = 0; i < n_lines; i++)
