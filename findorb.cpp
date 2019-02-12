@@ -1468,10 +1468,9 @@ void show_residuals( const OBSERVE FAR *obs, const int n_obs,
               const int top_line_residual_area,
               const int list_codes)
 {
-   int i, line_no = top_line_residual_area;
+   int i, line_no = top_line_residual_area, line_start;
    int n_obs_shown = getmaxy( stdscr) - line_no;
    const int n_mpc_codes = find_mpc_color( mpc_color_codes, NULL);
-   const int base_format = (residual_format & 3);
    char buff[200];
 
    n_stations_shown = (list_codes == SHOW_MPC_CODES_MANY ?
@@ -1492,133 +1491,70 @@ void show_residuals( const OBSERVE FAR *obs, const int n_obs,
    if( list_codes == SHOW_MPC_CODES_ONLY_ONE || n_stations_shown < 1)
       n_stations_shown = 1;
    n_obs_shown -= n_stations_shown;
+   line_start = curr_obs - n_obs_shown / 2;
 
-   if( base_format != RESIDUAL_FORMAT_SHORT)    /* one residual/line */
-      {
-      int line_start = curr_obs - n_obs_shown / 2;
+   if( line_start > n_obs - n_obs_shown)
+      line_start = n_obs - n_obs_shown;
+   if( line_start < 0)
+      line_start = 0;
 
-      if( line_start > n_obs - n_obs_shown)
-         line_start = n_obs - n_obs_shown;
-      if( line_start < 0)
-         line_start = 0;
+   for( i = 0; i < n_obs_shown; i++)
+      if( line_start + i < n_obs)
+         {
+         int color = COLOR_BACKGROUND;       /* show in 80-column MPC */
+         char resid_data[70];      /* format, w/added data if it fits */
+         const int dropped_start = 12;     /* ...but omit designation */
+         OBSERVE temp_obs = obs[line_start + i];
+         const int time_prec = temp_obs.time_precision;
 
-      for( i = 0; i < n_obs_shown; i++)
-         if( line_start + i < n_obs)
-            {
-            int color = COLOR_BACKGROUND;
-
-            add_to_mpc_color( obs[line_start + i].mpc_code,
-                      (line_start + i == curr_obs ? n_obs * n_obs : n_obs));
-            if( base_format == RESIDUAL_FORMAT_80_COL)
-               {                         /* show in original 80-column MPC  */
-               char resid_data[70];      /* format, w/added data if it fits */
-               const int dropped_start = 12;     /* ...but omit designation */
-               OBSERVE temp_obs = obs[line_start + i];
-               const int time_prec = temp_obs.time_precision;
-
-               format_observation( &temp_obs, buff,
-                           (residual_format & ~(3 | RESIDUAL_FORMAT_HMS))
-                           | RESIDUAL_FORMAT_FOUR_DIGIT_YEARS);
-               strcpy( resid_data, buff + 49);
-               *resid_data = ' ';
-               if( residual_format & RESIDUAL_FORMAT_HMS)
-                  if( time_prec == 5 || time_prec == 6)  /* 1e-5 or 1e-6 day */
-                     temp_obs.time_precision += 16;
-                              /* show corresponding 1s or 0.1s HHMMSS fmt */
-               recreate_observation_line( buff, &temp_obs);
-               memmove( buff, buff + dropped_start, strlen( buff + dropped_start) + 1);
-               strcat( buff, resid_data);
-               if( temp_obs.flags & OBS_IS_SELECTED)
-                  buff[51] = 'o';
-               }
-            else
-               format_observation( obs + line_start + i, buff, residual_format);
-            if( residual_format & RESIDUAL_FORMAT_SHOW_DELTAS)
-               if( line_start + i != curr_obs)
-                  {
-                  double diff;
-                  int column;
-
-                  column = ((base_format == RESIDUAL_FORMAT_80_COL) ?
-                                 15 : 0);
-                  sprintf( buff + column, "%16.5f",
-                           obs[line_start + i].jd - obs[curr_obs].jd);
-                  buff[column + 16] = ' ';
-
-                  diff = obs[line_start + i].ra - obs[curr_obs].ra;
-                  if( diff > PI)
-                     diff -= PI + PI;
-                  if( diff < -PI)
-                     diff += PI + PI;
-                  column = ((base_format == RESIDUAL_FORMAT_80_COL) ?
-                                 32 : 24);
-                  sprintf( buff + column, "%11.5f", diff * 180. / PI);
-                  buff[column + 11] = ' ';
-
-                  column = ((base_format == RESIDUAL_FORMAT_80_COL) ?
-                                 44 : 38);
-                  diff = obs[line_start + i].dec - obs[curr_obs].dec;
-                  sprintf( buff + column, "%11.5f", diff * 180. / PI);
-                  buff[column + 11] = ' ';
-                  }
-
-
-            if( line_start + i == curr_obs)
-               color = COLOR_SELECTED_OBS;
-
-            show_residual_text( buff, line_no++, 0, color,
-                                             obs[line_start + i].is_included);
-            if( residual_format & RESIDUAL_FORMAT_SHOW_DESIGS)
-               put_colored_text( obs[line_start + i].packed_id,
-                                   line_no - 1, strlen( buff) + 1, 12, color);
-            }
-      first_residual_shown = line_start;
-      }
-   else              /* put three observations/line */
-      {
-      const int width = getmaxx( stdscr);
-      const int n_cols = (width > 25 ? getmaxx( stdscr) / 25 : 1);
-      const int n_rows = (n_obs - 1) / n_cols + 1;
-      const int col_width = width / n_cols;
-      int j;
-      int line_start = curr_obs % n_rows - n_obs_shown / 2;
-
-      if( line_start > n_rows - n_obs_shown)
-         line_start = n_rows - n_obs_shown;
-      if( line_start < 0)
-         line_start = 0;
-      first_residual_shown = line_start;
-
-      for( i = 0; i < n_obs_shown && line_start < n_rows;
-                                         i++, line_no++, line_start++)
-         for( j = 0; j < n_cols; j++)
-            {
-            const int obs_number = j * n_rows + line_start;
-            char buff[50];
-            int color = COLOR_BACKGROUND, is_included = 1;
-
-            if( obs_number < n_obs)
+         add_to_mpc_color( obs[line_start + i].mpc_code,
+                   (line_start + i == curr_obs ? n_obs * n_obs : n_obs));
+         format_observation( &temp_obs, buff,
+                        (residual_format & ~(3 | RESIDUAL_FORMAT_HMS))
+                        | RESIDUAL_FORMAT_FOUR_DIGIT_YEARS);
+         strcpy( resid_data, buff + 49);
+         *resid_data = ' ';
+         if( residual_format & RESIDUAL_FORMAT_HMS)
+            if( time_prec == 5 || time_prec == 6)  /* 1e-5 or 1e-6 day */
+               temp_obs.time_precision += 16;
+                           /* show corresponding 1s or 0.1s HHMMSS fmt */
+         recreate_observation_line( buff, &temp_obs);
+         memmove( buff, buff + dropped_start, strlen( buff + dropped_start) + 1);
+         strcat( buff, resid_data);
+         if( temp_obs.flags & OBS_IS_SELECTED)
+            buff[51] = 'o';
+         if( residual_format & RESIDUAL_FORMAT_SHOW_DELTAS)
+            if( line_start + i != curr_obs)
                {
-               add_to_mpc_color( obs[obs_number].mpc_code,
-                      (obs_number == curr_obs ? n_obs * n_obs : n_obs));
-               buff[0] = ' ';
-               format_observation( obs + obs_number, buff + 1, residual_format);
-               if( obs_number == curr_obs)
-                  {
-                  buff[0] = '<';
-                  color = COLOR_SELECTED_OBS;
-                  }
-               strcat( buff, (obs_number == curr_obs ? ">    " : "    "));
-               is_included = obs[obs_number].is_included;
-               }
-            else
-               memset( buff, ' ', col_width);
-            buff[col_width] = '\0';
-            show_residual_text( buff, line_no, j * col_width, color,
-                     is_included);
-            }
-      }
+               double diff;
 
+               sprintf( buff + 15, "%16.5f",
+                        obs[line_start + i].jd - obs[curr_obs].jd);
+               buff[31] = ' ';
+
+               diff = obs[line_start + i].ra - obs[curr_obs].ra;
+               if( diff > PI)
+                  diff -= PI + PI;
+               if( diff < -PI)
+                  diff += PI + PI;
+               sprintf( buff + 32, "%11.5f", diff * 180. / PI);
+               buff[43] = ' ';
+               diff = obs[line_start + i].dec - obs[curr_obs].dec;
+               sprintf( buff + 44, "%11.5f", diff * 180. / PI);
+               buff[55] = ' ';
+               }
+
+
+         if( line_start + i == curr_obs)
+            color = COLOR_SELECTED_OBS;
+
+         show_residual_text( buff, line_no++, 0, color,
+                                          obs[line_start + i].is_included);
+         if( residual_format & RESIDUAL_FORMAT_SHOW_DESIGS)
+            put_colored_text( obs[line_start + i].packed_id,
+                                line_no - 1, strlen( buff) + 1, 12, color);
+         }
+   first_residual_shown = line_start;
                /* show "scroll bar" to right of observations: */
    show_right_hand_scroll_bar( top_line_residual_area,
                           n_obs_shown, first_residual_shown, n_obs);
@@ -2082,38 +2018,6 @@ static void put_colored_text( const char *text, const int line_no,
 #endif
 }
 
-
-static void cycle_residual_format( int *residual_format, char *message_to_user)
-{
-   switch( *residual_format & 3)
-      {
-      case RESIDUAL_FORMAT_FULL_NO_TABS:      /* 0 */
-         (*residual_format) += 2;             /* cycle to short format */
-         break;
-      case RESIDUAL_FORMAT_SHORT:             /* 2 */
-         (*residual_format)++;                /* cycles to MPC 80-col */
-         break;
-      case RESIDUAL_FORMAT_80_COL:            /* 3 */
-         (*residual_format) -= 3;             /* cycles back to full-no-tab */
-         break;
-      }
-   switch( *residual_format & 3)
-      {
-      case RESIDUAL_FORMAT_FULL_NO_TABS:        /* 0 */
-         strcpy( message_to_user, "Standard observation data shown");
-         *residual_format |= RESIDUAL_FORMAT_FOUR_DIGIT_YEARS;
-         break;
-      case RESIDUAL_FORMAT_SHORT:               /* 2 */
-         strcpy( message_to_user, "Short MPC residual format selected");
-         *residual_format &= ~RESIDUAL_FORMAT_FOUR_DIGIT_YEARS;
-         break;
-      case RESIDUAL_FORMAT_80_COL:              /* 3 */
-         strcpy( message_to_user, "Display of original MPC reports selected");
-         break;
-      }
-
-}
-
 OBSERVE *add_observations( FILE *ifile, OBSERVE *obs,
                   const OBJECT_INFO *ids, int *n_obs)
 {
@@ -2505,6 +2409,8 @@ int main( const int argc, const char **argv)
    sscanf( get_environment_ptr( "CONSOLE_OPTS"), "%9s %d %d %u",
                mpc_code, &observation_display, &residual_format, &list_codes);
 
+   residual_format |= RESIDUAL_FORMAT_80_COL;      /* force 80-column mode */
+
    for( i = 1; i < argc; i++)
       {
       const char *tptr = strchr( argv[i], '=');
@@ -2599,9 +2505,7 @@ int main( const int argc, const char **argv)
 
    while( !quit)
       {
-      const int base_format = (residual_format & 3);
-      int obs_per_line;
-      int line_no = 0, total_obs_lines;
+      int line_no = 0;
       extern double solar_pressure[];
       extern int n_extra_params;
 
@@ -2674,19 +2578,6 @@ int main( const int argc, const char **argv)
             clear( );
             }
          force_bogus_orbit = false;
-         }
-
-      if( base_format == RESIDUAL_FORMAT_SHORT)  /* multi-obs per line */
-         {
-         obs_per_line = getmaxx( stdscr) / 25;
-         if( !obs_per_line)
-            obs_per_line = 1;
-         total_obs_lines = (n_obs - 1) / obs_per_line + 1;
-         }
-      else
-         {
-         obs_per_line = 1;
-         total_obs_lines = n_obs;
          }
 
       if( curr_obs > n_obs - 1)
@@ -3049,9 +2940,6 @@ int main( const int argc, const char **argv)
                {              /* clicked among the observations */
                int new_curr = first_residual_shown + (y - top_line_residuals);
 
-               if( base_format == RESIDUAL_FORMAT_SHORT)  /* multi-obs per line */
-                  new_curr += total_obs_lines * (x * obs_per_line / max_x);
-
                if( new_curr < n_obs)  /* "normal" click in the observations area */
                   {
                   const int prev_curr_obs = new_curr;
@@ -3167,19 +3055,13 @@ int main( const int argc, const char **argv)
 #ifdef KEY_B1
          case KEY_B1:
 #endif
-            if( base_format == RESIDUAL_FORMAT_SHORT)  /* multi-obs per line */
-               curr_obs -= total_obs_lines;
-            else
-               curr_obs--;
+            curr_obs--;
             break;
          case KEY_RIGHT:
 #ifdef KEY_B3
          case KEY_B3:
 #endif
-            if( base_format == RESIDUAL_FORMAT_SHORT)  /* multi-obs per line */
-               curr_obs += total_obs_lines;
-            else
-               curr_obs++;
+            curr_obs++;
             break;
          case KEY_C3:         /* "PgDn" = lower right key in keypad */
          case KEY_NPAGE:
@@ -3343,21 +3225,12 @@ int main( const int argc, const char **argv)
             add_off_on = auto_repeat_full_improvement;
             break;
          case 'd': case 'D':
-            if( base_format == RESIDUAL_FORMAT_80_COL)
-               {
-               extern const char *observe_filename;
+            {
+            extern const char *observe_filename;
 
-               create_obs_file( obs, n_obs, 0);
-               show_a_file( get_file_name( tbuff, observe_filename));
-               }
-            else
-               {
-               extern const char *residual_filename;
-
-               write_residuals_to_file( get_file_name( tbuff, residual_filename),
-                      argv[1], n_obs, obs, residual_format);
-               show_a_file( tbuff);
-               }
+            create_obs_file( obs, n_obs, 0);
+            show_a_file( get_file_name( tbuff, observe_filename));
+            }
             break;
          case 'e': case'E':
             {
@@ -3615,9 +3488,6 @@ int main( const int argc, const char **argv)
                      "Perturber/R1 & R2/step size data display toggled");
             add_off_on = (observation_display & DISPLAY_BASIC_INFO);
             clear( );
-            break;
-         case 'k': case 'K':
-            cycle_residual_format( &residual_format, message_to_user);
             break;
          case 'l': case 'L':
             if( !*orbit_constraints)
