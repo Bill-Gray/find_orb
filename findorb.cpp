@@ -44,17 +44,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    #include <io.h>
 #endif
 
-/* "mycurses" is a minimal implementation of Curses for DOS,  containing
-   just what's needed for a few of my DOS apps (including this one).  It's
-   currently used only in the DOS OpenWATCOM implementation : */
-
-#if !defined( _WIN32) && defined( __WATCOMC__)
-   #define USE_MYCURSES
-   #include "mycurses.h"
-   #include "bmouse.h"
-   #include <conio.h>
-BMOUSE global_bmouse;
-#else
 #if defined( _WIN32)
    #ifdef MOUSE_MOVED
       #undef MOUSE_MOVED
@@ -64,7 +53,7 @@ BMOUSE global_bmouse;
    #endif
 #endif
    #include "curses.h"
-#endif
+
       /* The 'usual' Curses library provided with Linux lacks a few things */
       /* that PDCurses and MyCurses have, such as definitions for ALT_A    */
       /* and such.  'curs_lin.h' fills in these gaps.   */
@@ -237,12 +226,6 @@ extern double maximum_jd, minimum_jd;        /* orb_func.cpp */
 #define COLOR_FAINT_RED            14
 #define COLOR_FAINT_GRAY           15
 
-#ifdef USE_MYCURSES
-static int curses_kbhit( )
-{
-   return( kbhit( ) ? 0: ERR);
-}
-#else
 static int curses_kbhit( )
 {
    int c;
@@ -257,7 +240,6 @@ static int curses_kbhit( )
       ungetch( c);
    return( c);
 }
-#endif
 
 static int extended_getch( void)
 {
@@ -266,29 +248,7 @@ static int extended_getch( void)
 
    if( !rval)
       rval = 256 + getch( );
-#endif
-#ifdef USE_MYCURSES
-   int rval = 0;
-
-   while( !rval)
-      {
-      if( !curses_kbhit( ))
-         {
-         rval = getch( );
-         if( !rval)
-            rval = 256 + getch( );
-         }
-      else
-         {
-         mouse_read( &global_bmouse);
-         if( global_bmouse.released)
-            rval = KEY_MOUSE;
-         }
-      if( !rval)
-         napms( 200);
-      }
-#endif
-#if !defined (_WIN32) && !defined( USE_MYCURSES)
+#else
    int rval = getch( );
 
    if( rval == 27)
@@ -1121,10 +1081,8 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
                else if( x >= 55)
                   c = KEY_HOME;    /* start of list */
                }
-#ifndef USE_MYCURSES
             if( button & BUTTON1_DOUBLE_CLICKED)
                rval = choice;
-#endif
             }
                      /* if a letter/number is hit,  look for an obj that */
                      /* starts with that letter/number: */
@@ -1258,7 +1216,6 @@ struct cmd_area
    {
    unsigned key, line, col1, col2;
    } command_areas[MAX_CMD_AREAS];
-
 
 static unsigned show_basic_info( const OBSERVE FAR *obs, const int n_obs,
                                           const unsigned max_lines_to_show)
@@ -2031,28 +1988,9 @@ static int get_epoch_range_of_included_obs( const OBSERVE FAR *obs,
    return( rval);
 }
 
-#ifdef USE_MYCURSES
-static void initialize_global_bmouse( void)
-{
-   memset( &global_bmouse, 0, sizeof( BMOUSE));
-   global_bmouse.xmax = getmaxx( stdscr) - 1;
-   global_bmouse.ymax = getmaxy( stdscr) - 1;
-   global_bmouse.x = getmaxx( stdscr) / 2;
-   global_bmouse.y = getmaxy( stdscr) / 2;
-   global_bmouse.sensitivity = 0;
-   init_mouse( &global_bmouse);
-}
-#endif
-
 static void get_mouse_data( int *mouse_x, int *mouse_y,
                             int *mouse_z, unsigned long *button)
 {
-#ifdef USE_MYCURSES
-            *mouse_x = global_bmouse.x / 8;
-            *mouse_y = global_bmouse.y / 8;
-            *mouse_z = 0;
-            *button = global_bmouse.released;
-#else       /* non-Mycurses case: */
             MEVENT mouse_event;
 
 #ifdef __PDCURSES__
@@ -2064,7 +2002,6 @@ static void get_mouse_data( int *mouse_x, int *mouse_y,
             *mouse_y = mouse_event.y;
             *mouse_z = mouse_event.z;
             *button  = mouse_event.bstate;
-#endif       /* end non-Mycurses case: */
 }
 
 static void put_colored_text( const char *text, const int line_no,
@@ -2376,9 +2313,6 @@ static inline int initialize_curses( const int argc, const char **argv)
       debug_printf( "(3)\n");
    keypad( stdscr, 1);
    mousemask( ALL_MOUSE_EVENTS, NULL);
-#ifdef USE_MYCURSES
-   initialize_global_bmouse( );
-#endif
    return( 0);
 }
 
@@ -2421,9 +2355,6 @@ int main( const int argc, const char **argv)
    int update_element_display = 1, gauss_soln = 0;
    int residual_format = RESIDUAL_FORMAT_80_COL, bad_elements = 0;
    int element_format = 0, debug_mouse_messages = 0, prev_getch = 0;
-#ifdef USE_MYCURSES
-   int curr_text_mode = 0;
-#endif
    int auto_repeat_full_improvement = 0, n_ids, planet_orbiting = 0;
    OBJECT_INFO *ids;
    double noise_in_arcseconds = 1.;
@@ -3030,12 +2961,10 @@ int main( const int argc, const char **argv)
                   ALT_N, ALT_N, ALT_N, ALT_K, 't', 't', '=', '%' };
 
          get_mouse_data( (int *)&x, (int *)&y, (int *)&z, &button);
-#ifndef USE_MYCURSES
          dir = (( button & button1_events) ? 1 : -1);
          if( debug_mouse_messages)
             sprintf( message_to_user, "x=%d y=%d z=%d button=%lx",
                               x, y, z, button);
-#endif
          for( i = 0; i < 99 && i < getmaxx( stdscr); i++)
             {
             move( y, i);
@@ -3128,10 +3057,8 @@ int main( const int argc, const char **argv)
                   const int prev_curr_obs = new_curr;
 
                   curr_obs = new_curr;
-#ifndef USE_MYCURSES
                   if( button & BUTTON1_DOUBLE_CLICKED)
                      obs[curr_obs].is_included ^= 1;
-#endif
                   if( button & BUTTON_CTRL)
                      obs[curr_obs].flags ^= OBS_IS_SELECTED;
                   else if( dir == -1)    /* Non-left mouse button. Should */
@@ -3385,15 +3312,6 @@ int main( const int argc, const char **argv)
                  "Showing observation times as decimal days");
             break;
          case 'c': case 'C':
-#ifdef USE_MYCURSES
-            if( c == 'c')
-               curr_text_mode++;
-            else
-               curr_text_mode += N_TEXT_MODES - 1;
-            curr_text_mode %= N_TEXT_MODES;
-            set_text_mode( curr_text_mode);
-            initialize_global_bmouse( );
-#else
             {
             int new_xsize, new_ysize;
 
@@ -3402,7 +3320,6 @@ int main( const int argc, const char **argv)
             if( sscanf( tbuff, "%d %d", &new_xsize, &new_ysize) == 2)
                resize_term( new_ysize, new_xsize);
             }
-#endif
             sprintf( message_to_user, "%d x %d text mode selected",
                         getmaxx( stdscr), getmaxy( stdscr));
             break;
