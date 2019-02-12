@@ -1598,18 +1598,14 @@ static void show_final_line( const int n_obs,
                               getmaxx( stdscr) - len, len, color);
 }
 
-static const char *legends[] = {
-"YYYY MM DD.DDDDD    Obs   RA (J2000)     dec          Xres  Yres   delta  R",
-NULL,       /* this is the 'with tabs' format used in Windows Find_Orb */
-" YYMMDD Obs  Xres  Yres     ",
-"   YYYY MM DD.DDDDD   RA (J2000)   dec      sigmas   mag     ref Obs     Xres  Yres   delta  R" };
+static const char *legend =
+"   YYYY MM DD.DDDDD   RA (J2000)   dec      sigmas   mag     ref Obs     Xres  Yres   delta  R";
 
 static void show_residual_legend( const int line_no, const int residual_format)
 {
-   const int base_format = (residual_format & 3);
    char buff[290];
 
-   strcpy( buff, legends[base_format]);
+   strcpy( buff, legend);
    if( residual_format & RESIDUAL_FORMAT_TIME_RESIDS)
       {         /* residuals in time & cross-time, not RA and dec */
       char *text_loc;
@@ -1620,38 +1616,19 @@ static void show_residual_legend( const int line_no, const int residual_format)
          *text_loc = 'C';
       }
    if( residual_format & RESIDUAL_FORMAT_MAG_RESIDS)
-      {
       text_search_and_replace( buff, "delta  R", "delta mresid");
-      if( base_format == RESIDUAL_FORMAT_SHORT)
-         memcpy( buff + 13, "Resi  Mres", 10);
-      }
 
    if( residual_format & RESIDUAL_FORMAT_HMS)
       text_search_and_replace( buff, "YYYY MM DD.DDDDD ",
                                      "CYYMMDD:HHMMSSsss");
-   if( (residual_format & RESIDUAL_FORMAT_EXTRA)
-               && base_format != RESIDUAL_FORMAT_SHORT)
+   if( residual_format & RESIDUAL_FORMAT_EXTRA)
       strcat( buff, (residual_format & RESIDUAL_FORMAT_TIME_RESIDS)
                   ? "      Xres  Yres  total Mres"
                   : "      Tres  Cres  total Mres");
 
    if( line_no >= 0)
-      {
-      if( base_format == RESIDUAL_FORMAT_SHORT)
-         {
-         const int width = getmaxx( stdscr), n_cols = width / 25;
-         const int cols = width / n_cols;
-         int i;
+      put_colored_text( buff, line_no, 0, -1, COLOR_RESIDUAL_LEGEND);
 
-         buff[cols] = '\0';
-         for( i = 0; i < n_cols; i++)
-            put_colored_text( buff, line_no, i * cols, -1,
-                              COLOR_RESIDUAL_LEGEND);
-         }
-      else
-         put_colored_text( buff, line_no, 0, -1,
-                                 COLOR_RESIDUAL_LEGEND);
-      }
    mpc_column = (int)( strstr( buff, "Obs") - buff);
    resid_column = (int)( strstr( buff, "res") - buff - 1);
 }
@@ -2245,7 +2222,7 @@ int main( const int argc, const char **argv)
    unsigned n_command_lines = 4;
    int c = 1, element_precision, get_new_object = 1, add_off_on = -1;
    unsigned top_line_basic_info_perturbers;
-   unsigned top_line_orbital_elements, top_line_residual_legend;
+   unsigned top_line_orbital_elements;
    unsigned top_line_residuals;
    bool is_monte_orbit = false;
    unsigned list_codes = SHOW_MPC_CODES_NORMAL;
@@ -2743,7 +2720,6 @@ int main( const int argc, const char **argv)
          if( debug_level)
             refresh( );
          }
-      top_line_residual_legend = line_no;
       if( observation_display & DISPLAY_RESIDUAL_LEGEND)
          {
          if( c != KEY_MOUSE_MOVE && c != KEY_TIMER)
@@ -2990,8 +2966,6 @@ int main( const int argc, const char **argv)
                   }
                }
             }
-         else if( y == top_line_residual_legend && c == KEY_MOUSE)
-            c = 'k';           /* cycle the residual format */
          else if( n_command_lines &&
                           y == top_line_basic_info_perturbers + n_command_lines)
             {                      /* clicked on a perturber 'radio button' */
@@ -4362,7 +4336,7 @@ int main( const int argc, const char **argv)
             residual_format ^= RESIDUAL_FORMAT_SHOW_DESIGS;
             break;
          case ALT_R: case ALT_X: case ALT_Y:
-         case ALT_Z: case '\'':
+         case ALT_Z: case '\'': case 'k':
          default:
             debug_printf( "Key %d hit\n", c);
             show_a_file( "dos_help.txt");
