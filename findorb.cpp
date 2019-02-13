@@ -1492,19 +1492,16 @@ int show_station_info( const OBSERVE FAR *obs, const int n_obs,
    for( i = 0; i < n_stations_shown; i++, line_no++)
       {
       char buff[200];
-      const int saved_resid_column = resid_column;
       const int is_curr_code = !strcmp( mpc_color_codes[i].code,
                                         obs[curr_obs].mpc_code);
 
-      put_colored_text( "", line_no, 0, -1, COLOR_BACKGROUND);
-      resid_column = 0;    /* to avoid drawing artifacts */
+//    put_colored_text( "", line_no, 0, -1, COLOR_BACKGROUND);
       sprintf( buff, "(%s)", mpc_color_codes[i].code);
-      show_residual_text( buff, line_no, 0, COLOR_BACKGROUND, 1);
-      show_mpc_code_in_color( buff + 1, line_no, 1);
+      put_colored_text( "(   ) ", line_no, 0, 6, COLOR_BACKGROUND);
+      show_mpc_code_in_color( mpc_color_codes[i].code, line_no, 1);
       put_observer_data_in_text( mpc_color_codes[i].code, buff);
-      show_residual_text( buff, line_no, 6,
-             (is_curr_code ? COLOR_FINAL_LINE : COLOR_BACKGROUND), 1);
-      resid_column = saved_resid_column;
+      put_colored_text( buff, line_no, 6, -1,
+             (is_curr_code ? COLOR_FINAL_LINE : COLOR_BACKGROUND));
       }
    return( n_stations_shown);
 }
