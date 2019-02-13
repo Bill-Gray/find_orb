@@ -1353,7 +1353,7 @@ static MPC_STATION *mpc_color_codes = NULL;
 static int make_unicode_substitutions = 1;
 #endif
 
-int mpc_column, resid_column;
+int resid_column;
 
 static void show_residual_text( char *buff, const int line_no,
            const int column, const int default_color,
@@ -1388,13 +1388,13 @@ static void show_residual_text( char *buff, const int line_no,
       put_colored_text( tbuff, line_no, column + resid_column - 2,
                strlen( tbuff), resid_color);
       }
-   if( mpc_column >= 0)
-      {
-      buff += mpc_column;
-      if( *buff != ' ')       /* show MPC code in color: */
-         put_colored_text( buff, line_no, column + mpc_column, 3,
-                        512 + 16 + find_mpc_color( mpc_color_codes, buff));
-      }
+}
+
+static void show_mpc_code_in_color( const char *mpc_code,
+               const int y, const int x)
+{
+   put_colored_text( mpc_code, y, x, 3,
+                     512 + 16 + find_mpc_color( mpc_color_codes, mpc_code));
 }
 
 #define SORT_BY_SCORE 0
@@ -1461,24 +1461,19 @@ static void show_right_hand_scroll_bar( const int line_start,
       }
 }
 
-int first_residual_shown, n_stations_shown;
-
-void show_residuals( const OBSERVE FAR *obs, const int n_obs,
-              const int residual_format, const int curr_obs,
+int show_station_info( const OBSERVE FAR *obs, const int n_obs,
               const int top_line_residual_area,
+              const int curr_obs,
               const int list_codes)
 {
-   int i, line_no = top_line_residual_area, line_start;
-   int n_obs_shown = getmaxy( stdscr) - line_no;
+   int line_no, i;
+   int n_obs_shown = getmaxy( stdscr) - top_line_residual_area;
    const int n_mpc_codes = find_mpc_color( mpc_color_codes, NULL);
-   char buff[200];
-
-   n_stations_shown = (list_codes == SHOW_MPC_CODES_MANY ?
+   int n_stations_shown = (list_codes == SHOW_MPC_CODES_MANY ?
                               n_obs_shown - 3 : n_obs_shown / 3);
+
    if( n_obs_shown < 0)
-      return;
-   for( i = 0; i < n_obs_shown; i++)         /* clear out space */
-      put_colored_text( "", i + line_no, 0, -1, COLOR_BACKGROUND);
+      return( 0);
                   /* set 'scores' for each code to equal # of times */
                   /* that code was used: */
    for( i = 0; i < n_mpc_codes; i++)
@@ -1490,7 +1485,45 @@ void show_residuals( const OBSERVE FAR *obs, const int n_obs,
       n_stations_shown = n_mpc_codes;
    if( list_codes == SHOW_MPC_CODES_ONLY_ONE || n_stations_shown < 1)
       n_stations_shown = 1;
-   n_obs_shown -= n_stations_shown;
+   sort_mpc_codes( n_mpc_codes, SORT_BY_SCORE);
+                /* ...then sort the ones we're going to display by name: */
+   sort_mpc_codes( n_stations_shown, SORT_BY_NAME);
+   line_no = getmaxy( stdscr) - n_stations_shown;
+   for( i = 0; i < n_stations_shown; i++, line_no++)
+      {
+      char buff[200];
+      const int saved_resid_column = resid_column;
+      const int is_curr_code = !strcmp( mpc_color_codes[i].code,
+                                        obs[curr_obs].mpc_code);
+
+      put_colored_text( "", line_no, 0, -1, COLOR_BACKGROUND);
+      resid_column = 0;    /* to avoid drawing artifacts */
+      sprintf( buff, "(%s)", mpc_color_codes[i].code);
+      show_residual_text( buff, line_no, 0, COLOR_BACKGROUND, 1);
+      show_mpc_code_in_color( buff + 1, line_no, 1);
+      put_observer_data_in_text( mpc_color_codes[i].code, buff);
+      show_residual_text( buff, line_no, 6,
+             (is_curr_code ? COLOR_FINAL_LINE : COLOR_BACKGROUND), 1);
+      resid_column = saved_resid_column;
+      }
+   return( n_stations_shown);
+}
+
+static const char *legend =
+"   YYYY MM DD.DDDDD   RA (J2000)   dec      sigmas   mag     ref Obs     Xres  Yres   delta  R";
+
+static int show_residuals( const OBSERVE FAR *obs, const int n_obs,
+              const int residual_format, const int curr_obs,
+              const int top_line_residual_area,
+              const int n_stations_shown)
+{
+   int i, line_no = top_line_residual_area, line_start;
+   int n_obs_shown = getmaxy( stdscr) - line_no - n_stations_shown;
+   char buff[200];
+   const int mpc_column = (int)( strstr( legend, "Obs") - legend);
+
+   for( i = 0; i < n_obs_shown; i++)         /* clear out space */
+      put_colored_text( "", i + line_no, 0, -1, COLOR_BACKGROUND);
    line_start = curr_obs - n_obs_shown / 2;
 
    if( line_start > n_obs - n_obs_shown)
@@ -1548,42 +1581,19 @@ void show_residuals( const OBSERVE FAR *obs, const int n_obs,
          if( line_start + i == curr_obs)
             color = COLOR_SELECTED_OBS;
 
-         show_residual_text( buff, line_no++, 0, color,
+         show_residual_text( buff, line_no, 0, color,
                                           obs[line_start + i].is_included);
+
+         show_mpc_code_in_color( buff + mpc_column, line_no++, mpc_column);
+
          if( residual_format & RESIDUAL_FORMAT_SHOW_DESIGS)
             put_colored_text( obs[line_start + i].packed_id,
                                 line_no - 1, strlen( buff) + 1, 12, color);
          }
-   first_residual_shown = line_start;
                /* show "scroll bar" to right of observations: */
    show_right_hand_scroll_bar( top_line_residual_area,
-                          n_obs_shown, first_residual_shown, n_obs);
-
-   if( n_stations_shown)
-      {
-                /* OK,  sort obs by score,  highest first... */
-      sort_mpc_codes( n_mpc_codes, SORT_BY_SCORE);
-                /* ...then sort the ones we're going to display by name: */
-      sort_mpc_codes( n_stations_shown, SORT_BY_NAME);
-
-      for( i = 0; i < n_stations_shown; i++)
-         {
-         const int saved_resid_column = resid_column;
-         const int line_no = getmaxy( stdscr) - n_stations_shown + i;
-         const int is_curr_code = !strcmp( mpc_color_codes[i].code,
-                                        obs[curr_obs].mpc_code);
-
-         resid_column = 0;    /* to avoid drawing artifacts */
-         sprintf( buff, "(%s)", mpc_color_codes[i].code);
-         mpc_column = 1;
-         show_residual_text( buff, line_no, 0, COLOR_BACKGROUND, 1);
-         put_observer_data_in_text( mpc_color_codes[i].code, buff);
-         mpc_column = -1;
-         show_residual_text( buff, line_no, 6,
-             (is_curr_code ? COLOR_FINAL_LINE : COLOR_BACKGROUND), 1);
-         resid_column = saved_resid_column;
-         }
-      }
+                          n_obs_shown, line_start, n_obs);
+   return( line_start);
 }
 
 static void show_final_line( const int n_obs,
@@ -1597,9 +1607,6 @@ static void show_final_line( const int n_obs,
    put_colored_text( buff, getmaxy( stdscr) - 1,
                               getmaxx( stdscr) - len, len, color);
 }
-
-static const char *legend =
-"   YYYY MM DD.DDDDD   RA (J2000)   dec      sigmas   mag     ref Obs     Xres  Yres   delta  R";
 
 static void show_residual_legend( const int line_no, const int residual_format)
 {
@@ -1629,7 +1636,6 @@ static void show_residual_legend( const int line_no, const int residual_format)
    if( line_no >= 0)
       put_colored_text( buff, line_no, 0, -1, COLOR_RESIDUAL_LEGEND);
 
-   mpc_column = (int)( strstr( buff, "Obs") - buff);
    resid_column = (int)( strstr( buff, "res") - buff - 1);
 }
 
@@ -2251,6 +2257,7 @@ int main( const int argc, const char **argv)
    bool show_commented_elements = false;
    bool drop_single_obs = true;
    bool sort_obs_by_code = false;
+   int n_stations_shown = 0, first_residual_shown = 0;
 
    if( !strcmp( argv[0], "find_orb"))
       use_config_directory = true;
@@ -2739,8 +2746,13 @@ int main( const int argc, const char **argv)
 
       top_line_residuals = line_no;
       if( c != KEY_MOUSE_MOVE && c != KEY_TIMER)
-         show_residuals( obs, n_obs, residual_format, curr_obs, line_no,
-                                       list_codes);
+         {
+         n_stations_shown = show_station_info( obs, n_obs,
+                     line_no, curr_obs, list_codes);
+
+         first_residual_shown = show_residuals( obs, n_obs,
+                     residual_format, curr_obs, line_no, n_stations_shown);
+         }
 
 #ifdef TESTING_CODE_FOR_MESSAGE_AREA
       i = line_no + total_obs_lines;
