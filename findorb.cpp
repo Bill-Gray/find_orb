@@ -1359,37 +1359,33 @@ static void show_residual_text( char *buff, const int line_no,
            const int column, const int default_color,
            const int is_included)
 {
-   const int resid_column = (int)( strstr( legend, "res") - legend - 1);
+   const int resid_column = 73;  /* see above legend */
+   char *tptr = buff + resid_column - 2;
+   const int residual_field_size = 13;
+   int resid_color = default_color;
+   char tbuff[40];
 
 #ifdef DOESNT_WORK_QUITE_YET
    text_search_and_replace( buff, "\xb5", "\xc2\xb5");
 #endif
    put_colored_text( buff, line_no, column, (int)strlen( buff), default_color);
-   if( resid_column)
-      {
-      char *tptr = buff + resid_column - 2;
-      const int residual_field_size = (tptr[1] == '+' || tptr[1] == '-') ?
-                                    17 : 13;
-      int resid_color = default_color;
-      char tbuff[40];
 
-      memcpy( tbuff, tptr, residual_field_size);
-      if( !is_included)
-         {
-         resid_color = (default_color == COLOR_SELECTED_OBS ?
-                     COLOR_EXCLUDED_AND_SELECTED : COLOR_EXCLUDED_OBS) + 4096;
-         tbuff[0] = '(';                       /* put ()s around excluded obs */
-         tbuff[residual_field_size - 1] = ')';
-         }
-      tbuff[residual_field_size] = '\0';
-#ifdef HAVE_UNICODE
-               /* cvt 'u' = 'micro' = 'mu' to the Unicode U+00B5,  in UTF-8: */
-      if( make_unicode_substitutions)
-         text_search_and_replace( tbuff, "u", "\xc2\xb5");
-#endif
-      put_colored_text( tbuff, line_no, column + resid_column - 2,
-               strlen( tbuff), resid_color);
+   memcpy( tbuff, tptr, residual_field_size);
+   if( !is_included)
+      {
+      resid_color = (default_color == COLOR_SELECTED_OBS ?
+                  COLOR_EXCLUDED_AND_SELECTED : COLOR_EXCLUDED_OBS) + 4096;
+      tbuff[0] = '(';                       /* put ()s around excluded obs */
+      tbuff[residual_field_size - 1] = ')';
       }
+   tbuff[residual_field_size] = '\0';
+#ifdef HAVE_UNICODE
+            /* cvt 'u' = 'micro' = 'mu' to the Unicode U+00B5,  in UTF-8: */
+   if( make_unicode_substitutions)
+      text_search_and_replace( tbuff, "u", "\xc2\xb5");
+#endif
+   put_colored_text( tbuff, line_no, column + resid_column - 2,
+            strlen( tbuff), resid_color);
 }
 
 static void show_mpc_code_in_color( const char *mpc_code,
