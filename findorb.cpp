@@ -1346,19 +1346,21 @@ static MPC_STATION *mpc_color_codes = NULL;
 
 /* Show the text for a given observation... which will be in
    'default_color' unless it's excluded.  If it is,  the residuals
-   are shown in COLOR_EXCLUDED_OBS.  The three-character MPC code
-   is also shown in a separate color. */
+   are shown in COLOR_EXCLUDED_OBS. */
 
 #ifdef HAVE_UNICODE
 static int make_unicode_substitutions = 1;
 #endif
 
-int resid_column;
+static const char *legend =
+"   YYYY MM DD.DDDDD   RA (J2000)   dec      sigmas   mag     ref Obs     Xres  Yres   delta  R";
 
 static void show_residual_text( char *buff, const int line_no,
            const int column, const int default_color,
            const int is_included)
 {
+   const int resid_column = (int)( strstr( legend, "res") - legend - 1);
+
 #ifdef DOESNT_WORK_QUITE_YET
    text_search_and_replace( buff, "\xb5", "\xc2\xb5");
 #endif
@@ -1506,9 +1508,6 @@ int show_station_info( const OBSERVE FAR *obs, const int n_obs,
    return( n_stations_shown);
 }
 
-static const char *legend =
-"   YYYY MM DD.DDDDD   RA (J2000)   dec      sigmas   mag     ref Obs     Xres  Yres   delta  R";
-
 static int show_residuals( const OBSERVE FAR *obs, const int n_obs,
               const int residual_format, const int curr_obs,
               const int top_line_residual_area,
@@ -1632,8 +1631,6 @@ static void show_residual_legend( const int line_no, const int residual_format)
 
    if( line_no >= 0)
       put_colored_text( buff, line_no, 0, -1, COLOR_RESIDUAL_LEGEND);
-
-   resid_column = (int)( strstr( buff, "res") - buff - 1);
 }
 
 static void show_a_file( const char *filename)
