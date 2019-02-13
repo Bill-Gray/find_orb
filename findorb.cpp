@@ -207,7 +207,6 @@ extern double maximum_jd, minimum_jd;        /* orb_func.cpp */
 #define COLOR_FINAL_LINE            3
 #define COLOR_SELECTED_OBS          4
 #define COLOR_HIGHLIT_BUTTON        5
-#define COLOR_EXCLUDED_AND_SELECTED 8
 #define COLOR_EXCLUDED_OBS          6
 #define COLOR_OBS_INFO              7
 #define COLOR_MESSAGE_TO_USER       8
@@ -1373,8 +1372,7 @@ static void show_residual_text( char *buff, const int line_no,
    memcpy( tbuff, tptr, residual_field_size);
    if( !is_included)
       {
-      resid_color = (default_color == COLOR_SELECTED_OBS ?
-                  COLOR_EXCLUDED_AND_SELECTED : COLOR_EXCLUDED_OBS) + 4096;
+      resid_color = COLOR_EXCLUDED_OBS + 4096;
       tbuff[0] = '(';                       /* put ()s around excluded obs */
       tbuff[residual_field_size - 1] = ')';
       }
