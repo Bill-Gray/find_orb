@@ -1623,8 +1623,7 @@ static void show_residual_legend( const int line_no, const int residual_format)
                   ? "      Xres  Yres  total Mres"
                   : "      Tres  Cres  total Mres");
 
-   if( line_no >= 0)
-      put_colored_text( buff, line_no, 0, -1, COLOR_RESIDUAL_LEGEND);
+   put_colored_text( buff, line_no, 0, -1, COLOR_RESIDUAL_LEGEND);
 }
 
 static void show_a_file( const char *filename)
@@ -2196,7 +2195,6 @@ extern const char *elements_filename;
 #define DISPLAY_BASIC_INFO           1
 #define DISPLAY_OBSERVATION_DETAILS  2
 #define DISPLAY_ORBITAL_ELEMENTS     4
-#define DISPLAY_RESIDUAL_LEGEND      8
 
 int sanity_test_observations( const char *filename);
 
@@ -2715,15 +2713,9 @@ int main( const int argc, const char **argv)
          if( debug_level)
             refresh( );
          }
-      if( observation_display & DISPLAY_RESIDUAL_LEGEND)
-         {
-         if( c != KEY_MOUSE_MOVE && c != KEY_TIMER)
-            show_residual_legend( line_no, residual_format);
-         line_no++;
-         }
-      else
-         if( c != KEY_MOUSE_MOVE && c != KEY_TIMER)
-            show_residual_legend( -1, residual_format);
+      if( c != KEY_MOUSE_MOVE && c != KEY_TIMER)
+         show_residual_legend( line_no, residual_format);
+      line_no++;
       if( debug_level)
          refresh( );
       if( debug_level > 2)
@@ -4066,12 +4058,6 @@ int main( const int argc, const char **argv)
                }
             }
             break;
-         case ';':
-            observation_display ^= DISPLAY_RESIDUAL_LEGEND;
-            strcpy( message_to_user,"Residual legend");
-            add_off_on = (observation_display & DISPLAY_RESIDUAL_LEGEND);
-            clear( );
-            break;
          case '}':
             {
             if( residual_format & RESIDUAL_FORMAT_OVERPRECISE)
@@ -4337,6 +4323,7 @@ int main( const int argc, const char **argv)
             break;
          case ALT_R: case ALT_X: case ALT_Y:
          case ALT_Z: case '\'': case 'k':
+         case ';':
          default:
             debug_printf( "Key %d hit\n", c);
             show_a_file( "dos_help.txt");
