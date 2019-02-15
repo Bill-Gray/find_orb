@@ -2734,12 +2734,16 @@ int main( const int argc, const char **argv)
          }
 
 #ifdef TESTING_CODE_FOR_MESSAGE_AREA
-      i = line_no + total_obs_lines;
+            /* Not currently in use : if you don't have many observations and
+            there's unused space between the observations and the station
+            info,  it could be filled with... something.   */
+      i = line_no + n_obs - first_residual_shown;
       while( i < getmaxy( stdscr) - n_stations_shown)
          {
-         sprintf( tbuff, "Msg line %d of %d\n",
-                     i - line_no - total_obs_lines + 1,
-                     getmaxy( stdscr) - n_stations_shown - line_no - total_obs_lines);
+         int j = line_no + n_obs - first_residual_shown;
+
+         sprintf( tbuff, "Msg line %d of %d\n", i - j,
+                     getmaxy( stdscr) - n_stations_shown - j);
          put_colored_text( tbuff, i++, 40, 30, COLOR_MESSAGE_TO_USER);
          }
 #endif
