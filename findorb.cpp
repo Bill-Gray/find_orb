@@ -2421,12 +2421,6 @@ int main( const int argc, const char **argv)
    if( reset_astrometry_filename( argc, argv))
       drop_single_obs = false;
 
-   initialize_curses( argc, argv);
-#ifdef PDCURSES
-   original_xmax = getmaxx( stdscr);
-   original_ymax = getmaxy( stdscr);
-#endif
-
    if( !strcmp( argv[1], "c") || !strcmp( argv[1], "c+"))
       {
       const char *temp_clipboard_filename = "/tmp/obs_temp.txt";
@@ -2436,7 +2430,7 @@ int main( const int argc, const char **argv)
       }
 
    ids = find_objects_in_file( argv[1], &n_ids, NULL);
-   if( drop_single_obs)
+   if( n_ids > 0 && drop_single_obs)
       {
       int j = 0;
 
@@ -2453,10 +2447,15 @@ int main( const int argc, const char **argv)
          err_msg = "Couldn't locate the file '%s'\n";
       else
          err_msg = "No objects found in file '%s'\n";
-      sprintf( tbuff, err_msg, argv[1]);
-      inquire( tbuff, NULL, 0, COLOR_DEFAULT_INQUIRY);
-      goto Shutdown_program;
+      fprintf( stderr, err_msg, argv[1]);
+      return( -1);
       }
+
+   initialize_curses( argc, argv);
+#ifdef PDCURSES
+   original_xmax = getmaxx( stdscr);
+   original_ymax = getmaxy( stdscr);
+#endif
 
    if( debug_level > 2)
       debug_printf( "%d objects in file\n", n_ids);
