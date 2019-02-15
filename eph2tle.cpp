@@ -486,6 +486,8 @@ static void reset_desigs_by_name( const char *obj_name, tle_t *tle)
          "89988 00000AAL ZTF01sS = ZTF01sX = ZTF01wl",
          "89987 00000AAM JNS023 = ZTF02BI = A10boIy",
          "89986 00000AAN A10bMLz",
+         "89985 00000AAO ZTF02Rj",
+         "89984 00000AAP ZTF02Uy = ZTF02rw = ZTF02V0",
          "90084 09710A   9O0DC57 = unk P=2.26d, i=25",
          NULL };
    size_t i;
@@ -530,12 +532,14 @@ int main( const int argc, const char **argv)
    int ephem, progress_bar_freq = 2;
    tle_t tle;
    const time_t t0 = time( NULL);
+   bool use_precession = true;
    double step;
    unsigned n_steps, total_lines;
    int histo_counts[N_HIST_BINS];
    static int histo_divs[N_HIST_BINS] = { 1, 3, 10, 30, 100, 300, 1000, 3000, 10000, 30000 };
    double levenberg_marquardt_lambda0 = 0.;
    double sum_of_worst_resids = 0.;
+   double dist_units = 1., time_units = 1.;
 
    if( argc < 2)
       error_exit( -1);
@@ -657,8 +661,16 @@ int main( const int argc, const char **argv)
       bool writing_data = false;
       double mjdt;
       char *tptr = strstr( buff, "(500) Geocentric: ");
+      int ref_frame = -1;
 
-      sscanf( buff, "%lf %lf %u\n", &tdt, &step, &total_lines);
+      sscanf( buff, "%lf %lf %u %d,%lf,%lf\n", &tdt, &step, &total_lines,
+                  &ref_frame, &dist_units, &time_units);
+      if( ref_frame == -1)
+         {                             /* input coords are already mean */
+         use_precession = false;       /* of date;  don't precess 'em */
+         ref_frame = 0;
+         }
+      assert( !ref_frame);       /* input ephems must be equatorial */
       mjdt = tdt - 2400000.5;
       if( tptr)
          strcpy( obj_name, tptr + 18);
@@ -727,6 +739,7 @@ int main( const int argc, const char **argv)
          {
          double jdt, jd_utc;
          double precession_matrix[9], ivect[6];
+         size_t j;
 
          if( sscanf( buff, "%lf%lf%lf%lf%lf%lf%lf", &jdt,
                         ivect, ivect + 1, ivect + 2,
@@ -739,8 +752,15 @@ int main( const int argc, const char **argv)
                      /* I don't think TLEs work outside this range: */
          assert( jdt > jan_1956 && jdt < jan_2050);
          jd_utc = jdt - td_minus_utc( jdt) / seconds_per_day;
-         setup_precession( precession_matrix, 2000.,
+         for( j = 0; j < 6; j++)
+            ivect[j] /= dist_units;
+         for( j = 3; j < 6; j++)
+            ivect[j] *= time_units;
+         if( use_precession)
+            setup_precession( precession_matrix, 2000.,
                                       2000. + (jd_utc - 2451545.) / 365.25);
+         else
+            set_identity_matrix( precession_matrix);
          precess_vector( precession_matrix, ivect, sptr);
          precess_vector( precession_matrix, ivect + 3, sptr + 3);
          }
