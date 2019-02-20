@@ -23,6 +23,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include <unistd.h>
 #endif
 
+#define PDC_NCMOUSE
+
             /* Pretty much every platform I've run into supports */
             /* Unicode display,  except OpenWATCOM and early     */
             /* versions of MSVC.                                 */
@@ -65,6 +67,20 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    #define BUTTON_CTRL BUTTON_CONTROL
 #endif
 
+   /* On version 1 of ncurses,  the mouse mask is constrained to 32 bits and
+   there's no way to express the 'fifth button', which would otherwise give
+   you a mouse-wheel-up event.  Instead,  the button is returned as zero.
+   Note that that's also what you get with a 'mouse move' event,  and we can't
+   tell them apart.  So when 'mouse move' events are enabled -- currently done
+   only when there's a popup window on-screen -- we can't detect mouse up
+   events.  At least,  not on version 1 of ncurses. */
+
+#ifdef BUTTON5_PRESSED
+   #define button5_pressed (button & BUTTON5_PRESSED)
+#else
+   #define button5_pressed (!button)
+#endif
+
 #include <wchar.h>
 #include <math.h>
 #include <stdio.h>
@@ -100,7 +116,13 @@ devoted to station data.   */
 #define SHOW_MPC_CODES_NORMAL          1
 #define SHOW_MPC_CODES_MANY            2
 
-#define button1_events (BUTTON1_CLICKED | BUTTON1_DOUBLE_CLICKED | BUTTON1_TRIPLE_CLICKED)
+#ifndef BUTTON1_MOVED
+   #define BUTTON1_MOVED  0     /* I think only PDCurses has this */
+#endif
+
+#define button1_events (BUTTON1_CLICKED | BUTTON1_DOUBLE_CLICKED \
+      | BUTTON1_MOVED \
+      | BUTTON1_TRIPLE_CLICKED | BUTTON1_PRESSED | BUTTON1_RELEASED)
 
 #ifndef max
 #define max(a, b) ((a > b) ? a : b)
@@ -454,7 +476,11 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
                rval = 27;
                curr_line = -1;
                }
+#ifdef PDCURSES
+            if( MOUSE_POS_REPORT)
+#else
             if( button & REPORT_MOUSE_POSITION)
+#endif
                rval = KEY_MOUSE;          /* ignore mouse moves */
             if( curr_line != highlit_line)   /* move the highlight */
                {
@@ -1058,13 +1084,11 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
             unsigned long button;
 
             get_mouse_data( &x, &y, &z, &button);
-#ifdef BUTTON5_PRESSED
             if( button & BUTTON4_PRESSED)   /* actually 'wheel up' */
                c = KEY_UP;
-            else if( button & BUTTON5_PRESSED)   /* actually 'wheel down' */
+            else if( button5_pressed)   /* actually 'wheel down' */
                c = KEY_DOWN;
             else
-#endif
               if( y < n_lines)
                choice = curr_page + y + (x / column_width) * n_lines;
             else if( y == n_lines + 2)
@@ -1502,88 +1526,74 @@ int show_station_info( const OBSERVE FAR *obs, const int n_obs,
    return( n_stations_shown);
 }
 
-static int show_residuals( const OBSERVE FAR *obs, const int n_obs,
-              const int residual_format, const int curr_obs,
-              const int top_line_residual_area,
-              const int n_stations_shown)
+
+static void show_one_observation( OBSERVE obs, const int line,
+                        const int residual_format)
 {
-   int i, line_no = top_line_residual_area, line_start;
-   int n_obs_shown = getmaxy( stdscr) - line_no - n_stations_shown;
    char buff[200];
    const int mpc_column = (int)( strstr( legend, "Obs") - legend);
+   int color = COLOR_BACKGROUND;       /* show in 80-column MPC */
+   char resid_data[70];      /* format, w/added data if it fits */
+   const int dropped_start = 12;     /* ...but omit designation */
+   const int time_prec = obs.time_precision;
 
-   for( i = 0; i < n_obs_shown; i++)         /* clear out space */
-      put_colored_text( "", i + line_no, 0, -1, COLOR_BACKGROUND);
-   line_start = curr_obs - n_obs_shown / 2;
-
-   if( line_start > n_obs - n_obs_shown)
-      line_start = n_obs - n_obs_shown;
-   if( line_start < 0)
-      line_start = 0;
-
-   for( i = 0; i < n_obs_shown; i++)
-      if( line_start + i < n_obs)
-         {
-         int color = COLOR_BACKGROUND;       /* show in 80-column MPC */
-         char resid_data[70];      /* format, w/added data if it fits */
-         const int dropped_start = 12;     /* ...but omit designation */
-         OBSERVE temp_obs = obs[line_start + i];
-         const int time_prec = temp_obs.time_precision;
-
-         add_to_mpc_color( obs[line_start + i].mpc_code,
-                   (line_start + i == curr_obs ? n_obs * n_obs : n_obs));
-         format_observation( &temp_obs, buff,
+   put_colored_text( "", line, 0, -1, COLOR_BACKGROUND);
+   add_to_mpc_color( obs.mpc_code, 10);
+   format_observation( &obs, buff,
                         (residual_format & ~(3 | RESIDUAL_FORMAT_HMS))
                         | RESIDUAL_FORMAT_FOUR_DIGIT_YEARS);
-         strcpy( resid_data, buff + 49);
-         *resid_data = ' ';
-         if( residual_format & RESIDUAL_FORMAT_HMS)
-            if( time_prec == 5 || time_prec == 6)  /* 1e-5 or 1e-6 day */
-               temp_obs.time_precision += 16;
-                           /* show corresponding 1s or 0.1s HHMMSS fmt */
-         recreate_observation_line( buff, &temp_obs);
-         memmove( buff, buff + dropped_start, strlen( buff + dropped_start) + 1);
-         strcat( buff, resid_data);
-         if( temp_obs.flags & OBS_IS_SELECTED)
-            buff[51] = 'o';
-         if( residual_format & RESIDUAL_FORMAT_SHOW_DELTAS)
-            if( line_start + i != curr_obs)
-               {
-               double diff;
+   strcpy( resid_data, buff + 49);
+   *resid_data = ' ';
+   if( residual_format & RESIDUAL_FORMAT_HMS)
+      if( time_prec == 5 || time_prec == 6)  /* 1e-5 or 1e-6 day */
+         obs.time_precision += 16;
+                     /* show corresponding 1s or 0.1s HHMMSS fmt */
+   recreate_observation_line( buff, &obs);
+   memmove( buff, buff + dropped_start, strlen( buff + dropped_start) + 1);
+   strcat( buff, resid_data);
+#ifdef TEMP_REMOVE
+   if( residual_format & RESIDUAL_FORMAT_SHOW_DELTAS)
+      if( line_start + i != curr_obs)
+         {
+         double diff;
 
-               sprintf( buff + 15, "%16.5f",
-                        obs[line_start + i].jd - obs[curr_obs].jd);
-               buff[31] = ' ';
+         sprintf( buff + 15, "%16.5f",
+                  obs[line_start + i].jd - obs[curr_obs].jd);
+         buff[31] = ' ';
 
-               diff = obs[line_start + i].ra - obs[curr_obs].ra;
-               if( diff > PI)
-                  diff -= PI + PI;
-               if( diff < -PI)
-                  diff += PI + PI;
-               sprintf( buff + 32, "%11.5f", diff * 180. / PI);
-               buff[43] = ' ';
-               diff = obs[line_start + i].dec - obs[curr_obs].dec;
-               sprintf( buff + 44, "%11.5f", diff * 180. / PI);
-               buff[55] = ' ';
-               }
-
-
-         if( line_start + i == curr_obs)
-            color = COLOR_SELECTED_OBS;
-
-         show_residual_text( buff, line_no, 0, color,
-                                          obs[line_start + i].is_included);
-
-         show_mpc_code_in_color( buff + mpc_column, line_no++, mpc_column);
-
-         if( residual_format & RESIDUAL_FORMAT_SHOW_DESIGS)
-            put_colored_text( obs[line_start + i].packed_id,
-                                line_no - 1, strlen( buff) + 1, 12, color);
+         diff = obs[line_start + i].ra - obs[curr_obs].ra;
+         if( diff > PI)
+            diff -= PI + PI;
+         if( diff < -PI)
+            diff += PI + PI;
+         sprintf( buff + 32, "%11.5f", diff * 180. / PI);
+         buff[43] = ' ';
+         diff = obs[line_start + i].dec - obs[curr_obs].dec;
+         sprintf( buff + 44, "%11.5f", diff * 180. / PI);
+         buff[55] = ' ';
          }
-               /* show "scroll bar" to right of observations: */
-   show_right_hand_scroll_bar( top_line_residual_area,
-                          n_obs_shown, line_start, n_obs);
-   return( line_start);
+#endif
+
+   if( obs.flags & OBS_IS_SELECTED)
+      color = COLOR_SELECTED_OBS;
+
+   show_residual_text( buff, line, 0, color, obs.is_included);
+   show_mpc_code_in_color( buff + mpc_column, line, mpc_column);
+
+   if( residual_format & RESIDUAL_FORMAT_SHOW_DESIGS)
+      put_colored_text( obs.packed_id, line, strlen( buff) + 1, 12, color);
+}
+
+static void show_observations( const OBSERVE *obs, int line_no,
+                  const int residual_format, int n_obs_shown)
+{
+   while( n_obs_shown)
+      {
+      show_one_observation( *obs, line_no, residual_format);
+      obs++;
+      n_obs_shown--;
+      line_no++;
+      }
 }
 
 static void show_final_line( const int n_obs,
@@ -1899,11 +1909,7 @@ static void get_mouse_data( int *mouse_x, int *mouse_y,
 {
             MEVENT mouse_event;
 
-#ifdef __PDCURSES__
-            nc_getmouse( &mouse_event);
-#else
             getmouse( &mouse_event);
-#endif
             *mouse_x = mouse_event.x;
             *mouse_y = mouse_event.y;
             *mouse_z = mouse_event.z;
@@ -2243,7 +2249,8 @@ int main( const int argc, const char **argv)
    bool show_commented_elements = false;
    bool drop_single_obs = true;
    bool sort_obs_by_code = false;
-   int n_stations_shown = 0, first_residual_shown = 0;
+   int n_stations_shown = 0, top_obs_shown = 0, n_obs_shown = 0;
+   bool single_obs_selected = false;
 
    if( !strcmp( argv[0], "find_orb"))
       use_config_directory = true;
@@ -2478,7 +2485,6 @@ int main( const int argc, const char **argv)
       extern double solar_pressure[];
       extern int n_extra_params;
 
-
       if( c != KEY_MOUSE_MOVE && c != KEY_TIMER)
          prev_getch = c;
       if( debug_level > 3)
@@ -2542,7 +2548,7 @@ int main( const int argc, const char **argv)
                debug_printf( "R1 = %f; R2 = %f\n", r1, r2);
             for( i = 0; i < n_obs - 1 && !obs[i].is_included; i++)
                ;
-            curr_obs = i;
+            curr_obs = top_obs_shown = i;
             update_element_display = 1;
             clear( );
             }
@@ -2553,6 +2559,12 @@ int main( const int argc, const char **argv)
          curr_obs = n_obs - 1;
       if( curr_obs < 0)
          curr_obs = 0;
+      if( single_obs_selected)
+         {
+         for( i = 0; i < n_obs; i++)
+            obs[i].flags &= ~OBS_IS_SELECTED;
+         obs[curr_obs].flags |= OBS_IS_SELECTED;
+         }
       if( debug_level > 2)
          debug_printf( "update_element_display = %d\n", update_element_display);
       if( residual_format & (RESIDUAL_FORMAT_PRECISE | RESIDUAL_FORMAT_OVERPRECISE))
@@ -2577,7 +2589,6 @@ int main( const int argc, const char **argv)
             if( debug_level)
                refresh( );
             }
-//       line_no = 2;
          line_no = n_command_lines + 1;
          }
       if( observation_display & DISPLAY_OBSERVATION_DETAILS)
@@ -2588,13 +2599,7 @@ int main( const int argc, const char **argv)
 
          if( sort_obs_by_code)
             shellsort_r( obs, n_obs, sizeof( OBSERVE), compare_observations, &i);
-         while( i < n_obs && !(obs[i].flags & OBS_IS_SELECTED))
-            i++;
-         if( i == n_obs)      /* no observation selected */
-            obs[curr_obs].flags ^= OBS_IS_SELECTED;
          generate_obs_text( obs, n_obs, tbuff);
-         if( i == n_obs)      /* no observation selected */
-            obs[curr_obs].flags ^= OBS_IS_SELECTED;
 #ifdef HAVE_UNICODE
          if( make_unicode_substitutions)
             {
@@ -2726,28 +2731,42 @@ int main( const int argc, const char **argv)
       top_line_residuals = line_no;
       if( c != KEY_MOUSE_MOVE && c != KEY_TIMER)
          {
+         int lines_available;
+
          n_stations_shown = show_station_info( obs, n_obs,
                      line_no, curr_obs, list_codes);
 
-         first_residual_shown = show_residuals( obs, n_obs,
-                     residual_format, curr_obs, line_no, n_stations_shown);
+         lines_available = getmaxy( stdscr) - n_stations_shown - line_no;
+         n_obs_shown = (lines_available > n_obs ? n_obs : lines_available);
+         if( single_obs_selected)
+            {
+            if( top_obs_shown > curr_obs)
+               top_obs_shown = curr_obs;
+            if( top_obs_shown < curr_obs - n_obs_shown + 1)
+               top_obs_shown = curr_obs - n_obs_shown + 1;
+            }
+
+         if( top_obs_shown > n_obs - lines_available)
+            top_obs_shown = n_obs - lines_available;
+         if( top_obs_shown < 0)
+            top_obs_shown = 0;
+         show_observations( obs + top_obs_shown, top_line_residuals,
+                                 residual_format, n_obs_shown);
+         show_right_hand_scroll_bar( line_no,
+                            n_obs_shown, top_obs_shown, n_obs);
+            /* At present,  any unused space between the observation data and
+            the station info is left blank.  But as the commented-out lines
+            suggest,  it could be filled with... something,  TBD.  */
+         *tbuff = '\0';
+         for( i = 0; i < lines_available - n_obs_shown; i++)
+            {
+//          snprintf( tbuff, sizeof( tbuff), "Line %d of %d",
+//                      i + 1, lines_available - n_obs_shown);
+            put_colored_text( tbuff, top_line_residuals + n_obs_shown + i,
+                          0, -1, COLOR_BACKGROUND);
+            }
          }
-
-#ifdef TESTING_CODE_FOR_MESSAGE_AREA
-            /* Not currently in use : if you don't have many observations and
-            there's unused space between the observations and the station
-            info,  it could be filled with... something.   */
-      i = line_no + n_obs - first_residual_shown;
-      while( i < getmaxy( stdscr) - n_stations_shown)
-         {
-         int j = line_no + n_obs - first_residual_shown;
-
-         sprintf( tbuff, "Msg line %d of %d\n", i - j,
-                     getmaxy( stdscr) - n_stations_shown - j);
-         put_colored_text( tbuff, i++, 40, 30, COLOR_MESSAGE_TO_USER);
-         }
-#endif
-
+      single_obs_selected = false;
       if( debug_level > 2)
          debug_printf( "resids shown\n");
       if( debug_level)
@@ -2854,17 +2873,15 @@ int main( const int argc, const char **argv)
                      else
                         while( curr_obs > 0 && obs[curr_obs].jd > curr_jd - step)
                            curr_obs--;
+                     single_obs_selected = true;
                      }
                   }
                }
-#ifdef BUTTON5_PRESSED
          if( button & BUTTON4_PRESSED)   /* actually 'wheel up' */
-            c = KEY_UP;
-         else if( button & BUTTON5_PRESSED)   /* actually 'wheel down' */
-            c = KEY_DOWN;
-         else
-#endif
-         if( y >= station_start_line)
+            top_obs_shown--;
+         else if( button5_pressed)   /* actually 'wheel down' */
+            top_obs_shown++;
+         else if( y >= station_start_line)
             {
             const char *search_code =
                     mpc_color_codes[y - station_start_line].code;
@@ -2874,6 +2891,7 @@ int main( const int argc, const char **argv)
                curr_obs = (curr_obs + dir + n_obs) % n_obs;
                while( FSTRCMP( obs[curr_obs].mpc_code, search_code))
                   curr_obs = (curr_obs + dir + n_obs) % n_obs;
+               single_obs_selected = true;
                }
             else
                {
@@ -2905,58 +2923,55 @@ int main( const int argc, const char **argv)
             const unsigned max_x = getmaxx( stdscr);
 
             if( x == max_x - 1)    /* clicked on 'scroll bar' right of obs */
-               curr_obs = (y - top_line_residuals) * (n_obs - 1)
-                           / (station_start_line - top_line_residuals - 1);
+               {
+               dir = 0;
+               if( y == top_line_residuals)
+                  dir = -1;        /* similar to mouse wheel up */
+               else if( y == top_line_residuals + n_obs_shown - 1)
+                  dir = -1;        /* similar to mouse wheel down */
+               else
+                  {              /* clicked on scroll bar */
+                  top_obs_shown =
+                          (y - top_line_residuals) * n_obs / n_obs_shown;
+                  top_obs_shown -= n_obs_shown / 2;  /* Center display */
+                  }
+               if( button & BUTTON1_DOUBLE_CLICKED)
+                  dir += dir;
+               if( button & BUTTON1_TRIPLE_CLICKED)
+                  dir *= 3;
+               top_obs_shown += dir;
+               }
             else
                {              /* clicked among the observations */
-               int new_curr = first_residual_shown + (y - top_line_residuals);
+               int new_curr = top_obs_shown + (y - top_line_residuals);
 
                if( new_curr < n_obs)  /* "normal" click in the observations area */
                   {
-                  const int prev_curr_obs = new_curr;
-
                   curr_obs = new_curr;
                   if( button & BUTTON1_DOUBLE_CLICKED)
                      obs[curr_obs].is_included ^= 1;
-                  if( button & BUTTON_CTRL)
+                  else if( button & BUTTON_CTRL)
                      obs[curr_obs].flags ^= OBS_IS_SELECTED;
-                  else if( dir == -1)    /* Non-left mouse button. Should */
-                     {        /*  be BUTTON_SHIFT,  but that doesn't work */
-                     int n_selected = 0, n_unselected = 0, pass;
-
-                     for( pass = 0; pass < 2; pass++)
-                        for( i = min( curr_obs, prev_curr_obs);
-                             i <= max( curr_obs, prev_curr_obs); i++)
-                           {
-                           if( !pass)
-                              {
-                              if( obs[i].flags & OBS_IS_SELECTED)
-                                 n_selected++;
-                              else
-                                 n_unselected++;
-                              }
-                          else
-                              {
-                              if( n_selected > n_unselected)
-                                 obs[i].flags &= ~OBS_IS_SELECTED;
-                              else
-                                 obs[i].flags |= OBS_IS_SELECTED;
-                              }
-                          }
-                     i = full_inquire( get_find_orb_text( 2022), NULL, 0,
-                                 COLOR_MENU, y, x);
-                     if( i == KEY_F( 1))        /* toggle obs */
-                        c = 'x';
-                     if( i == KEY_F( 2))        /* set uncertainty */
-                        c = '%';
-                     snprintf( message_to_user, sizeof( message_to_user),
-                                 "opt %d selected", i);
-                     }
                   else        /* "ordinary",  unshifted or ctrled click */
                      {
                      for( i = 0; i < n_obs; i++)
-                        obs[i].flags &= ~OBS_IS_SELECTED;
-                     obs[curr_obs].flags |= OBS_IS_SELECTED;
+                        {
+                        if( i == curr_obs)
+                           obs[i].flags |= OBS_IS_SELECTED;
+                        else
+                           obs[i].flags &= ~OBS_IS_SELECTED;
+                        }
+                     show_observations( obs + top_obs_shown, top_line_residuals,
+                                 residual_format, n_obs_shown);
+                     if( dir == -1)
+                        {
+                        i = full_inquire( get_find_orb_text( 2022), NULL, 0,
+                                 COLOR_MENU, y, x);
+                        if( i == KEY_F( 1))        /* toggle obs */
+                           c = 'x';
+                        if( i == KEY_F( 2))        /* set uncertainty */
+                           c = '%';
+                        }
                      }
                   }
                }
@@ -2993,7 +3008,7 @@ int main( const int argc, const char **argv)
          perturbers ^= (1 << (c - '0'));
 #ifdef ALT_0
       else if( c >= ALT_0 && c <= ALT_9)
-         curr_obs = (n_obs - 1) * (c - ALT_0) / 10;
+         top_obs_shown = (n_obs - 1) * (c - ALT_0) / 10;
 #endif
       else switch( c)
          {
@@ -3003,42 +3018,44 @@ int main( const int argc, const char **argv)
          case KEY_C1:
          case KEY_END:
             curr_obs = n_obs - 1;
+            single_obs_selected = true;
             break;
          case KEY_A1:
          case KEY_HOME:
             curr_obs = 0;
+            single_obs_selected = true;
             break;
          case KEY_UP:
 #ifdef KEY_A2
          case KEY_A2:
 #endif
-            curr_obs--;
-            break;
-         case KEY_DOWN:
-#ifdef KEY_C2
-         case KEY_C2:
-#endif
-            curr_obs++;
-            break;
          case KEY_LEFT:
 #ifdef KEY_B1
          case KEY_B1:
 #endif
             curr_obs--;
+            single_obs_selected = true;
             break;
+         case KEY_DOWN:
+#ifdef KEY_C2
+         case KEY_C2:
+#endif
          case KEY_RIGHT:
 #ifdef KEY_B3
          case KEY_B3:
 #endif
             curr_obs++;
+            single_obs_selected = true;
             break;
          case KEY_C3:         /* "PgDn" = lower right key in keypad */
          case KEY_NPAGE:
-            curr_obs += getmaxy( stdscr) - line_no - n_stations_shown;
+            curr_obs += n_obs_shown;
+            single_obs_selected = true;
             break;
          case KEY_A3:         /* "PgUp" = upper right key in keypad */
          case KEY_PPAGE:
-            curr_obs -= getmaxy( stdscr) - line_no - n_stations_shown;
+            curr_obs -= n_obs_shown;
+            single_obs_selected = true;
             break;
          case ALT_W:
             {
@@ -3108,6 +3125,7 @@ int main( const int argc, const char **argv)
                         FSTRCMP( obs[new_obs].mpc_code, obs[curr_obs].mpc_code))
                new_obs = (new_obs + dir) % n_obs;
             curr_obs = new_obs;
+            single_obs_selected = true;
             }
             break;
          case KEY_F(6):          /* find prev excluded obs */
@@ -3119,6 +3137,7 @@ int main( const int argc, const char **argv)
             while( new_obs != curr_obs && obs[new_obs].is_included)
                new_obs = (new_obs + dir) % n_obs;
             curr_obs = new_obs;
+            single_obs_selected = true;
             }
             break;
          case '*':         /* toggle use of solar radiation pressure */
@@ -3181,11 +3200,13 @@ int main( const int argc, const char **argv)
             for( i = 0; i < n_obs - 1 && !obs[i].is_included; i++)
                ;
             curr_obs = i;
+            single_obs_selected = true;
             break;
          case KEY_F(10):          /* find end of included arc */
             for( i = n_obs - 1; i > 0 && !obs[i].is_included; i--)
                ;
             curr_obs = i;
+            single_obs_selected = true;
             break;
          case KEY_F(11):
          case CTRL( 'G'):
@@ -3808,6 +3829,7 @@ int main( const int argc, const char **argv)
                       curr_obs = i;
                       }
                    }
+            single_obs_selected = true;
             strcpy( message_to_user, "Worst observation found");
             }
             break;
@@ -4188,6 +4210,7 @@ int main( const int argc, const char **argv)
                          obs[curr_obs].jd < jd; curr_obs++)
                      ;
                }
+            single_obs_selected = true;
             break;
          case KEY_F(19):    /* shift-f7 */
             element_format ^= ELEM_OUT_ALTERNATIVE_FORMAT;
@@ -4318,12 +4341,10 @@ int main( const int argc, const char **argv)
          case 9:
             sort_obs_by_code = !sort_obs_by_code;
             break;
-         case ALT_P:
-            obs[curr_obs].flags ^= OBS_IS_SELECTED;
-            break;
          case ALT_A:
             residual_format ^= RESIDUAL_FORMAT_SHOW_DESIGS;
             break;
+         case ALT_P:
          case ALT_R: case ALT_X: case ALT_Y:
          case ALT_Z: case '\'': case 'k':
          case ';':
