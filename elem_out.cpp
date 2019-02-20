@@ -91,8 +91,6 @@ const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 void remove_trailing_cr_lf( char *buff);      /* ephem0.cpp */
 int write_tle_from_vector( char *buff, const double *state_vect,
         const double epoch, const char *norad_desig, const char *intl_desig);
-double find_moid( const ELEMENTS *elem1, const ELEMENTS *elem2,  /* moid4.c */
-                                     double *barbee_style_delta_v);
 int setup_planet_elem( ELEMENTS *elem, const int planet_idx,
                                           const double t_cen);   /* moid4.c */
 void set_environment_ptr( const char *env_ptr, const char *new_value);
@@ -1203,6 +1201,7 @@ int write_out_elements_to_file( const double *orbit,
                {
                static const char moid_idx[N_MOIDS] = { 3, 5, 2, 1, 4, 6, 7, 8,
                                        10, 11, 12, 13, 14, 15 };
+               moid_data_t mdata;
                double moid, moid_limit = .1;
                ELEMENTS planet_elem;
                const int forced_moid =
@@ -1210,8 +1209,9 @@ int write_out_elements_to_file( const double *orbit,
 
                setup_planet_elem( &planet_elem, moid_idx[j],
                                 (epoch_shown - J2000) / 36525.);
-               moid = find_moid( &planet_elem, &helio_elem,
-                              (j ? NULL : &barbee_style_delta_v));
+               moid = find_moid_full( &planet_elem, &helio_elem, &mdata);
+               if( !j)     /* only get Barbee speed for the earth */
+                  barbee_style_delta_v = mdata.barbee_speed * AU_IN_KM / seconds_per_day;
                if( j < 2)        /* Earth or Jupiter */
                   moid_limit = 1.;
                else if( j > 7)            /* asteroid */

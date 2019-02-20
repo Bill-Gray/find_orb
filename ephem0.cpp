@@ -88,8 +88,6 @@ int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
          __attribute__ (( format( printf, 3, 4)))
 #endif
 ;
-double find_moid( const ELEMENTS *elem1, const ELEMENTS *elem2,  /* moid4.c */
-                                     double *barbee_style_delta_v);
 int setup_planet_elem( ELEMENTS *elem, const int planet_idx,
                                           const double t_cen);   /* moid4.c */
 char *mpc_station_name( char *station_data);       /* mpc_obs.cpp */
@@ -2047,7 +2045,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                elem.epoch = curr_jd;
                calc_classical_elements( &elem, orbi, curr_jd, 1);
                setup_planet_elem( &planet_elem, j, (curr_jd - J2000) / 36525.);
-               moid = find_moid( &planet_elem, &elem, NULL);
+               moid = find_moid_full( &planet_elem, &elem, NULL);
                snprintf_append( buff, sizeof( buff), "%8.4f", moid);
                }
          prev_radial_vel = radial_vel;
