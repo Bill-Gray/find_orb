@@ -1964,11 +1964,15 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
    return( got_vectors);
 }
 
+double override_epoch_shown = 0.;
+
 double find_epoch_shown( const OBSERVE *obs, const int n_obs)
 {
    int first, last;
    double rval;
 
+   if( override_epoch_shown)
+      return( override_epoch_shown);
    get_first_and_last_included_obs( obs, n_obs, &first, &last);
    if( !last)      /* no observations included;  shouldn't actually happen */
       rval = floor( (obs[first].jd + obs[last].jd) / 2.) + .5;

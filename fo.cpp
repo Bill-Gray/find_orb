@@ -554,11 +554,21 @@ int main( const int argc, const char **argv)
                }
                break;
             case 't':
-               if( argv[i][2] == 'e')
-                  ephem_end_jd = get_time_from_string( curr_jd( ),
-                           argv[i] + 3,
+               if( argv[i][2] == 'e' || argv[i][2] == 'E')
+                  {
+                  double jd = get_time_from_string( curr_jd( ), argv[i] + 3,
                            CALENDAR_JULIAN_GREGORIAN | FULL_CTIME_YMD
                            | FULL_CTIME_TWO_DIGIT_YEAR, NULL);
+
+                  if( argv[i][2] == 'e')
+                     ephem_end_jd = jd;
+                  else
+                     {
+                     extern double override_epoch_shown;
+
+                     override_epoch_shown = jd;
+                     }
+                  }
                else
                   total_objects = atoi( arg);
                break;
