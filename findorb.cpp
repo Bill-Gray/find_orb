@@ -1907,13 +1907,13 @@ static int get_epoch_range_of_included_obs( const OBSERVE FAR *obs,
 static void get_mouse_data( int *mouse_x, int *mouse_y,
                             int *mouse_z, unsigned long *button)
 {
-            MEVENT mouse_event;
+   MEVENT mouse_event;
 
-            getmouse( &mouse_event);
-            *mouse_x = mouse_event.x;
-            *mouse_y = mouse_event.y;
-            *mouse_z = mouse_event.z;
-            *button  = mouse_event.bstate;
+   getmouse( &mouse_event);
+   *mouse_x = mouse_event.x;
+   *mouse_y = mouse_event.y;
+   *mouse_z = mouse_event.z;
+   *button  = mouse_event.bstate;
 }
 
 static void put_colored_text( const char *text, const int line_no,
@@ -2816,7 +2816,7 @@ int main( const int argc, const char **argv)
             else if( blink_state( ) != blink_state0)
                c = KEY_TIMER;
 #else
-            napms( 200);
+            napms( 50);
 #endif
             }
          if( !c)
@@ -2928,7 +2928,7 @@ int main( const int argc, const char **argv)
                if( y == top_line_residuals)
                   dir = -1;        /* similar to mouse wheel up */
                else if( y == top_line_residuals + n_obs_shown - 1)
-                  dir = -1;        /* similar to mouse wheel down */
+                  dir =  1;        /* similar to mouse wheel down */
                else
                   {              /* clicked on scroll bar */
                   top_obs_shown =
