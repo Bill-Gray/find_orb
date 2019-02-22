@@ -180,6 +180,7 @@ N010S        Neptune X = S/2003 N1 = Psamathe
 N011S        Neptune XI = S/2002 N2 = Sao
 N012S        Neptune XII = S/2002 N3 = Laomedeia
 N013S        Neptune XIII = S/2002 N4 = Neso
+N014S        Neptune XIV = S/2004 N1 = Hippocamp
 P001S        Pluto I = Charon = S/1978 P1
 P002S        Pluto II = Nix = S/2005 P 2
 P003S        Pluto III = Hydra = S/2005 P 1
