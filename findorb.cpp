@@ -495,6 +495,9 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
             }
          }
          while( rval == KEY_RESIZE || rval == KEY_MOUSE);
+#ifndef PDCURSES
+      printf("\033[?1003l");   /* ] used in ncurses with xterm-like */
+#endif                         /* terms to turn mouse move events off */
       mousemask( ALL_MOUSE_EVENTS, NULL);
       curs_set( 1);        /* turn cursor back on */
       }
@@ -2885,37 +2888,47 @@ int main( const int argc, const char **argv)
             {
             const char *search_code =
                     mpc_color_codes[y - station_start_line].code;
+            int c1;
 
-            if( button & button1_events)
+            mvchgat( y, 0, getmaxx( stdscr), A_REVERSE,
+                                            COLOR_BACKGROUND, NULL);
+            c1 = full_inquire( get_find_orb_text( 2023), NULL, 0,
+                                 COLOR_MENU, y, x);
+            switch( c1)
                {
-               curr_obs = (curr_obs + dir + n_obs) % n_obs;
-               while( FSTRCMP( obs[curr_obs].mpc_code, search_code))
+               case KEY_F( 1):
+                  {
+                  int n_selected = 0, n_deselected = 0;
+
+                  for( i = 0; i < n_obs; i++)
+                     if( !FSTRCMP( obs[i].mpc_code, search_code))
+                        {
+                        if( obs[i].flags & OBS_IS_SELECTED)
+                           n_selected++;
+                        else
+                           n_deselected++;
+                        }
+                  for( i = 0; i < n_obs; i++)
+                     if( !FSTRCMP( obs[i].mpc_code, search_code))
+                        {
+                        if( n_selected < n_deselected)
+                           obs[i].flags |= OBS_IS_SELECTED;
+                        else
+                           obs[i].flags &= ~OBS_IS_SELECTED;
+                        }
+                  snprintf( message_to_user, sizeof( message_to_user),
+                          "All obs from (%s) %sselected\n",
+                          search_code, (n_selected < n_deselected) ? "" : "de");
+                  }
+                  break;
+               case KEY_F( 2):
+               case KEY_F( 3):
+                  dir = (c1 == KEY_F( 2) ? 1 : -1);
                   curr_obs = (curr_obs + dir + n_obs) % n_obs;
-               single_obs_selected = true;
-               }
-            else
-               {
-               int n_selected = 0, n_deselected = 0;
-
-               for( i = 0; i < n_obs; i++)
-                  if( !FSTRCMP( obs[i].mpc_code, search_code))
-                     {
-                     if( obs[i].flags & OBS_IS_SELECTED)
-                        n_selected++;
-                     else
-                        n_deselected++;
-                     }
-               for( i = 0; i < n_obs; i++)
-                  if( !FSTRCMP( obs[i].mpc_code, search_code))
-                     {
-                     if( n_selected < n_deselected)
-                        obs[i].flags |= OBS_IS_SELECTED;
-                     else
-                        obs[i].flags &= ~OBS_IS_SELECTED;
-                     }
-               snprintf( message_to_user, sizeof( message_to_user),
-                       "All obs from (%s) %sselected\n",
-                       search_code, (n_selected < n_deselected) ? "" : "de");
+                  while( FSTRCMP( obs[curr_obs].mpc_code, search_code))
+                     curr_obs = (curr_obs + dir + n_obs) % n_obs;
+                  single_obs_selected = true;
+                  break;
                }
             }
          else if( y >= top_line_residuals)
