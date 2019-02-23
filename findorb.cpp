@@ -102,7 +102,6 @@ int debug_level = 0;
 
 extern unsigned perturbers;
 
-#define KEY_MOUSE_MOVE 31000
 #define KEY_TIMER      31001
 #define AUTO_REPEATING 31002
 #define KEY_ALREADY_HANDLED    31003
@@ -2488,7 +2487,7 @@ int main( const int argc, const char **argv)
       extern double solar_pressure[];
       extern int n_extra_params;
 
-      if( c != KEY_MOUSE_MOVE && c != KEY_TIMER)
+      if( c != KEY_TIMER)
          prev_getch = c;
       if( debug_level > 3)
          debug_printf( "get_new_object = %d\n", get_new_object);
@@ -2585,13 +2584,10 @@ int main( const int argc, const char **argv)
       top_line_basic_info_perturbers = line_no;
       if( observation_display & DISPLAY_BASIC_INFO)
          {
-         if( c != KEY_MOUSE_MOVE)
-            {
-            n_command_lines = show_basic_info( obs, n_obs, 1);
-            show_perturbers( n_command_lines);
-            if( debug_level)
-               refresh( );
-            }
+         n_command_lines = show_basic_info( obs, n_obs, 1);
+         show_perturbers( n_command_lines);
+         if( debug_level)
+            refresh( );
          line_no = n_command_lines + 1;
          }
       if( observation_display & DISPLAY_OBSERVATION_DETAILS)
@@ -2720,7 +2716,7 @@ int main( const int argc, const char **argv)
          if( debug_level)
             refresh( );
          }
-      if( c != KEY_MOUSE_MOVE && c != KEY_TIMER)
+      if(  c != KEY_TIMER)
          show_residual_legend( line_no, residual_format);
       line_no++;
       if( debug_level)
@@ -2732,7 +2728,7 @@ int main( const int argc, const char **argv)
          shellsort_r( obs, n_obs, sizeof( OBSERVE), compare_observations, &i);
 
       top_line_residuals = line_no;
-      if( c != KEY_MOUSE_MOVE && c != KEY_TIMER)
+      if( c != KEY_TIMER)
          {
          int lines_available;
 
@@ -2774,7 +2770,7 @@ int main( const int argc, const char **argv)
          debug_printf( "resids shown\n");
       if( debug_level)
          refresh( );
-      if( c != KEY_MOUSE_MOVE && c != KEY_TIMER)
+      if( c != KEY_TIMER)
          show_final_line( n_obs, curr_obs, COLOR_FINAL_LINE);
       if( sort_obs_by_code)
          shellsort_r( obs, n_obs, sizeof( OBSERVE), compare_observations, NULL);
@@ -2800,23 +2796,15 @@ int main( const int argc, const char **argv)
             }
       if( c != AUTO_REPEATING)
          {
-         int x1, y1, z1;
-         unsigned long button;
 #ifndef __PDCURSES__
          const int blink_state0 = blink_state( );
 #endif
 
          c = 0;
-         get_mouse_data( &x1, &y1, &z1, &button);
          while( !c && curses_kbhit( ) == ERR)
             {
-            int x, y, z;
-
-            get_mouse_data( &x, &y, &z, &button);
-            if( x != x1 || y != y1)
-               c = KEY_MOUSE_MOVE;
 #ifndef __PDCURSES__
-            else if( blink_state( ) != blink_state0)
+            if( blink_state( ) != blink_state0)
                c = KEY_TIMER;
 #else
             napms( 50);
@@ -2826,7 +2814,7 @@ int main( const int argc, const char **argv)
             c = extended_getch( );
          auto_repeat_full_improvement = 0;
          }
-      if( c != KEY_MOUSE_MOVE && c != KEY_TIMER)
+      if( c != KEY_TIMER)
          *message_to_user = '\0';
 
       if( c == KEY_MOUSE)
@@ -4069,7 +4057,6 @@ int main( const int argc, const char **argv)
             message_to_user[xmax] = '\0';
             }
             break;
-         case KEY_MOUSE_MOVE:
          case KEY_TIMER:
             break;
 #ifdef KEY_RESIZE
