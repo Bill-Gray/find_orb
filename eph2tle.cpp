@@ -564,6 +564,9 @@ int main( const int argc, const char **argv)
                fitted |= FIT_BSTAR;
                n_params++;
                break;
+            case 'B':
+               tle.bulletin_number = atoi( argv[i] + 2);
+               break;
             case 'd':
                if( argv[i][2])
                   strcpy( obj_name, argv[i] + 2);
