@@ -256,3 +256,9 @@
 2024    Copy elements to clipboard
 2024    Toggle element details
 
+2025    Click on an observation to get information about it.  Right-click to get
+2025    further options.  Ctrl-click to select multiple observations.\n
+
+2026    No observational header was provided with the observation(s).  Had one
+2026    been provided,  you'd see information about who made and measured these
+2026    data,  telescope used,  etc.\n

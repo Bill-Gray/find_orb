@@ -4726,8 +4726,8 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff)
          last = i;
          n_selected++;
          }
-   if( !n_selected)
-      strcpy( buff, "(No observations selected)\n");
+   if( !n_selected)     /* "Click on an observation to..." */
+      strcpy( buff, get_find_orb_text( 2025));
    else if( n_selected > 1)
       {
       double mean_xresid = 0., mean_yresid = 0.;
@@ -4801,8 +4801,8 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff)
             }
       else
          {
-         strcpy( tptr, "(No observation header available)\n");
-         i = 1;
+         strcpy( tptr, get_find_orb_text( 2026));
+         i = 1;            /* "No obs header" message */
          }
       n_lines = (int)i;
       }
