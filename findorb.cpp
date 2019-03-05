@@ -2204,6 +2204,30 @@ extern const char *elements_filename;
 #define DISPLAY_OBSERVATION_DETAILS  2
 #define DISPLAY_ORBITAL_ELEMENTS     4
 
+
+static int toggle_selected_observations( OBSERVE *obs, const unsigned n_obs,
+                                 unsigned *n_found)
+{
+   unsigned n_on = 0, n_off = 0, i;
+   int rval;
+
+   for( i = 0; i < n_obs; i++)
+      if( obs[i].flags & OBS_IS_SELECTED)
+         {
+         if( obs[i].is_included)
+            n_on++;
+         else
+            n_off++;
+         }
+   rval = (n_off > n_on);
+   for( i = 0; i < n_obs; i++)
+      if( obs[i].flags & OBS_IS_SELECTED)
+         obs[i].is_included = rval;
+   if( n_found)
+      *n_found = n_on + n_off;
+   return( rval);
+}
+
 int sanity_test_observations( const char *filename);
 
 /* main( ) begins by using the select_object_in_file( ) function (see above)
@@ -3835,12 +3859,13 @@ int main( const int argc, const char **argv)
             }
             break;
          case 'x': case 'X':
-            if( obs[curr_obs].is_included)
-               obs[curr_obs].is_included = 0;
-            else
-               obs[curr_obs].is_included = 1;
-            strcpy( message_to_user, "Inclusion of observation toggled");
-            add_off_on = obs[curr_obs].is_included;
+            {
+            unsigned n_found;
+
+            add_off_on = toggle_selected_observations( obs, n_obs, &n_found);
+            snprintf( message_to_user, sizeof( message_to_user),
+                                       "%u observation(s) toggled", n_found);
+            }
             break;
          case 'y': case 'Y':
             show_a_file( "gauss.out");
