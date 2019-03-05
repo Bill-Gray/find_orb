@@ -243,7 +243,7 @@
 
 # Following pop-up shown when you right-click on an _observatory code_ :
 
-2023    Toggle all this obscode
+2023    Select all this obscode
 2023    Find next from this obscode
 2023    Find prev from this obscode
 
