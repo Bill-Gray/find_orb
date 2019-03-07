@@ -77,7 +77,7 @@
 97187   &Topocentric ecliptic
 97188   Ro&und to nearest step
 97189   Ground track
-97192   S&uppress unobserables
+97192   S&uppress unobservables
 97193   &Visibility indicators
 97194   Ephem u&ncertainty
 97195   Human-readable output
