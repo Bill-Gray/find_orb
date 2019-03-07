@@ -12,7 +12,7 @@
 99106   &Full step
 99108   Mercurio
 99109   Venus
-99110   Earth
+99110   Tierra
 99111   Marte
 99112   Jupiter
 99113   Saturno
@@ -20,121 +20,121 @@
 99115   Neptuno
 99116   Pluton
 99117   Luna
-99118   Asteroids
-99129   Sa&ve elements
-99136   &Auto-Solve
-99137   Save &Residuals...
-99138   &Ephemeris...
-99142   &Open...
-99148   About...
+99118   Asteroides
+99129   Guardar elementos
+99136   &Auto-resolver
+99137   Guardar &Residuos...
+99138   &Efemerides...
+99142   &Abrir...
+99148   Acerca de...
 99149   R2:
 99150   UA
 99151   UA
 99153   R1:
 99174   Elementos orbitales:
 99156   Epoca
-99157   Perturbers:
+99157   Perturbadores:
 99140   &Gauss
-99141   Worst o&bs
-99143   F&ilter obs
+99141   Peor o&bs
+99143   F&iltar obs
 99139   &Monte Carlo...
 99144   &Ajustes
-99145   &Toggle Obs
-99146   Set Sigma(s)
-99179   (Will fill in Find_Orb & DE version info)
-99180   All Perturbers On
+99145   &Alternar Obs
+99146   Establecer Sigma(s)
+99179   (Insertar info version Find_Orb & DE)
+99180   Todos Perturbadores On
 99001   Salir
 
 # about
-98000   About FIND_ORB
+98000   Acerca de FIND_ORB
 98153   FIND_ORB Orbital Determination Software
-98149   GPL'ed software by Project Pluto (C)1997-2017
-98150   Updates and information about other astronomy
-98152   software can be found at:
+98149   GPL'ed software by Project Pluto (C)1997-2019
+98150   Actualizaciones e informacion acerca de otros
+98152   software de astronomia se pueden encontrar en:
 98155   https://www.projectpluto.com
 98179   Version
 
 # ephem
-97000   Make Ephemeris
-97001   &Done
-97129   &Save
-97147   &Go
+97000   Crea Efemerides
+97001   &Hecho
+97129   &Guardar
+97147   &Ir
 97148   &Pseudo-MPEC
-97149   Paste to &Clipboard
-97150   &Now
-97151   # steps:
-97152   Stepsize
-97153   Start:
+97149   Pegar al &Portapapeles
+97150   &Ahora
+97151   # paso:
+97152   Tamaño del paso
+97153   Inicio:
 97154   Latitud
 97155   Longitud
-97175   Show &Motion details
-97176   Show &Alt/az
-97182   &Radial velocity
-97183   &Phase angle
-97184   S&eparate motions
-97185   Phase angle &bisector
-97186   &Heliocentric ecliptic
-97187   &Topocentric ecliptic
-97188   Ro&und to nearest step
-97189   Ground track
-97192   S&uppress unobserables
-97193   &Visibility indicators
-97194   Ephem u&ncertainty
-97195   Human-readable output
-97196   Speed
+97175   Mostrar detalles &Movimiento
+97176   Mostrar &Alt/az
+97182   Velocidad &Radial 
+97183   Angulo de &Fase
+97184   S&eparar movimientos
+97185   &Bisectriz angulo de fase
+97186   Ecliptica &Heliocentrica
+97187   Ecliptica&Topocentrica
+97188   Re&dondear al paso más proximo
+97189   Trayectoria en superficie
+97192   S&uprimir no observables
+97193   Indicadores de &Visibilidad
+97194   I&ncertidumbre efemerides
+97195   Lectura humana directa
+97196   Velocidad
 97199   Latitud
 97200   &Observables
-97201   State &vectors
-97202   Car&tesian coords
-97203   MP&CORB elements
-97204   &8-line elements
-97205   C&lose approaches
-97206   MPC code
-96999   Suppress output below mag:
+97201   &Vectors de estado
+97202   Coordenadas Car&tesianas
+97203   Elementos MP&CORB
+97204   Elementos &8-line
+97205   Aproximaciones C&ercanas
+97206   Codigo MPC
+96999   Eliminar salidas magnitud bajo:
 
 # settings
 96000   Ajustes
-96149   Reference:
-96150   Monte Carlo noise:
-96151   Max filtered residual:
-96152   Element precision:
-96153   Constraints:
-96173   &Heliocentric orbits only
+96149   Referencia:
+96150   Ruido Monte Carlo:
+96151   Residuo max. filtrado:
+96152   Precision elemento:
+96153   Restricciones:
+96173   Solo orbitas &Heliocentricas
 96001   OK
-96002   Cancel
+96002   Cancelar
 
 # ephemeris
 
 # messages
-1       No orbit to improve!
-2       No residuals to save!
-3       No orbit to make an ephemeris!
-4       Method of Gauss failed!
-5       No changes made!
-6       Ephemeris must contain at least one entry!
-7       No step size specified!
-8       Month must be from 1 to 12!
-9       Day must be from 1 to %d!
-10      No observations loaded from that file!
-11      File not found!
-12      Latitude must start with an 'N' or 'S'!
-13      Longitude must start with an 'E' or 'W'!
-14      Invalid date!
-15      %d of %d observations
-16      From %d observations
-17      ; mean residual %s
-18      Find_Orb -- Orbit Determination
-19      Weighting of posns/mags/times is
-20      All preceding observations toggled
-21      All Perturbers On
-22      All Perturbers Off
+1       No hay orbita que mejorar!
+2       No hay residuos que guardar!
+3       No hay orbita para generar efemerides!
+4       Metodo de Gauss ha fallado!
+5       No se han hecho cambios!
+6       Las efemerides han de tener al menos una entrada!
+7       No se ha especificado el tamaño del paso!
+8       El mes entre 1 y 12!
+9       El dia entre 1 y %d!
+10      No se han cargado observaciones de ese archivo!
+11      Archivo no encontrado!
+12      La latitud debe empezar por 'N' or 'S'!
+13      La latitud debe empezar por 'E' or 'W'!
+14      Fecha no valida!
+15      %d de %d observaciones
+16      De %d observaciones
+17      ; Residuo medio %s
+18      Find_Orb -- Determinacion orbital
+19      Peso de posns/mags/times es
+20      Conmutar todas las observaciones anteriores
+21      Todos los perturbadores On
+22      Todos los perturbadores Off
 
 900     Ingles
 901     Frances
 902     Italiano
 903     Ruso
 904     Español
-905     Deutsch
+905     Aleman
 
 # months
 1000    enero
