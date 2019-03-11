@@ -149,3 +149,116 @@
 1009    octubre
 1010    noviembre
 1011    diciembre
+
+2000    La lat/lon especificada para el codigo (%s) en la cabecera esta mal formateada.\n
+2000    Vea https://www.projectpluto.com/find_orb.htm#obs_codes para\n
+2000    mas informacion sobre como arreglar esto.\n
+
+2001    Este objeto muestra muy poco movimiento y probablemente es una estrella.\n
+
+2002    No se ha encontrado el observador (%s). Estas observaciones se excluyen
+2002    y se tratan como geocentricas.
+
+2003    Esto se puede arreglar descargando
+2003    la lista actual de observatorios MPC en\n
+2003    https://www.minorplanetcenter.net/iau/lists/ObsCodes.html\n
+2003    y guardandola en la misma carpeta donde se ejecuta Find_Orb.
+
+2004    Puede leer sobre como añadir una
+2004    posicion XXX para un observador nuevo/temporal en\n
+2004    https://www.projectpluto.com/find_orb.htm#xxx_code
+
+2005    No se ha encontrado el archivo con los datos de sesgos observacionales 
+2005    Para incluir los datos FCCT14,  Find_Orb necesita
+2005    el archivo 'bias.dat'.  Hay mas informacion
+2005    sobre esto en https://www.projectpluto.com/bias.htm
+2005    Las correcciones de sesgos no es aplicaran hasta que no este disponible el archivo.
+
+2006    Find_Orb puede usar las efemerides NEOCP insertadas.
+2006    Sin embargo, las efemerides son geocentricas. Obtendra
+2006    mejore resultados si selecciona un codigo de observatorio
+2006    preferiblemente uno proximo al ecuardor.  (781) Quito
+2006    es el mejor para este proposito.
+
+2007    Las observaciones abarcan %.1f años,  mas del limite de Find_Orb
+2007    de %.1f años.  Si realmente quiere usar el conjunto 
+2007    de observaciones completo (que podria no procesarse correctamente),  edite en
+2007    'environ.dat' la linea MAX_OBSERVATION_SPAN.
+
+2008    No se han leido correctamente todas las observaciones de satelite.
+2008    Esto no deberia ocurrir.  Envie el archivo con sus observaciones 
+2008    a pluto@projectpluto.com para que se pueda arreglar.
+
+2009    %u observaciones estaban duplicadas.  Se han eliminado.
+
+2010    %u observaciones de satelite tenian datos de offset incorrectos.  El archivo
+2010    'debug.txt' podria mostrar mas informacion.  Estas observaciones
+2010    se han excluido.
+
+
+2011    %u observaciones estaban mal formateadas.  Estas observaciones
+2011    no seran tenidas en cuenta.
+
+2012    %u observaciones estan por debajo del horizonte.
+2013    %u observations se hicieron con luz solar. 
+2014    Estas observaciones se excluyen.
+
+2015    %u observaciones coinciden en fecha y codigo del observatorio,
+2015    pero no en otros aspectos. No seran tenidas en cuenta.
+
+2016    %u observaciones coinciden en fecha, RA/dec, magnitud, y codigo
+2016    MPC pero no en otros aspectos. No seran tenidas en cuenta.
+
+2017    %u observaciones son desde un satelite,  pero no estan marcadas
+2017    como tales y les falta la 'segunda linea' de datos de offset.  Vea\n
+2017    https://www.minorplanetcenter.net/iau/info/SatelliteObs.html
+2017    \npara mas informacion sobre como trabajar con observaciones desde satelite.
+
+2018    La fecha/hora de una o mas observaciones es en el futuro.
+2018    Si no es lo que esperaba, deberia revisar los datos. 
+
+2019    Falta el archivo 'elp82.dat'.  Sin este archivo
+2019    las posiciones lunares seran muy imprecias y las orbitas
+2020    tendran menos precision.  Consiga este archivo,  o (solucion
+2020    preferida) seleccion efemerides JPL.  Vea
+2020    https://www.projectpluto.com/find_orb.htm#de_eph
+2020    para mas detalles sobre como hacer esto.
+
+2020    Falta el archivo 'ps_1996.dat'. Sin este archivo
+2020    las posiciones planetarios no sera precisas y las orbitas 
+2020    tendran menos precision.  Consiga este archivo,  o (solucion
+2020    preferida) seleccion efemerides JPL.  Vea
+2020    https://www.projectpluto.com/find_orb.htm#de_eph
+2020    para mas detalles sobre como hacer esto.
+
+2021    No hay disponibles datos sobre efemerides de asteroides, 
+2021    por lo que no se incluyen asteroides como perturbadores.  Puede
+2021    arreglar esto descargando los archivos necesarios.  Vea
+2021    https://www.projectpluto.com/ast_pert.htm para mas detalles.
+
+# Following pop-up shown when you right-click on an _observation_ :
+
+2022    Cambiar observacion
+2022    Asignar valor de error a la observacion
+
+# Following pop-up shown when you right-click on an _observatory code_ :
+
+2023    Cambiar todas con este codigo de observatorio
+2023    Encontrar siguiente con este codigo de observatorio
+2023    Encontrar anterior con este codigo de observatorio
+
+# Following pop-up shown when you right-click on the _orbital elements_ :
+
+2024    Tomar obs del portapapeles
+2024    Abrir archivo
+2024    Seleccionar objecto
+2024    Guardar elementos
+2024    Guardar elementos al portapapeles
+2024    Cambiar detalles de los elementos
+
+2025    Haga clic en la observacion para obtener mas informacion sobre ella. Clic derecho para obtener
+2025    mas opciones.  Ctrl-clic para seleccionar varias observaciones.\n
+
+2026    No se ha proporcionado cabecera observacional con las observaciones.  Si se
+2026    hubiera proporcionao,  aquí se mostaría informacion acerca del observador, el medidor, 
+2026    el telescopio usado,  etc.\n
