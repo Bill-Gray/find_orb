@@ -54,7 +54,7 @@ TIME_RANGE=-1000,3000
    permission for their NEOCP observations to be redistributed in
    "unredacted" form.  (Contact me if you're willing to be added to this
    list.)
-GREENLIT=033 568 703 970 C95 G58 G96 H01 H41 H43 H45 I41 I52 I93 J95 V03
+GREENLIT=033 568 703 970 C95 G58 G96 H01 H41 H43 H45 I41 I52 I93 J95 V03 V06
 
    We default to assuming that no object will have an observed arc greater
    than 200 years,  and that if it _is_ longer than that,  it's a mistake.
