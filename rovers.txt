@@ -589,3 +589,8 @@ Sc2 !   8.77061      +45.86845      1278       Schiaparelli Observatory, 0.60-m 
 Kwa ! 167.733333     +08.716666        5       Kwajalein Island
 G34 !  13.701403     +50.860289      490.67    Oberfrauendorf
 920 ! -77.664299     +43.075229      141       RIT Observatory,  Rochester
+
+   David Briggs supplied corrected coordinates for (J69).  The scope
+is 155 metres above sea level;  the geoid height is about 46 metres.
+
+J69 !  -1.0196556    +50.9390167     201       North Observatory, Clanfield
