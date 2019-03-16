@@ -4419,6 +4419,8 @@ line 3: Obj alt 4.9 az 271.2  Sun alt -17.4 az 89.1
 line 4: (709) W & B Observatory, Cloudcroft  (N32.95580 E254.22882)
 */
 
+#define MAX_INFO_LEN 100
+
 static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
                  const int n_obs, const int line_number, char *buff,
                  const int show_alt_info)
@@ -4481,7 +4483,7 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
                                         acose( cos_phase) * 180. / PI);
             format_motion( ra_motion_buff, m.ra_motion);
             format_motion( dec_motion_buff, m.dec_motion);
-            sprintf( buff + strlen( buff), "RA vel %s   decvel %s   dT=",
+            snprintf_append( buff, MAX_INFO_LEN, "RA vel %s   decvel %s   dT=",
                                            ra_motion_buff, dec_motion_buff);
             buff += strlen( buff);
 
@@ -4491,7 +4493,7 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
 
                compute_error_ellipse_adjusted_for_motion( &sig1, &sig2, &tilt,
                               optr, &m);
-               snprintf_append( buff, 90, " %.3fx%.3f PA %.2f\n",
+               snprintf_append( buff, MAX_INFO_LEN, " %.3fx%.3f PA %.2f\n",
                          sig1, sig2, tilt * 180. / PI);
                }
             else
@@ -4527,7 +4529,7 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
             format_motion( tbuff, m.total_motion);
             sprintf( buff, "ang vel %s at PA %.1f", tbuff,
                       m.position_angle_of_motion);
-            sprintf( buff + strlen( buff), "   radial vel %.3f km/s  cross ",
+            snprintf_append( buff, MAX_INFO_LEN, "   radial vel %.3f km/s  cross ",
                                       m.radial_vel);
             if( fabs( m.cross_residual) < 9.9)
                sprintf( tbuff, "%.2f", m.cross_residual);
@@ -4548,7 +4550,7 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
             else
                *tbuff = '\0';
             if( *tbuff)
-               sprintf( buff + strlen( buff), "  %s ago", tbuff);
+               snprintf_append( buff, MAX_INFO_LEN, "  %s ago", tbuff);
             if( tdiff < 0.)
                strcat( buff, " <FUTURE!>");
             }
@@ -4567,11 +4569,11 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
             format_dist_in_buff( buff, optr->solar_r);  /* ephem0.cpp */
             strcat( buff, "  ");
             if( optr->obs_mag < BLANK_MAG)
-               sprintf( buff + strlen( buff), "mag=%5.2f  ", optr->obs_mag);
+               snprintf_append( buff, MAX_INFO_LEN, "mag=%5.2f  ", optr->obs_mag);
             else
                strcat( buff, "           ");
             if( optr->computed_mag)
-               sprintf( buff + strlen( buff), "mag (computed)=%5.2f   ",
+               snprintf_append( buff, MAX_INFO_LEN, "mag (computed)=%5.2f   ",
                          optr->computed_mag);
 
             full_ctime( buff + strlen( buff),
@@ -4605,7 +4607,7 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
                   }
                sprintf( buff, "Sigma %s\" ", sig1_buff);
                if( tilt_angle % 180)
-                  snprintf_append( buff, 90, "%d ", tilt_angle);
+                  snprintf_append( buff, MAX_INFO_LEN, "%d ", tilt_angle);
                }
          buff += strlen( buff);
          reference_to_text( buff, optr->reference, optr->jd);
@@ -4613,32 +4615,28 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
             strcat( buff, "  ");
          if( !get_obs_alt_azzes( optr, &sun_alt_az, &object_alt_az))
             {
-
-            sprintf( buff + strlen( buff), "Obj alt %.1f",
-                      object_alt_az.y);
+            snprintf_append( buff, MAX_INFO_LEN, "Obj alt %.1f", object_alt_az.y);
             if( object_alt_az.x > -1.)
-               sprintf( buff + strlen( buff), " az %.1f",
-                      object_alt_az.x);
+               snprintf_append( buff, MAX_INFO_LEN, " az %.1f",  object_alt_az.x);
             if( optr->note2 == 'R')
                {
                double xresid, yresid;
 
                get_residual_data( optr, &xresid, &yresid);
-               buff += strlen( buff);
                if( xresid && yresid)
-                  sprintf( buff, "   %.2f,%.2f sigmas",
+                  snprintf_append( buff, MAX_INFO_LEN, "   %.2f,%.2f sigmas",
                            xresid, yresid);
                else
-                  sprintf( buff, "   %.2f sigmas",
+                  snprintf_append( buff, MAX_INFO_LEN, "   %.2f sigmas",
                            xresid + yresid);
                }
             else
                {
-               sprintf( buff + strlen( buff), "  Sun alt %.1f",
-                     sun_alt_az.y);
+               snprintf_append( buff, MAX_INFO_LEN,
+                                 "  Sun alt %.1f", sun_alt_az.y);
                if( sun_alt_az.x > -1.)
-                  sprintf( buff + strlen( buff), " az %.1f",
-                        sun_alt_az.x);
+                  snprintf_append( buff, MAX_INFO_LEN,
+                                 " az %.1f", sun_alt_az.x);
                }
 #ifdef TEST_SPACECRAFT_LOC
             if( object_alt_az.x <= -1.)
@@ -4650,7 +4648,7 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
                ra = atan2( xyz[1], xyz[0]) + PI;
                dist = vector3_length( xyz);
                dec = asin( xyz[2] / dist);
-               sprintf( buff + strlen( buff),
+               snprintf_append( buff, MAX_INFO_LEN,
                           " PrimRA %.3f dec %.3f dist %.1f km",
                           ra * 180. / PI,
                           dec * 180. / PI, dist * AU_IN_KM);
@@ -4666,13 +4664,13 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
          break;
       case 4:
          if( optr->obs_mag < BLANK_MAG)
-            sprintf( buff, "Mag sigma %g; ", optr->mag_sigma);
+            snprintf( buff, MAX_INFO_LEN, "Mag sigma %g; ", optr->mag_sigma);
          else
             *buff = '\0';
-         sprintf( buff + strlen( buff), "time sigma %g",
+         snprintf_append( buff, MAX_INFO_LEN, "time sigma %g",
                           optr->time_sigma * seconds_per_day);
          if( optr->ra_bias || optr->dec_bias)
-             sprintf( buff + strlen( buff), "   RA bias %.3f\" dec bias %.3f\"",
+             snprintf_append( buff, MAX_INFO_LEN, "   RA bias %.3f\" dec bias %.3f\"",
                            optr->ra_bias, optr->dec_bias);
          if( show_alt_info)
             {
@@ -4680,7 +4678,7 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
                {
                const int month = mutant_hex_char_to_int( optr->columns_57_to_65[4]);
 
-               snprintf_append( buff, 90, "   %s %d %02d:%02d",
+               snprintf_append( buff, MAX_INFO_LEN, "   %s %d %02d:%02d",
                         set_month_name( month, NULL),
                         mutant_hex_char_to_int( optr->columns_57_to_65[5]),
                         mutant_hex_char_to_int( optr->columns_57_to_65[6]),
@@ -4690,7 +4688,7 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
                {
                extern double overobserving_time_span;
 
-               snprintf_append( buff, 90, " Nnear=%.3f",
+               snprintf_append( buff, MAX_INFO_LEN, " Nnear=%.3f",
                         n_nearby_obs( obs, n_obs, idx,
                                      overobserving_time_span));
                }
@@ -4733,7 +4731,8 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff)
       double mean_xresid = 0., mean_yresid = 0.;
       double mean_xresid2 = 0., mean_yresid2 = 0.;
 
-      sprintf( buff, "%d observations selected of %d\n", (int)n_selected, n_obs);
+      snprintf( buff, MAX_INFO_LEN, "%d observations selected of %d\n",
+                          (int)n_selected, n_obs);
       for( i = 0; i < (size_t)n_obs; i++)
          if( obs[i].flags & OBS_IS_SELECTED)
             {
@@ -4749,7 +4748,8 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff)
       mean_yresid /= (double)n_selected;
       mean_xresid2 /= (double)n_selected;
       mean_yresid2 /= (double)n_selected;
-      sprintf( buff + strlen( buff), "Mean RA residual %.3f +/- %.3f; dec %.3f +/- %.3f\n",
+      snprintf_append( buff, MAX_INFO_LEN,
+             "Mean RA residual %.3f +/- %.3f; dec %.3f +/- %.3f\n",
              mean_xresid, sqrt( mean_xresid2 - mean_xresid * mean_xresid),
              mean_yresid, sqrt( mean_yresid2 - mean_yresid * mean_yresid));
       n_lines++;
@@ -4763,23 +4763,27 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff)
          dist *= 180. / PI;      /* cvt radians to degrees */
          delta_time = optr2->jd - optr1->jd;
 
-         sprintf( buff + strlen( buff), "Observations are %.2f\" = %.2f' = %.3f degrees apart\n",
-               dist * 3600., dist * 60., dist);
+         snprintf_append( buff, MAX_INFO_LEN,
+                   "Observations are %.2f\" = %.2f' = %.3f degrees apart\n",
+                   dist * 3600., dist * 60., dist);
          if( fabs( delta_time) < 1.)
-            sprintf( buff + strlen( buff), "Time diff: %.2f sec = %.2f min = %.3f hrs\n",
+            snprintf_append( buff, MAX_INFO_LEN,
+                     "Time diff: %.2f sec = %.2f min = %.3f hrs\n",
                      delta_time * seconds_per_day,
                      delta_time * minutes_per_day,
                      delta_time * hours_per_day);
          else
-            sprintf( buff + strlen( buff), "Time diff: %.1f hrs = %.2f days\n",
+            snprintf_append( buff, MAX_INFO_LEN,
+                     "Time diff: %.1f hrs = %.2f days\n",
                      delta_time * 24., delta_time);
          dist /= delta_time;     /* get motion in degrees/day */
          dist *= 60. / 24.;      /* then convert to '/hr */
                            /* Dunno how the PA got flipped,  but it did: */
          posn_ang = 2. * PI - posn_ang;
-         sprintf( buff + strlen( buff), "Motion: %.2f'/hr in RA, %.2f'/hr in dec",
+         snprintf_append( buff, MAX_INFO_LEN,
+                  "Motion: %.2f'/hr in RA, %.2f'/hr in dec",
                   dist * sin( posn_ang), dist * cos( posn_ang));
-         sprintf( buff + strlen( buff), " (total %.2f'/hr at PA %.1f)\n",
+         snprintf_append( buff, MAX_INFO_LEN, " (total %.2f'/hr at PA %.1f)\n",
                   dist, posn_ang * 180. / PI);
          n_lines += 3;
          }
@@ -4865,7 +4869,8 @@ int sanity_test_observations( const char *filename)
 
                   if( !ofile)
                      ofile = fopen_ext( "sanity.txt", "fwb");
-                  sprintf( tbuff, "Line %ld: Sun alt %.1f az %.1f; obj alt %.1f az %.1f\n",
+                  snprintf( tbuff, sizeof( tbuff),
+                     "Line %ld: Sun alt %.1f az %.1f; obj alt %.1f az %.1f\n",
                            line_no,
                            alt_az_sun.y, alt_az_sun.x,
                            alt_az_obj.y, alt_az_obj.x);
