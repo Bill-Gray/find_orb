@@ -1,7 +1,8 @@
 /* moid4.cpp: computes MOID (Minimum Orbital Intersection Distance)
-between two orbits.
+between two orbits.  NOTE:  obsolete,  of historical interest only,
+replaced by 'moid.cpp' in the 'lunar' repository.  See notes below.
 
-Copyright (C) 2010, Project Pluto
+Copyright (C) 2019, Project Pluto
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -16,7 +17,14 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-02110-1301, USA.    */
+02110-1301, USA.
+
+This code is effectively obsolete.  It uses a semi-Sitarski like
+algorithm (essentially Newton-Raphson) to determine the MOID.
+The algorithm used in 'moid.cpp' in my 'lunar' repository is,  in
+most respects,  superior.  I'm not using the following code anywhere
+anymore,  but am keeping it (a) to ensure there's a reference to
+the new code and (b) because the algorithm _is_ of some interest. */
 
 #ifdef TEST_VERSION
 #include <stdio.h>
