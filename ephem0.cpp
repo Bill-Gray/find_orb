@@ -3280,50 +3280,60 @@ https://www.projectpluto.com/redacted.htm
    for some explanation of this,  and of the following code.  It figures
 out where in the redacted text to put links to the above explanation so
 people will understand why some data is removed in this seemingly
-strange manner.         */
+strange manner.  The redacted terms are placed randomly and sorted to be
+in the correct order.  If they'd overlap,  or run off the left edge,  we
+try again,  up to max_iteration times. */
 
 static inline void redacted_locations( const char *terms[],
               const unsigned n_redacted_lines, unsigned *x, unsigned *y)
 {
-   unsigned i, n_terms = 0;
+   unsigned i, j, n_terms = 0, iteration;
+   const unsigned max_iteration = 100;
+   bool success = false;
 
+   if( !n_redacted_lines)
+      return;
    while( terms[n_terms])
       n_terms++;
-   if( n_redacted_lines < 2)     /* can't do it */
+   srand( (unsigned)time( NULL));
+   for( iteration = 0; iteration < max_iteration && !success; iteration++)
       {
-      for( i = 0; i < n_terms; i++)
-         x[i] = y[i] = 9;
-      return;
-      }
-   for( i = 0; i < n_terms; i++)
-      if( n_redacted_lines > 3)
-         y[i] = i * (n_redacted_lines - 1) / (n_terms - 1);
-      else
-         y[i] = i / (n_terms /  n_redacted_lines);
-   for( i = 0; i < n_terms; i++)
-      {
-      unsigned n_this_line = 0, start = 0, j;
-      const unsigned max_column = 49 - (unsigned)strlen( terms[i]);
+      const unsigned max_column = 51;
 
-      for( j = 0; j < n_terms; j++)
-         if( y[j] == y[i])
-            {
-            if( !n_this_line)
-               start = j;
-            n_this_line++;
-            }
-      if( n_this_line == 1)      /* we've got the line to ourselves */
-         x[i] = rand( ) % max_column;     /* put the text anywhere */
-      else
-         x[i] = 1 + (i - start) * 47 / n_this_line + y[i] % 3;
+      success = true;
+      for( i = 0; i < n_terms; i++)
+         {
+         x[i] = rand( ) % (max_column - 4);
+         y[i] = rand( ) % n_redacted_lines;
+         for( j = 0; j < i; j++)
+            if( y[j] > y[i] || (y[j] == y[i] && x[j] > x[i]))
+               {
+               unsigned temp = x[i];   x[i] = x[j];  x[j] = temp;
+               temp = y[i];   y[i] = y[j];   y[j] = temp;
+               }
+         }
+      for( i = 0; i < n_terms; i++)
+         {
+         const unsigned end_x = x[i] + strlen( terms[i]) + 1;
+
+         if( end_x > max_column)
+            success = false;
+         if( i < n_terms - 1 && y[i] == y[i + 1] && end_x > x[i + 1])
+            success = false;        /* runs into next word */
+         }
       }
+   debug_printf( "%u lines; %u iterations\n",
+                  n_redacted_lines, iteration);
+   if( !success)        /* can't place the text;  just omit it */
+      for( i = 0; i < n_terms; i++)
+         y[i] = -9;
 }
 
 char *mpec_error_message = NULL;
 
 int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
 {
-   char buff[500], mpec_buff[7];
+   char buff[800], mpec_buff[7];
    const char *mpec_permits = (strchr( mpec_filename, '/') ? "fwb" : "tfcwb");
    FILE *ofile = fopen_ext( mpec_filename, mpec_permits);
    FILE *header_htm_ifile;
@@ -3488,6 +3498,11 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
 
    if( observations_ifile)
       {
+      unsigned max_term = 5, x[10], y[10];
+      const char *terms[] = { "Astrometry", "redacted;",
+                      "click", "here", "for", "explanation", NULL };
+
+      redacted_locations( terms, n_redacted_lines, x, y);
       fseek( observations_ifile, 0L, SEEK_SET);
       while( fgets_trimmed( buff, sizeof( buff), observations_ifile))
          if( memcmp( buff, "COM ", 4))      /* skip comment/'sigma' lines */
@@ -3511,15 +3526,11 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
                   const size_t start_of_redacted_text = 25;
                   const size_t length_of_redacted_text = 77 - start_of_redacted_text;
                   char *tptr = buff + start_of_redacted_text;
-                  unsigned max_term = 5, x[10], y[10];
-                  const char *terms[] = { "Astrometry", "redacted;",
-                                  "click", "here", "for", "explanation", NULL };
 
                   strcpy( tptr, "<code class=\"neocp\">");
                   tptr += strlen( tptr);
                   memset( tptr, '~', length_of_redacted_text);
                   strcpy( tptr + length_of_redacted_text, "</code>");
-                  redacted_locations( terms, n_redacted_lines, x, y);
                   for( i = max_term; i >= 0; i--)
                      if( redacted_line_number == y[i])
                         {
