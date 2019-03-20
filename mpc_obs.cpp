@@ -1954,16 +1954,22 @@ static int xref_designation( char *desig)
       }
 
    if( strlen( desig) > 34 && !strcmp( desig + 26, new_xdesig_indicator))
-      {                /* expand xdesig table by one,  add entry,  re-sort */
-      char *tptr;
+      {                /* Add new xdesignation.  Increase the table size by */
+      char *tptr;      /* one;  binary-search to find where new entry goes; */
+      int i1;          /* move everything following it;  insert new entry   */
 
       xlate_table = (char *)realloc( xlate_table, (n_lines + 1) * 26);
       assert( xlate_table);
-      tptr = xlate_table + n_lines * 26;
-      n_lines++;
+      for( i = -1, gap = 0x8000; gap; gap >>= 1)
+         if( (i1 = i + gap) < n_lines)
+            if( memcmp( xlate_table + i1 * 26, desig, 12) <= 0)
+               i = i1;
+      i++;
+      tptr = xlate_table + i * 26;
+      memmove( tptr + 26, tptr, (n_lines - i) * 26);
       memcpy( tptr, desig, 25);
       tptr[25] = '\0';
-      shellsort_r( xlate_table, n_lines, 26, qsort_strcmp, NULL);
+      n_lines++;
       return( 0);
       }
 
