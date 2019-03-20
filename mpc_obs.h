@@ -30,6 +30,7 @@ OBSERVE
    double ra_bias, dec_bias;     /* in arcseconds */
    char *second_line;
    int flags, is_included;
+   int ref_center;       /* 399 = geocenter, 10 = heliocenter, 0 = SSB... */
    int time_precision, ra_precision, dec_precision, mag_precision;
    char mpc_code[4], packed_id[13], reference[6];
    char columns_57_to_65[10];
