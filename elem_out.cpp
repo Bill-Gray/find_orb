@@ -1410,9 +1410,9 @@ int write_out_elements_to_file( const double *orbit,
          }
       else   /* for heliocentric orbits,  show MOIDs: */
          {
-         fprintf( ofile, "# MOIDs: Me%8.4f Ve%8.4f Ea%8.4f Ma%8.4f\n",
+         fprintf( ofile, "# MOIDs: Me%10.6f Ve%10.6f Ea%10.6f Ma%10.6f\n",
                   moids[1], moids[2], moids[3], moids[4]);
-         fprintf( ofile, "# MOIDs: Ju%8.4f Sa%8.4f Ur%8.4f Ne%8.4f\n",
+         fprintf( ofile, "# MOIDs: Ju%10.6f Sa%10.6f Ur%10.6f Ne%10.6f\n",
                   moids[5], moids[6], moids[7], moids[8]);
          }
       }
