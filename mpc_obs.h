@@ -42,7 +42,7 @@ OBSERVE
 
 OBJECT_INFO
    {
-   double jd_start, jd_end;
+   double jd_start, jd_end, jd_updated;
    long file_offset;
    char *obj_name;
    int n_obs;
@@ -52,6 +52,7 @@ OBJECT_INFO
 #define OBJECT_INFO_COMPARE_PACKED           0
 #define OBJECT_INFO_COMPARE_LAST_OBSERVED    1
 #define OBJECT_INFO_COMPARE_NAME             2
+#define OBJECT_INFO_COMPARE_LAST_UPDATED     3
 
 #define MOTION_DETAILS struct motion_details
 

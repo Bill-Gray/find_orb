@@ -3708,12 +3708,45 @@ static int id_compare( const void *a, const void *b, void *context)
       case OBJECT_INFO_COMPARE_LAST_OBSERVED:
          rval = (aptr->jd_end > bptr->jd_end ? 1 : -1);
          break;
+      case OBJECT_INFO_COMPARE_LAST_UPDATED:
+         rval = (aptr->jd_updated > bptr->jd_updated ? 1 : -1);
+         break;
       case OBJECT_INFO_COMPARE_NAME:
       default:
          rval = strcmp( aptr->obj_name, bptr->obj_name);
          break;
       }
    return( rval);
+}
+
+/* My code to download NEOCP observations (see my 'miscell' repository)
+stores the time each observation was first found in the normally
+unused bytes 60 to 64.  Byte 60 = '~',  61 = month,  62 = day,  63
+= hour,  64 = minute,  in MPC-style 'mutant hex'.  If our current
+observation is from NEOCP and byte 60 is a tilde,  we can get the
+update time.         */
+
+static double get_neocp_update_jd( const char *buff)
+{
+   double jd = 0.;
+
+   if( !memcmp( buff + 72, "NEOCP", 5) && buff[59] == '~')
+      {
+      const int month = mutant_hex_char_to_int( buff[60]);
+      const int day = mutant_hex_char_to_int( buff[61]);
+      const int hour = mutant_hex_char_to_int( buff[62]);
+      const int minute = mutant_hex_char_to_int( buff[63]);
+      long year = atol( buff + 15);
+      const int obs_month = atoi( buff + 18);
+
+      if( obs_month > month)    /* observed last year, posted this one */
+         year++;
+      jd = (double)dmy_to_day( day, month, year, 0) - 0.5
+                              + (double)hour / hours_per_day
+                              + (double)minute / minutes_per_day;
+      debug_printf( "%lf : %s\n", jd, buff + 59);
+      }
+   return( jd);
 }
 
 void sort_object_info( OBJECT_INFO *ids, const int n_ids,
@@ -3858,6 +3891,7 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
                strcpy( rval[loc].obj_name, obj_name);
                rval[loc].n_obs = 0;
                rval[loc].jd_start = rval[loc].jd_end = jd;
+               rval[loc].jd_updated = jd;    /* at minimum */
                if( is_neocp)   /* for NEOCP obs,  we need to start at the */
                   rval[loc].file_offset = 0L;   /* beginning of the file  */
                else
@@ -3874,6 +3908,15 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
                rval[loc].jd_start = jd;
             if( rval[loc].jd_end < jd)
                rval[loc].jd_end = jd;
+            if( rval[loc].jd_updated < jd)
+               rval[loc].jd_updated = jd;
+            if( !memcmp( buff + 72, "NEOCP", 5))
+               {
+               const double jd_u = get_neocp_update_jd( buff);
+
+               if( rval[loc].jd_updated < jd_u)
+                  rval[loc].jd_updated = jd_u;
+               }
             if( n == n_alloced - n_alloced / 4)  /* table is 75% full; */
                {                       /* reallocate & move everything */
                const unsigned new_size = n_alloced * 2 - 1;
