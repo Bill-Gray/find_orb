@@ -269,7 +269,13 @@ COD 699
 OBS M. E. Van Ness
 TEL 0.59-m LONEOS Schmidt + CCD
 
+   MPECs with data for CSS sites (703),  (E12),  (I52),  (G96),  and (V06)
+   list everybody who worked at CSS at the time in question.  Properly speaking,
+   we should list one "observer" (person actually at the scope) and everybody
+   else as "measurers",  but we don't really know who that one person was.
 COD 703
+COM Valid: 2019 Jan 20 - 2100
+OBS T. A. Pruyne
 COM Valid: 2018 Jan 1 - 2100
 OBS B. M. Africano
 COM Valid: 2010-2014
@@ -473,6 +479,8 @@ MEA H. B. Zhao, B. Li. H. Lu, G. Zhaori
 TEL 1.04-m f/1.8 Schmidt + CCD
 
 COD E12
+COM Valid: 2019 Jan 20 - 2100
+OBS T. A. Pruyne
 COM Valid: 2018 Jan 1 - 2100
 OBS B. M. Africano
 COM Valid: 2010-2014
@@ -526,6 +534,9 @@ OBS N. Primak, A. Schultz, S. Watters, J. Thiel, T. Goggia
 MEA PS1 Science Consortium
 TEL 1.8-m Ritchey-Chretien + CCD
 
+COD F52
+TEL 1.8-m Ritchey-Chretien + CCD
+
 COD F84
 OBS N. Teamo
 TEL 0.35-m f/2.0 Schmidt + 1392x1040 CCD
@@ -556,6 +567,8 @@ OBS G. McKeegan
 TEL 0.9-m f/4.5 Schmidt-Cassegrain + CCD
 
 COD G96
+COM Valid: 2019 Jan 20 - 2100
+OBS T. A. Pruyne
 COM Valid: 2018 Jan 1 - 2100
 OBS B. M. Africano
 COM Valid: 2010-2014
@@ -661,6 +674,8 @@ TEL 1.2-m f/2.44 Oschin Schmidt + CCD
 NET SDSS
 
 COD I52
+COM Valid: 2019 Jan 20 - 2100
+OBS T. A. Pruyne
 COM Valid: 2018 Jan 1 - 2100
 OBS B. M. Africano
 COM Valid: 2010-2014
@@ -898,6 +913,8 @@ NET PPMXL
 TEL 0.30-m reflector + CCD
 
 COD V06
+COM Valid: 2019 Jan 20 - 2100
+OBS T. A. Pruyne
 COM Valid: 2018 Jan 1 - 2100
 OBS B. M. Africano
 COM Valid: 2010-2014
