@@ -150,6 +150,8 @@
 1010    November
 1011    December
 
+1100    Astrometry redacted; click here for explanation
+
 2000    The lat/lon specified for code (%s) in the header is malformed.\n
 2000    See https://www.projectpluto.com/find_orb.htm#obs_codes for\n
 2000    information about how to fix this.\n
@@ -262,3 +264,8 @@
 2026    No observational header was provided with the observation(s).  Had one
 2026    been provided,  you'd see information about who made and measured these
 2026    data,  telescope used,  etc.\n
+
+2027    Integrating from %.4f to %.4f runs outside Find_Orb's
+2027    default time range.  If this is what you meant to do,  see\n
+2027    https://www.projectpluto.com/find_orb.htm#time_range\n
+2027    for instructions on how to extend the range.

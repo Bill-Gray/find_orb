@@ -168,6 +168,7 @@ double compute_weighted_rms( const OBSERVE FAR *obs, const int n_obs,
                            int *n_resids);                  /* orb_func.cpp */
 double find_epoch_shown( const OBSERVE *obs, const int n_obs); /* elem_out */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
+const char *get_find_orb_text( const int index);      /* elem_out.cpp */
 int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
                                    const char *format, ...)
 #ifdef __GNUC__
@@ -408,13 +409,10 @@ int integrate_orbit( double *orbit, const double t0, const double t1)
    if( t0 > maximum_jd || t1 > maximum_jd
                        || t0 < minimum_jd || t0 < minimum_jd)
       {
-      char buff[200];
+      char buff[300];
 
-      sprintf( buff, "Integrating from %.4f to %.4f runs outside\n",
+      snprintf( buff, sizeof( buff), get_find_orb_text( 2027),
                JD_TO_YEAR( t0), JD_TO_YEAR( t1));
-      strcat( buff, "Find_Orb's default time range.  See\n\n");
-      strcat( buff, "https://www.projectpluto.com/find_orb.htm#time_range\n\n");
-      strcat( buff, "for instructions on how to extend the range.\n");
       generic_message_box( buff, "o");
       exit( -1);
       }
