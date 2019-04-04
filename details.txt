@@ -820,6 +820,10 @@ TEL 1.0-m f/3.0 reflector + CCD
 COD Q38
 OBS M. Mattiazzo
 
+COD Q57
+OBS Y. JeongAhn
+TEL 1.6-m f/3.22 reflector + CCD
+
 COD Q60
 OBS L. Elenin
 TEL 0.4-m f/2.4 reflector + CCD
@@ -980,6 +984,10 @@ COD W86
 OBS T. Lister
 TEL 1.0-m f/8 Ritchey-Chretien + CCD
 
+COD W93
+OBS Y. JeongAhn
+TEL 1.6-m f/3.22 reflector + CCD
+
 COD Y00
 CON C. Jacques, Rua Bernardino S. Figueiredo 348, Belo Horizonte, MG, Brazil
 CON [cjacqueslf (at) gmail (dot) com]
@@ -1071,3 +1079,4 @@ COM Valid: 2018 Jun 4 - 2018 Jun 12
 NET UCAC-4
 COM Valid: 2018 Jun 12 - 2100
 NET Gaia-DR2
+
