@@ -496,7 +496,8 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
          while( rval == KEY_RESIZE || rval == KEY_MOUSE);
 #ifndef PDCURSES
       printf("\033[?1003l");   /* ] used in ncurses with xterm-like */
-#endif                         /* terms to turn mouse move events off */
+      printf("\033[?1000h");   /* ] terms to turn mouse move events off */
+#endif
       mousemask( ALL_MOUSE_EVENTS, NULL);
       curs_set( 1);        /* turn cursor back on */
       }
