@@ -541,7 +541,7 @@ int main( const int argc, const char **argv)
    int ephem, progress_bar_freq = 2;
    tle_t tle;
    const time_t t0 = time( NULL);
-   bool use_precession = true;
+   bool use_precession = true, archival = false;
    double step;
    unsigned n_steps, total_lines;
    int histo_counts[N_HIST_BINS];
@@ -549,6 +549,7 @@ int main( const int argc, const char **argv)
    double levenberg_marquardt_lambda0 = 0.;
    double sum_of_worst_resids = 0.;
    double dist_units = 1., time_units = 1.;
+   const char *search_dist = NULL;
 
    if( argc < 2)
       error_exit( -1);
@@ -620,7 +621,13 @@ int main( const int argc, const char **argv)
                sscanf( argv[i] + 2, "%lf", &levenberg_marquardt_lambda0);
                break;
             case 'r':
+               search_dist = argv[i] + 2;
+               break;
+            case 'R':
                srand( atoi( argv[i] + 2));
+               break;
+            case 'u': case 'U':
+               archival = true;
                break;
             case 'y':
                max_simplex_iter = (size_t)atoi( argv[i] + 2);
@@ -651,6 +658,12 @@ int main( const int argc, const char **argv)
       }
    fprintf( ofile, "# Made by eph2tle, compiled " __DATE__ " " __TIME__ "\n");
    fprintf( ofile, "# Run at %s#\n", ctime( &t0));
+   if( archival)
+      fprintf( ofile, "# No updates     (archival TLEs)\n");
+   if( search_dist)
+      fprintf( ofile, "# Max error %s\n", search_dist);
+   if( archival || search_dist)
+      fprintf( ofile, "#\n");
    while( fgets_trimmed( buff, sizeof( buff), ifile))
       if( *buff != ';')
          fprintf( ofile, "%s\n", buff);
