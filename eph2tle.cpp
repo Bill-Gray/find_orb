@@ -467,27 +467,36 @@ no NORAD or international designation.  The following ensures they get one,
 which won't (we lightheartedly hope) conflict with other designations.  The
 amateurs tracking classified objects use NORAD desigs starting at 90000,
 so I'll use 89999 and count down... except for 9O0DC57;  the "classified"
-tracking community already has designations for that. */
+tracking community already has designations for that.
+
+   Note also that the following designations were used in the past,
+when the objects in question hadn't been linked to something else.  Now
+that such linkage has been made,  these are all obsolete.  You won't
+find them in my current TLEs,  but you may have some 'historical' data
+that uses them.
+
+         "89998 00000AAB ZTF00V9",   = 89991 = 00000AAI
+         "89995 00000AAE ZGBD4BF = ZJ15031 = unknown", = 1965-058B
+         "89989 00000AAK ZV2F779",         = C05GHG1 = many others
+         "89987 00000AAM JNS023 = ZTF02BI = A10boIy",  = 1969-046D
+         "89985 00000AAO ZTF02Rj",         = C05GHG1 = many others
+*/
 
 static void reset_desigs_by_name( const char *obj_name, tle_t *tle)
 {
    const char *remaps[] = {
          "89999 00000AAA ZR3BAD8",
-         "89998 00000AAB ZTF00V9",
          "89997 00000AAC WT1190F = UDA34A3 = UW8551D = 9U01FF6",
          "89996 00000AAD XL8D89E",
-         "89995 00000AAE ZGBD4BF = ZJ15031 = unknown",
          "89994 00000AAF ZTF00Y9 = ZTF00Yp = ZTF00ah",
          "89993 00000AAG ZTF00hf = ZTF00YB",
          "89992 00000AAH ZTF00pm = ZTF01Ls",
          "89991 00000AAI ZTF00V9 = ZTF00Vv = ZTF00Y5",
          "89990 00000AAJ S509559",
-         "89989 00000AAK ZV2F779",
          "89988 00000AAL ZTF01sS = ZTF01sX = ZTF01wl",
-         "89987 00000AAM JNS023 = ZTF02BI = A10boIy",
          "89986 00000AAN A10bMLz",
-         "89985 00000AAO ZTF02Rj",
          "89984 00000AAP ZTF02Uy = ZTF02rw = ZTF02V0",
+         "89983 00000AAQ C05GHG1 = C04W5Q1 = C073CX1",
          "90084 09710A   9O0DC57 = unk P=2.26d, i=25",
          NULL };
    size_t i;
