@@ -200,6 +200,11 @@ Daw !   0.0000       0.00000   +0.00000    @10 Dawn spacecraft
 Spi ! 175.47263      -14.5684          0   @4  Spirit
 Opp ! 354.4734       -01.9462          0   @4  Opportunity
 MSL ! 137.4417       -04.5895          0   @4  MSL (Curiosity)
+Ins ! 135.0          +04.5             0   @4  InSight
+Pho ! 234.3          +68.22            0   @4  Phoenix lander, Mars
+Pat ! 326.78         +19.13            0   @4  Mars Pathfinder
+Vk1 ! 312.05         +22.27            0   @4  Viking 1
+Vk2 ! 134.29         +47.64            0   @4  Viking 2
 
    Shortly after the Chelyabinsk meteor impacted,  I computed a (_very) rough
    orbit based on the object coming in ten km above Chelyabinsk at 17.3 km/s
