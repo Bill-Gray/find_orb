@@ -26,9 +26,14 @@ in everything else.  But note that "true" nanosecond precision is
 possible,  if actually desired (see the NOT_CURRENTLY_IN_USE code).
 
    The range of a 64-bit signed integer is large enough to enable
-this function to work until Friday, 2262 Apr 11 23:47:16.  We can get
-an addition 292 years by using unsigned integers,  but it may be wiser
-to switch to 128-bit integers.     */
+this function to work until Friday, 2262 Apr 11 23:47:16.854775808.
+We can get an addition 292 years by using unsigned integers,  but
+it may be wiser to switch to 128-bit integers.
+
+   Note that the usual limitations apply:  no leap seconds,  and if
+the computer's time is adjusted by NTP or the user,  the result may
+actually go backward.  If you want to know what time it is,  don't
+ask a computer.  */
 
 #include <stdint.h>
 
