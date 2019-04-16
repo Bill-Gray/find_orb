@@ -514,7 +514,7 @@ static void reset_desigs_by_name( const char *obj_name, tle_t *tle)
 of date.  I _think_ that's right,  but it's possible that nutation should be
 included as well,  and even possible that SxPx assumes true orientation of
 date:  i.e.,  the full set of earth orientation parameters,  including
-proper motions and offsets from the IAU nutation theories,  ought to be used.
+polar motion and offsets from the IAU nutation theories,  ought to be used.
 
   The 'bulletin number' is in days since 2018 Jan 0,  or zero for TLEs
 computed before then.  Hence,  BULLETIN_EPOCH = days from 1970 Jan 1
