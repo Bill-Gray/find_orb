@@ -3214,7 +3214,11 @@ void remove_trailing_cr_lf( char *buff)
 /* MPC frowns upon redistribution of NEOCP astrometry.  So if an input
 line is from NEOCP,  it's blacked out,  _unless_ it's from a station
 that has given permission for republication.  Those stations are listed
-in the GREENLIT line in 'environ.dat';  you can add your own if desired.
+in the GREENLIT and GREENLIT2 lines in 'environ.dat';  you can add your
+own if desired.
+
+In some cases,  only heliocentric observations have gotten the green light.
+Those codes are followed by an asterisk in the GREENLIT/GREENLIT2 lines.
 
 For private use,  you can turn NEOCP redaction off... just be sure that
 if you do that,  you don't redistribute anything.        */
@@ -3226,10 +3230,24 @@ static bool is_neocp_line( const char *mpc_line)
    return( strlen( mpc_line) == 80 && !memcmp( mpc_line + 72, "NEOCP", 5));
 }
 
-static bool line_must_be_redacted( const char *mpc_line)
+static bool line_must_be_redacted( const char *mpc_line,
+                                                const bool is_heliocentric)
 {
-   return( is_neocp_line( mpc_line) && neocp_redaction_turned_on
-               && !strstr( get_environment_ptr( "GREENLIT"), mpc_line + 77));
+   bool rval = false;
+
+   if( is_neocp_line( mpc_line) && neocp_redaction_turned_on)
+      {
+      const char *greenlit = strstr( get_environment_ptr( "GREENLIT"),
+                                       mpc_line + 77);
+
+      rval = true;
+      if( !greenlit)        /* try an alternative string w/additional codes */
+         greenlit = strstr( get_environment_ptr( "GREENLIT2"),
+                               mpc_line + 77);
+      if( greenlit && (is_heliocentric || greenlit[3] != '*'))
+         rval = false;
+      }
+   return( rval);
 }
 
 int text_search_and_replace( char FAR *str, const char *oldstr,
@@ -3379,7 +3397,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
          {
          if( memcmp( buff + 56, "Removed", 7))
             n_neocp_lines++;
-         if( line_must_be_redacted( buff))
+         if( line_must_be_redacted( buff, orbit_is_heliocentric))
             n_redacted_lines++;
          }
 
@@ -3512,7 +3530,8 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
 //          else
                {
                char mpc_code[8];
-               const bool redacted = line_must_be_redacted( buff);
+               const bool redacted = line_must_be_redacted( buff,
+                                             orbit_is_heliocentric);
 
                strcpy( mpc_code, buff + 77);
                buff[77] = '\0';
