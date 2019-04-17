@@ -603,11 +603,12 @@ J69 !  -1.0196556    +50.9390167     201       North Observatory, Clanfield
    Some telescopes at (711) McDonald Observatory in Texas,  sorted using the
    site map at http://www.as.utexas.edu/mcdonald/observers/mcd_site_map.pdf
    and measured using G__gle Maps.  HJS is identified on the site map as the
-   107" scope;  the OST is 82";  Mc9 is 36";  Mc8 is 30".  Altitude is that
-   for (711);  couldn't find anythnig better.
+   107" scope;  the OST is 82";  Mc9 is 36";  Mc8 is 30".  HET is on Mt.
+   Fowlkes,  alt 6659 feet;  the others are on Mt. Locke,  alt 6792 feet,
+   probably above sea level.  I subtracted 22 meters to get an ellipsoid alt.
 
-HJS !-104.021973     +30.671745     2103       Harlan J Smith, McDonald Observatory
-OST !-104.022786     +30.671524     2103       Otto Struve Telescope,  McDonald Observatory
-Mc9 !-104.021944     +30.671420     2103       McDonald Observatory 0.9m
-Mc8 !-104.022738     +30.670799     2103       McDonald Observatory 0.8m
-HET !-104.014679     +30.681398     2103       Hobby-Eberly Telescope
+HJS !-104.021973     +30.671745     2007.7     Harlan J Smith, McDonald Observatory
+OST !-104.022786     +30.671524     2007.7     Otto Struve Telescope,  McDonald Observatory
+Mc9 !-104.021944     +30.671420     2007.7     McDonald Observatory 0.9m
+Mc8 !-104.022738     +30.670799     2007.7     McDonald Observatory 0.8m
+HET !-104.014679     +30.681398     2048.2     Hobby-Eberly Telescope
