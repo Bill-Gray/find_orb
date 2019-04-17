@@ -134,6 +134,33 @@ int debug_printf( const char *format, ...)
    return( 0);
 }
 
+/* Quick and dirty check on MPC80 format compliance.  FAILS on
+Find_Orb format extensions,  which is OK for its current
+use in ensuring that lines would be accepted by MPC. */
+
+static int quick_mpc80_check( const char *buff)
+{
+   const char *check = "nnnn nn nn.nnnnn?nn nn nn.nn??nn nn nn.n";
+   size_t i;
+   int rval = 0;
+
+   buff += 15;
+   for( i = 0; !rval && check[i]; i++)
+      switch( check[i])
+         {
+         case 'n':
+            if( buff[i] < '0' || buff[i] > '9')
+               rval = -1;
+            break;
+         case ' ':
+            if( buff[i] != ' ')
+               rval = -1;
+            break;
+         default:
+            break;
+         }
+   return( rval);
+}
 
       /* If you save NEOCP astrometry as a 'Web page,  complete',  the */
       /* first line is prefaced with HTML tags.  The following removes */
@@ -152,12 +179,36 @@ static void remove_html_tags( char *buff)
       }
 }
 
-      /* In some situations,  MPC lines end up with a bit of leading  */
-      /* garbage.  My hope is that this function will fix most cases. */
+/* In some situations,  MPC observations end up with one or more
+leading or trailing spaces.  Or people copy/paste observations and
+leave off a space or three at the beginning,  or don't put the
+designation exactly where MPC wants it to be.  This function attempts
+to puzzle out 'what the observer really meant to say',  for the most
+common sorts of errors I've seen.
 
-static void fix_up_mpc_observation( char *buff)
+   If the input line appears to be a malformed observation with fixable
+errors, the return value will have bits set from the following values.
+Otherwise,  zero will be returned. */
+
+#define OBS_FORMAT_MISSING_LEADING_SPACES       1
+#define OBS_FORMAT_WRONG_DESIG_PLACEMENT        2
+#define OBS_FORMAT_INCORRECT                    4
+
+static int fix_up_mpc_observation( char *buff)
 {
    size_t len = strlen( buff);
+   int rval = 0;
+
+   debug_printf( "Input line len %d\n%s\n", (int)len, buff);
+   if( len < 80 && len > 70 && is_valid_mpc_code( buff + len - 3)
+                  && !quick_mpc80_check( buff + len - 80))
+      {
+      memmove( buff + 80 - len, buff, len + 1);
+      memset( buff, ' ', 80 - len);
+      rval = OBS_FORMAT_MISSING_LEADING_SPACES;
+      debug_printf( "Fixed up :\n%s\n", buff);
+      len = 80;
+      }
 
    if( len == 80 && observation_jd( buff))      /* doesn't need fixing */
       {                                      /* except maybe for desig */
@@ -169,9 +220,10 @@ static void fix_up_mpc_observation( char *buff)
             {
             memset( buff, ' ', 5);
             memcpy( buff + 5, tbuff, 7);
+            rval |= OBS_FORMAT_WRONG_DESIG_PLACEMENT;
             }
          }
-      return;
+      return( rval);
       }
 
    if( len < 90)     /* avoid buffer overruns */
@@ -213,12 +265,12 @@ static void fix_up_mpc_observation( char *buff)
                   memcpy( obuff + 32, tbuff, 2);
                   bytes_read += tval;
                   }
-               else        /* formatting trouble */
-                  return;
+               else        /* formatting trouble;  giving up */
+                  return( 0);
                }
             if( sscanf( buff + bytes_read, "%9s%9s%n", minutes, seconds,
                            &tval) != 2)
-               return;
+               return( 0);
             bytes_read += tval;
             memcpy( obuff + 35, minutes, 2);  /* RA minutes */
             memcpy( obuff + 38, seconds, strlen( seconds));
@@ -234,11 +286,11 @@ static void fix_up_mpc_observation( char *buff)
                   bytes_read += tval;
                   }
                else        /* formatting trouble */
-                  return;
+                  return( 0);
                }
             if( sscanf( buff + bytes_read, "%9s%9s%n", minutes, seconds,
                            &tval) != 2)
-               return;
+               return( 0);
             bytes_read += tval;
             memcpy( obuff + 48, minutes, 2);  /* dec minutes */
             memcpy( obuff + 51, seconds, strlen( seconds));
@@ -261,10 +313,15 @@ static void fix_up_mpc_observation( char *buff)
                }
             memcpy( obuff + 77, buff + len - 3, 3);
             obuff[80] = '\0';
-            strcpy( buff, obuff);
+            if( strcmp( buff, obuff))
+               {
+               rval |= OBS_FORMAT_INCORRECT;
+               strcpy( buff, obuff);
+               }
             }
          }
       }
+   return( rval);
 }
 
 
@@ -3188,7 +3245,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
    char obj_name[80];
    OBSERVE FAR *rval;
    bool including_obs = true;
-   int i = 0;
+   int i = 0, n_fixes_made = 0;
    unsigned line_no = 0;
    unsigned n_below_horizon = 0, n_in_sunlight = 0;
    unsigned lines_actually_read = 0;
@@ -3231,7 +3288,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
    while( fgets_with_ades_xlation( buff, sizeof( buff), ades_context, ifile)
                   && i != n_obs)
       {
-      int is_rwo = 0;
+      int is_rwo = 0, fixes_made = 0;
       double rwo_posn_sigma_1 = 0., rwo_posn_sigma_2 = 0., rwo_mag_sigma = 0.;
       char original_packed_desig[13];
       size_t ilen = strlen( buff);
@@ -3268,7 +3325,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
             }
          }
       if( fixing_trailing_and_leading_spaces)
-         fix_up_mpc_observation( buff);
+         fixes_made = fix_up_mpc_observation( buff);
       original_packed_desig[12] = '\0';
       memcpy( original_packed_desig, buff, 12);
       xref_designation( buff);
@@ -3461,6 +3518,14 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                if( !rval[i].is_included)
                   rval[i].flags |= OBS_DONT_USE;
                rval[i].obs_details = get_code_details( obs_details, rval[i].mpc_code);
+               if( fixes_made)
+                  {
+                  char comment[15];
+
+                  snprintf( comment, sizeof( comment), "FixMe%d ", fixes_made);
+                  comment_observation( rval + i, comment);
+                  n_fixes_made++;
+                  }
                i++;
                }
             }
@@ -3566,6 +3631,12 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
       {
       debug_printf( "%s:\n", rval->packed_id);
       generic_message_box( get_find_orb_text( 2008), "o");
+      }
+   if( n_fixes_made)
+      {
+      snprintf( buff, sizeof( buff), get_find_orb_text( 2028),
+                     n_fixes_made);
+      generic_message_box( buff, "o");
       }
    if( n_duplicate_obs_found)
       {

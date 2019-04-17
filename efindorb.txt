@@ -269,3 +269,7 @@
 2027    default time range.  If this is what you meant to do,  see\n
 2027    https://www.projectpluto.com/find_orb.htm#time_range\n
 2027    for instructions on how to extend the range.
+
+2028    %d observations were read by Find_Orb,  but only after the format was
+2028    corrected.  The observation would probably be rejected by MPC.  See
+2028    https://www.projectpluto.com/fix_obs.htm for details.
