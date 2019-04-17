@@ -199,14 +199,12 @@ static int fix_up_mpc_observation( char *buff)
    size_t len = strlen( buff);
    int rval = 0;
 
-   debug_printf( "Input line len %d\n%s\n", (int)len, buff);
    if( len < 80 && len > 70 && is_valid_mpc_code( buff + len - 3)
                   && !quick_mpc80_check( buff + len - 80))
       {
       memmove( buff + 80 - len, buff, len + 1);
       memset( buff, ' ', 80 - len);
       rval = OBS_FORMAT_MISSING_LEADING_SPACES;
-      debug_printf( "Fixed up :\n%s\n", buff);
       len = 80;
       }
 
@@ -3815,7 +3813,6 @@ static double get_neocp_update_jd( const char *buff)
       jd = (double)dmy_to_day( day, month, year, 0) - 0.5
                               + (double)hour / hours_per_day
                               + (double)minute / minutes_per_day;
-      debug_printf( "%lf : %s\n", jd, buff + 59);
       }
    return( jd);
 }
