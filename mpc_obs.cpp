@@ -4709,7 +4709,7 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
             if( optr->note2 != 'R')
                {
                int tilt_angle = 0;
-               char sig1_buff[20], sig2_buff[10];
+               char sig1_buff[20], sig2_buff[20];
 
                strcpy( buff, "Sigma ");
                sprintf( sig1_buff, "%.6f", optr->posn_sigma_1);
