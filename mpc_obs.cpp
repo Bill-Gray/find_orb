@@ -501,8 +501,8 @@ static inline int get_lat_lon_from_header( double *lat,
             generic_message_box( tbuff, "o");
             }
          }
-      else if( !i && strlen( lines[0]) > 8)
-         *name_from_header = lines[0] + 8;
+   if( rval && strlen( lines[0]) > 8)
+      *name_from_header = lines[0] + 8;
                /* if observatory name is specified in header,  e.g., */
                /* COD Bow Generic Observatory,  Bowdoinham */
    return( rval);
