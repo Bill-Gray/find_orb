@@ -434,6 +434,7 @@ int integrate_orbit( double *orbit, const double t0, const double t1)
    while( t != t1 && !rval)
       {
       double delta_t, new_t = ceil( (t - .5) / stepsize + .5) * stepsize + .5;
+      bool step_taken = true;
 
       reset_auto_perturbers( t, orbit);
       if( reset_of_elements_needed || !(n_steps % 50))
@@ -570,6 +571,7 @@ int integrate_orbit( double *orbit, const double t0, const double t1)
             else           /* failed:  try again with a smaller step */
                {
                n_rejects++;
+               step_taken = false;
                new_t = t;
                stepsize /= STEP_INCREMENT;
                reset_of_elements_needed = 1;
@@ -591,7 +593,7 @@ int integrate_orbit( double *orbit, const double t0, const double t1)
       else if( integration_timeout && !(n_steps % 100))
          if( clock( ) > integration_timeout)
             rval = INTEGRATION_TIMED_OUT;
-      if( fail_on_hitting_planet)
+      if( step_taken && fail_on_hitting_planet)
          {
          extern int planet_hit;
 
@@ -2734,6 +2736,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
          n_included_observations++;
    if( n_included_observations < 3)
       {
+      debug_printf( "full_improvement fail: %d obs\n", n_included_observations);
       runtime_message = NULL;
       return( -3);
       }
@@ -2758,6 +2761,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
    fail_on_hitting_planet = saved_fail_on_hitting_planet;
    if( set_locs_rval)
       {
+      debug_printf( "Hit a planet in full_improvement : %d\n", set_locs_rval);
       runtime_message = NULL;
       return( -4);
       }
@@ -2878,6 +2882,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
                memcpy( orbit, original_orbit, 6 * sizeof( double));
                memcpy( solar_pressure, original_params, n_extra_params * sizeof( double));
                runtime_message = NULL;
+               debug_printf( "Integration timeout\n");
                return( -4);
                }
             if( set_locs_rval)      /* gonna have to try again, */
@@ -3342,7 +3347,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
          const double after_rms = compute_rms( obs, n_obs);
 
          sprintf( tstr, "Half-stepping %d\n", 7 - i);
-         if( after_rms > before_rms * 1.1 && !limited_orbit)
+         if( after_rms > before_rms * 1.5 && !limited_orbit)
             {
             for( j = 0; j < 6; j++)
                orbit[j] = (orbit[j] + orbit2[j]) * .5;
