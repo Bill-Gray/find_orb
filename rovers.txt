@@ -612,3 +612,14 @@ OST !-104.022786     +30.671524     2007.7     Otto Struve Telescope,  McDonald 
 Mc9 !-104.021944     +30.671420     2007.7     McDonald Observatory 0.9m
 Mc8 !-104.022738     +30.670799     2007.7     McDonald Observatory 0.8m
 HET !-104.014679     +30.681398     2048.2     Hobby-Eberly Telescope
+
+   Mt. Hopkins telescopes,  identified with
+   http://linmax.sao.arizona.edu/FLWO/MtHop090529.jpg and measured with G__gle Maps.
+   (G91) and (V07) really are two different codes for the exact same scope.  Alts
+   are from ObsCodes.html,  with (G91/V07)'s alt recycled for FL*.
+
+696 !-110.885179   +31.688899       2627.639   Whipple Observatory, Mt. Hopkins
+G91 !-110.878687   +31.680742       2287.949   Whipple Observatory, Mount Hopkins-2MASS
+V07 !-110.878687   +31.680742       2287.949   Whipple Observatory, Mount Hopkins-PAIRITEL
+FL5 !-110.878340   +31.681015       2287.949   Whipple Observatory,  1.5-m
+FL2 !-110.878488   +31.680868       2287.949   Whipple Observatory,  1.2-m
