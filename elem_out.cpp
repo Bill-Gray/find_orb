@@ -65,6 +65,8 @@ int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
          __attribute__ (( format( printf, 3, 4)))
 #endif
 ;
+#define ssnprintf_append( obuff, ...) snprintf_append( obuff, sizeof( obuff), __VA_ARGS__)
+#define ssnprintf( obuff, ...) snprintf( obuff, sizeof( obuff), __VA_ARGS__)
 int store_defaults( const int ephemeris_output_options,
          const int element_format, const int element_precision,
          const double max_residual_for_filtering,
@@ -76,6 +78,9 @@ static int elements_in_mpcorb_format( char *buff, const char *packed_desig,
                 const char *full_desig, const ELEMENTS *elem,
                 const OBSERVE FAR *obs, const int n_obs);   /* orb_func.c */
 static int elements_in_guide_format( char *buff, const ELEMENTS *elem,
+                     const char *obj_name, const OBSERVE *obs,
+                     const unsigned n_obs);                /* orb_func.c */
+static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
                      const char *obj_name, const OBSERVE *obs,
                      const unsigned n_obs);                /* orb_func.c */
 int find_worst_observation( const OBSERVE FAR *obs, const int n_obs);
@@ -121,6 +126,7 @@ int set_language( const int language);                      /* elem_out.cpp */
 void get_find_orb_text_filename( char *filename);     /* elem_out.cpp */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 static int names_compare( const char *name1, const char *name2);
+static int get_uncertainty( const char *key, char *obuff, const bool in_km);
 
 extern int debug_level;
 double asteroid_magnitude_slope_param = .15;
@@ -503,6 +509,155 @@ static int elements_in_mpcorb_format( char *buff, const char *packed_desig,
       memcpy( buff + 142, coarse_perturb, 3);
       memcpy( buff + 146, precise_perturb, 2);
       }
+   return( 0);
+}
+
+static char *iso_time( char *buff, const double jd)
+{
+   full_ctime( buff, jd, CALENDAR_JULIAN_GREGORIAN
+                | FULL_CTIME_YMD | FULL_CTIME_MONTHS_AS_DIGITS
+                | FULL_CTIME_LEADING_ZEROES | FULL_CTIME_HUNDREDTH_SEC);
+   buff[4] = buff[7] = '-';
+   buff[10] = 'T';
+   buff[19] = 'Z';
+   buff[20] = '\0';
+   return( buff);
+}
+
+static char *object_name( char *buff, const int obj_index)
+{
+   if( !obj_index)
+      strcpy( buff, "Sun");
+   else if( obj_index > 0 && obj_index < 11) /* nine planets & moon */
+      strcpy( buff, get_find_orb_text( 99107 + obj_index));
+   else
+      sprintf( buff, "Object_%d\n", obj_index);
+   return( buff);
+}
+
+static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
+                     const char *obj_name, const OBSERVE *obs,
+                     const unsigned n_obs)
+{
+   double jd = current_jd( );
+   double jd_first, jd_last;
+   char buff[180];
+   int first, last, i, n_used;
+   extern const char *elements_filename;
+   FILE *ifile = fopen_ext( get_file_name( buff, elements_filename), "tfcrb");
+
+   fprintf( ofile, "{\n  \"object\": \"%s\",\n", obj_name);
+   fprintf( ofile, "  \"created\": %.5f,\n", jd);
+   fprintf( ofile, "  \"created iso\": \"%s\",\n", iso_time( buff, jd));
+   fprintf( ofile, "  \"elements\":\n  {\n");
+   fprintf( ofile, "    \"central body\": \"%s\",\n", object_name( buff, elem->central_obj));
+   fprintf( ofile, "    \"epoch\": %17.8f,", elem->epoch);
+   if( elem->ecc < 1.)
+      {
+      fprintf( ofile, "\n    \"M\": %12.8f,", elem->mean_anomaly * 180. / PI);
+      if( !get_uncertainty( "sigma_M", buff, 0))
+         fprintf( ofile, " \"M sigma\": %s,", buff);
+      }
+
+   fprintf( ofile, "\n    \"n\": %12.8f,", (180 / PI) / elem->t0);
+   if( !get_uncertainty( "sigma_n:", buff, 0))
+      fprintf( ofile, " \"n sigma\": %s,", buff);
+
+   fprintf( ofile, "\n    \"a\": %12.8f,", elem->major_axis);
+   if( !get_uncertainty( "sigma_a:", buff, 0))
+      fprintf( ofile, " \"a sigma\": %s,", buff);
+
+   fprintf( ofile, "\n    \"e\": %12.8f,", elem->ecc);
+   if( !get_uncertainty( "sigma_e", buff, 0))
+      fprintf( ofile, " \"e sigma\": %s,", buff);
+
+   fprintf( ofile, "\n    \"q\": %12.8f,", elem->q);
+   if( !get_uncertainty( "sigma_q", buff, 0))
+      fprintf( ofile, " \"q sigma\": %s,", buff);
+   if( elem->ecc < 1.)
+      {
+      const double big_q = elem->q * (1. + elem->ecc) / (1. - elem->ecc);
+
+      fprintf( ofile, "\n    \"Q\": %12.8f,", big_q);
+      if( !get_uncertainty( "sigma_Q", buff, 0))
+         fprintf( ofile, " \"Q sigma\": %s,", buff);
+      }
+
+   fprintf( ofile, "\n    \"i\": %12.8f,", elem->incl * 180. / PI);
+   if( !get_uncertainty( "sigma_i", buff, 0))
+      fprintf( ofile, " \"i sigma\": %s,", buff);
+
+   fprintf( ofile, "\n    \"arg_per\":  %12.8f,", elem->arg_per * 180. / PI);
+   if( !get_uncertainty( "sigma_omega", buff, 0))
+      fprintf( ofile, " \"arg_per sigma\":  %s,", buff);
+
+   fprintf( ofile, "\n    \"asc_node\": %12.8f,", elem->asc_node * 180. / PI);
+   if( !get_uncertainty( "sigma_Omega", buff, 0))
+      fprintf( ofile, " \"asc_node sigma\": %s,", buff);
+
+   fprintf( ofile, "\n    \"Tp\": %16.8f,", elem->perih_time);
+   if( !get_uncertainty( "sigma_Tp", buff, 0))
+      fprintf( ofile, " \"Tp sigma\": %s,", buff);
+   if( elem->abs_mag)
+      {
+      fprintf( ofile, "\n    \"H\": %6.2f,", elem->slope_param);
+      if( !get_uncertainty( "sigma_H:", buff, 0))
+         fprintf( ofile, " \"H sigma\": %s,", buff);
+      }
+
+   if( ifile)
+      {
+      int moid_no = 1;
+      char tbuff[80];
+
+      while( fgets( buff, sizeof( buff), ifile))
+         if( !memcmp( buff, "# MOIDs:", 8))
+            {
+            if( moid_no == 1)
+               {
+               fprintf( ofile, "\n   \"MOIDs\":");
+               fprintf( ofile, "\n   {");
+               }
+            for( i = 0; i < 4; i++, moid_no++)
+               fprintf( ofile, "\n      \"%s\" : %.9s%c",
+                     object_name( tbuff, moid_no), buff + i * 13 + 12,
+                     (moid_no == 8) ? ' ' : ',');
+            }
+      fclose( ifile);
+      if( moid_no > 1)
+         fprintf( ofile, "\n    }");
+      }
+
+   fprintf( ofile, "\n  },\n  \"observations\":\n  {");
+   get_first_and_last_included_obs( obs, n_obs, &first, &last);
+   for( i = n_used = 0; i < (int)n_obs; i++)
+      n_used += (obs[i].is_included & 1);
+   fprintf( ofile, "\n    \"count\": %u,", n_obs);
+   fprintf( ofile, "\n    \"used\": %u,", n_used);
+   jd_first = obs[first].jd - td_minus_utc( obs[first].jd) / seconds_per_day;
+   jd_last  = obs[last].jd - td_minus_utc( obs[last].jd) / seconds_per_day;
+   fprintf( ofile, "\n    \"earliest\": %16.8f,", jd_first);
+   fprintf( ofile, "\n    \"latest\": %16.8f,", jd_last);
+   fprintf( ofile, "\n    \"earliest iso\": \"%s\",", iso_time( buff, jd_first));
+   fprintf( ofile, "\n    \"latest iso\": \"%s\",", iso_time( buff, jd_last));
+   fprintf( ofile, "\n    \"residuals\":\n    [");
+   for( i = 0; i < (int)n_obs; i++)
+      {
+      MOTION_DETAILS m;
+
+      jd = obs[i].jd - td_minus_utc( obs[i].jd) / seconds_per_day;
+      compute_observation_motion_details( obs + i, &m);
+      fprintf( ofile, "\n      {\"JD\": %.6f, \"iso date\": \"%s\", \"obscode\": \"%s\",",
+                  jd, iso_time( buff, jd), obs[i].mpc_code);
+      fprintf( ofile, "\n             \"dRA\" : %.3f, \"dDec\": %.3f, \"dTime\": %.3f, \"cross\": %.3f,",
+         m.xresid, m.yresid, m.time_residual, m.cross_residual);
+      fprintf( ofile, "\n             \"incl\" : %d", obs[i].is_included);
+      if( obs[i].obs_mag != BLANK_MAG)
+         fprintf( ofile, ", \"dMag\" : %.2f", obs[i].obs_mag - obs[i].computed_mag);
+      fprintf( ofile, " }%c", (i == (int)n_obs - 1 ? ' ' : ','));
+      }
+   fprintf( ofile, "\n    ]\n  },");
+   fprintf( ofile, "\n}\n");
    return( 0);
 }
 
@@ -1697,6 +1852,11 @@ int write_out_elements_to_file( const double *orbit,
       {
       elements_in_guide_format( tbuff, &elem, object_name, obs, n_obs);
       fprintf( ofile, "%s%s\n", tbuff, impact_buff);
+      fclose( ofile);
+      }
+   if( (ofile = fopen_ext( get_file_name( tbuff, "elements.json"), "tfcwb")) != NULL)
+      {
+      elements_in_json_format( ofile, &elem, object_name, obs, n_obs);
       fclose( ofile);
       }
    free( tbuff);
