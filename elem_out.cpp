@@ -656,7 +656,7 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
          fprintf( ofile, ", \"dMag\" : %.2f", obs[i].obs_mag - obs[i].computed_mag);
       fprintf( ofile, " }%c", (i == (int)n_obs - 1 ? ' ' : ','));
       }
-   fprintf( ofile, "\n    ]\n  },");
+   fprintf( ofile, "\n    ]\n  }");
    fprintf( ofile, "\n}\n");
    return( 0);
 }
