@@ -1234,6 +1234,14 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                         && show_topocentric_data);
    const bool show_uncertainties = ((options & OPTION_SHOW_SIGMAS)
                         && n_objects > 1 && ephem_type == OPTION_OBSERVABLES);
+   const bool show_moon_alt = ((options & OPTION_MOON_ALT)
+                        && show_topocentric_data);
+   const bool show_moon_az  = ((options & OPTION_MOON_AZ )
+                        && show_topocentric_data);
+   const bool show_sun_alt = ((options & OPTION_SUN_ALT)
+                        && show_topocentric_data);
+   const bool show_sun_az  = ((options & OPTION_SUN_AZ )
+                        && show_topocentric_data);
    double abs_mag = calc_absolute_magnitude( obs, n_obs);
    double unused_ht_in_meters;
    DPT latlon;
@@ -1379,6 +1387,14 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
             fprintf( ofile, (options & OPTION_SEPARATE_MOTIONS) ? "  RA '/hr dec " : "  '/hr    PA  ");
          if( show_alt_az)
             fprintf( ofile, " alt  az");
+         if( show_sun_alt)
+            fprintf( ofile, "Salt");
+         if( show_sun_az)
+            fprintf( ofile, " Saz");
+         if( show_moon_alt)
+            fprintf( ofile, "Malt");
+         if( show_moon_az)
+            fprintf( ofile, " Maz");
          if( options & OPTION_RADIAL_VEL_OUTPUT)
             fprintf( ofile, "  rvel ");
          if( show_radar_data)
@@ -1422,6 +1438,14 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
             fprintf( ofile, " ------ ------");
          if( show_alt_az)
             fprintf( ofile, " --- ---");
+         if( show_sun_alt)
+            fprintf( ofile, " ---");
+         if( show_sun_az)
+            fprintf( ofile, " ---");
+         if( show_moon_alt)
+            fprintf( ofile, " ---");
+         if( show_moon_az)
+            fprintf( ofile, " ---");
          if( options & OPTION_RADIAL_VEL_OUTPUT)
             fprintf( ofile, "  -----");
          if( show_radar_data)
@@ -1949,13 +1973,27 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                end_ptr[7] = ' ';
                }
             if( show_alt_az)
+            for( j = 0; j < 3; j++)
                {
-                           /* FIX someday:  this only works if planet_no == 3, */
-                           /* i.e.,  topocentric ephemerides */
-               snprintf_append( buff, sizeof( buff), " %c%02d %03d",
-                                    (alt_az[0].y > 0. ? '+' : '-'),
-                                    (int)( fabs( alt_az[0].y * 180. / PI) + .5),
-                                    (int)( alt_az[0].x * 180. / PI + .5));
+               bool show_alt = show_alt_az, show_az = show_alt_az;
+
+               if( j == 1)
+                  {
+                  show_alt = show_sun_alt;
+                  show_az  = show_sun_az;
+                  }
+               if( j == 2)
+                  {
+                  show_alt = show_moon_alt;
+                  show_az  = show_moon_az;
+                  }
+               if( show_alt)
+                  snprintf_append( buff, sizeof( buff), " %c%02d",
+                                    (alt_az[j].y > 0. ? '+' : '-'),
+                                    (int)( fabs( alt_az[j].y * 180. / PI) + .5));
+               if( show_az)
+                  snprintf_append( buff, sizeof( buff), " %03d",
+                                    (int)( alt_az[j].x * 180. / PI + .5));
                }
             if( options & OPTION_RADIAL_VEL_OUTPUT)
                {

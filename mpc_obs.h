@@ -135,6 +135,11 @@ parameters in Find_Orb.  This may get bumped up at some point. */
 #define OPTION_SUPPRESS_SOLAR_R      0x800000
 #define OPTION_SUPPRESS_ELONG        0x1000000
 
+#define OPTION_SUN_ALT               0x2000000
+#define OPTION_SUN_AZ                0x4000000
+#define OPTION_MOON_ALT              0x8000000
+#define OPTION_MOON_AZ               0x10000000
+
 #define HELIOCENTRIC_SIGMAS_ONLY       0
 #define ORBIT_SIGMAS_REQUESTED         1
 #define NO_ORBIT_SIGMAS_REQUESTED    (-1)
