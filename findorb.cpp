@@ -733,6 +733,18 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
          case '4':
             ephemeris_output_options ^= OPTION_SUPPRESS_ELONG;
             break;
+         case '5':
+            ephemeris_output_options ^= OPTION_SUN_ALT;
+            break;
+         case '6':
+            ephemeris_output_options ^= OPTION_SUN_AZ;
+            break;
+         case '7':
+            ephemeris_output_options ^= OPTION_MOON_ALT;
+            break;
+         case '8':
+            ephemeris_output_options ^= OPTION_MOON_AZ;
+            break;
          case 'a': case 'A':
             ephemeris_output_options ^= OPTION_ALT_AZ_OUTPUT;
             break;
@@ -975,6 +987,14 @@ static void object_comment_text( char *buff, const OBJECT_INFO *id)
 {
    sprintf( buff, "%d obs; ", id->n_obs);
    make_date_range_text( buff + strlen( buff), id->jd_start, id->jd_end);
+   if( id->jd_updated != id->jd_end)
+      {
+      char time_buff[80];
+
+      full_ctime( time_buff, id->jd_updated, FULL_CTIME_FORMAT_HH_MM
+                  | FULL_CTIME_NO_YEAR | CALENDAR_JULIAN_GREGORIAN);
+      snprintf_append( buff, 90, " Updated %s", time_buff);
+      }
 }
 
 /* select_object_in_file( ) uses the find_objects_in_file( ) function to
