@@ -17,6 +17,10 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301, USA.    */
 
+#ifndef _WIN32
+#include <sys/stat.h>
+#include <sys/types.h>
+#endif
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
@@ -1683,36 +1687,41 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
             if( n_objects > 1 && obj_n == n_objects - 1 && show_this_line)
                {
                double dist, posn_ang;
-               char tbuff[13];
-               const char *offset_dir = get_environment_ptr( "OFFSET_FILES");
+               char tbuff[80];
 
                if( n_objects == 2)
                   calc_dist_and_posn_ang( (const double *)&stored_ra_decs[0],
                                        (const double *)&ra_dec,
                                        &dist, &posn_ang);
-               else if( *offset_dir)
+               else
                   {
-                  char filename[80];
-                  FILE *offset_ofile;
+                  const char *offset_dir = get_environment_ptr( "OFFSET_FILES");
+                  FILE *offset_ofile = NULL;
 
-                  strcpy( filename, offset_dir);
-                  full_ctime( date_buff, curr_jd,
-                        FULL_CTIME_FORMAT_HH_MM | FULL_CTIME_YMD
-                      | FULL_CTIME_MONTHS_AS_DIGITS | FULL_CTIME_NO_SPACES
-                      | FULL_CTIME_NO_COLONS | FULL_CTIME_LEADING_ZEROES);
-                  strcat( filename, date_buff);
-                  strcat( filename, ".off");
-                  offset_ofile = fopen( filename, "wb");
-                  if( offset_ofile)
+                  if( *offset_dir)
                      {
+#ifndef _WIN32
+                     mkdir( offset_dir, 0777);
+#endif
+                     strcpy( tbuff, offset_dir);
+                     strcat( tbuff, "/");
+                     full_ctime( date_buff, curr_jd,
+                           FULL_CTIME_FORMAT_HH_MM | FULL_CTIME_YMD
+                         | FULL_CTIME_MONTHS_AS_DIGITS | FULL_CTIME_NO_SPACES
+                         | FULL_CTIME_NO_COLONS | FULL_CTIME_LEADING_ZEROES);
+                     strcat( tbuff, date_buff);
+                     strcat( tbuff, ".off");
+                     offset_ofile = fopen( tbuff, "wb");
+                     assert( offset_ofile);
                      full_ctime( date_buff, curr_jd,
                             FULL_CTIME_FORMAT_HH_MM | FULL_CTIME_YMD);
                      fprintf( offset_ofile, "# JD %f = %s\n", curr_jd, date_buff);
                      fprintf( offset_ofile, "# %s\n", obs->packed_id);
-                     calc_sr_dist_and_posn_ang( stored_ra_decs, n_objects,
-                                       &dist, &posn_ang, offset_ofile);
-                     fclose( offset_ofile);
                      }
+                  calc_sr_dist_and_posn_ang( stored_ra_decs, n_objects,
+                                       &dist, &posn_ang, offset_ofile);
+                  if( offset_ofile)
+                     fclose( offset_ofile);
                   }
                put_ephemeris_posn_angle_sigma( tbuff, dist, posn_ang, computer_friendly);
                fprintf( ofile, " %s", tbuff);
