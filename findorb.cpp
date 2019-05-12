@@ -1727,12 +1727,38 @@ static void show_a_file( const char *filename)
                         && fgets_trimmed( buff, sizeof( buff), ifile); i++)
          {
          const int curr_line = top_line + i;
+#ifdef A_RGB_COLOR
+         int color_col = -1, rgb = 255;
+#endif
 
          if( is_ephem)
+            {
+#ifdef A_RGB_COLOR
+            char *tptr = strchr( buff, '$');
+
+            if( tptr)
+               color_col = tptr - buff;
+            rgb = remove_rgb_code( buff);
+#else
             remove_rgb_code( buff);
+#endif
+            }
          if( i >= 3 || !is_ephem)
             put_colored_text( buff, i, 0, -1,
                (line_no == curr_line ? COLOR_ORBITAL_ELEMENTS : COLOR_BACKGROUND));
+#ifdef A_RGB_COLOR
+         if( color_col >= 0 && rgb >= 0 && i >= 3 && is_ephem)
+            {
+            const int blue =  ((rgb >> 3) & 0x1f);
+            const int green = ((rgb >> 11) & 0x1f);
+            const int red =   ((rgb >> 19) & 0x1f);
+            const int text_color = (blue + red + green > 48 ? 0 : 31);
+            const chtype color = A_RGB( text_color, text_color, text_color,
+                                       red, green, blue);
+
+            mvchgat( i, color_col + 1, 2, color, 0, NULL);
+            }
+#endif
          }
                /* show "scroll bar" to right of text: */
       show_right_hand_scroll_bar( 0, n_lines_to_show, top_line, n_lines);
@@ -4390,6 +4416,7 @@ int main( const int argc, const char **argv)
          case ALT_A:
             residual_format ^= RESIDUAL_FORMAT_SHOW_DESIGS;
             break;
+
          case ALT_P:
          case ALT_R: case ALT_X: case ALT_Y:
          case ALT_Z: case '\'': case 'k':
