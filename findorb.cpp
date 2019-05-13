@@ -2290,6 +2290,7 @@ int sanity_test_observations( const char *filename);
 int main( const int argc, const char **argv)
 {
    char obj_name[80], tbuff[500], orbit_constraints[90];
+   char ifilename[256];;
    unsigned n_command_lines = 4;
    int c = 1, element_precision, get_new_object = 1, add_off_on = -1;
    unsigned top_line_basic_info_perturbers;
@@ -2331,6 +2332,7 @@ int main( const int argc, const char **argv)
       use_config_directory = false;
    if( !setlocale( LC_ALL, "C.UTF-8") && !setlocale( LC_ALL, "en_US.utf8"))
       debug_printf( "Couldn't set a UTF-8 locale\n");
+   *ifilename = '\0';
    for( i = 1; i < argc; i++)       /* check to see if we're debugging: */
       if( argv[i][0] == '-')
          {
@@ -2427,7 +2429,7 @@ int main( const int argc, const char **argv)
                }
                break;
             case 's':
-               sanity_test_observations( argv[1]);
+               sanity_test_observations( ifilename);
                printf( "Sanity check complete\n");
                exit( 0);
 //             break;
@@ -2456,24 +2458,26 @@ int main( const int argc, const char **argv)
                return( -1);
             }
          }
+      else     /* argument does not start with '-' */
+         {
+         const char *tptr = strchr( argv[i], '=');
+
+         if( tptr)
+            {
+            const size_t len = tptr - argv[i];
+
+            memcpy( tbuff, argv[i], len);
+            tbuff[len] = '\0';
+            set_environment_ptr( tbuff, argv[i] + len + 1);
+            }
+         else if( !*ifilename)
+            strcpy( ifilename, argv[i]);
+         }
    sscanf( get_environment_ptr( "CONSOLE_OPTS"), "%9s %d %d %u",
                mpc_code, &observation_display, &residual_format, &list_codes);
 
    residual_format |= RESIDUAL_FORMAT_80_COL;      /* force 80-column mode */
 
-   for( i = 1; i < argc; i++)
-      {
-      const char *tptr = strchr( argv[i], '=');
-
-      if( tptr && argv[i][0] != '-')
-         {
-         const size_t len = tptr - argv[i];
-
-         memcpy( tbuff, argv[i], len);
-         tbuff[len] = '\0';
-         set_environment_ptr( tbuff, argv[i] + len + 1);
-         }
-      }
 
    get_defaults( &ephemeris_output_options, &element_format,
          &element_precision, &max_residual_for_filtering,
@@ -2490,7 +2494,7 @@ int main( const int argc, const char **argv)
    if( debug_level)
       debug_printf( "%d sigma recs read\n", i);
 
-   if( argc < 2)
+   if( !*ifilename)
       {
       printf( "'findorb' needs the name of an input file of MPC-formatted\n");
       printf( "astrometry as a command-line argument.\n");
@@ -2501,15 +2505,15 @@ int main( const int argc, const char **argv)
    if( reset_astrometry_filename( argc, argv))
       drop_single_obs = false;
 
-   if( !strcmp( argv[1], "c") || !strcmp( argv[1], "c+"))
+   if( !strcmp( ifilename, "c") || !strcmp( ifilename, "c+"))
       {
       const char *temp_clipboard_filename = "/tmp/obs_temp.txt";
 
       clipboard_to_file( temp_clipboard_filename, argv[1][1] == '+');
-      argv[1] = temp_clipboard_filename;
+      strcpy( ifilename, temp_clipboard_filename);
       }
 
-   ids = find_objects_in_file( argv[1], &n_ids, NULL);
+   ids = find_objects_in_file( ifilename, &n_ids, NULL);
    if( n_ids > 0 && drop_single_obs)
       {
       int j = 0;
@@ -2527,7 +2531,7 @@ int main( const int argc, const char **argv)
          err_msg = "Couldn't locate the file '%s'\n";
       else
          err_msg = "No objects found in file '%s'\n";
-      fprintf( stderr, err_msg, argv[1]);
+      fprintf( stderr, err_msg, ifilename);
       return( -1);
       }
 
@@ -2589,7 +2593,7 @@ int main( const int argc, const char **argv)
             refresh( );
             monte_carlo_object_count = 0;
 
-            ifile = fopen( argv[1], "rb");
+            ifile = fopen( ifilename, "rb");
                 /* Start quite a bit ahead of the actual data,  just in case */
                 /* there's a #Sigma: or something in the observation header */
                 /* to which we should pay attention:                        */
@@ -3150,7 +3154,7 @@ int main( const int argc, const char **argv)
          case KEY_F(16):     /* Shift-F4:  select another object to add in */
             if( (i = select_object_in_file( ids, n_ids)) >= 0)
                {
-               FILE *ifile = fopen( argv[1], "rb");
+               FILE *ifile = fopen( ifilename, "rb");
 
                obs = add_observations( ifile, obs, ids + i, &n_obs);
                fclose( ifile);
@@ -3573,7 +3577,7 @@ int main( const int argc, const char **argv)
          case 'm': case 'M':
             create_obs_file( obs, n_obs, 0);
             create_ephemeris( orbit, curr_epoch, obs, n_obs, obj_name,
-                           argv[1], residual_format);
+                           ifilename, residual_format);
             break;
          case 'n': case 'N':   /* select a new object from the input file */
             get_new_object = 1;
@@ -4244,7 +4248,7 @@ int main( const int argc, const char **argv)
             unlink( get_file_name( tbuff, ephemeris_filename));
 #endif
             write_residuals_to_file( get_file_name( tbuff, residual_filename),
-                             argv[1], n_obs, obs, RESIDUAL_FORMAT_SHORT);
+                             ifilename, n_obs, obs, RESIDUAL_FORMAT_SHORT);
             sprintf( tbuff, "%s%s.htm", path, obs->packed_id);
             debug_printf( "Creating '%s'\n", tbuff);
             text_search_and_replace( tbuff, " ", "");
