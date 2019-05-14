@@ -3549,8 +3549,9 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
             }
          else if( !memcmp( buff, "# helio_only", 12) && !orbit_is_heliocentric)
             suppressed = (buff[13] == '1');
-         else if( !memcmp( buff, "# neocp_only", 12) && !n_neocp_lines)
-            suppressed = (buff[13] == '1');
+         else if( !memcmp( buff, "# neocp_only", 12))
+            if( !n_neocp_lines || strlen( obj_name) > 7)
+               suppressed = (buff[13] == '1');
 
       fclose( header_htm_ifile);
       }
