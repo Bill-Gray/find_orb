@@ -96,7 +96,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name);
                                                /* ephem0.cpp */
 void set_environment_ptr( const char *env_ptr, const char *new_value);
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
-int reset_astrometry_filename( const int argc, const char **argv);
+int reset_astrometry_filename( int *argc, const char **argv);
 uint64_t parse_bit_string( const char *istr);                /* miscell.cpp */
 
 /* In this non-interactive version of Find_Orb,  we just print out warning
@@ -387,7 +387,7 @@ static const char *get_arg( const int argc, const char **argv, const int idx)
       return( argv[idx + 1]);
 }
 
-int main( const int argc, const char **argv)
+int main( int argc, const char **argv)
 {
    char tbuff[300], mpc_code[20];
    char **summary_lines = NULL;
@@ -422,6 +422,9 @@ int main( const int argc, const char **argv)
    else
       use_config_directory = false;
    *mpc_code = '\0';
+   if( reset_astrometry_filename( &argc, argv))
+      drop_single_obs = false;
+
    for( i = 1; i < argc; i++)       /* check to see if we're debugging: */
       if( argv[i][0] == '-')
          {
@@ -618,9 +621,6 @@ int main( const int argc, const char **argv)
       printf( "astrometry as a command-line argument.\n");
       return( -2);
       }
-
-   if( reset_astrometry_filename( argc, argv))
-      drop_single_obs = false;
 
    ids = find_objects_in_file( argv[1], &n_ids, NULL);
    if( n_ids <= 0)

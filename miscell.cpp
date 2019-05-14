@@ -69,7 +69,7 @@ can turn it back to 'false'.
 int generic_message_box( const char *message, const char *box_type);
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 void make_config_dir_name( char *oname, const char *iname);  /* miscell.cpp */
-int reset_astrometry_filename( const int argc, const char **argv);
+int reset_astrometry_filename( int *argc, const char **argv);
 uint64_t parse_bit_string( const char *istr);                /* miscell.cpp */
 
 int use_config_directory = false;
@@ -310,7 +310,7 @@ orbital elements are _read_ (not computed) from 'mpcorb.sof',  and a
 single dummy observation is made that reflects the object's position
 at the epoch (see above 'make_fake_astrometry()' function).  */
 
-int reset_astrometry_filename( const int argc, const char **argv)
+int reset_astrometry_filename( int *argc, const char **argv)
 {
    int rval = 0;
 
@@ -318,13 +318,13 @@ int reset_astrometry_filename( const int argc, const char **argv)
       {
       const char *filename = "/tmp/temp_obs.txt";
       char obj_name[50];
-      int i;
+      int i, j;
 
       if( argv[1][2])
          strcpy( obj_name, argv[1] + 2);
       else
          *obj_name = '\0';
-      for( i = 2; i < argc && argv[i][0] != '-' && !strchr( argv[i], '='); i++)
+      for( i = 2; i < *argc && argv[i][0] != '-' && !strchr( argv[i], '='); i++)
          {
          if( *obj_name)
             strcat( obj_name, " ");
@@ -342,6 +342,10 @@ int reset_astrometry_filename( const int argc, const char **argv)
       else
          make_fake_astrometry( obj_name, filename);
       argv[1] = filename;
+      for( j = 2; i < *argc; j++, i++)
+         argv[j] = argv[i];
+      argv[j] = NULL;
+      *argc = j;
       rval = 1;
       }
    return( rval);

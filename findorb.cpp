@@ -209,7 +209,7 @@ void set_environment_ptr( const char *env_ptr, const char *new_value);
 int orbital_monte_carlo( const double *orbit, OBSERVE *obs, const int n_obs,
          const double curr_epoch, const double epoch_shown);   /* orb_func.cpp */
 void make_config_dir_name( char *oname, const char *iname);    /* miscell.cpp */
-int reset_astrometry_filename( const int argc, const char **argv);
+int reset_astrometry_filename( int *argc, const char **argv);
 int compare_observations( const void *a, const void *b, void *context);
 int set_language( const int language);                      /* elem_out.cpp */
 void shellsort_r( void *base, const size_t n_elements, const size_t esize,
@@ -2287,7 +2287,7 @@ int sanity_test_observations( const char *filename);
    an action such as taking an Herget step or a "full step",  or resetting
    the epoch,  or quitting,  is taken. */
 
-int main( const int argc, const char **argv)
+int main( int argc, const char **argv)
 {
    char obj_name[80], tbuff[500], orbit_constraints[90];
    char ifilename[256];;
@@ -2333,6 +2333,10 @@ int main( const int argc, const char **argv)
    if( !setlocale( LC_ALL, "C.UTF-8") && !setlocale( LC_ALL, "en_US.utf8"))
       debug_printf( "Couldn't set a UTF-8 locale\n");
    *ifilename = '\0';
+
+   if( reset_astrometry_filename( &argc, argv))
+      drop_single_obs = false;
+
    for( i = 1; i < argc; i++)       /* check to see if we're debugging: */
       if( argv[i][0] == '-')
          {
@@ -2502,9 +2506,6 @@ int main( const int argc, const char **argv)
       }
 
    *message_to_user = '\0';
-   if( reset_astrometry_filename( argc, argv))
-      drop_single_obs = false;
-
    if( !strcmp( ifilename, "c") || !strcmp( ifilename, "c+"))
       {
       const char *temp_clipboard_filename = "/tmp/obs_temp.txt";
