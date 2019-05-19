@@ -104,6 +104,19 @@ const double SRP1AU = 2.3e-7;
    /*   Interestingly,  this also means that an object with area/mass =  */
    /* 1286 m^2/kg would have SRP balancing the sun's gravity.  Which     */
    /* would make it big and light.  Solar sails aren't easy.             */
+   /*
+        A final comment : non-gravs of the A1, A2, A3 form give the
+    acceleration the object would have at one AU from the sun,  in
+    units of AU/day.  If the non-gravs are of the 1/r^2 model (rock-like)
+    rather than,  say,  the Sekanina-Marsden model for an outgassing
+    comet,  then for an area/mass ratio of z m^2/kg,  A1 = SRP1AU * z.
+    Or,  alternatively,  A1 = SRP1AU * AMR.  (Roughly speaking,  anyway;
+    in such scenarios,  A2 and A3 are fitted parameters,  so the radial
+    component is slightly different.)  Thus,  for example,  one gets an
+    area/mass ratio for 1I/`Oumuamua of 1.15 m^2/kg,  but if you fit A1
+    and A2,  you get A1 = 2.39e-7 AU/day^2... somewhat lower than you'd
+    expect if you just multiplied 1.15 by SRP1AU,  but pretty close;  the
+    tangential components are rarely large.  */
 
 int n_extra_params = 0, setting_outside_of_arc = 1;
 double solar_pressure[MAX_N_NONGRAV_PARAMS], uncertainty_parameter = 99.;
