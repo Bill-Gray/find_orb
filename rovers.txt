@@ -614,12 +614,26 @@ Mc8 !-104.022738     +30.670799     2007.7     McDonald Observatory 0.8m
 HET !-104.014679     +30.681398     2048.2     Hobby-Eberly Telescope
 
    Mt. Hopkins telescopes,  identified with
-   http://linmax.sao.arizona.edu/FLWO/MtHop090529.jpg and measured with G__gle Maps.
-   (G91) and (V07) really are two different codes for the exact same scope.  Alts
-   are from ObsCodes.html,  with (G91/V07)'s alt recycled for FL*.
+   http://linmax.sao.arizona.edu/FLWO/MtHop090529.jpg and measured with
+   G__gle Maps. (G91) and (V07) really are two different codes for the
+   exact same 1.3-m scope.  Alts are from ObsCodes.html,  with (G91/V07)'s alt
+   recycled for FL5 and FL2 (they're all close to one another).  (696) is the
+   6.5-m MMT.
 
 696 !-110.885179   +31.688899       2627.639   Whipple Observatory, Mt. Hopkins
 G91 !-110.878687   +31.680742       2287.949   Whipple Observatory, Mount Hopkins-2MASS
 V07 !-110.878687   +31.680742       2287.949   Whipple Observatory, Mount Hopkins-PAIRITEL
 FL5 !-110.878340   +31.681015       2287.949   Whipple Observatory,  1.5-m
 FL2 !-110.878488   +31.680868       2287.949   Whipple Observatory,  1.2-m
+
+   G__gle Maps shows five domes on Calar Alto.  MPC gives five codes.  (493),
+   "Calar Alto",  has low precision;  I have no idea which scope is intended.
+   (Z84) and (Z79) were identifiable.  I _think_ (G36) = Un1.  Alts,  again,
+   are from ObsCodes.html.   According to Wikipaedia,  (Z79) = 3.5m scope;
+   (Z84) = 0.8-m Schmidt; (Un1) = 1.23m;  (Un2) = 1.5m; (Un3) = 2.2m.
+
+Z84 !  -2.548143   +37.223981       2160.811   Calar Alto-Schmidt
+Un1 !  -2.547483   +37.223165                  Unknown about 100m SSE of Z84;  (G36)?
+Un2 !  -2.548248   +37.224987                  Unknown about 100m north of Z84
+Un3 !  -2.546037   +37.223133                  Unknown about 200m ESE of Z84
+Z79 !  -2.546678   +37.220850       2162.511   Calar Alto TNO Survey
