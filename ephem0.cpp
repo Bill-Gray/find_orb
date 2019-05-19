@@ -1256,6 +1256,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
           planet_radius_in_meters( planet_no) / AU_IN_METERS;
    const bool fake_astrometry = ((options & 7) == OPTION_FAKE_ASTROMETRY);
    const int added_ra_dec_precision = atoi( get_environment_ptr( "ADDED_RA_DEC_PRECISION"));
+   char buff[440];
 
    step = get_step_size( stepsize, &step_units, &n_step_digits);
    if( !step)
@@ -1329,7 +1330,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       strcpy( hr_min_text, pre_texts[hh_mm]);
       if( added_ra_dec_precision > 0)
          {
-         memset( added_prec_text, ' ', added_ra_dec_precision);
+         memset( added_prec_text, '-', added_ra_dec_precision);
          added_prec_text[added_ra_dec_precision] = '\0';
          }
       else
@@ -1361,106 +1362,66 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                            guessed_rotation_period_in_hours( abs_mag),
                            diameter_from_abs_mag( abs_mag, optical_albedo));
             }
-         fprintf( ofile, "Date %s%s  ",
+         snprintf( buff, sizeof( buff), "Date %s%s  ",
                         (*timescale ? "(TT)"  : "(UTC)"), hr_min_text);
          if( !(options & OPTION_SUPPRESS_RA_DEC))
-            fprintf( ofile, " RA%s              Dec%s         ",
+            snprintf_append( buff, sizeof( buff), "-RA%s-----------  -Dec%s-------  ",
                                        added_prec_text, added_prec_text);
          if( !(options & OPTION_SUPPRESS_DELTA))
-            fprintf( ofile, "delta  ");
+            snprintf_append( buff, sizeof( buff), "delta  ");
          if( !(options & OPTION_SUPPRESS_SOLAR_R))
-            fprintf( ofile, " r     ");
+            snprintf_append( buff, sizeof( buff), "-r---- ");
          if( !(options & OPTION_SUPPRESS_ELONG))
-            fprintf( ofile, "elong ");
+            snprintf_append( buff, sizeof( buff), "elong ");
          if( show_visibility)
-            fprintf( ofile, "SM ");
+            snprintf_append( buff, sizeof( buff), "SM ");
          if( options & OPTION_PHASE_ANGLE_OUTPUT)
-            fprintf( ofile, " ph_ang  ");
+            snprintf_append( buff, sizeof( buff), " ph_ang  ");
          if( options & OPTION_PHASE_ANGLE_BISECTOR)
-            fprintf( ofile, " ph_ang_bisector  ");
+            snprintf_append( buff, sizeof( buff), " ph_ang_bisector  ");
          if( options & OPTION_HELIO_ECLIPTIC)
-            fprintf( ofile, " helio ecliptic   ");
+            snprintf_append( buff, sizeof( buff), " helio_ecliptic   ");
          if( options & OPTION_TOPO_ECLIPTIC)
-            fprintf( ofile, " topo ecliptic    ");
+            snprintf_append( buff, sizeof( buff), " topo_ecliptic    ");
          if( abs_mag)
-            fprintf( ofile, " mag");
+            snprintf_append( buff, sizeof( buff), " mag");
 
          if( options & OPTION_LUNAR_ELONGATION)
-            fprintf( ofile, "  LuElo");
+            snprintf_append( buff, sizeof( buff), "  LuElo");
          if( options & OPTION_MOTION_OUTPUT)
-            fprintf( ofile, (options & OPTION_SEPARATE_MOTIONS) ? "  RA '/hr dec " : "  '/hr    PA  ");
+            snprintf_append( buff, sizeof( buff),
+                   (options & OPTION_SEPARATE_MOTIONS) ? " -RA-'/hr-dec-"
+                                                       : " -'/hr- --PA--");
          if( show_alt_az)
-            fprintf( ofile, " alt  az");
+            snprintf_append( buff, sizeof( buff), " alt -az");
          if( show_sun_alt)
-            fprintf( ofile, "Salt");
+            snprintf_append( buff, sizeof( buff), "Salt");
          if( show_sun_az)
-            fprintf( ofile, " Saz");
+            snprintf_append( buff, sizeof( buff), " Saz");
          if( show_moon_alt)
-            fprintf( ofile, "Malt");
+            snprintf_append( buff, sizeof( buff), "Malt");
          if( show_moon_az)
-            fprintf( ofile, " Maz");
+            snprintf_append( buff, sizeof( buff), " Maz");
          if( options & OPTION_RADIAL_VEL_OUTPUT)
-            fprintf( ofile, "  rvel ");
+            snprintf_append( buff, sizeof( buff), "  rvel-");
          if( show_radar_data)
-            fprintf( ofile, "  SNR");
+            snprintf_append( buff, sizeof( buff), "  SNR");
          if( options & OPTION_GROUND_TRACK)
-            fprintf( ofile, "  lon      lat      alt (km) ");
+            snprintf_append( buff, sizeof( buff), " -lon---- -lat---- -alt-(km)-");
          if( options & OPTION_SPACE_VEL_OUTPUT)
-            fprintf( ofile, "  svel ");
+            snprintf_append( buff, sizeof( buff), "  svel ");
          if( show_uncertainties)
-            fprintf( ofile, " \" sig PA");
-         fprintf( ofile, "\n");
-
-         for( i = 0; hr_min_text[i]; i++)
-            if( hr_min_text[i] != ' ')
-               hr_min_text[i] = '-';
-         fprintf( ofile, "---- -- --%s  ",  hr_min_text);
-         if( !(options & OPTION_SUPPRESS_RA_DEC))
-            fprintf( ofile, "-------------%s   -----------%s  ",
-                                          added_prec_text, added_prec_text);
-         if( !(options & OPTION_SUPPRESS_DELTA))
-            fprintf( ofile, "------ ");
-         if( !(options & OPTION_SUPPRESS_SOLAR_R))
-            fprintf( ofile, "------ ");
-         if( !(options & OPTION_SUPPRESS_ELONG))
-            fprintf( ofile, "----- ");
-         if( show_visibility)
-            fprintf( ofile, "-- ");
-         if( options & OPTION_PHASE_ANGLE_OUTPUT)
-            fprintf( ofile, " ------  ");
-         if( options & OPTION_PHASE_ANGLE_BISECTOR)
-            fprintf( ofile, " ---------------  ");
-         if( options & OPTION_HELIO_ECLIPTIC)
-            fprintf( ofile, " ---------------  ");
-         if( options & OPTION_TOPO_ECLIPTIC)
-            fprintf( ofile, " ---------------  ");
-         if( abs_mag)
-            fprintf( ofile, " ---");
-         if( options & OPTION_LUNAR_ELONGATION)
-            fprintf( ofile, "  -----");
-         if( options & OPTION_MOTION_OUTPUT)
-            fprintf( ofile, " ------ ------");
-         if( show_alt_az)
-            fprintf( ofile, " --- ---");
-         if( show_sun_alt)
-            fprintf( ofile, " ---");
-         if( show_sun_az)
-            fprintf( ofile, " ---");
-         if( show_moon_alt)
-            fprintf( ofile, " ---");
-         if( show_moon_az)
-            fprintf( ofile, " ---");
-         if( options & OPTION_RADIAL_VEL_OUTPUT)
-            fprintf( ofile, "  -----");
-         if( show_radar_data)
-            fprintf( ofile, " ----");
-         if( options & OPTION_GROUND_TRACK)
-            fprintf( ofile, " -------- -------- ----------");
-         if( options & OPTION_SPACE_VEL_OUTPUT)
-            fprintf( ofile, "  -----");
-         if( show_uncertainties)
-            fprintf( ofile, " ---- ---");
-         fprintf( ofile, "\n");
+            snprintf_append( buff, sizeof( buff), " \"-sig-PA");
+         for( i = 0; buff[i]; i++)
+            if( buff[i] == '-')
+               fprintf( ofile, " ");
+            else
+               {
+               fprintf( ofile, "%c", buff[i]);
+               if( buff[i] != ' ')
+                  buff[i] = '-';
+               }
+         fprintf( ofile, "\n%s\n", buff);
          }
       }
 
@@ -1478,7 +1439,6 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       double obs_posn[3], obs_vel[3];
       double obs_posn_equatorial[3];
       double geo_posn[3], geo_vel[3];
-      char buff[440];
       double curr_jd = jd_start + (double)i * step, delta_t;
       long rgb = 0;
 
