@@ -79,6 +79,7 @@ int debug_printf( const char *format, ...)                 /* runge.cpp */
          __attribute__ (( format( printf, 1, 2)))
 #endif
 ;
+char *iso_time( char *buff, const double jd);         /* elem_out.cpp */
 double mag_band_shift( const char mag_band);                /* elem_out.c */
 char *get_file_name( char *filename, const char *template_file_name);
 double current_jd( void);                       /* elem_out.cpp */
@@ -1207,6 +1208,70 @@ inline void calc_sr_dist_and_posn_ang( const DPT *ra_decs, const unsigned n_obje
    free( x);
 }
 
+static int create_json_ephemeris( FILE *ofile, FILE *ifile, char *header)
+{
+   char buff[1024];
+   int line_no = 0;
+
+   text_search_and_replace( header, "-", "");
+   text_search_and_replace( header, "\"sigPA", "sigPos sigPA");
+   text_search_and_replace( header, "ph_ang_bisector", "PABlon PABlat");
+   text_search_and_replace( header, "topo_ecliptic", "topoLon topoLat");
+   text_search_and_replace( header, "helio_ecliptic", "helioLon helioLat");
+   text_search_and_replace( header, "RA'/hrdec", "RAvel decvel");
+   text_search_and_replace( header, "'/hr PA", "motion_rate motionPA ");
+   header[4] = '-';     /* make 'Date (UTC)' into one token */
+   while( fgets_trimmed( buff, sizeof( buff), ifile))
+      if( memcmp( buff, "....", 4) && *buff != '#')         /* skip irrelevant lines */
+         {
+         char *hptr = header, *bptr = buff;
+         const char *preceder = (line_no ? ",\n" : "");
+
+         fprintf( ofile, "%s      \"%d\": {", preceder, line_no);
+         while( *hptr && *bptr)
+            {
+            int hlen = 0, blen = 0;
+            char out_token[20], out_text[20];
+
+            while( *bptr && *bptr == ' ')
+               bptr++;
+            while( *hptr && *hptr == ' ')
+               hptr++;
+            if( !*bptr && !*hptr)         /* end of line */
+               break;
+            if( !*bptr || !*hptr)
+               {
+               fprintf( ofile, "MISMATCH\n");
+               return( -1);
+               }
+            while( hptr[hlen] && hptr[hlen] != ' ')
+               hlen++;
+            while( bptr[blen] && bptr[blen] != ' ')
+               blen++;
+            assert( hlen < 18);
+            assert( blen < 18);
+            if( hptr == header)     /* first token -> date/time */
+               strcpy( out_token, "JD");
+            else
+               {
+               memcpy( out_token, hptr, hlen);
+               out_token[hlen] = '\0';
+               fprintf( ofile, ", ");
+               }
+            memcpy( out_text, bptr, blen);
+            out_text[blen] = '\0';
+            fprintf( ofile, "\"%s\": %s", out_token, out_text);
+            hptr += hlen;
+            bptr += blen;
+            }
+         fprintf( ofile, " }");
+         line_no++;
+         }
+   if( line_no)
+      fprintf( ofile, "\n");
+   return( line_no);
+}
+
 double ephemeris_mag_limit = 22.;
 
 int ephemeris_in_a_file( const char *filename, const double *orbit,
@@ -1256,7 +1321,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
           planet_radius_in_meters( planet_no) / AU_IN_METERS;
    const bool fake_astrometry = ((options & 7) == OPTION_FAKE_ASTROMETRY);
    const int added_ra_dec_precision = atoi( get_environment_ptr( "ADDED_RA_DEC_PRECISION"));
-   char buff[440];
+   char buff[440], *header = NULL;
 
    step = get_step_size( stepsize, &step_units, &n_step_digits);
    if( !step)
@@ -1399,7 +1464,13 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
          snprintf_append( buff, sizeof( buff), "  svel ");
       if( show_uncertainties)
          snprintf_append( buff, sizeof( buff), " \"-sig-PA");
-      if( !computer_friendly)
+      if( computer_friendly)
+         {
+         header = (char *)malloc( 1024);
+         assert( header);
+         strcpy( header, buff);
+         }
+      else
          {
          if( show_radar_data)
             {
@@ -2070,6 +2141,28 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       fprintf( ofile, "No ephemeris output.  Object was too faint,  or in daylight,\n"
                    "or below horizon for the specified times.  Check ephem options.\n");
    fclose( ofile);
+   if( header)
+      {
+      FILE *ifile = fopen_ext( filename, is_default_ephem ? "tfcr" : "fr");
+
+      strcpy( buff, filename);
+      text_search_and_replace( buff, ".txt", ".json");
+      ofile = fopen_ext( buff, is_default_ephem ? "tfcw" : "fw");
+      fprintf( ofile, "{\n  \"ephemeris\":\n  {\n");
+      fprintf( ofile, "    \"obscode\": \"%.3s\",\n", note_text + 1);
+      fprintf( ofile, "    \"count\": %d,\n", n_lines_shown);
+      fprintf( ofile, "    \"start\": %f,\n", jd_start);
+      fprintf( ofile, "    \"step\": %.9f,\n", step);
+      fprintf( ofile, "    \"start iso\": \"%s\",\n", iso_time( buff, jd_start));
+      fprintf( ofile, "    \"entries\":\n");
+      fprintf( ofile, "    {\n");
+      create_json_ephemeris( ofile, ifile, header);
+      fprintf( ofile, "    }\n");
+      free( header);
+      fclose( ifile);
+      fprintf( ofile, "  }\n}\n");
+      fclose( ofile);
+      }
    return( 0);
 }
 
