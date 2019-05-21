@@ -82,7 +82,7 @@ static int elements_in_guide_format( char *buff, const ELEMENTS *elem,
                      const unsigned n_obs);                /* orb_func.c */
 static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
                      const char *obj_name, const OBSERVE *obs,
-                     const unsigned n_obs);                /* orb_func.c */
+                     const unsigned n_obs, const double *moids);
 int find_worst_observation( const OBSERVE FAR *obs, const int n_obs);
 double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit);
 int set_locs( const double *orbit, double t0, OBSERVE FAR *obs, int n_obs);
@@ -538,14 +538,12 @@ static char *object_name( char *buff, const int obj_index)
 
 static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
                      const char *obj_name, const OBSERVE *obs,
-                     const unsigned n_obs)
+                     const unsigned n_obs, const double *moids)
 {
    double jd = current_jd( );
    double jd_first, jd_last;
    char buff[180];
    int first, last, i, n_used;
-   extern const char *elements_filename;
-   FILE *ifile = fopen_ext( get_file_name( buff, elements_filename), "tfcrb");
 
    fprintf( ofile, "{\n  \"object\": \"%s\",\n", obj_name);
    fprintf( ofile, "  \"created\": %.5f,\n", jd);
@@ -606,27 +604,17 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
          fprintf( ofile, " \"H sigma\": %s,", buff);
       }
 
-   if( ifile)
+/* if( moids[1])        */
       {
-      int moid_no = 1;
       char tbuff[80];
 
-      while( fgets( buff, sizeof( buff), ifile))
-         if( !memcmp( buff, "# MOIDs:", 8))
-            {
-            if( moid_no == 1)
-               {
-               fprintf( ofile, "\n   \"MOIDs\":");
-               fprintf( ofile, "\n   {");
-               }
-            for( i = 0; i < 4; i++, moid_no++)
-               fprintf( ofile, "\n      \"%s\" : %.9s%c",
-                     object_name( tbuff, moid_no), buff + i * 13 + 12,
-                     (moid_no == 8) ? ' ' : ',');
-            }
-      fclose( ifile);
-      if( moid_no > 1)
-         fprintf( ofile, "\n    }");
+      fprintf( ofile, "\n    \"MOIDs\":");
+      fprintf( ofile, "\n    {");
+      for( i = 1; i <= 8; i++)
+         fprintf( ofile, "\n      \"%s\" : %.6f%c",
+                     object_name( tbuff, i), moids[i],
+                     (i == 8) ? ' ' : ',');
+      fprintf( ofile, "\n    }");
       }
 
    fprintf( ofile, "\n  },\n  \"observations\":\n  {");
@@ -1857,7 +1845,7 @@ int write_out_elements_to_file( const double *orbit,
       }
    if( (ofile = fopen_ext( get_file_name( tbuff, "elements.json"), "tfcwb")) != NULL)
       {
-      elements_in_json_format( ofile, &elem, object_name, obs, n_obs);
+      elements_in_json_format( ofile, &elem, object_name, obs, n_obs, moids);
       fclose( ofile);
       }
    free( tbuff);
