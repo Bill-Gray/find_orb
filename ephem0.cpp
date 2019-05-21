@@ -1272,6 +1272,38 @@ static int create_json_ephemeris( FILE *ofile, FILE *ifile, char *header)
    return( line_no);
 }
 
+static int combine_json_elems_and_ephems( FILE *ephem_file)
+{
+   char buff[1024];
+   FILE *ofile = fopen_ext( get_file_name( buff, "combined.json"), "tfcwb");
+   FILE *elem_file = fopen_ext( get_file_name( buff, "elements.json"), "tfcrb");
+   bool in_observations = false, obs_end_found = false;
+   bool in_ephemerides = false;
+
+   while( !obs_end_found && fgets( buff, sizeof( buff), elem_file))
+      {
+      if( !memcmp( buff, "  \"observations\":", 17))
+         in_observations = true;
+      if( in_observations && !memcmp( buff, "  }", 3))
+         {
+         strcpy( buff, "  },\n");   /* JSON needs comma for 'continuation' */
+         obs_end_found = true;
+         }
+      fwrite( buff, strlen( buff), 1, ofile);
+      }
+   fclose( elem_file);
+   fseek( ephem_file, 0L, SEEK_SET);
+   while( fgets( buff, sizeof( buff), ephem_file))
+      {
+      if( !memcmp( buff, "  \"ephemeris\":", 14))
+         in_ephemerides = true;
+      if( in_ephemerides)
+         fwrite( buff, strlen( buff), 1, ofile);
+      }
+   fclose( ofile);
+   return( 0);
+}
+
 double ephemeris_mag_limit = 22.;
 
 int ephemeris_in_a_file( const char *filename, const double *orbit,
@@ -1390,7 +1422,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    else if( ephem_type != OPTION_CLOSE_APPROACHES)
       {
       char hr_min_text[80], added_prec_text[10];
-      const char *pre_texts[4] = { "", " HH", " HH:MM", " HH:MM:SS" };
+      const char *pre_texts[4] = { "", "-HH", "-HH:MM", "-HH:MM:SS" };
 
       strcpy( hr_min_text, pre_texts[hh_mm]);
       if( added_ra_dec_precision > 0)
@@ -1908,7 +1940,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                }
             if( !obj_n)
                {
-               const bool two_place_mags =
+               const bool two_place_mags = computer_friendly ||
                             (*get_environment_ptr( "MAG_DIGITS") == '2');
                double phase_ang;
                double curr_mag = abs_mag + calc_obs_magnitude(
@@ -1977,7 +2009,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   else
                      snprintf_append( buff, sizeof( buff), " %3d ", (int)( curr_mag + .5));
                   if( phase_ang > PI * 2. / 3.)    /* over 120 degrees */
-                     if( object_type != OBJECT_TYPE_COMET)
+                     if( object_type != OBJECT_TYPE_COMET
+                                 && !computer_friendly)
                         {
                         char *endptr = buff + strlen( buff);
 
@@ -2144,16 +2177,17 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    if( header)
       {
       FILE *ifile = fopen_ext( filename, is_default_ephem ? "tfcr" : "fr");
+      char time_buff[40];
 
       strcpy( buff, filename);
       text_search_and_replace( buff, ".txt", ".json");
-      ofile = fopen_ext( buff, is_default_ephem ? "tfcw" : "fw");
+      ofile = fopen_ext( buff, is_default_ephem ? "tfcw+" : "fw+");
       fprintf( ofile, "{\n  \"ephemeris\":\n  {\n");
       fprintf( ofile, "    \"obscode\": \"%.3s\",\n", note_text + 1);
       fprintf( ofile, "    \"count\": %d,\n", n_lines_shown);
       fprintf( ofile, "    \"start\": %f,\n", jd_start);
       fprintf( ofile, "    \"step\": %.9f,\n", step);
-      fprintf( ofile, "    \"start iso\": \"%s\",\n", iso_time( buff, jd_start));
+      fprintf( ofile, "    \"start iso\": \"%s\",\n", iso_time( time_buff, jd_start));
       fprintf( ofile, "    \"entries\":\n");
       fprintf( ofile, "    {\n");
       create_json_ephemeris( ofile, ifile, header);
@@ -2161,6 +2195,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       free( header);
       fclose( ifile);
       fprintf( ofile, "  }\n}\n");
+      combine_json_elems_and_ephems( ofile);
       fclose( ofile);
       }
    return( 0);
