@@ -1232,6 +1232,7 @@ static int create_json_ephemeris( FILE *ofile, FILE *ifile, char *header)
             {
             int hlen = 0, blen = 0;
             char out_token[20], out_text[20];
+            bool is_text = false;
 
             while( *bptr && *bptr == ' ')
                bptr++;
@@ -1260,6 +1261,14 @@ static int create_json_ephemeris( FILE *ofile, FILE *ifile, char *header)
                }
             memcpy( out_text, bptr, blen);
             out_text[blen] = '\0';
+            if( !strcmp( out_token, "SM"))
+               is_text = true;
+            if( is_text)      /* Text must be enclosed in quotes for JSON */
+               {
+               memmove( out_text + 1, out_text, strlen( out_text) + 1);
+               *out_text = out_text[blen + 1] = '\"';
+               out_text[blen + 2] = '\0';
+               }
             fprintf( ofile, "\"%s\": %s", out_token, out_text);
             hptr += hlen;
             bptr += blen;
@@ -1935,7 +1944,10 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                else
                   tbuff[2] = ' ';         /* moon's down */
                tbuff[3] = '\0';
-               snprintf_append( buff, sizeof( buff), "$%06lx", rgb);
+               if( !computer_friendly)
+                  snprintf_append( buff, sizeof( buff), "$%06lx", rgb);
+               else if( tbuff[1] == ' ' && tbuff[2] == ' ')
+                  tbuff[1] = '-';
                strcat( buff, tbuff);
                }
             if( !obj_n)
