@@ -127,6 +127,7 @@ void get_find_orb_text_filename( char *filename);     /* elem_out.cpp */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 static int names_compare( const char *name1, const char *name2);
 static int get_uncertainty( const char *key, char *obuff, const bool in_km);
+char *iso_time( char *buff, const double jd);         /* elem_out.cpp */
 
 extern int debug_level;
 double asteroid_magnitude_slope_param = .15;
@@ -512,7 +513,7 @@ static int elements_in_mpcorb_format( char *buff, const char *packed_desig,
    return( 0);
 }
 
-static char *iso_time( char *buff, const double jd)
+char *iso_time( char *buff, const double jd)
 {
    full_ctime( buff, jd, CALENDAR_JULIAN_GREGORIAN
                 | FULL_CTIME_YMD | FULL_CTIME_MONTHS_AS_DIGITS
