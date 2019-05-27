@@ -578,6 +578,14 @@ int main( int argc, const char **argv)
             case 'v':
                use_colors = false;
                break;
+            case 'x':
+               {
+               extern const char *alt_config_directory;
+
+               use_config_directory = true;
+               alt_config_directory = arg;
+               }
+               break;
             case 'z':
                use_config_directory = true;
                break;
