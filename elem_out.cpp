@@ -545,61 +545,66 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
    char buff[180];
    int first, last, i, n_used;
 
-   fprintf( ofile, "{\n  \"object\": \"%s\",\n", obj_name);
-   fprintf( ofile, "  \"created\": %.5f,\n", jd);
-   fprintf( ofile, "  \"created iso\": \"%s\",\n", iso_time( buff, jd));
-   fprintf( ofile, "  \"elements\":\n  {\n");
-   fprintf( ofile, "    \"central body\": \"%s\",\n", object_name( buff, elem->central_obj));
-   fprintf( ofile, "    \"epoch\": %17.8f,", elem->epoch);
+   fprintf( ofile, "{\n  \"num\": 1,\n");
+   fprintf( ofile, "  \"ids\":\n  [\n    \"%s\"\n", obj_name);
+   fprintf( ofile, "  ],\n");
+   fprintf( ofile, "  \"objects\":\n  {\n");
+   fprintf( ofile, "    \"%s\":\n", obj_name);
+   fprintf( ofile, "    {\n    \"object\": \"%s\",\n", obj_name);
+   fprintf( ofile, "      \"created\": %.5f,\n", jd);
+   fprintf( ofile, "      \"created iso\": \"%s\",\n", iso_time( buff, jd));
+   fprintf( ofile, "      \"elements\":\n      {\n");
+   fprintf( ofile, "        \"central body\": \"%s\",\n", object_name( buff, elem->central_obj));
+   fprintf( ofile, "        \"epoch\": %17.8f,", elem->epoch);
    if( elem->ecc < 1.)
       {
-      fprintf( ofile, "\n    \"M\": %12.8f,", elem->mean_anomaly * 180. / PI);
+      fprintf( ofile, "\n        \"M\": %12.8f,", elem->mean_anomaly * 180. / PI);
       if( !get_uncertainty( "sigma_M", buff, 0))
          fprintf( ofile, " \"M sigma\": %s,", buff);
       }
 
-   fprintf( ofile, "\n    \"n\": %12.8f,", (180 / PI) / elem->t0);
+   fprintf( ofile, "\n        \"n\": %12.8f,", (180 / PI) / elem->t0);
    if( !get_uncertainty( "sigma_n:", buff, 0))
       fprintf( ofile, " \"n sigma\": %s,", buff);
 
-   fprintf( ofile, "\n    \"a\": %12.8f,", elem->major_axis);
+   fprintf( ofile, "\n        \"a\": %12.8f,", elem->major_axis);
    if( !get_uncertainty( "sigma_a:", buff, 0))
       fprintf( ofile, " \"a sigma\": %s,", buff);
 
-   fprintf( ofile, "\n    \"e\": %12.8f,", elem->ecc);
+   fprintf( ofile, "\n        \"e\": %12.8f,", elem->ecc);
    if( !get_uncertainty( "sigma_e", buff, 0))
       fprintf( ofile, " \"e sigma\": %s,", buff);
 
-   fprintf( ofile, "\n    \"q\": %12.8f,", elem->q);
+   fprintf( ofile, "\n        \"q\": %12.8f,", elem->q);
    if( !get_uncertainty( "sigma_q", buff, 0))
       fprintf( ofile, " \"q sigma\": %s,", buff);
    if( elem->ecc < 1.)
       {
       const double big_q = elem->q * (1. + elem->ecc) / (1. - elem->ecc);
 
-      fprintf( ofile, "\n    \"Q\": %12.8f,", big_q);
+      fprintf( ofile, "\n        \"Q\": %12.8f,", big_q);
       if( !get_uncertainty( "sigma_Q", buff, 0))
          fprintf( ofile, " \"Q sigma\": %s,", buff);
       }
 
-   fprintf( ofile, "\n    \"i\": %12.8f,", elem->incl * 180. / PI);
+   fprintf( ofile, "\n        \"i\": %12.8f,", elem->incl * 180. / PI);
    if( !get_uncertainty( "sigma_i", buff, 0))
       fprintf( ofile, " \"i sigma\": %s,", buff);
 
-   fprintf( ofile, "\n    \"arg_per\":  %12.8f,", elem->arg_per * 180. / PI);
+   fprintf( ofile, "\n        \"arg_per\":  %12.8f,", elem->arg_per * 180. / PI);
    if( !get_uncertainty( "sigma_omega", buff, 0))
       fprintf( ofile, " \"arg_per sigma\":  %s,", buff);
 
-   fprintf( ofile, "\n    \"asc_node\": %12.8f,", elem->asc_node * 180. / PI);
+   fprintf( ofile, "\n        \"asc_node\": %12.8f,", elem->asc_node * 180. / PI);
    if( !get_uncertainty( "sigma_Omega", buff, 0))
       fprintf( ofile, " \"asc_node sigma\": %s,", buff);
 
-   fprintf( ofile, "\n    \"Tp\": %16.8f,", elem->perih_time);
+   fprintf( ofile, "\n        \"Tp\": %16.8f,", elem->perih_time);
    if( !get_uncertainty( "sigma_Tp", buff, 0))
       fprintf( ofile, " \"Tp sigma\": %s,", buff);
    if( elem->abs_mag)
       {
-      fprintf( ofile, "\n    \"H\": %6.2f,", elem->slope_param);
+      fprintf( ofile, "\n        \"H\": %6.2f,", elem->slope_param);
       if( !get_uncertainty( "sigma_H:", buff, 0))
          fprintf( ofile, " \"H sigma\": %s,", buff);
       }
@@ -608,45 +613,45 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
       {
       char tbuff[80];
 
-      fprintf( ofile, "\n    \"MOIDs\":");
-      fprintf( ofile, "\n    {");
+      fprintf( ofile, "\n        \"MOIDs\":");
+      fprintf( ofile, "\n        {");
       for( i = 1; i <= 8; i++)
-         fprintf( ofile, "\n      \"%s\" : %.6f%c",
+         fprintf( ofile, "\n          \"%s\" : %.6f%c",
                      object_name( tbuff, i), moids[i],
                      (i == 8) ? ' ' : ',');
-      fprintf( ofile, "\n    }");
+      fprintf( ofile, "\n        }");
       }
 
-   fprintf( ofile, "\n  },\n  \"observations\":\n  {");
+   fprintf( ofile, "\n      },\n      \"observations\":\n      {");
    get_first_and_last_included_obs( obs, n_obs, &first, &last);
    for( i = n_used = 0; i < (int)n_obs; i++)
       n_used += (obs[i].is_included & 1);
-   fprintf( ofile, "\n    \"count\": %u,", n_obs);
-   fprintf( ofile, "\n    \"used\": %u,", n_used);
+   fprintf( ofile, "\n        \"count\": %u,", n_obs);
+   fprintf( ofile, "\n        \"used\": %u,", n_used);
    jd_first = obs[first].jd - td_minus_utc( obs[first].jd) / seconds_per_day;
    jd_last  = obs[last].jd - td_minus_utc( obs[last].jd) / seconds_per_day;
-   fprintf( ofile, "\n    \"earliest\": %16.8f,", jd_first);
-   fprintf( ofile, "\n    \"latest\": %16.8f,", jd_last);
-   fprintf( ofile, "\n    \"earliest iso\": \"%s\",", iso_time( buff, jd_first));
-   fprintf( ofile, "\n    \"latest iso\": \"%s\",", iso_time( buff, jd_last));
-   fprintf( ofile, "\n    \"residuals\":\n    [");
+   fprintf( ofile, "\n        \"earliest\": %16.8f,", jd_first);
+   fprintf( ofile, "\n        \"latest\": %16.8f,", jd_last);
+   fprintf( ofile, "\n        \"earliest iso\": \"%s\",", iso_time( buff, jd_first));
+   fprintf( ofile, "\n        \"latest iso\": \"%s\",", iso_time( buff, jd_last));
+   fprintf( ofile, "\n        \"residuals\":\n        [");
    for( i = 0; i < (int)n_obs; i++)
       {
       MOTION_DETAILS m;
 
       jd = obs[i].jd - td_minus_utc( obs[i].jd) / seconds_per_day;
       compute_observation_motion_details( obs + i, &m);
-      fprintf( ofile, "\n      {\"JD\": %.6f, \"iso date\": \"%s\", \"obscode\": \"%s\",",
+      fprintf( ofile, "\n          {\"JD\": %.6f, \"iso date\": \"%s\", \"obscode\": \"%s\",",
                   jd, iso_time( buff, jd), obs[i].mpc_code);
-      fprintf( ofile, "\n             \"dRA\" : %.3f, \"dDec\": %.3f, \"dTime\": %.3f, \"cross\": %.3f,",
+      fprintf( ofile, "\n                 \"dRA\" : %.3f, \"dDec\": %.3f, \"dTime\": %.3f, \"cross\": %.3f,",
          m.xresid, m.yresid, m.time_residual, m.cross_residual);
-      fprintf( ofile, "\n             \"incl\" : %d", obs[i].is_included);
+      fprintf( ofile, "\n                 \"incl\" : %d", obs[i].is_included);
       if( obs[i].obs_mag != BLANK_MAG)
          fprintf( ofile, ", \"dMag\" : %.2f", obs[i].obs_mag - obs[i].computed_mag);
       fprintf( ofile, " }%c", (i == (int)n_obs - 1 ? ' ' : ','));
       }
-   fprintf( ofile, "\n    ]\n  }");
-   fprintf( ofile, "\n}\n");
+   fprintf( ofile, "\n        ]\n      }");
+   fprintf( ofile, "\n    }\n  }\n}\n");
    return( 0);
 }
 

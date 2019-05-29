@@ -1291,11 +1291,11 @@ static int combine_json_elems_and_ephems( FILE *ephem_file)
 
    while( !obs_end_found && fgets( buff, sizeof( buff), elem_file))
       {
-      if( !memcmp( buff, "  \"observations\":", 17))
+      if( !memcmp( buff, "      \"observations\":", 17))
          in_observations = true;
-      if( in_observations && !memcmp( buff, "  }", 3))
+      if( in_observations && !memcmp( buff, "      }", 7))
          {
-         strcpy( buff, "  },\n");   /* JSON needs comma for 'continuation' */
+         strcpy( buff, "      },\n");   /* JSON needs comma for 'continuation' */
          obs_end_found = true;
          }
       fwrite( buff, strlen( buff), 1, ofile);
@@ -1307,7 +1307,10 @@ static int combine_json_elems_and_ephems( FILE *ephem_file)
       if( !memcmp( buff, "  \"ephemeris\":", 14))
          in_ephemerides = true;
       if( in_ephemerides)
+         {
+         fprintf( ofile, "    ");
          fwrite( buff, strlen( buff), 1, ofile);
+         }
       }
    fclose( ofile);
    return( 0);
