@@ -394,12 +394,12 @@ static int create_combined_json_header( const OBJECT_INFO *ids,
    return( 0);
 }
 
-static int add_json_data( const char *ofilename,
+static int add_json_data( const char *ofilename, const char *append_filename,
             const bool is_last_call)
 {
    char buff[200];
    FILE *ofile = fopen_ext( get_file_name( buff, ofilename), "tfcab");
-   FILE *ifile = fopen_ext( get_file_name( buff, "combined.json"), "tfcrb");
+   FILE *ifile = fopen_ext( get_file_name( buff, append_filename), "tfcrb");
    bool found_start = false, found_end = false;
 
    while( !found_start && fgets_trimmed( buff, sizeof( buff), ifile))
@@ -907,7 +907,9 @@ int main( int argc, const char **argv)
             else
                printf( "; not enough observations\n");
             unload_observations( obs, n_obs_actually_loaded);
-            add_json_data( "total.json", i == starting_object + total_objects - 1);
+            add_json_data( "total.json",
+                     (mpec_path || !is_default_ephem) ? "combined.json" : "elements.json",
+                     i == starting_object + total_objects - 1);
             }
          object_comment_text( tbuff, ids + i);
                   /* Abbreviate 'observations:' to 'obs:' */
