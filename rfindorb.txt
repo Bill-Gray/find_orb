@@ -24,7 +24,7 @@
 99129   Sa&ve Элементы
 99136   &Auto-Solve
 99137   Save &Residuals...
-99138   &Ephemeris...
+99138   &Эфемериды...
 99142   &Open...
 99148   About...
 99149   R2:
@@ -55,7 +55,7 @@
 98179   Version
 
 # ephem
-97000   Make Ephemeris
+97000   Make Эфемериды
 97001   &Done
 97129   &Save
 97147   &Go
