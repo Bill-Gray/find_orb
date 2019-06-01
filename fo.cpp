@@ -376,6 +376,52 @@ static void colorize_text( char *text)
       add_vt100_colors( tptr, 10, VT100_RED);
 }
 
+static int create_combined_json_header( const OBJECT_INFO *ids,
+         const unsigned n_objs, const char *ofilename)
+{
+   char buff[200];
+   FILE *ofile = fopen_ext( get_file_name( buff, ofilename), "tfcwb");
+   unsigned i;
+
+   fprintf( ofile, "{\n  \"num\": %u,\n", n_objs);
+   fprintf( ofile, "  \"ids\":\n  [\n");
+   for( i = 0; i < n_objs; i++)
+      fprintf( ofile, "    \"%s\"%c\n", ids[i].obj_name,
+               (i == n_objs - 1 ? ' ' : ','));
+   fprintf( ofile, "  ],\n");
+   fprintf( ofile, "  \"objects\":\n  {\n");
+   fclose( ofile);
+   return( 0);
+}
+
+static int add_json_data( const char *ofilename,
+            const bool is_last_call)
+{
+   char buff[200];
+   FILE *ofile = fopen_ext( get_file_name( buff, ofilename), "tfcab");
+   FILE *ifile = fopen_ext( get_file_name( buff, "combined.json"), "tfcrb");
+   bool found_start = false, found_end = false;
+
+   while( !found_start && fgets_trimmed( buff, sizeof( buff), ifile))
+      if( !strcmp( buff, "  {"))
+         found_start = true;
+   assert( found_start);
+
+   while( !found_end && fgets_trimmed( buff, sizeof( buff), ifile))
+      {
+      if( !strcmp( buff, "    }") && !is_last_call)
+         {
+         strcat( buff, ",");
+         found_end = true;
+         }
+      fprintf( ofile, "%s\n", buff);
+      }
+   fclose( ifile);
+   fclose( ofile);
+   return( 0);
+}
+
+
 /* I really should use getopt() or a portable variant.  However,  this has
 been sufficiently effective thus far... */
 
@@ -650,6 +696,7 @@ int main( int argc, const char **argv)
    if( !total_objects)
       total_objects = n_ids;
 
+   create_combined_json_header( ids, total_objects, "total.json");
    t0 = update_time = time( NULL);
 #ifdef FORKING
    while( process_count < n_processes - 1)
@@ -860,6 +907,7 @@ int main( int argc, const char **argv)
             else
                printf( "; not enough observations\n");
             unload_observations( obs, n_obs_actually_loaded);
+            add_json_data( "total.json", i == starting_object + total_objects - 1);
             }
          object_comment_text( tbuff, ids + i);
                   /* Abbreviate 'observations:' to 'obs:' */
