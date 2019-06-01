@@ -333,6 +333,9 @@ ESO ! -704354.1      -291539.5      2400       ESO 3.6-m, La Silla
    above sea level.  The geoid height is 33.91 meters for UT1 (using
    EGM96),  resulting in an ellipsoidal height of 2369.34 meters.
    I'll go with that until we get better data...
+   Incidentally,  there are actually four 1.8-m auxiliary telescopes.
+   But they can be moved to any of the thirty locations CPA0 to CPM0
+   given below.
 
 UT1 ! -702418.27     -243739.44     2369.34    VLT UT1 (Antu)
 UT2 ! -702417.39     -243737.80     2369.34    VLT UT2 (Kueyen)
