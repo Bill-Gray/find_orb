@@ -1312,6 +1312,7 @@ static int combine_json_elems_and_ephems( FILE *ephem_file)
          fwrite( buff, strlen( buff), 1, ofile);
          }
       }
+   fprintf( ofile, "  }\n}");
    fclose( ofile);
    return( 0);
 }
@@ -3490,8 +3491,6 @@ static inline void redacted_locations( const char *terms[],
             success = false;        /* runs into next word */
          }
       }
-   debug_printf( "%u lines; %u iterations\n",
-                  n_redacted_lines, iteration);
    if( !success)        /* can't place the text;  just omit it */
       for( i = 0; i < n_terms; i++)
          y[i] = -9;
