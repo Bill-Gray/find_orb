@@ -430,6 +430,21 @@ static inline double comet_g_func( const double r)
       return( 1. / (r * r));
 }
 
+#ifdef NOT_CURRENTLY_USED_ALT_G_FUNCTION
+
+/* I gather JPL is now using this comet g function,  but don't know
+any details as yet.  Just putting it here for future use and as
+an aide memoire.       */
+
+static inline double new_comet_g_func( const double r)
+{
+   const double r_squared = r * r;
+   const double tval = 1. + r * r_squared / 125.;
+
+   return( 25. * 0.04084 * exp( -2.6 * log( tval)) / r_squared);
+}
+#endif            /* NOT_CURRENTLY_USED_ALT_G_FUNCTION */
+
 /* I wrote a little code to dump the following constants from DE-432.
 They were given in AU^3/day^2;  from that,  I got the following,  using
 the first column to fill most of the 'planet_mass' array.  Note that for
