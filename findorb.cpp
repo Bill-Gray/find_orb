@@ -1504,7 +1504,7 @@ static void show_right_hand_scroll_bar( const int line_start,
       }
 }
 
-int show_station_info( const OBSERVE FAR *obs, const int n_obs,
+static int show_station_info( const OBSERVE FAR *obs, const int n_obs,
               const int top_line_residual_area,
               const int curr_obs,
               const int list_codes)
@@ -1517,17 +1517,18 @@ int show_station_info( const OBSERVE FAR *obs, const int n_obs,
 
    if( n_obs_shown < 0)
       return( 0);
-                  /* set 'scores' for each code to equal # of times */
-                  /* that code was used: */
-   for( i = 0; i < n_mpc_codes; i++)
-      mpc_color_codes[i].score = 0;
-   for( i = 0; i < n_obs; i++)
-      add_to_mpc_color( obs[i].mpc_code, 1);
-
    if( n_stations_shown > n_mpc_codes)
       n_stations_shown = n_mpc_codes;
    if( list_codes == SHOW_MPC_CODES_ONLY_ONE || n_stations_shown < 1)
       n_stations_shown = 1;
+   if( !obs)                     /* just getting a count of # stns shown */
+      return( n_stations_shown);
+
+                  /* set 'scores' for each code to equal # of times */
+                  /* that code was used: */
+   for( i = 0; i < n_obs; i++)
+      add_to_mpc_color( obs[i].mpc_code, 1);
+
    sort_mpc_codes( n_mpc_codes, SORT_BY_SCORE);
                 /* ...then sort the ones we're going to display by name: */
    sort_mpc_codes( n_stations_shown, SORT_BY_NAME);
@@ -1561,7 +1562,7 @@ static void show_one_observation( OBSERVE obs, const int line,
    const int time_prec = obs.time_precision;
 
    put_colored_text( "", line, 0, -1, COLOR_BACKGROUND);
-   add_to_mpc_color( obs.mpc_code, 10);
+   add_to_mpc_color( obs.mpc_code, 1000);
    format_observation( &obs, buff,
                         (residual_format & ~(3 | RESIDUAL_FORMAT_HMS))
                         | RESIDUAL_FORMAT_FOUR_DIGIT_YEARS);
@@ -2806,9 +2807,10 @@ int main( int argc, const char **argv)
       top_line_residuals = line_no;
       if( c != KEY_TIMER)
          {
+         const int n_mpc_codes = find_mpc_color( mpc_color_codes, NULL);
          int lines_available;
 
-         n_stations_shown = show_station_info( obs, n_obs,
+         n_stations_shown = show_station_info( NULL, n_obs,
                      line_no, curr_obs, list_codes);
 
          lines_available = getmaxy( stdscr) - n_stations_shown - line_no;
@@ -2825,8 +2827,13 @@ int main( int argc, const char **argv)
             top_obs_shown = n_obs - lines_available;
          if( top_obs_shown < 0)
             top_obs_shown = 0;
+         for( i = 0; i < n_mpc_codes; i++)
+            mpc_color_codes[i].score = 0;
          show_observations( obs + top_obs_shown, top_line_residuals,
                                  residual_format, n_obs_shown);
+         show_station_info( obs, n_obs,
+                     line_no, curr_obs, list_codes);
+
          show_right_hand_scroll_bar( line_no,
                             n_obs_shown, top_obs_shown, n_obs);
             /* At present,  any unused space between the observation data and
