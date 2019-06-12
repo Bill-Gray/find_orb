@@ -402,6 +402,8 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
       else
          col++;
       }
+   assert( n_lines > 0 && n_lines < 400);
+   assert( real_width > 0 && real_width < 400);
    tbuff[real_width] = '\0';
          /* Store rectangle behind the 'inquiry box': */
    buffered_screen = (chtype *)calloc( n_lines * real_width,
