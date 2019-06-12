@@ -2291,7 +2291,7 @@ int sanity_test_observations( const char *filename);
 int main( int argc, const char **argv)
 {
    char obj_name[80], tbuff[500], orbit_constraints[90];
-   char ifilename[256];;
+   char ifilename[256];
    unsigned n_command_lines = 4;
    int c = 1, element_precision, get_new_object = 1, add_off_on = -1;
    unsigned top_line_basic_info_perturbers;
@@ -2511,7 +2511,7 @@ int main( int argc, const char **argv)
       {
       const char *temp_clipboard_filename = "/tmp/obs_temp.txt";
 
-      clipboard_to_file( temp_clipboard_filename, argv[1][1] == '+');
+      clipboard_to_file( temp_clipboard_filename, ifilename[1] == '+');
       strcpy( ifilename, temp_clipboard_filename);
       }
 
