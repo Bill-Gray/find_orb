@@ -81,7 +81,8 @@ int debug_printf( const char *format, ...)                 /* runge.cpp */
          __attribute__ (( format( printf, 1, 2)))
 #endif
 ;
-char **load_file_into_memory( const char *filename, size_t *n_lines);
+char **load_file_into_memory( const char *filename, size_t *n_lines,
+                        const bool fail_if_not_found);      /* mpc_obs.cpp */
 int compare_observations( const void *a, const void *b, void *context);
 void shellsort_r( void *base, const size_t n_elements, const size_t esize,
          int (*compare)(const void *, const void *, void *), void *context);
@@ -1107,9 +1108,11 @@ static int unpack_provisional_packed_desig( char *obuff, const char *ibuff)
    return( rval);
 }
 
-char **load_file_into_memory( const char *filename, size_t *n_lines)
+char **load_file_into_memory( const char *filename, size_t *n_lines,
+                        const bool fail_if_not_found)
 {
-   FILE *ifile = fopen_ext( filename, "crb");
+   FILE *ifile = fopen_ext( filename, (fail_if_not_found ? "fcrb" : "crb"));
+
    char **rval = NULL;
 
    if( ifile)
@@ -1263,7 +1266,7 @@ int get_object_name( char *obuff, const char *packed_desig)
       {
       int sort_column = 0;
 
-      extra_names = load_file_into_memory( "odd_name.txt", &n_lines);
+      extra_names = load_file_into_memory( "odd_name.txt", &n_lines, true);
       shellsort_r( extra_names, n_lines, sizeof( char *),
                      string_compare_for_sort, &sort_column);
       }
@@ -4124,10 +4127,9 @@ const char *get_environment_ptr( const char *env_ptr)
       {
       int sort_column = 0;
 
-      edata = load_file_into_memory( environ_dot_dat, NULL);
+      edata = load_file_into_memory( environ_dot_dat, NULL, false);
       if( !edata)       /* fall back on a default version: */
-         edata = load_file_into_memory( "environ.def", NULL);
-      assert( edata);
+         edata = load_file_into_memory( "environ.def", NULL, true);
                   /* remove blank/commented-out lines : */
       for( i = n_lines = 0; edata[i]; i++)
          if( edata[i][0] > ' ' && edata[i][0] != '#')
@@ -4156,7 +4158,7 @@ const char *get_environment_ptr( const char *env_ptr)
 void set_environment_ptr( const char *env_ptr, const char *new_value)
 {
    size_t i;
-   char **text = load_file_into_memory( environ_dot_dat, NULL);
+   char **text = load_file_into_memory( environ_dot_dat, NULL, false);
    FILE *ofile;
    bool found_it = false;
    const size_t env_ptr_len = strlen( env_ptr);
@@ -4164,8 +4166,7 @@ void set_environment_ptr( const char *env_ptr, const char *new_value)
    assert( env_ptr);
    assert( new_value);
    if( !text)
-      text = load_file_into_memory( "environ.def", NULL);
-   assert( text);
+      text = load_file_into_memory( "environ.def", NULL, true);
    ofile = fopen_ext( environ_dot_dat, "fcwb");
    assert( ofile);
    for( i = 0; text[i]; i++)

@@ -120,7 +120,8 @@ double evaluate_initial_orbit( const OBSERVE FAR *obs,      /* orb_func.c */
                               const int n_obs, const double *orbit);
 double diameter_from_abs_mag( const double abs_mag,      /* ephem0.cpp */
                                      const double optical_albedo);
-char **load_file_into_memory( const char *filename, size_t *n_lines);
+char **load_file_into_memory( const char *filename, size_t *n_lines,
+                        const bool fail_if_not_found);      /* mpc_obs.cpp */
 const char *get_find_orb_text( const int index);      /* elem_out.cpp */
 int set_language( const int language);                      /* elem_out.cpp */
 void get_find_orb_text_filename( char *filename);     /* elem_out.cpp */
@@ -324,16 +325,14 @@ const char *get_find_orb_text( const int index)
       {
       if( text)          /* 'text' = pointer to strings for current language */
          free( text);
-      text = load_file_into_memory( filename, NULL);
-      assert( text);
+      text = load_file_into_memory( filename, NULL, true);
       collapse_findorb_txt( text);
       currently_loaded_language = findorb_language;
       }
    if( !default_text)     /* 'default_text' = strings for English,  and as */
       {                   /* a backstop when something isn't translated    */
       *filename = 'e';
-      default_text = load_file_into_memory( filename, NULL);
-      assert( default_text);
+      default_text = load_file_into_memory( filename, NULL, true);
       collapse_findorb_txt( default_text);
       }
    if( text)         /* try non-default language first... */
@@ -1888,7 +1887,7 @@ instead of in its default semi-random order,  we can do a binary search.
 void set_solutions_found( OBJECT_INFO *ids, const int n_ids)
 {
    size_t n_lines;
-   char **ilines = load_file_into_memory( vector_data_file, &n_lines);
+   char **ilines = load_file_into_memory( vector_data_file, &n_lines, false);
    int i;
 
    for( i = 0; i < n_ids; i++)
