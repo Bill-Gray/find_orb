@@ -4881,27 +4881,28 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff)
          dist *= 180. / PI;      /* cvt radians to degrees */
          delta_time = optr2->jd - optr1->jd;
 
-         snprintf_append( buff, MAX_INFO_LEN,
+         snprintf( buff + strlen( buff), MAX_INFO_LEN,
                    "Observations are %.2f\" = %.2f' = %.3f degrees apart\n",
                    dist * 3600., dist * 60., dist);
          if( fabs( delta_time) < 1.)
-            snprintf_append( buff, MAX_INFO_LEN,
+            snprintf( buff + strlen( buff), MAX_INFO_LEN,
                      "Time diff: %.2f sec = %.2f min = %.3f hrs\n",
                      delta_time * seconds_per_day,
                      delta_time * minutes_per_day,
                      delta_time * hours_per_day);
          else
-            snprintf_append( buff, MAX_INFO_LEN,
+            snprintf( buff + strlen(buff), MAX_INFO_LEN,
                      "Time diff: %.1f hrs = %.2f days\n",
                      delta_time * 24., delta_time);
          dist /= delta_time;     /* get motion in degrees/day */
          dist *= 60. / 24.;      /* then convert to '/hr */
                            /* Dunno how the PA got flipped,  but it did: */
          posn_ang = 2. * PI - posn_ang;
-         snprintf_append( buff, MAX_INFO_LEN,
+         snprintf( buff + strlen(buff), MAX_INFO_LEN,
                   "Motion: %.2f'/hr in RA, %.2f'/hr in dec",
                   dist * sin( posn_ang), dist * cos( posn_ang));
-         snprintf_append( buff, MAX_INFO_LEN, " (total %.2f'/hr at PA %.1f)\n",
+         snprintf( buff + strlen( buff), MAX_INFO_LEN,
+                  " (total %.2f'/hr at PA %.1f)\n",
                   dist, posn_ang * 180. / PI);
          n_lines += 3;
          }
