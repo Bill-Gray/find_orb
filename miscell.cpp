@@ -314,7 +314,8 @@ int reset_astrometry_filename( int *argc, const char **argv)
 {
    int rval = 0;
 
-   if( argv[1][0] == '-' && (argv[1][1] == 'o' || argv[1][1] == 'f'))
+   if( *argc > 1 && argv[1][0] == '-'
+                    && (argv[1][1] == 'o' || argv[1][1] == 'f'))
       {
       const char *filename = "/tmp/temp_obs.txt";
       char obj_name[50];

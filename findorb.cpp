@@ -1613,7 +1613,7 @@ static void show_one_observation( OBSERVE obs, const int line,
 static void show_observations( const OBSERVE *obs, int line_no,
                   const int residual_format, int n_obs_shown)
 {
-   while( n_obs_shown)
+   while( n_obs_shown > 0)
       {
       show_one_observation( *obs, line_no, residual_format);
       obs++;
@@ -2248,6 +2248,67 @@ static inline int initialize_curses( const int argc, const char **argv)
    return( 0);
 }
 
+#ifdef _WIN32
+static int user_select_file( char *filename, const char *title, const int flags)
+{
+   const bool is_save_dlg = (flags & 1);
+   OPENFILENAME ofns;
+
+   memset( &ofns, 0, sizeof( ofns));
+   ofns.lStructSize = sizeof( ofns );
+   ofns.lpstrFile = filename;
+   ofns.nMaxFile = 256;
+   ofns.lpstrTitle = title;
+   ofns.Flags =  OFN_EXPLORER | OFN_HIDEREADONLY;
+   if( is_save_dlg)
+      GetSaveFileName( &ofns );
+   else
+      GetOpenFileName( &ofns );
+   return 0;
+}
+#else
+
+/* In non-Windows situations,  file selection is delegated to the 'zenity'
+program. If that's unavailable,  we try 'yad' (fork of zenity with
+essentially the same options).  If those fail,  we go to the "traditional"
+curses 'dialog' program.  */
+
+static int try_a_file_dialog_program( char *filename, const char *command)
+{
+   FILE *f = popen( command, "r");
+
+   assert( f);
+   if( !fgets_trimmed( filename, 256, f))
+      *filename = '\0';
+   return( (pclose( f) & 0x4000) ? -1 : 0);
+}
+
+static int user_select_file( char *filename, const char *title, const int flags)
+{
+   const bool is_save_dlg = (flags & 1);
+   char cmd[256];
+
+   strcpy( cmd, "zenity --file-selection");
+   if( is_save_dlg)
+      strcat( cmd, " --save --confirm-overwrite");
+   snprintf_append( cmd, sizeof( cmd), " --title \"%s\"", title);
+   strcat( cmd, " 2>/dev/null");
+   if( !try_a_file_dialog_program( filename, cmd))
+      return( 0);
+
+   memcpy( cmd, "yad   ", 6);
+   if( !try_a_file_dialog_program( filename, cmd))
+      return( 0);
+
+   snprintf( cmd, sizeof( cmd),
+           "dialog --stdout --title \"%s\" --fselect ~ 0 0", title);
+   if( !try_a_file_dialog_program( filename, cmd))
+      return( 0);
+   assert( 1);
+   return( -1);
+}
+#endif
+
 extern const char *elements_filename;
 
 #define DISPLAY_BASIC_INFO           1
@@ -2500,6 +2561,9 @@ int main( int argc, const char **argv)
 
    if( debug_level)
       debug_printf( "%d sigma recs read\n", i);
+
+   if( !*ifilename)
+      user_select_file( ifilename, "Open astrometry file", 0);
 
    if( !*ifilename)
       {
