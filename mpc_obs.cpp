@@ -2895,6 +2895,11 @@ int unload_observations( OBSERVE FAR *obs, const int n_obs)
    return( 0);
 }
 
+inline bool is_satellite_obs( const OBSERVE *obs)
+{
+   return( obs->second_line && obs->second_line[14] == 's');
+}
+
 /* I had ideas of checking for discordant satellite coordinates
 by fitting a quadratic to x, y, and z,  and looking for
 outliers.  But at least thus far,  it looks like a lot of work
@@ -2964,11 +2969,6 @@ static inline void compute_quadratic_fits( double *coeffs, const double *x,
    coeffs[1] = quad;
    coeffs[2] = linear;
    coeffs[3] = constant + y0;
-}
-
-inline bool is_satellite_obs( const OBSERVE *obs)
-{
-   return( obs->second_line && obs->second_line[14] == 's');
 }
 
 static void check_satellite_obs( const OBSERVE *obs, unsigned n_obs)
@@ -3227,6 +3227,45 @@ static inline int extract_ades_sigmas( const char *buff,
    if( rval)
       debug_printf( "Malformed ADES sigma: '%s'\n", buff);
    return( rval);
+}
+
+/* For satellite observations (note2 = 's'),  we get a second line
+giving a position,  but no velocity.  To set that,  we look for
+the nearest observation in time (preceding or following) from
+the same satellite,  and assume linear motion in between. */
+
+static void set_satellite_velocities( OBSERVE FAR *obs, const int n_obs)
+{
+   int i;
+
+   for( i = 0; i < n_obs; i++)
+      if( is_satellite_obs( obs + i))
+         {
+         int a, b, j, k;
+
+         a = i - 1;
+         while( a >= 0 && (obs[i].jd == obs[a].jd
+                        || strcmp( obs[i].mpc_code, obs[a].mpc_code)))
+            a--;
+         b = i + 1;
+         while( b < n_obs && (obs[i].jd == obs[b].jd
+                        || strcmp( obs[i].mpc_code, obs[b].mpc_code)))
+            b++;
+         if( a >= 0 || b < n_obs)
+            {
+            double dt;
+
+            if( a < 0)
+               j = b;
+            else if( b >= n_obs)
+               j = a;
+            else
+               j = ((obs[b].jd - obs[i].jd < obs[i].jd - obs[a].jd) ? b : a);
+            dt = obs[j].jd - obs[i].jd;
+            for( k = 0; k < 3; k++)
+               obs[i].obs_vel[k] = (obs[j].obs_posn[k] - obs[i].obs_posn[k]) / dt;
+            }
+         }
 }
 
    /* By default,  Find_Orb will only handle arcs up to 200 years */
@@ -3761,7 +3800,10 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
          rval[0].flags |= OBS_DONT_USE;
       }
    if( n_obs > 1)
+      {
       check_for_star( rval, n_obs);
+      set_satellite_velocities( rval, n_obs);
+      }
    return( rval);
 }
 
@@ -4675,7 +4717,11 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
          break;
       case 2:
          if( show_alt_info && optr->second_line)
-            strcpy( buff, optr->second_line);
+//          strcpy( buff, optr->second_line);
+            sprintf( buff, "Vel %.8f %.8f %.8f",
+                           optr->obs_vel[0] * 1000.,
+                           optr->obs_vel[1] * 1000.,
+                           optr->obs_vel[2] * 1000.);
          else
             {
             strcpy( buff, "Delta=");
