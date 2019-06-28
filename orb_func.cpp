@@ -4103,6 +4103,9 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
    attempt_extensions( obs, n_obs, orbit);
 // available_sigmas = NO_SIGMAS_AVAILABLE;
    integration_timeout = 0;
+   if( *get_environment_ptr( "INCLUDE_ALL"))
+      for( i = 0; i < n_obs; i++)
+         obs[i].is_included = 1;
    return( obs[start].jd);    /* ...and return epoch = JD of first observation */
 }
 
