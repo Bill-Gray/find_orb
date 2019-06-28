@@ -1629,6 +1629,28 @@ static void comment_observation( OBSERVE FAR *obs, const char *comment)
       obs->columns_57_to_65[i] = comment[i];
 }
 
+/* Converts JPL's SPICE codes,  such as 399=geocenter,  599=Jupiter body
+center,  etc.  to plain ol' Sun=0, Merc=1,  etc. codes used in JPL's
+DE ephemerides.  This matters because in ADES,  satellite reference
+locations are specified using SPICE index values,  and we need to know
+which object to look up from the DE ephem.  (Almost all such offsets
+are relative to the geocenter.  But Gaia,  for example,  is relative
+to the solar system barycenter.)   */
+
+static int jpl_code_to_planet_idx( const int spice_code)
+{
+   int rval = -1;
+
+   if( !spice_code)        /* SSB */
+      rval = 12;
+   else if( spice_code == 10)    /* sun */
+      rval = 0;
+   else if( spice_code % 100 == 99)
+      rval = spice_code / 100;
+   assert( rval >= 0);
+   return( rval);
+}
+
 void set_up_observation( OBSERVE FAR *obs)
 {
    double rho_cos_phi = 0.;
@@ -1672,10 +1694,8 @@ void set_up_observation( OBSERVE FAR *obs)
       obs->flags |= OBS_NO_OFFSET;
       comment_observation( obs, "? offset");
       }
-   if( observer_planet == -2)          /* satellite observation,  with  */
-      observer_planet = 3;             /* sat posn relative to earth    */
-   if( !strcmp( obs->mpc_code, "258"))    /* Gaia offsets are relative to SSB */
-      observer_planet = 12;
+   if( observer_planet == -2)          /* satellite observation */
+      observer_planet = jpl_code_to_planet_idx( obs->ref_center);
    compute_observer_loc( obs->jd, observer_planet,
                rho_cos_phi, rho_sin_phi, lon, obs->obs_posn);
    compute_observer_vel( obs->jd, observer_planet,
@@ -1714,8 +1734,7 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
    double utc = extract_date_from_mpc_report( buff, &time_format);
    const bool is_radar_obs = (buff[14] == 'R' || buff[14] == 'r');
    static bool fcct_error_message_shown = false;
-   const double saved_ra_bias = obs->ra_bias;
-   const double saved_dec_bias = obs->dec_bias;
+   const OBSERVE saved_obs = *obs;
    double coord_epoch = input_coordinate_epoch;
    int obj_desig_type;
 
@@ -1725,8 +1744,9 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
    assert( buff);
    memset( obs, 0, sizeof( OBSERVE));
    memcpy( obs->packed_id, buff, 12);
-   obs->ra_bias = saved_ra_bias;
-   obs->dec_bias = saved_dec_bias;
+   obs->ra_bias = saved_obs.ra_bias;
+   obs->dec_bias = saved_obs.dec_bias;
+   obs->ref_center = saved_obs.ref_center;
    obs->packed_id[12] = '\0';
    obj_desig_type = get_object_name( NULL, obs->packed_id);
    if( obj_desig_type == OBJ_DESIG_COMET_PROVISIONAL
@@ -3309,6 +3329,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                (*get_environment_ptr( "FIX_OBSERVATIONS") != '\0');
    bool is_fcct14_data = false, apply_sigmas_once = false;
    void *ades_context;
+   int spacecraft_offset_reference = 399;    /* default is geocenter */
 
    *desig_from_neocp = '\0';
    strcpy( mpc_code_from_neocp, "500");   /* default is geocenter */
@@ -3395,7 +3416,10 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                else if( !look_for_matching_line( buff, second_line))
                   observation_is_good = false;
                if( observation_is_good)
+                  {
+                  rval[i].ref_center = spacecraft_offset_reference;
                   parse_observation( rval + i, buff);
+                  }
                }
 
             if( buff[14] == 'S' && observation_is_good)
@@ -3567,6 +3591,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                   n_fixes_made++;
                   }
                i++;
+               spacecraft_offset_reference = 399;  /* default to geocentric offsets */
                }
             }
          }
@@ -3635,6 +3660,8 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
             while( fgets_trimmed( buff, sizeof( buff), ifile)
                      && !strstr( buff, "end ignore obs"))
                ;     /* deliberately empty loop */
+         else if( !memcmp( buff, "#Offset center ", 15))
+            spacecraft_offset_reference = atoi( buff + 15);
          }
       }
    free_ades2mpc_context( ades_context);
