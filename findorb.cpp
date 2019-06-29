@@ -2270,9 +2270,10 @@ static int user_select_file( char *filename, const char *title, const int flags)
 
 /* In non-Windows situations,  file selection is delegated to the 'zenity'
 program. If that's unavailable,  we try 'yad' (fork of zenity with
-essentially the same options),  then 'kdialog' (used on KDE).  If those fail,
-we go to the "traditional" curses 'dialog' program.  (I may add other
-possibilities as I find them.  The Curses 'dialog' is pretty bad.) */
+essentially the same options),  then 'kdialog' (used on KDE),  then
+'Xdialog'.  If all else fails, we go to the "traditional" curses
+'dialog' program.  (I may add other possibilities as I find them.
+The Curses 'dialog' is pretty bad.) */
 
 static int try_a_file_dialog_program( char *filename, const char *command)
 {
@@ -2288,6 +2289,7 @@ static int user_select_file( char *filename, const char *title, const int flags)
 {
    const bool is_save_dlg = (flags & 1);
    char cmd[256];
+   int rval;
 
    strcpy( cmd, "zenity --file-selection");
    if( is_save_dlg)
@@ -2309,10 +2311,14 @@ static int user_select_file( char *filename, const char *title, const int flags)
    if( !try_a_file_dialog_program( filename, cmd))
       return( 0);
 
-   snprintf( cmd, sizeof( cmd),
-           "dialog --stdout --title \"%s\" --fselect ~ 0 0", title);
-   strcat( cmd, " 2>/dev/null");
-   if( !try_a_file_dialog_program( filename, cmd))
+   snprintf( cmd, sizeof( cmd), "Xdialog --stdout --title \"%s\"", title);
+   strcat( cmd, " --fselect ~ 0 0");
+   rval = try_a_file_dialog_program( filename, cmd);
+   if( !rval)
+      return( 0);
+
+         /* dialog and Xdialog take the same options : */
+   if( !try_a_file_dialog_program( filename, cmd + 1))
       return( 0);
 
    assert( 1);
