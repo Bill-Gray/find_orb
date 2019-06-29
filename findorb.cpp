@@ -2400,6 +2400,7 @@ int main( int argc, const char **argv)
    bool sort_obs_by_code = false;
    int n_stations_shown = 0, top_obs_shown = 0, n_obs_shown = 0;
    bool single_obs_selected = false;
+   const char *most_recent_file = "MOST_RECENT_FILE_OPENED";
 
    if( !strcmp( argv[0], "find_orb"))
       use_config_directory = true;
@@ -2592,6 +2593,9 @@ int main( int argc, const char **argv)
       strcpy( ifilename, temp_clipboard_filename);
       }
 
+   if( !strcmp( ifilename, "p"))
+      strcpy( ifilename, get_environment_ptr( most_recent_file));
+
    ids = find_objects_in_file( ifilename, &n_ids, NULL);
    if( n_ids > 0 && drop_single_obs)
       {
@@ -2707,6 +2711,7 @@ int main( int argc, const char **argv)
             curr_obs = top_obs_shown = i;
             update_element_display = 1;
             clear( );
+            set_environment_ptr( most_recent_file, ifilename);
             }
          force_bogus_orbit = false;
          }
