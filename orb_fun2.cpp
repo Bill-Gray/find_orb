@@ -97,8 +97,8 @@ int simplex_method( OBSERVE FAR *obs, int n_obs, double *orbit,
    for( i = 0; i < 3; i++)
       {
       rptr[i] = rvals + i * 2;
-      rptr[i][0] = r1 * (i == 1 ? 1.1 : 1);
-      rptr[i][1] = r2 * (i == 2 ? 1.1 : 1);
+      rptr[i][0] = r1 * (i == 1 ? 1.5 : 1);
+      rptr[i][1] = r2 * (i == 2 ? 1.5 : 1);
       }
    context.obs = obs;
    context.n_obs = n_obs;
@@ -147,7 +147,7 @@ int superplex_method( OBSERVE FAR *obs, int n_obs, double *orbit, const char *co
       rptr[i] = rvals + i * 6;
       memcpy( rptr[i], orbit, 6 * sizeof( double));
       if( i < 6)
-         rptr[i][i] += (i < 3 ? .01 : .0003);
+         rptr[i][i] += (i < 3 ? .2 : .03);
       }
    context.obs = obs;
    context.n_obs = n_obs;
@@ -681,7 +681,7 @@ If,  between those points,  we find a minimum "score" (sum of the squares
 of the residuals,  unweighted),  we do a parabolic search for the real
 minimum.  We may find multiple minima.  We take the lowest of them.  */
 
-#define N_DIVS 100
+#define N_DIVS 300
 
 double improve_along_lov( double *orbit, const double epoch, const double *lov,
           const unsigned n_params, unsigned n_obs, OBSERVE *obs)
