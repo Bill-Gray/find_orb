@@ -2253,7 +2253,9 @@ static int user_select_file( char *filename, const char *title, const int flags)
 {
    const bool is_save_dlg = (flags & 1);
    OPENFILENAME ofns;
+   wchar_t old_path[_MAX_DIR];
 
+   _wgetcwd( old_path, _MAX_DIR);
    memset( &ofns, 0, sizeof( ofns));
    ofns.lStructSize = sizeof( ofns );
    ofns.lpstrFile = filename;
@@ -2264,6 +2266,7 @@ static int user_select_file( char *filename, const char *title, const int flags)
       GetSaveFileName( &ofns );
    else
       GetOpenFileName( &ofns );
+   _wchdir( old_path);
    return 0;
 }
 #else
