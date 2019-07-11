@@ -135,6 +135,7 @@ devoted to station data.   */
 #define RESIDUAL_FORMAT_SHOW_DELTAS              0x1000
 #define RESIDUAL_FORMAT_SHOW_DESIGS              0x2000
 
+static int user_select_file( char *filename, const char *title, const int flags);
 double get_planet_mass( const int planet_idx);                /* orb_func.c */
 int simplex_method( OBSERVE FAR *obs, int n_obs, double *orbit,
                const double r1, const double r2, const char *constraints);
@@ -1779,6 +1780,7 @@ static void show_a_file( const char *filename)
          put_colored_text( "pgUp", i, 41, 4, COLOR_FINAL_LINE);
          put_colored_text( "Top", i, 46, 3, COLOR_FINAL_LINE);
          }
+      put_colored_text( "Save", i, 50, 4, COLOR_FINAL_LINE);
 
       strcpy( buff, msgs[msg_num] + 1);
       if( *err_text)
@@ -1821,6 +1823,8 @@ static void show_a_file( const char *filename)
                c = KEY_PPAGE;
             else if( x >= 46 && x <= 48)  /* "Top" */
                c = KEY_HOME;
+            else if( x >= 50 && x <= 53)  /* "Save" */
+               c = ALT_S;
             }
          else if( x == getmaxx( stdscr) - 1)  /* clicked scroll bar */
             line_no = y * n_lines / n_lines_to_show;
@@ -1883,6 +1887,23 @@ static void show_a_file( const char *filename)
          case KEY_EXIT:
 #endif
             keep_going = 0;
+            break;
+         case ALT_S:
+            {
+            user_select_file( buff, "Save file", 1);
+            if( *buff)
+               {
+               FILE *ofile = fopen( buff, "wb");
+
+               if( ofile)
+                  {
+                  fseek( ifile, 0L, SEEK_SET);
+                  while( fgets( buff, sizeof( buff), ifile))
+                     fputs( buff, ofile);
+                  fclose( ofile);
+                  }
+               }
+            }
             break;
          case 'q':
             if( find_text)
