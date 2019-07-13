@@ -56,18 +56,18 @@ else
 endif
 
 ifdef X
-	ADDED_CFLAGS=-DXCURSES -DPDC_WIDE -I../PDCurses
+	CURSES_FLAGS=-DXCURSES -DPDC_WIDE -I../PDCurses
 	CURSES_LIB=-lXCurses -lXaw -lXmu -lXt -lX11 -lSM -lICE -lXext -lXpm
 endif
 
 ifdef VT
-	ADDED_CFLAGS=-DPDC_WIDE -DVT -I$(HOME)/PDCurses
+	CURSES_FLAGS=-DPDC_WIDE -DVT -I$(HOME)/PDCurses
 	CURSES_LIB=$(HOME)/PDCurses/vt/libpdcurses.a
 endif
 
 ifdef XCOMPILE
 	CC=x86_64-w64-mingw32-g++
-	ADDED_CFLAGS=-DUTF8 -DPDC_WIDE -I $(INSTALL_DIR)/include -I../PDCurses
+	CURSES_FLAGS=-DUTF8 -DPDC_WIDE -I $(INSTALL_DIR)/include -I../PDCurses
  OBJSADDED=clipfunc.o
 	EXE=.exe
 	CURSES_LIB=-lpdcurses -static-libgcc
@@ -88,6 +88,9 @@ LIBS=$(LIBSADDED) -llunar -ljpl -lsatell
 
 find_orb$(EXE):          findorb.o $(OBJS)
 	$(CC) -o find_orb$(EXE) findorb.o $(OBJS)  $(LIBS) $(CURSES_LIB)
+
+findorb.o:         findorb.cpp
+	$(CC) $(CFLAGS) $(CURSES_FLAGS) $<
 
 fo$(EXE):          fo.o $(OBJS)
 	$(CC) -o fo$(EXE) fo.o $(OBJS) $(LIBS)
@@ -160,4 +163,4 @@ uninstall:
 	rmdir $(IDIR)
 
 .cpp.o:
-	$(CC) $(CFLAGS) $(ADDED_CFLAGS) $<
+	$(CC) $(CFLAGS) $<
