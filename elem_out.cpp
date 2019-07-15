@@ -1888,7 +1888,7 @@ void set_solutions_found( OBJECT_INFO *ids, const int n_ids)
 {
    size_t n_lines;
    char **ilines = load_file_into_memory( vector_data_file, &n_lines, false);
-   int i;
+   int i, j;
 
    for( i = 0; i < n_ids; i++)
       ids[i].solution_exists = 0;
@@ -1896,6 +1896,15 @@ void set_solutions_found( OBJECT_INFO *ids, const int n_ids)
       {
       int sort_column = -11;
 
+      for( i = 0; (size_t)i < n_lines; i += 3)
+         {
+         j = 10;
+         while( ilines[i][j] != ' ')
+            j++;
+         if( j != 10)
+            memmove( ilines[i] + 10, ilines[i] + j,
+                                       strlen( ilines[i] + j + 1));
+         }
       assert( n_lines % 3 == 0);
       n_lines /= 3;   /* three lines in 'vectors.dat' for each set of elems */
       shellsort_r( ilines, n_lines, 3 * sizeof( char *),
@@ -2022,6 +2031,7 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
    extern int n_extra_params;
    extern double solar_pressure[];
    char object_name[80];
+   double abs_mag = 10.;         /* default value for 'dummy' use */
 
    get_object_name( object_name, obs->packed_id);
    for( i = 0; i < MAX_N_NONGRAV_PARAMS; i++)
@@ -2034,39 +2044,79 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
       double residual_filter_threshhold = 0.;
 
       while( fgets_trimmed( buff, sizeof( buff), ifile))
-//       if( !FMEMCMP( object_name, buff + 11, FSTRLEN( object_name)))
-//          if( buff[ FSTRLEN( object_name) + 11] < ' ' && *buff == ' ')
-         if( !names_compare( object_name, buff + 11) || (take_first_soln && !got_vectors))
-               {
-               int n_read;
+         {
+         i = 1;
+         while( buff[i] && buff[i] != ' ')
+            i++;
+         assert( buff[i] == ' ');
+         if( !names_compare( object_name, buff + i + 1) || (take_first_soln && !got_vectors))
+            {
+            int n_read, center = 0, is_equatorial = 0;
+            char *tptr;
+            double dist_units = 1., time_units = .001;
 
-               got_vectors = 1;
-               *orbit_epoch = atof( buff);
-               *perturbers = 0;
-               fgets_trimmed( buff, sizeof( buff), ifile);
-               for( i = 0; i < MAX_N_NONGRAV_PARAMS; i++)
-                   solar_pressure[i] = 0.;
-               n_read = sscanf( buff, "%lf%lf%lf%x%lf %lf %lf",
-                             &orbit[0], &orbit[1], &orbit[2], perturbers,
-                             solar_pressure,
-                             solar_pressure + 1,
-                             solar_pressure + 2);
-               assert( n_read >= 3 && n_read < 8);
-               n_extra_params = n_read - 4;
-               if( n_extra_params < 0)
-                  n_extra_params = 0;
-               fgets_trimmed( buff, sizeof( buff), ifile);
-               sscanf( buff, "%lf%lf%lf%lf%lf%lf",
-                             orbit + 3, orbit + 4, orbit + 5,
-                             &residual_filter_threshhold, &jd1, &jd2);
-               for( i = 3; i < 6; i++)
-                  orbit[i] /= 1000.;
-               for( i = 0; i < n_obs; i++)
-                  {
-                  obs[i].computed_ra  = obs[i].ra;
-                  obs[i].computed_dec = obs[i].dec;
-                  }
+            got_vectors = 1;
+            *orbit_epoch = atof( buff);
+            *perturbers = 0;
+            fgets_trimmed( buff, sizeof( buff), ifile);
+            tptr = strchr( buff, '#');
+            if( tptr)
+               {
+               char *tptr2;
+
+               *tptr++ = '\0';
+               tptr2 = strstr( tptr, "Ctr");
+               if( tptr2)
+                  center = atoi( tptr2 + 3);
+               if( strstr( tptr, "km"))
+                  dist_units = AU_IN_KM;
+               if( strstr( tptr, "eq"))
+                  is_equatorial = 1;
+               if( strstr( tptr, "sec"))
+                  time_units = seconds_per_day;
                }
+            for( i = 0; i < MAX_N_NONGRAV_PARAMS; i++)
+                solar_pressure[i] = 0.;
+            n_read = sscanf( buff, "%lf%lf%lf%x%lf %lf %lf",
+                          &orbit[0], &orbit[1], &orbit[2], perturbers,
+                          solar_pressure,
+                          solar_pressure + 1,
+                          solar_pressure + 2);
+            assert( n_read >= 3 && n_read < 8);
+            n_extra_params = n_read - 4;
+            if( n_extra_params < 0)
+               n_extra_params = 0;
+            fgets_trimmed( buff, sizeof( buff), ifile);
+            sscanf( buff, "%lf%lf%lf%lf%lf%lf",
+                          orbit + 3, orbit + 4, orbit + 5,
+                          &residual_filter_threshhold, &jd1, &jd2);
+            for( i = 3; i < 6; i++)
+               orbit[i] /= dist_units / time_units;
+            for( i = 0; i < 3; i++)
+               orbit[i] /= dist_units;
+            if( is_equatorial)
+               {
+               equatorial_to_ecliptic( orbit);
+               equatorial_to_ecliptic( orbit + 3);
+               }
+            if( center)
+               {
+               double vect[3];
+
+               compute_observer_loc( *orbit_epoch, center, 0., 0., 0., vect);
+               for( i = 0; i < 3; i++)
+                  orbit[i] += vect[i];
+               compute_observer_vel( *orbit_epoch, center, 0., 0., 0., vect);
+               for( i = 0; i < 3; i++)
+                  orbit[i + 3] += vect[i];
+               }
+            for( i = 0; i < n_obs; i++)
+               {
+               obs[i].computed_ra  = obs[i].ra;
+               obs[i].computed_dec = obs[i].dec;
+               }
+            }
+         }
       if( got_vectors)
          {
          set_locs( orbit, *orbit_epoch, obs, n_obs);
@@ -2090,29 +2140,28 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
       got_vectors = get_orbit_from_mpcorb_sof( object_name, orbit, &elems);
       if( got_vectors)
          {
-         const bool ephem_mode =
-                     (n_obs == 1 && !strcmp( obs->reference, "Dummy"));
-
          *orbit_epoch = elems.epoch;
-         if( ephem_mode)
-            obs->jd = *orbit_epoch + td_minus_ut( *orbit_epoch) / seconds_per_day;
-         if( ephem_mode || got_vectors == 1)
+         if( got_vectors == 1)
             *perturbers = 0x7fe;    /* Merc-Pluto plus moon */
          set_locs( orbit, *orbit_epoch, obs, n_obs);
-         if( ephem_mode)
-            {
-            obs->ra = obs->computed_ra;
-            obs->dec = obs->computed_dec;
-            obs->obs_mag = elems.abs_mag + calc_obs_magnitude( obs->solar_r,
-                       obs->r, vector3_length( obs->obs_posn), NULL);
-            obs->obs_mag = floor( obs->obs_mag * 10.) * .1;
-            }
+         abs_mag = elems.abs_mag;
          }
       }
    if( !got_vectors)
       {
       *perturbers = 0;
       *orbit_epoch = initial_orbit( obs, n_obs, orbit);
+      }
+   else if( n_obs == 1 && !strcmp( obs->reference, "Dummy"))
+      {
+      obs->jd = *orbit_epoch + td_minus_ut( *orbit_epoch) / seconds_per_day;
+      *perturbers = 0x7fe;    /* Merc-Pluto plus moon */
+      set_locs( orbit, *orbit_epoch, obs, n_obs);
+      obs->ra = obs->computed_ra;
+      obs->dec = obs->computed_dec;
+      obs->obs_mag = abs_mag + calc_obs_magnitude( obs->solar_r,
+                 obs->r, vector3_length( obs->obs_posn), NULL);
+      obs->obs_mag = floor( obs->obs_mag * 10.) * .1;
       }
    return( got_vectors);
 }
