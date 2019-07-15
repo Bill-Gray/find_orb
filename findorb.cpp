@@ -2205,6 +2205,8 @@ static inline int initialize_curses( const int argc, const char **argv)
    resize_term( 50, 98);
    Xinitscr( argc, (char **)argv);
 #else
+   INTENTIONALLY_UNUSED_PARAMETER( argc);
+   INTENTIONALLY_UNUSED_PARAMETER( argv);
    initscr( );
 #endif
    if( debug_level > 2)

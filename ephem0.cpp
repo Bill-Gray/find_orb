@@ -47,8 +47,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #define LOG_10 2.3025850929940456840179914546843642076011014886287729760333279009675726
 #define LIGHT_YEAR_IN_KM    (365.25 * seconds_per_day * SPEED_OF_LIGHT)
 
-#define ROB_MATSON_TEST_CODE     1
-
 int save_ephemeris_file( const char *filename);       /* ephem0.cpp */
 double centralize_ang( double ang);             /* elem_out.cpp */
 double vector_to_polar( double *lon, double *lat, const double *vector);
@@ -2536,6 +2534,9 @@ static void show_dd_hh_mm_ss_point_sss( char *text,
 static void put_mag_resid( char *output_text, const double obs_mag,
                            const double computed_mag, const char mag_band)
 {
+
+   INTENTIONALLY_UNUSED_PARAMETER( mag_band);
+
    if( obs_mag < BLANK_MAG && computed_mag)
       snprintf( output_text, 8, "%6.2f ",
                obs_mag - computed_mag);
@@ -3244,6 +3245,7 @@ static int write_observer_data_to_file( FILE *ofile, const char *ast_filename,
    int try_ast_file = 1, try_details_file = 1, try_scope_file = 1;
    char stations[400][5];
 
+   INTENTIONALLY_UNUSED_PARAMETER( ast_filename);
    n_stations = get_list_of_stations( n_obs, obs_data, 400, stations);
    for( i = 0; i < n_stations; i++)
       {

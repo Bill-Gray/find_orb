@@ -107,6 +107,9 @@ proceed as if nothing had happened: */
 int inquire( const char *prompt, char *buff, const int max_len,
                      const int color)
 {
+   INTENTIONALLY_UNUSED_PARAMETER( buff);
+   INTENTIONALLY_UNUSED_PARAMETER( max_len);
+   INTENTIONALLY_UNUSED_PARAMETER( color);
    printf( "\n%s\n", prompt);
    return( 0);
 }
@@ -127,6 +130,10 @@ void refresh_console( void)
 
 void move_add_nstr( const int col, const int row, const char *msg, const int n_bytes)
 {
+   INTENTIONALLY_UNUSED_PARAMETER( col);
+   INTENTIONALLY_UNUSED_PARAMETER( row);
+   INTENTIONALLY_UNUSED_PARAMETER( msg);
+   INTENTIONALLY_UNUSED_PARAMETER( n_bytes);
 }
 
 static double curr_jd( void)

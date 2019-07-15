@@ -360,7 +360,9 @@ int set_tholen_style_sigmas( OBSERVE *obs, const char *buff)
 int generic_message_box( const char *message, const char *box_type)
 {
    int rval = 0;
+
 #ifdef CONSOLE
+   INTENTIONALLY_UNUSED_PARAMETER( box_type);
    inquire( message, NULL, 30, COLOR_DEFAULT_INQUIRY);
 #else
    int box_flags = MB_YESNO;
@@ -1979,6 +1981,7 @@ static unsigned find_in_hash_table( const OBJECT_INFO *objs, const char *desig,
 
 int qsort_strcmp( const void *a, const void *b, void *ignored_context)
 {
+   INTENTIONALLY_UNUSED_PARAMETER( ignored_context);
    return( strcmp( (const char *)a, (const char *)b));
 }
 

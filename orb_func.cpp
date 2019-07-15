@@ -1660,6 +1660,7 @@ int get_sr_orbits( double *orbits, OBSERVE FAR *obs,
    unsigned i, rval = 0;
    double *tptr = orbits;
 
+   INTENTIONALLY_UNUSED_PARAMETER( noise_in_sigmas);
 // perturbers = AUTOMATIC_PERTURBERS;
    for( i = 0; i < max_orbits && clock( ) < end_clock; i++)
       {

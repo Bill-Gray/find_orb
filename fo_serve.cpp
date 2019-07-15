@@ -69,6 +69,9 @@ int inquire( const char *prompt, char *buff, const int max_len,
 {
    extern char *mpec_error_message;
 
+   INTENTIONALLY_UNUSED_PARAMETER( buff);
+   INTENTIONALLY_UNUSED_PARAMETER( max_len);
+   INTENTIONALLY_UNUSED_PARAMETER( color);
    if( !mpec_error_message)
       {
       mpec_error_message = (char *)malloc( strlen( prompt) + 1);
@@ -97,6 +100,10 @@ void refresh_console( void)
 
 void move_add_nstr( const int col, const int row, const char *msg, const int n_bytes)
 {
+   INTENTIONALLY_UNUSED_PARAMETER( col);
+   INTENTIONALLY_UNUSED_PARAMETER( row);
+   INTENTIONALLY_UNUSED_PARAMETER( msg);
+   INTENTIONALLY_UNUSED_PARAMETER( n_bytes);
 }
 
 static void show_problem_message( void)
@@ -186,6 +193,8 @@ int main( const int argc, const char **argv)
 
    avoid_runaway_process( 45);
 #endif         /* _WIN32 */
+   INTENTIONALLY_UNUSED_PARAMETER( argv);
+   INTENTIONALLY_UNUSED_PARAMETER( argc);
    setvbuf( lock_file, NULL, _IONBF, 0);
    neocp_redaction_turned_on = false;
    printf( "Content-type: text/html\n\n");
