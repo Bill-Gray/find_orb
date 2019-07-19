@@ -1938,7 +1938,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                {
                strcpy( fake_line, obs->packed_id);
                strcpy( fake_line + 12, "  C");
-               full_ctime( fake_line + 15, curr_jd,
+               full_ctime( fake_line + 15, curr_jd + 5e-7,
                         FULL_CTIME_MICRODAYS | FULL_CTIME_YMD
                       | FULL_CTIME_MONTHS_AS_DIGITS | FULL_CTIME_LEADING_ZEROES);
                strcat( fake_line, ra_buff);
