@@ -1965,7 +1965,7 @@ static int get_orbit_from_mpcorb_sof( const char *object_name, double *orbit,
          snprintf( tname, sizeof( tname), "%3uP        ",
                   atoi( object_name + 2));
       else
-         snprintf( tname, sizeof( tname), "%-12s", object_name);
+         snprintf( tname, sizeof( tname), "%-12.12s", object_name);
       while( !got_vectors && fgets_trimmed( buff, sizeof( buff), ifile))
          if( !memcmp( tname, buff, 12))
             {

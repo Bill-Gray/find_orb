@@ -2786,8 +2786,8 @@ void format_observation( const OBSERVE FAR *obs, char *text,
                                              + m.yresid * m.yresid), resid_format);
          xresid[5] = ' ';        /* replace the '+' with a ' ' */
          }
-      strncpy( text, xresid, 6);
-      strncpy( text + 6, yresid, 6);
+      memcpy( text, xresid, 6);
+      memcpy( text + 6, yresid, 6);
       text[0] = (obs->is_included ? ' ' : '(');
       text[12] = (obs->is_included ? ' ' : ')');
       text[13] = '\0';
