@@ -180,6 +180,13 @@ Ke2 !-1552827.24268  +194935.61788  4185.581   Keck 2, Mauna Kea
 Sub !-1552833.66719  +194931.81425  4189.001   Subaru, Mauna Kea
 Gem !-1552808.56831  +194925.68521  4239.439   Gemini North, Mauna Kea
 
+   From http://cso.caltech.edu/wiki/cso/telescope/telescope : a position
+about 400 meters northwest of the above aerial survey position,  and
+dozens of meters lower in altitude!  (Again with 26 meters added on
+the assumption that the altitude given at the page is ASL,  not ellipsoidal.)
+
+Cso !-1552842.124    +194931.698    4165       Caltech Submillimeter Observatory (CSO)
+
       The following five (official) MPC sites have corrected positions,
    copy/pasted from the above.
 
@@ -508,6 +515,14 @@ HAA !-156.257185     +20.707308     3050       Haleakala Amateur Astronomers
 
 BO3 ! 169.68363      -45.03816       377       BOOTES-3,  Lauder
 Z82 !  -4.040972     +36.759222      109       BOOTES-2 Observatory, Algarrobo
+
+   Three BOOTES telescopes,  from a private communication from Ignacio Perez
+   Garcia, 2019 Jul 23.  BO1 is at 53m ASL + 50m geoid height.  B04 is at
+   3230m minus 49 meters (the geoid is _below_ the ellipsoid there).  BO5 is
+   at 2812m ASL minus 32 meters for geoid height.
+BO1 !  -6.734106     +37.104098      103       BOOTES-1B
+BO4 ! 100.030067     +45.0397       3181       BOOTES-4, Lijang, China
+BO5 !-115.463611     +31.044167     2780       BOOTES-5, Mexico
 
    Private communication,  2018 Jul 30,  Giorgio Baj: "K38, 008 55 05.654 E,
    45 52 25.533 N, 0484 m, GPS altitude referred MSL."  Added 47 meters
