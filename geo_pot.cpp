@@ -1792,7 +1792,7 @@ int main( const int argc, const char **argv)
    ggm03c_terms[0] = 1.;      /* include "J0" term    */
    oval = 1. - (double)geo_potential( loc[0], loc[1], loc[2], derivs, n_terms);
    oval -= centrifugal_pot_at_equator * cos( lat) * cos( lat) / 2.;
-   printf( "%e  %f\n", oval,
+   printf( "%e  (geoid height %f meters)\n", oval,
                  -14497.68 - oval * EARTH_MAJOR_AXIS);
 #else
                      /* cvt radius from units of earth radii to AU: */
@@ -1827,6 +1827,9 @@ int main( const int argc, const char **argv)
    derivs[2] = .5 * dpot / delta;
    printf( "  Derivs: %.10e %.10e %.10e (numerical, AU/day^2)\n", derivs[0], derivs[1], derivs[2]);
 #endif
+   printf( "Lat %c%f Long %c%f\n",
+         (lat > 0. ? 'N' : 'S'), fabs( lat) * 180. / PI,
+         (lon > 0. ? 'E' : 'W'), fabs( lon) * 180. / PI);
    return( 0);
 }
 #endif          // #ifdef TEST_MAIN
