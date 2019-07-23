@@ -4175,6 +4175,12 @@ you should be able to toggle them on and do a full step or two to get them
 to work correctly.  The first part of the code looks for such "simple" arc
 extension.
 
+   It'll also look for extensions that are no greater than the existing
+arc length (i.e.,  if you have a 2.6-day arc,  it'll look 2.6 days before
+the first and 2.6 days after the last observation) which have residuals
+of less than two sigmas.  Such observations should be "safe" to add,  and
+can help get past one or more bad observations.
+
    However,  you may not find such an easy extension,  either because there
 are no more observations or because the adjacent observations have residuals
 greater than the limit.  In that case,  the arc is extended by exactly one
@@ -4197,10 +4203,14 @@ int extend_orbit_solution( OBSERVE FAR *obs, const int n_obs,
 {
    int first_idx, last_idx, n_added = 0, initial_count;
    OBSERVE FAR *optr;
+   double jd_low, jd_high;
+   const double max_sigma = 2.;
 
    exclude_unusable_observations( obs, n_obs);
    initial_count = count_observations_used( obs, n_obs);
    get_first_and_last_included_obs( obs, n_obs, &first_idx, &last_idx);
+   jd_low  = obs[first_idx].jd * 2. - obs[last_idx].jd;
+   jd_high = obs[last_idx].jd * 2. - obs[first_idx].jd;
    optr = obs + first_idx - 1;
    while( first_idx > 0 && total_residual_err( optr) < limit
                 && obs[last_idx].jd - optr->jd < time_limit)
@@ -4209,6 +4219,16 @@ int extend_orbit_solution( OBSERVE FAR *obs, const int n_obs,
       optr--;
       first_idx--;
       n_added++;
+      }
+   while( first_idx > 0 && optr->jd > jd_low)
+      {
+      if( total_residual_err( optr) < max_sigma)
+         {
+         optr->is_included = 1;
+         n_added++;
+         }
+      optr--;
+      first_idx--;
       }
    optr = obs + last_idx + 1;
    while( last_idx < n_obs - 1 && total_residual_err( optr) < limit
@@ -4219,6 +4239,17 @@ int extend_orbit_solution( OBSERVE FAR *obs, const int n_obs,
       last_idx++;
       n_added++;
       }
+   while( last_idx < n_obs - 1 && optr->jd < jd_high)
+      {
+      if( total_residual_err( optr) < max_sigma)
+         {
+         optr->is_included = 1;
+         n_added++;
+         }
+      optr++;
+      last_idx++;
+      }
+
    if( !n_added)
       {
       int direction = 0;
