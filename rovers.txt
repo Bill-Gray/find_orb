@@ -521,7 +521,7 @@ Z82 !  -4.040972     +36.759222      109       BOOTES-2 Observatory, Algarrobo
    3230m minus 49 meters (the geoid is _below_ the ellipsoid there).  BO5 is
    at 2812m ASL minus 32 meters for geoid height.
 BO1 !  -6.734106     +37.104098      103       BOOTES-1B
-BO4 ! 100.030067     +45.0397       3181       BOOTES-4, Lijang, China
+BO4 ! 100.030067     +26.695222     3181       BOOTES-4, Lijang, China
 BO5 !-115.463611     +31.044167     2780       BOOTES-5, Mexico
 
    Private communication,  2018 Jul 30,  Giorgio Baj: "K38, 008 55 05.654 E,
