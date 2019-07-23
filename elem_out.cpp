@@ -603,9 +603,12 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
       fprintf( ofile, " \"Tp sigma\": %s,", buff);
    if( elem->abs_mag)
       {
-      fprintf( ofile, "\n        \"H\": %6.2f,", elem->slope_param);
+      fprintf( ofile, "\n        \"H\": %6.2f,", elem->abs_mag);
       if( !get_uncertainty( "sigma_H:", buff, 0))
          fprintf( ofile, " \"H sigma\": %s,", buff);
+      fprintf( ofile, "\n        \"G\": %6.2f,", elem->slope_param);
+      if( !get_uncertainty( "sigma_G:", buff, 0))
+         fprintf( ofile, " \"G sigma\": %s,", buff);
       }
 
 /* if( moids[1])        */
