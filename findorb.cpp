@@ -3145,24 +3145,38 @@ int main( int argc, const char **argv)
 
                if( new_curr < n_obs)  /* "normal" click in the observations area */
                   {
-                  curr_obs = new_curr;
                   if( button & BUTTON1_DOUBLE_CLICKED)
-                     obs[curr_obs].is_included ^= 1;
+                     obs[new_curr].is_included ^= 1;
                   else if( button & BUTTON_CTRL)
-                     obs[curr_obs].flags ^= OBS_IS_SELECTED;
+                     obs[new_curr].flags ^= OBS_IS_SELECTED;
                   else        /* "ordinary",  unshifted or ctrled click */
                      {
-                     for( i = 0; i < n_obs; i++)
-                        {
-                        if( i == curr_obs)
-                           obs[i].flags |= OBS_IS_SELECTED;
-                        else
-                           obs[i].flags &= ~OBS_IS_SELECTED;
+                     int idx1 = new_curr, idx2 = new_curr;
+
+                     if( button & (BUTTON1_RELEASED | BUTTON2_RELEASED | BUTTON3_RELEASED))
+                        {                          /* selected a range of obs */
+                        idx1 = min( curr_obs, new_curr);
+                        idx2 = max( curr_obs, new_curr);
                         }
-                     show_observations( obs + top_obs_shown, top_line_residuals,
-                                 residual_format, n_obs_shown);
-                     if( dir == -1)
+                     if( button & BUTTON_CTRL)
                         {
+                        for( i = 0; i < n_obs; i++)
+                           if( i >= idx1 && i <= idx2)
+                              obs[i].flags ^= OBS_IS_SELECTED;
+                        }
+                     else
+                        {
+                        for( i = 0; i < n_obs; i++)
+                           if( i >= idx1 && i <= idx2)
+                              obs[i].flags |= OBS_IS_SELECTED;
+                           else
+                              obs[i].flags &= ~OBS_IS_SELECTED;
+                        }
+                     if( button & (BUTTON2_RELEASED | BUTTON2_CLICKED
+                                 | BUTTON3_RELEASED | BUTTON3_CLICKED))
+                        {                 /* right or middle button click/release */
+                        show_observations( obs + top_obs_shown, top_line_residuals,
+                                 residual_format, n_obs_shown);
                         i = full_inquire( get_find_orb_text( 2022), NULL, 0,
                                  COLOR_MENU, y, x);
                         if( i == KEY_F( 1))        /* toggle obs */
@@ -3171,6 +3185,7 @@ int main( int argc, const char **argv)
                            c = '%';
                         }
                      }
+                  curr_obs = new_curr;
                   }
                }
             }
