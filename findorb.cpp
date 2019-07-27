@@ -4139,29 +4139,41 @@ int main( int argc, const char **argv)
                }
             break;
          case '%':
-            inquire( "Uncertainty of this observation, in arcsec: ",
+            {
+            int n_selected = 0;
+            double new_sig;
+
+            inquire( "Uncertainty of selected observation(s), in arcsec: ",
                                 tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY);
-            if( atof( tbuff) != 0.)
-               {
-               set_tholen_style_sigmas( obs + curr_obs, tbuff);
-               strcpy( message_to_user, "Positional uncertainty reset");
-               }
-            else if( atof( tbuff + 1) != 0.)
-               {
-               if( *tbuff == 'm')
+            if( *tbuff == 't' || *tbuff == 'm')
+               new_sig = atof( tbuff + 1);
+            else
+               new_sig = atof( tbuff);
+            for( i = 0; new_sig > 0. && i < n_obs; i++)
+               if( obs[i].flags & OBS_IS_SELECTED)
                   {
-                  obs[curr_obs].mag_sigma = atof( tbuff + 1);
-                  sprintf( message_to_user, "Magnitude sigma reset to %.3e",
-                                    obs[curr_obs].mag_sigma);
+                  n_selected++;
+                  switch( *tbuff)
+                     {
+                     case 'm':
+                        obs[i].mag_sigma = new_sig;
+                        snprintf( message_to_user, sizeof( message_to_user),
+                               "Magnitude sigma reset to %.3e", new_sig);
+                        break;
+                     case 't':
+                        obs[i].time_sigma = new_sig / seconds_per_day;
+                        snprintf( message_to_user, sizeof( message_to_user),
+                               "Time sigma reset to %.3e seconds", new_sig);
+                        break;
+                     default:
+                        set_tholen_style_sigmas( obs + i, tbuff);
+                        strcpy( message_to_user, "Positional uncertainty reset");
+                        break;
+                     }
                   }
-               if( *tbuff == 't')
-                  {
-                  obs[curr_obs].time_sigma = atof( tbuff + 1);
-                  sprintf( message_to_user, "Time sigma reset to %.3e seconds",
-                                    obs[curr_obs].time_sigma);
-                  obs[curr_obs].time_sigma /= seconds_per_day;
-                  }
-               }
+            snprintf_append( message_to_user, sizeof( message_to_user),
+                     " for %d observations", n_selected);
+            }
             break;
          case '"':
             debug_mouse_messages ^= 1;
