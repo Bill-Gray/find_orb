@@ -1,4 +1,4 @@
-/* clipfunc.cpp: functions for getting/saving data to/from the Windows clipboard
+/* clipfunc.cpp: functions for getting/saving data to/from the clipboard
 
 Copyright (C) 2012, Project Pluto
 
@@ -18,6 +18,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301, USA.    */
 
 #include <stdio.h>
+
+#ifdef _WIN32
 #include <windows.h>
 
 int copy_buffer_to_clipboard( const char *contents, const long length);
@@ -136,3 +138,72 @@ int clipboard_to_file( const char *filename, const int append)
         }
     return rval;
 }
+#elif defined __PDCURSES__ && !defined VT
+
+#include <stdlib.h>
+#include "curses.h"
+
+int clipboard_to_file( const char *filename, const int append)
+{
+   long size = -99;
+   char *contents;
+   int err_code;
+
+   err_code = PDC_getclipboard( &contents, &size);
+   if( err_code == PDC_CLIP_SUCCESS)
+      {
+      FILE *ofile = fopen( filename, "wb");
+
+      if( ofile)
+         {
+         fwrite( contents, size, 1, ofile);
+         fclose( ofile);
+         }
+      PDC_freeclipboard( contents);
+      }
+   return( err_code);
+}
+
+int copy_file_to_clipboard( const char *filename)
+{
+   FILE *ifile = fopen( filename, "rb");
+   int err_code = -1;
+
+   if( ifile)
+      {
+      size_t length, bytes_read;
+      char *buff;
+
+      fseek( ifile, 0L, SEEK_END);
+      length = (size_t)ftell( ifile);
+      fseek( ifile, 0L, SEEK_SET);
+      buff = (char *)malloc( length + 1);
+      assert( buff);
+      buff[length] = '\0';
+      bytes_read = fread( buff, 1, length, ifile);
+      assert( bytes_read == length);
+      fclose( ifile);
+      err_code = PDC_setclipboard( buff, length);
+      free( buff);
+      }
+   return( err_code);
+}
+#else    /* non-PDCurses, non-Windows:  use xclip */
+#include <stdlib.h>
+
+int clipboard_to_file( const char *filename, const int append)
+{
+   char cmd[80];
+
+   snprintf( cmd, sizeof( cmd), "xclip -o >%c %s", (append ? '>' : ' '), filename);
+   return( system( cmd));
+}
+
+int copy_file_to_clipboard( const char *filename)
+{
+   char cmd[80];
+
+   snprintf( cmd, sizeof( cmd), "xclip -i %s", filename);
+   return( system( cmd));
+}
+#endif
