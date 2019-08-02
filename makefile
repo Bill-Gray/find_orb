@@ -23,7 +23,6 @@ CURSES_LIB=-lncursesw
 CC=g++
 LIBSADDED=-L $(INSTALL_DIR)/lib -lm
 EXE=
-OBJSADDED=
 RM=rm -f
 
 ifdef CLANG
@@ -37,7 +36,6 @@ endif
 ifdef MSWIN
 	LIBSADDED=-static-libgcc
 	EXE=.exe
-	OBJSADDED=clipfunc.o
 	CURSES_LIB=-lpdcurses
 	MKDIR=-mkdir
 else
@@ -68,7 +66,6 @@ endif
 ifdef XCOMPILE
 	CC=x86_64-w64-mingw32-g++
 	CURSES_FLAGS=-DUTF8 -DPDC_WIDE -I $(INSTALL_DIR)/include -I../PDCurses
- OBJSADDED=clipfunc.o
 	EXE=.exe
 	CURSES_LIB=-lpdcurses -static-libgcc
 	LIBSADDED=-L $(INSTALL_DIR)/win_lib -lm -lgdi32 -luser32 -mwindows
@@ -82,14 +79,17 @@ OBJS=b32_eph.o bc405.o bias.o collide.o conv_ele.o details.o eigen.o \
 	elem2tle.o elem_out.o elem_ou2.o ephem0.o errors.o gauss.o   \
 	geo_pot.o healpix.o lsquare.o miscell.o         monte0.o \
 	mpc_obs.o mt64.o nanosecs.o orb_func.o orb_fun2.o pl_cache.o roots.o  \
-	runge.o shellsor.o sigma.o simplex.o sm_vsop.o sr.o stackall.o $(OBJSADDED)
+	runge.o shellsor.o sigma.o simplex.o sm_vsop.o sr.o stackall.o
 
 LIBS=$(LIBSADDED) -llunar -ljpl -lsatell
 
-find_orb$(EXE):          findorb.o $(OBJS)
-	$(CC) -o find_orb$(EXE) findorb.o $(OBJS)  $(LIBS) $(CURSES_LIB)
+find_orb$(EXE):          findorb.o clipfunc.o $(OBJS)
+	$(CC) -o find_orb$(EXE) findorb.o clipfunc.o $(OBJS)  $(LIBS) $(CURSES_LIB)
 
 findorb.o:         findorb.cpp
+	$(CC) $(CFLAGS) $(CURSES_FLAGS) $<
+
+clipfunc.o:        clipfunc.cpp
 	$(CC) $(CFLAGS) $(CURSES_FLAGS) $<
 
 fo$(EXE):          fo.o $(OBJS)
@@ -112,7 +112,7 @@ IDIR=$(HOME)/.find_orb
 clean:
 	$(RM) $(OBJS) fo.o findorb.o fo_serve.o find_orb$(EXE) fo$(EXE)
 	$(RM) fo_serve.cgi eph2tle.o eph2tle$(EXE) cssfield$(EXE)
-	$(RM) cssfield.o neat_xvt.o neat_xvt$(EXE)
+	$(RM) clipfunc.o cssfield.o neat_xvt.o neat_xvt$(EXE)
 
 clean_temp:
 	$(RM) $(IDIR)/bc405pre.txt
