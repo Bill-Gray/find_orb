@@ -3262,16 +3262,16 @@ static void set_satellite_velocities( OBSERVE FAR *obs, const int n_obs)
    int i;
 
    for( i = 0; i < n_obs; i++)
-      if( is_satellite_obs( obs + i))
+      if( is_satellite_obs( obs + i) && obs[i].second_line)
          {
          int a, b, j, k;
 
          a = i - 1;
-         while( a >= 0 && (obs[i].jd == obs[a].jd
+         while( a >= 0 && (obs[i].jd == obs[a].jd || !obs[a].second_line
                         || strcmp( obs[i].mpc_code, obs[a].mpc_code)))
             a--;
          b = i + 1;
-         while( b < n_obs && (obs[i].jd == obs[b].jd
+         while( b < n_obs && (obs[i].jd == obs[b].jd || !obs[b].second_line
                         || strcmp( obs[i].mpc_code, obs[b].mpc_code)))
             b++;
          if( a >= 0 || b < n_obs)
