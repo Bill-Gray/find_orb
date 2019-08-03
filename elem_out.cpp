@@ -1268,7 +1268,7 @@ int write_out_elements_to_file( const double *orbit,
    *more_moids = '\0';
    for( i = 0; i < 9; i++)
       moids[i] = 0.;
-   for( i = 1; *tptr && i < n_lines; i++)
+   for( i = 1; i < n_lines && *tptr; i++)
       {
       char *tt_ptr;
       char sigma_buff[80];
