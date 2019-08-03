@@ -3932,14 +3932,8 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
    const clock_t t0 = clock( );
    int next_output = 2000, n_obs_read = 0;
    long filesize;
-
-   if( ifile)
-      {
-      fseek( ifile, 0L, SEEK_END);
-      filesize = ftell( ifile);
-      fseek( ifile, 0L, SEEK_SET);
-      }
 #endif
+
    if( obj_name_stack)
       {
       destroy_stack( obj_name_stack);
@@ -3955,6 +3949,11 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
          *n_found = -1;
       return( NULL);
       }
+#ifdef CONSOLE
+   fseek( ifile, 0L, SEEK_END);
+   filesize = ftell( ifile);
+   fseek( ifile, 0L, SEEK_SET);
+#endif
    *mpc_code_from_neocp = '\0';
    *desig_from_neocp = '\0';
    *new_xdesig = '\0';
