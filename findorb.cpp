@@ -4523,6 +4523,9 @@ Shutdown_program:
       resize_term( original_ymax, original_xmax);
 #endif
    endwin( );
+#ifdef __PDCURSES__
+   delscreen( SP);
+#endif
    curses_running = false;
    if( obs && n_obs)
       create_obs_file( obs, n_obs, 0);

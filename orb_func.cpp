@@ -38,6 +38,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    #define CONSOLE
 #endif
 
+#ifndef _WIN32
+   #include <unistd.h>
+#endif
+
 #ifdef CONSOLE
       /* In the console version of Find_Orb,  the following two functions */
       /* get remapped to Curses functions.  In the non-interactive one,   */
@@ -58,6 +62,8 @@ int integration_method = 0;
 extern int debug_level;
 
 int generic_message_box( const char *message, const char *box_type);
+int find_fcct_biases( const double ra, const double dec, const char catalog,
+                 const double jd, double *bias_ra, double *bias_dec);
 
 #define AUTOMATIC_PERTURBERS  1
 #define J2000 2451545.
@@ -4457,18 +4463,30 @@ int metropolis_search( OBSERVE *obs, const int n_obs, double *orbit,
 
 int clean_up_find_orb_memory( void)
 {
+#ifndef _WIN32
+   extern const char *lock_filename;      /* "/tmp/fo_lock" */
+   extern FILE *lock_file;
+#endif
+
    free_sigma_recs( );
    get_observer_data( NULL, NULL, NULL, NULL, NULL);
    get_object_name( NULL, NULL);
    planet_posn( -1, 0., NULL);
    add_gaussian_noise_to_obs( 0, NULL, 0.);
    full_improvement( NULL, 0, NULL, 0., NULL, 0, 0.);
-   get_environment_ptr( NULL);
    if( sr_orbits)
       {
       free( sr_orbits);
       sr_orbits = NULL;
       }
    find_objects_in_file( NULL, NULL, NULL);
+   find_fcct_biases( 0., 0., 0, 0., NULL, NULL);
+   get_find_orb_text( 0);
+   load_cospar_file( NULL);
+   get_environment_ptr( NULL);
+#ifndef _WIN32
+   fclose( lock_file);
+   unlink( lock_filename);
+#endif
    return( 0);
 }

@@ -35,8 +35,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 
 #ifndef _WIN32
 #include <sys/file.h>
+#include <unistd.h>
 
 bool findorb_already_running = false;
+const char *lock_filename = "/tmp/fo_lock";
+FILE *lock_file;
 #endif
 
             /* Pretty much every platform I've run into supports */
@@ -65,8 +68,10 @@ int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
          __attribute__ (( format( printf, 3, 4)))
 #endif
 ;
+#ifdef NOT_CURRENTLY_IN_USE
 #define ssnprintf_append( obuff, ...) snprintf_append( obuff, sizeof( obuff), __VA_ARGS__)
 #define ssnprintf( obuff, ...) snprintf( obuff, sizeof( obuff), __VA_ARGS__)
+#endif
 int store_defaults( const int ephemeris_output_options,
          const int element_format, const int element_precision,
          const double max_residual_for_filtering,
@@ -2632,8 +2637,7 @@ int get_defaults( int *ephemeris_output_options, int *element_format,
    const char *override_fcct14_filename = get_environment_ptr( "FCCT14_FILE");
 
 #ifndef _WIN32
-   FILE *lock_file = fopen( "/tmp/fo_lock", "w");
-
+   lock_file = fopen( lock_filename, "w");
    assert( lock_file);
    if( flock( fileno( lock_file), LOCK_EX | LOCK_NB))
       findorb_already_running = true;
