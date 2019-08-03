@@ -2690,7 +2690,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
       perturbers |= (1 << IDX_ASTEROIDS); /* actually turned on! Otherwise, */
       n_params = 7;                       /* we can loop forever...         */
       }
-   else if( limited_orbit && !memcmp( limited_orbit, "np=", 3))
+   else if( limited_orbit && !strncmp( limited_orbit, "np=", 3))
       n_params = atoi( limited_orbit + 3);
    else
       n_params = 6 + n_extra_params;
@@ -4461,6 +4461,8 @@ int metropolis_search( OBSERVE *obs, const int n_obs, double *orbit,
 #include "sigma.h"
 #include "pl_cache.h"
 
+void pop_all_orbits( void);         /* orb_func2.cpp */
+
 int clean_up_find_orb_memory( void)
 {
 #ifndef _WIN32
@@ -4484,6 +4486,7 @@ int clean_up_find_orb_memory( void)
    get_find_orb_text( 0);
    load_cospar_file( NULL);
    get_environment_ptr( NULL);
+   pop_all_orbits( );
 #ifndef _WIN32
    fclose( lock_file);
    unlink( lock_filename);
