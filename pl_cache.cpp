@@ -66,9 +66,8 @@ int format_jpl_ephemeris_info( char *buff);                 /* pl_cache.c */
 static int planet_posn_raw( int planet_no, const double jd,
                             double *vect_2000)
 {
-   static void *ps_1996_data[10];
    const int jpl_center = 11;         /* default to heliocentric */
-   int i, rval = 0;
+   int rval = 0;
    static const char *jpl_filename = NULL;
    static void *jpl_eph = NULL;
    const int bc405_start = 100;
@@ -180,67 +179,22 @@ static int planet_posn_raw( int planet_no, const double jd,
                            jd, planet_no, failure_code);
       }
 
-   if( planet_no == 10)        /* the moon */
-      {
-      double tloc[4];
-
-      if( !compute_elp_xyz( NULL, (jd - J2000) / 36525., 0., tloc))
-         for( i = 0; i < 3; i++)
-            vect_2000[i] = tloc[i] / AU_IN_KM;
-      else
-         {
-         static int first_time = 1;
-
-         rval = -3;
-         if( first_time)
-            generic_message_box( get_find_orb_text( 2019), "o");
-         first_time = 0;
-         compute_rough_planet_loc( (jd - J2000) / 36525., 10, vect_2000);
-         }
-      return( rval);
-      }
-
    if( planet_no < 0)          /* flag to unload everything */
-      {
-      for( i = 0; i < 10; i++)
-         if( ps_1996_data[i])
-            {
-            unload_ps1996_series( ps_1996_data[i]);
-            ps_1996_data[i] = NULL;
-            }
-      return( 0);
-      }
-
-   if( !ps_1996_data[planet_no])
-      ps_1996_data[planet_no] = load_ps1996_series( NULL, jd, planet_no);
-
-   if( !ps_1996_data[planet_no])
-      rval = -1;
-   else if( get_ps1996_position( jd, ps_1996_data[planet_no], vect_2000, 0))
-      {
-      unload_ps1996_series( ps_1996_data[planet_no]);
-      ps_1996_data[planet_no] = load_ps1996_series( NULL, jd, planet_no);
-      if( !ps_1996_data[planet_no])
-         rval = -2;
-      else if( get_ps1996_position( jd, ps_1996_data[planet_no], vect_2000, 0))
-         rval = -3;
-      }
-
-   if( !rval)
-      equatorial_to_ecliptic( vect_2000);
+      rval = 0;                /* Currently,  nothing to unload */
    else
       {
-      static int first_time = 1;
+      static bool error_message_shown = false;
 
-      if( first_time)
+      if( !error_message_shown)
          {
-         generic_message_box( get_find_orb_text( 2020), "o");
-         debug_printf( "Loading ps_1996: rval %d, planet %d, JD %f\n",
-                  rval, planet_no, jd);
+         error_message_shown = true;
+         generic_message_box( get_find_orb_text( jpl_eph ? 2030 : 2029), "o");
          }
-      first_time = 0;
-      if( planet_no > 0 && planet_no < 9)
+      if( planet_no > 0 && planet_no <= 10)
+         {
          compute_rough_planet_loc( (jd - J2000) / 36525., planet_no, vect_2000);
+         rval = 0;
+         }
       }
 
    return( rval);

@@ -273,3 +273,12 @@
 2028    %d observations were read by Find_Orb,  but only after the format was
 2028    corrected.  The observation would probably be rejected by MPC.  See
 2028    https://www.projectpluto.com/fix_obs.htm for details.
+
+2029    You don't currently have JPL planetary ephemerides set up
+2029    for use in Find_Orb.  This will result in some loss of accuracy
+2029    and speed.  See https://www.projectpluto.com/find_orb.htm#de_eph
+2029    for further information.
+
+2030    You're attempting to compute planetary positions for dates
+2030    outside the range covered by your JPL ephemeris file.  See
+2030    https://www.projectpluto.com/find_orb.htm#de_eph for more info.
