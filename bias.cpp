@@ -121,6 +121,7 @@ int find_fcct_biases( const double ra, const double dec, const char catalog,
             {
             bias_file_known_to_be_missing = true;
             free( bias_data);
+            bias_data = NULL;
             return( BIAS_NO_BIAS_FILE);
             }
          loc = 0;
