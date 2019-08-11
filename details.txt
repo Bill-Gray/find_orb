@@ -316,6 +316,8 @@ COM Valid: 1900-2004 jul 1
 OBS D. McLean
 COM Valid: 2004 jul 1 - 2015
 OBS R. H. McNaught
+COM Valid: 2019 - 2100
+OBS D. Rankin
 COM Valid: 2014 - 2100
 OBS R. L. Seaman
 COM Valid: 2014 - 2100
@@ -521,6 +523,8 @@ COM Valid: 1900-2004 jul 1
 OBS D. McLean
 COM Valid: 2004 jul 1 - 2015
 OBS R. H. McNaught
+COM Valid: 2019 - 2100
+OBS D. Rankin
 COM Valid: 2014 - 2100
 OBS R. L. Seaman
 COM Valid: 2014 - 2100
@@ -609,6 +613,8 @@ COM Valid: 1900-2004 jul 1
 OBS D. McLean
 COM Valid: 2004 jul 1 - 2015
 OBS R. H. McNaught
+COM Valid: 2019 - 2100
+OBS D. Rankin
 COM Valid: 2014 - 2100
 OBS R. L. Seaman
 COM Valid: 2014 - 2100
@@ -716,6 +722,8 @@ COM Valid: 1900-2004 jul 1
 OBS D. McLean
 COM Valid: 2004 jul 1 - 2015
 OBS R. H. McNaught
+COM Valid: 2019 - 2100
+OBS D. Rankin
 COM Valid: 2014 - 2100
 OBS R. L. Seaman
 COM Valid: 2014 - 2100
@@ -959,6 +967,8 @@ COM Valid: 1900-2004 jul 1
 OBS D. McLean
 COM Valid: 2004 jul 1 - 2015
 OBS R. H. McNaught
+COM Valid: 2019 - 2100
+OBS D. Rankin
 COM Valid: 2014 - 2100
 OBS R. L. Seaman
 COM Valid: 2014 - 2100

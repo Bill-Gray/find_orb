@@ -47,6 +47,7 @@
  Gorbovskoy                                <a href="http://www.researchgate.net/profile/E_Gorbovskoy/citations">Gorbovskoy</a>
  Grauer                                    <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0018871">Grauer</a>
  Grav                                      <a href="http://web.mac.com/tgrav/iWeb/Family/Welcome.html">Grav</a>
+ Groeller                                  Gr&ouml;ller
  Guido                                     <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0120361">Guido</a>
  Hammergren                                <a href="http://www.eccentrix.com/members/ssp2k/ppl/profiles/drhammer.html">Hammergren</a>
  Healy                                     <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0066479">Healy</a>
