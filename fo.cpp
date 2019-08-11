@@ -755,6 +755,7 @@ int main( int argc, const char **argv)
             long file_offset = ids[i].file_offset - 40L;
             int element_options = ELEM_OUT_ALTERNATIVE_FORMAT;
             double epoch_shown, curr_epoch, orbit[12];
+            bool have_json_ephem = false;
 
             if( all_heliocentric)
                element_options |= ELEM_OUT_HELIOCENTRIC_ONLY;
@@ -914,8 +915,11 @@ int main( int argc, const char **argv)
             else
                printf( "; not enough observations\n");
             unload_observations( obs, n_obs_actually_loaded);
+            if( ephemeris_output_options & OPTION_COMPUTER_FRIENDLY)
+               if( mpec_path || !is_default_ephem)
+                  have_json_ephem = true;
             add_json_data( "total.json",
-                     (mpec_path || !is_default_ephem) ? "combined.json" : "elements.json",
+                     have_json_ephem ? "combined.json" : "elements.json",
                      i == starting_object + total_objects - 1);
             }
          object_comment_text( tbuff, ids + i);
