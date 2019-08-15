@@ -2316,6 +2316,67 @@ static int toggle_selected_observations( OBSERVE *obs, const unsigned n_obs,
    return( rval);
 }
 
+static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
+                                 const bool drop_single_obs)
+{
+   OBJECT_INFO *ids;
+   const char *most_recent_file = "MOST_RECENT_FILE_OPENED";
+   const char *temp_clipboard_filename = "/tmp/obs_temp.txt";
+
+   *err_buff = '\0';
+   if( !*ifilename)
+      user_select_file( ifilename, "Open astrometry file", 0);
+
+   if( !*ifilename)
+      {
+      strcpy( err_buff, "'findorb' needs the name of an input file of MPC-formatted\n"
+               "astrometry as a command-line argument.\n");
+      return( NULL);
+      }
+
+   if( !strcmp( ifilename, "c") || !strcmp( ifilename, "c+"))
+      {
+      clipboard_to_file( temp_clipboard_filename, ifilename[1] == '+');
+      strcpy( ifilename, temp_clipboard_filename);
+      }
+
+   if( !strcmp( ifilename, "p"))
+      strcpy( ifilename, get_environment_ptr( most_recent_file));
+
+   ids = find_objects_in_file( ifilename, n_ids, NULL);
+   if( *n_ids > 0 && drop_single_obs)
+      {
+      int i, j;
+
+      for( i = j = 0; i < *n_ids; i++)
+         if( ids[i].n_obs > 1)
+            ids[j++] = ids[i];
+      *n_ids = j;
+      }
+   if( debug_level > 2)
+      debug_printf( "%d objects in file\n", *n_ids);
+   if( *n_ids <= 0)
+      {        /* no objects found,  or file not found */
+      const char *err_msg;
+
+      if( *n_ids == -1)
+         err_msg = "Couldn't locate the file '%s'\n";
+      else
+         err_msg = "No objects found in file '%s'\n";
+      sprintf( err_buff, err_msg, ifilename);
+      if( ids)
+         free( ids);
+      ids = NULL;
+      }
+   else
+      {
+      set_solutions_found( ids, *n_ids);
+      if( strcmp( ifilename, temp_clipboard_filename))
+         set_environment_ptr( most_recent_file, ifilename);
+      }
+   return( ids);
+}
+
 int sanity_test_observations( const char *filename);
 
 /* main( ) begins by using the select_object_in_file( ) function (see above)
@@ -2339,7 +2400,7 @@ int main( int argc, const char **argv)
    unsigned top_line_residuals;
    bool is_monte_orbit = false;
    unsigned list_codes = SHOW_MPC_CODES_NORMAL;
-   int i, quit = 0, n_obs = 0;
+   int i, quit = 0, n_obs = 0, get_new_file = 1;
    int observation_display = 0;
    OBSERVE FAR *obs = NULL;
    int curr_obs = 0;
@@ -2350,7 +2411,7 @@ int main( int argc, const char **argv)
    int residual_format = RESIDUAL_FORMAT_80_COL, bad_elements = 0;
    int element_format = 0, debug_mouse_messages = 0, prev_getch = 0;
    int auto_repeat_full_improvement = 0, n_ids, planet_orbiting = 0;
-   OBJECT_INFO *ids;
+   OBJECT_INFO *ids = NULL;
    double noise_in_arcseconds = 1.;
    double monte_data[MONTE_DATA_SIZE];
    extern int monte_carlo_object_count;
@@ -2366,7 +2427,6 @@ int main( int argc, const char **argv)
    bool sort_obs_by_code = false;
    int n_stations_shown = 0, top_obs_shown = 0, n_obs_shown = 0;
    bool single_obs_selected = false;
-   const char *most_recent_file = "MOST_RECENT_FILE_OPENED";
 
    if( !strcmp( argv[0], "find_orb"))
       use_config_directory = true;
@@ -2540,49 +2600,6 @@ int main( int argc, const char **argv)
    if( debug_level)
       debug_printf( "%d sigma recs read\n", i);
 
-   if( !*ifilename)
-      user_select_file( ifilename, "Open astrometry file", 0);
-
-   if( !*ifilename)
-      {
-      printf( "'findorb' needs the name of an input file of MPC-formatted\n");
-      printf( "astrometry as a command-line argument.\n");
-      exit( 0);
-      }
-
-   *message_to_user = '\0';
-   if( !strcmp( ifilename, "c") || !strcmp( ifilename, "c+"))
-      {
-      const char *temp_clipboard_filename = "/tmp/obs_temp.txt";
-
-      clipboard_to_file( temp_clipboard_filename, ifilename[1] == '+');
-      strcpy( ifilename, temp_clipboard_filename);
-      }
-
-   if( !strcmp( ifilename, "p"))
-      strcpy( ifilename, get_environment_ptr( most_recent_file));
-
-   ids = find_objects_in_file( ifilename, &n_ids, NULL);
-   if( n_ids > 0 && drop_single_obs)
-      {
-      int j = 0;
-
-      for( i = 0; i < n_ids; i++)
-         if( ids[i].n_obs > 1)
-            ids[j++] = ids[i];
-      n_ids = j;
-      }
-   if( n_ids <= 0)
-      {        /* no objects found,  or file not found */
-      const char *err_msg;
-
-      if( n_ids == -1)
-         err_msg = "Couldn't locate the file '%s'\n";
-      else
-         err_msg = "No objects found in file '%s'\n";
-      fprintf( stderr, err_msg, ifilename);
-      return( -1);
-      }
 
    initialize_curses( argc, argv);
 #ifdef PDCURSES
@@ -2590,21 +2607,7 @@ int main( int argc, const char **argv)
    original_ymax = getmaxy( stdscr);
 #endif
 
-   if( debug_level > 2)
-      debug_printf( "%d objects in file\n", n_ids);
-   if( debug_level > 3)
-      for( i = 0; i < n_ids; i++)
-         {
-         debug_printf( "   Object %d: '%s', '%s'\n", i,
-                        ids[i].packed_desig, ids[i].obj_name);
-         object_comment_text( tbuff, ids + i);
-         debug_printf( "   %s\n", tbuff);
-         }
-   if( n_ids > 0)
-      set_solutions_found( ids, n_ids);
-   if( debug_level > 2)
-      debug_printf( "solutions set\n");
-
+   *message_to_user = '\0';
    while( !quit)
       {
       int line_no = 0;
@@ -2613,6 +2616,19 @@ int main( int argc, const char **argv)
 
       if( c != KEY_TIMER)
          prev_getch = c;
+      if( get_new_file)
+         {
+         if( ids)
+            free( ids);
+         ids = load_file( ifilename, &n_ids, tbuff, drop_single_obs);
+         if( !ids)
+            {
+            inquire( tbuff, NULL, 30, COLOR_DEFAULT_INQUIRY);
+            goto Shutdown_program;
+            }
+         get_new_file = 0;
+         get_new_object = 1;
+         }
       if( debug_level > 3)
          debug_printf( "get_new_object = %d\n", get_new_object);
       if( get_new_object)
@@ -2677,7 +2693,6 @@ int main( int argc, const char **argv)
             curr_obs = top_obs_shown = i;
             update_element_display = 1;
             clear( );
-            set_environment_ptr( most_recent_file, ifilename);
             }
          force_bogus_orbit = false;
          }
@@ -4540,7 +4555,8 @@ Shutdown_program:
    set_environment_ptr( "EPHEM_START", ephemeris_start);
    sprintf( tbuff, "%d %s", n_ephemeris_steps, ephemeris_step_size);
    set_environment_ptr( "EPHEM_STEPS", tbuff);
-   free( ids);
+   if( ids)
+      free( ids);
    if( mpc_color_codes)
       free( mpc_color_codes);
    clean_up_find_orb_memory( );
