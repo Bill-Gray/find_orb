@@ -57,6 +57,7 @@ static void adjust_time( char *time_buff, const int half_exposure)
                + atoi( time_buff + 14) * 60 + atoi( time_buff + 17);
 
    sec += half_exposure;
+   assert( sec < 86400 + 86400);   /* allow for day-long exposure! */
    snprintf( time_buff + 11, 9, "%02u:%02u:%02u",
                sec / 3600, (sec / 60) % 60, sec % 60);
    time_buff[19] = ' ';
