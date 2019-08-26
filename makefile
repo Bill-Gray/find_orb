@@ -75,6 +75,10 @@ all: fo$(EXE) find_orb$(EXE) fo_serve.cgi eph2tle$(EXE)
 
 CFLAGS=-c -O3 -Wall -pedantic -Wextra -I $(INSTALL_DIR)/include
 
+ifdef DEBUG
+	CFLAGS += -g
+endif
+
 OBJS=b32_eph.o bc405.o bias.o collide.o conv_ele.o details.o eigen.o \
 	elem2tle.o elem_out.o elem_ou2.o ephem0.o errors.o gauss.o   \
 	geo_pot.o healpix.o lsquare.o miscell.o         monte0.o \
