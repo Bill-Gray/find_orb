@@ -180,6 +180,14 @@ static void remove_html_tags( char *buff)
       }
 }
 
+double minimum_observation_jd = 1.;      /* set in console Find_Orb's */
+double maximum_observation_jd =  1e+9;   /* command line      */
+
+static bool is_in_range( const double jd)
+{
+   return( jd > minimum_observation_jd && jd < maximum_observation_jd);
+}
+
 /* In some situations,  MPC observations end up with one or more
 leading or trailing spaces.  Or people copy/paste observations and
 leave off a space or three at the beginning,  or don't put the
@@ -3394,7 +3402,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
       memcpy( original_packed_desig, buff, 12);
       xref_designation( buff);
       add_line_to_observation_details( obs_details, buff);
-      if( observation_jd( buff) &&
+      if( is_in_range( observation_jd( buff)) &&
                      !compare_desigs( packed_desig, buff))
          {
          const int error_code = parse_observation( rval + i, buff);
@@ -4004,7 +4012,7 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
          xref_designation( new_xdesig);
          *new_xdesig = '\0';
          }
-      if( jd != 0. && !is_second_line( buff))
+      if( is_in_range( jd) && !is_second_line( buff))
          if( !station || !memcmp( buff + 76, station, 3))
             {
             int loc;

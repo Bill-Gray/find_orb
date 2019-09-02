@@ -2526,12 +2526,24 @@ int main( int argc, const char **argv)
                break;
             case 'r':
                {
-               extern double minimum_observation_year;  /* default is -1e+9 */
-               extern double maximum_observation_year;  /* default is +1e+9. */
+               const char *comma = strchr( arg, ',');
 
-               sscanf( arg, "%lf,%lf",
-                             &minimum_observation_year,
-                             &maximum_observation_year);
+               if( comma)
+                  {
+                  extern double minimum_observation_jd;  /* default is 1     */
+                  extern double maximum_observation_jd;  /* default is +1e+9. */
+                  const size_t len = comma - arg;
+
+                  assert( len < sizeof( tbuff));
+                  memcpy( tbuff, arg, len);
+                  tbuff[len] = '\0';
+                  minimum_observation_jd =
+                          get_time_from_string( 0., tbuff,
+                          FULL_CTIME_YMD | CALENDAR_JULIAN_GREGORIAN, NULL);
+                  maximum_observation_jd =
+                          get_time_from_string( 0., comma + 1,
+                          FULL_CTIME_YMD | CALENDAR_JULIAN_GREGORIAN, NULL);
+                  }
                }
                break;
             case 's':
