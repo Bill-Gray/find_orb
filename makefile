@@ -105,6 +105,9 @@ eph2tle$(EXE):          eph2tle.o conv_ele.o elem2tle.o simplex.o lsquare.o
 cssfield$(EXE):          cssfield.o
 	$(CC) -o cssfield$(EXE) cssfield.o $(LIBS)
 
+roottest$(EXE):          roottest.o
+	$(CC) -o roottest$(EXE) roottest.o roots.o
+
 neat_xvt$(EXE):          neat_xvt.o
 	$(CC) -o neat_xvt$(EXE) neat_xvt.o
 
