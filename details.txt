@@ -978,7 +978,13 @@ TEL 1.55-m reflector + CCD
 
 COD W34
 OBS R. L. Flynn
+COM Valid: 1900 - 2019 May 29
 TEL 0.20-m f/10 Schmidt-Cassegrain + f/7.0 focal reducer
+COM Valid: 2019 May 29 - 2100
+TEL 0.35-m f/1.9 Schmidt-Cassegrain + CCD
+COM Aplanatic Schmidt-Cassegrain
+COM Photo/astrometry Astrometrica 4.12.0.488
+COM (Default details from R. L. Flynn,  2019 Sep 4)
 
 COD W77
 OBS J. E. Mazur
