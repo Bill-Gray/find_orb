@@ -3307,6 +3307,7 @@ double maximum_observation_span = 200.;
 
 int sanity_check_observations = 1;
 bool use_sigmas = true;
+extern int is_interstellar;
 
 OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                            const int n_obs)
@@ -3354,6 +3355,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
             /* may tell you it's really a comet,  and the orbit may   */
             /* tell you it's an artsat.                               */
    object_type = OBJECT_TYPE_ASTEROID;
+   is_interstellar = 0;
    if( !obs_details)
       obs_details = init_observation_details( );
    ades_context = init_ades2mpc( );
@@ -3601,6 +3603,9 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                   comment_observation( rval + i, comment);
                   n_fixes_made++;
                   }
+               if( rval[i].packed_id[4] == 'I' &&
+                    rval[i].packed_id[0] == '0' && rval[i].packed_id[1] == '0')
+                  is_interstellar = 1;
                i++;
                spacecraft_offset_reference = 399;  /* default to geocentric offsets */
                }
@@ -3661,6 +3666,8 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
             observation_time_offset = atof( buff + 8) / seconds_per_day;
          else if( !memcmp( buff, "#relax_xyz", 10))
             strict_sat_xyz_format = false;
+         else if( !memcmp( buff, "#interstellar", 12))
+            is_interstellar = 1;
          else if( !memcmp( buff, "#time ", 6))
             override_time = get_time_from_string( 0, buff + 6,
                               CALENDAR_JULIAN_GREGORIAN, NULL);

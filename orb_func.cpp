@@ -3540,9 +3540,10 @@ static const char *incl_vs_a_scattergram[30] = {
 /* value);  inclination (anything above .5 radians,  or about 30 degrees, */
 /* is considered unlikely).  Also,  main-belt objects (based on a) are    */
 /* slightly encouraged.                                                   */
-/*    Note that if the designation is that of an interstellar object,  we */
-/* don't add a penalty for highly hyperbolic solutions.  In that case,  a */
-/* high eccentricity is exactly what we expect to see.                    */
+/*    Note that if the designation is that of an interstellar object,  or */
+/* if the line 'COM interstellar' is in the observation file,  we don't   */
+/* add a penalty for highly hyperbolic solutions.  In that case,  a high  */
+/* eccentricity is exactly what we expect to see.                         */
 
 static double adjustment_for_orbit_likelihood( const double semimajor_axis,
                  const double inclination, const double q)
@@ -3577,6 +3578,8 @@ static double adjustment_for_orbit_likelihood( const double semimajor_axis,
    return( rval * .1);
 }
 
+int is_interstellar = 0;
+
 double evaluate_initial_orbit( const OBSERVE FAR *obs,
                               const int n_obs, const double *orbit)
 {
@@ -3585,8 +3588,6 @@ double evaluate_initial_orbit( const OBSERVE FAR *obs,
    ELEMENTS elem;
    int planet_orbiting = find_best_fit_planet( obs->jd,
                                   orbit, rel_orbit);
-   const bool is_interstellar = (obs->packed_id[4] == 'I' &&
-                  obs->packed_id[0] == '0' && obs->packed_id[1] == '0');
 
    elem.gm = get_planet_mass( planet_orbiting);
    calc_classical_elements( &elem, rel_orbit, obs[0].jd, 1);

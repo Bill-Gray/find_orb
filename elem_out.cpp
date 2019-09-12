@@ -1118,7 +1118,7 @@ int write_out_elements_to_file( const double *orbit,
    extern const char *elements_filename;
    FILE *ofile = fopen_ext( get_file_name( buff, elements_filename), file_permits);
    double rel_orbit[6], orbit2[6];
-   int planet_orbiting, n_lines, i, bad_elements;
+   int planet_orbiting, n_lines, i, bad_elements = 0;
    ELEMENTS elem, helio_elem;
    char *tptr, *tbuff;
    char impact_buff[80];
@@ -1137,6 +1137,7 @@ int write_out_elements_to_file( const double *orbit,
    int showing_sigmas = available_sigmas;
    int elements_frame = atoi( get_environment_ptr( "ELEMENTS_FRAME"));
    const unsigned orbit_summary_options = atoi( get_environment_ptr( "ORBIT_SUMMARY_OPTIONS"));
+   extern int is_interstellar;         /* orb_func.cpp */
 
    setvbuf( ofile, NULL, _IONBF, 0);
    setvbuf( stdout, NULL, _IONBF, 0);
@@ -1779,10 +1780,13 @@ int write_out_elements_to_file( const double *orbit,
          fprintf( ofile, "\n");
       }
    fclose( ofile);
-         /* Return value indicates probable trouble if the eccentricity      */
-         /* is greater than 1.2 for an heliocentric orbit.  If that happens, */
-         /* the orbital elements ought to be shown in,  say,  flashing red.  */
-   bad_elements = ( helio_elem.ecc < 1.2 || helio_elem.central_obj ? 0 : -1);
+         /* If the eccentricity is greater than about 1.2 for an heliocentric
+            orbit,  and it's not marked as an interstellar object either by
+            designation or a 'COM interstellar' line in the input,  the orbit
+            is probably bogus and should be shown in,  say,  flashing red.  */
+
+   if( !is_interstellar && !helio_elem.central_obj && helio_elem.ecc > 1.2)
+      bad_elements = 1;
    if( helio_elem.q > 90.)
       bad_elements |= 2;
 
