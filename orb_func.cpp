@@ -1685,25 +1685,25 @@ int get_sr_orbits( double *orbits, OBSERVE FAR *obs,
 //    free( stored_ra_decs_mags_times);
       }
    qsort( orbits, rval, 7 * sizeof( double), sr_orbit_compare);
-   for( i = 0; i < rval; i++)
-      {
-      extern const char *elements_filename;
-      const char *tname = elements_filename;
-      extern int append_elements_to_element_file;
-      int curr_append = append_elements_to_element_file;
+   if( writing_sr_elems)
+      for( i = 0; i < rval; i++)
+         {
+         extern const char *elements_filename;
+         const char *tname = elements_filename;
+         extern int append_elements_to_element_file;
+         int curr_append = append_elements_to_element_file;
 
-      elements_filename = "sr_elems.txt";
-      append_elements_to_element_file = (i ? 1 : 0);
-      set_locs( orbits, obs[0].jd, obs, n_obs);
-      if( writing_sr_elems)
+         elements_filename = "sr_elems.txt";
+         append_elements_to_element_file = (i ? 1 : 0);
+         set_locs( orbits, obs[0].jd, obs, n_obs);
          write_out_elements_to_file( orbits, obs[0].jd,
-               find_epoch_shown( obs, n_obs),
-               obs, n_obs, "", 5,
-               1, ELEM_OUT_NO_COMMENT_DATA | ELEM_OUT_PRECISE_MEAN_RESIDS);
-      orbits += 7;
-      append_elements_to_element_file = curr_append;
-      elements_filename = tname;
-      }
+                  find_epoch_shown( obs, n_obs),
+                  obs, n_obs, "", 5,
+                  1, ELEM_OUT_NO_COMMENT_DATA | ELEM_OUT_PRECISE_MEAN_RESIDS);
+         orbits += 7;
+         append_elements_to_element_file = curr_append;
+         elements_filename = tname;
+         }
    return( rval);
 }
 
