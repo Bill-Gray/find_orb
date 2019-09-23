@@ -381,6 +381,10 @@ COD 834
 OBS R. Mackintosh, R. Caprio, P. Kelis
 MEA R. Mackintosh
 
+COD 850
+OBS D. T. Durig
+TEL 0.3-m f/5.0 Schmidt-Cassegrain + CCD
+
 COD 854
 OBS J. E. McGaha
 TEL 0.36-m f/10.0 Schmidt-Cassegrain + CCD
@@ -472,7 +476,18 @@ COD C51
 MEA A. Mainzer, E. Wright, J. Bauer, T. Grav, J. Dailey
 MEA J. Masiero, R. Cutri, R. McMillan, R. Walker
 
+COD C53
+OBS S. Thorsteinson
+MEA D. D. Balam
+TEL 0.15-m reflector + CCD
+
+COD C65
+OBS T. Santana-Ros
+MEA M. Micheli
+TEL 0.80-m f/9.6 Ritchey-Chretien + CCD
+
 COD C95
+OBS J. Jahn
 TEL 0.60-m f/3.2 Newtonian reflector + CCD
 
 COD D29
@@ -786,6 +801,10 @@ COD J97 Alginet
 OBS T. Climent
 TEL 0.25-m f/4 Schmidt-Cassegrain + CCD
 
+COD K61
+OBS M. Adamovsky
+TEL 0.51-m f/6.8 reflector + CCD
+
 COD K88
 OBS K. Sarneczky
 TEL 0.60-m Schmidt + CCD
@@ -1095,4 +1114,9 @@ COM Valid: 2018 Jun 4 - 2018 Jun 12
 NET UCAC-4
 COM Valid: 2018 Jun 12 - 2100
 NET Gaia-DR2
+
+COD Z84
+OBS E. Schwab
+MEA E. Schwab, D. Koschny, M. Micheli
+TEL 0.8-m f/3 Schmidt + CCD
 
