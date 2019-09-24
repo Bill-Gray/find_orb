@@ -282,3 +282,17 @@
 2030    You're attempting to compute planetary positions for dates
 2030    outside the range covered by your JPL ephemeris file.  See
 2030    https://www.projectpluto.com/find_orb.htm#de_eph for more info.
+
+2031    F Select file from hard drive
+2031    C Copy astrometry from clipboard
+2031    N Give object name and get data from MPC
+
+2032    0 No non-gravitational forces
+2032    R Radial force only
+2032    T Tangential force only
+2032    2 Radial & tangential
+2032    3 Radial, tangential, & out-of-plane
+2032    I Inverse-square force
+2032    C Comet (Marsden-Sekanina) force
+
+2033    Use arrow keys to select object,  then hit the space bar or Enter (or use mouse)
