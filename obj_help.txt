@@ -1,0 +1,11 @@
+   If a file contains astrometry for more than one object,  Find_Orb will
+list them.  If there's sufficient room on-screen,  it may list a bit of
+information about that object (number of observations and time range).
+
+   Double-click on an object,  or move the highlighted object with the
+cursor keys and hit Enter or Space,  and Find_Orb will load astrometry
+for that object.
+
+   If you have a _lot_ of objects in the file,  you can just type the
+object's name to find it.
+

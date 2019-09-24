@@ -1022,7 +1022,8 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
                    (n_cols == 1 ? -1 : column_width), color);
             }
 
-         put_colored_text( "Use arrow keys to find your choice,  then hit the space bar or Enter",
+              /* "Use arrow keys to select object", etc. */
+         put_colored_text( get_find_orb_text( 2033),
                                  n_lines, 0, -1, COLOR_SELECTED_OBS);
          if( err_message)
             put_colored_text( "Not a valid choice",
@@ -1035,6 +1036,7 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
          if( *search_text)
             put_colored_text( search_text, n_lines + 1, 55,
                       (int)strlen( search_text), COLOR_FINAL_LINE);
+         put_colored_text( "HELP", n_lines + 1, 75, 4, COLOR_HIGHLIT_BUTTON);
          flushinp( );
          c = extended_getch( );
          err_message = 0;
@@ -1048,9 +1050,10 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
                c = KEY_UP;
             else if( button5_pressed)   /* actually 'wheel down' */
                c = KEY_DOWN;
-            else
-              if( y < n_lines)
+            else if( y < n_lines)
                choice = curr_page + y + (x / column_width) * n_lines;
+            else if( y == n_lines + 1 || y == n_lines)
+               c = '?';
             else if( y == n_lines + 2)
                {
                if( x >= 75)
@@ -1069,7 +1072,7 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
             }
                      /* if a letter/number is hit,  look for an obj that */
                      /* starts with that letter/number: */
-         if( (c >= ' ' && c <= 'z') || c == 8)
+         if( (c >= ' ' && c <= 'z' && c != '?') || c == 8)
             {
             size_t len = strlen( search_text);
 
@@ -1109,6 +1112,9 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
 #endif
          switch( c)
             {
+            case '?':
+               show_a_file( "obj_help.txt");
+               break;
             case 9:
                force_full_width_display ^= 1;
                break;
