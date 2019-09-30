@@ -3385,19 +3385,6 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
          if( is_rwo && !i && debug_level)
             debug_printf( "Got .rwo data\n");
          }
-      if( ilen >= 90 && buff[82] == '.' && buff[88] == '.')
-         {                    /* Possible Tholen-style sigmas:  2F6.3 */
-         double sig1, sig2;   /* right after the usual 80 columns */
-         int bytes_read;
-
-         if( sscanf( buff + 80, "%lf%lf%n", &sig1, &sig2, &bytes_read) >= 2
-                     && bytes_read >= 10)
-            {
-            buff[80] = '\0';
-            rwo_posn_sigma_1 = sig1;
-            rwo_posn_sigma_2 = sig2;
-            }
-         }
       if( fixing_trailing_and_leading_spaces)
          fixes_made = fix_up_mpc_observation( buff);
       original_packed_desig[12] = '\0';
@@ -3999,11 +3986,6 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
          debug_printf( "After get_neocp_data\n");
       if( iline_len > MINIMUM_RWO_LENGTH)
          rwo_to_mpc( buff, NULL, NULL, NULL, NULL, NULL);
-      if( iline_len >= 90 && buff[82] == '.' && buff[88] == '.')
-         {
-         buff[80] = '\0';     /* probably Dave Tholen-style sigmas */
-         iline_len = 80;
-         }
       if( fixing_trailing_and_leading_spaces)
          fix_up_mpc_observation( buff);
       if( debug_level > 8)
