@@ -897,26 +897,31 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
       }
 }
 
-static int select_element_frame( void)
+static void select_element_frame( void)
 {
-   const char *menu = "0 Default element frame\n"
-                      "1 J2000 ecliptic frame\n"
-                      "2 J2000 equatorial frame\n"
-                      "3 Body frame\n";
+   int c;
 
-   int c = inquire( menu, NULL, 0, COLOR_DEFAULT_INQUIRY);
-
-   if( c >= KEY_F( 1) && c <= KEY_F( 4))
-      c += '0' - KEY_F( 1);
-   if( c >= '0' && c <= '3')
+   do
       {
-      char obuff[2];
+      c = inquire( get_find_orb_text( 2034), NULL, 0, COLOR_DEFAULT_INQUIRY);
 
-      obuff[0] = (char)c;
-      obuff[1] = '\0';
-      set_environment_ptr( "ELEMENTS_FRAME", obuff);
+      if( c >= KEY_F( 1) && c <= KEY_F( 5))
+         c += '0' - KEY_F( 1);
+      if( c >= '0' && c <= '3')
+         {
+         char obuff[2];
+
+         obuff[0] = (char)c;
+         obuff[1] = '\0';
+         set_environment_ptr( "ELEMENTS_FRAME", obuff);
+         }
+      else if( c == '4' || c == '?')
+         {
+         c = 0;
+         show_a_file( "frame_he.txt");
+         }
       }
-   return( c);
+      while( !c);
 }
 
 

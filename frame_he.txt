@@ -1,0 +1,18 @@
+   By default,  geocentric orbital elements are shown in the J2000
+equatorial frame.  Any other sort of elements (heliocentric,
+barycentric, centered on other planets or their satellites) is
+shown in the J2000 ecliptic frame.  That default will almost
+always be what's desired.
+
+   However,  you can select a particular frame to be used for
+all elements,  including a 'body frame' element.  These are
+elements referred to the current orientation of the central body,
+and are sometimes used for inner satellites of other planets.
+(Elements for more distant,  'irregular' satellites of the gas
+giants are more commonly referenced to the J2000 ecliptic.)
+
+   The frame used will be shown in the orbital elements.  It
+makes a significant difference in the inclination,  ascending
+node,  and longitude of periapsis;  it makes no difference at
+all in the mean anomaly,  semimajor axis,  orbital period,
+or eccentricity.

@@ -159,7 +159,7 @@ install:
 	cp fo       $(HOME)/bin
 	$(MKDIR) $(IDIR)
 	cp command.txt details.txt dosephem.txt dos_help.txt ?findorb.txt           $(IDIR)
-	cp environ.def geo_rect.txt header.htm jpl_eph.txt mpcorb.hdr               $(IDIR)
+	cp environ.def frame_he.txt geo_rect.txt header.htm jpl_eph.txt mpcorb.hdr  $(IDIR)
 	cp mu1.txt observer.txt obslinks.htm ObsCodes.htm ObsCodesF.html            $(IDIR)
 	cp obj_help.txt odd_name.txt rovers.txt                                     $(IDIR)
 	cp scopes.txt sigma.txt xdesig.txt                                          $(IDIR)
