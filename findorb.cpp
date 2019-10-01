@@ -924,7 +924,6 @@ static void select_element_frame( void)
       while( !c);
 }
 
-
 static void object_comment_text( char *buff, const OBJECT_INFO *id)
 {
    sprintf( buff, "%d obs; ", id->n_obs);
@@ -4495,9 +4494,18 @@ int main( int argc, const char **argv)
             show_commented_elements = !show_commented_elements;
             break;
          case ALT_L:
-            c = extended_getch( );
-            set_language( c);
-            update_element_display = 1;
+            {
+            const char *language_letters = "efirsd";
+
+            c = inquire( get_find_orb_text( 2035), NULL, 0, COLOR_DEFAULT_INQUIRY);
+            if( c >= KEY_F( 1) && c <= KEY_F( 6))
+               c = language_letters[c - KEY_F( 1)];
+            if( strchr( language_letters, c))
+               {
+               set_language( c);
+               update_element_display = 1;
+               }
+            }
             break;
          case CTRL( 'K'):
             {

@@ -302,3 +302,10 @@
 2034    2 J2000 equatorial frame
 2034    3 Body frame
 2034    ? Help
+
+2035    English
+2035    French
+2035    Italian
+2035    Russian
+2035    Spanish
+2035    German
