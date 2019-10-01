@@ -215,6 +215,7 @@ int compare_observations( const void *a, const void *b, void *context);
 int set_language( const int language);                      /* elem_out.cpp */
 void shellsort_r( void *base, const size_t n_elements, const size_t esize,
          int (*compare)(const void *, const void *, void *), void *context);
+static int count_wide_chars_in_utf8_string( const char *iptr, const char *endptr);
 int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
                                    const char *format, ...)
 #ifdef __GNUC__
@@ -309,14 +310,18 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
    for( i = 0; prompt[i]; i++)
       if( prompt[i] == '\n')
          {
-         if( box_size < i - line_start)
-            box_size = i - line_start;
+         const int new_size = count_wide_chars_in_utf8_string(
+                     prompt + line_start, prompt + i);
+
+         if( box_size < new_size)
+            box_size = new_size;
          line_start = i;
          if( prompt[i + 1])   /* ignore trailing '\n's */
             n_lines++;
          }
-   if( box_size < i - line_start)
-      box_size = i - line_start;
+   i = count_wide_chars_in_utf8_string( prompt + line_start, prompt + i);
+   if( box_size < i)
+      box_size = i;
    if( box_size > getmaxx( stdscr) - 2)
       box_size = getmaxx( stdscr) - 2;
 
@@ -350,20 +355,25 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
    for( i = 0; prompt[i]; )
       {
       int n_spaces, color_to_use = color;
+      int n_wchars;
 
       for( j = i; prompt[j] && prompt[j] != '\n'; j++)
          ;
       memset( tbuff, ' ', side_borders);
       memcpy( tbuff + side_borders, prompt + i, j - i);
-      n_spaces = box_size + side_borders - (j - i);
+      n_wchars = count_wide_chars_in_utf8_string(
+                     prompt + i, prompt + j);
+      n_spaces = box_size + side_borders - n_wchars;
       if( n_spaces > 0)
          memset( tbuff + side_borders + j - i, ' ', n_spaces);
+      else
+         n_spaces = 0;
       if( !i)
          color_to_use |= 0x4000;     /* overline */
       if( !prompt[j] || !prompt[j + 1])
          color_to_use |= 0x2000;     /* underline */
       put_colored_text( tbuff, line, col - side_borders,
-             real_width, color_to_use);
+             side_borders + j - i + n_spaces, color_to_use);
       i = j;
       if( prompt[i] == '\n')
          i++;
