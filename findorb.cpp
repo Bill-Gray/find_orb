@@ -2298,6 +2298,33 @@ extern const char *elements_filename;
 #define DISPLAY_OBSERVATION_DETAILS  2
 #define DISPLAY_ORBITAL_ELEMENTS     4
 
+static int count_wide_chars_in_utf8_string( const char *iptr, const char *endptr)
+{
+   int rval = 0;
+
+   while( iptr < endptr)
+      {
+      switch( ((unsigned char)*iptr) >> 4)
+         {
+         case 0xf:          /* four-byte token;  U+10000 to U+1FFFFF */
+            iptr += 4;
+            break;
+         case 0xe:          /* three-byte token; U+0800 to U+FFFF */
+            iptr += 3;
+            break;
+         case 0xc:          /* two-byte token: U+0080 to U+03FF */
+         case 0xd:          /* two-byte token: U+0400 to U+07FF */
+            iptr += 2;
+            break;
+         default:          /* "ordinary" ASCII (U+0 to U+7F) */
+            iptr++;        /* single-byte token              */
+            break;
+         }
+      rval++;
+      }
+   assert( endptr == iptr);
+   return( rval);
+}
 
 static int toggle_selected_observations( OBSERVE *obs, const unsigned n_obs,
                                  unsigned *n_found)
@@ -2829,7 +2856,7 @@ int main( int argc, const char **argv)
                   }
                else if( !show_commented_elements && *tbuff != '#')
                   {
-                  char *tptr = strstr( tbuff, "Earth MOID:");
+                  char *tptr;
 
                   if( !memcmp( tbuff, "IMPACT", 6))
 #ifndef __PDCURSES__
@@ -2844,10 +2871,12 @@ int main( int argc, const char **argv)
                   put_colored_text( tbuff, line_no + iline, 0, -1, elem_color);
                   if( right_side_col < (unsigned)strlen( tbuff) + spacing)
                      right_side_col = (unsigned)strlen( tbuff) + spacing;
+                  tptr = strstr( tbuff, "Earth MOID:");
                   if( tptr)         /* low Earth MOID:  show in flashing text to draw attn */
                      if( atof( tptr + 11) < .01)
-                        put_colored_text( tptr, line_no + iline, (int)( tptr - tbuff),
-                                       20, COLOR_ATTENTION + 256);
+                        put_colored_text( tptr, line_no + iline,
+                              count_wide_chars_in_utf8_string( tbuff, tptr),
+                              20, COLOR_ATTENTION + 256);
                   iline++;
                   }
                else
