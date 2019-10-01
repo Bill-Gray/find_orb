@@ -340,7 +340,7 @@ const char *get_find_orb_text( const int index)
       default_text = load_file_into_memory( filename, NULL, true);
       collapse_findorb_txt( default_text);
       }
-   if( text)         /* try non-default language first... */
+   if( text && findorb_language != 'e')  /* try non-default language... */
       {
       for( i = 0; text[i]; i++)
          if( atoi( text[i]) == index)
