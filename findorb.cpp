@@ -235,9 +235,10 @@ extern double maximum_jd, minimum_jd;        /* orb_func.cpp */
 #define COLOR_MESSAGE_TO_USER       8
 #define COLOR_RESIDUAL_LEGEND       9
 #define COLOR_MENU                 10
-#define COLOR_DEFAULT_INQUIRY       9
-#define COLOR_ATTENTION             7
 #define COLOR_SCROLL_BAR           11
+#define COLOR_DEFAULT_INQUIRY      12
+#define COLOR_ATTENTION            13
+#define COLOR_MPC_CODES            14
 
 static int curses_kbhit( )
 {
@@ -1384,8 +1385,8 @@ static void show_residual_text( char *buff, const int line_no,
 static void show_mpc_code_in_color( const char *mpc_code,
                const int y, const int x)
 {
-   put_colored_text( mpc_code, y, x, 3,
-                     512 + 16 + find_mpc_color( mpc_color_codes, mpc_code));
+   put_colored_text( mpc_code, y, x, 3, 512 + COLOR_MPC_CODES
+                      + find_mpc_color( mpc_color_codes, mpc_code));
 }
 
 #define SORT_BY_SCORE 0
