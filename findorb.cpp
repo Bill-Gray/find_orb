@@ -2146,8 +2146,50 @@ static const char *get_arg( const int argc, const char **argv, const int idx)
       return( argv[idx + 1]);
 }
 
+      /* Either locate a palette color close to the desired RGB,  or
+         (on platforms where one can do so) allocate a new palette entry
+         with the desired RGB value.      */
+static int find_rgb( const unsigned irgb)
+{
+   int best_match = 0, best_dist = 4000, i;
+   static int n_colors = 0;
+   short rgb0[3];
+
+   if( !can_change_color( ) || COLORS <= 8)     /* limited to a fixed palette */
+      n_colors = COLORS;
+   rgb0[0] = (int)( irgb >> 16);
+   rgb0[1] = (int)( (irgb >> 8) & 0xff);
+   rgb0[2] = (int)( irgb & 0xff);
+   for( i = 0; i < 3; i++)
+      rgb0[i] = rgb0[i] * 200 / 51;
+   for( i = 0; i < n_colors; i++)
+      {
+      short rgb[3];
+      int j, dist = 0;
+
+      color_content( (short)i, rgb, rgb + 1, rgb + 2);
+      for( j = 0; j < 3; j++)
+         dist += abs( rgb[j] - rgb0[j]);
+      if( best_dist > dist)
+         {
+         best_dist = dist;
+         best_match = i;
+         }
+      }
+            /* We may have found a suitable color already allocated.  Or
+               we may have no choice but to accept the best fit we found. */
+   if( best_dist < 15 || n_colors == COLORS)
+      return( best_match);
+   init_color( n_colors, rgb0[0], rgb0[1], rgb0[2]);
+   n_colors++;
+   return( n_colors - 1);
+}
+
 static inline int initialize_curses( const int argc, const char **argv)
 {
+   FILE *ifile = fopen_ext( "command.txt", "fcrb");
+   char buff[90], char_to_search_for;
+
 #ifdef __PDCURSES__
    ttytype[0] = 20;    /* Window must have at least 20 lines in Win32a */
    ttytype[1] = 55;    /* Window can have a max of 55 lines in Win32a */
@@ -2183,40 +2225,17 @@ static inline int initialize_curses( const int argc, const char **argv)
                               /* "Find_Orb -- Orbit Determination" */
 #endif
    start_color( );
-   if( COLORS >= COLOR_FAINT_GRAY && can_change_color())
-      {
-      init_color( COLOR_GRAY, 500, 500, 500);
-      init_color( COLOR_BROWN, 500, 200, 0);
-      init_color( COLOR_ORANGE, 1000, 500, 0);
-      init_color( COLOR_FAINT_GREEN, 0, 500, 500);
-      init_color( COLOR_FAINT_BLUE, 0, 0, 500);
-      init_color( COLOR_FAINT_RED, 400, 0, 0);
-      init_color( COLOR_FAINT_GRAY, 300, 300, 300);
-      init_pair( COLOR_SCROLL_BAR, COLOR_GREEN, COLOR_GRAY);
-      init_pair( COLOR_MENU, COLOR_ORANGE, COLOR_FAINT_GRAY);
-      init_pair( COLOR_OBS_INFO, COLOR_WHITE, COLOR_FAINT_RED);
-      }
-   else
-      {
-      init_pair( COLOR_SCROLL_BAR, COLOR_GREEN, COLOR_CYAN);
-      init_pair( COLOR_MENU, COLOR_WHITE, COLOR_BLUE);
-      init_pair( COLOR_OBS_INFO, COLOR_WHITE, COLOR_RED);
-      }
-   init_pair( COLOR_BACKGROUND, COLOR_WHITE, COLOR_BLACK);
-   init_pair( COLOR_ORBITAL_ELEMENTS, COLOR_BLACK, COLOR_YELLOW);
-   init_pair( COLOR_FINAL_LINE, COLOR_WHITE, COLOR_BLUE);
-   init_pair( COLOR_SELECTED_OBS, COLOR_WHITE, COLOR_MAGENTA);
-   init_pair( COLOR_HIGHLIT_BUTTON, COLOR_BLACK, COLOR_GREEN);
-   init_pair( COLOR_EXCLUDED_OBS, COLOR_RED, COLOR_GREEN);
-   init_pair( COLOR_MESSAGE_TO_USER, COLOR_BLACK, COLOR_WHITE);
-   init_pair( COLOR_RESIDUAL_LEGEND, COLOR_BLACK, COLOR_CYAN);
+   char_to_search_for = (COLORS > 8 ? 'c' : '8');
+   while( fgets( buff, sizeof( buff), ifile))
+      if( *buff == char_to_search_for)
+         {
+         int idx;
+         unsigned fore_rgb, back_rgb;
 
-                  /* MPC color-coded station colors: */
-   init_pair( 16, COLOR_YELLOW, COLOR_BLACK);
-   init_pair( 17, COLOR_WHITE, COLOR_BLACK);
-   init_pair( 18, COLOR_MAGENTA, COLOR_BLACK);
-   init_pair( 19, COLOR_CYAN, COLOR_BLACK);
-   init_pair( 20, COLOR_GREEN, COLOR_BLACK);
+         if( sscanf( buff + 1, "%d %x %x", &idx, &fore_rgb, &back_rgb) == 3)
+            init_pair( idx, find_rgb( fore_rgb), find_rgb( back_rgb));
+         }
+   fclose( ifile);
 
    if( debug_level > 2)
       debug_printf( "(3)\n");
