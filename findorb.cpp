@@ -239,15 +239,6 @@ extern double maximum_jd, minimum_jd;        /* orb_func.cpp */
 #define COLOR_ATTENTION             7
 #define COLOR_SCROLL_BAR           11
 
-
-#define COLOR_GRAY                  9
-#define COLOR_BROWN                10
-#define COLOR_ORANGE               11
-#define COLOR_FAINT_GREEN          12
-#define COLOR_FAINT_BLUE           13
-#define COLOR_FAINT_RED            14
-#define COLOR_FAINT_GRAY           15
-
 static int curses_kbhit( )
 {
    int c;
