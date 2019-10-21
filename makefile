@@ -2,12 +2,13 @@
 # Use 'bsdmake' for BSD
 # GNU MAKE Makefile for Find_Orb
 #
-# Usage: make -f [path/]linmake [CLANG=Y] [XCOMPILE=Y] [MSWIN=Y] [X=Y] [VT=Y] [tgt]
+# Usage: make -f [path/]linmake [CLANG=Y] [W32=Y] [W64=Y] [MSWIN=Y] [X=Y] [VT=Y] [tgt]
 #
 #	where tgt can be any of:
 # [all|find_orb|fo|fo_serve|clean|clean_temp|eph2tle|cssfield|neat_xvt]
 #
-#	'XCOMPILE' = cross-compile for Windows,  using MinGW,  on a Linux box
+#	'W32'/'W64' = cross-compile for 32- or 64-bit Windows,  using MinGW-w64,
+#      on a Linux box
 #	'MSWIN' = compile for Windows,  using MinGW and PDCurses,  on a Windows machine
 #	'CLANG' = use clang instead of GCC;  Linux only
 # 'X' = use PDCurses instead of ncurses
@@ -63,12 +64,24 @@ ifdef VT
 	CURSES_LIB=$(HOME)/PDCurses/vt/libpdcurses.a
 endif
 
-ifdef XCOMPILE
+LIB_DIR=$(INSTALL_DIR)/lib
+
+ifdef W64
 	CC=x86_64-w64-mingw32-g++
 	CURSES_FLAGS=-DUTF8 -DPDC_WIDE -I $(INSTALL_DIR)/include -I../PDCurses
 	EXE=.exe
-	CURSES_LIB=-lpdcurses -static-libgcc
-	LIBSADDED=-L $(INSTALL_DIR)/win_lib -lm -lgdi32 -luser32 -mwindows
+	CURSES_LIB=-lpdcurses
+	LIB_DIR=$(INSTALL_DIR)/win_lib
+	LIBSADDED=-L $(LIB_DIR) -lm -lgdi32 -luser32 -mwindows -static-libgcc
+endif
+
+ifdef W32
+	CC=i686-w64-mingw32-g++
+	CURSES_FLAGS=-DUTF8 -DPDC_WIDE -I $(INSTALL_DIR)/include -I../PDCurses
+	EXE=.exe
+	CURSES_LIB=-lpdcurses
+	LIB_DIR=$(INSTALL_DIR)/win_lib32
+	LIBSADDED=-L $(LIB_DIR) -lm -lgdi32 -luser32 -mwindows -static-libgcc
 endif
 
 all: fo$(EXE) find_orb$(EXE) fo_serve.cgi eph2tle$(EXE)
@@ -88,7 +101,7 @@ OBJS=b32_eph.o bc405.o bias.o collide.o conv_ele.o details.o eigen.o \
 LIBS=$(LIBSADDED) -llunar -ljpl -lsatell
 
 find_orb$(EXE):          findorb.o clipfunc.o $(OBJS)
-	$(CC) -o find_orb$(EXE) findorb.o clipfunc.o $(OBJS)  $(LIBS) $(CURSES_LIB)
+	$(CC) -o find_orb$(EXE) findorb.o clipfunc.o $(OBJS) $(LIBS) $(CURSES_LIB)
 
 findorb.o:         findorb.cpp
 	$(CC) $(CFLAGS) $(CURSES_FLAGS) $<
