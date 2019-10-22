@@ -180,6 +180,9 @@ static void get_field_size( double *width, double *height, const double jd,
       case 'J':         /* J95:  25' to 2005 jun 22, 18' for 2005 jun 27 on */
          *width = (jd < jun_24_2005 ? 25. / 60. : 18. / 60.);
          break;
+      case 'T':         /* ATLAS (T05), (T08)   */
+         *width = 7.4;
+         break;
       case 'V':         /* V06:  580" field of view */
          *width = 580. / 3600.;
          break;
@@ -221,13 +224,23 @@ static void get_field_size_from_input( double *width, double *height,
       }
 }
 
+/* Quick sanity check : do the time and location of the field seem
+   at all reasonable? */
+
+static bool is_valid_field( const field_location_t *field)
+{
+   return( field->jd > 2.3e+6 && field->jd < 2.5e+6
+                     && field->ra >= 0. && field->ra <= 360.
+                     && field->dec >= -90. && field->dec <= 90.);
+}
+
 int main( const int argc, const char **argv)
 {
    int file_number;
    FILE *ofile;
    char buff[200];
    field_location_t *rval = NULL;
-   int n_alloced = 0, n = 0, i;
+   int n_alloced = 0, n = 0, i, included = 0xffff;
    int verbose = 0, n_duplicates = 0;
 
    setvbuf( stdout, NULL, _IONBF, 0);
@@ -235,6 +248,9 @@ int main( const int argc, const char **argv)
       if( argv[i][0] == '-')
          switch( argv[i][1])
             {
+            case 'o':
+               included ^= (1 << atoi( argv[i] + 2));
+               break;
             case 'v':
                verbose = 1;
                break;
@@ -244,6 +260,7 @@ int main( const int argc, const char **argv)
             }
 
    for( file_number = 0; file_number < 10; file_number++)
+      if( (included >> file_number) & 1)
       {
       FILE *ifile;
 
@@ -253,6 +270,7 @@ int main( const int argc, const char **argv)
          {
          double min_jd = 1e+10, max_jd = 0.;
          double tilt = 0.;
+         int n_invalid_fields = 0;
 
          printf( "%s opened;  reading fields\n", buff);
          while( fgets( buff, sizeof( buff), ifile))
@@ -275,7 +293,7 @@ int main( const int argc, const char **argv)
                            &rval[n].dec, timestr, (char *)&rval[n].obscode);
                assert( n_scanned == 4);
                rval[n].jd = get_time_from_string( 0., timestr, 0, NULL);
-               if( rval[n].jd)      /* some lines have 'time=NULL' */
+               if( is_valid_field( rval + n))
                   {
                   rval[n].ra  *= PI / 180.;
                   rval[n].dec *= PI / 180.;
@@ -292,13 +310,15 @@ int main( const int argc, const char **argv)
                      max_jd = rval[n].jd;
                   n++;
                   }
+               else
+                  n_invalid_fields++;
                if( n < 10 || n % 100000 == 0)
                   printf( "%d fields read and parsed\r", n);
                }
             else if( !memcmp( buff, "# Tilt: ", 8))
                tilt = atof( buff + 8);
          fclose( ifile);
-         printf( "\n%d fields found\n", n);
+         printf( "\n%d fields found; %d invalid fields omitted\n", n, n_invalid_fields);
          full_ctime( buff, min_jd, 0);
          printf( "Fields run from %.21s to ", buff);
          full_ctime( buff, max_jd, 0);
