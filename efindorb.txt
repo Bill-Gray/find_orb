@@ -242,12 +242,9 @@
 
 2022    Toggle observation
 2022    Set observation uncertainty
-
-# Following pop-up shown when you right-click on an _observatory code_ :
-
-2023    Select all this obscode
-2023    Find next from this obscode
-2023    Find prev from this obscode
+2022    Select all this obscode
+2022    Find prev from this obscode
+2022    Find next from this obscode
 
 # Following pop-up shown when you right-click on the _orbital elements_ :
 
