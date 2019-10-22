@@ -1,4 +1,4 @@
-   Version date: 2018 Feb 22
+   Version date: 2019 Oct 08
 
    The parameters shown in this software are basically the same as those
 shown in the Windows software,  as described at
@@ -6,7 +6,7 @@ shown in the Windows software,  as described at
 https://www.projectpluto.com/find_orb.htm
 
    Commands are very different,  because they are all keyboard based (but
-you can do a few minor things with the mouse;  see end of this text.)
+you can do a fair bit with the mouse;  see end of this text.)
 
 ?      (Or any other unrecognized key) Shows this file (dos_help.txt).
 
@@ -119,6 +119,10 @@ c      (WATCOM-compiled under DOS version only) Select a different text
          just data for the observatory for the currently-selected observation;
          use about a third of the observation area for observatory data;
          or use most of that area for observatory data.
+Alt-K  Toggle display of observational uncertainties in columns 57 to 65 of
+         the MPC 80-column format.  Those columns usually go unused.
+&      Toggle obs to be shown in 'traditional' punched-card format,  even if
+         the time was given in base-60 and the positions as decimal degrees.
 
         RESIDUAL-RELATED COMMANDS:
 
@@ -183,6 +187,8 @@ s      Save orbital elements to a file.  (Whatever elements are shown
          plus an attempt to extract the largest eigenvalue of the former
          in hopes of computing uncertainty info. This data is stored in
          the file 'covar.txt';  this command really just displays that file.
+F8     In Linux/*BSD/OSX,  show the 'original' console as it looked when
+         Find_Orb started.  Hit Enter to return to Find_Orb.
 q      Exit the program
 
    COMMANDS NOBODY SHOULD HAVE TO USE (mostly for my testing purposes,  or
@@ -207,7 +213,6 @@ z      Integrate current orbit forward,  then back,  a certain number of
          specific observatory for a specific object.
 Alt-D  Reset debug level.
 Shift-F6   Reset atmospheric drag (doesn't work yet)
-&      Attempt to find precoveries within a list of plates (doesn't work yet)
 
 Mouse actions:
 
