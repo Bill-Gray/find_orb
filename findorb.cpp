@@ -465,6 +465,7 @@ void refresh_console( void)
 
 void move_add_nstr( const int col, const int row, const char *msg, const int n_bytes)
 {
+   attrset( COLOR_PAIR( COLOR_FINAL_LINE));
    mvaddnstr( col, row, msg, n_bytes);
 }
 
