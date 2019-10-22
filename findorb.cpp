@@ -3095,48 +3095,14 @@ int main( int argc, const char **argv)
             {
             const char *search_code =
                     mpc_color_codes[y - station_start_line].code;
-            int c1;
-
-            mvchgat( y, 0, getmaxx( stdscr), A_REVERSE,
-                                            COLOR_BACKGROUND, NULL);
-            c1 = full_inquire( get_find_orb_text( 2023), NULL, 0,
-                                 COLOR_MENU, y, x);
-            switch( c1)
-               {
-               case KEY_F( 1):
-                  {
-                  int n_selected = 0, n_deselected = 0;
-
-                  for( i = 0; i < n_obs; i++)
-                     if( !FSTRCMP( obs[i].mpc_code, search_code))
-                        {
-                        if( obs[i].flags & OBS_IS_SELECTED)
-                           n_selected++;
-                        else
-                           n_deselected++;
-                        }
-                  for( i = 0; i < n_obs; i++)
-                     if( !FSTRCMP( obs[i].mpc_code, search_code))
-                        {
-                        if( n_selected < n_deselected)
-                           obs[i].flags |= OBS_IS_SELECTED;
-                        else
-                           obs[i].flags &= ~OBS_IS_SELECTED;
-                        }
-                  snprintf( message_to_user, sizeof( message_to_user),
-                          "All obs from (%s) %sselected\n",
-                          search_code, (n_selected < n_deselected) ? "" : "de");
-                  }
-                  break;
-               case KEY_F( 2):
-               case KEY_F( 3):
-                  dir = (c1 == KEY_F( 2) ? 1 : -1);
-                  curr_obs = (curr_obs + dir + n_obs) % n_obs;
-                  while( FSTRCMP( obs[curr_obs].mpc_code, search_code))
-                     curr_obs = (curr_obs + dir + n_obs) % n_obs;
-                  single_obs_selected = true;
+                                                  /* clicked on MPC station; */
+            for( i = 1; i <= n_obs; i++)          /* find next or prev obs   */
+               {                                  /* from that stn           */
+               curr_obs = (curr_obs + dir + n_obs) % n_obs;
+               if( !strcmp( obs[curr_obs].mpc_code, search_code))
                   break;
                }
+            single_obs_selected = true;
             }
          else if( y >= top_line_residuals)
             {
@@ -3201,10 +3167,46 @@ int main( int argc, const char **argv)
                                  residual_format, n_obs_shown);
                         i = full_inquire( get_find_orb_text( 2022), NULL, 0,
                                  COLOR_MENU, y, x);
-                        if( i == KEY_F( 1))        /* toggle obs */
-                           c = 'x';
-                        if( i == KEY_F( 2))        /* set uncertainty */
-                           c = '%';
+                        switch( i)
+                           {
+                           case KEY_F( 1) :       /* toggle obs */
+                              c = 'x';
+                              break;
+                           case KEY_F( 2) :       /* set uncertainty */
+                              c = '%';
+                              break;
+                           case KEY_F( 3) :       /* select all this obscode */
+                              {
+                              int n_selected = 0, n_deselected = 0;
+                              char *search_code = obs[new_curr].mpc_code;
+
+                              for( i = 0; i < n_obs; i++)
+                                 if( !FSTRCMP( obs[i].mpc_code, search_code))
+                                    {
+                                    if( obs[i].flags & OBS_IS_SELECTED)
+                                       n_selected++;
+                                    else
+                                       n_deselected++;
+                                    }
+                              for( i = 0; i < n_obs; i++)
+                                 if( !FSTRCMP( obs[i].mpc_code, search_code))
+                                    {
+                                    if( n_selected < n_deselected)
+                                       obs[i].flags |= OBS_IS_SELECTED;
+                                    else
+                                       obs[i].flags &= ~OBS_IS_SELECTED;
+                                    }
+                              snprintf( message_to_user, sizeof( message_to_user),
+                                      "%d obs from (%s) %sselected\n",
+                                      n_selected + n_deselected,
+                                      search_code, (n_selected < n_deselected) ? "" : "de");
+                              }
+                              break;
+                           case KEY_F( 4) :       /* prev this obscode */
+                           case KEY_F( 5) :       /* next this obscode */
+                              c = i;         /* works out perfectly,  by luck */
+                              break;
+                           }
                         }
                      }
                   curr_obs = new_curr;
