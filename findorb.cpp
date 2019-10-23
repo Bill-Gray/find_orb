@@ -1555,7 +1555,14 @@ static void show_one_observation( OBSERVE obs, const int line,
    show_mpc_code_in_color( buff + mpc_column, line, mpc_column);
 
    if( residual_format & RESIDUAL_FORMAT_SHOW_DESIGS)
-      put_colored_text( obs.packed_id, line, strlen( buff) + 1, 12, color);
+      {
+      char *tptr = obs.packed_id;
+
+      if( *tptr && *tptr == ' ')
+         while( tptr[1] == ' ')
+            tptr++;
+      put_colored_text( tptr, line, 44, 9, color + 1);
+      }
 }
 
 static void show_observations( const OBSERVE *obs, int line_no,
