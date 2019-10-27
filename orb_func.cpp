@@ -370,6 +370,7 @@ int show_runtime_messages = 1;
 
 // static int reference_planet = 0;
 static unsigned perturbers_automatically_found;
+extern unsigned always_included_perturbers;
 
 static int reset_auto_perturbers( const double jd, const double *orbit)
 {
@@ -391,6 +392,7 @@ static int reset_auto_perturbers( const double jd, const double *orbit)
       perturbers_automatically_found |= (1 << 20);
    if( perturbers & AUTOMATIC_PERTURBERS)
       perturbers = mask | AUTOMATIC_PERTURBERS;
+   perturbers |= always_included_perturbers;
    return( perturbing_planet);
 }
 
@@ -2684,7 +2686,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
    const bool saved_fail_on_hitting_planet =
                                      fail_on_hitting_planet;
 
-   perturbers_automatically_found = 0;
+   perturbers_automatically_found = always_included_perturbers;
    if( asteroid_mass)                    /* If computing an asteroid mass, */
       {                                  /* be very sure that asteroids are */
       perturbers |= (1 << IDX_ASTEROIDS); /* actually turned on! Otherwise, */
@@ -3763,7 +3765,7 @@ static double find_sungrazer_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
       obs[i].is_included = 0;
    obs += start;
    n_obs = end - start + 1;
-   perturbers = 0;
+   perturbers = always_included_perturbers;
    for( r = .85; r < 1.15; r += (r > .95 && r < 1.05 ? .001 : .002))
       for( direction = 0; direction < 2; direction++)
          {
@@ -3900,7 +3902,7 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
    if( i == n_obs)      /* all obs are from SOHO or STEREOs */
       return( find_sungrazer_orbit( obs, n_obs, orbit));
 
-   perturbers = AUTOMATIC_PERTURBERS;
+   perturbers = AUTOMATIC_PERTURBERS | always_included_perturbers;
    if( !strcmp( obs->mpc_code, "Daw"))    /* For Dawn-based observations, */
       {                                   /* show a Ceres-centric orbit   */
       extern int forced_central_body;     /* and include asteroid perts   */
@@ -4107,6 +4109,7 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
 
 // set_locs( orbit, obs[start].jd, obs, n_obs);
    perturbers = perturbers_automatically_found & (~AUTOMATIC_PERTURBERS);
+   perturbers |= always_included_perturbers;
    fail_on_hitting_planet = false;
    attempt_extensions( obs, n_obs, orbit);
 // available_sigmas = NO_SIGMAS_AVAILABLE;
