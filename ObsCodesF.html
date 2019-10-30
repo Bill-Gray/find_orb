@@ -20,9 +20,9 @@
       potentially hazardous asteroids">
 
   <script type="text/javascript" src="/js/jquery-latest.js"></script>
-  <script type="text/javascript" src="/js/jquery.main.js"></script>
+<!--  <script type="text/javascript" src="/js/jquery.main.js"></script> -->
+<!--  <script type="text/javascript" src="/js/jquery.metadata.js"></script> -->
   <script type="text/javascript" src="/js/jquery.tablesorter.js"></script>
-  <script type="text/javascript" src="/js/jquery.metadata.js"></script>
   <script type="text/javascript" src="/js/webtrends.js"></script>
   <script type="text/javascript" src="/js/track_pdfs.js"></script>
   <link href='https://fonts.googleapis.com/css?family=Arvo:400,700,400italic,700italic|PT+Sans:400,700,400italic,700italic|PT+Sans+Narrow:400,700' rel='stylesheet' type='text/css'>
@@ -58,7 +58,7 @@ orbit, minor planets, minor planet, asteroids, asteroid, comets, comet">
             <!-- search-form -->
             <div class="form-holder">
               <!-- This commented code opens a new page for the search. -->
-              <!--<form class="search-form" method="get" action="http://www.google.com/search" target="_blank">-->
+              <!--<form class="search-form" method="get" action="https://www.google.com/search" target="_blank">-->
               <form class="search-form" method="get" action="https://www.google.com/search">
                 <fieldset>
                   <!--<label for="search">Search</label>-->
@@ -68,11 +68,10 @@ orbit, minor planets, minor planet, asteroids, asteroid, comets, comet">
               </form>
             </div>
             <div class="social-bar">
-              <a href="https://twitter.com/MinorPlanetCtr"><span class="social twitter">L</span></a>
+<!--              <a href="https://twitter.com/MinorPlanetCtr"><span class="social twitter">L</span></a> -->
 <!--              <a href="https://www.facebook.com/MinorPlanetCenter"><span class="social facebook">F</span></a> -->
-<!--              <a href="https://plus.google.com/103523519128767953332/posts"><span class="social gplus">G</span></a> -->
-              <a href="https://www.youtube.com/channel/UCtALMOQHuBxh5XMsYNiDhMg"><span class="social youtube">X</span></a>
-              <a href="/iau/rss/mpc_feeds.html"><span class="social rss">R</span></a>
+<!--              <a href="https://www.youtube.com/channel/UCtALMOQHuBxh5XMsYNiDhMg"><span class="social youtube">X</span></a> -->
+<!--              <a href="/iau/rss/mpc_feeds.html"><span class="social rss">R</span></a> -->
             </div>
           </div>
         </div>
@@ -85,6 +84,7 @@ orbit, minor planets, minor planet, asteroids, asteroid, comets, comet">
                 <li><a href="/iau/MPEph/MPEph.html">Ephemeris Service</a></li>
                 <li><a href="/mpec/RecentMPECs.html">MPECs</a></li>
                 <li><a href="/iau/NEO/toconfirm_tabular.html">NEO Confirmation</a></li>
+                <li><a href="/iau/NEO/pccp_tabular.html">Possible Comet Confirmation</a></li>
                 <li><a href="/iau/Ephemerides/EphemOrbEls.html" class="nested">Orbital Elements</a>
                   <ul>
                     <li><a href="/iau/MPCORB.html">MPCORB</a></li>
@@ -109,7 +109,7 @@ orbit, minor planets, minor planet, asteroids, asteroid, comets, comet">
                 </li>
                 <li><a href="/iau/services/WebCSAccess.html" class="nested">Other Observer Services</a>
                   <ul>
-                    <li><a href="/whats_up">Observing Target List</a></li>
+                    <li><a href="/whatsup">Observing Target List</a></li>
                     <li><a href="/iau/NatSats/NaturalSatellites.html">Natural Satellite Ephemerides</a></li>
                     <li><a href="/iau/MPEph/NewObjEphems.html">New Object Ephemerides</a></li>
                     <li><a href="/cgi-bin/checkmp.cgi">MPChecker</a></li>
@@ -151,26 +151,23 @@ orbit, minor planets, minor planet, asteroids, asteroid, comets, comet">
                         <li><a href="/iau/lists/ClosestComets.html">Closest Approaches</a></li>
                         <li><a href="/iau/lists/PeriodicCodes.html">Periodic Comets</a></li>
                       </ul>-->
+                    <li><a href="/iau/lists/ObsCodesF.html">Observatory Codes</a></li>		    
                     <li><a href="/iau/Animations/Animations.html">Animations</a></li>
                   </ul>                
                 </li>
                 <li><a href="/iau/MPCStatus.html">MPC Status</a></li>
                 <!--<li><%= link_to 'Summary', :controller => 'mpc', :action => 'summary' %></li>-->
-                <li><a href='/mpc/obs_stats_2014_2017#2016_2017'>2016-17 NEO Obs Statistics</a></li>
+                <li><a href='/mpc/obs_stats_2014_2018'>2014-18 NEO Obs Statistics</a></li>
                 <li><a href='/mpc/summary'>Summary of Latest Data</a></li>
               </ul>
             </li>
-             <li><a href=""><span>Public</span></a>
-              <ul>
-                <!-- <li><a href="/asteroid-explorers">Asteroid Explorers</a></li> -->
-                <li><a href="/daily-minor-planet">Daily Minor Planet</a></li>
-		<li><a href="/asteroid_hazard_videos">Videos: Asteroid Hazards</a></li>
-              </ul>
+            <li><a href="/data"><span>DATA</span></a>
             </li>
-            <li><a href="/data"><span>Data</span></a>
+            <li><a href="http://iawn.net/" target="_blank"><span>IAWN</span></a>
             </li>
-            <li><a href="http://iawn.net/"><span>IAWN</span></a>
-            </li>
+            <li><a href="https://minorplanetcenter.net/mpcops/beta/"><span>BETA</span></a></li>
+            <li><a href="/iau/MPCStatus.html"><span style="color:#ff0000">STATUS</a></li>
+
           </ul>
         </nav>
       </header>
@@ -221,7 +218,7 @@ Code  Long.    cos       sin     Name
 007   2.33675 0.659470 +0.749223 <a href="http://www.obspm.fr/">Paris</a>
 008   3.0355  0.80172  +0.59578  Algiers-Bouzar&#233;ah
 009   7.4417  0.6838   +0.7272   <a href="http://www.uecht.ch/">Berne-Uecht</a>
-010   6.9267  0.72368  +0.68811  Caussols
+010   6.92124 0.723655 +0.688135 Caussols
 011   8.7975  0.67920  +0.73161  Wetzikon
 012   4.35821 0.633333 +0.771306 <a href="http://www.astro.oma.be/">Uccle</a>
 013   4.48397 0.614813 +0.786029 <a href="http://www.strw.leidenuniv.nl/">Leiden</a>
@@ -332,9 +329,9 @@ Code  Long.    cos       sin     Name
 118  17.2740  0.66558  +0.74394  <a href="http://www.daa.fmph.uniba.sk/agonews">Astronomical and Geophysical Observatory, Modra</a>
 119  42.8200  0.74731  +0.66262  Abastuman
 120  13.7261  0.70489  +0.70699  <a href="http://www.astro.hr/">Vi&#353;njan</a>
-121  36.9369  0.64883  +0.75842  <a href="http://www.astron.kharkov.ua/asteroids/asteroids.html">Kharkov University, Chuguevskaya Station</a>
+121  36.93403 0.648856 +0.758394 <a href="http://www.astron.kharkov.ua/asteroids/asteroids.html">Kharkov University, Chuguevskaya Station</a>
 122   3.5035  0.72017  +0.69176  Pises Observatory
-123  44.2917  0.76352  +0.64398  Byurakan
+123  44.2917  0.76352  +0.64398  <a href="https://www.bao.am/">Byurakan</a>
 124   2.2550  0.72534  +0.68612  Castres
 125  44.78950 0.747594 +0.662026 Tbilisi
 126   9.7903  0.71893  +0.69283  <a href="http://www.osservatorioiras.com/iras/index.php/en/">Monte Viseggi</a>
@@ -489,7 +486,7 @@ Code  Long.    cos       sin     Name
 285   2.3708  0.66135  +0.74759  Flammarion Observatory, Juvisy
 286 102.7883  0.90694  +0.42057  Yunnan Observatory
 290 250.10799 0.842743 +0.537438 <a href="http://www.as.arizona.edu/vatican-advanced-technology-telescope">Mt. Graham-VATT</a>
-291 248.4009  0.84947  +0.52647  <a href="http://spacewatch.lpl.arizona.edu/">LPL/Spacewatch II</a>
+291 248.4009  0.84947  +0.52647  <a href="https://spacewatch.lpl.arizona.edu/telescopes#09meter">LPL/Spacewatch II</a>
 292 285.1058  0.76630  +0.64033  Burlington, New Jersey
 293 285.5899  0.76936  +0.63668  Burlington remote site
 294 285.8467  0.76031  +0.64739  Astrophysical Obs., College of Staten Island
@@ -507,6 +504,7 @@ Code  Long.    cos       sin     Name
 306 290.6769  0.98477  +0.17381  Observatorio Taya Beixo, Barquisimeto
 307 287.7166  0.72410  +0.68743  Shattuck Observatory, Hanover
 309 289.59569 0.909943 -0.414336 <a href="http://www.eso.org/sci/facilities/paranal/">Cerro Paranal</a>
+310 288.87164 0.739802 +0.670574 Minor Planet Center Test Code
 312 112.334   0.9574   +0.2877   Tsingtao field station, Xisha Islands
 318 115.691   0.85206  -0.52170  Quinns Rock
 319 116.1350  0.84883  -0.52702  Perth Observatory, Perth-Lowell Telescope
@@ -561,7 +559,7 @@ Code  Long.    cos       sin     Name
 378 136.0142  0.82437  +0.56426  Murou
 379 137.6279  0.82300  +0.56613  Hamamatsu-Yuto
 380 137.0349  0.82190  +0.56772  Ishiki
-381 137.6283  0.81220  +0.58173  Tokyo-Kiso
+381 137.62542 0.812172 +0.581777 <a href="http://www.ioa.s.u-tokyo.ac.jp/kisohp/top_e.html">Tokyo-Kiso</a>
 382 137.5553  0.80915  +0.58639  Tokyo-Norikura
 383 137.8959  0.80218  +0.59526  Chirorin
 384 138.1792  0.8219   +0.5678   Shimada
@@ -656,7 +654,7 @@ Code  Long.    cos       sin     Name
 473  13.31661 0.694793 +0.716822 <a href="http://remanzacco.blogspot.com/">Remanzacco</a>
 474 170.46496 0.720773 -0.691079 <a href="http://www.phys.canterbury.ac.nz/">Mount John Observatory, Lake Tekapo</a>
 475   7.6965  0.70747  +0.70443  Turin (before 1913)
-476   7.14044 0.706594 +0.705356 <a href="http://grangeobs.net/">Grange Observatory, Bussoleno</a>
+476   7.14075 0.706596 +0.705358 <a href="http://grangeobs.net/">Grange Observatory, Bussoleno</a>
 477   0.4856  0.62103  +0.78117  Galleywood
 478   3.0896  0.72548  +0.68597  Lamalou-les-Bains
 479   6.0505  0.73020  +0.68096  Sollies-Pont
@@ -851,7 +849,7 @@ Code  Long.    cos       sin     Name
 668 240.82    0.821    +0.568    San Emigdio Peak
 669 240.8238  0.82540  +0.56279  Ojai
 670 240.9558  0.82775  +0.55922  <a href="http://www.camarilloobservatory.com/">Camarillo</a>
-671 242.0022  0.82719  +0.56052  <a href="http://stony-ridge.org/">Stony Ridge</a>
+671 242.00198 0.827184 +0.560523 <a href="http://stony-ridge.org/">Stony Ridge</a>
 672 241.9436  0.82794  +0.55942  <a href="http://www.mtwilson.edu/">Mount Wilson</a>
 673 242.31783 0.826474 +0.561722 <a href="http:/tmoa.jpl.nasa.gov/">Table Mountain Observatory, Wrightwood</a>
 674 242.33605 0.826464 +0.561730 Ford Observatory, Wrightwood
@@ -871,7 +869,7 @@ Code  Long.    cos       sin     Name
 688 248.4645  0.81938  +0.57193  <a href="http://www.lowell.edu/">Lowell Observatory, Anderson Mesa Station</a>
 689 248.2601  0.81851  +0.57319  <a href="http://www.nofs.navy.mil/">U.S.&#32;Naval Observatory, Flagstaff</a>
 690 248.3367  0.81832  +0.57344  <a href="http://www.lowell.edu/">Lowell Observatory, Flagstaff</a>
-691 248.4010  0.84951  +0.52642  <a href="http://spacewatch.lpl.arizona.edu/">Steward Observatory, Kitt Peak-Spacewatch</a>
+691 248.39966 0.849466 +0.526479 <a href="https://spacewatch.lpl.arizona.edu/telescopes#18meter">Steward Observatory, Kitt Peak-Spacewatch</a>
 692 249.0513  0.84679  +0.53036  <a href="http://www.as.arizona.edu/steward">Steward Observatory, Tucson</a>
 693 249.26745 0.845317 +0.533211 <a href="http://james.as.arizona.edu/~psmith/61inch/">Catalina Station, Tucson</a>
 694 248.9943  0.84700  +0.53009  Tumamoc Hill, Tucson
@@ -1437,6 +1435,7 @@ C53                              NEOSSat
 C54                              New Horizons
 C55                              Kepler
 C56                              LISA-Pathfinder
+C57                              TESS
 C60   7.06926 0.634261 +0.770545 Argelander Institute for Astronomy Obs., Bonn
 C61   2.58202 0.658892 +0.749723 Chelles
 C62  11.3467  0.68967  +0.72175  Eurac Observatory, Bolzano
@@ -1920,7 +1919,7 @@ J65 353.4497  0.59830  +0.79860  <a href="http://www.astroshack.net">Celbridge</
 J66 357.7833  0.61071  +0.78922  Kinver
 J67 359.4667  0.77114  +0.63457  <a href="http://www.hfsystem.net/Astro/">Observatorio La Puebla de Vallbona</a>
 J68 357.7055  0.61813  +0.78345  <a href="http://www.dmiller.demon.co.uk/astronomy.htm">Tweenhills Observatory, Hartpury</a>
-J69 358.9803  0.63144  +0.77286  <a href="http://www.hantsastro.org.uk/">North Observatory, Clanfield</a>
+J69 358.98034 0.631443 +0.772863 <a href="http://www.hantsastro.org.uk/">North Observatory, Clanfield</a>
 J70 358.8404  0.78968  +0.61149  <a href="http://webs.ono.com/jpab">Obs. Astron&#243;mico Vega del Thader, El Palmar</a>
 J71 357.8947  0.59350  +0.80217  Willow Bank Observatory
 J72 358.9664  0.79065  +0.61028  <a href="http://www.observamurcia.com/obs_valle_del_sol.htm">Valle del Sol</a>
@@ -1956,6 +1955,7 @@ K02   0.66761 0.622858 +0.779718 Eastwood Observatory, Leigh on Sea
 K03   0.74411 0.744133 +0.665979 Observatori AAS Montsec
 K04   0.74416 0.744130 +0.665983 Lo Fossil Observatory, Ager
 K05   1.02311 0.610689 +0.789233 Eden Observatory, Banham
+K06   1.99950 0.749658 +0.659703 Observatorio Montagut, Can Sola
 K07   2.4614  0.65973  +0.74902  Observatoire de Gravelle, St.&#32;Maurice
 K08   1.8800  0.75142  +0.65773  Observatorio Lledoner, Vallirana
 K09   2.2400  0.74889  +0.66051  Lli&#231;&#224; d'Amunt
@@ -2025,7 +2025,7 @@ K72  16.3396  0.77485  +0.63021  Celico
 K73  16.4158  0.75789  +0.65029  Gravina in Puglia
 K74  10.2364  0.64667  +0.76025  Muensterschwarzach Observatory, Schwarzach
 K75  11.7289  0.68897  +0.72269  Astro Dolomites, Santa Cristina Valgardena
-K76   7.62898 0.713488 +0.698410 BSA Osservatorio, Savigliano
+K76   7.62898 0.713488 +0.698410 <a href="http://osservatorioastronomicobsa.it/">BSA Osservatorio, Savigliano</a>
 K77  11.2903  0.64680  +0.76019  EHB01 Observatory, Engelhardsberg
 K78   9.85356 0.718987 +0.692718 iota Scorpii Observatory, La Spezia
 K79  11.05789 0.631175 +0.773097 Erfurt
@@ -2083,15 +2083,32 @@ L30   7.51469 0.624126 +0.778737 Lohbach Observatory, Benninghofen
 L31  12.85615 0.632524 +0.772019 RaSo Observatory, Chemnitz
 L32  20.81044 0.845576 -0.532593 Korea Microlensing Telescope Network-SAAO
 L33  29.9546  0.67379  +0.73646  Ananjev
+L34  14.02061 0.789742 +0.611548 Galhassin Robotic Telescope, Isnello
 L35  30.5086  0.64055  +0.76537  DreamSky Observatory, Lisnyky
+L36  14.78008 0.645319 +0.761467 <a href="http://www.projectsoft.cz/en/roboticka-observator.php">Ond&#345;ejov--BlueEye600 Telescope</a>
+L37 353.73883 0.803937 +0.592739 Observatorio Alnitak, El Puerto de Santa Mar&#237;a
+L38   9.69997 0.615648 +0.785407 Gartensternwarte Schafsweide, Schelde
+L39  11.04031 0.723062 +0.688490 Osservatorio Spica, Signa
+L40   6.95681 0.654011 +0.754011 Sternwarte Saarbruecken Rastpfuhl
+L41  12.30181 0.720683 +0.691022 Ponte Uso
+L42  11.5633  0.73670  +0.67400  Observatory-Astrocamp Manciano
+L43   0.74439 0.744131 +0.665982 Ager, Leida
+L44   6.22111 0.688185 +0.723360 AstroVal, Le Chenit
+L45  15.06243 0.793975 +0.605979 ObsCT, Catania
+L46 356.11939 0.762017 +0.645574 Observatorio Majadahonda
+L47  12.50711 0.725542 +0.685961 Osservatorio Astronomico, Piobbico
+L48  23.56873 0.674816 +0.735566 Baia Mare
+L49  13.00730 0.671444 +0.738747 VEGA-Sternwarte, Dorfleiten
 L50  34.0114  0.71157  +0.70039  GenShtab Observatory, Nauchnij
 L51  34.0164  0.71169  +0.70028  MARGO, Nauchnij
 L52  34.01694 0.711679 +0.700287 MASTER-Tavrida
+L55  35.08750 0.666222 +0.743283 Sura Gardens, Dnipro
 L71  38.5839  0.71089  +0.70101  Vedrus Observatory, Azovskaya
 L72  38.6928  0.55979  +0.82589  Melezhy Astrophoto Observatory
 L96  44.2745  0.76340  +0.64416  ISON-Byurakan Observatory
 N27  73.7253  0.57847  +0.81298  Omsk-Yogik Observatory
 N30  74.3694  0.85369  +0.51909  Zeds Astronomical Observatory, Lahore
+N31  74.44422 0.853321 +0.519690 Eden Astronomical Observatory, Lahore
 N42  76.97181 0.732126 +0.679511 Tien-Shan Astronomical Observatory
 N43  77.1167  0.16712  -0.98328  Plateau Observatory for Dome A, Kunlun Station
 N50  78.96383 0.842176 +0.538692 Himalayan Chandra Telescope, IAO, Hanle
@@ -2117,6 +2134,7 @@ Q23 140.3864  0.79654  +0.60264  Sukagawa
 Q24 140.52350 0.810991 +0.583108 Katori
 Q33 142.48278 0.715989 +0.695814 Nayoro Observatory, Hokkaido University
 Q38 143.5506  0.81654  -0.57538  Swan Hill
+Q56 148.97642 0.821480 -0.568478 Heaven's Mirror Observatory, Yass
 Q57 149.06173 0.855649 -0.516175 Korea Microlensing Telescope Network-SSO
 Q58 149.07085 0.855632 -0.516199 Siding Spring-LCO Clamshell {#}1
 Q59 149.07081 0.855626 -0.516197 Siding Spring-LCO Clamshell {#}2
@@ -2129,6 +2147,7 @@ Q65 149.19313 0.855519 -0.516201 Warrumbungle Observatory
 Q66 149.06425 0.855627 -0.516205 Siding Spring-Janess-G, JAXA
 Q67 149.49233 0.835816 -0.547369 JBL Observatory, Bathurst
 Q68 150.33742 0.832917 -0.551813 Blue Mountains Observatory, Leura
+Q69 150.44933 0.832777 -0.551945 Hazelbrook
 Q79 152.8481  0.88871  -0.45696  Samford Valley Observatory
 Q80 153.2160  0.88762  -0.45904  Birkdale
 R57 170.47278 0.720489 -0.691309 Aorangi Iti Observatory, Lake Tekapo
@@ -2148,6 +2167,7 @@ U63 239.19456 0.681217 +0.729770 Burnt Tree Hill Observatory, Cle Elum
 U64 239.46151 0.683272 +0.727821 CWU-Lind Observatory, Ellensburg
 U68 240.58701 0.799040 +0.599620 JPL SynTrack Robotic Telescope, Auberry
 U69 240.5870  0.79904  +0.59962  iTelescope SRO Observatory, Auberry
+U70 240.5869  0.79904  +0.59962  RASC Observatory, Alder Springs
 U73 241.6172  0.83164  +0.55346  Redondo Beach
 U78 242.8449  0.82758  +0.55989  Cedar Glen Observatory
 U79 242.79187 0.838837 +0.542598 Cosmos Research Center, Encinitas
@@ -2155,6 +2175,7 @@ U80 243.6151  0.82737  +0.56004  CS3-DanHenge Observatory, Landers
 U81 243.61514 0.827367 +0.560037 CS3-Trojan Station, Landers
 U82 243.61519 0.827368 +0.560036 CS3-Palmer Divide Station, Landers
 U96 246.68600 0.579007 +0.812698 Athabasca University Geophysical Observatory
+V00 248.39981 0.849456 +0.526492 Kitt Peak-Bok
 V01 248.23911 0.762243 +0.645493 Mountainville Observatory, Alpine
 V02 248.05794 0.835743 +0.547377 Command Module, Tempe
 V03 248.3314  0.79889  +0.59979  Big Water
@@ -2164,8 +2185,10 @@ V06 249.26745 0.845317 +0.533211 Catalina Sky Survey-Kuiper
 V07 249.1219  0.85208  +0.52234  Whipple Observatory, Mount Hopkins-PAIRITEL
 V08 249.33900 0.848249 +0.528126 Mountain Creek Ranch, Vail
 V09 249.74202 0.849537 +0.526080 <a href="http://www.mokaobservatory.com">Moka Observatory, Benson</a>
+V10 248.32772 0.818623 +0.572977 Sierra Sinagua Observatory, Flagstaff
 V16 251.10288 0.849510 +0.526194 Dark Sky New Mexico, Animas
 V23 252.76406 0.828722 +0.558332 FOAH Observatory, Magdalena
+V26 253.39020 0.911283 +0.410639 UAS-ISON Observatory, Cosala
 V29 254.26660 0.840062 +0.541466 Tzec Maun Cloudcroft Facility
 V30 254.47105 0.840710 +0.540313 Heaven on Earth Observatory, Mayhill
 V31 254.4750  0.84061  +0.54046  Hazardous Observatory, Mayhill
@@ -2173,6 +2196,7 @@ V35 255.91881 0.861839 +0.506046 Deep Sky Observatory Collaborative, Pier 5
 V36 255.61742 0.843042 +0.536333 The Ranch Observatory, Lakewood
 V37 255.98483 0.861053 +0.507428 McDonald Observatory-LCO ELP
 V38 255.98493 0.861051 +0.507431 McDonald Observatory-LCO ELP Aqawan A {#}1
+V39 255.98452 0.861051 +0.507430 McDonald Observatory-LCO ELP B
 V59 261.0734  0.86642  +0.49781  Millwood Observatory, Comfort
 V60 261.09473 0.862140 +0.505126 Putman Mountain Observatory
 V70 263.33572 0.870056 +0.491332 Starry Night Observatory, Columbus
@@ -2203,6 +2227,7 @@ W66 285.05381 0.756278 +0.652109 SVH Observatory, Blairstown
 W67 285.10211 0.759453 +0.648444 Paul Robinson Observatory, Voorhees State Park
 W70 285.91386 0.698475 +0.713264 Loose Goose Observatory, Saint-J&#233;rome
 W71 285.99297 0.717404 +0.694456 Rand II Observatory, Lake Placid
+W75 289.60944 0.910001 -0.414150 SPECULOOS-South Observatory, Paranal
 W76 289.23695 0.862826 -0.504288 CHILESCOPE Observatory, Rio Hurtad
 W77 287.4010  0.75196  +0.65702  Skyledge Observatory, Killingworth
 W78 288.88325 0.739859 +0.670509 Clay Telescope, Harvard University
@@ -2247,6 +2272,8 @@ Z21 343.48830 0.881468 +0.471452 Tenerife-LCO Aqawan A {#}1
 Z22 343.4894  0.88148  +0.47143  MASTER-IAC Observatory, Tenerife
 Z26 343.38969 0.883010 +0.467899 Observatorio Astronomico Arcangel, Las Zocas
 Z27 343.6998  0.87976  +0.47393  Observatorio Coralito, La Laguna
+Z30 355.52500 0.586571 +0.807215 Glyn Marsh Observatory, Douglas
+Z32 358.98372 0.766879 +0.640130 Observatorio Astrofisico de Javalambre
 Z33 357.67331 0.787438 +0.614748 6ROADS Observatory 2, Nerpio
 Z34 359.11233 0.612800 +0.787622 NNHS Drummonds Observatory
 Z35 358.8985  0.76788  +0.63877  OAO University Observatory Station Aras
@@ -2306,7 +2333,7 @@ Z88 357.5101  0.62716  +0.77632  Fosseway Observatoy, Stratton-on-the-Fosse
 Z89 357.8281  0.59942  +0.79777  Macclesfield
 Z90 357.8482  0.79540  +0.60418  <a href="http://www.alboxclima.com/astronomia/astro.htm">Albox</a>
 Z91 358.74999 0.631731 +0.772595 Curdridge
-Z92 358.39222 0.591378 +0.803713 West Park Observatory, Leeds
+Z92 358.39222 0.591378 +0.803713 Almalex Observatory, Leeds
 Z93 359.85589 0.782380 +0.620769 Observatorio Polop, Alicante
 Z94 358.8565  0.62725  +0.77623  Kempshott
 Z95 358.8909  0.76782  +0.63883  <a href="http://www.apt.com.es/web/index.php?option=com_content&view=article&id=52&Itemid=55">Astronomia Para Todos Remote Observatory</a>
@@ -2323,7 +2350,6 @@ Z99 359.97874 0.595468 +0.800687 Clixby Observatory, Cleethorpes
   <!-- footer -->
   <footer id="footer">
     <div class="holder">
-      <!-- footer nav -->
       <nav class="nav">
         <ul>
           <li><a href="/">Home</a></li>
@@ -2333,33 +2359,28 @@ Z99 359.97874 0.595468 +0.800687 Clixby Observatory, Cleethorpes
           <li><a href="/daily-minor-planet">For the Public</a></li>
         </ul>
       </nav>
-            <img src="/images/MPC_logo_circular.png" width="60" height="60" alt="Minor Planet Center Logo">
-      <!-- copy -->
+      
+      <a href="https://www.cfa.harvard.edu">
+      <img src="/images/CfA_Logo_Vertical_CMYK.png" width="110" height="47"></a>
       <p>
-      <div class="copy">The Minor Planet Center is hosted by the Smithsonian Astrophysical Observatory, a part of the Harvard-Smithsonian Center for Astrophysics.<center>The Minor Planet Center is funded by NASA.</center></div> 
-    </div>
+      <p>
+      <p>
+      <div class="copy">The Minor Planet Center is hosted by the Center for Astrophysics | Harvard &amp; Smithsonian.<center>The Minor Planet Center is funded by NASA.</center></div> 
   </footer>
 
 <script type="text/javascript">
-  <!-- $(document).ready(function() { -->
-  $(window).load(function() {
+  $(window).on('load', (function() {
     $("table").tablesorter();
-  }); 
+  })); 
 </script>
 
-<script type="text/javascript">
-  (function() {
-    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-    po.src = 'https://apis.google.com/js/plusone.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-  })();
-</script>
 <script type="text/javascript">
 //<![CDATA[
 var _tag=new WebTrends();
 _tag.dcsGetId();
 //]]>
 </script>
+
 <script type="text/javascript">
 //<![CDATA[
 _tag.dcsCustom=function(){
@@ -2369,6 +2390,7 @@ _tag.dcsCustom=function(){
 _tag.dcsCollect();
 //]]>
 </script>
+
 <noscript>
 <div><img alt="DCSIMG" id="DCSIMG" width="1" height="1" src="//logs1.smithsonian.museum/dcsa7yzrmbdzpxzrosrn4tyep_5i1d/njs.gif?dcsuri=/nojavascript&amp;WT.js=No&amp;WT.tv=9.4.0&amp;dcssip=www.minorplanetcenter.net"/></div>
 </noscript>
