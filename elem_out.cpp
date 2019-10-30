@@ -2622,6 +2622,8 @@ int set_language( const int language)
    return( 0);
 }
 
+unsigned always_included_perturbers;
+
 int get_defaults( int *ephemeris_output_options, int *element_format,
          int *element_precision, double *max_residual_for_filtering,
          double *noise_in_arcseconds)
@@ -2709,6 +2711,7 @@ int get_defaults( int *ephemeris_output_options, int *element_format,
       max_n_sr_orbits = 500;
    sr_orbits = (double *)calloc( (size_t)max_n_sr_orbits, 7 * sizeof( double));
    assert( sr_orbits);
+   sscanf( get_environment_ptr( "PERTURBERS"), "%x", &always_included_perturbers);
    return( 0);
 }
 
