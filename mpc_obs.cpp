@@ -4743,11 +4743,11 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
          break;
       case 2:
          if( show_alt_info && optr->second_line)
-//          strcpy( buff, optr->second_line);
-            sprintf( buff, "Vel %.8f %.8f %.8f",
-                           optr->obs_vel[0] * 1000.,
-                           optr->obs_vel[1] * 1000.,
-                           optr->obs_vel[2] * 1000.);
+            strcpy( buff, optr->second_line);
+//          sprintf( buff, "Vel %.8f %.8f %.8f",
+//                         optr->obs_vel[0] * 1000.,
+//                         optr->obs_vel[1] * 1000.,
+//                         optr->obs_vel[2] * 1000.);
          else
             {
             strcpy( buff, "Delta=");
