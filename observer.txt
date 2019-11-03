@@ -37,10 +37,11 @@
  Denneau                                   <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0012267">Denneau</a>
  Ernst                                     <a href="http://www.starkenburg-sternwarte.de/asteroiden/namen/7686.htm">Ernst</a>
  Foglia                                    <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0013147">Foglia</a>
+ Fuls                                      <a href="https://catalina.lpl.arizona.edu/person/carson-fuls">Fuls</a>
  Galad                                     <a href="http://en.wikipedia.org/wiki/Adri%C3%A1n_Gal%C3%A1d">Gal&aacute;d</a>
  Galli                                     <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0006515">Galli</a>
  Garradd                                   <a href="http://members.ozemail.com.au/~loomberah/">Garradd</a>
- Gasparovic                                Ga&#x161;parovi&#x107;
+ Gasparovic                                <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?orb=1;sstr=gasparovic">Ga&#x161;parovi&#x107;</a>
  Geffert                                   <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0017855">Geffert</a>
  Gibbs                                     <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0014220">Gibbs</a>
  Gilmore                                   <a href="http://www.phys.canterbury.ac.nz/people/gilmore.shtml">Gilmore</a>
@@ -49,6 +50,7 @@
  Grav                                      <a href="http://web.mac.com/tgrav/iWeb/Family/Welcome.html">Grav</a>
  Groeller                                  Gr&ouml;ller
  Guido                                     <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0120361">Guido</a>
+ Haleakala                                 Haleakal&#x101;
  Hammergren                                <a href="http://www.eccentrix.com/members/ssp2k/ppl/profiles/drhammer.html">Hammergren</a>
  Healy                                     <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0066479">Healy</a>
  Hill                                      <a href="http://www.lpl.arizona.edu/~rhill/">Hill</a>
