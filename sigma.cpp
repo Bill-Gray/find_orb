@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <math.h>
 #include "watdefs.h"
 #include "sigma.h"
 #include "afuncs.h"
@@ -62,6 +63,10 @@ static int parse_sigma_record( SIGMA_RECORD *w, const char *buff)
       w->jd2 = 3000000.;
       w->mag1 = -100;
       w->mag2 = 3000;
+      if( buff[32] == '.')
+         w->mag1 = (int)floor( atof( buff + 29) * 10. + .5);
+      if( buff[37] == '.')
+         w->mag2 = (int)floor( atof( buff + 34) * 10. + .5);
       for( i = 0; i < 2; i++)
          if( buff[i * 11 + 8] != ' ')
             {
@@ -170,7 +175,7 @@ double get_observation_sigma( const double jd, const int mag_in_tenths,
       if( !memcmp( mpc_code, w->mpc_code, 3)
                               || !memcmp( "   ", w->mpc_code, 3))
          if( jd > w->jd1 && jd < w->jd2)
-            if( mag_in_tenths > w->mag1 && mag_in_tenths < w->mag2)
+            if( mag_in_tenths > w->mag1 && mag_in_tenths <= w->mag2)
                if( w->program_code == ' ' || w->program_code == program_code)
                   {
                   if( mag_sigma && !*mag_sigma)

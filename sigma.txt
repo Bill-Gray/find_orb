@@ -68,9 +68,31 @@
 # is probably quite a bit better than the above .1 second.
 #
 #    SOHO and STEREO,  though,  were not intended to do astrometry and
-# produce noisy data.  (Each has multiple instruments,  and we really
-# should take that into account at some point...)
- 249                                    10                SOHO
+# produce noisy data.  "Program code" A = SOHO C2; B = SOHO C3;
+# G = STEREO/SECCHI HI1-A; H = COR2-A (both for code C49);  and
+# O = STEREO/SECCHI HI1-B; H = COR2-B (both for code C50).  SOHO
+# uncertainties as a function of magnitude and camera are from
+# an e-mail from Karl Battams,  2019 Nov 1.
+ 249 A                         8.7      36                SOHO
+ 249 A                         8.2  8.8 24                SOHO
+ 249 A                         7.2  8.2 12                SOHO
+ 249 A                         4.2  7.2  6                SOHO
+ 249 A                         2.7  4.2 12                SOHO
+ 249 A                         1.7  2.7 18                SOHO
+ 249 A                         0.2  1.7 24                SOHO
+ 249 A                        -1.8  0.2 36                SOHO
+ 249 A                             -1.8 48                SOHO
+ 249 B                         9.7      280               SOHO
+ 249 B                         9.2  9.7 224               SOHO
+ 249 B                         7.7  9.2 168               SOHO
+ 249 B                         7.2  7.7 112               SOHO
+ 249 B                         6.7  7.2 84                SOHO
+ 249 B                         5.7  6.7 56                SOHO
+ 249 B                         2.7  5.7 28                SOHO
+ 249 B                         1.2  2.7 56                SOHO
+ 249 B                        -0.2  1.2 84                SOHO
+ 249 B                        -1.2 -0.2 112               SOHO
+ 249 B                             -1.2 168               SOHO
  C49                                    10                STEREO-A
  C50                                    10                STEREO-B
 # MPC appears to be weighting (C51) WISE data lightly,  which appears to
