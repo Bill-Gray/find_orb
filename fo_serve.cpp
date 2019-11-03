@@ -167,9 +167,9 @@ int main( const int argc, const char **argv)
 {
    const size_t max_buff_size = 400000;       /* room for 5000 obs */
    char *buff = (char *)malloc( max_buff_size);
-   char boundary[100], mpec_name[100];
+   char mpec_name[100];
    char ephemeris_step_size[80], mpc_code[20];
-   int n_ids, n_ephem_steps = 0;
+   int n_ids, n_ephem_steps = 0, cgi_status;
    char field[30];
    OBJECT_INFO *ids;
    FILE *ifile;
@@ -228,15 +228,14 @@ int main( const int argc, const char **argv)
       }
 #endif
    fprintf( lock_file, "defaults loaded\n");
-
-   if( !fgets( boundary, sizeof( boundary), stdin))
+   cgi_status = initialize_cgi_reading( );
+   if( cgi_status <= 0)
       {
-      printf( "<p> <b> No info read from stdin</b>");
+      printf( "<p> <b> CGI data reading failed : error %d </b>", cgi_status);
       printf( "This isn't supposed to happen.</p>\n");
       return( 0);
       }
-   fprintf( lock_file, "Got boundary line: %s", boundary);
-   while( get_multipart_form_data( boundary, field, buff, NULL, max_buff_size) >= 0)
+   while( !get_cgi_data( field, buff, NULL, max_buff_size))
       {
       if( !strcmp( field, "TextArea") || !strcmp( field, "upfile"))
          {
