@@ -685,6 +685,9 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
          case '8':
             ephemeris_output_options ^= OPTION_MOON_AZ;
             break;
+         case '9':
+            ephemeris_output_options ^= OPTION_SKY_BRIGHTNESS;
+            break;
          case 'a': case 'A':
             ephemeris_output_options ^= OPTION_ALT_AZ_OUTPUT;
             break;

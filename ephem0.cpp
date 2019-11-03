@@ -1405,6 +1405,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                         && show_topocentric_data);
    const bool show_sun_az  = ((options & OPTION_SUN_AZ )
                         && show_topocentric_data);
+   const bool show_sky_brightness = ((options & OPTION_SKY_BRIGHTNESS)
+                        && show_topocentric_data);
    double abs_mag = calc_absolute_magnitude( obs, n_obs);
    double unused_ht_in_meters;
    DPT latlon;
@@ -1521,6 +1523,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
          snprintf_append( buff, sizeof( buff), "elong ");
       if( show_visibility)
          snprintf_append( buff, sizeof( buff), "SM ");
+      if( show_sky_brightness)
+         snprintf_append( buff, sizeof( buff), "SkyBr ");
       if( options & OPTION_PHASE_ANGLE_OUTPUT)
          snprintf_append( buff, sizeof( buff), " ph_ang  ");
       if( options & OPTION_PHASE_ANGLE_BISECTOR)
@@ -1793,6 +1797,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
             double cos_elong, solar_r, elong;
             bool moon_more_than_half_lit = false;
             double fraction_illum = 1.;    /* i.e.,  not in earth's shadow */
+            double mags_per_arcsec2 = 99.99;    /* sky brightness */
 
             strcpy( buff, "Nothing to see here... move along... uninteresting... who cares?...");
             solar_r = vector3_length( orbi_after_light_lag);
@@ -1922,6 +1927,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                      if( component > 0.)
                         rgb |= (unsigned)component << (j * 8);
                      }
+                  mags_per_arcsec2 = -2.5 * log10( bdata.brightness[3]) - 11.055;  /* R brightness */
                   }
                }
             if( computer_friendly)
@@ -2005,6 +2011,13 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                else if( tbuff[1] == ' ' && tbuff[2] == ' ')
                   tbuff[1] = '-';
                strcat( buff, tbuff);
+               }
+            if( show_sky_brightness)
+               {
+               if( mags_per_arcsec2 < 99 || computer_friendly)
+                  snprintf_append( buff, sizeof( buff), " %5.2f", mags_per_arcsec2);
+               else
+                  strcat( buff, " --.--");
                }
             if( !obj_n)
                {
