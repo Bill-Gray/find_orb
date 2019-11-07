@@ -646,6 +646,8 @@ FL2 !-110.878488   +31.680868       2287.949   Whipple Observatory,  1.2-m
 
    G__gle Maps shows five domes on Calar Alto.  MPC gives five codes.  (493),
    "Calar Alto",  has low precision;  I have no idea which scope is intended.
+   (Observations on the 2019 Oct 10 MPCs say data came from a 1.23-m scope,
+   a 1.23-m f/8 scope,  a 1.2-m f/8 scope,  and a 3.5-m f/3.9 scope.)
    (Z84) and (Z79) were identifiable.  I _think_ (G36) = Un1.  Alts,  again,
    are from ObsCodes.html.   According to Wikipaedia,  (Z79) = 3.5m scope;
    (Z84) = 0.8-m Schmidt; (Un1) = 1.23m;  (Un2) = 1.5m; (Un3) = 2.2m.
@@ -655,3 +657,14 @@ Un1 !  -2.547483   +37.223165                  Unknown about 100m SSE of Z84;  (
 Un2 !  -2.548248   +37.224987                  Unknown about 100m north of Z84
 Un3 !  -2.546037   +37.223133                  Unknown about 200m ESE of Z84
 Z79 !  -2.546678   +37.220850       2162.511   Calar Alto TNO Survey
+
+   Two ASAS-SN scopes,  both sharing LCO domes.  These are essentially
+duplicates of (V37) and (T03),  measured from G__gle Maps with altitudes
+copied from the MPC data.
+
+HSL !-104.015183   +30.679849       2010       ASAS-SN, Henrietta Swan Leavitt/McDonald Obs
+AHa !-156.257494   +20.707009       3050       ASAS-SN, Haleakala 'Brutus'
+
+   2019 Nov 7 : these two ISON observatories tracked the NEO A00001.
+Ark !  412553.67     +433859.94     2046       Arkhyz
+Bla ! 1274320.40     +500735.68      146       Blagoveschensk
