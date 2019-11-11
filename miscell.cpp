@@ -67,6 +67,7 @@ can turn it back to 'false'.
 */
 
 int generic_message_box( const char *message, const char *box_type);
+const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 void make_config_dir_name( char *oname, const char *iname);  /* miscell.cpp */
 int reset_astrometry_filename( int *argc, const char **argv);
@@ -219,8 +220,13 @@ static int is_neocp_desig( const char *buff)
 
 /* If astrometry is desired for a particular designation,  we hunt for it
 in several possible locations.  If it looks like a temporary designation,
-we look through 'neocp.txt'.  If that doesn't turn up anything,  we use
-the 'grab_mpc' program :
+we look through two files specified by NEOCP_FILE_NAME and NEOCP_FILE_NAME2.
+For the on-line Find_Orb,  those correspond to a file containing astrometry
+for objects currently on NEOCP and an 'neocp.old'-file for objects that
+have been removed from NEOCP.
+
+   If that doesn't turn up (i.e.,  it's not an NEOCP object,  old or
+current),  we use the 'grab_mpc' program :
 
 https://github.com/Bill-Gray/miscell/blob/master/grab_mpc.c
 
@@ -232,21 +238,28 @@ hours have elapsed;  see 'grab_mpc.c' for details.       */
 static int fetch_astrometry_from_mpc( FILE *ofile, const char *desig)
 {
    char tbuff[100];
-   int bytes_written = 0;
+   int bytes_written = 0, pass;
 
    assert( ofile);
    if( is_neocp_desig( desig))
-      {
-      FILE *ifile = fopen( "../../neocp2/neocp.txt", "rb");
-
-      if( ifile)
+      for( pass = 0; pass < 2 && !bytes_written; pass++)
          {
-         while( fgets( tbuff, sizeof( tbuff), ifile))
-            if( desig_matches( tbuff, desig))
-               bytes_written += (int)fwrite( tbuff, 1, strlen( tbuff), ofile);
-         fclose( ifile);
+         const char *ifilename = get_environment_ptr( pass ?
+                          "NEOCP_FILE_NAME2" : "NEOCP_FILE_NAME");
+
+         if( *ifilename)
+            {
+            FILE *ifile = fopen( ifilename, "rb");
+
+            if( ifile)
+               {
+               while( fgets( tbuff, sizeof( tbuff), ifile))
+                  if( desig_matches( tbuff, desig))
+                     bytes_written += (int)fwrite( tbuff, 1, strlen( tbuff), ofile);
+               fclose( ifile);
+               }
+            }
          }
-      }
    if( !bytes_written)    /* no NEOCP data;  maybe MPC has astrometry */
       {
       unsigned j = 0;
