@@ -195,8 +195,9 @@ static int desig_matches( const char *iline, const char *desig)
 
    while( *iline == ' ')
       iline++;
-   if( !memcmp( iline, desig, len) && iline[len] == ' ')
-      rval = 1;
+   if( !memcmp( iline, desig, len))
+      if( iline[len] == ' ' || iline[len] == '*')
+         rval = 1;
    return( rval);
 }
 
