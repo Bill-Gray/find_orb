@@ -290,7 +290,10 @@ static void collapse_findorb_txt( char **text)
    size_t i, j;
 
    for( i = 0; text[i]; i++)
+      {
       text_search_and_replace( text[i], "\\n", "\n");
+      text_search_and_replace( text[i], "[email]", "pluto@p");
+      }
    for( i = 0; text[i]; i++)
       {
       const int idx = atoi( text[i]);

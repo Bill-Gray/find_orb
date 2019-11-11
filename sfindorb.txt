@@ -69,7 +69,7 @@
 97155   Longitud
 97175   Mostrar detalles &Movimiento
 97176   Mostrar &Alt/az
-97182   Velocidad &Radial 
+97182   Velocidad &Radial
 97183   Angulo de &Fase
 97184   S&eparar movimientos
 97185   &Bisectriz angulo de fase
@@ -168,7 +168,7 @@
 2004    posicion XXX para un observador nuevo/temporal en\n
 2004    https://www.projectpluto.com/find_orb.htm#xxx_code
 
-2005    No se ha encontrado el archivo con los datos de sesgos observacionales 
+2005    No se ha encontrado el archivo con los datos de sesgos observacionales
 2005    Para incluir los datos FCCT14,  Find_Orb necesita
 2005    el archivo 'bias.dat'.  Hay mas informacion
 2005    sobre esto en https://www.projectpluto.com/bias.htm
@@ -181,13 +181,13 @@
 2006    es el mejor para este proposito.
 
 2007    Las observaciones abarcan %.1f años,  mas del limite de Find_Orb
-2007    de %.1f años.  Si realmente quiere usar el conjunto 
+2007    de %.1f años.  Si realmente quiere usar el conjunto
 2007    de observaciones completo (que podria no procesarse correctamente),  edite en
 2007    'environ.dat' la linea MAX_OBSERVATION_SPAN.
 
 2008    No se han leido correctamente todas las observaciones de satelite.
-2008    Esto no deberia ocurrir.  Envie el archivo con sus observaciones 
-2008    a pluto@projectpluto.com para que se pueda arreglar.
+2008    Esto no deberia ocurrir.  Envie el archivo con sus observaciones
+2008    a [email]rojectpluto.com para que se pueda arreglar.
 
 2009    %u observaciones estaban duplicadas.  Se han eliminado.
 
@@ -200,7 +200,7 @@
 2011    no seran tenidas en cuenta.
 
 2012    %u observaciones estan por debajo del horizonte.
-2013    %u observations se hicieron con luz solar. 
+2013    %u observations se hicieron con luz solar.
 2014    Estas observaciones se excluyen.
 
 2015    %u observaciones coinciden en fecha y codigo del observatorio,
@@ -215,7 +215,7 @@
 2017    \npara mas informacion sobre como trabajar con observaciones desde satelite.
 
 2018    La fecha/hora de una o mas observaciones es en el futuro.
-2018    Si no es lo que esperaba, deberia revisar los datos. 
+2018    Si no es lo que esperaba, deberia revisar los datos.
 
 2019    Falta el archivo 'elp82.dat'.  Sin este archivo
 2019    las posiciones lunares seran muy imprecias y las orbitas
@@ -225,13 +225,13 @@
 2020    para mas detalles sobre como hacer esto.
 
 2020    Falta el archivo 'ps_1996.dat'. Sin este archivo
-2020    las posiciones planetarios no sera precisas y las orbitas 
+2020    las posiciones planetarios no sera precisas y las orbitas
 2020    tendran menos precision.  Consiga este archivo,  o (solucion
 2020    preferida) seleccion efemerides JPL.  Vea
 2020    https://www.projectpluto.com/find_orb.htm#de_eph
 2020    para mas detalles sobre como hacer esto.
 
-2021    No hay disponibles datos sobre efemerides de asteroides, 
+2021    No hay disponibles datos sobre efemerides de asteroides,
 2021    por lo que no se incluyen asteroides como perturbadores.  Puede
 2021    arreglar esto descargando los archivos necesarios.  Vea
 2021    https://www.projectpluto.com/ast_pert.htm para mas detalles.
@@ -260,5 +260,5 @@
 2025    mas opciones.  Ctrl-clic para seleccionar varias observaciones.\n
 
 2026    No se ha proporcionado cabecera observacional con las observaciones.  Si se
-2026    hubiera proporcionao,  aquí se mostaría informacion acerca del observador, el medidor, 
+2026    hubiera proporcionao,  aquí se mostaría informacion acerca del observador, el medidor,
 2026    el telescopio usado,  etc.\n

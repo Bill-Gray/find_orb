@@ -189,7 +189,7 @@
 
 2008    Not all satellite observations were read correctly.
 2008    This shouldn't happen.  Please send your observation
-2008    file to pluto@projectpluto.com so it can be fixed.
+2008    file to [email]rojectpluto.com so it can be fixed.
 
 2009    %u observations were duplicates.  They have been removed.
 
