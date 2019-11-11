@@ -3798,8 +3798,8 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
                   }
                text_search_and_replace( buff + 13, "JPLRS",
                      "<a href=\"http://ssd.jpl.nasa.gov/?radar\">JPLRS</a>");
-               fprintf( ofile, " %s<a href=\"#stn_%s\">%s</a>\n",
-                        buff + 13, mpc_code, mpc_code);
+               fprintf( ofile, "%s<a href=\"#stn_%s\">%s</a>\n",
+                        buff + 12, mpc_code, mpc_code);
                }
             }
       fclose( observations_ifile);
