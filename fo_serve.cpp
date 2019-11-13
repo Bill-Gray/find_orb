@@ -37,6 +37,7 @@ extern int debug_level;
 
 int debug_level = 0;
 
+int fetch_astrometry_from_mpc( FILE *ofile, const char *desig);
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 void set_environment_ptr( const char *env_ptr, const char *new_value);
 char *get_file_name( char *filename, const char *template_file_name);
@@ -130,35 +131,6 @@ static void show_problem_message( void)
 size_t strlcpy(char *dest, const char *src, size_t size);   /* miscell.cpp */
 #endif
 
-static int desig_matches( const char *iline, const char *desig)
-{
-   const size_t len = strlen( desig);
-   int rval = 0;
-
-   while( *iline == ' ')
-      iline++;
-   if( !memcmp( iline, desig, len) && iline[len] == ' ')
-      rval = 1;
-   return( rval);
-}
-
-static int is_neocp_desig( const char *buff)
-{
-   const size_t len = strlen( buff);
-   int rval = 0;
-
-   if( len > 2 && len < 8 && !strchr( buff, ' '))
-      {
-      int unused, n_bytes;
-
-      rval = 1;
-      if( sscanf( buff, "%d%n", &unused, &n_bytes) == 1
-                  && n_bytes == (int)len)    /* oops!  numbered object */
-         rval = 0;
-      }
-   return( rval);
-}
-
 double current_jd( void);                       /* elem_out.cpp */
 void compute_variant_orbit( double *variant, const double *ref_orbit,
                      const double n_sigmas);       /* orb_func.cpp */
@@ -247,6 +219,7 @@ int main( const int argc, const char **argv)
 
             assert( ofile);
             bytes_written += fwrite( buff, 1, strlen( buff), ofile);
+            fprintf( ofile, "\n");
             fclose( ofile);
             if( tptr)
                debug_level = atoi( tptr + 12);
@@ -254,55 +227,11 @@ int main( const int argc, const char **argv)
          }
       else if( !strcmp( field, "obj_name") && *buff)
          {
-         char tbuff[100];
-         size_t neocp_bytes_found = 0;
-         const char *neocp_filename = "../../neocp2/neocp.txt";
          FILE *ofile = fopen( temp_obs_filename,
                                (bytes_written ? "ab" : "wb"));
 
          assert( ofile);
-         if( !memcmp( buff, "Old_", 4))     /* hidden trickery to search old */
-            {                               /* NEOCP designations */
-            memmove( buff, buff + 4, strlen( buff + 3));
-            neocp_filename = "../../neocp2/neocp.old";
-            }
-         if( !memcmp( buff, "Ext_", 4))     /* allow for a supplemental file */
-            {                               /* for artsats,  etc.     */
-            memmove( buff, buff + 4, strlen( buff + 3));
-            neocp_filename = "ext_ast.txt";
-            }
-         if( is_neocp_desig( buff))
-            {
-            FILE *ifile = fopen( neocp_filename, "rb");
-
-            assert( ifile);
-            while( fgets( tbuff, sizeof( tbuff), ifile))
-               if( desig_matches( tbuff, buff))
-                  neocp_bytes_found += fwrite( tbuff, 1, strlen( tbuff), ofile);
-            fclose( ifile);
-            }
-         bytes_written += neocp_bytes_found;
-         if( !neocp_bytes_found)   /* not an NEOCP object;  let's see if */
-            {                      /* we can get astrometry elsewhere    */
-            unsigned j = 0;
-            char filename[40];
-
-            for( i = 0; buff[i]; i++)
-               j = j * 314159u + (unsigned)buff[i];
-            sprintf( filename, "temp%02d.ast", j % 100);
-            sprintf( tbuff, "./grab_mpc %s %s", filename, buff);
-            i = system( tbuff);
-            debug_printf( "'%s': %ld\n", tbuff, (long)i);
-            if( !i)
-               {
-               FILE *ifile = fopen( filename, "rb");
-
-               assert( ifile);
-               while( fgets( tbuff, sizeof( tbuff), ifile))
-                  bytes_written += fwrite( tbuff, 1, strlen( tbuff), ofile);
-               fclose( ifile);
-               }
-            }
+         bytes_written += fetch_astrometry_from_mpc( ofile, buff);
          fclose( ofile);
          }
       else if( !strcmp( field, "year") || !strcmp( field, "t_end"))
