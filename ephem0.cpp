@@ -1415,7 +1415,6 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    bool show_radar_data = (get_radar_data( note_text + 1, &rdata) == 0);
    const double planet_radius_in_au =
           planet_radius_in_meters( planet_no) / AU_IN_METERS;
-   const bool fake_astrometry = ((options & 7) == OPTION_FAKE_ASTROMETRY);
    const int added_ra_dec_precision = atoi( get_environment_ptr( "ADDED_RA_DEC_PRECISION"));
    char buff[440], *header = NULL;
 
@@ -1789,32 +1788,12 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
             }
          else if( ephem_type == OPTION_OBSERVABLES)
             {
-            DPT ra_dec, alt_az[3];
-            double lunar_elong = 0.;
-            double ra, dec, earth_r = 0.;
-            char ra_buff[80], dec_buff[80], date_buff[80];
-            char r_buff[20], solar_r_buff[20], fake_line[81];
-            double cos_elong, solar_r, elong;
-            bool moon_more_than_half_lit = false;
-            double fraction_illum = 1.;    /* i.e.,  not in earth's shadow */
-            double mags_per_arcsec2 = 99.99;    /* sky brightness */
+            DPT ra_dec;
+            char date_buff[80];
+            const bool fake_astrometry = ((options & 7) == OPTION_FAKE_ASTROMETRY);
 
             strcpy( buff, "Nothing to see here... move along... uninteresting... who cares?...");
-            solar_r = vector3_length( orbi_after_light_lag);
-            earth_r = vector3_length( obs_posn_equatorial);
-            cos_elong = r * r + earth_r * earth_r - solar_r * solar_r;
-            cos_elong /= 2. * earth_r * r;
-            elong = acose( cos_elong);
-
             ra_dec.x = atan2( topo[1], topo[0]);
-            ra = ra_dec.x * 12. / PI;
-            if( ra < 0.) ra += 24.;
-            if( ra >= 24.) ra -= 24.;
-            if( computer_friendly)
-               snprintf( ra_buff, sizeof( ra_buff), "%9.5f", ra * 15.);
-            else
-               output_angle_to_buff( ra_buff, ra, 3 + added_ra_dec_precision);
-
             ra_dec.y = asin( topo[2] / r);
             stored_ra_decs[obj_n] = ra_dec;
             if( n_objects > 1 && obj_n == n_objects - 1 && show_this_line)
@@ -1859,9 +1838,35 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                put_ephemeris_posn_angle_sigma( tbuff, dist, posn_ang, computer_friendly);
                fprintf( ofile, " %s", tbuff);
                }
-            dec = ra_dec.y * 180. / PI;
             if( !obj_n)
                {
+               const double dec = ra_dec.y * 180. / PI;
+               double ra = ra_dec.x * 12. / PI;
+               double lunar_elong = 0.;
+               char r_buff[20], solar_r_buff[20], fake_line[81];
+               double cos_elong, solar_r, elong;
+               bool moon_more_than_half_lit = false;
+               double fraction_illum = 1.;    /* i.e.,  not in earth's shadow */
+               double mags_per_arcsec2 = 99.99;    /* sky brightness */
+               DPT alt_az[3];
+               double earth_r = 0.;
+               char ra_buff[80], dec_buff[80];
+               const bool two_place_mags = computer_friendly ||
+                            (*get_environment_ptr( "MAG_DIGITS") == '2');
+               double phase_ang, curr_mag;
+
+               solar_r = vector3_length( orbi_after_light_lag);
+               earth_r = vector3_length( obs_posn_equatorial);
+               cos_elong = r * r + earth_r * earth_r - solar_r * solar_r;
+               cos_elong /= 2. * earth_r * r;
+               elong = acose( cos_elong);
+               if( ra < 0.) ra += 24.;
+               if( ra >= 24.) ra -= 24.;
+               if( computer_friendly)
+                  snprintf( ra_buff, sizeof( ra_buff), "%9.5f", ra * 15.);
+               else
+                  output_angle_to_buff( ra_buff, ra, 3 + added_ra_dec_precision);
+
                for( j = 0; j < 3; j++)    /* compute alt/azzes of object (j=0), */
                   {                       /* sun (j=1), and moon (j=2)          */
                   DPT obj_ra_dec = ra_dec;
@@ -1929,104 +1934,98 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                      }
                   mags_per_arcsec2 = -2.5 * log10( bdata.brightness[3]) - 11.055;  /* R brightness */
                   }
-               }
-            if( computer_friendly)
-               snprintf( dec_buff, sizeof( dec_buff), "%9.5f", dec);
-            else
-               {
-               output_signed_angle_to_buff( dec_buff, dec, 2 + added_ra_dec_precision);
-               if( added_ra_dec_precision < 0)
-                  dec_buff[12] = '\0';
+               if( computer_friendly)
+                  snprintf( dec_buff, sizeof( dec_buff), "%9.5f", dec);
                else
-                  dec_buff[12 + added_ra_dec_precision] = '\0';
-               }
-            if( fake_astrometry)
-               {
-               strcpy( fake_line, obs->packed_id);
-               strcpy( fake_line + 12, "  C");
-               full_ctime( fake_line + 15, curr_jd + 5e-7,
-                        FULL_CTIME_MICRODAYS | FULL_CTIME_YMD
-                      | FULL_CTIME_MONTHS_AS_DIGITS | FULL_CTIME_LEADING_ZEROES);
-               strcat( fake_line, ra_buff);
-               strcat( fake_line, dec_buff);
-               strcat( fake_line, "         ");      /* columns 57 to 65 */
-               }
-            if( options & OPTION_SUPPRESS_RA_DEC)
-               *dec_buff = *ra_buff = '\0';
-            else
-               {
-               memmove( ra_buff + 1, ra_buff, strlen( ra_buff) + 1);
-               *ra_buff = ' ';
-               strcat( ra_buff, "   ");
-               strcat( dec_buff, " ");
-               }
-            if( computer_friendly)
-               {
-               snprintf( date_buff, sizeof( date_buff), "%13.5f", curr_jd);
-               snprintf( r_buff, sizeof( r_buff), "%14.9f", r);
-               snprintf( solar_r_buff, sizeof( solar_r_buff), "%12.7f", solar_r);
-               }
-            else
-               {
-               full_ctime( date_buff, curr_jd, date_format);
-                    /* the radar folks prefer the distance to be always in */
-                    /* AU,  w/no switch to km for close approach objects: */
-               use_au_only = show_radar_data;
-               format_dist_in_buff( r_buff, r);
-               use_au_only = false;
-               format_dist_in_buff( solar_r_buff, solar_r);
-               }
-            if( options & OPTION_SUPPRESS_DELTA)
-                *r_buff = '\0';
-            if( options & OPTION_SUPPRESS_SOLAR_R)
-                *solar_r_buff = '\0';
-            snprintf( buff, sizeof( buff), "%s %s%s%s%s",
-                  date_buff, ra_buff, dec_buff, r_buff, solar_r_buff);
+                  {
+                  output_signed_angle_to_buff( dec_buff, dec, 2 + added_ra_dec_precision);
+                  if( added_ra_dec_precision < 0)
+                     dec_buff[12] = '\0';
+                  else
+                     dec_buff[12 + added_ra_dec_precision] = '\0';
+                  }
+               if( fake_astrometry)
+                  {
+                  strcpy( fake_line, obs->packed_id);
+                  strcpy( fake_line + 12, "  C");
+                  full_ctime( fake_line + 15, curr_jd + 5e-7,
+                           FULL_CTIME_MICRODAYS | FULL_CTIME_YMD
+                         | FULL_CTIME_MONTHS_AS_DIGITS | FULL_CTIME_LEADING_ZEROES);
+                  strcat( fake_line, ra_buff);
+                  strcat( fake_line, dec_buff);
+                  strcat( fake_line, "         ");      /* columns 57 to 65 */
+                  }
+               if( options & OPTION_SUPPRESS_RA_DEC)
+                  *dec_buff = *ra_buff = '\0';
+               else
+                  {
+                  memmove( ra_buff + 1, ra_buff, strlen( ra_buff) + 1);
+                  *ra_buff = ' ';
+                  strcat( ra_buff, "   ");
+                  strcat( dec_buff, " ");
+                  }
+               if( computer_friendly)
+                  {
+                  snprintf( date_buff, sizeof( date_buff), "%13.5f", curr_jd);
+                  snprintf( r_buff, sizeof( r_buff), "%14.9f", r);
+                  snprintf( solar_r_buff, sizeof( solar_r_buff), "%12.7f", solar_r);
+                  }
+               else
+                  {
+                  full_ctime( date_buff, curr_jd, date_format);
+                       /* the radar folks prefer the distance to be always in */
+                       /* AU,  w/no switch to km for close approach objects: */
+                  use_au_only = show_radar_data;
+                  format_dist_in_buff( r_buff, r);
+                  use_au_only = false;
+                  format_dist_in_buff( solar_r_buff, solar_r);
+                  }
+               if( options & OPTION_SUPPRESS_DELTA)
+                   *r_buff = '\0';
+               if( options & OPTION_SUPPRESS_SOLAR_R)
+                   *solar_r_buff = '\0';
+               snprintf( buff, sizeof( buff), "%s %s%s%s%s",
+                     date_buff, ra_buff, dec_buff, r_buff, solar_r_buff);
 
-            if( !(options & OPTION_SUPPRESS_ELONG))
-               snprintf_append( buff, sizeof( buff), " %5.1f", elong * 180. / PI);
+               if( !(options & OPTION_SUPPRESS_ELONG))
+                  snprintf_append( buff, sizeof( buff), " %5.1f", elong * 180. / PI);
 
-            if( show_visibility)
-               {
-               char tbuff[4];
+               if( show_visibility)
+                  {
+                  char tbuff[4];
 
-               tbuff[0] = ' ';
-               if( alt_az[1].y > 0.)
-                  tbuff[1] = '*';         /* daylight */
-               else if( alt_az[1].y > -6. * PI / 180.)
-                  tbuff[1] = 'C';         /* civil twilight */
-               else if( alt_az[1].y > -12. * PI / 180.)
-                  tbuff[1] = 'N';         /* civil twilight */
-               else if( alt_az[1].y > -18. * PI / 180.)
-                  tbuff[1] = 'A';         /* civil twilight */
-               else
-                  tbuff[1] = ' ';         /* plain ol' night */
-               if( alt_az[2].y > 0.)      /* moon's up */
-                  tbuff[2] = (moon_more_than_half_lit ? 'M' : 'm');
-               else
-                  tbuff[2] = ' ';         /* moon's down */
-               tbuff[3] = '\0';
-               if( !computer_friendly)
-                  snprintf_append( buff, sizeof( buff), "$%06lx", rgb);
-               else if( tbuff[1] == ' ' && tbuff[2] == ' ')
-                  tbuff[1] = '-';
-               strcat( buff, tbuff);
-               }
-            if( show_sky_brightness)
-               {
-               if( mags_per_arcsec2 < 99 || computer_friendly)
-                  snprintf_append( buff, sizeof( buff), " %5.2f", mags_per_arcsec2);
-               else
-                  strcat( buff, " --.--");
-               }
-            if( !obj_n)
-               {
-               const bool two_place_mags = computer_friendly ||
-                            (*get_environment_ptr( "MAG_DIGITS") == '2');
-               double phase_ang;
-               double curr_mag = abs_mag + calc_obs_magnitude(
+                  tbuff[0] = ' ';
+                  if( alt_az[1].y > 0.)
+                     tbuff[1] = '*';         /* daylight */
+                  else if( alt_az[1].y > -6. * PI / 180.)
+                     tbuff[1] = 'C';         /* civil twilight */
+                  else if( alt_az[1].y > -12. * PI / 180.)
+                     tbuff[1] = 'N';         /* civil twilight */
+                  else if( alt_az[1].y > -18. * PI / 180.)
+                     tbuff[1] = 'A';         /* civil twilight */
+                  else
+                     tbuff[1] = ' ';         /* plain ol' night */
+                  if( alt_az[2].y > 0.)      /* moon's up */
+                     tbuff[2] = (moon_more_than_half_lit ? 'M' : 'm');
+                  else
+                     tbuff[2] = ' ';         /* moon's down */
+                  tbuff[3] = '\0';
+                  if( !computer_friendly)
+                     snprintf_append( buff, sizeof( buff), "$%06lx", rgb);
+                  else if( tbuff[1] == ' ' && tbuff[2] == ' ')
+                     tbuff[1] = '-';
+                  strcat( buff, tbuff);
+                  }
+               if( show_sky_brightness)
+                  {
+                  if( mags_per_arcsec2 < 99 || computer_friendly)
+                     snprintf_append( buff, sizeof( buff), " %5.2f", mags_per_arcsec2);
+                  else
+                     strcat( buff, " --.--");
+                  }
+
+               curr_mag = abs_mag + calc_obs_magnitude(
                           solar_r, r, earth_r, &phase_ang);  /* elem_out.cpp */
-
                if( curr_mag > 999.)       /* avoid overflow for objects     */
                   curr_mag = 999.;        /* essentially at zero elongation */
                if( curr_mag > ephemeris_mag_limit)
@@ -2100,127 +2099,126 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                            endptr[-2] = '?';
                         }
                   }
-               }
 
-            if( !obj_n && (options & OPTION_LUNAR_ELONGATION))
-               snprintf_append( buff, sizeof( buff), "%6.1f", lunar_elong * 180. / PI);
+               if( options & OPTION_LUNAR_ELONGATION)
+                  snprintf_append( buff, sizeof( buff), "%6.1f", lunar_elong * 180. / PI);
 
-
-            if( options & OPTION_MOTION_OUTPUT)
-               {
-               MOTION_DETAILS m;
-               char *end_ptr = buff + strlen( buff);
-
-               compute_observation_motion_details( &temp_obs, &m);
-               strcat( buff, " ");
-               if( options & OPTION_SEPARATE_MOTIONS)
+               if( options & OPTION_MOTION_OUTPUT)
                   {
-                  format_motion( end_ptr + 1, m.ra_motion);
-                  format_motion( end_ptr + 8, m.dec_motion);
-                  }
-               else
-                  {
-                  format_motion( end_ptr + 1, m.total_motion);
-                  snprintf( end_ptr + 8, 7, "%5.1f ",
-                                  m.position_angle_of_motion);
-                  }
-               end_ptr[7] = ' ';
-               }
-            if( show_alt_az)
-            for( j = 0; j < 3; j++)
-               {
-               bool show_alt = show_alt_az, show_az = show_alt_az;
+                  MOTION_DETAILS m;
+                  char *end_ptr = buff + strlen( buff);
 
-               if( j == 1)
-                  {
-                  show_alt = show_sun_alt;
-                  show_az  = show_sun_az;
+                  compute_observation_motion_details( &temp_obs, &m);
+                  strcat( buff, " ");
+                  if( options & OPTION_SEPARATE_MOTIONS)
+                     {
+                     format_motion( end_ptr + 1, m.ra_motion);
+                     format_motion( end_ptr + 8, m.dec_motion);
+                     }
+                  else
+                     {
+                     format_motion( end_ptr + 1, m.total_motion);
+                     snprintf( end_ptr + 8, 7, "%5.1f ",
+                                     m.position_angle_of_motion);
+                     }
+                  end_ptr[7] = ' ';
                   }
-               if( j == 2)
-                  {
-                  show_alt = show_moon_alt;
-                  show_az  = show_moon_az;
-                  }
-               if( show_alt)
-                  snprintf_append( buff, sizeof( buff), " %c%02d",
-                                    (alt_az[j].y > 0. ? '+' : '-'),
-                                    (int)( fabs( alt_az[j].y * 180. / PI) + .5));
-               if( show_az)
-                  snprintf_append( buff, sizeof( buff), " %03d",
-                                    (int)( alt_az[j].x * 180. / PI + .5));
-               }
-            if( options & OPTION_RADIAL_VEL_OUTPUT)
-               {
-               char *end_ptr = buff + strlen( buff);
-               const double rvel_in_km_per_sec =
-                                        radial_vel * AU_IN_KM / seconds_per_day;
+               if( show_alt_az)
+                  for( j = 0; j < 3; j++)
+                     {
+                     bool show_alt = show_alt_az, show_az = show_alt_az;
 
-               if( computer_friendly)
-                  snprintf_append( buff, sizeof( buff),
-                                   "%12.6f", rvel_in_km_per_sec);
-               else
-                  format_velocity_in_buff( end_ptr, rvel_in_km_per_sec);
-               }
-            if( show_radar_data)
-               {
-               if( alt_az[0].y < 0.)
-                  strcat( buff, "  n/a");
-               else
+                     if( j == 1)
+                        {
+                        show_alt = show_sun_alt;
+                        show_az  = show_sun_az;
+                        }
+                     if( j == 2)
+                        {
+                        show_alt = show_moon_alt;
+                        show_az  = show_moon_az;
+                        }
+                     if( show_alt)
+                        snprintf_append( buff, sizeof( buff), " %c%02d",
+                                          (alt_az[j].y > 0. ? '+' : '-'),
+                                          (int)( fabs( alt_az[j].y * 180. / PI) + .5));
+                     if( show_az)
+                        snprintf_append( buff, sizeof( buff), " %03d",
+                                          (int)( alt_az[j].x * 180. / PI + .5));
+                     }
+               if( options & OPTION_RADIAL_VEL_OUTPUT)
+                  {
+                  char *end_ptr = buff + strlen( buff);
+                  const double rvel_in_km_per_sec =
+                                           radial_vel * AU_IN_KM / seconds_per_day;
+
+                  if( computer_friendly)
+                     snprintf_append( buff, sizeof( buff),
+                                      "%12.6f", rvel_in_km_per_sec);
+                  else
+                     format_velocity_in_buff( end_ptr, rvel_in_km_per_sec);
+                  }
+               if( show_radar_data)
+                  {
+                  if( alt_az[0].y < 0.)
+                     strcat( buff, "  n/a");
+                  else
+                     {
+                     char *tptr = buff + strlen( buff);
+                     const double radar_albedo = 0.1;
+                     double snr = radar_snr_per_day( &rdata, abs_mag,
+                                    radar_albedo, r);
+
+                     *tptr = ' ';
+                     show_packed_with_si_prefixes( tptr + 1, snr);
+                     }
+                  }
+               if( options & OPTION_GROUND_TRACK)
                   {
                   char *tptr = buff + strlen( buff);
-                  const double radar_albedo = 0.1;
-                  double snr = radar_snr_per_day( &rdata, abs_mag,
-                                 radar_albedo, r);
+                  double lat_lon[2], alt_in_meters;
+                  const double meters_per_km = 1000.;
 
-                  *tptr = ' ';
-                  show_packed_with_si_prefixes( tptr + 1, snr);
+                  alt_in_meters = find_lat_lon_alt( utc, geo, planet_no, lat_lon,
+                           *get_environment_ptr( "GEOMETRIC_GROUND_TRACK") == '1');
+                  snprintf( tptr, 30, "%9.4f %+08.4f %10.3f",
+                        lat_lon[0] * 180. / PI,
+                        lat_lon[1] * 180. / PI,
+                        alt_in_meters / meters_per_km);
+                  tptr[30] = '\0';
                   }
-               }
-            if( options & OPTION_GROUND_TRACK)
-               {
-               char *tptr = buff + strlen( buff);
-               double lat_lon[2], alt_in_meters;
-               const double meters_per_km = 1000.;
 
-               alt_in_meters = find_lat_lon_alt( utc, geo, planet_no, lat_lon,
-                        *get_environment_ptr( "GEOMETRIC_GROUND_TRACK") == '1');
-               snprintf( tptr, 30, "%9.4f %+08.4f %10.3f",
-                     lat_lon[0] * 180. / PI,
-                     lat_lon[1] * 180. / PI,
-                     alt_in_meters / meters_per_km);
-               tptr[30] = '\0';
-               }
+               if( options & OPTION_SPACE_VEL_OUTPUT)
+                  {
+                           /* get 'full' velocity; cvt AU/day to km/sec: */
+                  const double total_vel =
+                             vector3_length( topo_vel) * AU_IN_KM / seconds_per_day;
 
-            if( options & OPTION_SPACE_VEL_OUTPUT)
-               {
-                        /* get 'full' velocity; cvt AU/day to km/sec: */
-               const double total_vel =
-                          vector3_length( topo_vel) * AU_IN_KM / seconds_per_day;
-
-               format_velocity_in_buff( buff + strlen( buff), total_vel);
-               }
-            if( options & OPTION_SUPPRESS_UNOBSERVABLE)
-               {
-               if( show_radar_data)
-                  {     /* for radar, 'observable' = obj above horizon */
-                  show_this_line = (alt_az[0].y > rdata.altitude_limit);
+                  format_velocity_in_buff( buff + strlen( buff), total_vel);
                   }
-               else if( show_topocentric_data && show_this_line)
-                  {        /* "observable" = obj above horizon,  sun below it */
-                  show_this_line = (alt_az[0].y > 0. && alt_az[1].y < 0.);
+               if( options & OPTION_SUPPRESS_UNOBSERVABLE)
+                  {
+                  if( show_radar_data)
+                     {     /* for radar, 'observable' = obj above horizon */
+                     show_this_line = (alt_az[0].y > rdata.altitude_limit);
+                     }
+                  else if( show_topocentric_data && show_this_line)
+                     {        /* "observable" = obj above horizon,  sun below it */
+                     show_this_line = (alt_az[0].y > 0. && alt_az[1].y < 0.);
+                     }
                   }
-               }
 
-            if( fake_astrometry)
-               strcpy( buff, fake_line);
-            if( !show_this_line)
-               {
-               if( last_line_shown)
-                  strcpy( buff, "................\n");
-               else
-                  *buff = '\0';
+               if( fake_astrometry)
+                  strcpy( buff, fake_line);
+               if( !show_this_line)
+                  {
+                  if( last_line_shown)
+                     strcpy( buff, "................\n");
+                  else
+                     *buff = '\0';
+                  }
+               last_line_shown = show_this_line;
                }
-            last_line_shown = show_this_line;
             }
          else        /* shouldn't happen */
             strcpy( buff, "DANGER!\n");
