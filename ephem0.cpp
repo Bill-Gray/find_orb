@@ -1545,11 +1545,11 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       if( show_alt_az)
          snprintf_append( buff, sizeof( buff), " alt -az");
       if( show_sun_alt)
-         snprintf_append( buff, sizeof( buff), "Salt");
+         snprintf_append( buff, sizeof( buff), " Sal");
       if( show_sun_az)
          snprintf_append( buff, sizeof( buff), " Saz");
       if( show_moon_alt)
-         snprintf_append( buff, sizeof( buff), "Malt");
+         snprintf_append( buff, sizeof( buff), " Mal");
       if( show_moon_az)
          snprintf_append( buff, sizeof( buff), " Maz");
       if( options & OPTION_RADIAL_VEL_OUTPUT)
