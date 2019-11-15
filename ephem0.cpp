@@ -1385,7 +1385,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    int n_lines_shown = 0;
    unsigned date_format;
    const int ephem_type = ((options & 7) == 6 ? 0 : (options & 7));
-   FILE *ofile;
+   FILE *ofile, *computer_friendly_ofile = NULL;
    const bool computer_friendly = ((options & OPTION_COMPUTER_FRIENDLY) ? true : false);
    char step_units;
    const char *timescale = get_environment_ptr( "TT_EPHEMERIS");
@@ -1564,9 +1564,15 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
          snprintf_append( buff, sizeof( buff), " \"-sig-PA");
       if( ephem_type == OPTION_OBSERVABLES)
          {
+         char cf_filename[256];
+
          header = (char *)malloc( 1024);
          assert( header);
          strcpy( header, buff);
+         strcpy( cf_filename, filename);
+         text_search_and_replace( cf_filename, ".txt", ".eph");
+         computer_friendly_ofile = fopen_ext( cf_filename, is_default_ephem ? "tfcw+" : "fw+");
+         assert( computer_friendly_ofile);
          }
       if( !computer_friendly)
          {
@@ -2262,8 +2268,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
          }
       if( *buff)
          fprintf( ofile, "%s\n", (computer_friendly ? alt_buff : buff));
-//    if( last_line_shown)
-//       fprintf( ofile, "\n");
+      if( *alt_buff)
+         fprintf( computer_friendly_ofile, "%s\n", alt_buff);
       prev_ephem_t = ephemeris_t;
       }
    free( orbits_at_epoch);
@@ -2273,7 +2279,6 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    fclose( ofile);
    if( header)
       {
-      FILE *ifile = fopen_ext( filename, is_default_ephem ? "tfcr" : "fr");
       char time_buff[40];
 
       strcpy( buff, filename);
@@ -2287,14 +2292,15 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       fprintf( ofile, "    \"start iso\": \"%s\",\n", iso_time( time_buff, jd_start));
       fprintf( ofile, "    \"entries\":\n");
       fprintf( ofile, "    {\n");
-      create_json_ephemeris( ofile, ifile, header);
+      fseek( computer_friendly_ofile, 0L, SEEK_SET);
+      create_json_ephemeris( ofile, computer_friendly_ofile, header);
       fprintf( ofile, "    }\n");
       free( header);
-      fclose( ifile);
       fprintf( ofile, "  }\n}\n");
       combine_json_elems_and_ephems( ofile);
       fclose( ofile);
       }
+   fclose( computer_friendly_ofile);
    return( 0);
 }
 
