@@ -2268,7 +2268,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
          }
       if( *buff)
          fprintf( ofile, "%s\n", (computer_friendly ? alt_buff : buff));
-      if( *alt_buff)
+      if( *alt_buff && computer_friendly_ofile)
          fprintf( computer_friendly_ofile, "%s\n", alt_buff);
       prev_ephem_t = ephemeris_t;
       }
@@ -2277,7 +2277,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       fprintf( ofile, "No ephemeris output.  Object was too faint,  or in daylight,\n"
                    "or below horizon for the specified times.  Check ephem options.\n");
    fclose( ofile);
-   if( header)
+   if( header && computer_friendly_ofile)
       {
       char time_buff[40];
 
@@ -2289,6 +2289,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       fprintf( ofile, "    \"count\": %d,\n", n_lines_shown);
       fprintf( ofile, "    \"start\": %f,\n", jd_start);
       fprintf( ofile, "    \"step\": %.9f,\n", step);
+      fprintf( ofile, "    \"n_steps\": %d,\n", n_steps);
       fprintf( ofile, "    \"start iso\": \"%s\",\n", iso_time( time_buff, jd_start));
       fprintf( ofile, "    \"entries\":\n");
       fprintf( ofile, "    {\n");
@@ -2300,7 +2301,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       combine_json_elems_and_ephems( ofile);
       fclose( ofile);
       }
-   fclose( computer_friendly_ofile);
+   if( computer_friendly_ofile)
+      fclose( computer_friendly_ofile);
    return( 0);
 }
 
