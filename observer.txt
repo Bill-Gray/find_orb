@@ -36,6 +36,8 @@
  Denisenko                                 <a href="https://en.wikipedia.org/wiki/Denis_Denisenko">Denisenko</a>
  Denneau                                   <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0012267">Denneau</a>
  Ernst                                     <a href="http://www.starkenburg-sternwarte.de/asteroiden/namen/7686.htm">Ernst</a>
+ Fitzsimmons                               <a href="https://alanfitzsimmons.wordpress.com/">Fitzsimmons</a>
+ Flewelling                                <a href="https://twitter.com/heatherflew">Flewelling</a>
  Foglia                                    <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0013147">Foglia</a>
  Fuls                                      <a href="https://catalina.lpl.arizona.edu/person/carson-fuls">Fuls</a>
  Galad                                     <a href="http://en.wikipedia.org/wiki/Adri%C3%A1n_Gal%C3%A1d">Gal&aacute;d</a>
@@ -53,6 +55,7 @@
  Haleakala                                 Haleakal&#x101;
  Hammergren                                <a href="http://www.eccentrix.com/members/ssp2k/ppl/profiles/drhammer.html">Hammergren</a>
  Healy                                     <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0066479">Healy</a>
+ Heinze                                    <a href="http://www.ariheinze.com/">Heinze</a>
  Hill                                      <a href="http://www.lpl.arizona.edu/~rhill/">Hill</a>
  Hoenig                                    <a href="http://www.mpifr-bonn.mpg.de/staff/shoenig/">H&ouml;nig</a>
  Holman                                    <a href="http://en.wikipedia.org/wiki/3666_Holman">Holman</a>
