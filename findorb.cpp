@@ -2392,7 +2392,6 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
                                  const bool drop_single_obs)
 {
    OBJECT_INFO *ids;
-   const char *most_recent_file = "MOST_RECENT_FILE_OPENED";
    const char *temp_clipboard_filename = "/tmp/obs_temp.txt";
 
    *err_buff = '\0';
@@ -2411,9 +2410,6 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
       clipboard_to_file( temp_clipboard_filename, ifilename[1] == '+');
       strcpy( ifilename, temp_clipboard_filename);
       }
-
-   if( !strcmp( ifilename, "p"))
-      strcpy( ifilename, get_environment_ptr( most_recent_file));
 
    ids = find_objects_in_file( ifilename, n_ids, NULL);
    if( *n_ids > 0 && drop_single_obs)
@@ -2441,11 +2437,7 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
       ids = NULL;
       }
    else
-      {
       set_solutions_found( ids, *n_ids);
-      if( strcmp( ifilename, temp_clipboard_filename))
-         set_environment_ptr( most_recent_file, ifilename);
-      }
    return( ids);
 }
 
