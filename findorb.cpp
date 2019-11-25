@@ -759,6 +759,9 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
          case ALT_G:
             strcpy( mpc_code, "500");
             break;
+         case ALT_L:
+            strcpy( mpc_code, "Lun");
+            break;
          case ALT_O:                         /* set 'observables' */
             ephemeris_output_options &= ~7;
             break;
