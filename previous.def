@@ -1,0 +1,5 @@
+# Astrometry files previously opened by Find_Orb.  As you open new files,
+# they'll be added below.  If you then run,  say,  "find_orb :*neocp*",
+# the most recently opened file matching the wildcard *neocp* will be
+# opened.  I find this useful,  since I have a few files I open frequently.
+#

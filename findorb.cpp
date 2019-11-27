@@ -216,6 +216,8 @@ int set_language( const int language);                      /* elem_out.cpp */
 void shellsort_r( void *base, const size_t n_elements, const size_t esize,
          int (*compare)(const void *, const void *, void *), void *context);
 static int count_wide_chars_in_utf8_string( const char *iptr, const char *endptr);
+char **load_file_into_memory( const char *filename, size_t *n_lines,
+                        const bool fail_if_not_found);      /* mpc_obs.cpp */
 int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
                                    const char *format, ...)
 #ifdef __GNUC__
@@ -2388,12 +2390,36 @@ static int toggle_selected_observations( OBSERVE *obs, const unsigned n_obs,
    return( rval);
 }
 
+/* Simplified regular expression matching.  Enough for our humble needs. */
+
+static bool patMatch( const char *pattern, const char *string)
+{
+   while( pattern[0])
+      if( pattern[0] == '*')
+            return patMatch(pattern+1, string) || (string[0] && patMatch(pattern, string+1));
+      else
+         {
+         if( pattern[0] == '?' && !string[0])
+            return 0;
+         if( pattern[0] != '?' && pattern[0] != string[0])
+            return 0;
+         pattern++;
+         string++;
+         }
+   return !string[0];
+}
+
 static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
                                  const bool drop_single_obs)
 {
    OBJECT_INFO *ids;
    const char *temp_clipboard_filename = "/tmp/obs_temp.txt";
+   size_t n_lines, i;
+   const char *prev_fn = "previous.txt";
+   char **prev_files = load_file_into_memory( prev_fn, &n_lines, false);
 
+   if( !prev_files)
+      prev_files = load_file_into_memory( "previous.def", &n_lines, true);
    *err_buff = '\0';
    if( !*ifilename)
       user_select_file( ifilename, "Open astrometry file", 0);
@@ -2410,6 +2436,10 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
       clipboard_to_file( temp_clipboard_filename, ifilename[1] == '+');
       strcpy( ifilename, temp_clipboard_filename);
       }
+   if( *ifilename == ':')
+      for( i = n_lines - 1; i; i--)
+         if( *prev_files[i] != '#' && patMatch( ifilename + 1, prev_files[i]))
+            strcpy( ifilename, prev_files[i]);
 
    ids = find_objects_in_file( ifilename, n_ids, NULL);
    if( *n_ids > 0 && drop_single_obs)
@@ -2437,7 +2467,25 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
       ids = NULL;
       }
    else
+      {
+      FILE *ofile =  fopen_ext( prev_fn, "fcw");
+#ifdef _WIN32
+      char *canonical_path = ifilename;
+#else
+      char *canonical_path = realpath( ifilename, NULL);
+#endif
+
+      assert( canonical_path);
       set_solutions_found( ids, *n_ids);
+      for( i = 0; i < n_lines; i++)
+         if( strcmp( prev_files[i], canonical_path))
+            fprintf( ofile, "%s\n", prev_files[i]);
+      fprintf( ofile, "%s\n", canonical_path);
+      fclose( ofile);
+#ifndef _WIN32
+      free( canonical_path);
+#endif
+      }
    return( ids);
 }
 
