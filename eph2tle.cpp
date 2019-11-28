@@ -607,6 +607,7 @@ int main( const int argc, const char **argv)
                   perror( "Output not opened");
                   return( -1);
                   }
+               setbuf( ofile, NULL);
                }
                break;
             case 'f': case 'F':
