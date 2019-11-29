@@ -1533,29 +1533,6 @@ static void show_one_observation( OBSERVE obs, const int line,
    recreate_observation_line( buff, &obs);
    memmove( buff, buff + dropped_start, strlen( buff + dropped_start) + 1);
    strcat( buff, resid_data);
-#ifdef TEMP_REMOVE
-   if( residual_format & RESIDUAL_FORMAT_SHOW_DELTAS)
-      if( line_start + i != curr_obs)
-         {
-         double diff;
-
-         sprintf( buff + 15, "%16.5f",
-                  obs[line_start + i].jd - obs[curr_obs].jd);
-         buff[31] = ' ';
-
-         diff = obs[line_start + i].ra - obs[curr_obs].ra;
-         if( diff > PI)
-            diff -= PI + PI;
-         if( diff < -PI)
-            diff += PI + PI;
-         sprintf( buff + 32, "%11.5f", diff * 180. / PI);
-         buff[43] = ' ';
-         diff = obs[line_start + i].dec - obs[curr_obs].dec;
-         sprintf( buff + 44, "%11.5f", diff * 180. / PI);
-         buff[55] = ' ';
-         }
-#endif
-
    if( obs.flags & OBS_IS_SELECTED)
       color = COLOR_SELECTED_OBS;
 
@@ -3555,11 +3532,6 @@ int main( int argc, const char **argv)
                stored_ra_decs =
                    add_gaussian_noise_to_obs( n_obs, obs, noise_in_arcseconds);
             push_orbit( curr_epoch, orbit);
-#ifdef NOW_OBSOLETE
-            if( !strcmp( orbit_constraints, "e=1"))
-               improve_parabolic( obs, n_obs, orbit, curr_epoch);
-            else
-#endif
             if( c == AUTO_REPEATING && using_sr)
                {
                find_nth_sr_orbit( orbit, obs, n_obs, monte_carlo_object_count);
