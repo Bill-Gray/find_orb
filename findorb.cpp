@@ -123,6 +123,24 @@ devoted to station data.   */
       | BUTTON1_MOVED \
       | BUTTON1_TRIPLE_CLICKED | BUTTON1_PRESSED | BUTTON1_RELEASED)
 
+      /* Not all Curses allow the following attributes. */
+
+#ifndef A_ITALIC
+   #define A_ITALIC   0
+#endif
+#ifndef A_LEFTLINE
+   #define A_LEFTLINE 0
+#endif
+#ifndef A_RIGHTLINE
+   #define A_RIGHTLINE 0
+#endif
+#ifndef A_UNDERLINE
+   #define A_UNDERLINE 0
+#endif
+#ifndef A_OVERLINE
+   #define A_OVERLINE 0
+#endif
+
 #ifndef max
 #define max(a, b) ((a > b) ? a : b)
 #define min(a, b) ((a < b) ? a : b)
@@ -363,9 +381,9 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
       else
          n_spaces = 0;
       if( !i)
-         color_to_use |= 0x4000;     /* overline */
+         color_to_use |= A_OVERLINE;
       if( !prompt[j] || !prompt[j + 1])
-         color_to_use |= 0x2000;     /* underline */
+         color_to_use |= A_UNDERLINE;
       put_colored_text( tbuff, line, col - side_borders,
              side_borders + j - i + n_spaces, color_to_use);
       i = j;
@@ -1377,7 +1395,7 @@ static void show_residual_text( char *buff, const int line_no,
    memcpy( tbuff, tptr, residual_field_size);
    if( !is_included)
       {
-      resid_color = COLOR_EXCLUDED_OBS + 4096;
+      resid_color = COLOR_EXCLUDED_OBS;
       tbuff[0] = '(';                       /* put ()s around excluded obs */
       tbuff[residual_field_size - 1] = ')';
       }
@@ -1931,27 +1949,12 @@ static void get_mouse_data( int *mouse_x, int *mouse_y,
 static void put_colored_text( const char *text, const int line_no,
                const int column, const int n_bytes, const int color)
 {
+   const attr_t attrib_mask = A_BOLD | A_BLINK | A_LEFTLINE
+            | A_RIGHTLINE | A_ITALIC | A_UNDERLINE | A_OVERLINE;
+
+
    attrset( COLOR_PAIR( color & 255));
-   if( color & 256)
-      attron( A_BLINK);
-#ifdef __PDCURSES__
-   if( color & 512)
-      attron( A_BOLD);
-#endif
-#ifdef A_LEFTLINE
-   if( color & 1024)
-      attron( A_LEFTLINE);
-   if( color & 2048)
-      attron( A_RIGHTLINE);
-   if( color & 4096)
-      attron( A_ITALIC);
-   if( color & 8192)
-      attron( A_UNDERLINE);
-#endif
-#ifdef A_OVERLINE
-   if( color & 16384)
-      attron( A_OVERLINE);
-#endif
+   attron( color & attrib_mask);
    if( n_bytes > 0)
       {
       const int len = getmaxx( stdscr) - column;
@@ -1986,24 +1989,7 @@ static void put_colored_text( const char *text, const int line_no,
          remains -= n_bytes;
          }
       }
-   if( color & 256)
-      attroff( A_BLINK);
-   if( color & 512)
-      attroff( A_BOLD);
-#ifdef A_LEFTLINE
-   if( color & 1024)
-      attroff( A_LEFTLINE);
-   if( color & 2048)
-      attroff( A_RIGHTLINE);
-   if( color & 4096)
-      attroff( A_ITALIC);
-   if( color & 8192)
-      attroff( A_UNDERLINE);
-#endif
-#ifdef A_OVERLINE
-   if( color & 16384)
-      attroff( A_OVERLINE);
-#endif
+   attroff( color & attrib_mask);
 }
 
 OBSERVE *add_observations( FILE *ifile, OBSERVE *obs,
@@ -2889,15 +2875,8 @@ int main( int argc, const char **argv)
             unsigned right_side_col = 0;
             const unsigned spacing = 4;  /* allow four columns between */
                         /* 'standard' and 'extended' (right-hand) text */
-
-#ifndef __PDCURSES__
-            const int is_blinking = blink_state( ) % 2;
-            int elem_color = ((bad_elements && is_blinking) ?
-                                256 + COLOR_OBS_INFO : COLOR_ORBITAL_ELEMENTS);
-#else
             int elem_color = (bad_elements ?
-                                256 + COLOR_OBS_INFO : COLOR_ORBITAL_ELEMENTS);
-#endif
+                              A_BLINK + COLOR_OBS_INFO : COLOR_ORBITAL_ELEMENTS);
 
             while( iline < 20 && fgets_trimmed( tbuff, sizeof( tbuff), ifile))
                {
@@ -2915,11 +2894,7 @@ int main( int argc, const char **argv)
                   char *tptr;
 
                   if( !memcmp( tbuff, "IMPACT", 6))
-#ifndef __PDCURSES__
-                     elem_color = (is_blinking ? COLOR_ATTENTION : COLOR_ORBITAL_ELEMENTS);
-#else
-                     elem_color = COLOR_ATTENTION + 256;
-#endif
+                     elem_color = COLOR_ATTENTION + A_BLINK;
 #ifdef HAVE_UNICODE
                   if( make_unicode_substitutions)
                      text_search_and_replace( tbuff, " +/- ", " \xc2\xb1 ");
@@ -2932,7 +2907,7 @@ int main( int argc, const char **argv)
                      if( atof( tptr + 11) < .01)
                         put_colored_text( tptr, line_no + iline,
                               count_wide_chars_in_utf8_string( tbuff, tptr),
-                              20, COLOR_ATTENTION + 256);
+                              20, COLOR_ATTENTION + A_BLINK);
                   iline++;
                   }
                else
