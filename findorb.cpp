@@ -2096,16 +2096,6 @@ static double get_elements( const char *filename, double *state_vect)
    return( elem.epoch);
 }
 
-#ifndef __PDCURSES__
-static int blink_state( void)
-{
-   const int one_billion = 1000000000;
-   const int blinking_freq = one_billion / 2;      /* blink twice a second */
-
-   return( (int)nanoseconds_since_1970( ) / blinking_freq);
-}
-#endif
-
 /* I really should use getopt() or a portable variant.  However,  this has
 been sufficiently effective thus far... */
 
@@ -3020,19 +3010,14 @@ int main( int argc, const char **argv)
             }
       if( c != AUTO_REPEATING)
          {
-#ifndef __PDCURSES__
-         const int blink_state0 = blink_state( );
-#endif
+         const time_t t0 = time( NULL);
 
          c = 0;
          while( !c && curses_kbhit( ) == ERR)
             {
-#ifndef __PDCURSES__
-            if( blink_state( ) != blink_state0)
-               c = KEY_TIMER;
-#else
             napms( 50);
-#endif
+            if( t0 != time( NULL))  /* wait one second for a key hit */
+               c = KEY_TIMER;
             }
          if( !c)
             c = extended_getch( );
