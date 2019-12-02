@@ -1333,7 +1333,7 @@ static double find_closest_approach( const double *input_orbit, double jde,
                             const double step, const double *prev_r)
 {
    double orbit[6];
-   bool is_done = false;
+   int is_done = 0;
    brent_min_t b;
 
    memcpy( orbit, input_orbit, 6 * sizeof( double));
@@ -3576,7 +3576,7 @@ static inline void redacted_locations( const char *terms[],
          }
       for( i = 0; i < n_terms; i++)
          {
-         const unsigned end_x = x[i] + strlen( terms[i]) + 1;
+         const unsigned end_x = x[i] + (unsigned)strlen( terms[i]) + 1;
 
          if( end_x > max_column)
             success = false;
