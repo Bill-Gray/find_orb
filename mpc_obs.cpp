@@ -2376,6 +2376,43 @@ static inline double get_radar_frequency( const int mpc_code, const int year)
    return( freq_in_mhz);
 }
 
+/* In transferring/translating satellite offsets from the .rwo format
+to the MPC's 80-column format,  there are nuances.  In what follows,
+obuff[0] will be a plus or minus.  obuff[1...11] will be the offset,
+in kilometers or AU.  ibuff must be set to point to the decimal point
+in the .rwo's offset coordinate.  There's some extra weirdness because
+if the output is in kilometers,  you have to pad with leading spaces
+if there are four or fewer leading digits.   */
+
+static inline void transfer_rwo_satellite_offset( char *obuff,
+            const char units, const char *ibuff)
+{
+   size_t loc = 0, size_out = 11;
+
+   assert( *ibuff == '.');
+   ibuff--;
+   while( isdigit( *ibuff))
+      {
+      ibuff--;
+      loc++;
+      }
+   if( *ibuff == '-')
+      *obuff++ = '-';
+   else
+      {
+      assert( *ibuff == ' ');
+      *obuff++ = '+';
+      }
+   ibuff++;
+   if( units == '1' && loc < 5) /* for km,  must be at least five digits; */
+      {                         /* leave some leading spaces */
+      obuff += 5 - loc;
+      size_out -= 5 - loc;
+      }
+   while( size_out-- && *ibuff != ' ')
+      *obuff++ = *ibuff++;
+}
+
 /* Code to convert an observation in the AstDyS and NeoDyS '.rwo' format
 to the MPC's 80-byte format.  Return value indicates that the input
 buffer _was_ in .rwo format (rval = 1) or was not (rval = 0),  in which
@@ -2459,18 +2496,33 @@ static void xfer_rwo_time_to_mpc( char *obuff, const char *ibuff)
 
 #define MINIMUM_RWO_LENGTH 117
 
+/* Circa 2019,  AstDyS/NEODyS revised their spacecraft offset lines to
+allow 24 bytes per coordinate instead of 12.  Both old and new formats can
+be handled without too much trouble.   */
+
+#define OLD_SECOND_LINE_FORMAT   1
+#define NEW_SECOND_LINE_FORMAT   2
+
 static int rwo_to_mpc( char *buff, double *ra_bias, double *dec_bias,
                   double *posn_sigma_ra, double *posn_sigma_dec, double *mag_sigma)
 {
-   int rval = 0, i, j;
+   int rval = 0, i, second_line = 0;
    const size_t line_len = strlen( buff);
    char obuff[82], second_radar_line[82];
 
    *second_radar_line = '\0';
    if( debug_level > 2)
       debug_printf( "rwo_to_mpc: Input: '%s'\n", buff);
-   if( line_len == 75 && buff[27] == '.' && buff[54] == '.'
-               && buff[13] == 's' && buff[12] == ' ')
+   if( !memcmp( buff + 11, "S s", 3) && buff[27] == '.')
+      {
+      if( line_len == 75)
+         if( buff[42] == '.' && buff[54] == '.' && buff[66] == '.')
+            second_line = OLD_SECOND_LINE_FORMAT;
+      if( line_len == 111)
+         if( buff[46] == '.' && buff[70] == '.' && buff[94] == '.')
+            second_line = NEW_SECOND_LINE_FORMAT;
+      }
+   if( second_line)
       {                       /* satellite second line */
       if( debug_level > 2)
          debug_printf( "Input: '%s'\n", buff);
@@ -2478,20 +2530,12 @@ static int rwo_to_mpc( char *buff, double *ra_bias, double *dec_bias,
       obuff[14] = buff[13];   /* obs type */
       xfer_rwo_time_to_mpc( obuff + 15, buff + 17);
       obuff[32] = buff[34];      /* units specifier */
-      memcpy( obuff + 34, buff + 36, 36);  /* xyz */
-      memcpy( obuff + 77, buff + 72, 3);   /* MPC code */
-      for( i = 34; i < 59; i += 12)
-         {
-         for( j = i + 1; j < i + 12; j++)
-            if( obuff[j] == '-' || obuff[j] == '+')
-               {
-               obuff[i] = obuff[j];
-               obuff[j] = ' ';
-               }
-         if( obuff[i] == ' ')   /* if no sign given, make coordinate */
-            obuff[i] = '+';     /* explicitly positive */
-         }
+      memcpy( obuff + 77, buff + line_len - 3, 3);   /* MPC code */
+      for( i = 0; i < 3; i++)
+         transfer_rwo_satellite_offset( obuff + 34 + i * 12, buff[34],
+                     buff + 38 + (4 + i * 12) * second_line);
       rval = 1;
+      obuff[80] = '\0';
       if( debug_level > 2)
          debug_printf( "Output: '%s'\n", obuff);
       }
@@ -3378,7 +3422,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
       if( get_neocp_data( buff, desig_from_neocp, mpc_code_from_neocp))
          if( !i && debug_level)
             debug_printf( "Got NEOCP data\n");
-      if( ilen == 75 || ilen >= MINIMUM_RWO_LENGTH)
+      if( ilen == 75 || ilen == 111 || ilen >= MINIMUM_RWO_LENGTH)
          {
          is_rwo = rwo_to_mpc( buff, &rval[i].ra_bias, &rval[i].dec_bias,
                 &rwo_posn_sigma_1, &rwo_posn_sigma_2, &rwo_mag_sigma);
