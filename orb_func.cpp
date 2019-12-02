@@ -57,6 +57,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    #define isfinite _finite
 #endif
 
+#if defined( _MSC_VER) && (_MSC_VER < 1900)
+                      /* For older MSVCs,  we have to supply our own  */
+                      /* snprintf().  See snprintf.cpp for details.  */
+int snprintf( char *string, const size_t max_len, const char *format, ...);
+#endif
+
 unsigned perturbers = 0;
 int integration_method = 0;
 extern int debug_level;
