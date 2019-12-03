@@ -187,6 +187,10 @@ the assumption that the altitude given at the page is ASL,  not ellipsoidal.)
 
 Cso !-1552842.124    +194931.698    4165       Caltech Submillimeter Observatory (CSO)
 
+   Following position from Geoff Bowers :
+
+MKV !-155.45551209   +19.8013877    3763.061   Mauna Kea VLBA
+
       The following five (official) MPC sites have corrected positions,
    copy/pasted from the above.
 
@@ -665,6 +669,17 @@ copied from the MPC data.
 HSL !-104.015183   +30.679849       2010       ASAS-SN, Henrietta Swan Leavitt/McDonald Obs
 AHa !-156.257494   +20.707009       3050       ASAS-SN, Haleakala 'Brutus'
 
+Leo !-111.016862   +32.374086        723.9     Leo Observatory
+
    2019 Nov 7 : these two ISON observatories tracked the NEO A00001.
 Ark !  412553.67     +433859.94     2046       Arkhyz
 Bla ! 1274320.40     +500735.68      146       Blagoveschensk
+093 !  202154.0      +692054         200       Skibotn
+
+   From various links at
+
+   http://haro.astrossp.unam.mx/oanspm/index.php?option=com_content&view=article&id=2&Itemid=2
+
+67a |-1152800.     +310243.         2790.      1.5-m, National Astronomical Observatory of Mexico
+67b |-1152749.     +310239.         2800.      2.12-m, National Astronomical Observatory of Mexico
+67c |-1152758.     +310242.         2790.      0.84-m, National Astronomical Observatory of Mexico
