@@ -313,6 +313,18 @@ int main( const int argc, const char **argv)
          ephemeris_output_options |= OPTION_SHOW_SIGMAS;
       else if( !strcmp( field, "comp_fr"))
          ephemeris_output_options |= OPTION_COMPUTER_FRIENDLY;
+      else if( !strcmp( field, "lun_elong"))
+         ephemeris_output_options |= OPTION_LUNAR_ELONGATION;
+      else if( !strcmp( field, "lun_alt"))
+         ephemeris_output_options |= OPTION_MOON_ALT;
+      else if( !strcmp( field, "lun_az"))
+         ephemeris_output_options |= OPTION_MOON_AZ;
+      else if( !strcmp( field, "sun_alt"))
+         ephemeris_output_options |= OPTION_SUN_ALT;
+      else if( !strcmp( field, "sun_az"))
+         ephemeris_output_options |= OPTION_SUN_AZ;
+      else if( !strcmp( field, "sky_br"))
+         ephemeris_output_options |= OPTION_SKY_BRIGHTNESS;
       else if( !strcmp( field, "redact_neocp"))
          neocp_redaction_turned_on = true;
       else if( !strcmp( field, "ephem_type"))
