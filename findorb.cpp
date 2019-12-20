@@ -4277,19 +4277,13 @@ int main( int argc, const char **argv)
             show_a_file( "debug.txt");
             break;
          case '.':
-            {
-            size_t slen;
-            const size_t xmax =
-                     min( (size_t)getmaxx( stdscr), sizeof( message_to_user)) - 1;
-
-            strcpy( message_to_user, longname( ));
-            strcat( message_to_user, "    ");
-            format_jpl_ephemeris_info( tbuff);
-            slen = strlen( message_to_user);
-            if( slen < xmax)
-               strncpy( message_to_user + slen, tbuff + 1, xmax - slen);
-            message_to_user[xmax] = '\0';
-            }
+            snprintf( tbuff, sizeof( tbuff), "%s\n", longname( ));
+            snprintf_append( tbuff, sizeof( tbuff),
+                        "%d pairs of %d colors\n", COLOR_PAIRS, COLORS);
+            if( can_change_color( ))
+               strcat( tbuff, "Colors are changeable\n");
+            format_jpl_ephemeris_info( tbuff + strlen( tbuff) - 1);
+            inquire( tbuff, NULL, 0, COLOR_DEFAULT_INQUIRY);
             break;
          case KEY_TIMER:
             break;
