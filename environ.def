@@ -56,7 +56,7 @@ TIME_RANGE=-1000,3000
    list.)  An asterisk indicates that observations of geocentric objects
    should remain redacted.
 GREENLIT=033 291 568 691 703 970 C95 G58 G96 H01 H41 H43 H45 I41 I52 I93
-GREENLIT2=J95 T05* T08* V03 V06 Y00 Z37 Z48 Z80
+GREENLIT2=J95 T05* T08* V03 V06 V11 Y00 Z37 Z48 Z80
 
    We default to assuming that no object will have an observed arc greater
    than 200 years,  and that if it _is_ longer than that,  it's a mistake.
