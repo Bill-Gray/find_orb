@@ -2107,6 +2107,8 @@ static const char *get_arg( const int argc, const char **argv, const int idx)
       return( argv[idx + 1]);
 }
 
+static bool force_eight_color_mode = false;
+
       /* Either locate a palette color close to the desired RGB,  or
          (on platforms where one can do so) allocate a new palette entry
          with the desired RGB value.      */
@@ -2116,8 +2118,8 @@ static int find_rgb( const unsigned irgb)
    static int n_colors = 0;
    short rgb0[3];
 
-   if( !can_change_color( ) || COLORS <= 8)     /* limited to a fixed palette */
-      n_colors = COLORS;
+   if( !can_change_color( ) || COLORS <= 8 || force_eight_color_mode)
+      n_colors = COLORS;            /* limited to a fixed palette */
    rgb0[0] = (int)( irgb >> 16);
    rgb0[1] = (int)( (irgb >> 8) & 0xff);
    rgb0[2] = (int)( irgb & 0xff);
@@ -2186,7 +2188,7 @@ static inline int initialize_curses( const int argc, const char **argv)
                               /* "Find_Orb -- Orbit Determination" */
 #endif
    start_color( );
-   char_to_search_for = (COLORS > 8 ? 'c' : '8');
+   char_to_search_for = (COLORS > 8 && !force_eight_color_mode ? 'c' : '8');
    while( fgets( buff, sizeof( buff), ifile))
       if( *buff == char_to_search_for)
          {
@@ -2514,6 +2516,9 @@ int main( int argc, const char **argv)
             {
             case '1':
                drop_single_obs = false;
+               break;
+            case '8':
+               force_eight_color_mode = true;
                break;
             case 'a':
                {
