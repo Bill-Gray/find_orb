@@ -4282,7 +4282,8 @@ int main( int argc, const char **argv)
             show_a_file( "debug.txt");
             break;
          case '.':
-            snprintf( tbuff, sizeof( tbuff), "%s\n", longname( ));
+            snprintf( tbuff, sizeof( tbuff), "%s\n%s\n%s\n",
+                                 longname( ), termname( ), curses_version( ));
             snprintf_append( tbuff, sizeof( tbuff),
                         "%d pairs of %d colors\n", COLOR_PAIRS, COLORS);
             if( can_change_color( ))
