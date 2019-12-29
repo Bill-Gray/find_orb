@@ -26,6 +26,16 @@ LIBSADDED=-L $(INSTALL_DIR)/lib -lm
 EXE=
 RM=rm -f
 
+ifeq ($(OS),Windows_NT)
+    detected_OS := Windows
+else
+    detected_OS := $(shell sh -c 'uname 2>/dev/null || echo Unknown')
+endif
+
+ifeq ($(detected_OS),Darwin)  # Mac OS X uses 'ncurses', not 'ncursesw'
+	CURSES_LIB=-lncurses
+endif
+
 ifdef CLANG
 	CC=clang
 endif

@@ -25,6 +25,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 
 #define PDC_NCMOUSE
 
+#ifdef __APPLE__
+   #define _XOPEN_SOURCE_EXTENDED
+   /* https://stackoverflow.com/questions/48042203/curses-library-doesnt-support-wide-char-on-os-x-high-sierra */
+#endif
+
             /* Pretty much every platform I've run into supports */
             /* Unicode display,  except OpenWATCOM and early     */
             /* versions of MSVC.                                 */
