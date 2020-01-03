@@ -2113,6 +2113,47 @@ static const char *get_arg( const int argc, const char **argv, const int idx)
       return( argv[idx + 1]);
 }
 
+/* ncurses' color_content( ) returns bogus RGB values if the color is
+uninitialized,  or if it can't really change colors.  The following
+ought to get the 'real' RGB for xterm-256colors,  which seems to be
+the most common case. */
+
+static void default_color_content( const int color, short *r,
+                     short *g, short *b)
+{
+   if( color < 16)      /* 'base' 8 low-intensity,  8 high-intensity */
+      {
+      const short level = (color & 8 ? 0xff : 0xc0);
+
+      *r = (color & 1) ? level : 0;
+      *g = (color & 2) ? level : 0;
+      *b = (color & 4) ? level : 0;
+      }
+   else if( color < 16 + 216)    /* 6x6x6 color cube */
+      {
+      const short idx = color - 16;
+
+      *r = idx / 36;
+      *g = (idx / 6) % 6;
+      *b = idx % 6;
+      if( *r)
+         *r = *r * 40 + 55;
+      if( *g)
+         *g = *g * 40 + 55;
+      if( *b)
+         *b = *b * 40 + 55;
+      }
+   else              /* 24 shades of gray */
+      {
+      const short level = (short)( color - 16 - 216);
+
+      *r = *g = *b = 8 + level * 10;
+      }
+   *r = *r * 200 / 51;
+   *g = *g * 200 / 51;
+   *b = *b * 200 / 51;
+}
+
 static bool force_eight_color_mode = false;
 
       /* Either locate a palette color close to the desired RGB,  or
@@ -2136,7 +2177,10 @@ static int find_rgb( const unsigned irgb)
       short rgb[3];
       int j, dist = 0;
 
-      color_content( (short)i, rgb, rgb + 1, rgb + 2);
+      if( force_eight_color_mode)
+         default_color_content( (short)i, rgb, rgb + 1, rgb + 2);
+      else
+         color_content( (short)i, rgb, rgb + 1, rgb + 2);
       for( j = 0; j < 3; j++)
          dist += abs( rgb[j] - rgb0[j]);
       if( best_dist > dist)
@@ -2149,6 +2193,7 @@ static int find_rgb( const unsigned irgb)
                we may have no choice but to accept the best fit we found. */
    if( best_dist < 15 || n_colors == COLORS)
       return( best_match);
+   assert( !force_eight_color_mode);
    init_color( n_colors, rgb0[0], rgb0[1], rgb0[2]);
    n_colors++;
    return( n_colors - 1);
@@ -2194,7 +2239,7 @@ static inline int initialize_curses( const int argc, const char **argv)
                               /* "Find_Orb -- Orbit Determination" */
 #endif
    start_color( );
-   char_to_search_for = (COLORS > 8 && !force_eight_color_mode ? 'c' : '8');
+   char_to_search_for = (COLORS > 8 ? 'c' : '8');
    while( fgets( buff, sizeof( buff), ifile))
       if( *buff == char_to_search_for)
          {
