@@ -1533,7 +1533,7 @@ static int show_station_info( const OBSERVE FAR *obs, const int n_obs,
 
 
 static void show_one_observation( OBSERVE obs, const int line,
-                        const int residual_format)
+                        const int residual_format, bool is_underlined)
 {
    char buff[200];
    const int mpc_column = (int)( strstr( legend, "Obs") - legend);
@@ -1558,7 +1558,8 @@ static void show_one_observation( OBSERVE obs, const int line,
    strcat( buff, resid_data);
    if( obs.flags & OBS_IS_SELECTED)
       color = COLOR_SELECTED_OBS;
-
+   if( is_underlined)
+      color |= A_UNDERLINE;
    show_residual_text( buff, line, 0, color, obs.is_included);
    show_mpc_code_in_color( buff + mpc_column, line, mpc_column);
 
@@ -1578,7 +1579,7 @@ static void show_observations( const OBSERVE *obs, int line_no,
 {
    while( n_obs_shown > 0)
       {
-      show_one_observation( *obs, line_no, residual_format);
+      show_one_observation( *obs, line_no, residual_format, false);
       obs++;
       n_obs_shown--;
       line_no++;
