@@ -688,3 +688,8 @@ Bla !+1274320.40   +500735.68        146       Blagoveschensk
    of the MPC position.  I recycled the altitude from MPC.
 
 T08 !-155.576049   +19.536135       3412.      ATLAS-MLO, Mauna Loa
+
+   Some observations of C/1844 Y1 were made from this site in southern
+   India.  G__gle Maps shows a dome there.
+
+Tre !  76.9583     +08.5085           57.      Trivandrum
