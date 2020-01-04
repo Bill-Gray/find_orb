@@ -1574,16 +1574,15 @@ static void show_one_observation( OBSERVE obs, const int line,
       }
 }
 
-static void show_observations( const OBSERVE *obs, int line_no,
-                  const int residual_format, int n_obs_shown)
+static void show_observations( const OBSERVE *obs, const int first_obs_idx,
+                int line_no, const int residual_format, const int n_obs_shown)
 {
-   while( n_obs_shown > 0)
-      {
-      show_one_observation( *obs, line_no, residual_format, false);
-      obs++;
-      n_obs_shown--;
-      line_no++;
-      }
+   int i;
+   const int underline_freq = atoi( get_environment_ptr( "UNDERLINE_OBS"));
+
+   for( i = first_obs_idx; i < first_obs_idx + n_obs_shown; i++)
+      show_one_observation( obs[i], line_no++, residual_format,
+            underline_freq && i % underline_freq == underline_freq - 1);
 }
 
 static void show_final_line( const int n_obs,
@@ -3016,7 +3015,7 @@ int main( int argc, const char **argv)
             top_obs_shown = 0;
          for( i = 0; i < n_mpc_codes; i++)
             mpc_color_codes[i].score = 0;
-         show_observations( obs + top_obs_shown, top_line_residuals,
+         show_observations( obs, top_obs_shown, top_line_residuals,
                                  residual_format, n_obs_shown);
          show_station_info( obs, n_obs,
                      line_no, curr_obs, list_codes);
@@ -3209,7 +3208,7 @@ int main( int argc, const char **argv)
                      if( button & (BUTTON2_RELEASED | BUTTON2_CLICKED
                                  | BUTTON3_RELEASED | BUTTON3_CLICKED))
                         {                 /* right or middle button click/release */
-                        show_observations( obs + top_obs_shown, top_line_residuals,
+                        show_observations( obs, top_obs_shown, top_line_residuals,
                                  residual_format, n_obs_shown);
                         i = full_inquire( get_find_orb_text( 2022), NULL, 0,
                                  COLOR_MENU, y, x);
