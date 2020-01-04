@@ -2390,8 +2390,7 @@ static int64_t ten_to_the_nth( int n)
 /* See comments for get_ra_dec() in mpc_fmt.cpp for info on the meaning  */
 /* of 'precision' in this function.                                      */
 
-static void output_angle_to_buff( char *obuff, const double angle,
-                               const int precision)
+static void output_angle_to_buff( char *obuff, double angle, int precision)
 {
    int n_digits_to_show = 0;
    int64_t power_mul, fraction;
@@ -2441,11 +2440,22 @@ static void output_angle_to_buff( char *obuff, const double angle,
          case 310:      /* formats 307-312 are the 'super-precise' formats */
          case 311:
          case 312:      /* microseconds (or microarcseconds) */
+         case 400:      /* (RA) ddd mm ss,  integer arcseconds */
+         case 401:      /* (RA) ddd mm ss.s,  tenths of arcseconds */
+         case 402:      /* (RA) ddd mm ss.ss,  centiarcsec */
             {
+            const char *format = "%02u %02u %02u";
+
+            if( precision >= 400)
+               {
+               format = "%03u %02u %02u";
+               precision -= 400;
+               angle *= 15.;
+               }
             n_digits_to_show = precision % 306;
             power_mul = ten_to_the_nth( n_digits_to_show);
             fraction = (int64_t)( angle * 3600. * (double)power_mul + .5);
-            snprintf( obuff, 9, "%02u %02u %02u",
+            snprintf( obuff, 10, format,
                      (unsigned)( fraction / ((int64_t)3600 * power_mul)),
                      (unsigned)( fraction / ((int64_t)60 * power_mul)) % 60,
                      (unsigned)( fraction / power_mul) % 60);
@@ -2925,11 +2935,14 @@ void recreate_observation_line( char *obuff, const OBSERVE FAR *obs)
       return;
       }
 // set_obs_to_microday( &tobs);
-   if( force_traditional_format && tobs.time_precision > 6)
+   if( force_traditional_format)
       {
-      tobs.ra_precision = 3;
-      tobs.dec_precision = 2;
-      tobs.time_precision = 6;
+      if( tobs.ra_precision > 3)
+         tobs.ra_precision = 3;
+      if( tobs.dec_precision > 2)
+         tobs.dec_precision = 2;
+      if( tobs.time_precision > 6)
+         tobs.time_precision = 6;
       }
    format_observation( &tobs, buff, 4);
    memcpy( obuff, obs->packed_id, 12);
