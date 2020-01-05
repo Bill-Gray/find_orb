@@ -143,6 +143,13 @@ typedef uint64_t ephem_option_t;
 #define OPTION_MOON_AZ               0x10000000
 #define OPTION_SKY_BRIGHTNESS        0x20000000
 
+#define EPHEM_OPTION_BIT( N)  (((ephem_option_t)1) << (N))
+
+#define OPTION_SUN_TARGET_PA         EPHEM_OPTION_BIT( 30)
+#define OPTION_SUN_HELIO_VEL_PA      EPHEM_OPTION_BIT( 31)
+#define OPTION_ORBIT_PLANE_ANGLE     EPHEM_OPTION_BIT( 32)
+#define OPTION_GALACTIC_COORDS       EPHEM_OPTION_BIT( 33)
+
 #define HELIOCENTRIC_SIGMAS_ONLY       0
 #define ORBIT_SIGMAS_REQUESTED         1
 #define NO_ORBIT_SIGMAS_REQUESTED    (-1)

@@ -1533,6 +1533,14 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
          snprintf_append( buff, sizeof( buff), " helio_ecliptic   ");
       if( options & OPTION_TOPO_ECLIPTIC)
          snprintf_append( buff, sizeof( buff), " topo_ecliptic    ");
+      if( options & OPTION_GALACTIC_COORDS)
+         snprintf_append( buff, sizeof( buff), "Gal_Lon- Gal_Lat- ");
+      if( options & OPTION_SUN_TARGET_PA)
+         snprintf_append( buff, sizeof( buff), "-PsAng- ");
+      if( options & OPTION_SUN_HELIO_VEL_PA)
+         snprintf_append( buff, sizeof( buff), "-PsAMV- ");
+      if( options & OPTION_ORBIT_PLANE_ANGLE)
+         snprintf_append( buff, sizeof( buff), "-PlAng- ");
       if( abs_mag)
          snprintf_append( buff, sizeof( buff), " mag");
 
@@ -1860,7 +1868,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                bool moon_more_than_half_lit = false;
                double fraction_illum = 1.;    /* i.e.,  not in earth's shadow */
                double mags_per_arcsec2 = 99.99;    /* sky brightness */
-               DPT alt_az[3];
+               DPT alt_az[3], sun_ra_dec;
                double earth_r = 0.;
                char ra_buff[80], dec_buff[80];
                double phase_ang, curr_mag;
@@ -1901,6 +1909,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                         lunar_elong = acose( cos_elong);
                         }
                      vector_to_polar( &obj_ra_dec.x, &obj_ra_dec.y, vect);
+                     if( j == 1)
+                        sun_ra_dec = obj_ra_dec;
                      }
                   obj_ra_dec.x = -obj_ra_dec.x;
                   full_ra_dec_to_alt_az( &obj_ra_dec, &alt_az[j], NULL, &latlon, utc, NULL);
@@ -2079,6 +2089,58 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   snprintf_append( tbuff, sizeof( tbuff), " %8.4f %8.4f",
                                                      eclip_lon * 180. / PI,
                                                      eclip_lat * 180. / PI);
+                  }
+               if( options & OPTION_GALACTIC_COORDS)
+                  {
+                  double galactic_lat, galactic_lon;
+
+                  ra_dec_to_galactic( ra_dec.x, ra_dec.y,
+                                                  &galactic_lat, &galactic_lon);
+                  if( galactic_lon < 0.)
+                     galactic_lon += PI + PI;
+                  snprintf_append( tbuff, sizeof( buff), " %8.4f %8.4f",
+                              galactic_lon * 180. / PI, galactic_lat * 180. / PI);
+                  }
+               if( options & OPTION_SUN_TARGET_PA)
+                  {
+                  double sun_target_pa, unused_elongation;
+
+                  calc_dist_and_posn_ang( &ra_dec.x, &sun_ra_dec.x,
+                           &unused_elongation, &sun_target_pa);
+                  sun_target_pa = PI - sun_target_pa;
+                  if( sun_target_pa < 0.)
+                     sun_target_pa += PI + PI;
+                  snprintf_append( tbuff, sizeof( buff), " %7.3f",
+                                  sun_target_pa * 180. / PI);
+                  }
+               if( options & OPTION_SUN_HELIO_VEL_PA)
+                  {
+                  double unused_dist, pa, helio_vel[3];
+                  DPT vel_pole;
+
+                  memcpy( helio_vel, orbi + 3, 3 * sizeof( double));
+                  ecliptic_to_equatorial( helio_vel);
+                  vector_to_polar( &vel_pole.x, &vel_pole.y, helio_vel);
+                  calc_dist_and_posn_ang( &ra_dec.x, &vel_pole.x,
+                                        &unused_dist, &pa);
+                  pa = PI - pa;
+                  if( pa < 0.)
+                     pa += PI + PI;
+                  snprintf_append( tbuff, sizeof( buff), " %7.3f",
+                                 pa * 180. / PI);
+                  }
+               if( options & OPTION_ORBIT_PLANE_ANGLE)
+                  {
+                  double orbit_norm[3], unused_pa, dist;
+                  DPT orbit_pole;
+
+                  vector_cross_product( orbit_norm, orbi, orbi + 3);
+                  ecliptic_to_equatorial( orbit_norm);
+                  vector_to_polar( &orbit_pole.x, &orbit_pole.y, orbit_norm);
+                  calc_dist_and_posn_ang( &ra_dec.x, &orbit_pole.x,
+                                        &dist, &unused_pa);
+                  snprintf_append( tbuff, sizeof( buff), " %7.3f",
+                                    dist * 180. / PI - 90.);
                   }
 
                strcat( buff, tbuff);

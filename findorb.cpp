@@ -778,10 +778,17 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                strcpy( mpc_code, buff);
                }
             break;
+         case ALT_C:      /* toggle comet-related options */
+            ephemeris_output_options ^= OPTION_SUN_TARGET_PA |
+                           OPTION_SUN_HELIO_VEL_PA | OPTION_ORBIT_PLANE_ANGLE;
+            break;
          case ALT_D:
             strcpy( ephemeris_start, "+0");
             ephemeris_output_options &= ~7;
                      /* FALLTHRU */
+         case CTRL( 'G'):
+            ephemeris_output_options ^= OPTION_GALACTIC_COORDS;
+            break;
          case ALT_G:
             strcpy( mpc_code, "500");
             break;
