@@ -151,6 +151,8 @@ void make_config_dir_name( char *oname, const char *iname);  /* miscell.cpp */
 int put_elements_into_sof( char *obuff, const char *templat,
          const ELEMENTS *elem,
          const int n_obs, const OBSERVE *obs);                /* elem_ou2.cpp */
+uint64_t parse_bit_string( const char *istr);                /* miscell.cpp */
+const char *write_bit_string( char *ibuff, const uint64_t bits);
 
 int debug_printf( const char *format, ...)                 /* runge.cpp */
 #ifdef __GNUC__
@@ -2579,14 +2581,15 @@ int store_defaults( const ephem_option_t ephemeris_output_options,
          const double max_residual_for_filtering,
          const double noise_in_arcseconds)
 {
-   char buff[150];
+   char buff[256];
 
-   sprintf( buff, "%c,%d,%d,%lu,%f,%f",
+   sprintf( buff, "%c,%d,%d,0,%f,%f",
                default_comet_magnitude_type,
                element_format, element_precision,
-               ephemeris_output_options,
                max_residual_for_filtering, noise_in_arcseconds);
    set_environment_ptr( "SETTINGS", buff);
+   set_environment_ptr( "EPHEM_OPTIONS",
+                   write_bit_string( buff, ephemeris_output_options));
    sprintf( buff, "%.3f %f %u %d", probability_of_blunder * 100.,
               overobserving_time_span,
               overobserving_ceiling,
@@ -2644,6 +2647,7 @@ int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
    extern unsigned max_n_sr_orbits;
    int use_sigmas_int;
    const char *override_fcct14_filename = get_environment_ptr( "FCCT14_FILE");
+   const char *ephem_bitstring = get_environment_ptr( "EPHEM_OPTIONS");
 
 #ifndef _WIN32
    lock_file = fopen( lock_filename, "w");
@@ -2684,6 +2688,10 @@ int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
                element_format, element_precision,
                ephemeris_output_options,
                max_residual_for_filtering, noise_in_arcseconds);
+
+   if( *ephem_bitstring)
+      *ephemeris_output_options = parse_bit_string( ephem_bitstring);
+
    sscanf( get_environment_ptr( "FILTERING"), "%lf %lf %u %d",
                &probability_of_blunder,
                &overobserving_time_span,
