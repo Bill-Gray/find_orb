@@ -73,6 +73,7 @@ FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 void make_config_dir_name( char *oname, const char *iname);  /* miscell.cpp */
 int reset_astrometry_filename( int *argc, const char **argv);
 uint64_t parse_bit_string( const char *istr);                /* miscell.cpp */
+const char *write_bit_string( char *ibuff, const uint64_t bits);
 
 int use_config_directory = false;
 const char *alt_config_directory;
@@ -415,6 +416,37 @@ uint64_t parse_bit_string( const char *istr)
          }
       }
    return( rval);
+}
+
+/* Inverse of the above function.  I _think_ the longest possible bitstring
+length is 122 bytes :
+
+0-1,3-4,6-7,9,11-12,14-15,17-18,20-21,23-24,26-27,29-30,32-33,35-36,38-40,41-42,44-45,47-48,50-51,53-54,56-57,59-60,62-63
+
+   but I lack a formal proof of this.  I'm sure 256 bytes will be more
+than enough.   */
+
+const char *write_bit_string( char *ibuff, const uint64_t bits)
+{
+   int i, j;
+   const size_t max_bitstring_len = 256;
+
+   *ibuff = '\0';
+   for( i = 0; i < 64; i++)
+      if( (bits >> i) & 1)
+         {
+         j = i + 1;
+         while( (bits >> j) & 1)
+            j++;
+         if( j > i + 1)
+            snprintf_append( ibuff, max_bitstring_len, "%d-%d,", i, j - 1);
+         else
+            snprintf_append( ibuff, max_bitstring_len, "%d,", i);
+         i = j;
+         }
+   if( *ibuff)             /* remove trailing comma */
+      ibuff[strlen( ibuff) - 1] = '\0';
+   return( ibuff);
 }
 
 /* strlcat() and strlcpy() appear in some BSDs,  but I don't think they
