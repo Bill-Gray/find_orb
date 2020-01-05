@@ -15,11 +15,18 @@ CONSOLE_OPTS=500 15 3 1
 
    The 'settings' give the comet magnitude type used (defaults to 'N', or
    'nuclear');  the format used for orbital elements;  the precision used
-   in orbital elements (defaults to five places for angular elements);  the
-   ephemeris output options,  in a complicated form;  the maximum residual
-   filtered,  in arcseconds (defaults to 2);  and the Gaussian "noise"
-   added,  in sigmas,  when running Monte Carlo orbits.
-SETTINGS=N,4,5,66560,2.000000,1.000000
+   in orbital elements (defaults to five places for angular elements);  a
+   zero,  for a no-longer-used quantity;  the maximum residual filtered,
+   in arcseconds (defaults to 2);  and the Gaussian "noise" added,  in
+   sigmas,  when running Monte Carlo orbits.
+SETTINGS=N,4,5,0,2.000000,1.000000
+
+   Ephemeris options are enumerated at
+   https://www.projectpluto.com/fo_usage.htm#eph_opts . This line just
+   specifies which options are currently set for ephemerides.  Defaults are
+   10 (round time to nearest ephemeris step) and 16 (show uncertainties).
+EPHEM_OPTIONS=10,16
+
 DEFAULTS=N4
 EPHEM_START=+0
 EPHEM_STEPS=100 1
@@ -266,14 +273,19 @@ LANGUAGE=e
    the last few digits will be almost pure random numbers.
 ADDED_RA_DEC_PRECISION=0
 
-
    By default,  Find_Orb does a decent job of figuring out which objects
    should be included as perturbers.  But if you want to insist that all
    computations include certain objects,  you can use the line below to
    do so.  It's a hexadecimal number that is the sum of 2=Mercury,  4=Venus,
    8=Earth, ... 100 = Neptune, 200=Pluto, 400=the Moon.  The sun is always
-   included.  So 3fe,  for example,  would be (nine) planets plus the moon.
-   308 would add just the earth and moon.  Note that if Find_Orb detects
+   included.  So 7fe,  for example,  would be (nine) planets plus the moon.
+   408 would add just the earth and moon.  Note that if Find_Orb detects
    that an orbit would pass close to,  say,  Neptune,  then it will be
    turned on automatically.
 PERTURBERS=0
+
+   In console Find_Orb,  one can have every (say) fifth observation
+   underlined by setting the following value to 5.  This can make the
+   observation section a little easier to read.  Not everybody agrees
+   with me on this,  though,  so the default is for it to be unset.
+UNDERLINE_OBS=
