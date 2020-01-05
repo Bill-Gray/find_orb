@@ -81,7 +81,7 @@ int debug_printf( const char *format, ...)                 /* runge.cpp */
 ;
 int text_search_and_replace( char FAR *str, const char *oldstr,
                                      const char *newstr);   /* ephem0.cpp */
-int get_defaults( int *ephemeris_output_options, int *element_format,
+int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
          int *element_precision, double *max_residual_for_filtering,
          double *noise_in_arcseconds);                /* elem_out.cpp */
 int inquire( const char *prompt, char *buff, const int max_len,
@@ -460,7 +460,8 @@ int main( int argc, const char **argv)
    bool all_heliocentric = true;
    bool use_colors = true;
    bool show_processing_steps = true;
-   int ephemeris_output_options = OPTION_SHOW_SIGMAS | OPTION_ROUND_TO_NEAREST_STEP;
+   ephem_option_t ephemeris_output_options
+               = OPTION_SHOW_SIGMAS | OPTION_ROUND_TO_NEAREST_STEP;
    time_t update_time, t0;
    double ephem_end_jd = 0.;
    extern bool is_default_ephem;
@@ -670,7 +671,7 @@ int main( int argc, const char **argv)
    if( all_heliocentric)
       forced_central_body = 0;
    if( ephem_option_string)
-      ephemeris_output_options = (int)parse_bit_string( ephem_option_string);
+      ephemeris_output_options = parse_bit_string( ephem_option_string);
 
    load_up_sigma_records( "sigma.txt");
    if( debug_level)

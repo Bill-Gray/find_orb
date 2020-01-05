@@ -1376,7 +1376,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
          const double lon,
          const double rho_cos_phi, const double rho_sin_phi,
          const int n_steps, const char *note_text,
-         const int options, const unsigned n_objects)
+         const ephem_option_t options, const unsigned n_objects)
 {
    double *orbits_at_epoch, step;
    DPT *stored_ra_decs;
@@ -2362,7 +2362,7 @@ int ephemeris_in_a_file_from_mpc_code( const char *filename,
          OBSERVE *obs, const int n_obs,
          const double epoch_jd, const double jd_start, const char *stepsize,
          const int n_steps, const char *mpc_code,
-         const int options, const unsigned n_objects)
+         const ephem_option_t options, const unsigned n_objects)
 {
    double rho_cos_phi, rho_sin_phi, lon;
    char note_text[100], buff[100];

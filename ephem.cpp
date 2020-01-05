@@ -361,7 +361,8 @@ void CEphem::OnClickedGo()
          ephemeris_in_a_file( ephemeris_filename, temp_orbit, obs, n_obs,
                      planet_no, epoch, jd,
                      CT2A( m_ephem_step), lon, rho_cos_phi, rho_sin_phi,
-                     m_number_steps, note_text, options, n_orbits);
+                     m_number_steps, note_text,
+                     (ephem_option_t)options, n_orbits);
 
          CListBox* pListBox = (CListBox*)GetDlgItem( IDC_LIST1);
          FILE *ifile = fopen( ephemeris_filename, "r");

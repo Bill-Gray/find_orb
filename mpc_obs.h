@@ -86,6 +86,8 @@ parameters in Find_Orb.  This may get bumped up at some point. */
 
 #define MAX_N_NONGRAV_PARAMS 3
 
+typedef uint64_t ephem_option_t;
+
 /* Bitfield options for ephemeris_in_a_file( ): */
 /* Bottom three bits define an ephemeris type.  "Observables" are the */
 /* usual RA/dec,  radial velocity,  etc. type output.  "State vector  */
@@ -208,13 +210,13 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
          const double lon,
          const double rho_cos_phi, const double rho_sin_phi,
          const int n_steps, const char *note_text,
-         const int options, const unsigned n_objects);
+         const ephem_option_t options, const unsigned n_objects);
 int ephemeris_in_a_file_from_mpc_code( const char *filename,
          const double *orbit,
          OBSERVE *obs, const int n_obs,
          const double epoch_jd, const double jd_start, const char *stepsize,
          const int n_steps, const char *mpc_code,
-         const int options, const unsigned n_objects);
+         const ephem_option_t options, const unsigned n_objects);
 int find_best_fit_planet( const double jd, const double *ivect,
                      double *rel_vect);     /* runge.cpp */
 int integrate_orbit( double *orbit, const double t0, const double t1);

@@ -182,11 +182,11 @@ static void get_mouse_data( int *mouse_x, int *mouse_y, int *mouse_z, unsigned l
 int get_object_name( char *obuff, const char *packed_desig);   /* mpc_obs.c */
 int make_pseudo_mpec( const char *mpec_filename, const char *obj_name);
                                               /* ephem0.cpp */
-int store_defaults( const int ephemeris_output_options,
+int store_defaults( const ephem_option_t ephemeris_output_options,
          const int element_format, const int element_precision,
          const double max_residual_for_filtering,
          const double noise_in_arcseconds);           /* elem_out.cpp */
-int get_defaults( int *ephemeris_output_options, int *element_format,
+int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
          int *element_precision, double *max_residual_for_filtering,
          double *noise_in_arcseconds);                /* elem_out.cpp */
 int text_search_and_replace( char FAR *str, const char *oldstr,
@@ -543,7 +543,8 @@ static double *set_up_alt_orbits( const double *orbit, unsigned *n_orbits)
 
 static char mpc_code[80];
 static char ephemeris_start[80], ephemeris_step_size[80];
-static int ephemeris_output_options, n_ephemeris_steps;
+static int n_ephemeris_steps;
+static ephem_option_t ephemeris_output_options;
 
 static void create_ephemeris( const double *orbit, const double epoch_jd,
          OBSERVE *obs, const int n_obs, const char *obj_name,
@@ -557,7 +558,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
    while( c > 0)
       {
       int format_start;
-      const int ephem_type = (ephemeris_output_options & 7);
+      const int ephem_type = (int)(ephemeris_output_options & 7);
       extern double ephemeris_mag_limit;
       const bool is_topocentric =
                is_topocentric_mpc_code( mpc_code);

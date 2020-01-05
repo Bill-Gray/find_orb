@@ -72,11 +72,11 @@ int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
 #define ssnprintf_append( obuff, ...) snprintf_append( obuff, sizeof( obuff), __VA_ARGS__)
 #define ssnprintf( obuff, ...) snprintf( obuff, sizeof( obuff), __VA_ARGS__)
 #endif
-int store_defaults( const int ephemeris_output_options,
+int store_defaults( const ephem_option_t ephemeris_output_options,
          const int element_format, const int element_precision,
          const double max_residual_for_filtering,
          const double noise_in_arcseconds);           /* elem_out.cpp */
-int get_defaults( int *ephemeris_output_options, int *element_format,
+int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
          int *element_precision, double *max_residual_for_filtering,
          double *noise_in_arcseconds);                /* elem_out.cpp */
 static int elements_in_mpcorb_format( char *buff, const char *packed_desig,
@@ -2574,14 +2574,14 @@ extern double ephemeris_mag_limit;
 extern int apply_debiasing;
 extern int sigmas_in_columns_57_to_65;
 
-int store_defaults( const int ephemeris_output_options,
+int store_defaults( const ephem_option_t ephemeris_output_options,
          const int element_format, const int element_precision,
          const double max_residual_for_filtering,
          const double noise_in_arcseconds)
 {
    char buff[150];
 
-   sprintf( buff, "%c,%d,%d,%d,%f,%f",
+   sprintf( buff, "%c,%d,%d,%lu,%f,%f",
                default_comet_magnitude_type,
                element_format, element_precision,
                ephemeris_output_options,
@@ -2627,11 +2627,11 @@ int set_language( const int language)
 
 unsigned always_included_perturbers;
 
-int get_defaults( int *ephemeris_output_options, int *element_format,
+int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
          int *element_precision, double *max_residual_for_filtering,
          double *noise_in_arcseconds)
 {
-   int unused_ephemeris_output_options;
+   ephem_option_t unused_ephemeris_output_options;
    int unused_element_format;
    int unused_element_precision;
    double unused_max_residual_for_filtering;
@@ -2679,7 +2679,7 @@ int get_defaults( int *ephemeris_output_options, int *element_format,
       maximum_jd = YEAR_TO_JD( maximum_jd);
       }
    *ephemeris_output_options = 0;
-   sscanf( get_environment_ptr( "SETTINGS"), "%c,%d,%d,%d,%lf,%lf",
+   sscanf( get_environment_ptr( "SETTINGS"), "%c,%d,%d,%lu,%lf,%lf",
                &default_comet_magnitude_type,
                element_format, element_precision,
                ephemeris_output_options,
