@@ -1366,6 +1366,12 @@ static double find_closest_approach( const double *input_orbit, double jde,
    return( jde);
 }
 
+static void add_lon_lat_to_ephem( char *buff, const size_t buflen,
+               const double lon_in_radians, const double lat_in_radians)
+{
+   snprintf_append( buff, buflen, " %8.4f %8.4f", lon_in_radians * 180. / PI,
+                                                 lat_in_radians * 180. / PI);
+}
 
 double ephemeris_mag_limit = 22.;
 
@@ -2066,9 +2072,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                      pab_vector[j] = topo_ecliptic[j] / r
                                           + orbi_after_light_lag[j] / solar_r;
                   vector_to_polar( &pab_lon, &pab_lat, pab_vector);
-                  snprintf_append( tbuff, sizeof( tbuff), " %8.4f %8.4f",
-                                                     pab_lon * 180. / PI,
-                                                     pab_lat * 180. / PI);
+                  add_lon_lat_to_ephem( tbuff, sizeof( tbuff),
+                              pab_lon, pab_lat);
                   }
 
                if( options & OPTION_HELIO_ECLIPTIC)
@@ -2076,9 +2081,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   double eclip_lon, eclip_lat;
 
                   vector_to_polar( &eclip_lon, &eclip_lat, orbi_after_light_lag);
-                  snprintf_append( tbuff, sizeof( tbuff), " %8.4f %8.4f",
-                                                     eclip_lon * 180. / PI,
-                                                     eclip_lat * 180. / PI);
+                  add_lon_lat_to_ephem( tbuff, sizeof( tbuff),
+                              eclip_lon, eclip_lat);
                   }
 
                if( options & OPTION_TOPO_ECLIPTIC)
@@ -2086,9 +2090,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   double eclip_lon, eclip_lat;
 
                   vector_to_polar( &eclip_lon, &eclip_lat, topo_ecliptic);
-                  snprintf_append( tbuff, sizeof( tbuff), " %8.4f %8.4f",
-                                                     eclip_lon * 180. / PI,
-                                                     eclip_lat * 180. / PI);
+                  add_lon_lat_to_ephem( tbuff, sizeof( tbuff),
+                              eclip_lon, eclip_lat);
                   }
                if( options & OPTION_GALACTIC_COORDS)
                   {
@@ -2098,8 +2101,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                                                   &galactic_lat, &galactic_lon);
                   if( galactic_lon < 0.)
                      galactic_lon += PI + PI;
-                  snprintf_append( tbuff, sizeof( buff), " %8.4f %8.4f",
-                              galactic_lon * 180. / PI, galactic_lat * 180. / PI);
+                  add_lon_lat_to_ephem( tbuff, sizeof( tbuff),
+                              galactic_lon, galactic_lat);
                   }
                if( options & OPTION_SUN_TARGET_PA)
                   {
