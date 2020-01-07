@@ -1660,9 +1660,6 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
          double *orbi = orbits_at_epoch + obj_n * 6;
          double radial_vel, v_dot_r;
          double topo[3], topo_vel[3], geo[3], r;
-#ifdef SOLRAD_11B_HACK
-         double gvel[3];
-#endif
          double topo_ecliptic[3];
          double orbi_after_light_lag[3];
          OBSERVE temp_obs;
@@ -1674,19 +1671,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
             topo[j] = orbi[j] - obs_posn[j];
             geo[j] = orbi[j] - geo_posn[j];
             topo_vel[j] = orbi[j + 3] - obs_vel[j];
-#ifdef SOLRAD_11B_HACK
-            gvel[j] = orbi[j + 3] - geo_vel[j];
-#endif
             }
-#ifdef SOLRAD_11B_HACK
-         for( j = 0; j < 3; j++)       /* reflect through the geocenter  */
-            {                             /* Note that geo & gvel are */
-            topo[j] -= geo[j] * 2.;       /* simply negated.             */
-            geo[j] -= geo[j] * 2.;
-            topo_vel[j] -= gvel[j] * 2.;
-            gvel[j] -= gvel[j] * 2.;
-            }
-#endif
          r = vector3_length( topo);
                     /* for "ordinary ephemeris" (not state vectors or */
                     /* orbital elements),  include light-time lag:    */
