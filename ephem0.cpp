@@ -78,6 +78,8 @@ int debug_printf( const char *format, ...)                 /* runge.cpp */
          __attribute__ (( format( printf, 1, 2)))
 #endif
 ;
+int calc_derivatives( const double jd, const double *ival, double *oval,
+                           const int reference_planet);     /* runge.cpp */
 char *iso_time( char *buff, const double jd);         /* elem_out.cpp */
 double mag_band_shift( const char mag_band);                /* elem_out.c */
 char *get_file_name( char *filename, const char *template_file_name);
@@ -1661,7 +1663,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
          double radial_vel, v_dot_r;
          double topo[3], topo_vel[3], geo[3], r;
          double topo_ecliptic[3];
-         double orbi_after_light_lag[3];
+         double orbi_after_light_lag[6];
          OBSERVE temp_obs;
          int j;
 
@@ -1676,14 +1678,24 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                     /* for "ordinary ephemeris" (not state vectors or */
                     /* orbital elements),  include light-time lag:    */
          if( ephem_type == OPTION_OBSERVABLES)
-            for( j = 0; j < 3; j++)
+            {
+            double derivs[6], dt = -r / AU_PER_DAY;
+
+            calc_derivatives( ephemeris_t, orbi, derivs, 0);
+            for( j = 0; j < 6; j++)
                {
-               const double diff = -orbi[j + 3] * r / AU_PER_DAY;
+               const double diff = derivs[j] * dt;
 
                orbi_after_light_lag[j] = orbi[j] + diff;
-               topo[j] += diff;
-               geo[j] += diff;
+               if( j < 3)
+                  {
+                  topo[j] += diff;
+                  geo[j] += diff;
+                  }
+               else
+                  topo_vel[j - 3] += diff;
                }
+            }
 
          memset( &temp_obs, 0, sizeof( OBSERVE));
          temp_obs.r = vector3_length( topo);
@@ -2106,7 +2118,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   double unused_dist, pa, helio_vel[3];
                   DPT vel_pole;
 
-                  memcpy( helio_vel, orbi + 3, 3 * sizeof( double));
+                  memcpy( helio_vel, orbi_after_light_lag + 3, 3 * sizeof( double));
                   ecliptic_to_equatorial( helio_vel);
                   vector_to_polar( &vel_pole.x, &vel_pole.y, helio_vel);
                   calc_dist_and_posn_ang( &ra_dec.x, &vel_pole.x,
