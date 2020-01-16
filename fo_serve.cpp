@@ -37,6 +37,7 @@ extern int debug_level;
 
 int debug_level = 0;
 
+uint64_t parse_bit_string( const char *istr);                /* miscell.cpp */
 int fetch_astrometry_from_mpc( FILE *ofile, const char *desig);
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 void set_environment_ptr( const char *env_ptr, const char *new_value);
@@ -151,7 +152,7 @@ int main( const int argc, const char **argv)
    double jd_start = 0., jd_end = 0., user_selected_epoch = 0.;
    const double min_jd = 2400000.5;
    const double max_jd = 2600000.5;
-   int ephemeris_output_options = OPTION_ROUND_TO_NEAREST_STEP;
+   ephem_option_t ephemeris_output_options = OPTION_ROUND_TO_NEAREST_STEP;
    int residual_format = RESIDUAL_FORMAT_SHORT;
    double mag_limit = 99.;
    extern double ephemeris_mag_limit;
@@ -329,6 +330,10 @@ int main( const int argc, const char **argv)
          neocp_redaction_turned_on = true;
       else if( !strcmp( field, "ephem_type"))
          ephemeris_output_options += atoi( buff);
+      else if( !strcmp( field, "ephem_opts"))
+         ephemeris_output_options = parse_bit_string( buff);
+      else if( *field == 'e' && isdigit( field[1]))
+         ephemeris_output_options |= ((ephem_option_t)1 << atoi( field + 1));
       else if( !strcmp( field, "language"))
          {
          extern char findorb_language;
