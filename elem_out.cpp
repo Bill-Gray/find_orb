@@ -17,8 +17,11 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301, USA.    */
 
+#define __STDC_FORMAT_MACROS
+
 #include <math.h>
 #include <stdlib.h>
+#include <inttypes.h>
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
@@ -2683,7 +2686,7 @@ int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
       maximum_jd = YEAR_TO_JD( maximum_jd);
       }
    *ephemeris_output_options = 0;
-   sscanf( get_environment_ptr( "SETTINGS"), "%c,%d,%d,%lu,%lf,%lf",
+   sscanf( get_environment_ptr( "SETTINGS"), "%c,%d,%d,%" SCNu64 ",%lf,%lf",
                &default_comet_magnitude_type,
                element_format, element_precision,
                ephemeris_output_options,
