@@ -108,47 +108,48 @@ typedef uint64_t ephem_option_t;
 #define OPTION_CLOSE_APPROACHES        5
 #define OPTION_FAKE_ASTROMETRY         6
 
-#define OPTION_ALT_AZ_OUTPUT            0x008
-#define OPTION_RADIAL_VEL_OUTPUT        0x010
-#define OPTION_MOTION_OUTPUT            0x020
-#define OPTION_PHASE_ANGLE_OUTPUT       0x040
-#define OPTION_GROUND_TRACK             0x100
-#define OPTION_SEPARATE_MOTIONS         0x200
+#define EPHEM_OPTION_BIT( N)  (((ephem_option_t)1) << (N))
 
-#define OPTION_ROUND_TO_NEAREST_STEP    0x400
-#define OPTION_PHASE_ANGLE_BISECTOR     0x800
-#define OPTION_HELIO_ECLIPTIC          0x1000
-#define OPTION_TOPO_ECLIPTIC           0x2000
+#define OPTION_ALT_AZ_OUTPUT            EPHEM_OPTION_BIT( 3)
+#define OPTION_RADIAL_VEL_OUTPUT        EPHEM_OPTION_BIT( 4)
+#define OPTION_MOTION_OUTPUT            EPHEM_OPTION_BIT( 5)
+#define OPTION_PHASE_ANGLE_OUTPUT       EPHEM_OPTION_BIT( 6)
+#define OPTION_GROUND_TRACK             EPHEM_OPTION_BIT( 8)
+#define OPTION_SEPARATE_MOTIONS         EPHEM_OPTION_BIT( 9)
 
-#define OPTION_VISIBILITY              0x4000
-#define OPTION_SUPPRESS_UNOBSERVABLE   0x8000
-#define OPTION_SHOW_SIGMAS            0x10000
-#define OPTION_COMPUTER_FRIENDLY      0x20000
+#define OPTION_ROUND_TO_NEAREST_STEP    EPHEM_OPTION_BIT( 10)
+#define OPTION_PHASE_ANGLE_BISECTOR     EPHEM_OPTION_BIT( 11)
+#define OPTION_HELIO_ECLIPTIC           EPHEM_OPTION_BIT( 12)
+#define OPTION_TOPO_ECLIPTIC            EPHEM_OPTION_BIT( 13)
+
+#define OPTION_VISIBILITY               EPHEM_OPTION_BIT( 14)
+#define OPTION_SUPPRESS_UNOBSERVABLE    EPHEM_OPTION_BIT( 15)
+#define OPTION_SHOW_SIGMAS              EPHEM_OPTION_BIT( 16)
+#define OPTION_COMPUTER_FRIENDLY        EPHEM_OPTION_BIT( 17)
       /* Above option means 'ephems are written in format easy for  */
       /* software to read,  instead of in a human-readable format'. */
 
       /* Added 2015 May 4 at suggestion of Denis Denisenko          */
-#define OPTION_MOIDS                  0x40000
-#define OPTION_SPACE_VEL_OUTPUT       0x80000
-#define OPTION_LUNAR_ELONGATION      0x100000
+#define OPTION_MOIDS                    EPHEM_OPTION_BIT( 18)
+#define OPTION_SPACE_VEL_OUTPUT         EPHEM_OPTION_BIT( 19)
+#define OPTION_LUNAR_ELONGATION         EPHEM_OPTION_BIT( 20)
 
-#define OPTION_SUPPRESS_RA_DEC       0x200000
-#define OPTION_SUPPRESS_DELTA        0x400000
-#define OPTION_SUPPRESS_SOLAR_R      0x800000
-#define OPTION_SUPPRESS_ELONG        0x1000000
+#define OPTION_SUPPRESS_RA_DEC          EPHEM_OPTION_BIT( 21)
+#define OPTION_SUPPRESS_DELTA           EPHEM_OPTION_BIT( 22)
+#define OPTION_SUPPRESS_SOLAR_R         EPHEM_OPTION_BIT( 23)
+#define OPTION_SUPPRESS_ELONG           EPHEM_OPTION_BIT( 24)
 
-#define OPTION_SUN_ALT               0x2000000
-#define OPTION_SUN_AZ                0x4000000
-#define OPTION_MOON_ALT              0x8000000
-#define OPTION_MOON_AZ               0x10000000
-#define OPTION_SKY_BRIGHTNESS        0x20000000
+#define OPTION_SUN_ALT                  EPHEM_OPTION_BIT( 25)
+#define OPTION_SUN_AZ                   EPHEM_OPTION_BIT( 26)
+#define OPTION_MOON_ALT                 EPHEM_OPTION_BIT( 27)
+#define OPTION_MOON_AZ                  EPHEM_OPTION_BIT( 28)
+#define OPTION_SKY_BRIGHTNESS           EPHEM_OPTION_BIT( 29)
 
-#define EPHEM_OPTION_BIT( N)  (((ephem_option_t)1) << (N))
 
-#define OPTION_SUN_TARGET_PA         EPHEM_OPTION_BIT( 30)
-#define OPTION_SUN_HELIO_VEL_PA      EPHEM_OPTION_BIT( 31)
-#define OPTION_ORBIT_PLANE_ANGLE     EPHEM_OPTION_BIT( 32)
-#define OPTION_GALACTIC_COORDS       EPHEM_OPTION_BIT( 33)
+#define OPTION_SUN_TARGET_PA            EPHEM_OPTION_BIT( 30)
+#define OPTION_SUN_HELIO_VEL_PA         EPHEM_OPTION_BIT( 31)
+#define OPTION_ORBIT_PLANE_ANGLE        EPHEM_OPTION_BIT( 32)
+#define OPTION_GALACTIC_COORDS          EPHEM_OPTION_BIT( 33)
 
 #define HELIOCENTRIC_SIGMAS_ONLY       0
 #define ORBIT_SIGMAS_REQUESTED         1
