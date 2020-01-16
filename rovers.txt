@@ -417,7 +417,6 @@ https://spacewatch.lpl.arizona.edu/telescopes
    Other scopes measured while looking at Kitt Peak in Google Maps.
 Google Maps doesn't give me altitudes.  I used the altitude from (691).
 
-Bok !-111.600140     +31.963110     2061.      Bok 2.3-m telescope, Kitt Peak
 May !-111.599895     +31.964027     2061.      Mayall telescope,  Kitt Peak
 1.3 !-111.598406     +31.959634     2061.      1.3-m telescope, Kitt Peak
 2.1 !-111.598296     +31.958175     2061.      2.1-m telescope, Kitt Peak
@@ -683,11 +682,6 @@ Bla !+1274320.40   +500735.68        146       Blagoveschensk
 67a !-1152800.     +310243.         2790.      1.5-m, National Astronomical Observatory of Mexico
 67b !-1152749.     +310239.         2800.      2.12-m, National Astronomical Observatory of Mexico
 67c !-1152758.     +310242.         2790.      0.84-m, National Astronomical Observatory of Mexico
-
-   (T08) correction from Larry Denneau,  shifting about 54 m northeast
-   of the MPC position.  I recycled the altitude from MPC.
-
-T08 !-155.576049   +19.536135       3412.      ATLAS-MLO, Mauna Loa
 
    Some observations of C/1844 Y1 were made from this site in southern
    India.  G__gle Maps shows a dome there.
