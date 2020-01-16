@@ -1,0 +1,10 @@
+   Select a file containing astrometric observations.  These can be in the
+MPC's 80-column format,  or PSV ADES,  or XML ADES.  See
+
+https://projectpluto.com/astromet.htm
+
+   for details on what formats this program will accept.
+
+   If the file has data on one object,  that data will immediately be read
+and an orbit calculated.  If it has data for two or more objects,  you'll
+be able to select the one in which you're interested.

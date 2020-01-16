@@ -2132,9 +2132,9 @@ static void default_color_content( const int color, short *r,
       {
       const short level = (color & 8 ? 0xff : 0xc0);
 
-      *r = (color & 1) ? level : 0;
-      *g = (color & 2) ? level : 0;
-      *b = (color & 4) ? level : 0;
+      *r = (color & COLOR_RED) ? level : 0;
+      *g = (color & COLOR_GREEN) ? level : 0;
+      *b = (color & COLOR_BLUE) ? level : 0;
       }
    else if( color < 16 + 216)    /* 6x6x6 color cube */
       {
@@ -2309,7 +2309,13 @@ static int user_select_file( char *filename, const char *title, const int flags)
 {
    const bool is_save_dlg = (flags & 1);
    char cmd[256];
-   int rval;
+   int rval, i;
+   FILE *ifile = fopen_ext( "openfile.txt", "fcrb");
+
+   for( i = 1; i < getmaxy( stdscr) && fgets_trimmed( cmd, sizeof( cmd), ifile); i++)
+      put_colored_text( cmd, i, 0, -1, COLOR_BACKGROUND);
+   fclose( ifile);
+   refresh( );
 
    strcpy( cmd, "zenity --file-selection");
    if( is_save_dlg)

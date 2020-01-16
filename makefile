@@ -184,7 +184,7 @@ install:
 	cp command.txt details.txt dosephem.txt dos_help.txt ?findorb.txt           $(IDIR)
 	cp environ.def frame_he.txt geo_rect.txt header.htm jpl_eph.txt mpcorb.hdr  $(IDIR)
 	cp mu1.txt observer.txt obslinks.htm ObsCodes.htm ObsCodesF.html            $(IDIR)
-	cp obj_help.txt odd_name.txt previous.def rovers.txt                        $(IDIR)
+	cp obj_help.txt odd_name.txt openfile.txt previous.def rovers.txt           $(IDIR)
 	cp scopes.txt sigma.txt xdesig.txt                                          $(IDIR)
 
 uninstall:
