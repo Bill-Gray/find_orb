@@ -2179,7 +2179,7 @@ static int find_rgb( const unsigned irgb)
    rgb0[2] = (int)( irgb & 0xff);
    for( i = 0; i < 3; i++)
       rgb0[i] = rgb0[i] * 200 / 51;
-   for( i = 0; i < n_colors; i++)
+   for( i = 0; i < n_colors && i < 256; i++)
       {
       short rgb[3];
       int j, dist = 0;
