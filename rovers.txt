@@ -286,10 +286,17 @@ d66 ! 3554454.89654  +402547.90955   849.87404 DSS 66 Madrid 26-meter
 
    Coordinates for Cerro Tololo and Cerro Pachon telescopes,  from
    https://arxiv.org/abs/1210.1616 , Table 6.  Note that some positions
-   given here don't match those given by MPC's ObsCodes.html.  In case
-   of disagreement,  I'd think these positions should be trusted.
+   given here don't match those given by MPC's ObsCodes.html.  In
+   particular,  the location for (I33) given by MPC is about half a
+   kilometer west of reality (compared to the above reference,  and
+   the map at http://www.ctio.noao.edu/soar/content/location , and
+   inspection on G__gle Maps).  I am reasonably sure that (I02) 2MASS,
+   and five LCO telescopes are among those listed below,  but matching
+   up the telescopes listed below to their MPC codes is difficult;
+   the area is a packed array of domes,  and the MPC coordinates are
+   not up to the job of puzzling out which scope is which.
 
-Blan! -704823.49     -301010.78     2241.4     Blanco 4-m
+W84 ! -704823.49     -301010.78     2241.4     Blanco 4-m
 S1.5! -704824.44     -301009.42     2241.9     SMARTS 1.5-m
 S1.0! -704821.83     -301007.92     2240.5     SMARTS 1.0-m
 S0.9! -704823.86     -301007.90     2241.4     SMARTS 0.9-m
@@ -298,7 +305,7 @@ UCAC! -704822.82     -301006.95     2241.2     Former UCAC
 CHAS! -704821.65     -301006.97     2240.5     Former CHASE
 RASI! -704825.11     -301008.03     2238       RASICAM
 WHAM! -704812.85     -301005.92     2188       WHAM
-KASI! -704814.39     -301001.84     2182       KASI
+W93 ! -704814.39     -301001.84     2182       Korea Microlensing Telescope Network-CTIO
 LCOA! -704817.24     -301002.58     2198       LCOGT Stellan-A
 LCOB! -704816.78     -301002.39     2198       LCOGT Stellan-B
 LCOC! -704816.85     -301002.81     2198       LCOGT Stellan-C
@@ -314,8 +321,8 @@ GONG! -704819.84     -301003.92     2209       GONG
 SSIA! -704819.56     -301005.28     2212       SSI Airglow
 T80S! -704820.48     -301004.31     2212       T80-South (site)
 SARA! -704757.13     -301019.72     2151       SARA South 0.6-m
-GemS! -704412.06     -301426.67     2748       Gemini South 8.2-m
-SOAR! -704401.11     -301416.41     2738       SOAR 4.1-m
+I11 ! -704412.06     -301426.67     2748       Gemini South 8.2-m
+I33 ! -704401.11     -301416.41     2738       SOAR 4.1-m
 LSST! -704457.90     -301440.68     2647       LSST 8.4-m (site)
 LSA ! -704451.80     -301441.27     2647       LSST Aux. 1.4-m (site)
 ALO ! -704417.50     -301506.37     2552       Andes LIDAR Obs. (ALO)
@@ -633,6 +640,7 @@ OST !-104.022786     +30.671524     2007.7     Otto Struve Telescope,  McDonald 
 Mc9 !-104.021944     +30.671420     2007.7     McDonald Observatory 0.9m
 Mc8 !-104.022738     +30.670799     2007.7     McDonald Observatory 0.8m
 HET !-104.014679     +30.681398     2048.2     Hobby-Eberly Telescope
+Mc? !-104.023712     +30.669781     2007.7     McDonald Observatory unknown
 
    Mt. Hopkins telescopes,  identified with
    http://linmax.sao.arizona.edu/FLWO/MtHop090529.jpg and measured with
@@ -687,3 +695,27 @@ Bla !+1274320.40   +500735.68        146       Blagoveschensk
    India.  G__gle Maps shows a dome there.
 
 Tre !  76.9583     +08.5085           57.      Trivandrum
+
+   Various unidentified scopes on Mt. Lemmon.  Altitude is that
+   for (G96).  Lat/lon is from Bing Maps (the area is redacted
+   on Google Maps,  but apparently,  nobody got round to asking
+   Bing to delete their imagery.)
+
+ML1 !-110.788677   +32.442480       2789.      Mt. Lemmon unk1
+ML2 !-110.788728   +32.442267       2789.      Mt. Lemmon unk2
+ML3 !-110.789093   +32.442301       2789.      Mt. Lemmon unk3
+ML4 !-110.788862   +32.442066       2789.      Mt. Lemmon unk4
+ML5 !-110.788902   +32.441672       2789.      Mt. Lemmon unk5
+ML6 !-110.789385   +32.442164       2789.      Mt. Lemmon unk6
+ML7 !-110.789742   +32.441551       2789.      Mt. Lemmon unk7
+ML8 !-110.791527   +32.441551       2789.      Mt. Lemmon unk8
+
+   Various unidentified scopes on Mauna Loa.  Altitude is that
+   for (T08).  Lat/lon is from G__gle Maps.
+
+mL1 !-155.576113   +19.536009       3427.      Mauna Loa unk1
+mL2 !-155.576414   +19.536252       3427.      Mauna Loa unk2
+mL3 !-155.576593   +19.535446       3427.      Mauna Loa unk3
+mL4 !-155.576588   +19.535550       3427.      Mauna Loa unk4
+mL5 !-155.576000   +19.536421       3427.      Mauna Loa unk5
+
