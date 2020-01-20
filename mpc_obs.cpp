@@ -383,46 +383,6 @@ int generic_message_box( const char *message, const char *box_type)
    return( rval);
 }
 
-static double center_around( double ival, const double center)
-{
-   while( ival > center + 180.)
-      ival -= 360.;
-   while( ival < center - 180.)
-      ival += 360.;
-   return( ival);
-}
-
-#define is_between( x, x1, x2) ((x < x1 && x > x2) || (x < x2 && x > x1))
-
-static bool extract_region_data_for_mpc_station( char *buff,
-            const double lat, const double lon)
-{
-   FILE *ifile = fopen_ext( "geo_rect.txt", "fcrb");
-   const double lat_in_degrees = (180. / PI) * lat;
-   const double lon_in_degrees = (180. / PI) * lon;
-
-   *buff = '\0';
-   if( ifile)
-      {
-      char tbuff[90];
-
-      while( !*buff && fgets_trimmed( tbuff, sizeof( tbuff), ifile))
-         if( *tbuff != '#')
-            {
-            double lon1 = center_around( atof( tbuff), lon);
-            double lat1 = atof( tbuff + 10);
-            double lon2 = center_around( atof( tbuff + 20), lon1);
-            double lat2 = atof( tbuff + 30);
-
-            if( is_between( lon_in_degrees, lon1, lon2) &&
-                   is_between( lat_in_degrees, lat1, lat2))
-               strcpy( buff, tbuff + 40);
-            }
-      fclose( ifile);
-      }
-   return( *buff ? true : false);
-}
-
 /* https://www.minorplanetcenter.net/iau/info/Astrometry.html#HowObsCode
 suggests that you start out using "observatory code" (XXX),  whilst
 including a comment such as
@@ -4205,12 +4165,22 @@ void put_observer_data_in_text( const char FAR *mpc_code, char *buff)
          {
          const char *output_format = "  (%c%.6f %c%.6f)";
 
+         lon *= 180. / PI;
+         lat *= 180. / PI;
          snprintf_append( buff, 80, output_format,
-                           (lat > 0. ? 'N' : 'S'), fabs( lat) * 180. / PI,
-                           (lon > 0. ? 'E' : 'W'), fabs( lon) * 180. / PI);
+                           (lat > 0. ? 'N' : 'S'), fabs( lat),
+                           (lon > 0. ? 'E' : 'W'), fabs( lon));
          if( planet_idx == 3)
-            extract_region_data_for_mpc_station( buff + strlen( buff),
-                           lat, lon);
+            {
+            FILE *ifile = fopen_ext( "geo_rect.txt", "fcrb");
+
+            if( ifile)
+               {
+               extract_region_data_for_lat_lon( ifile,
+                                       buff + strlen( buff), lat, lon);
+               fclose( ifile);
+               }
+            }
          }
       }
 }
