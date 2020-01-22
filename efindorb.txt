@@ -276,8 +276,9 @@
 2029    and speed.  See https://www.projectpluto.com/find_orb.htm#de_eph
 2029    for further information.
 
-2030    You're attempting to compute planetary positions for dates
-2030    outside the range covered by your JPL ephemeris file.  See
+2030    Your JPL ephemeris file, %s ,
+2030    only covers the years %.1f to %.1f.  To cover your desired date
+2030    range,  you'll need a different/larger JPL ephemeris file.  See
 2030    https://www.projectpluto.com/find_orb.htm#de_eph for more info.
 
 2031    F Select file from hard drive

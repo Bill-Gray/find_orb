@@ -50,6 +50,7 @@ int64_t planet_ns;
 
 #define J2000 2451545.0
 #define J0 (J2000 - 2000. * 365.25)
+#define JD_TO_YEAR( jd)  (((jd)-J2000) / 365.25 + 2000.)
 
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 void make_config_dir_name( char *oname, const char *iname);  /* miscell.cpp */
@@ -188,7 +189,22 @@ static int planet_posn_raw( int planet_no, const double jd,
       if( !error_message_shown)
          {
          error_message_shown = true;
-         generic_message_box( get_find_orb_text( jpl_eph ? 2030 : 2029), "o");
+         if( jpl_eph)
+            {
+            int unused_de_version;
+            double jd_start, jd_end;
+            char *buff = (char *)malloc( 10000);
+
+            assert( buff);
+            get_jpl_ephemeris_info( &unused_de_version, &jd_start, &jd_end);
+            snprintf( buff, 10000, get_find_orb_text( 2030), jpl_filename,
+                        JD_TO_YEAR( jd_start),
+                        JD_TO_YEAR( jd_end));
+            generic_message_box( buff, "o");
+            free( buff);
+            }
+         else
+            generic_message_box( get_find_orb_text( 2029), "o");
          }
       if( planet_no > 0 && planet_no <= 10)
          {
