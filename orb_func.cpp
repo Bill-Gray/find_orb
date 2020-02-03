@@ -224,11 +224,6 @@ void set_distance( OBSERVE FAR *obs, double r)
    obs->solar_r = vector3_length( obs->obj_posn);
 }
 
-static double dot_prod( const double *a, const double *b)
-{
-   return( a[0] * b[0] + a[1] * b[1] + a[2] * b[2]);
-}
-
 double vector3_dist( const double *a, const double *b)
 {
    const double dx = a[0] - b[0];
@@ -726,8 +721,8 @@ static void light_bending( const double *observer, double *result)
       dir[i] /= dlen;
      /* "dir" is now a unit vector perpendicular to p,  aimed away */
      /* from the sun */
-   phi1 = acose( dot_prod( result, observer) / (rlen * olen));
-   phi2 = acose( -dot_prod( p, observer) / (plen * olen));
+   phi1 = acose( dot_product( result, observer) / (rlen * olen));
+   phi2 = acose( -dot_product( p, observer) / (plen * olen));
    bending = bend_factor * (tan( phi1 / 2.) - tan( phi2 / 2.));
    bending *= plen;
    for( i = 0; i < 3; i++)
@@ -2376,7 +2371,7 @@ void **calloc_double_dimension_array( const size_t x, const size_t y,
 
 static double dotted_dist( OBSERVE FAR *obs)
 {
-   return( dot_prod( obs->vect, obs->obj_posn) - dot_prod( obs->vect, obs->obs_posn));
+   return( dot_product( obs->vect, obs->obj_posn) - dot_product( obs->vect, obs->obs_posn));
 }
 
 double n_nearby_obs( const OBSERVE FAR *obs, const unsigned n_obs,
@@ -3403,10 +3398,6 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
    return( err_code);
 }
 
-static inline double dot_product( const double *a, const double *b)
-{
-   return( a[0] * b[0] + a[1] * b[1] + a[2] * b[2]);
-}
 
 /* 'score_orbit_arc' basically looks at a series of observations and
 assigns a 'score' indicating how good an orbit we expect it can
