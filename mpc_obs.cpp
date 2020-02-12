@@ -3839,6 +3839,24 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
       {
       check_for_star( rval, n_obs);
       set_satellite_velocities( rval, n_obs);
+      for( i = 0; i < n_obs_actually_loaded; i++)
+         if( rval[i].note2 == 'x')     /* check for deleted satellite observation */
+            {
+            int j = -1;
+            const double thresh = 1.1e-5;    /* allow for roundoff */
+
+            if( i > 0 && rval[i].jd - rval[i-1].jd < thresh
+                       && !strcmp( rval[i].mpc_code, rval[i - 1].mpc_code))
+               j = i-1;
+            if( i < n_obs_actually_loaded - 1 && rval[i+1].jd - rval[i].jd < thresh
+                       && !strcmp( rval[i].mpc_code, rval[i + 1].mpc_code))
+               j = i+1;
+            if( j >= 0)
+               {
+               memcpy( rval[i].obs_posn, rval[j].obs_posn, 3 * sizeof( double));
+               memcpy( rval[i].obs_vel, rval[j].obs_vel, 3 * sizeof( double));
+               }
+            }
       }
    return( rval);
 }
