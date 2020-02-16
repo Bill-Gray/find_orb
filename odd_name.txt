@@ -283,3 +283,6 @@ STEREO-B     2006-047B = NORAD 29511 = STEREO-B
 2019-040A    2019-040A = NORAD 44432 = Spektr-RG
 2019-040B    2019-040B = NORAD 44433 = Spektr-RG Booster
      ZTF09oP ZTF09oP = ZTF09mO = A10jyaB
+     C0Z1JL1 C0Z1JL1 = ZTF0Csc = C21KXA2 = ZTF0Czu = 'Multijunk'
+     SolO    Solar Orbiter
+     SolCent Solar Orbiter Centaur
