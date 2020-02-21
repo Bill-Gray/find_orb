@@ -222,6 +222,9 @@ static void show_dist_in_au( char *buff, const double dist_in_au)
 static const char *si_prefixes = "kMGTPEZYXWVUSRQONLJIHFDCBA";
 static bool use_au_only = false;
 
+/* Given a non-negative value,  this gives a four-character output
+such as '3.14', '.314', '3145', '314k', '3.1M',  etc.  */
+
 static void show_packed_with_si_prefixes( char *buff, double ival)
 {
    *buff = '\0';
@@ -486,6 +489,13 @@ typedef struct
    char file_number;
 } field_location_t;
 
+typedef struct
+{
+   double height, width;
+   double min_jd, max_jd;
+   char obscode[4], file_number;
+} field_group_t;
+
 #pragma pack( )
 
 /* In searching for fields,  we may be interested in fields _within_ a certain
@@ -607,6 +617,32 @@ static void show_precovery_extent( char *obuff, const obj_location_t *objs,
 /* See 'precover.txt' for information on what's going on here. */
 
 #define FIELD_BUFF_N 1024
+#define COMPRESSED_FIELD_SIZE 18
+
+
+static void extract_field( field_location_t *field, const char *buff,
+               const field_group_t *groups)
+{
+   int32_t array[4];
+
+   assert( buff[16] >= 0);
+   assert( buff[16] < 17);
+   assert( strlen( groups->obscode) == 3);
+   groups += buff[16];
+   assert( strlen( groups->obscode) == 3);
+   memcpy( array, buff, 4 * sizeof( int32_t));
+   field->ra = (double)array[0] * 2. * PI / 2e+9;
+   field->dec = (double)array[1]      * PI / 2e+9;
+   field->jd = groups->min_jd + (groups->max_jd - groups->min_jd)
+                        * (double)array[2] / 2e+9;
+   field->file_offset = array[3];
+   field->tilt = (double)buff[17] * PI / 256.;
+   field->height = groups->height;
+   field->width  = groups->width;
+   field->file_number = groups->file_number;
+   strcpy( field->obscode, groups->obscode);
+}
+
 
 static int find_precovery_plates( OBSERVE *obs, const int n_obs,
                            FILE *ofile, const double *orbit,
@@ -620,13 +656,15 @@ static int find_precovery_plates( OBSERVE *obs, const int n_obs,
    obj_location_t *p1, *p2, *p3;
    int n_fields_read, n;
    const double abs_mag = calc_absolute_magnitude( obs, n_obs);
-   field_location_t *fbuff;
+   char *buff;
         /* Slightly easier to work with 'bit set means included' : */
    const int inclusion = atoi( get_environment_ptr( "FIELD_INCLUSION")) ^ 3;
    const bool show_base_60 = (*get_environment_ptr( "FIELD_DEBUG") != '\0');
    const char *precovery_header_line =
                "    RA (J2000) dec  Mag  YYYY MM DD HH:MM:SS.s Code"
                " Sigma  PA Prob   Directory  Image Filename\n";
+   int n_groups;
+   field_group_t *groups;
 
    if( !ofile)
       return( -1);
@@ -643,15 +681,26 @@ static int find_precovery_plates( OBSERVE *obs, const int n_obs,
    setvbuf( ofile, NULL, _IONBF, 0);
    fprintf( ofile, "#CSS precovery fields\n");
    fprintf( ofile, "%s", precovery_header_line);
-   fbuff = (field_location_t *)calloc( FIELD_BUFF_N, sizeof( field_location_t));
-   assert( fbuff);
+   buff = (char *)calloc( FIELD_BUFF_N, COMPRESSED_FIELD_SIZE);
+   assert( buff);
+   if( !fgets( buff, 100, ifile))
+      return( -4);
+   n_groups = atoi( buff);
+   assert( n_groups);
+   groups = (field_group_t *)calloc( n_groups, sizeof( field_group_t));
+   assert( groups);
+   if( fread( groups, sizeof( field_group_t), n_groups, ifile) != (size_t)n_groups)
+      return( -3);
    orbi = (double *)malloc( 12 * n_orbits * sizeof( double));
    memcpy( orbi, orbit,     6 * n_orbits * sizeof( double));
-   while( (n_fields_read = (int)fread( fbuff, sizeof( field_location_t), FIELD_BUFF_N, ifile)) > 0)
+   while( (n_fields_read = (int)fread( buff, COMPRESSED_FIELD_SIZE, FIELD_BUFF_N, ifile)) > 0)
       for( n = 0; n < n_fields_read; n++)
-         if( jd_is_in_range( fbuff[n].jd, min_jd, max_jd))
+         {
+         field_location_t field;
+
+         extract_field( &field, buff + n * COMPRESSED_FIELD_SIZE, groups);
+         if( jd_is_in_range( field.jd, min_jd, max_jd))
             {
-            field_location_t field = fbuff[n];
             double fraction, mag;
             double margin = .1;
             const double jdt = field.jd + td_minus_utc( field.jd) / seconds_per_day;
@@ -777,8 +826,10 @@ static int find_precovery_plates( OBSERVE *obs, const int n_obs,
                   }
                }
             }
+         }
    fclose( ifile);
-   free( fbuff);
+   free( buff);
+   free( groups);
    if( original_file)
       fclose( original_file);
    free( orbi);
@@ -2655,12 +2706,49 @@ static void put_mag_resid( char *output_text, const double obs_mag,
       strcpy( output_text, "------ ");
 }
 
+/* Output is a number in three bytes,  such as '3.1', ' 31', '314', ' 3k',
+'31k', '.3M',  etc. */
+
+static void show_number_in_three_bytes( char *buff, double ival)
+{
+   if( ival < 999)
+      snprintf( buff, 4, (ival < 9.9 ? "%3.1f" : "%3.0f"), ival);
+   else
+      {
+      int i, digit;
+
+      ival /= 1000.;
+      for( i = 0; ival > 99. && si_prefixes[i]; i++)
+         ival /= 1000.;
+      digit = (int)( ival * 10);
+      if( !si_prefixes[i])
+         strcpy( buff, "!!!");
+      else
+         {
+         if( digit < 10)
+            {
+            *buff++ = '.';
+            *buff++ = '0' + digit;
+            }
+         else
+            {
+            digit /= 10;
+            *buff++ = '0' + digit / 10;
+            *buff++ = '0' + digit % 10;
+            }
+         *buff++ = si_prefixes[i];
+         *buff++ = '\0';
+         }
+      }
+}
+
 static void show_resid_in_sigmas( char *buff, const double sigmas)
 {
-   if( sigmas < -999 || sigmas > 999)
-      strcpy( buff, " HUGE ");
-   else
-      snprintf( buff, 7, (fabs( sigmas) > 9.9 ? " %+4.0f " : " %+4.1f "), sigmas);
+   *buff++ = ' ';
+   *buff++ = (sigmas > 0. ? '+' : '-');
+   show_number_in_three_bytes( buff, fabs( sigmas));
+   buff[3] = ' ';
+   buff[4] = '\0';
 }
 
 /* format_observation( ) takes an observation and produces text for it,
