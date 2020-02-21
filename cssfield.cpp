@@ -105,7 +105,100 @@ typedef struct
    char file_number;
 } field_location_t;
 
+typedef struct
+{
+   double height, width;
+   double min_jd, max_jd;
+   char obscode[4], file_number;
+} field_group_t;
+
 #pragma pack( )
+
+static int field_group_compare( const field_group_t *a,
+                                const field_group_t *b)
+{
+   int rval = a->file_number - b->file_number;
+
+   if( !rval)
+      rval = strcmp( a->obscode, b->obscode);
+   if( !rval && a->width != b->width)
+      rval = (a->width > b->width ? -1 : 1);
+   if( !rval && a->height != b->height)
+      rval = (a->height > b->height ? -1 : 1);
+   return( rval);
+}
+
+static void fill_group_struct( field_group_t *g, const field_location_t *f)
+{
+   g->height = f->height;
+   g->width  = f->width;
+   g->file_number = f->file_number;
+   strcpy( g->obscode, f->obscode);
+}
+
+static field_group_t *find_groups( const field_location_t *f,
+                     const size_t n_fields, size_t *n_found)
+{
+   size_t i, j;
+   field_group_t *rval = NULL;
+
+   *n_found = 0;
+   for( i = 0; i < n_fields; i++, f++)
+      {
+      field_group_t curr_f;
+
+      fill_group_struct( &curr_f, f);
+      j = 0;
+      while( j < *n_found && field_group_compare( &curr_f, rval + j))
+         j++;
+      if( j == *n_found)
+         {
+         (*n_found)++;
+         rval = (field_group_t *)realloc( rval, *n_found * sizeof( field_group_t));
+         assert( rval);
+         curr_f.max_jd = curr_f.min_jd = f->jd;
+         rval[j] = curr_f;
+         printf( "Group %d: code %s, file %d, %fx%f\n",
+                     (int)j, curr_f.obscode, curr_f.file_number,
+                     curr_f.width, curr_f.height);
+         }
+      else
+         {
+         if( rval[j].min_jd > f->jd)
+            rval[j].min_jd = f->jd;
+         if( rval[j].max_jd < f->jd)
+            rval[j].max_jd = f->jd;
+         }
+      }
+   return( rval);
+}
+
+#define COMPRESSED_FIELD_SIZE 18
+
+static void pack_field( const field_location_t *f, const field_group_t *groups,
+                            size_t n_groups, char *obuff)
+{
+   size_t i = 0;
+   int32_t array[4];
+   double tval;
+   field_group_t g;
+
+   fill_group_struct( &g, f);
+   while( i < n_groups && field_group_compare( &g, groups + i))
+      i++;
+   assert( i < n_groups);
+   assert( f->ra >= 0. && f->ra <= 2. * PI);
+   assert( f->dec >= -PI / 2. && f->dec <= PI / 2.);
+   assert( f->jd >= groups[i].min_jd && f->jd <= groups[i].max_jd);
+   array[0] = (int32_t)( (2.e+9 / (2. * PI)) * f->ra);
+   array[1] = (int32_t)( (2.e+9 / PI) * f->dec);
+   tval = (f->jd - groups[i].min_jd) / (groups[i].max_jd - groups[i].min_jd);
+   array[2] = (int32_t)( 2.e+9 * tval);
+   array[3] = (int32_t)( f->file_offset);
+   memcpy( obuff, array, 4 * sizeof( int32_t));
+   obuff[16] = (char)i;
+   obuff[17] = (char)( f->tilt * 256. / PI);
+}
 
 int field_compare( const void *a, const void *b)
 {
@@ -242,6 +335,8 @@ int main( const int argc, const char **argv)
    field_location_t *rval = NULL;
    int n_alloced = 0, n = 0, i, included = 0xffff;
    int verbose = 0, n_duplicates = 0;
+   size_t n_groups;
+   field_group_t *groups;
 
    setvbuf( stdout, NULL, _IONBF, 0);
    for( i = 1; i < argc; i++)
@@ -316,7 +411,7 @@ int main( const int argc, const char **argv)
                   printf( "%d fields read and parsed\r", n);
                }
             else if( !memcmp( buff, "# Tilt: ", 8))
-               tilt = atof( buff + 8);
+               tilt = atof( buff + 8) * PI / 180.;
          fclose( ifile);
          printf( "\n%d fields found; %d invalid fields omitted\n", n, n_invalid_fields);
          full_ctime( buff, min_jd, 0);
@@ -347,11 +442,31 @@ int main( const int argc, const char **argv)
    printf( "Full time span is %.21s", buff);
    full_ctime( buff, rval[  0  ].jd, 0);
    printf( " to %.21s\n", buff);
+   groups = find_groups( rval, n, &n_groups);
+   printf( "%d groups found\n", (int)n_groups);
    ofile = fopen( "css.idx", "wb");
    if( !ofile)
+      {
       perror( "opening ofile failed");
-   else if( fwrite( rval, sizeof( rval[0]), n, ofile) != (size_t)n)
+      return( -1);
+      }
+   fprintf( ofile, "%d\n", (int)n_groups);
+   if( fwrite( groups, sizeof( groups[0]), n_groups, ofile) != n_groups)
+      {
       perror( "write failure");
+      return( -1);
+      }
+   for( i = 0; i < n; i++)
+      {
+      char buff[COMPRESSED_FIELD_SIZE];
+
+      pack_field( rval + i, groups, n_groups, buff);
+      if( fwrite( buff, COMPRESSED_FIELD_SIZE, 1, ofile) != 1)
+         {
+         perror( "write failure (2)");
+         return( -1);
+         }
+      }
    for( i = 0; i < n - 1; i++)
       if( rval[i].jd == rval[i + 1].jd
                      && !strcmp( rval[i].obscode, rval[i + 1].obscode))
