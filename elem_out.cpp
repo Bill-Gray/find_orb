@@ -2432,7 +2432,7 @@ present,   I'm treating 'C' magnitudes as close enough to 'R' or
 them minimal or no weight in the computation of H values.)
 
 Estimates for the mag band shifts in R, B, I, and U are from a post by
-Petr Pravec,  http://tech.groups.yahoo.com/group/mpml/message/24833,
+Petr Pravec,  https://groups.io/g/mpml/message/24598
 in turn derived from data in Shevchenko and Lupishko, Solar System
 Research 32, 220-232, 1998 :
 
