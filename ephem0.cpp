@@ -626,7 +626,6 @@ static void extract_field( field_location_t *field, const char *buff,
    int32_t array[4];
 
    assert( buff[16] >= 0);
-   assert( buff[16] < 17);
    assert( strlen( groups->obscode) == 3);
    groups += buff[16];
    assert( strlen( groups->obscode) == 3);
@@ -792,7 +791,7 @@ static int find_precovery_plates( OBSERVE *obs, const int n_obs,
                      char filename[20];
 
                      current_file_number = field.file_number;
-                     snprintf( filename, sizeof( filename), "css%d.csv",
+                     snprintf( filename, sizeof( filename), "css_%d.csv",
                                     current_file_number);
                      if( original_file)
                         fclose( original_file);
@@ -809,14 +808,10 @@ static int find_precovery_plates( OBSERVE *obs, const int n_obs,
                      fseek( original_file, field.file_offset, SEEK_SET);
                      if( fgets_trimmed( buff, sizeof( buff), original_file))
                         {
-                        int loc;
-
                         for( i = 0; buff[i]; i++)
                            if( buff[i] == ',')
                               buff[i] = ' ';
-                        if( sscanf( buff, "%*f %*f %*s %*s %24s%n",
-                                           time_buff, &loc) == 1)
-                           fprintf( ofile, " %s %s", time_buff, buff + loc);
+                        fprintf( ofile, " %s", buff);
                         }
                      else
                         fprintf( ofile, "File %d: seeked to %ld and failed",
@@ -940,7 +935,7 @@ then scaling them until they matched values in radar planning documents.
 
    See also Lance's comments at
 
-http://tech.groups.yahoo.com/group/mpml/message/28688
+https://groups.io/g/mpml/message/28412
 
    Lance also noted that there's also a more subtle dependence due to the subradar
 latitude (you get a better echo if the pole is pointing straight at the radar).
