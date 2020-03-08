@@ -366,6 +366,10 @@ int main( const int argc, const char **argv)
          double min_jd = 1e+10, max_jd = 0.;
          double tilt = 0.;
          int n_invalid_fields = 0;
+         FILE *ofile;
+
+         sprintf( buff, "css_%d.csv", file_number);
+         ofile = fopen( buff, "wb");
 
          printf( "%s opened;  reading fields\n", buff);
          while( fgets( buff, sizeof( buff), ifile))
@@ -373,7 +377,7 @@ int main( const int argc, const char **argv)
                {
                char timestr[80];
                size_t i;
-               int n_scanned;
+               int n_scanned, offset;
 
                for( i = 0; buff[i]; i++)
                   if( buff[i] == ',')
@@ -384,16 +388,17 @@ int main( const int argc, const char **argv)
                   rval = (field_location_t *)realloc( rval,
                                         n_alloced * sizeof( field_location_t));
                   }
-               n_scanned = sscanf( buff, "%lf %lf %70s %3s", &rval[n].ra,
-                           &rval[n].dec, timestr, (char *)&rval[n].obscode);
+               n_scanned = sscanf( buff, "%lf %lf %70s %3s%n", &rval[n].ra,
+                           &rval[n].dec, timestr, (char *)&rval[n].obscode, &offset);
                assert( n_scanned == 4);
+               assert( buff[offset] == ' ');
                rval[n].jd = get_time_from_string( 0., timestr, 0, NULL);
                if( is_valid_field( rval + n))
                   {
                   rval[n].ra  *= PI / 180.;
                   rval[n].dec *= PI / 180.;
                   rval[n].tilt = tilt;
-                  rval[n].file_offset = (uint32_t)( ftell( ifile) - strlen( buff));
+                  rval[n].file_offset = (uint32_t)ftell( ofile);
                   rval[n].file_number = (char)file_number;
                   get_field_size( &rval[n].width, &rval[n].height, rval[n].jd,
                                        rval[n].obscode);
@@ -404,15 +409,24 @@ int main( const int argc, const char **argv)
                   if( max_jd < rval[n].jd)
                      max_jd = rval[n].jd;
                   n++;
+                  for( i = 0; buff[i]; i++)
+                     if( buff[i] == ' ')
+                        buff[i] = ',';
+                  fputs( buff + offset + 1, ofile);
                   }
                else
                   n_invalid_fields++;
                if( n < 10 || n % 100000 == 0)
                   printf( "%d fields read and parsed\r", n);
                }
-            else if( !memcmp( buff, "# Tilt: ", 8))
-               tilt = atof( buff + 8) * PI / 180.;
+            else
+               {
+               if( !memcmp( buff, "# Tilt: ", 8))
+                  tilt = atof( buff + 8) * PI / 180.;
+               fputs( buff, ofile);
+               }
          fclose( ifile);
+         fclose( ofile);
          printf( "\n%d fields found; %d invalid fields omitted\n", n, n_invalid_fields);
          full_ctime( buff, min_jd, 0);
          printf( "Fields run from %.21s to ", buff);
