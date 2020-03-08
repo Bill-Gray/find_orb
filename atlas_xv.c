@@ -38,7 +38,7 @@ And there will probably be other pointing log converters to come.
 
 Compile with
 
-gcc -Wall -O3 -o atlas_xv atlas_xv.c -lm
+gcc -Wextra -pedantic -Wall -O3 -o atlas_xv atlas_xv.c -lm
 
 */
 
@@ -77,15 +77,19 @@ int main( const int argc, const char **argv)
 
                   assert( ra > 0. && ra < 360.);
                   assert( dec > -90. && dec < 90.);
-                  memcpy( mpc_code, argv[i], 3);
-                  mpc_code[3] = '\0';
+                  if( !memcmp( buff, "01a", 3))
+                     strcpy( mpc_code, "T08");
+                  if( !memcmp( buff, "02a", 3))
+                     strcpy( mpc_code, "T05");
+                  else
+                     assert( 1);
                   if( exposure != new_exposure)
                      {
                      exposure = new_exposure;
                      printf( "# Exposure: %.2f\n", exposure);
                      }
                   mjd += exposure * .5 / seconds_per_day;
-                  printf( "%.3f,%.3f,mjd%.5f,%.3s,%.14s\n", ra, dec, mjd,
+                  printf( "%07.3f,%+07.3f,mjd%.5f,%.3s,%.14s\n", ra, dec, mjd,
                                  mpc_code, buff);
                   }
                }
