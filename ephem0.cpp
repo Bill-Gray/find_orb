@@ -18,9 +18,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301, USA.    */
 
 #ifndef _WIN32
-#include <sys/stat.h>
-#include <sys/types.h>
+   #include <sys/stat.h>
+   #include <sys/types.h>
 #endif
+#ifdef __linux
+   #include <linux/limits.h>
+#endif
+#include <sys/types.h>
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
@@ -105,6 +109,9 @@ static void output_angle_to_buff( char *obuff, const double angle,
                                const int precision);         /* ephem0.cpp */
 static void put_residual_into_text( char *text, const double resid,
                                  const int resid_format);    /* ephem0.cpp */
+FILE *open_json_file( char *filename, const char *env_ptr, const char *default_name,
+                  const char *packed_desig, const char *permits); /* ephem0.cpp */
+size_t strlcat( char *dst, const char *src, size_t dsize);     /* miscell.cpp */
 
 const char *observe_filename = "observe.txt";
 const char *residual_filename = "residual.txt";
@@ -1329,14 +1336,80 @@ static int create_json_ephemeris( FILE *ofile, FILE *ifile, char *header)
    return( line_no);
 }
 
-static int combine_json_elems_and_ephems( FILE *ephem_file)
+/* Given a fully-specified filename,  this function will try to make sure
+that a directory exists for it.  For example,   given a filename
+
+/home/joe/z/k32/hi_there/thanx.txt
+
+   it'll mkdir( "/home"), mkdir ("/home/joe"),  ... "/home/joe/z/k32/hi_there". */
+
+#ifndef _WIN32
+static void make_path_available( const char *filename)
+{
+   char path[PATH_MAX];
+   int i;
+
+   for( i = 0; filename[i] && i < PATH_MAX; i++)
+      {
+      if( i && filename[i] == '/')
+         {
+         path[i] = '\0';
+         mkdir( path, 0777);
+         }
+      path[i] = filename[i];
+      }
+}
+#endif
+
+/* By default,  JSON files are kept with fixed names in the ~/.find_orb
+directory.  However,  this can be overridden with parameters in
+'environ.dat' (q.v.)  The following function opens JSON files as specified
+therein (if you've actually done so) or in the default locations (if you
+haven't.)  See https://www.projectpluto.com/fo_usage#json_files for
+further information. */
+
+FILE *open_json_file( char *filename, const char *env_ptr, const char *default_name,
+                  const char *packed_desig, const char *permits)
+{
+   char full_permits[20];
+
+   env_ptr = get_environment_ptr( env_ptr);
+   if( !*env_ptr)
+      {
+      get_file_name( filename, default_name);
+      strcpy( full_permits, "fc");
+      }
+   else
+      {
+      char tbuff[100];
+
+      strcpy( tbuff, packed_desig);
+      strcpy( filename, env_ptr);
+      text_search_and_replace( tbuff, " ", "");
+      text_search_and_replace( filename, "%p", tbuff);
+      if( *filename == '~')
+         {
+         strcpy( tbuff, getenv( "HOME"));
+         text_search_and_replace( filename, "~", tbuff);
+         }
+      strcpy( full_permits, "f");
+#ifndef _WIN32
+      make_path_available( filename);
+#endif
+      }
+   strlcat( full_permits, permits, sizeof( full_permits));
+   return( fopen_ext( filename, full_permits));
+}
+
+static int combine_json_elems_and_ephems( const char *packed_desig, FILE *ephem_file)
 {
    char buff[1024];
-   FILE *ofile = fopen_ext( get_file_name( buff, "combined.json"), "tfcwb");
-   FILE *elem_file = fopen_ext( get_file_name( buff, "elements.json"), "tfcrb");
+   FILE *ofile, *elem_file;
    bool in_observations = false, obs_end_found = false;
    bool in_ephemerides = false;
 
+   ofile = open_json_file( buff, "JSON_COMBINED_NAME", "combined.json", packed_desig, "wb");
+   elem_file = open_json_file( buff, "JSON_ELEMENTS_NAME", "elements.json", packed_desig, "rb");
    while( !obs_end_found && fgets( buff, sizeof( buff), elem_file))
       {
       if( !memcmp( buff, "      \"observations\":", 17))
@@ -2389,9 +2462,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       {
       char time_buff[40];
 
-      strcpy( buff, filename);
-      text_search_and_replace( buff, ".txt", ".json");
-      ofile = fopen_ext( buff, is_default_ephem ? "tfcw+" : "fw+");
+      ofile = open_json_file( buff, "JSON_EPHEM_NAME", "ephemeri.json",
+                              obs->packed_id, "w+");
       fprintf( ofile, "{\n  \"ephemeris\":\n  {\n");
       fprintf( ofile, "    \"obscode\": \"%.3s\",\n", note_text + 1);
       fprintf( ofile, "    \"count\": %d,\n", n_lines_shown);
@@ -2406,14 +2478,13 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       fprintf( ofile, "    }\n");
       free( header);
       fprintf( ofile, "  }\n}\n");
-      combine_json_elems_and_ephems( ofile);
+      combine_json_elems_and_ephems( obs->packed_id, ofile);
       fclose( ofile);
       }
    if( computer_friendly_ofile)
       fclose( computer_friendly_ofile);
    return( 0);
 }
-
 /* The above ephemeris code may insert a six-character hexadecimal
 color,  computed using sky background brightness data,  prefaced by
 '$'.  This should be removed before the line is shown to a user.
