@@ -786,11 +786,11 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             strcpy( ephemeris_start, "+0");
             ephemeris_output_options &= ~7;
                      /* FALLTHRU */
-         case CTRL( 'G'):
-            ephemeris_output_options ^= OPTION_GALACTIC_COORDS;
-            break;
          case ALT_G:
             strcpy( mpc_code, "500");
+            break;
+         case CTRL( 'G'):
+            ephemeris_output_options ^= OPTION_GALACTIC_COORDS;
             break;
          case ALT_L:
             strcpy( mpc_code, "Lun");
