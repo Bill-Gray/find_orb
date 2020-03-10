@@ -558,6 +558,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
    while( c > 0)
       {
       int format_start;
+      unsigned i, n_lines;
       const int ephem_type = (int)(ephemeris_output_options & 7);
       extern double ephemeris_mag_limit;
       const bool is_topocentric =
@@ -657,8 +658,21 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                   (ephemeris_output_options & OPTION_SUPPRESS_SOLAR_R) ? ' ' : '*');
             snprintf_append( buff, sizeof( buff), "4 [%c] elong\n",
                   (ephemeris_output_options & OPTION_SUPPRESS_ELONG) ? ' ' : '*');
+            snprintf_append( buff, sizeof( buff), "9 [%c] Sky brightness\n",
+                  (ephemeris_output_options & OPTION_SKY_BRIGHTNESS) ? '*' : ' ');
+            snprintf_append( buff, sizeof( buff), "K [%c] Galactic coordinates\n",
+                  (ephemeris_output_options & OPTION_GALACTIC_COORDS) ? '*' : ' ');
+            snprintf_append( buff, sizeof( buff), "@ [%c] Comet options\n",
+                  (ephemeris_output_options & OPTION_SUN_TARGET_PA) ? '*' : ' ');
             }
          }
+      for( i = n_lines = 0; buff[i]; i++)
+         if( buff[i] == '\n')
+            {
+            n_lines++;
+            if( n_lines + 4 == (unsigned)LINES)
+               buff[i + 1] = '\0';
+            }
       snprintf_append( buff, sizeof( buff), "C  %s\n", ephem_type_strings[ephem_type]);
       snprintf_append( buff, sizeof( buff), "?  Help about making ephemerides\n");
       snprintf_append( buff, sizeof( buff), "M  Make ephemeris\n");
@@ -668,9 +682,9 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                      /* to the corresponding first letter on that line   */
                      /* (except for the first two lines,  which wouldn't */
                      /* work;  they start with spaces) :                 */
-      if( c >= KEY_F( 3) && c < KEY_F( 30))
+      if( c >= KEY_F( 3) && c < KEY_F( 40))
          {
-         unsigned n = c - KEY_F( 1), i;
+         unsigned n = c - KEY_F( 1);
 
          for( i = 0; buff[i] && n; i++)
             if( buff[i] == '\n')
@@ -778,7 +792,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                strcpy( mpc_code, buff);
                }
             break;
-         case ALT_C:      /* toggle comet-related options */
+         case '@':        /* toggle comet-related options */
             ephemeris_output_options ^= OPTION_SUN_TARGET_PA |
                            OPTION_SUN_HELIO_VEL_PA | OPTION_ORBIT_PLANE_ANGLE;
             break;
@@ -789,7 +803,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
          case ALT_G:
             strcpy( mpc_code, "500");
             break;
-         case CTRL( 'G'):
+         case 'k': case 'K':
             ephemeris_output_options ^= OPTION_GALACTIC_COORDS;
             break;
          case ALT_L:
