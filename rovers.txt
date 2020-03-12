@@ -724,3 +724,8 @@ mL3 !-155.576593   +19.535446       3427.      Mauna Loa unk3
 mL4 !-155.576588   +19.535550       3427.      Mauna Loa unk4
 mL5 !-155.576000   +19.536421       3427.      Mauna Loa unk5
 
+   Three planned or in-process telescopes of 39.3,  24.5,  and 30-m aperture.
+
+ELT !-070.191631   -24.589327       3046.      Extremely Large Telescope
+GMT !-0704109.0    -290142.0        2516.      Giant Magellan Telescope
+TMT !-155.4816     +19.8327         4050.      Thirty-Meter Telescope
