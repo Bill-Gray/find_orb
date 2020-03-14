@@ -98,6 +98,8 @@ void set_environment_ptr( const char *env_ptr, const char *new_value);
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 int reset_astrometry_filename( int *argc, const char **argv);
 uint64_t parse_bit_string( const char *istr);                /* miscell.cpp */
+FILE *open_json_file( char *filename, const char *env_ptr, const char *default_name,
+                  const char *packed_desig, const char *permits); /* ephem0.cpp */
 
 /* In this non-interactive version of Find_Orb,  we just print out warning
 messages such as "3 observations were made in daylight" or "couldn't find
@@ -401,14 +403,18 @@ static int create_combined_json_header( const OBJECT_INFO *ids,
    return( 0);
 }
 
-static int add_json_data( const char *ofilename, const char *append_filename,
-            const bool is_last_call)
+static int add_json_data( const char *ofilename, const bool have_json_ephem,
+            const char *packed_desig, const bool is_last_call)
 {
    char buff[200];
    FILE *ofile = fopen_ext( get_file_name( buff, ofilename), "tfcab");
-   FILE *ifile = fopen_ext( get_file_name( buff, append_filename), "tfcrb");
+   FILE *ifile;
    bool found_start = false, found_end = false;
 
+   if( have_json_ephem)
+      ifile = open_json_file( buff, "JSON_COMBINED_NAME", "combined.json", packed_desig, "rb");
+   else
+      ifile = open_json_file( buff, "JSON_ELEMENTS_NAME", "elements.json", packed_desig, "rb");
    while( !found_start && fgets_trimmed( buff, sizeof( buff), ifile))
       if( !strcmp( buff, "  {"))
          found_start = true;
@@ -919,8 +925,7 @@ int main( int argc, const char **argv)
             if( ephemeris_output_options & OPTION_COMPUTER_FRIENDLY)
                if( mpec_path || !is_default_ephem)
                   have_json_ephem = true;
-            add_json_data( "total.json",
-                     have_json_ephem ? "combined.json" : "elements.json",
+            add_json_data( "total.json", have_json_ephem, obs->packed_id,
                      i == starting_object + total_objects - 1);
             }
          object_comment_text( tbuff, ids + i);
