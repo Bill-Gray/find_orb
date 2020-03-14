@@ -148,7 +148,7 @@ int main( const int argc, const char **argv)
    FILE *ifile;
    FILE *lock_file = fopen( "lock.txt", "w");
    extern int combine_all_observations;
-   const char *temp_obs_filename = "temp_obs.txt";
+   extern const char *temp_obs_filename;     /* miscell.cpp */
    double jd_start = 0., jd_end = 0., user_selected_epoch = 0.;
    const double min_jd = 2400000.5;
    const double max_jd = 2600000.5;

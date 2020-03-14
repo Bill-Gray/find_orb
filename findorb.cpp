@@ -2446,7 +2446,7 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
                                  const bool drop_single_obs)
 {
    OBJECT_INFO *ids;
-   const char *temp_clipboard_filename = "/tmp/obs_temp.txt";
+   extern const char *temp_obs_filename;     /* miscell.cpp */
    size_t n_lines, i;
    const char *prev_fn = "previous.txt";
    char **prev_files = load_file_into_memory( prev_fn, &n_lines, false);
@@ -2466,8 +2466,8 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
 
    if( !strcmp( ifilename, "c") || !strcmp( ifilename, "c+"))
       {
-      clipboard_to_file( temp_clipboard_filename, ifilename[1] == '+');
-      strcpy( ifilename, temp_clipboard_filename);
+      clipboard_to_file( temp_obs_filename, ifilename[1] == '+');
+      strcpy( ifilename, temp_obs_filename);
       }
    if( *ifilename == ':')
       for( i = n_lines - 1; i; i--)
@@ -2513,7 +2513,8 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
       for( i = 0; i < n_lines; i++)
          if( strcmp( prev_files[i], canonical_path))
             fprintf( ofile, "%s\n", prev_files[i]);
-      fprintf( ofile, "%s\n", canonical_path);
+      if( strcmp( canonical_path, temp_obs_filename))
+         fprintf( ofile, "%s\n", canonical_path);
       fclose( ofile);
 #ifndef _WIN32
       free( canonical_path);
