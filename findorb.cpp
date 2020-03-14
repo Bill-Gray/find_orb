@@ -664,6 +664,14 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                   (ephemeris_output_options & OPTION_GALACTIC_COORDS) ? '*' : ' ');
             snprintf_append( buff, sizeof( buff), "@ [%c] Comet options\n",
                   (ephemeris_output_options & OPTION_SUN_TARGET_PA) ? '*' : ' ');
+            snprintf_append( buff, sizeof( buff), "5 [%c] Sun altitude\n",
+                  (ephemeris_output_options & OPTION_SUN_ALT) ? '*' : ' ');
+            snprintf_append( buff, sizeof( buff), "6 [%c] Sun azimuth\n",
+                  (ephemeris_output_options & OPTION_SUN_AZ) ? '*' : ' ');
+            snprintf_append( buff, sizeof( buff), "7 [%c] Moon altitude\n",
+                  (ephemeris_output_options & OPTION_MOON_ALT) ? '*' : ' ');
+            snprintf_append( buff, sizeof( buff), "8 [%c] Moon azimuth\n",
+                  (ephemeris_output_options & OPTION_MOON_AZ) ? '*' : ' ');
             }
          }
       for( i = n_lines = 0; buff[i]; i++)
