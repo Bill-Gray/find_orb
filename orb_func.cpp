@@ -4466,6 +4466,7 @@ void pop_all_orbits( void);         /* orb_func2.cpp */
 
 int clean_up_find_orb_memory( void)
 {
+   extern const char *temp_obs_filename;     /* miscell.cpp */
 #ifndef _WIN32
    extern const char *lock_filename;      /* "/tmp/fo_lock" */
    extern FILE *lock_file;
@@ -4492,5 +4493,6 @@ int clean_up_find_orb_memory( void)
    fclose( lock_file);
    unlink( lock_filename);
 #endif
+   unlink( temp_obs_filename);
    return( 0);
 }
