@@ -1655,6 +1655,8 @@ static void show_residual_legend( const int line_no, const int residual_format)
    put_colored_text( buff, line_no, 0, -1, COLOR_RESIDUAL_LEGEND);
 }
 
+static int find_rgb( const unsigned irgb);
+
 static void show_a_file( const char *filename)
 {
    FILE *ifile = fopen_ext( filename, "tclrb");
@@ -1698,6 +1700,9 @@ static void show_a_file( const char *filename)
       const int top_possible_line = (is_ephem ? 3 : 0);
       const int n_lines_to_show = getmaxy( stdscr) - 1;
       int top_line;
+      int color_start = 18;      /* see 'command.txt' */
+      const bool color_visibility = (can_change_color( ) &&
+                  n_lines_to_show + color_start < COLORS);
 
       clear( );
       if( line_no < top_possible_line)
@@ -1723,38 +1728,34 @@ static void show_a_file( const char *filename)
                         && fgets_trimmed( buff, sizeof( buff), ifile); i++)
          {
          const int curr_line = top_line + i;
-#ifdef A_RGB_COLOR
          int color_col = -1, rgb = 255;
-#endif
 
          if( is_ephem)
             {
-#ifdef A_RGB_COLOR
             char *tptr = strchr( buff, '$');
 
             if( tptr)
                color_col = tptr - buff;
             rgb = remove_rgb_code( buff);
-#else
-            remove_rgb_code( buff);
-#endif
             }
          if( i >= 3 || !is_ephem)
             put_colored_text( buff, i, 0, -1,
                (line_no == curr_line ? COLOR_ORBITAL_ELEMENTS : COLOR_BACKGROUND));
-#ifdef A_RGB_COLOR
-         if( color_col >= 0 && rgb >= 0 && i >= 3 && is_ephem)
+         if( color_col >= 0 && rgb >= 0 && i >= 3 && is_ephem
+                        && color_visibility)
             {
             const int blue =  ((rgb >> 3) & 0x1f);
             const int green = ((rgb >> 11) & 0x1f);
             const int red =   ((rgb >> 19) & 0x1f);
-            const int text_color = (blue + red + green > 48 ? 0 : 31);
-            const chtype color = A_RGB( text_color, text_color, text_color,
-                                       red, green, blue);
+            const int text_color = find_rgb(
+                              blue + red + green > 48 ? 0 : 0xffffff);
+            const short color_pair_idx = (short)( i + color_start);
+            const short color_idx = (short)( i + 2 * color_start);
 
-            mvchgat( i, color_col + 1, 2, color, 0, NULL);
+            init_color( color_idx, red * 990 / 31, green * 999 / 31, blue * 999 / 31);
+            init_pair( color_pair_idx, text_color, color_idx);
+            mvchgat( i, color_col + 1, 2, A_NORMAL, color_pair_idx, NULL);
             }
-#endif
          }
                /* show "scroll bar" to right of text: */
       show_right_hand_scroll_bar( 0, n_lines_to_show, top_line, n_lines);
