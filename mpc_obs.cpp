@@ -4127,7 +4127,14 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
          while( isdigit( buff[i]))        /* form COM NORAD = Int'l desig */
             i++;
          if( i > 1 && i < 7 && !memcmp( buff + i, "U = ", 4))
+            {
+            int j = i + 4;
+
+            while( buff[j] > ' ')
+               j++;
+            buff[j] = '\0';
             memmove( buff + 1, buff + i + 2, strlen( buff + i + 1));
+            }
          }
       if( !memcmp( buff, "#= ", 3))
          {
