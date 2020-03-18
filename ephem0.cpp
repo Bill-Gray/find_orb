@@ -651,6 +651,7 @@ static void extract_field( field_location_t *field, const char *buff,
 
 
 static int find_precovery_plates( OBSERVE *obs, const int n_obs,
+                           const char *idx_filename,
                            FILE *ofile, const double *orbit,
                            const int n_orbits, double epoch_jd,
                            const double min_jd, const double max_jd,
@@ -666,27 +667,21 @@ static int find_precovery_plates( OBSERVE *obs, const int n_obs,
         /* Slightly easier to work with 'bit set means included' : */
    const int inclusion = atoi( get_environment_ptr( "FIELD_INCLUSION")) ^ 3;
    const bool show_base_60 = (*get_environment_ptr( "FIELD_DEBUG") != '\0');
-   const char *precovery_header_line =
-               "    RA (J2000) dec  Mag  YYYY MM DD HH:MM:SS.s Code"
-               " Sigma  PA Prob   Directory  Image Filename\n";
    int n_groups;
    field_group_t *groups;
 
    if( !ofile)
       return( -1);
-   ifile = fopen_ext( "css.idx", "crb");
+   ifile = fopen_ext( idx_filename, "crb");
    if( !ifile)
       {
-      fprintf( ofile, "Couldn't open 'css.idx'\n");
+      fprintf( ofile, "Couldn't open %s\n", idx_filename);
       fclose( ofile);
       return( -2);
       }
    p1 = (obj_location_t *)calloc( 3 * n_orbits, sizeof( obj_location_t));
    p2 = p1 + n_orbits;
    p3 = p2 + n_orbits;
-   setvbuf( ofile, NULL, _IONBF, 0);
-   fprintf( ofile, "#CSS precovery fields\n");
-   fprintf( ofile, "%s", precovery_header_line);
    buff = (char *)calloc( FIELD_BUFF_N, COMPRESSED_FIELD_SIZE);
    assert( buff);
    if( !fgets( buff, 100, ifile))
@@ -836,7 +831,6 @@ static int find_precovery_plates( OBSERVE *obs, const int n_obs,
       fclose( original_file);
    free( orbi);
    free( p1);
-   fclose( ofile);
    return( 0);
 }
 
@@ -1556,15 +1550,31 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       {
       double min_jd = jd_start;
       double max_jd = jd_start + step * (double)n_steps;
+      const char *precovery_header_line =
+               "    RA (J2000) dec  Mag  YYYY MM DD HH:MM:SS.s Code"
+               " Sigma  PA Prob   Directory  Image Filename\n";
+      int rval;
 
       if( max_jd < min_jd)
          {
          min_jd = max_jd;
          max_jd = jd_start;
          }
-      return( find_precovery_plates( obs, n_obs, ofile, orbit,
+      setvbuf( ofile, NULL, _IONBF, 0);
+      fprintf( ofile, "#CSS precovery fields\n");
+      fprintf( ofile, "%s", precovery_header_line);
+      for( i = 0; i < 2; i++)
+         {
+         rval = find_precovery_plates( obs, n_obs,
+                           (i ? "css.idx" : "css_new.idx"),
+                           ofile, orbit,
                            n_objects, epoch_jd, min_jd, max_jd,
-                           ephemeris_mag_limit));
+                           ephemeris_mag_limit);
+         if( rval)
+            fprintf( ofile, "Err %d on pass %d\n", rval, i);
+         }
+      fclose( ofile);
+      return( rval);
       }
    if( planet_no < 0)      /* bad observatory code or satellite */
       return( -3);
