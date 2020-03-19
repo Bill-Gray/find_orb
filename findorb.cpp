@@ -77,8 +77,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    you a mouse-wheel-up event.  Instead,  the button is returned as zero.
    Note that that's also what you get with a 'mouse move' event,  and we can't
    tell them apart.  So when 'mouse move' events are enabled -- currently done
-   only when there's a popup window on-screen -- we can't detect mouse up
-   events.  At least,  not on version 1 of ncurses. */
+   only when there's a popup window on-screen -- we can't detect mouse wheel
+   up events.  At least,  not on version 1 of ncurses. */
 
 #ifdef BUTTON5_PRESSED
    #define button5_pressed (button & BUTTON5_PRESSED)
@@ -1797,13 +1797,11 @@ static void show_a_file( const char *filename)
          unsigned long button;
 
          get_mouse_data( &x, &y, &z, &button);
-#ifdef BUTTON5_PRESSED
          if( button & BUTTON4_PRESSED)   /* actually 'wheel up' */
             c = KEY_UP;
-         else if( button & BUTTON5_PRESSED)   /* actually 'wheel down' */
+         else if( button5_pressed)       /* actually 'wheel down' */
             c = KEY_DOWN;
          else
-#endif
           if( y == i)
             {
             if( x >= 25 && x <= 28)       /* "Quit" */
