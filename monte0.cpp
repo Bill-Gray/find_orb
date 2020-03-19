@@ -334,9 +334,7 @@ double dump_monte_data_to_file( FILE *ofile, const double *sigmas,
             const int planet_orbiting)
 {
    double uparam = 97.;   /* assume we won't get a "correct" uncertainty */
-   static const char *text[MONTE_N_ENTRIES] = {
-                           "Tp", "e", "q", "Q", "1/a", "i", "M",
-                           "omega", "Omega", "MOID", "H" };
+   extern const char *monte_label[];                     /* orb_func.cpp */
    static const char *units_text[MONTE_N_ENTRIES] = {
                            "days", "", "AU", "AU", "1/AU", "deg",
                            "deg", "deg", "deg", "AU", "mag" };
@@ -368,7 +366,7 @@ double dump_monte_data_to_file( FILE *ofile, const double *sigmas,
       else
          put_double_in_buff( tbuff, sigmas[i]);
       fprintf( ofile, "sigma_%-5s%s %s",
-                  text[i], tbuff, units_text[i]);
+                  monte_label[i], tbuff, units_text[i]);
       if( !strcmp( units_text[i], "AU"))    /* show in km,  too */
          {
          tptr = put_double_in_buff( tbuff, sigmas[i] * AU_IN_KM);

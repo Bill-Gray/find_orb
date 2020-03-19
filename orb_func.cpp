@@ -2586,7 +2586,7 @@ int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid)
    return( n_residuals);
 }
 
-static const char *monte_label[MONTE_N_ENTRIES] = {
+const char *monte_label[MONTE_N_ENTRIES] = {
                            "Tp", "e", "q", "Q", "1/a", "i", "M",
                            "omega", "Omega", "MOID", "H" };
 
