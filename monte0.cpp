@@ -52,6 +52,8 @@ void put_orbital_elements_in_array_form( const ELEMENTS *elem,
    output_array[MONTE_MEAN_ANOM] = elem->mean_anomaly * 180. / PI;
    output_array[MONTE_ARG_PER] = elem->arg_per * 180. / PI;
    output_array[MONTE_ASC_NODE] = elem->asc_node * 180. / PI;
+   output_array[MONTE_EARTH_MOID] = 0.;
+   output_array[MONTE_H] = elem->abs_mag;
 }
 
 void add_monte_orbit( double *monte_data, const ELEMENTS *elem,
@@ -334,10 +336,10 @@ double dump_monte_data_to_file( FILE *ofile, const double *sigmas,
    double uparam = 97.;   /* assume we won't get a "correct" uncertainty */
    static const char *text[MONTE_N_ENTRIES] = {
                            "Tp", "e", "q", "Q", "1/a", "i", "M",
-                           "omega", "Omega" };
+                           "omega", "Omega", "MOID", "H" };
    static const char *units_text[MONTE_N_ENTRIES] = {
                            "days", "", "AU", "AU", "1/AU", "deg",
-                           "deg", "deg", "deg" };
+                           "deg", "deg", "deg", "AU", "mag" };
    const double sigma_a = sigmas[MONTE_INV_A] * semimajor_axis * semimajor_axis;
    int i;
    char tbuff[40], *tptr;

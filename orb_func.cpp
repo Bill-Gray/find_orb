@@ -2588,8 +2588,7 @@ int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid)
 
 static const char *monte_label[MONTE_N_ENTRIES] = {
                            "Tp", "e", "q", "Q", "1/a", "i", "M",
-                           "omega", "Omega" };
-
+                           "omega", "Omega", "MOID", "H" };
 
 /* See 'full.txt' for an explanation of why we do this.  Basically,  this
 sets up initial axes for the least-squares fit that are passably close to
@@ -2813,6 +2812,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
             /* evaluate elements of 'orbit2',  then put */
             /* into an array form: */
    elem.gm = get_planet_mass( planet_orbiting);
+   elem.abs_mag = calc_absolute_magnitude( obs, n_obs);
    calc_classical_elements( &elem, orbit2, epoch2, 1);
 
    put_orbital_elements_in_array_form( &elem, elements_in_array);
@@ -2924,6 +2924,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
                   /* evaluate elements of 'rel_orbit',  then  put */
                   /* into an array form: */
          elem.gm = get_planet_mass( planet_orbiting);
+         elem.abs_mag = calc_absolute_magnitude( obs, n_obs);
          calc_classical_elements( &elem, rel_orbit, epoch2, 1);
 
          put_orbital_elements_in_array_form( &elem, element_slopes[i]);
