@@ -12,6 +12,9 @@
   Characters from ASCII 33 = '!' to 126='~' can be used,  for 94^3=830584
   possible observatory codes.  That should last for a while.
 
+     Altitudes marked with '?' are usually just copied from the altitude
+  given for a nearby telescope,  and may not be completely accurate.
+
      The '!' in column 5 indicates that the data depart from the usual MPC
   format.  The observatory name starts in column 48,  rather than column
   31,  to allow more precision.  It also gives room to specify a non-Earth
@@ -130,10 +133,10 @@ JSt !   8.32         +52.02          300       Joerg Strunk meteor site
 
 SBo !   8.327722     +47.525778      450       Sandro Boschetti
 
-   TAROT positions from http://tarot.obs-hp.fr/tarot/infos/ :
+   TAROT position from http://tarot.obs-hp.fr/tarot/infos/.  See
+   (TaS) below,  in the La Silla section.
 
 Tar !   6.92389      +43.75222      1270       TAROT Calern Observatory
-Ta2 ! -70.7322       -29.2608       2347       TAROT La Silla ESO
 
    There are at least eleven telescopes on Mauna Kea,  all currently lumped
    as (568).  Some are not very close to the position specified for (568)
@@ -335,19 +338,37 @@ ALO ! -704417.50     -301506.37     2552       Andes LIDAR Obs. (ALO)
 War ! 149.1930       -31.2763        552.      Warrumbungle Observatory
 Dub ! 148.58525      -31.29358       300.      Dubbo Observatory
 
-   Coords from http://www.ls.eso.org/sci/facilities/lasilla/telescopes/d1p5/
-   (Danish 1.52-m),
-   http://www.eso.org/sci/facilities/lasilla/telescopes/ntt/overview.html
-   (New Technology Telescope),
-   http://www.eso.org/sci/facilities/lasilla/telescopes/3p6/overview.html
-   (ESO 3.6-m),
-   http://www.eso.org/sci/facilities/lasilla/telescopes/national/2p2.html
-   (ESO/MPG 2.2-m).  MPC lumps these at (809) La Silla
 
-Dan ! -704407.662    -291514.235    2340       Danish Telescope, La Silla
-NTT ! -704401.5      -291532.1      2375       New Technology Telescope, La Silla
-MPG ! -704004.543    -291515.433    2335       Max Planck Gesellschaft, La Silla
-ESO ! -704354.1      -291539.5      2400       ESO 3.6-m, La Silla
+   https://www.eso.org/public/usa/teles-instr/lasilla/ provides a map of
+   telescopes at La Silla,  enabling me to identify the following scopes
+   and measure lat/lons on G__gle Maps.  MPC lumps these at (809) La Silla.
+   Altitudes are from https://www.eso.org/public/teles-instr/lasilla/mpg22/
+   (links to individual telescope pages) and http://tarot.obs-hp.fr/tarot/infos/.
+   I am somewhat skeptical of them;  the ESO pages give a lot of bogus lat/lon
+   values,  by ~200 metres (a geodetic datum issue,  I think).  The effect
+   on altitude should be less.  But they're probably ASL rather than ellipsoidal.
+   If so,  34 metres should be added to La Silla altitudes.
+
+I40 ! -70.739391     -29.254609     2375       La Silla--TRAPPIST
+Da5 ! -70.739587     -29.254999     2340?      Danish 50-cm, La Silla
+ES5 ! -70.739373     -29.255072     2340?      ESO 0.5-m, La Silla
+Boc ! -70.739644     -29.255257     2340?      Bochum 0.61-m, La Silla
+Du9 ! -70.739387     -29.255496     2340?      Dutch 0.9-m, La Silla
+ELS ! -70.738925     -29.255892     2340?      ESO 1.52-m, La Silla
+ES1 ! -70.738377     -29.256736     2340?      ESO 1-m (NW), La Silla
+Mas ! -70.737820     -29.257163     2375       Multi-site All-Sky CAmeRA (MASCARA), La Silla
+Ma1 ! -70.737972     -29.257378     2340?      Marly 1-m, La Silla
+Ms3 ! -70.737890     -29.257550     2340?      Marseille 0.36-m, La Silla
+Dan ! -70.737517     -29.257800     2340       Danish 1.54-m, La Silla
+MPG ! -70.736642     -29.257896     2335       MPG/ESO Max Planck 2.2-m, La Silla
+ESo ! -70.735790     -29.258138     2345?      ESO 1-m (SE), La Silla
+DIM ! -70.735334     -29.258092     2360?      DIMM (Differential Motion Monitor), La Silla
+NTT ! -70.733837     -29.258970     2375       New Technology Telescope, La Silla
+LEu ! -70.732962     -29.259573     2375       Leonhard Euler 1.2-m, La Silla
+TaS ! -70.732578     -29.260101     2347       TAROT, La Silla
+ESO ! -70.731784     -29.261065     2400       ESO 3.6-m, La Silla
+CAT ! -70.731830     -29.260797     2400?      CAT (Coude Auxiliary Telescope), La Silla
+SST ! -70.732371     -29.263556     2400?      Swedish-ESO Submillimetre (SEST), La Silla
 
    https://www.eso.org/sci/facilities/paranal/astroclimate/site.html gives
    latitude/longitude for not only each of the four "unit telescopes"
