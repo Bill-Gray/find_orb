@@ -1488,6 +1488,82 @@ static void add_lon_lat_to_ephem( char *buff, const size_t buflen,
                                                  lat_in_radians * 180. / PI);
 }
 
+/* We have an image map,  currently based on Gaia-DR2,  of 'galactic
+confusion'. See bright.cpp in my 'star_cats' repository for the code that
+created this.  The image is in the .pgm (Portable GrayMap) format,
+basically an array of byte values.  We convert RA/dec to a pixel
+location,  and read that pixel value.  Some logic is added to save
+the FILE* and cache a few bytes.
+
+'bright2.pgm' has a one-degree resolution (and is therefore 360x180)
+and is distributed by default with Find_Orb.  'bright.pgm' has ten times
+the resolution,  but does require a correspondingly bigger download.
+We look for the latter;  if it fails,  we try the former. */
+
+static int galactic_confusion( const double ra, const double dec)
+{
+   static FILE *image_file;
+   static long buff_offset, hdr_offset;
+   static int xsize, ysize;
+   static unsigned char buff[32];
+   int i, x, y;
+   long loc;
+
+   if( ra == -99.)       /* flag for "we're done here;  free everything up" */
+      {
+      if( image_file)
+         {
+         fclose( image_file);
+         image_file = NULL;
+         xsize = 0;
+         return( 0);
+         }
+      }
+   assert( ra >= 0. && ra <= 360.);
+   assert( dec >= -90. && dec <= 90.);
+   if( hdr_offset == -1)    /* we've already looked for a confusion image */
+      return( 0);           /* and failed.  No need to fail again. */
+   for( i = 0; !image_file && i < 2; i++)
+      image_file = fopen_ext( i ? "bright2.pgm" : "bright.pgm", "cr");
+   assert( image_file);
+   if( !image_file)        /* tried both possible confusion images. */
+      {
+      hdr_offset = -1;
+      return( 0);
+      }
+   if( !xsize)
+      {
+      char tbuff[40];
+
+      if( fgets( tbuff, sizeof( buff), image_file))
+         if( fgets( tbuff, sizeof( buff), image_file))
+            {
+            sscanf( tbuff, "%d %d", &xsize, &ysize);
+            if( !fgets( tbuff, sizeof( buff), image_file))
+               return( 0);   /* line w/max pixel value */
+            assert( atoi( tbuff) == 255);
+            hdr_offset = ftell( image_file);
+            buff_offset = -99;
+            }
+      }
+   assert( xsize);
+   x = (int)( (360. - ra) * (double)xsize / 360.) % xsize;
+   y = (int)( (90. - dec) * (double)ysize / 180.);
+   loc = x + y * xsize;
+   if( loc < buff_offset || loc >= buff_offset + (long)sizeof( buff))
+      {
+      size_t bytes_read;
+
+      buff_offset = loc - sizeof( buff) / 2;
+      if( buff_offset < 0)
+         buff_offset = 0;
+      fseek( image_file, buff_offset + hdr_offset, SEEK_SET);
+      bytes_read = fread( buff, 1, sizeof( buff), image_file);
+      assert( bytes_read == sizeof( buff));
+      }
+   return( buff[loc - buff_offset]);
+}
+
 double ephemeris_mag_limit = 22.;
 
 int ephemeris_in_a_file( const char *filename, const double *orbit,
@@ -2150,6 +2226,25 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   else
                      tbuff[2] = ' ';         /* moon's down */
                   tbuff[3] = '\0';
+                  if( tbuff[1] == ' ' && tbuff[2] == ' ')
+                     {
+                     int galact_conf = galactic_confusion( ra * 15, dec);
+
+                     if( galact_conf > 15)
+                        {
+                        int band;
+
+                        galact_conf = galact_conf * 100 / 256;       /* scale to 0-99 */
+                        for( band = 0; band < 24; band += 8)
+                           if( ((rgb >> band) & 0xff) < (unsigned)galact_conf)
+                              {
+                              rgb &= ~(0xff << band);
+                              rgb |= (unsigned long)galact_conf << band;
+                              }
+                        tbuff[1] = (char)( '0' + galact_conf / 10);
+                        tbuff[2] = (char)( '0' + galact_conf % 10);
+                        }
+                     }
                   snprintf_append( buff, sizeof( buff), "$%06lx%s", rgb, tbuff);
                   if( tbuff[1] == ' ' && tbuff[2] == ' ')
                      tbuff[1] = '-';
