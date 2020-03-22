@@ -805,6 +805,10 @@ COD K61
 OBS M. Adamovsky
 TEL 0.51-m f/6.8 reflector + CCD
 
+COD K80
+TEL 0.28-m f/2.2 Schmidt astrograph + CCD
+OBS T. Kluwak
+
 COD K88
 OBS K. Sarneczky
 TEL 0.60-m Schmidt + CCD
