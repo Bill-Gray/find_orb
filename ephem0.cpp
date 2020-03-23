@@ -1500,7 +1500,7 @@ and is distributed by default with Find_Orb.  'bright.pgm' has ten times
 the resolution,  but does require a correspondingly bigger download.
 We look for the latter;  if it fails,  we try the former. */
 
-static int galactic_confusion( const double ra, const double dec)
+int galactic_confusion( const double ra, const double dec)
 {
    static FILE *image_file;
    static long buff_offset, hdr_offset;
@@ -1512,12 +1512,10 @@ static int galactic_confusion( const double ra, const double dec)
    if( ra == -99.)       /* flag for "we're done here;  free everything up" */
       {
       if( image_file)
-         {
          fclose( image_file);
-         image_file = NULL;
-         xsize = 0;
-         return( 0);
-         }
+      image_file = NULL;
+      xsize = 0;
+      return( 0);
       }
    assert( ra >= 0. && ra <= 360.);
    assert( dec >= -90. && dec <= 90.);
