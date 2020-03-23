@@ -2460,12 +2460,14 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
 
    if( !prev_files)
       prev_files = load_file_into_memory( "previous.def", &n_lines, true);
+   assert( prev_files);
    *err_buff = '\0';
    if( !*ifilename)
       user_select_file( ifilename, "Open astrometry file", 0);
 
    if( !*ifilename)
       {
+      free( prev_files);
       strcpy( err_buff, "'findorb' needs the name of an input file of MPC-formatted\n"
                "astrometry as a command-line argument.\n");
       return( NULL);
@@ -2527,6 +2529,7 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
       free( canonical_path);
 #endif
       }
+   free( prev_files);
    return( ids);
 }
 
