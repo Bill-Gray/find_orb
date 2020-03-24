@@ -1406,9 +1406,9 @@ static int combine_json_elems_and_ephems( const char *packed_desig, FILE *ephem_
    elem_file = open_json_file( buff, "JSON_ELEMENTS_NAME", "elements.json", packed_desig, "rb");
    while( !obs_end_found && fgets( buff, sizeof( buff), elem_file))
       {
-      if( !memcmp( buff, "      \"observations\":", 17))
+      if( !strncmp( buff, "      \"observations\":", 17))
          in_observations = true;
-      if( in_observations && !memcmp( buff, "      }", 7))
+      if( in_observations && !strncmp( buff, "      }", 7))
          {
          strcpy( buff, "      },\n");   /* JSON needs comma for 'continuation' */
          obs_end_found = true;
@@ -1419,7 +1419,7 @@ static int combine_json_elems_and_ephems( const char *packed_desig, FILE *ephem_
    fseek( ephem_file, 0L, SEEK_SET);
    while( fgets( buff, sizeof( buff), ephem_file))
       {
-      if( !memcmp( buff, "  \"ephemeris\":", 14))
+      if( !strncmp( buff, "  \"ephemeris\":", 14))
          in_ephemerides = true;
       if( in_ephemerides)
          {
@@ -1522,7 +1522,7 @@ int galactic_confusion( const double ra, const double dec)
    if( hdr_offset == -1)    /* we've already looked for a confusion image */
       return( 0);           /* and failed.  No need to fail again. */
    for( i = 0; !image_file && i < 2; i++)
-      image_file = fopen_ext( i ? "bright2.pgm" : "bright.pgm", "cr");
+      image_file = fopen_ext( i ? "bright2.pgm" : "bright.pgm", "crb");
    assert( image_file);
    if( !image_file)        /* tried both possible confusion images. */
       {
