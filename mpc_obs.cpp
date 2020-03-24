@@ -3363,6 +3363,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
    if( !obs_details)
       obs_details = init_observation_details( );
    ades_context = init_ades2mpc( );
+   memset( buff, 0, 13);         /* suppress spurious Valgrind messages */
    while( fgets_with_ades_xlation( buff, sizeof( buff), ades_context, ifile)
                   && i != n_obs)
       {
@@ -3375,7 +3376,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
       lines_actually_read++;
       if( *buff == '<')
          remove_html_tags( buff);
-      if( !memcmp( buff, "errmod  = 'fcct14'", 18))
+      if( !strncmp( buff, "errmod  = 'fcct14'", 18))
          is_fcct14_data = true;
       if( debug_level > 2)
          debug_printf( "Line %d: %s\n", line_no, buff);
