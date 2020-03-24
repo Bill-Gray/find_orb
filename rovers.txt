@@ -341,34 +341,30 @@ Dub ! 148.58525      -31.29358       300.      Dubbo Observatory
 
    https://www.eso.org/public/usa/teles-instr/lasilla/ provides a map of
    telescopes at La Silla,  enabling me to identify the following scopes
-   and measure lat/lons on G__gle Maps.  MPC lumps these at (809) La Silla.
-   Altitudes are from https://www.eso.org/public/teles-instr/lasilla/mpg22/
-   (links to individual telescope pages) and http://tarot.obs-hp.fr/tarot/infos/.
-   I am somewhat skeptical of them;  the ESO pages give a lot of bogus lat/lon
-   values,  by ~200 metres (a geodetic datum issue,  I think).  The effect
-   on altitude should be less.  But they're probably ASL rather than ellipsoidal.
-   If so,  34 metres should be added to La Silla altitudes.
+   and measure lat/lon/alts on G__gle Earth.  MPC lumps these at (809)
+   and (262),  which appear to be for NTT,  and (I40) TRAPPIST.  I've
+   added a 34 metre geoid height to the Google values.
 
-I40 ! -70.739391     -29.254609     2375       La Silla--TRAPPIST
-Da5 ! -70.739587     -29.254999     2340?      Danish 50-cm, La Silla
-ES5 ! -70.739373     -29.255072     2340?      ESO 0.5-m, La Silla
-Boc ! -70.739644     -29.255257     2340?      Bochum 0.61-m, La Silla
-Du9 ! -70.739387     -29.255496     2340?      Dutch 0.9-m, La Silla
-ELS ! -70.738925     -29.255892     2340?      ESO 1.52-m, La Silla
-ES1 ! -70.738377     -29.256736     2340?      ESO 1-m (NW), La Silla
-Mas ! -70.737820     -29.257163     2375       Multi-site All-Sky CAmeRA (MASCARA), La Silla
-Ma1 ! -70.737972     -29.257378     2340?      Marly 1-m, La Silla
-Ms3 ! -70.737890     -29.257550     2340?      Marseille 0.36-m, La Silla
-Dan ! -70.737517     -29.257800     2340       Danish 1.54-m, La Silla
-MPG ! -70.736642     -29.257896     2335       MPG/ESO Max Planck 2.2-m, La Silla
-ESo ! -70.735790     -29.258138     2345?      ESO 1-m (SE), La Silla
-DIM ! -70.735334     -29.258092     2360?      DIMM (Differential Motion Monitor), La Silla
-NTT ! -70.733837     -29.258970     2375       New Technology Telescope, La Silla
-LEu ! -70.732962     -29.259573     2375       Leonhard Euler 1.2-m, La Silla
-TaS ! -70.732578     -29.260101     2347       TAROT, La Silla
-ESO ! -70.731784     -29.261065     2400       ESO 3.6-m, La Silla
-CAT ! -70.731830     -29.260797     2400?      CAT (Coude Auxiliary Telescope), La Silla
-SST ! -70.732371     -29.263556     2400?      Swedish-ESO Submillimetre (SEST), La Silla
+I40 ! -70.739391     -29.254609     2349       La Silla--TRAPPIST
+Da5 ! -70.739587     -29.254999     2354       Danish 50-cm, La Silla
+ES5 ! -70.739373     -29.255072     2356       ESO 0.5-m, La Silla
+Boc ! -70.739644     -29.255257     2355       Bochum 0.61-m, La Silla
+Du9 ! -70.739387     -29.255496     2360       Dutch 0.9-m, La Silla
+ELS ! -70.738925     -29.255892     2369       ESO 1.52-m, La Silla
+ES1 ! -70.738377     -29.256736     2371       ESO 1-m (NW), La Silla
+Mas ! -70.737820     -29.257163     2370       Multi-site All-Sky CAmeRA (MASCARA), La Silla
+Ma1 ! -70.737972     -29.257378     2369       Marly 1-m, La Silla
+Ms3 ! -70.737890     -29.257550     2368       Marseille 0.36-m, La Silla
+Dan ! -70.737517     -29.257800     2366       Danish 1.54-m, La Silla
+MPG ! -70.736642     -29.257896     2364       MPG/ESO Max Planck 2.2-m, La Silla
+ESo ! -70.735790     -29.258138     2364       ESO 1-m (SE), La Silla
+DIM ! -70.735334     -29.258092     2365       DIMM (Differential Motion Monitor), La Silla
+NTT ! -70.733837     -29.258970     2384       New Technology Telescope, La Silla
+LEu ! -70.732962     -29.259573     2382       Leonhard Euler 1.2-m, La Silla
+TaS ! -70.732578     -29.260101     2397       TAROT, La Silla
+ESO ! -70.731784     -29.261065     2420       ESO 3.6-m, La Silla
+CAT ! -70.731830     -29.260797     2422       CAT (Coude Auxiliary Telescope), La Silla
+SST ! -70.732371     -29.263556     2397       Swedish-ESO Submillimetre (SEST), La Silla
 
    https://www.eso.org/sci/facilities/paranal/astroclimate/site.html gives
    latitude/longitude for not only each of the four "unit telescopes"
@@ -447,17 +443,17 @@ https://spacewatch.lpl.arizona.edu/telescopes
 
 291 !-111.599905     +31.961669     2045.      LPL/Spacewatch II
 
-   Other scopes measured while looking at Kitt Peak in Google Maps.
-Google Maps doesn't give me altitudes.  I used the altitude from (691).
+   Other scopes measured while looking at Kitt Peak in Google Earth.
+30m substracted to get ellipsoidal altitudes.
 
-May !-111.599895     +31.964027     2061.      Mayall telescope,  Kitt Peak
-1.3 !-111.598406     +31.959634     2061.      1.3-m telescope, Kitt Peak
-2.1 !-111.598296     +31.958175     2061.      2.1-m telescope, Kitt Peak
-WIY !-111.600586     +31.958052     2061.      WIYN telescope, Kitt Peak
-Bur !-111.599203     +31.960597     2061.      Burrell Schmidt, Kitt Peak
-Unk1!-111.598157     +31.960070     2061.      Near visitor center, Kitt Peak
-Unk2!-111.599620     +31.958041     2061.      Unkn 2.1-m 90 meters east of WIYN
-WIY2!-111.600237     +31.958013     2061.      WIYN 0.9-m, Kitt Peak
+May !-111.599895     +31.964027     2051.      Mayall telescope,  Kitt Peak
+1.3 !-111.598406     +31.959634     2042.      1.3-m telescope, Kitt Peak
+2.1 !-111.598296     +31.958175     2055.      2.1-m telescope, Kitt Peak
+WIY !-111.600586     +31.958052     2057.      WIYN telescope, Kitt Peak
+Bur !-111.599203     +31.960597     2060.      Burrell Schmidt, Kitt Peak
+Unk1!-111.598157     +31.960070     2042.      Near visitor center, Kitt Peak
+Unk2!-111.599620     +31.958041     2060.      Unkn 2.1-m 90 meters east of WIYN
+WIY2!-111.600237     +31.958013     2058.      WIYN 0.9-m, Kitt Peak
 
    From http://kp12m.as.arizona.edu/12m_docs/12_meter_description.htm .
 Again,  I subtracted 30 meters for geoid height.  The odd mismatch in
@@ -750,3 +746,18 @@ mL5 !-155.576000   +19.536421       3427.      Mauna Loa unk5
 ELT !-070.191631   -24.589327       3046.      Extremely Large Telescope
 GMT !-0704109.0    -290142.0        2516.      Giant Magellan Telescope
 TMT !-155.4816     +19.8327         4050.      Thirty-Meter Telescope
+
+   Improved coords for both Magellan scopes.  Alt is from
+   https://www.as.arizona.edu/magellan-65m-telescopes (converted from
+   feet,  so treat with caution).  Lat/lons given there are identical
+   and split the difference between the positions given below,  which
+   were measured on G__gle Maps.
+268 !-070.692620   -29.014044       2515.      New Horizons KBO Search-Magellan/Clay
+269 !-070.692187   -29.014442       2515.      New Horizons KBO Search-Magellan/Baade
+
+   Coords for these two telescopes are provided by Wikipaedia,  claimed good to
+   a meter (though given to 3-m precision?),  and they do land squarely on domes
+   in G__gle Maps.  Many Las Campanas telescopes are unidentified.  The
+   coordinates given for (304) and (I05) are clearly bogus.
+War !-704205.9     -290035.8        2275.      Warsaw Telescope, Las Campanas (OGLE)
+ASA !-704205.1     -290036.9        2275?      All-Sky Automated Survey (ASAS), Las Campanas
