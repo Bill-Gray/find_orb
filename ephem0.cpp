@@ -1079,7 +1079,20 @@ almost always 100% (you don't spend much time in the earth's shadow).
    See http://www.minorplanet.info/MPB/issues/MPB_45-3.pdf for a discussion
 of two instances where this matters.  2008 TC3 and 2018 LA,  impactors,
 are other examples of objects passing through earth's shadow,  as are
-numerous artsats.    */
+numerous artsats.
+
+   Note further that the following assumes a uniformly bright sun
+across the entire disk.  The disk is actually darker near the limb;
+a formula on page 216 of the above paper gives a decent approximation
+of disk brightness as a function of radius (unfortunately,  the source
+it gives is no longer available) :
+
+I = 0.436 + 0.72 * mu - 0.16 mu^2,
+
+   where I = intensity and mu^2 = 1 - (r/R)^2,  r = distance from
+the center of the solar disk and R = radius of the solar disk.
+Ideally,  we'd integrate a series of bands using this function to
+compute a (probably only slightly) more accurate brightness drop. */
 
 static double shadow_check( const double *planet_loc,
                             const double *obs_posn,
