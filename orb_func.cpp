@@ -3054,10 +3054,13 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
          const double yresid = yresids[i];      /* all in _radians_ */
          const double resid2 = xresid * xresid + yresid * yresid;
 
-         if( use_blunder_method == 2 && probability_of_blunder)
-            weight = reweight_for_blunders( resid2, weight);
-         if( overobserving_time_span && overobserving_ceiling)
-            weight *= reweight_for_overobserving( obs, n_obs, i);
+         if( !(obs[i].flags & OBS_ALREADY_CORRECTED_FOR_OVEROBSERVING))
+            {
+            if( use_blunder_method == 2 && probability_of_blunder)
+               weight = reweight_for_blunders( resid2, weight);
+            if( overobserving_time_span && overobserving_ceiling)
+               weight *= reweight_for_overobserving( obs, n_obs, i);
+            }
          FMEMCPY( loc_vals, slopes + i * 2 * n_params,
                                          2 * n_params * sizeof( double));
          lsquare_add_observation( lsquare, xresid, weight, loc_vals);

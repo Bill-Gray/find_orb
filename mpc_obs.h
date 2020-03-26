@@ -163,7 +163,10 @@ typedef uint64_t ephem_option_t;
 #define OBS_NO_OFFSET      4
 #define OBS_IS_SELECTED    8
 
-#define OBS_THOLEN_SIGMAS  0x10
+   /* Following is used for newer NEODyS/AstDyS data for which */
+   /* FCCT14 or VFCC17 over-observing correction has already been */
+   /* applied;  we shouldn't 'correct' a second time */
+#define OBS_ALREADY_CORRECTED_FOR_OVEROBSERVING  0x10
 
 extern int object_type;
 

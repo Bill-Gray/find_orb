@@ -3085,75 +3085,6 @@ static void convert_com_to_pound_sign( char *buff)
       }
 }
 
-/* Recent .rwo data,  with the FCCT14 model,  "corrects" observations for
-over-observing.  It does this by figuring out how many observations the
-observatory made that night and multiplying the sigmas by the square root
-of that number.  So a one-observation run gets the same weight in the
-solution as a four-observation run,  and the sigmas are shown artificially
-increased.
-
-This can cause trouble for Find_Orb,  so we reverse the process,  getting us
-back to the "uncorrected" sigmas.  We can then apply Find_Orb's over-observing,
-timing correction,  and blunder management methods.
-
-Any .rwo observation that isn't from a satellite and hasn't already been
-uncorrected needs to be uncorrected.  We set the OBS_ALREADY_DECORRECTED
-flag so observations aren't corrected more than once.   */
-
-#define OBS_ALREADY_DECORRECTED      0x4000
-
-static bool needs_uncorrecting( const OBSERVE *obs)
-{
-   return( !memcmp( obs->reference, ".rwo ", 5) && obs->note2 != 'S'
-                   && !(obs->flags & OBS_ALREADY_DECORRECTED));
-}
-
-static inline void remove_astdys_overobs_correction( int n_obs, OBSERVE *obs)
-{
-   int original_n_obs = n_obs;
-
-   while( n_obs)
-      {
-      while( n_obs && !needs_uncorrecting( obs))
-         {
-         n_obs--;
-         obs++;
-         }
-      if( n_obs)
-         {
-         int pass, i, n_that_night = 0;
-         double lon, unused_rho_cos_phi, unused_rho_sin_phi;
-         const int planet_no = get_observer_data( obs->mpc_code,
-                   NULL, &lon, &unused_rho_cos_phi, &unused_rho_sin_phi);
-
-         assert( planet_no == 3);
-         lon /= 2. * PI;    /* cvt to "days" */
-         for( pass = 0; pass < 2; pass++)
-            for( i = 0; i < n_obs
-                 && floor( obs[i].jd - lon) == floor( obs->jd - lon); i++)
-               if( !memcmp( obs[i].mpc_code, obs->mpc_code, 3))
-                  {
-                  if( !pass)    /* just counting observations on first pass */
-                     n_that_night++;
-                  else
-                     {
-                     assert( n_that_night);
-                     obs[i].posn_sigma_1 /= sqrt( (double)n_that_night);
-                     obs[i].posn_sigma_2 /= sqrt( (double)n_that_night);
-                     obs[i].flags |= OBS_ALREADY_DECORRECTED;
-                     }
-                  }
-         }
-      }
-   obs -= original_n_obs;
-   while( original_n_obs--)       /* clear all the flags */
-      {
-      obs->flags &= ~OBS_ALREADY_DECORRECTED;
-      obs++;
-      }
-}
-
-
 /* (691) Spacewatch has a habit of providing near-duplicate observations,
 one "hand-measured",  the other not,  like this :
 
@@ -3343,7 +3274,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
    extern int n_monte_carlo_impactors;   /* and this,  too */
    const bool fixing_trailing_and_leading_spaces =
                (*get_environment_ptr( "FIX_OBSERVATIONS") != '\0');
-   bool is_fcct14_data = false, apply_sigmas_once = false;
+   bool is_fcct14_or_vfcc17_data = false, apply_sigmas_once = false;
    void *ades_context;
    int spacecraft_offset_reference = 399;    /* default is geocenter */
 
@@ -3377,7 +3308,9 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
       if( *buff == '<')
          remove_html_tags( buff);
       if( !strncmp( buff, "errmod  = 'fcct14'", 18))
-         is_fcct14_data = true;
+         is_fcct14_or_vfcc17_data = true;
+      if( !strncmp( buff, "errmod  = 'vfcc17'", 18))
+         is_fcct14_or_vfcc17_data = true;
       if( debug_level > 2)
          debug_printf( "Line %d: %s\n", line_no, buff);
       if( get_neocp_data( buff, desig_from_neocp, mpc_code_from_neocp))
@@ -3581,6 +3514,8 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                   rval[i].ra  -= rval[i].ra_bias  * radians_per_arcsec / cos( rval[i].dec);
                   rval[i].dec -= rval[i].dec_bias * radians_per_arcsec;
                   }
+               if( is_fcct14_or_vfcc17_data && is_rwo)
+                  rval[i].flags |= OBS_ALREADY_CORRECTED_FOR_OVEROBSERVING;
                if( rval[i].note2 == 'n')        /* video observations:  assume */
                   rval[i].time_sigma = 0.01 / seconds_per_day;  /* 10ms sigma */
                set_obs_vect( rval + i);
@@ -3822,9 +3757,6 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
       }
    if( rval[n_obs_actually_loaded - 1].jd > current_jd( ))   /* warn obs are */
       generic_message_box( get_find_orb_text( 2018), "o");   /* in future */
-
-   if( is_fcct14_data)
-      remove_astdys_overobs_correction( n_obs, rval);
 
 #ifdef FUTURE_SATELLITE_OBS_CHECKING
    check_satellite_obs( rval, n_obs_actually_loaded);
