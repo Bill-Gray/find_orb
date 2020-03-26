@@ -314,9 +314,9 @@ CHAS! -704821.65     -301006.97     2240.5     Former CHASE
 RASI! -704825.11     -301008.03     2238       RASICAM
 WHAM! -704812.85     -301005.92     2188       WHAM
 W93 ! -704814.39     -301001.84     2182       Korea Microlensing Telescope Network-CTIO
-LCOA! -704817.24     -301002.58     2198       LCOGT Stellan-A
-LCOB! -704816.78     -301002.39     2198       LCOGT Stellan-B
-LCOC! -704816.85     -301002.81     2198       LCOGT Stellan-C
+W85 ! -704817.24     -301002.58     2198       Cerro Tololo-LCO A
+W86 ! -704816.78     -301002.39     2198       Cerro Tololo-LCO B
+W87 ! -704816.85     -301002.81     2198       Cerro Tololo-LCO C
 S1.3! -704817.92     -301002.81     2200       SMARTS 1.3-m
 PRO1! -704818.91     -301003.52     2207       PROMPT #1
 PRO2! -704819.56     -301003.49     2207       PROMPT #2
@@ -647,8 +647,14 @@ G34 !  13.701403     +50.860289      490.67    Oberfrauendorf
 
    David Briggs supplied corrected coordinates for (J69).  The scope
 is 155 metres above sea level;  the geoid height is about 46 metres.
+(J69) is one of five domes visible on G__gle Earth as part of the
+Hampshire Astronomical Group site.  The altitudes appear to be identical.
 
 J69 !  -1.0196556    +50.9390167     201       North Observatory, Clanfield
+Ha1 !  -1.019663     +50.939114      201       HAG about 10m north of (J69)
+Ha2 !  -1.019629     +50.938673      201       HAG about 40m south of (J69)
+Ha3 !  -1.019306     +50.938298      201       HAG smaller dome ~85m SSE of (J69)
+Ha3 !  -1.019140     +50.938284      201       HAG larger dome ~85m SSE of (J69)
 
    Some telescopes at (711) McDonald Observatory in Texas,  sorted using the
    site map at http://www.as.utexas.edu/mcdonald/observers/mcd_site_map.pdf
@@ -681,15 +687,16 @@ FL2 !-110.878488   +31.680868       2287.949   Whipple Observatory,  1.2-m
    "Calar Alto",  has low precision;  I have no idea which scope is intended.
    (Observations on the 2019 Oct 10 MPCs say data came from a 1.23-m scope,
    a 1.23-m f/8 scope,  a 1.2-m f/8 scope,  and a 3.5-m f/3.9 scope.)
-   (Z84) and (Z79) were identifiable.  I _think_ (G36) = Un1.  Alts,  again,
-   are from ObsCodes.html.   According to Wikipaedia,  (Z79) = 3.5m scope;
-   (Z84) = 0.8-m Schmidt; (Un1) = 1.23m;  (Un2) = 1.5m; (Un3) = 2.2m.
+   (Z84) and (Z79) were identifiable.  I _think_ (G36) = Un1.  Alts are from
+   G__gle Earth,  with 51m added for geoid height.  According to Wikipaedia,
+   (Z79) = 3.5m scope;  (Z84) = 0.8-m Schmidt; (Un1) = 1.23m;  (Un2) = 1.5m;
+   (Un3) = 2.2m.
 
-Z84 !  -2.548143   +37.223981       2160.811   Calar Alto-Schmidt
-Un1 !  -2.547483   +37.223165                  Unknown about 100m SSE of Z84;  (G36)?
-Un2 !  -2.548248   +37.224987                  Unknown about 100m north of Z84
-Un3 !  -2.546037   +37.223133                  Unknown about 200m ESE of Z84
-Z79 !  -2.546678   +37.220850       2162.511   Calar Alto TNO Survey
+Z84 !  -2.548143   +37.223981       2207.      Calar Alto-Schmidt
+Un1 !  -2.547483   +37.223165       2211.      Unknown about 100m SSE of Z84;  (G36)?
+Un2 !  -2.548248   +37.224987       2201.      Unknown about 100m north of Z84
+Un3 !  -2.546037   +37.223133       2112.      Unknown about 200m ESE of Z84
+Z79 !  -2.546678   +37.220850       2210.      Calar Alto TNO Survey
 
    Two ASAS-SN scopes,  both sharing LCO domes.  These are essentially
 duplicates of (V37) and (T03),  measured from G__gle Maps with altitudes
@@ -733,13 +740,14 @@ ML7 !-110.789742   +32.441551       2789.      Mt. Lemmon unk7
 ML8 !-110.791527   +32.441551       2789.      Mt. Lemmon unk8
 
    Various unidentified scopes on Mauna Loa.  Altitude is that
-   for (T08).  Lat/lon is from G__gle Maps.
+   for (T08).  Lat/lon/alt is from G__gle Earth,  27 meters
+   added for geoid height.
 
-mL1 !-155.576113   +19.536009       3427.      Mauna Loa unk1
-mL2 !-155.576414   +19.536252       3427.      Mauna Loa unk2
-mL3 !-155.576593   +19.535446       3427.      Mauna Loa unk3
-mL4 !-155.576588   +19.535550       3427.      Mauna Loa unk4
-mL5 !-155.576000   +19.536421       3427.      Mauna Loa unk5
+mL1 !-155.576113   +19.536009       3425.      Mauna Loa unk1
+mL2 !-155.576414   +19.536252       3423.      Mauna Loa unk2
+mL3 !-155.576593   +19.535446       3434.      Mauna Loa unk3
+mL4 !-155.576588   +19.535550       3434.      Mauna Loa unk4
+mL5 !-155.576000   +19.536421       3420.      Mauna Loa unk5
 
    Three planned or in-process telescopes of 39.3,  24.5,  and 30-m aperture.
 
