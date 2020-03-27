@@ -769,3 +769,41 @@ TMT !-155.4816     +19.8327         4050.      Thirty-Meter Telescope
    coordinates given for (304) and (I05) are clearly bogus.
 War !-704205.9     -290035.8        2275.      Warsaw Telescope, Las Campanas (OGLE)
 ASA !-704205.1     -290036.9        2275?      All-Sky Automated Survey (ASAS), Las Campanas
+
+   Carolin Liefke sorted out the history of (024) Heidelberg-Konigstuhl
+   (see https://groups.io/g/mpml/message/35417).  The site listed below as
+   (024) was used by observers at the Max Planck Instutute for Astronomy
+   until about 2013.  The site listed at (HeK) is an older site,  used
+   for observations since about 1897.  Locations measured with G__gle
+   Earth,  48 metres added for geoid height.
+024 !+008.723675   +49.395428        616.      Heidelberg-Konigstuhl (to 2013)
+HeK !+008.724941   +49.398185        621.      Heidelberg-Konigstuhl (starting ~1895)
+
+   Some neighboring domes near the above :
+He1 !+008.724705   +49.397846        618.      Dome ~43m SSW of (HeK)
+He2 !+008.725357   +49.398129        616.      Sm dome ~40m E of (HeK)
+He3 !+008.725390   +49.397949        617.      Sm dome ~30m S of (He2)
+He4 !+008.725620   +49.397864        619.      Sm dome ~25m SW of (He3)
+He5 !+008.725960   +49.397864        618.      Sm dome ~25m W of (He4)
+He6 !+008.726110   +49.398032        616.      Easternmost dome at (HeK) site
+He7 !+008.724327   +49.398147        619.      Sm rooftop dome at (HeK) site
+He8 !+008.723153   +49.395424        616.      Sm dome ~40m W of (024)
+
+   Michael Gill advises me (private e-mail) that "Wilfred Hall Observatory
+   Preston is now the Alston Observatory",  and supplied the following
+   lat/lon from G__gle Maps.  52m added for geoid height.
+
+989 !-002.593854   +53.801360        115.      Alston Observatory
+WH1 !-002.593935   +53.801238        115.      Sm dome SSW (closer to) (989)
+WH2 !-002.594020   +53.801184        115.      Sm dome SSW (further from) (989)
+
+   Luca Buzzi points out that (559) has data at
+   http://sln.oact.inaf.it/sln_old/index.html (49m added for geoid height).
+   Five domes are spread out over ~160 metres.  I picked one at random to
+   be (559);  since the MPC coordinates are only good to about six km,
+   it'll be an improvement no matter which one it really ought to be.
+559 !-014.973117   +37.692483       1775.      Serra La Nave-INAF
+SN1 !-014.972747   +37.693152       1773.      W-most dome at Serra La Nave
+SN2 !-014.974309   +37.693127       1782.      Dome W of (SN3) at Serra La Nave
+SN3 !-014.974418   +37.693106       1782.      Middle of three domes at Serra La Nave
+SN4 !-014.974534   +37.693119       1782.      Dome E of (SN3) at Serra La Nave
