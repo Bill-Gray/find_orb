@@ -802,8 +802,25 @@ WH2 !-002.594020   +53.801184        115.      Sm dome SSW (further from) (989)
    Five domes are spread out over ~160 metres.  I picked one at random to
    be (559);  since the MPC coordinates are only good to about six km,
    it'll be an improvement no matter which one it really ought to be.
-559 !-014.973117   +37.692483       1775.      Serra La Nave-INAF
-SN1 !-014.972747   +37.693152       1773.      W-most dome at Serra La Nave
-SN2 !-014.974309   +37.693127       1782.      Dome W of (SN3) at Serra La Nave
-SN3 !-014.974418   +37.693106       1782.      Middle of three domes at Serra La Nave
-SN4 !-014.974534   +37.693119       1782.      Dome E of (SN3) at Serra La Nave
+559 !+014.973117   +37.692483       1775.      Serra La Nave-INAF
+SN1 !+014.972747   +37.693152       1773.      W-most dome at Serra La Nave
+SN2 !+014.974309   +37.693127       1782.      Dome W of (SN3) at Serra La Nave
+SN3 !+014.974418   +37.693106       1782.      Middle of three domes at Serra La Nave
+SN4 !+014.974534   +37.693119       1782.      Dome E of (SN3) at Serra La Nave
+
+   Only change here is 'Rutherfurd' for 'Rutherford';  all else is as in
+   ObsCodes.html.  John W. Briggs writes : "Astronomer Lewis Morris Rutherfurd
+   was a major benefactor to Columbia and a trustee, and the Observatory is
+   named after him.  But even on the Department's website now (last I checked,
+   anyway) they manage to continue to spell Rutherfurd's last name wrong."
+795 286.0123 0.7589  +0.6491  Rutherfurd
+
+   John W. Briggs also writes : "796 Stamford Observatory is a facility
+   owned by the Stamford Museum and Nature Center in Connecticut.  (It was
+   the first domed observatory I ever entered as a youngster!) The
+   instrument is an unusual 22-inch Gregory-Maksutov.  The dome still
+   exists (although perhaps not for much longer).  I was visiting there
+   within the last year."  John provides the following coordinates (with
+   31 meters subtracted for geoid height.)
+
+796 !-073.548888   +41.124166         56       Stamford
