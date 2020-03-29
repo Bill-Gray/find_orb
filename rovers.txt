@@ -830,4 +830,20 @@ SN4 !+014.974534   +37.693119       1782.      Dome E of (SN3) at Serra La Nave
    Rhode Island, and it was in the backyard of his home... The main
    instrument was a 16-inch f/10.7 astrometric Newtonian."
 
-792 !-071.701111   +41.353333        -23.      Quonochontaug
+792 !-071.701111   +41.353333        -23.      University of Rhode Island, Quonochontaug
+
+   John W. Briggs identifies (303a) below as the 1-m Askania Schmidt.  The
+   other three telescopes,  according to Wikipaedia,  are "a 65-cm Zeiss
+   refractor, a 1-m Zeiss reflector and a 50-cm Askania double astrograph."
+
+303a!-070.869722   +08.787222       3587.      OAN de Llano del Hato, Merida
+303b!-070.868995   +08.787228       3581.      Dome 100m east of (303a)
+303c!-070.870470   +08.788358       3589.      Dome 100m NNW of (303a)
+303d!-070.870321   +08.789390       3575.      Dome 230m N of (303a)
+
+   Jari Suomela provided the following identification,  and notes
+   that "099 is Juhani Salmi's second observatory and is well
+   documented. It's has even been featured in Sky & Telescope many
+   moons ago, and this page http://kyyro.com/salmi.htm."  18m added
+   for geoid height.
+099 !+025.535292   +61.130225        112.      Lahti
