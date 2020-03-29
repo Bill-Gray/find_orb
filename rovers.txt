@@ -808,12 +808,17 @@ SN2 !+014.974309   +37.693127       1782.      Dome W of (SN3) at Serra La Nave
 SN3 !+014.974418   +37.693106       1782.      Middle of three domes at Serra La Nave
 SN4 !+014.974534   +37.693119       1782.      Dome E of (SN3) at Serra La Nave
 
-   Only change here is 'Rutherfurd' for 'Rutherford';  all else is as in
-   ObsCodes.html.  John W. Briggs writes : "Astronomer Lewis Morris Rutherfurd
-   was a major benefactor to Columbia and a trustee, and the Observatory is
-   named after him.  But even on the Department's website now (last I checked,
-   anyway) they manage to continue to spell Rutherfurd's last name wrong."
-795 286.0123 0.7589  +0.6491  Rutherfurd
+   MPC has the wrong vowel in the observatory name.  John W. Briggs writes :
+   "Astronomer Lewis Morris Rutherfurd was a major benefactor to Columbia and
+   a trustee, and the Observatory is named after him.  But even on the
+   Department's website now (last I checked, anyway) they manage to continue
+   to spell Rutherfurd's last name wrong."
+   http://www.columbia.edu/cu/computinghistory/pupin.html provides further
+   info,  putting the observatory at that spot when (795) was reporting
+   data to MPC (1936 to 1940).  Coordinates from G__gle Earth,  which
+   gives elevation 88 meters ASL (which appears to take the ten-story
+   building height into account).  I subtracted 32m for geoid height.
+795 !-073.961418   +40.809981         56.      Rutherfurd
 
    John W. Briggs also writes : "796 Stamford Observatory is a facility
    owned by the Stamford Museum and Nature Center in Connecticut.  (It was
