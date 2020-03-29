@@ -823,4 +823,11 @@ SN4 !+014.974534   +37.693119       1782.      Dome E of (SN3) at Serra La Nave
    within the last year."  John provides the following coordinates (with
    31 meters subtracted for geoid height.)
 
-796 !-073.548888   +41.124166         56       Stamford
+796 !-073.548888   +41.124166         56.      Stamford
+
+   John W. Briggs also writes : "792 Quonochontaug was built by my late
+   friend, Professor William S. Penhallow (1933-2020) of the University of
+   Rhode Island, and it was in the backyard of his home... The main
+   instrument was a 16-inch f/10.7 astrometric Newtonian."
+
+792 !-071.701111   +41.353333        -23.      Quonochontaug
