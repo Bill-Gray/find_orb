@@ -150,8 +150,8 @@ int main( const int argc, const char **argv)
    extern int combine_all_observations;
    extern const char *temp_obs_filename;     /* miscell.cpp */
    double jd_start = 0., jd_end = 0., user_selected_epoch = 0.;
-   const double min_jd = 2400000.5;
-   const double max_jd = 2600000.5;
+   const double min_jd = 2378527.5;    /* 1800 feb 1 */
+   const double max_jd = 2488083.5;    /* 2099 dec 1 */
    ephem_option_t ephemeris_output_options = OPTION_ROUND_TO_NEAREST_STEP;
    int residual_format = RESIDUAL_FORMAT_SHORT;
    double mag_limit = 99.;
