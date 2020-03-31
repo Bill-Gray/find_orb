@@ -344,6 +344,13 @@ Dub ! 148.58525      -31.29358       300.      Dubbo Observatory
    and measure lat/lon/alts on G__gle Earth.  MPC lumps these at (809)
    and (262),  which appear to be for NTT,  and (I40) TRAPPIST.  I've
    added a 34 metre geoid height to the Google values.
+   Mike Kretlow points out that (262) probably corresponds to the 1-m
+   ESO Schmidt.  I'm not moving (262) quite yet,  but that does look
+   as if it would be the right thing to do.
+   (GPO) observed from 1968 June 6 until it was decommissioned in 1996
+   and replaced by the 1-m MarLy telescope (now also decommissioned in
+   2009),  so (GPO) and (Ma1) have identical coordinates.  The GPO is
+   now at the Observatoire Haut-Provence in France.
 
 I40 ! -70.739391     -29.254609     2349       La Silla--TRAPPIST
 Da5 ! -70.739587     -29.254999     2354       Danish 50-cm, La Silla
@@ -351,13 +358,14 @@ ES5 ! -70.739373     -29.255072     2356       ESO 0.5-m, La Silla
 Boc ! -70.739644     -29.255257     2355       Bochum 0.61-m, La Silla
 Du9 ! -70.739387     -29.255496     2360       Dutch 0.9-m, La Silla
 ELS ! -70.738925     -29.255892     2369       ESO 1.52-m, La Silla
-ES1 ! -70.738377     -29.256736     2371       ESO 1-m (NW), La Silla
+ES1 ! -70.738377     -29.256736     2371       ESO 1-m (decommissioned), La Silla
 Mas ! -70.737820     -29.257163     2370       Multi-site All-Sky CAmeRA (MASCARA), La Silla
-Ma1 ! -70.737972     -29.257378     2369       Marly 1-m, La Silla
+GPO ! -70.737972     -29.257378     2369       Grand Prisme Objectif
+Ma1 ! -70.737972     -29.257378     2369       MarLy 1-m, La Silla
 Ms3 ! -70.737890     -29.257550     2368       Marseille 0.36-m, La Silla
 Dan ! -70.737517     -29.257800     2366       Danish 1.54-m, La Silla
 MPG ! -70.736642     -29.257896     2364       MPG/ESO Max Planck 2.2-m, La Silla
-ESo ! -70.735790     -29.258138     2364       ESO 1-m (SE), La Silla
+ESo ! -70.735790     -29.258138     2364       ESO 1-m Schmidt, La Silla
 DIM ! -70.735334     -29.258092     2365       DIMM (Differential Motion Monitor), La Silla
 NTT ! -70.733837     -29.258970     2384       New Technology Telescope, La Silla
 LEu ! -70.732962     -29.259573     2382       Leonhard Euler 1.2-m, La Silla
