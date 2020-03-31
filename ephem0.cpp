@@ -980,7 +980,12 @@ if you're getting in twice as many runs.)  Radar ephemerides also show
 "SNR/run" and "SNR/day",  where that latter quantity is SNR/run times
 the square root of the number of runs (i.e.,  it's more like "SNR per
 time we spend observing that day,  which will probably not be 24 hours.")
-*/
+
+   Flaviane C. F. Venditti tells me that Arecibo "can detect objects as
+close as ~0.008 AU."  Round-trip light time for an object 1 AU away is
+998.01 seconds,  leading to the convenient relationship that a target
+at 0.001 AU has an almost exactly one-second delay between pulse and
+return.                          */
 
 const double optical_albedo = .1;
 
