@@ -780,7 +780,7 @@ ASA !-704205.1     -290036.9        2275?      All-Sky Automated Survey (ASAS), 
 
    Carolin Liefke sorted out the history of (024) Heidelberg-Konigstuhl
    (see https://groups.io/g/mpml/message/35417).  The site listed below as
-   (024) was used by observers at the Max Planck Instutute for Astronomy
+   (024) was used by observers at the Max Planck Institute for Astronomy
    until about 2013.  The site listed at (HeK) is an older site,  used
    for observations since about 1897.  Locations measured with G__gle
    Earth,  48 metres added for geoid height.
@@ -860,6 +860,16 @@ SN4 !+014.974534   +37.693119       1782.      Dome E of (SN3) at Serra La Nave
    moons ago, and this page http://kyyro.com/salmi.htm."  18m added
    for geoid height.
 099 !+025.535292   +61.130225        112.      Lahti
+
+   MPC gives a link to astronomie.at for (563) Seewalchen,  the site for
+   Sternwarte Gahberg,  which gives the coordinates below for (563a)
+   after adding 45 meters for geoid height.  Robert Orso tells me the
+   observations submitted to MPC were done by Martin Bressler at his
+   site about 5.2 km to the north,  and has supplied the lat/lon used
+   below for the "real" (563).
+
+563a!+013.608333   +47.912777        905.      Gahberg,  Seewalchen
+563 !+013.604255   +47.959486        640.      Seewalchen
 
    MPC's list of Web sites for observatories gives (090)'s as
    astro-mainz.de,  which tells us that the observatory was on
