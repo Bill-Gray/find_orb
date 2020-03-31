@@ -861,6 +861,25 @@ SN4 !+014.974534   +37.693119       1782.      Dome E of (SN3) at Serra La Nave
    for geoid height.
 099 !+025.535292   +61.130225        112.      Lahti
 
+   MPC's list of Web sites for observatories gives (090)'s as
+   astro-mainz.de,  which tells us that the observatory was on
+   the roof of the Anne-Frank-Realschule from 1962 to 2011.
+   (The MPC observations are all from 1985.)  That site appears in
+   G__gle Earth,  with the dome clearly visible.  However,  Mike
+   Kretlow (who grew up there and was a member of the astronomical
+   societies in Mainz and Wiesbaden) tells me this isn't where
+   the observations were made.  So it doesn't get the (090) code.
+   48m added for geoid height.
+090b!+008.270659   +50.003873        172.      Mainz
+
+   Mike also says that the AAG Mainz built the Paul-Baumann-Sternwarte
+   outside the city in 1984,  but that this is probably also not where
+   astrometry was done :
+090c!+008.225898   +49.946391        250.      Mainz
+
+   Mike is reasonably sure of where (090) was and who did the observing,
+   and is waiting for a reply concerning the coordinates.
+
    http://www.obs-hp.fr/ohp_leaflet.pdf shows a site map identifying
    four telescopes at Haute-Provence Observatory.  The map is somewhat
    impressionistic,  and I am not 100% sure of (OH3) and (OH4) (other
