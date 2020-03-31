@@ -662,6 +662,8 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                   (ephemeris_output_options & OPTION_SKY_BRIGHTNESS) ? '*' : ' ');
             snprintf_append( buff, sizeof( buff), "K [%c] Galactic coordinates\n",
                   (ephemeris_output_options & OPTION_GALACTIC_COORDS) ? '*' : ' ');
+            snprintf_append( buff, sizeof( buff), "%% [%c] Galactic confusion\n",
+                  (ephemeris_output_options & OPTION_GALACTIC_CONFUSION) ? '*' : ' ');
             snprintf_append( buff, sizeof( buff), "@ [%c] Comet options\n",
                   (ephemeris_output_options & OPTION_SUN_TARGET_PA) ? '*' : ' ');
             snprintf_append( buff, sizeof( buff), "5 [%c] Sun altitude\n",
@@ -813,6 +815,9 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             break;
          case 'k': case 'K':
             ephemeris_output_options ^= OPTION_GALACTIC_COORDS;
+            break;
+         case '%':
+            ephemeris_output_options ^= OPTION_GALACTIC_CONFUSION;
             break;
          case ALT_L:
             strcpy( mpc_code, "Lun");

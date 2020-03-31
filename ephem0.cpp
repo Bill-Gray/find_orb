@@ -1570,7 +1570,7 @@ int galactic_confusion( const double ra, const double dec)
          buff_offset = 0;
       fseek( image_file, buff_offset + hdr_offset, SEEK_SET);
       bytes_read = fread( buff, 1, sizeof( buff), image_file);
-      assert( bytes_read == sizeof( buff));
+      assert( bytes_read >= sizeof( buff) / 2);
       }
    return( buff[loc - buff_offset]);
 }
@@ -1759,6 +1759,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
          snprintf_append( buff, sizeof( buff), " topo_ecliptic    ");
       if( options & OPTION_GALACTIC_COORDS)
          snprintf_append( buff, sizeof( buff), "Gal_Lon- Gal_Lat- ");
+      if( options & OPTION_GALACTIC_CONFUSION)
+         snprintf_append( buff, sizeof( buff), "GC ");
       if( options & OPTION_SUN_TARGET_PA)
          snprintf_append( buff, sizeof( buff), "-PsAng- ");
       if( options & OPTION_SUN_HELIO_VEL_PA)
@@ -2237,7 +2239,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   else
                      tbuff[2] = ' ';         /* moon's down */
                   tbuff[3] = '\0';
-                  if( tbuff[1] == ' ' && tbuff[2] == ' ')
+                  if( tbuff[1] == ' ')
                      {
                      int galact_conf = galactic_confusion( ra * 15, dec);
 
@@ -2252,8 +2254,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                               rgb &= ~(0xff << band);
                               rgb |= (unsigned long)galact_conf << band;
                               }
-                        tbuff[1] = (char)( '0' + galact_conf / 10);
-                        tbuff[2] = (char)( '0' + galact_conf % 10);
+                        if( galact_conf > 25)
+                           tbuff[1] = (galact_conf > 60 ? 'G' : 'g');
                         }
                      }
                   snprintf_append( buff, sizeof( buff), "$%06lx%s", rgb, tbuff);
@@ -2335,6 +2337,13 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                      galactic_lon += PI + PI;
                   add_lon_lat_to_ephem( tbuff, sizeof( tbuff),
                               galactic_lon, galactic_lat);
+                  }
+               if( options & OPTION_GALACTIC_CONFUSION)
+                  {
+                  const int galact_conf =
+                               galactic_confusion( ra * 15, dec) * 100 / 256;
+
+                  snprintf_append( tbuff, sizeof( buff), " %02d", galact_conf);
                   }
                if( options & OPTION_SUN_TARGET_PA)
                   {
