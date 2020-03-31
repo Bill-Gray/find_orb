@@ -2783,7 +2783,10 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
    fail_on_hitting_planet = saved_fail_on_hitting_planet;
    if( set_locs_rval)
       {
-      debug_printf( "Hit a planet in full_improvement : %d\n", set_locs_rval);
+      extern int planet_hit;
+
+      debug_printf( "Hit planet %d in full_improvement : %d\n",
+                      planet_hit, set_locs_rval);
       runtime_message = NULL;
       return( -4);
       }
