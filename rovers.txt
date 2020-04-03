@@ -781,21 +781,64 @@ ASA !-704205.1     -290036.9        2275?      All-Sky Automated Survey (ASAS), 
    Carolin Liefke sorted out the history of (024) Heidelberg-Konigstuhl
    (see https://groups.io/g/mpml/message/35417).  The site listed below as
    (024) was used by observers at the Max Planck Institute for Astronomy
-   until about 2013.  The site listed at (HeK) is an older site,  used
-   for observations since about 1897.  Locations measured with G__gle
-   Earth,  48 metres added for geoid height.
-024 !+008.723675   +49.395428        616.      Heidelberg-Konigstuhl (to 2013)
-HeK !+008.724941   +49.398185        621.      Heidelberg-Konigstuhl (starting ~1895)
+   until about 2013.  The MPIA was founded in 1967.  Observations from 1898
+   to 1967 were made at the Landessternwarte Konigstuhl (LSW) site,  given
+   below as (HeK),  with a 6" double astrograph before 1900 and the 16"
+   Bruce double astrograph after that.  Later observations were probably
+   all made at the (024) MPIA site with a 70-cm Cassegrain.  Locations from
+   G__gle Earth,  48 metres added for geoid height.
+024 !+008.723675   +49.395428        616.      Heidelberg-Konigstuhl (2003?-2013)
+HeK !+008.724941   +49.398185        621.      Heidelberg-Konigstuhl (1898-?1968)
 
-   Some neighboring domes near the above :
-He1 !+008.724705   +49.397846        618.      Dome ~43m SSW of (HeK)
-He2 !+008.725357   +49.398129        616.      Sm dome ~40m E of (HeK)
-He3 !+008.725390   +49.397949        617.      Sm dome ~30m S of (He2)
-He4 !+008.725620   +49.397864        619.      Sm dome ~25m SW of (He3)
-He5 !+008.725960   +49.397864        618.      Sm dome ~25m W of (He4)
-He6 !+008.726110   +49.398032        616.      Easternmost dome at (HeK) site
-He7 !+008.724327   +49.398147        619.      Sm rooftop dome at (HeK) site
-He8 !+008.723153   +49.395424        616.      Sm dome ~40m W of (024)
+   Some neighboring domes near the above.  Carolin directed me to
+   https://www.lsw.uni-heidelberg.de/foerderkreis/gelaende/image.php
+   for identifications,  and provided some comments for most of them :
+
+   "The 72-cm Waltz reflector was used for spectrographic measurements and,
+   if I remember correctly,  also had a photomultiplier attached in previous
+   times.  It's currently used with a high-res spectrograph for exoplanet
+   radial velocity measurements."
+He1 !+008.724705   +49.397846        618.      Waltz reflector, LSW-Heidelberg
+
+   "The 75-cm Zeiss telescope from 1977 is now called ATOM and supports the
+   H.E.S.S. cherenkov telescopes in Namibia since 2005."
+
+He2 !+008.725357   +49.398129        616.      Zeiss telescope, LSW-Heidelberg
+
+   "Access to dome... hosting a 50-year old Schmidt telescope is prohibited
+   because of risk of collapse"
+He3 !+008.725390   +49.397949        617.      25-cm f/3.6 Schmidt, LSW-Heidelberg
+
+   "The 70-cm [Cassegrain]...built in 1989. It can be remotely operated
+   and is mainly used for student projects."
+He4 !+008.725620   +49.397864        619.      70-cm f/8 Cassegrain, LSW-Heidelberg
+
+   "The historic Kann refractor was used for visual observations
+   only and is now - like the guiding telescope of the Bruce double
+   astrograph [HeK] - used for observations with the public and guided tours"
+He5 !+008.725960   +49.397864        618.      8" refractor, LSW-Heidelberg
+
+   "I have been in [this] dome once, the dust cover on that 50cm telescope
+   is so thick, it has not been used in decades"
+He6 !+008.726110   +49.398032        616.      50-cm f/14 Cassegrain, LSW-Heidelberg
+
+   "The rooftop observatory He7 from your list does no longer exist. It was
+   a Meade Skyshed Pod erected in 2010 which hosted a 8" SC that was meant
+   to track space junk ... and has been dismantled two years ago"
+He7 !+008.724327   +49.398147        619.      8" SCT, LSW-Heidelberg
+
+   Carolin has hopes that the 20" Planewave CDK scope in (He8) can be
+   set up for remote observing and put to work :
+He8 !+008.723153   +49.395424        616.      Sm dome ~40m W of (024) at MPIA
+
+   Carolin Liefke also points out that Max Wolf's early discoveries were
+   made from his parents' home in Maerzgasse,  at the following location
+   about 2.2 km NW from the above He* cluster.  This is presumably the
+   site used by Wolf until the above (HeK) site site opened on 1898 June 20.
+   (There is a two-year gap in the reported astrometry.)
+
+He9 !+008.699555   +49.409750        173.      Heidelberg (before 1896)
+
 
    Michael Gill advises me (private e-mail) that "Wilfred Hall Observatory
    Preston is now the Alston Observatory",  and supplied the following
