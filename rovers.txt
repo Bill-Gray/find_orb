@@ -347,10 +347,10 @@ Dub ! 148.58525      -31.29358       300.      Dubbo Observatory
    Mike Kretlow points out that (262) probably corresponds to the 1-m
    ESO Schmidt.  I'm not moving (262) quite yet,  but that does look
    as if it would be the right thing to do.
-   (GPO) observed from 1968 June 6 until it was decommissioned in 1996
+   (gpo) observed from 1968 June 6 until it was decommissioned in 1996
    and replaced by the 1-m MarLy telescope (now also decommissioned in
-   2009),  so (GPO) and (Ma1) have identical coordinates.  The GPO is
-   now at the Observatoire Haut-Provence in France.
+   2009),  so (gpo) and (Ma1) have identical coordinates.  The GPO is
+   now at the Observatoire Haut-Provence in France (see (GPO) below).
 
 I40 ! -70.739391     -29.254609     2349       La Silla--TRAPPIST
 Da5 ! -70.739587     -29.254999     2354       Danish 50-cm, La Silla
@@ -360,7 +360,7 @@ Du9 ! -70.739387     -29.255496     2360       Dutch 0.9-m, La Silla
 ELS ! -70.738925     -29.255892     2369       ESO 1.52-m, La Silla
 ES1 ! -70.738377     -29.256736     2371       ESO 1-m (decommissioned), La Silla
 Mas ! -70.737820     -29.257163     2370       Multi-site All-Sky CAmeRA (MASCARA), La Silla
-GPO ! -70.737972     -29.257378     2369       Grand Prisme Objectif
+gpo ! -70.737972     -29.257378     2369       Grand Prisme Objectif
 Ma1 ! -70.737972     -29.257378     2369       MarLy 1-m, La Silla
 Ms3 ! -70.737890     -29.257550     2368       Marseille 0.36-m, La Silla
 Dan ! -70.737517     -29.257800     2366       Danish 1.54-m, La Silla
