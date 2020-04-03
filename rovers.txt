@@ -896,19 +896,27 @@ SN4 !+014.974534   +37.693119       1782.      Dome E of (SN3) at Serra La Nave
 
    http://www.obs-hp.fr/ohp_leaflet.pdf shows a site map identifying
    four telescopes at Haute-Provence Observatory.  The map is somewhat
-   impressionistic,  and I am not 100% sure of (OH3) and (OH4) (other
-   than that there are definitely domes there).  I also got coords
-   for six other domes visible on the site.  51m added for geoid height.
+   impressionistic,  and I was not 100% sure of (OH3) and (OH4) (other
+   than that there are definitely domes there).   However,  Mike Kretlow
+   sent me a map (http://stargate-ohp.de/pics/plan2b_gross.gif) and
+   explanation of the site confirming that the leaflet was correct,
+   marked SATINO,  and noted that Tuebingen is ROTAT.  I was then able
+   to identify all but one of the domes measured below.  51m added for
+   geoid height.
+
+51m added for geoid height.
 OH1 !+005.712526   +43.931481        705.      Observatoire Haute-Provence, 1.93-m
 OH2 !+005.711704   +43.933394        719.      Observatoire Haute-Provence, 1.52-m
 OH3 !+005.714509   +43.932374        695.      Observatoire Haute-Provence, 80-cm
 OH4 !+005.715177   +43.931745        688.      Observatoire Haute-Provence, 1.2-m
-OH5 !+005.714727   +43.932967        702.      Observatoire Haute-Provence, unid #1
-OH6 !+005.715464   +43.933568        701.      Observatoire Haute-Provence, unid #2
-OH7 !+005.713879   +43.933529        709.      Observatoire Haute-Provence, unid #3
-OH8 !+005.713326   +43.932287        702.      Observatoire Haute-Provence, unid #4
-OH9 !+005.712621   +43.932621        708.      Observatoire Haute-Provence, unid #5, SSW end of bldg
-OHa !+005.712752   +43.932779        709.      Observatoire Haute-Provence, unid #6, NNE end of bldg
-OHb !+005.711919   +43.932509        713.      Observatoire Haute-Provence, unid #7
-OHc !+005.710962   +43.934038        726.      Observatoire Haute-Provence, unid #8
-OHd !+005.710366   +43.934290        730.      Observatoire Haute-Provence, unid #9
+OH5 !+005.714727   +43.932967        702.      Rosace 40-cm, Observatoire Haute-Provence
+OH6 !+005.715464   +43.933568        701.      Geneve, Observatoire Haute-Provence
+OH7 !+005.713879   +43.933529        709.      Schmidt, Observatoire Haute-Provence
+OH8 !+005.713326   +43.932287        702.      PPO, Observatoire Haute-Provence
+OH9 !+005.712621   +43.932621        708.      Jumelees,  Observatoire Haute-Provence
+OHa !+005.712752   +43.932779        709.      ROTAT, Observatoire Haute-Provence
+GPO !+005.711919   +43.932509        713.      Grand Prisme Objectif, OHP
+OHc !+005.710962   +43.934038        726.      Observatoire Haute-Provence, unid
+OHd !+005.710366   +43.934290        730.      Dobson, Observatoire Haute-Provence
+OHe !+005.712389   +43.932077        780.      SATINO, Observatoire Haute-Provence
+
