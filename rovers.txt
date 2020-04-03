@@ -920,3 +920,37 @@ OHc !+005.710962   +43.934038        726.      Observatoire Haute-Provence, unid
 OHd !+005.710366   +43.934290        730.      Dobson, Observatoire Haute-Provence
 OHe !+005.712389   +43.932077        780.      SATINO, Observatoire Haute-Provence
 
+   Peter Birtwhistle writes : "...I can offer the original lat. and
+   long. as supplied by the observers back then, I think generally by
+   measuring off the British Ordnance Survey maps. I've taken a look at
+   them in Google Earth and they may indeed be better than the co-ords
+   in the MPC list but I can't prove that..."
+   The positions are probably in a datum other than WGS84,  and there would
+   be a datum shift of perhaps hundreds of metres.  But since the MPC
+   positions have a precision of ~6.3 km in latitude and altitude,  these
+   definitely represent an improvement.
+   Observer F. Van Looy,  45m added for geoid height.
+002 !+003713.      +513529.          110.      Rayleigh
+   Observer Alan Young.  47m for geoid height.
+489 !-000742.6     +521916.5          59.5     Hemingford Abbots
+   Observer John Baguley.  50m for geoid height.
+492 !-013200.0     +525438.0         150.      Mickleover
+
+   Peter was also able to contact Mike Swan,  the observer for (490),  and
+   confirmed the location and found the concrete base of the observatory
+   on G__gle Earth :
+   Observer Mike Swan.  48m for geoid height.
+490 !-001.997417   +50.802694         78.      Wimborne Minster
+
+   Peter writes : " I also took a look at 997 Hartwell which is only about
+   34 miles from J95 [Peter's observatory] and found that it was the 19th
+   century observatory of Dr John Lee and a reasonably detailed plan of
+   the observatory building was published by Captain W.H. Smyth and now
+   available via the Internet book archive. The observatory is long since
+   demolished but I've measured the location of where the transit
+   telescope and also the equatorial telescope were housed..."  Based on
+   the old drawing,  Peter guesstimates a height of 3m for the transit
+   telescope (which we think is the 'real' 997) and 5m for the equatorial,
+   with a base altitude 83m ASL,  plus 47m for geoid height.
+997 !-000.846278   +51.805000         133.     Hartwell
+997e!-000.846194   +51.805000         135.     Hartwell equatorial
