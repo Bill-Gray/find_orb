@@ -502,6 +502,7 @@ static void reset_desigs_by_name( const char *obj_name, tle_t *tle)
          "89983 00000AAQ C05GHG1 = C04W5Q1 = C073CX1",
          "89983 00000AAQ C0Z1JL1 = ZTF0Csc = C21KXA2 = ZTF0Czu = 'Multijunk'",
          "89982 00000AAR S511502",
+         "89981 00000AAS S512009 = ZTF0D86",
          "90084 09710A   9O0DC57 = unk P=2.26d, i=25",
          NULL };
    size_t i;
