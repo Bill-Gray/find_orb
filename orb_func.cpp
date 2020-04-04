@@ -2219,6 +2219,20 @@ double evaluate_for_simplex_method( const OBSERVE FAR *obs,
    return( rval);
 }
 
+static int parse_constraint( const char *tptr)
+{
+   int rval = 0;
+
+   if( *tptr && tptr[1] == '=')
+      rval = *tptr;
+   else if( *tptr == 'A' && tptr[1] >= '1' && tptr[1] <= '3'
+                        && tptr[2] == '=')
+      rval = tptr[1];
+   else if( !memcmp( tptr, "Tp=", 3))
+      rval = 'T';
+   return( rval);
+}
+
 static int evaluate_limited_orbit( const double *orbit,
                     const int planet_orbiting, const double epoch,
                     const char *limited_orbit, double *constraints)
@@ -2228,17 +2242,18 @@ static int evaluate_limited_orbit( const double *orbit,
    if( limited_orbit)
       {
       ELEMENTS elem;
-      int i;
+      int i, variable;
 
       elem.gm = get_planet_mass( planet_orbiting);
       calc_classical_elements( &elem, orbit, epoch, 1);
-      while( *limited_orbit && limited_orbit[1] == '=')
+      while( (variable = parse_constraint( limited_orbit)) != 0)
          {
-         double value = atof( limited_orbit + 2);
-         char variable = *limited_orbit;
+         const int offset = (limited_orbit[1] == '=' ? 2 : 3);
+         double value = atof( limited_orbit + offset);
          int angular_constraint = 0, tbuff_loc = 0;
          char tbuff[80];
 
+         limited_orbit += offset;
          while( *limited_orbit && *limited_orbit != ',')
             tbuff[tbuff_loc++] = *limited_orbit++;
          tbuff[tbuff_loc] = '\0';
@@ -2307,6 +2322,9 @@ static int evaluate_limited_orbit( const double *orbit,
                       10000. * (solar_pressure[0] * SOLAR_GM / SRP1AU - value);
                if( n_extra_params > 1)
                   constraints[rval - 1] *= 100000.;
+               break;
+            case '1': case '2': case '3':
+               constraints[rval++] = 1e+10 * (solar_pressure[variable - '1'] - value);
                break;
             case 'K':
                {
