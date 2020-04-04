@@ -17,7 +17,9 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301, USA.    */
 
-#ifndef _WIN32
+#ifdef _WIN32
+   #include <direct.h>        /* for _mkdir() definition */
+#else
    #include <sys/stat.h>
    #include <sys/types.h>
 #endif
@@ -1355,7 +1357,6 @@ that a directory exists for it.  For example,   given a filename
 
    it'll mkdir( "/home"), mkdir ("/home/joe"),  ... "/home/joe/z/k32/hi_there". */
 
-#ifndef _WIN32
 static void make_path_available( const char *filename)
 {
    char path[PATH_MAX];
@@ -1366,12 +1367,15 @@ static void make_path_available( const char *filename)
       if( i && filename[i] == '/')
          {
          path[i] = '\0';
+#ifdef _WIN32
+         _mkdir( path);
+#else
          mkdir( path, 0777);
+#endif
          }
       path[i] = filename[i];
       }
 }
-#endif
 
 /* By default,  JSON files are kept with fixed names in the ~/.find_orb
 directory.  However,  this can be overridden with parameters in
@@ -1405,9 +1409,7 @@ FILE *open_json_file( char *filename, const char *env_ptr, const char *default_n
          text_search_and_replace( filename, "~", tbuff);
          }
       strcpy( full_permits, "f");
-#ifndef _WIN32
       make_path_available( filename);
-#endif
       }
    strlcat( full_permits, permits, sizeof( full_permits));
    return( fopen_ext( filename, full_permits));
@@ -2054,12 +2056,13 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   if( *offset_dir)
                      {
                      char date_buff[80];
+                     static bool path_already_made = false;
 
-#ifndef _WIN32
-                     mkdir( offset_dir, 0777);
-#endif
                      strcpy( tbuff, offset_dir);
                      strcat( tbuff, "/");
+                     if( !path_already_made)
+                        make_path_available( tbuff);
+                     path_already_made = true;
                      full_ctime( date_buff, curr_jd,
                            FULL_CTIME_FORMAT_HH_MM | FULL_CTIME_YMD
                          | FULL_CTIME_MONTHS_AS_DIGITS | FULL_CTIME_NO_SPACES
