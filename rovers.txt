@@ -981,9 +981,9 @@ OHe !+005.712389   +43.932077        780.      SATINO, Observatoire Haute-Proven
 
    Peter was also able to contact Mike Swan,  the observer for (490),  and
    confirmed the location and found the concrete base of the observatory
-   on G__gle Earth :
-   Observer Mike Swan.  48m for geoid height.
-490 !-001.997417   +50.802694         78.      Wimborne Minster
+   on G__gle Earth.  Peter has also suggested modifying the name to make it
+   a little clearer.  48m for geoid height.
+490 !-001.997417   +50.802694         78.      Stone Park Observatory, Wimborne Minster
 
    Peter writes : " I also took a look at 997 Hartwell which is only about
    34 miles from J95 [Peter's observatory] and found that it was the 19th
