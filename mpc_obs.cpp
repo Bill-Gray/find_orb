@@ -160,6 +160,9 @@ static int quick_mpc80_check( const char *buff)
          default:
             break;
          }
+   if( i >= 17 && strchr( "Rrvs", buff[-1]))
+      rval = 0;   /* radar obs or 2nd line for rover or satellite obs;  */
+                  /* the date will check out OK in such cases           */
    return( rval);
 }
 
@@ -199,7 +202,7 @@ common sorts of errors I've seen.
 errors, the return value will have bits set from the following values.
 Otherwise,  zero will be returned. */
 
-#define OBS_FORMAT_MISSING_LEADING_SPACES       1
+#define OBS_FORMAT_LEADING_SPACES               1
 #define OBS_FORMAT_WRONG_DESIG_PLACEMENT        2
 #define OBS_FORMAT_INCORRECT                    4
 
@@ -208,12 +211,22 @@ static int fix_up_mpc_observation( char *buff)
    size_t len = strlen( buff);
    int rval = 0;
 
-   if( len < 80 && len > 70 && is_valid_mpc_code( buff + len - 3)
+   while( len > 40 && buff[len] <= ' ')
+      len--;                  /* lop off trailing spaces */
+   buff[len] = '\0';
+   if( !is_valid_mpc_code( buff + len - 3))
+      return( 0);
+   if( len != 80 && len > 70 && is_valid_mpc_code( buff + len - 3)
                   && !quick_mpc80_check( buff + len - 80))
       {
-      memmove( buff + 80 - len, buff, len + 1);
-      memset( buff, ' ', 80 - len);
-      rval = OBS_FORMAT_MISSING_LEADING_SPACES;
+      if( len < 80)        /* insert missing leading spaces */
+         {
+         memmove( buff + 80 - len, buff, len + 1);
+         memset( buff, ' ', 80 - len);
+         }
+      else                 /* remove spurious leading spaces */
+         memmove( buff, buff + len - 80, 81);
+      rval = OBS_FORMAT_LEADING_SPACES;
       len = 80;
       }
 
