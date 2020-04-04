@@ -211,7 +211,7 @@ static int fix_up_mpc_observation( char *buff)
    size_t len = strlen( buff);
    int rval = 0;
 
-   while( len > 40 && buff[len] <= ' ')
+   while( len > 40 && buff[len - 1] <= ' ')
       len--;                  /* lop off trailing spaces */
    buff[len] = '\0';
    if( !is_valid_mpc_code( buff + len - 3))
