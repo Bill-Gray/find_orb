@@ -987,7 +987,11 @@ time we spend observing that day,  which will probably not be 24 hours.")
 close as ~0.008 AU."  Round-trip light time for an object 1 AU away is
 998.01 seconds,  leading to the convenient relationship that a target
 at 0.001 AU has an almost exactly one-second delay between pulse and
-return.                          */
+return.  At 0.008 AU in monostatic mode,  the transmitter has to be
+toggled every eight seconds.  "The times I observed with short round
+trip times (<10 seconds), the transmitter tripped frequently, so we try
+not to push it too much."  I gather they _could_ go a bit closer,  but
+it'd require a really,  really good reason.  */
 
 const double optical_albedo = .1;
 
