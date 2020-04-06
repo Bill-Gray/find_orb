@@ -1004,3 +1004,15 @@ OHe !+005.712389   +43.932077        780.      SATINO, Observatoire Haute-Proven
    https://archive.org/details/deshartwelliano00smytgoog/page/n124/mode/2up
 997 !-000.846278   +51.805000         133.     Hartwell
 997e!-000.846194   +51.805000         135.     Hartwell equatorial
+
+   Jan also writes : "(640) Seftenberg has a completely wrong longitude (offset
+   > ~200 km).  It was active ~1845-1858,  founded by British astronomer
+   John Parish.  After his death on 1858 Sep 2,  his nephew (who had no
+   interest in astronomy) ordered the observatory pulled down."  Jan provides
+   the following reference :
+   https://ui.adsabs.harvard.edu/#abs/1845AN.....23..129K/abstract
+   Also,  note that this is _not_ the Seftenberg in Germany.  It is the Czech
+   town of Žamberk,  known in German as Senftenberg in Böhmen.  Jan reminds
+   me that at the time,  Czechia was part of the Austro-Hungarian Empire,
+   and German was the official language.  44m added for geoid height.
+640 !+016.467486   +50.085097         481.     Senftenberger Sternwarte
