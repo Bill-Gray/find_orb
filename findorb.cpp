@@ -2986,7 +2986,10 @@ int main( int argc, const char **argv)
                      elem_color = COLOR_ATTENTION + A_BLINK;
 #ifdef HAVE_UNICODE
                   if( make_unicode_substitutions)
+                     {
                      text_search_and_replace( tbuff, " +/- ", " \xc2\xb1 ");
+                     text_search_and_replace( tbuff, "^2", "\xc2\xb2");
+                     }
 #endif
                   put_colored_text( tbuff, line_no + iline, 0, -1, elem_color);
                   if( right_side_col < (unsigned)strlen( tbuff) + spacing)
