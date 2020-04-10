@@ -921,12 +921,12 @@ int main( int argc, const char **argv)
                }
             else
                printf( "; not enough observations\n");
-            unload_observations( obs, n_obs_actually_loaded);
             if( ephemeris_output_options & OPTION_COMPUTER_FRIENDLY)
                if( mpec_path || !is_default_ephem)
                   have_json_ephem = true;
             add_json_data( "total.json", have_json_ephem, obs->packed_id,
                      i == starting_object + total_objects - 1);
+            unload_observations( obs, n_obs_actually_loaded);
             }
          object_comment_text( tbuff, ids + i);
                   /* Abbreviate 'observations:' to 'obs:' */
