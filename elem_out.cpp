@@ -1342,7 +1342,11 @@ int write_out_elements_to_file( const double *orbit,
                      strcat( tbuff0, sigma_buff);
                snprintf_append( tt_ptr, 180, "A%d: %s", j + 1, tbuff0);
                if( j == n_extra_params - 1)
+                  {
                   strcat( tt_ptr, " AU/day^2");
+                  if( object_type != OBJECT_TYPE_COMET)
+                     strcat( tt_ptr, " [1/r^2]");
+                  }
                else
                   strcat( tt_ptr, (strlen( tt_ptr) > 50) ? "\n" : "   ");
                }
