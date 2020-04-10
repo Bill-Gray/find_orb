@@ -260,6 +260,9 @@ steps are taken to cache downloads to avoid hammering MPC servers. The
 temp*.ast files are time-stamped,  and we only get new data if three
 hours have elapsed;  see 'grab_mpc.c' for details.
 
+   (On Windows(R),  we may be able to use the URLDownloadToFile()
+function (q.v.) to handle such downloads.)
+
    Note that your average user probably hasn't set up these various
 files to provide NEOCP astrometry nor 'grab_mpc',  which will cause
 this code to always return 0 (i.e.,  no astrometry fetched.)
