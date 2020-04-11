@@ -417,8 +417,7 @@ double dump_monte_data_to_file( FILE *ofile, const double *sigmas,
             fprintf( ofile, "sigma_P: %12.3g years\n",
                         sigma_P_in_days / 365.25);
          }
-      fprintf( ofile, "P = %.2f years; U=%.1f\n",
-                  per_yrs, uparam);
+      fprintf( ofile, "U=%.1f\n", uparam);
       }
    available_sigmas = MONTE_CARLO_SIGMAS_AVAILABLE;
    full_sigmas = "";
