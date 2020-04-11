@@ -3557,7 +3557,20 @@ int main( int argc, const char **argv)
 
             inquire( "Enter new epoch,  as YYYY MM DD, or JD,  or 'now':",
                              tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY);
-            if( extract_date( tbuff, &new_jd) >= 0)
+            if( !tbuff[1] && strchr( "sme", tbuff[0]))
+               {
+               int first, last;
+
+               first = find_first_and_last_obs_idx( obs, n_obs, &last);
+               if( *tbuff == 's')
+                  epoch_shown = obs[first].jd;
+               if( *tbuff == 'e')
+                  epoch_shown = obs[last].jd;
+               if( *tbuff == 'm')
+                  epoch_shown = (obs[first].jd + obs[last].jd) / 2.;
+               epoch_shown = floor( epoch_shown) + .5;
+               }
+            else if( extract_date( tbuff, &new_jd) >= 0)
                if( new_jd > minimum_jd && new_jd < maximum_jd)
                   epoch_shown = floor( new_jd * 100. + .5) / 100.;
             }
