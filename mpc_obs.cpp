@@ -210,11 +210,12 @@ static int fix_up_mpc_observation( char *buff)
 {
    size_t len = strlen( buff);
    int rval = 0;
+   char tchar, packed[13];
 
    while( len > 40 && buff[len - 1] <= ' ')
       len--;                  /* lop off trailing spaces */
    buff[len] = '\0';
-   if( !is_valid_mpc_code( buff + len - 3))
+   if( !is_valid_mpc_code( buff + len - 3) || len <= 40)
       return( 0);
    if( len != 80 && len > 70 && is_valid_mpc_code( buff + len - 3)
                   && !quick_mpc80_check( buff + len - 80))
@@ -229,7 +230,11 @@ static int fix_up_mpc_observation( char *buff)
       rval = OBS_FORMAT_LEADING_SPACES;
       len = 80;
       }
-
+   tchar = buff[12];
+   buff[12] = '\0';
+   if( !create_mpc_packed_desig( packed, buff))
+      memcpy( buff, packed, 12);
+   buff[12] = tchar;
    if( len == 80 && observation_jd( buff))      /* doesn't need fixing */
       {                                      /* except maybe for desig */
       if( buff[7] == ' ' && buff[6] != ' ')
@@ -1273,7 +1278,7 @@ int get_object_name( char *obuff, const char *packed_desig)
                }
             }
 
-   if( *xdesig == '~')         /* Find_Orb extension to allow storing of */
+   if( *xdesig == '$')         /* Find_Orb extension to allow storing of */
       {                        /* an unpacked name,  up to 11 chars */
       if( obuff)
          strcpy( obuff, xdesig + 1);
