@@ -191,6 +191,53 @@ static bool is_in_range( const double jd)
    return( jd > minimum_observation_jd && jd < maximum_observation_jd);
 }
 
+/* Packed designations are routinely misaligned.  This fixes the most common
+cases,  using the following rules :
+   A seven- or eight-byte packed designation should always be right-aligned.
+(Which will mean starting in column 6 or 5,  respectively.)
+   If a five-byte desig starts in column 0,  it's probably a numbered object;
+leave it alone.  Otherwise,  it's probably a temp desig and should start in
+column 6.  (This gets a little tricky.  Five-byte desigs should always
+start either in column 1,  if it's a numbered object,  or column 6... but
+figuring out which way to go is difficult.)
+   1-4 byte or six-byte desigs are definitely temporary and should always
+start in column 6 and leave blank(s) at the end. */
+
+static void check_packed_desig_alignment( char *buff)
+{
+   int i = 0, j = 11, new_i, len;
+
+   while( buff[i] == ' ' && i < j)
+      i++;
+   while( buff[j] == ' ' && i < j)
+      j--;
+   len = j - i + 1;
+   if( len > 8)            /* over-long */
+      return;
+   new_i = i;
+   switch( len)
+      {
+      case 7:
+      case 8:
+         new_i = 12 - len;
+         break;
+      case 5:
+         if( i)
+            new_i = 5;
+         break;
+      default:
+         new_i = 5;
+      }
+   if( i != new_i)
+      {
+//    debug_printf( "Was : '%s';  len %d, %d to %d\n", buff, len, i, new_i);
+      memmove( buff + new_i, buff + i, len);
+      memset( buff, ' ', new_i);
+      memset( buff + new_i + len, ' ', 12 - new_i - len);
+//    debug_printf( "Now : '%s'\n", buff);
+      }
+}
+
 /* In some situations,  MPC observations end up with one or more
 leading or trailing spaces.  Or people copy/paste observations and
 leave off a space or three at the beginning,  or don't put the
@@ -234,22 +281,11 @@ static int fix_up_mpc_observation( char *buff)
    buff[12] = '\0';
    if( !create_mpc_packed_desig( packed, buff))
       memcpy( buff, packed, 12);
+   else
+      check_packed_desig_alignment( buff);
    buff[12] = tchar;
    if( len == 80 && observation_jd( buff))      /* doesn't need fixing */
-      {                                      /* except maybe for desig */
-      if( buff[7] == ' ' && buff[6] != ' ')
-         {
-         char tbuff[20];
-
-         if( sscanf( buff, "%19s", tbuff) == 1 && strlen( tbuff) == 7)
-            {
-            memset( buff, ' ', 5);
-            memcpy( buff + 5, tbuff, 7);
-            rval |= OBS_FORMAT_WRONG_DESIG_PLACEMENT;
-            }
-         }
       return( rval);
-      }
 
    if( len < 90)     /* avoid buffer overruns */
       {
