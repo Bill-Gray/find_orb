@@ -2579,9 +2579,6 @@ int main( int argc, const char **argv)
    extern char default_comet_magnitude_type;
    extern double max_monte_rms;
    extern int use_config_directory;          /* miscell.c */
-#ifdef __PDCURSES__
-   int original_xmax, original_ymax;
-#endif
    double max_residual_for_filtering = 2.5;
    bool show_commented_elements = false;
    bool drop_single_obs = true;
@@ -2778,10 +2775,6 @@ int main( int argc, const char **argv)
 
 
    initialize_curses( argc, argv);
-#ifdef PDCURSES
-   original_xmax = getmaxx( stdscr);
-   original_ymax = getmaxy( stdscr);
-#endif
 
    *message_to_user = '\0';
    while( !quit)
@@ -4712,10 +4705,6 @@ int main( int argc, const char **argv)
    attrset( COLOR_PAIR( COLOR_BACKGROUND));
    show_final_line( n_obs, curr_obs, COLOR_BACKGROUND);
 Shutdown_program:
-#ifdef __PDCURSES__
-   if( !strstr( longname( ), "Win32a"))
-      resize_term( original_ymax, original_xmax);
-#endif
    endwin( );
 #ifdef __PDCURSES__
    delscreen( SP);
