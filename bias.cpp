@@ -53,7 +53,7 @@ tesselation (see 'healpix.cpp'). Within each tile, the bias of 19 (for
 FCCT14) or 26 (for EFCC18) different catalogs in RA, dec,  and proper
 motion in RA and dec are given.  The biases are relative to a "presumed
 good reference".  For FCCT14,  that was subset of PPMXL.  ECFF18 was
-able to use Gaia-DR2,  an improvement.)  Those biases are then stored in
+able to use Gaia-DR2,  an improvement.  Those biases are then stored in
 'bias.dat'.
 
    This code reads in all 49152 * n_cats biases (each of which is really
@@ -169,7 +169,7 @@ int find_fcct_biases( const double ra, const double dec, const char catalog,
                }
             else if( !memcmp( buff, "! |---", 6))
                {        /* header line */
-               n_cats = strlen( buff) / 29;
+               n_cats = (int)strlen( buff) / 29;
                assert( n_cats == 19 || n_cats == 26);
                for( i = 0; i < n_cats; i++)
                   {
