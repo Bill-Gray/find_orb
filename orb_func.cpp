@@ -4519,7 +4519,9 @@ int clean_up_find_orb_memory( void)
 #ifndef _WIN32
    fclose( lock_file);
    unlink( lock_filename);
-#endif
    unlink( temp_obs_filename);
+#else
+   _unlink( temp_obs_filename);
+#endif
    return( 0);
 }
