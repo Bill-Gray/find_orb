@@ -1354,6 +1354,10 @@ static int create_json_ephemeris( FILE *ofile, FILE *ifile, char *header)
    return( line_no);
 }
 
+#ifndef PATH_MAX
+   #define PATH_MAX 256
+#endif
+
 /* Given a fully-specified filename,  this function will try to make sure
 that a directory exists for it.  For example,   given a filename
 
@@ -2261,7 +2265,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
 
                         galact_conf = galact_conf * 100 / 256;       /* scale to 0-99 */
                         for( band = 0; band < 24; band += 8)
-                           if( ((rgb >> band) & 0xff) < (unsigned)galact_conf)
+                           if( ((rgb >> band) & 0xff) < (long)galact_conf)
                               {
                               rgb &= ~(0xff << band);
                               rgb |= (unsigned long)galact_conf << band;
