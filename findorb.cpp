@@ -1446,7 +1446,7 @@ static void show_residual_text( char *buff, const int line_no,
       text_search_and_replace( tbuff, "u", "\xc2\xb5");
 #endif
    put_colored_text( tbuff, line_no, column + resid_column - 2,
-            strlen( tbuff), resid_color);
+            (int)strlen( tbuff), resid_color);
 }
 
 static void show_mpc_code_in_color( const char *mpc_code,
@@ -1740,7 +1740,7 @@ static void show_a_file( const char *filename)
             char *tptr = strchr( buff, '$');
 
             if( tptr)
-               color_col = tptr - buff;
+               color_col = (int)( tptr - buff);
             rgb = remove_rgb_code( buff);
             }
          if( i >= 3 || !is_ephem)
