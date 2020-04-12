@@ -19,6 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 
 
 #include "stdafx.h"
+#include <stdint.h>
 #include "mpc_obs.h"
 #include "find_orb.h"
 #include "orbitdlg.h"
