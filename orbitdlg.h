@@ -69,7 +69,7 @@ protected:
    double max_residual_for_filtering;
    double orbit[6], orbit_epoch, monte_noise;
    int n_obs, element_format, element_precision, n_objects;
-   int ephemeris_output_options;
+   ephem_option_t ephemeris_output_options;
    int bad_elements;
    double blunder_probability;
    void FAR *obs_data;

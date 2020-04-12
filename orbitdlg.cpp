@@ -25,6 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include <stdio.h>
 #include <direct.h>
 #include <assert.h>
+#include <stdint.h>
 #include <dos.h>
 #include <sys/stat.h>
 #include "watdefs.h"
@@ -87,6 +88,8 @@ int write_residuals_to_file( const char *filename, const char *ast_filename,
                                                 /* ephem0.cpp */
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 void set_environment_ptr( const char *env_ptr, const char *new_value);
+int text_search_and_replace( char FAR *str, const char *oldstr,
+                                     const char *newstr);   /* ephem0.cpp */
 double convenient_gauss( const OBSERVE FAR *obs, int n_obs, double *orbit,
                   const double mu, const int desired_soln); /* gauss.cpp */
 int debug_printf( const char *format, ...)                 /* runge.cpp */
@@ -101,11 +104,11 @@ int find_nth_sr_orbit( double *orbit, OBSERVE FAR *obs, int n_obs,
                             const int orbit_number);       /* orb_func.cpp */
 void set_window_placement( HWND hwnd, const char *ibuff);  /* orbitdlg.cpp */
 char *get_placement_text( HWND hwnd);                      /* orbitdlg.cpp */
-int store_defaults( const int ephemeris_output_options,
+int store_defaults( const ephem_option_t ephemeris_output_options,
          const int element_format, const int element_precision,
          const double max_residual_for_filtering,
          const double noise_in_arcseconds);           /* elem_out.cpp */
-int get_defaults( int *ephemeris_output_options, int *element_format,
+int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
          int *element_precision, double *max_residual_for_filtering,
          double *noise_in_arcseconds);                /* elem_out.cpp */
 const char *get_find_orb_text( const int index);      /* elem_out.cpp */
@@ -699,6 +702,10 @@ void COrbitDlg::UpdateElementDisplay( int update_orbit)
          }
       *tptr = '\0';
 
+#ifdef _UNICODE
+      text_search_and_replace( orbit_buff, " +/- ", " \xc2\xb1 ");
+      text_search_and_replace( orbit_buff, "^2", "\xc2\xb2");
+#endif
       SetDlgItemText( IDC_ORBIT1, CA2T( orbit_buff, CP_UTF8));
 
       fclose( ifile);
