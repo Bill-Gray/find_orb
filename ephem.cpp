@@ -211,9 +211,9 @@ void CEphem::CreateB32Ephemeris( const char *filename)
 
 static const char *mpec_filename = "mpec.htm";
 
-int CEphem::GetEphemerisBitmask( )
+ephem_option_t CEphem::GetEphemerisBitmask( )
 {
-   int rval = m_ephem_type;
+   ephem_option_t rval = m_ephem_type;
 
    if( m_alt_az)
       rval |= OPTION_ALT_AZ_OUTPUT;
@@ -281,7 +281,7 @@ void CEphem::OnClickedGo()
       {
       double rho_sin_phi, rho_cos_phi, lon = 0.;
       char note_text[80];
-      int options = GetEphemerisBitmask( );
+      ephem_option_t options = GetEphemerisBitmask( );
       int planet_no;
 
       if( m_use_mpc_code)

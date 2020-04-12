@@ -31,7 +31,7 @@ public:
    OBSERVE *obs;
    int n_obs;
    const char *obj_name;
-   int GetEphemerisBitmask( );
+   ephem_option_t GetEphemerisBitmask( );
 
 // Dialog Data
    //{{AFX_DATA(CEphem)
