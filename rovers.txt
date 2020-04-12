@@ -1027,3 +1027,10 @@ L?? !-111.536909   +35.099318        2182.     Unknown 250m N of Perkins 1.8-m
 c24 !-111.664018   +35.202328        2195.     Lowell Clark 24" refractor
 L?2 !-111.663985   +35.201881        2198.     Unknown 50m S of Lowell Clark refractor
 L?3 !-111.665784   +35.202790        2197.     Unknown 170m WNW of Lowell Clark refractor
+
+   The MPC position for (J45) is a bit off the coast of the Canary Islands.
+   Jari Suomela pointed me to the following location,  which is confirmed by
+   the observatory Web site,  www.miradordelcielo.es,  and by G__gle Earth.
+   This position is about 1 km north and 20 km west of the MPC one.  42-m
+   added for geoid height.
+J45 !-015.532647   +28.011625         892.     Observatorio Montana Cabreja, Vega de San Mateo
