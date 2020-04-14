@@ -1395,9 +1395,15 @@ further information. */
 FILE *open_json_file( char *filename, const char *env_ptr, const char *default_name,
                   const char *packed_desig, const char *permits)
 {
-   char full_permits[20];
+   char tbuff[100], full_permits[20];
 
+#ifdef _WIN32
+   strcpy( tbuff, "WIN_");
+   strcat( tbuff, env_ptr);
+   env_ptr = get_environment_ptr( tbuff);
+#else
    env_ptr = get_environment_ptr( env_ptr);
+#endif
    if( !*env_ptr)
       {
       get_file_name( filename, default_name);
@@ -1405,17 +1411,17 @@ FILE *open_json_file( char *filename, const char *env_ptr, const char *default_n
       }
    else
       {
-      char tbuff[100];
-
       strcpy( tbuff, packed_desig);
       strcpy( filename, env_ptr);
       text_search_and_replace( tbuff, " ", "");
       text_search_and_replace( filename, "%p", tbuff);
+#ifndef _WIN32
       if( *filename == '~')
          {
          strcpy( tbuff, getenv( "HOME"));
          text_search_and_replace( filename, "~", tbuff);
          }
+#endif
       strcpy( full_permits, "f");
       make_path_available( filename);
       }
