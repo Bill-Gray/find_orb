@@ -93,7 +93,7 @@ int fitted = FIT_DEFAULTS;
 #define EPHEM_TYPE_SDP4       '3'
 #define EPHEM_TYPE_SGP8       '4'
 #define EPHEM_TYPE_SDP8       '5'
-#define EPHEM_TYPE_HIGH       'h'
+#define EPHEM_TYPE_HIGH       'H'
 
 static int get_sxpx( const int ephem, const tle_t *tle, double *state,
                                  const double t_since_minutes)
