@@ -238,6 +238,10 @@ COD 620
 OBS S. Sanchez, R. Stoss, J. Nomen
 TEL 0.30-m f/9 Schmidt-Cassegrain + CCD
 
+COD 645
+MEA Z. Ivezic, M. Juric, R. H. Lupton, S. Tabachnik, T. Quinn
+TEL 2.5-m SDSS Telescope + SDSS camera
+
 COD 649
 CON Powell Observatory Louisburg, KS USA
 CON [lrobinsn (at) ix.netcom (dot) com]
