@@ -839,7 +839,6 @@ He8 !+008.723153   +49.395424        616.      Sm dome ~40m W of (024) at MPIA
 
 He9 !+008.699555   +49.409750        173.      Heidelberg (before 1896)
 
-
    Michael Gill advises me (private e-mail) that "Wilfred Hall Observatory
    Preston is now the Alston Observatory",  and supplied the following
    lat/lon from G__gle Maps.  52m added for geoid height.
@@ -849,9 +848,13 @@ He9 !+008.699555   +49.409750        173.      Heidelberg (before 1896)
    http://articles.adsabs.harvard.edu/cgi-bin/nph-journal_query?volume=4&plate_select=NO&page=314&plate=&cover=&journal=QJRAS
    which leads to :
    http://www.star.uclan.ac.uk/observatories/alston-observatory/
+   Tim Haymes has been on the site recently.  He says the (989) dome contains
+   the 15" Grubb refractor.  WH1 is a 3-m ScopeDome,  installed in 2019,  with
+   an instrument planned for it.  WH2 is now gone.  (Z49) is the Moses Holden
+   70cm alt/az robotic scope,  installed in 2016.
 989 !-002.593854   +53.801360        115.      Alston Observatory
-WH1 !-002.593935   +53.801238        115.      Sm dome SSW (closer to) (989)
-WH2 !-002.594020   +53.801184        115.      Sm dome SSW (further from) (989)
+WH1 !-002.593935   +53.801238        115.      3-m ScopeDome near (989)
+WH2 !-002.594020   +53.801184        115.      Removed dome SSW of(989)
 
    Luca Buzzi points out that (559) has data at
    http://sln.oact.inaf.it/sln_old/index.html (49m added for geoid height).
