@@ -1728,6 +1728,7 @@ static inline void compute_sr_sigmas( const double *sr_orbits,
       double orbit[6];
       ELEMENTS elem;
 
+      memset( &elem, 0, sizeof( ELEMENTS));
       elem.gm = SOLAR_GM;
       memcpy( orbit, sr_orbits + 6 * i, 6 * sizeof( double));
       integrate_orbit( orbit, epoch, epoch_shown);
