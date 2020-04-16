@@ -96,10 +96,12 @@ endif
 
 all: fo$(EXE) find_orb$(EXE) fo_serve.cgi eph2tle$(EXE)
 
-CFLAGS=-c -O3 -Wall -pedantic -Wextra -I $(INSTALL_DIR)/include
+CFLAGS=-c -Wall -pedantic -Wextra -I $(INSTALL_DIR)/include
 
 ifdef DEBUG
-	CFLAGS += -g
+	CFLAGS += -g -O0
+else
+	CFLAGS += -O3
 endif
 
 OBJS=b32_eph.o bc405.o bias.o collide.o conv_ele.o details.o eigen.o \
