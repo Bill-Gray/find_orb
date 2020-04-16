@@ -3288,6 +3288,23 @@ static void set_satellite_velocities( OBSERVE FAR *obs, const int n_obs)
          }
 }
 
+/* Uncertainties on time,  magnitude,  and the error ellipse all will have
+default values.  If ADES or Tholen or .rwo uncertainties have been set,  or
+uncertainties in columns 57-65,  we use them.  (Such uncertainties apply to
+_only_ one observation.)  Global uncertainties can be set using COM Time
+sigma,  COM Posn sigma or COM Mag sigma;  if observation-specific sigmas
+haven't been set,  we use those global uncertainties.
+
+   I'm calling the various flavors of single-observation uncertainties
+"ADES sigmas",  because (a) the behavior for any of those methods is the
+same -- the sigma(s) are applied to the next observation and then forgotten;
+(b) ADES will probably be the most common case;  (c) variable names such as
+single_observation_posn_sigma_1 looked too long to me.     */
+
+#define SET_SIGMA( sigma, ades_sigma, override_sigma)   \
+       { if( ades_sigma) sigma = ades_sigma;  else if( override_sigma) sigma = override_sigma; }
+
+
    /* By default,  Find_Orb will only handle arcs up to 200 years */
    /* long.  If the arc is longer than that,  observations will be */
    /* dropped to get an arc that fits.  The max arc length can be */
@@ -3312,11 +3329,11 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
    unsigned lines_actually_read = 0;
    unsigned n_spurious_matches = 0;
    unsigned n_sat_obs_without_offsets = 0;
-   double override_posn_sigma_1 = 0.;  /* in arcsec */
-   double override_posn_sigma_2 = 0.;
-   double override_posn_sigma_theta = 0.;
-   double override_mag_sigma = 0.;   /* in mags */
-   double override_time_sigma = 0.;  /* in seconds */
+   double override_posn_sigma_1 = 0., ades_posn_sigma_1 = 0.;  /* in arcsec */
+   double override_posn_sigma_2 = 0., ades_posn_sigma_2 = 0.;
+   double override_posn_sigma_theta = 0., ades_posn_sigma_theta = 0.;
+   double override_mag_sigma = 0., ades_mag_sigma = 0.;   /* in mags */
+   double override_time_sigma = 0., ades_time_sigma = 0.;  /* in seconds */
             /* We distinguish between observations that are complete clones */
             /* of each other,  and those with the same time, RA/dec, MPC    */
             /* code, and magnitude,  but which differ someplace else.       */
@@ -3328,7 +3345,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
    extern int n_monte_carlo_impactors;   /* and this,  too */
    const bool fixing_trailing_and_leading_spaces =
                (*get_environment_ptr( "FIX_OBSERVATIONS") != '\0');
-   bool is_fcct14_or_vfcc17_data = false, apply_sigmas_once = false;
+   bool is_fcct14_or_vfcc17_data = false;
    void *ades_context;
    int spacecraft_offset_reference = 399;    /* default is geocenter */
 
@@ -3353,9 +3370,9 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                   && i != n_obs)
       {
       int is_rwo = 0, fixes_made = 0;
-      double rwo_posn_sigma_1 = 0., rwo_posn_sigma_2 = 0., rwo_mag_sigma = 0.;
       char original_packed_desig[13];
       size_t ilen = strlen( buff);
+      double jd;
 
       line_no++;
       lines_actually_read++;
@@ -3373,7 +3390,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
       if( ilen == 75 || ilen == 111 || ilen >= MINIMUM_RWO_LENGTH)
          {
          is_rwo = rwo_to_mpc( buff, &rval[i].ra_bias, &rval[i].dec_bias,
-                &rwo_posn_sigma_1, &rwo_posn_sigma_2, &rwo_mag_sigma);
+                &ades_posn_sigma_1, &ades_posn_sigma_2, &ades_mag_sigma);
          if( is_rwo && !i && debug_level)
             debug_printf( "Got .rwo data\n");
          }
@@ -3383,8 +3400,8 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
       memcpy( original_packed_desig, buff, 12);
       xref_designation( buff);
       add_line_to_observation_details( obs_details, buff);
-      if( is_in_range( observation_jd( buff)) &&
-                     !compare_desigs( packed_desig, buff))
+      jd = observation_jd( buff);
+      if( is_in_range( jd) && !compare_desigs( packed_desig, buff))
          {
          const int error_code = parse_observation( rval + i, buff);
 
@@ -3466,7 +3483,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                {
                const double radians_per_arcsec = PI / (180. * 3600.);
                double mag_sigma = 0., time_sigma = 0.;
-               double posn_sigma_1 = 0.0001, posn_sigma_2 = 0.0001;
+               double posn_sigma_1, posn_sigma_2;
                double posn_sigma_theta = 0.;
                     /* If we want all observations to have the same sigma, */
                     /* we use a nonexistent MPC code.  "Unknown" codes will */
@@ -3487,28 +3504,12 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                   double ra_sigma, dec_sigma;
                   int bytes_read;
 
-                  if( override_mag_sigma)
-                     mag_sigma = override_mag_sigma;
-                  if( override_time_sigma)
-                     time_sigma = override_time_sigma;
-                  if( override_posn_sigma_1)
-                     posn_sigma_1 = override_posn_sigma_1;
-                  if( override_posn_sigma_2)
-                     posn_sigma_2 = override_posn_sigma_2;
-                  if( override_posn_sigma_theta)
-                     posn_sigma_theta = override_posn_sigma_theta;
+                  SET_SIGMA( mag_sigma, ades_mag_sigma, override_mag_sigma);
+                  SET_SIGMA( time_sigma, ades_time_sigma, override_time_sigma);
+                  SET_SIGMA( posn_sigma_1, ades_posn_sigma_1, override_posn_sigma_1);
+                  SET_SIGMA( posn_sigma_2, ades_posn_sigma_2, override_posn_sigma_2);
+                  SET_SIGMA( posn_sigma_theta, ades_posn_sigma_theta, override_posn_sigma_theta);
 
-                     /* AstDyS/NEODyS .rwo data has position and mag sigmas */
-                     /* in it;  Dave Tholen puts position sigmas in columns */
-                     /* 81-92.  If available,  we use these :               */
-                  if( rwo_posn_sigma_1 && rwo_posn_sigma_2)
-                     {
-                     posn_sigma_1 = rwo_posn_sigma_1;
-                     posn_sigma_2 = rwo_posn_sigma_2;
-                     posn_sigma_theta = 0.;
-                     }
-                  if( rwo_mag_sigma)
-                     mag_sigma = rwo_mag_sigma;
                   if( sscanf( rval[i].columns_57_to_65, "%lf %lf%n",
                               &ra_sigma, &dec_sigma, &bytes_read) >= 2
                               && bytes_read >= 8
@@ -3538,13 +3539,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                      posn_sigma_theta = 0.;
                      }
                   }
-               if( apply_sigmas_once)
-                  {
-                  override_posn_sigma_1 = override_posn_sigma_2
-                     = override_posn_sigma_theta = override_mag_sigma
-                     = override_time_sigma = 0.;
-                  apply_sigmas_once = false;
-                  }
+
                            /* The observation data's precision has already been */
                            /* used to figure out a minimum sigma;  e.g.,  a mag */
                            /* of '16.3' results in a sigma of 0.1.  If the above */
@@ -3592,6 +3587,10 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                }
             }
          }
+                           /* See above : sigmas from ADES or Dave Tholen are used once. */
+      if( is_in_range( jd))          /*  If we've just got an observation,  zero 'em out */
+          ades_posn_sigma_1 = ades_posn_sigma_2 = ades_posn_sigma_theta
+                      = ades_mag_sigma = ades_time_sigma = 0.;
       override_time = 0.;
       convert_com_to_pound_sign( buff);
                /* For backwards compatibility,  we'll handle both 'weight' */
@@ -3616,13 +3615,10 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                }
             }
          else if( !memcmp( buff, "#Sigmas ", 8))
-            {
-            apply_sigmas_once = true;
-            extract_ades_sigmas( buff + 8, &override_posn_sigma_1,
-                        &override_posn_sigma_2,
-                        &override_posn_sigma_theta,
-                        &override_mag_sigma, &override_time_sigma);
-            }
+            extract_ades_sigmas( buff + 8, &ades_posn_sigma_1,
+                        &ades_posn_sigma_2,
+                        &ades_posn_sigma_theta,
+                        &ades_mag_sigma, &ades_time_sigma);
          else if( !memcmp( buff, "#Mag sigma ", 11))
             override_mag_sigma = atof( buff + 11);
          else if( !memcmp( buff, "#Time sigma ", 12))
