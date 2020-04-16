@@ -1340,7 +1340,7 @@ int write_out_elements_to_file( const double *orbit,
                if( showing_sigmas)
                   if( !get_uncertainty( sig_name, sigma_buff + 4, false))
                      strcat( tbuff0, sigma_buff);
-               snprintf_append( tt_ptr, 180, "A%d: %s", j + 1, tbuff0);
+               snprintf_append( buff, sizeof( buff), "A%d: %s", j + 1, tbuff0);
                if( j == n_extra_params - 1)
                   {
                   strcat( tt_ptr, " AU/day^2");
