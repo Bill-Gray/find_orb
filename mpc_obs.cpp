@@ -262,7 +262,7 @@ static int fix_up_mpc_observation( char *buff)
    while( len > 40 && buff[len - 1] <= ' ')
       len--;                  /* lop off trailing spaces */
    buff[len] = '\0';
-   if( !is_valid_mpc_code( buff + len - 3) || len <= 40)
+   if( len <= 40 || !is_valid_mpc_code( buff + len - 3))
       return( 0);
    if( len != 80 && len > 70 && is_valid_mpc_code( buff + len - 3)
                   && !quick_mpc80_check( buff + len - 80))
