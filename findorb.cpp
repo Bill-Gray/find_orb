@@ -3565,7 +3565,7 @@ int main( int argc, const char **argv)
                }
             else if( extract_date( tbuff, &new_jd) >= 0)
                if( new_jd > minimum_jd && new_jd < maximum_jd)
-                  epoch_shown = floor( new_jd * 100. + .5) / 100.;
+                  epoch_shown = new_jd;
             }
             update_element_display = 1;
             break;
