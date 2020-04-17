@@ -1309,6 +1309,13 @@ static int create_json_ephemeris( FILE *ofile, FILE *ifile, char *header)
 
             while( *bptr && *bptr == ' ')
                bptr++;
+            if( !is_text)
+               {                    /* JSON objects to leading '+' */
+               if( *bptr == '+')    /* and to leading zeroes */
+                  bptr++;
+               while( *bptr == '0' && isdigit( bptr[1]))
+                  bptr++;
+               }
             while( *hptr && *hptr == ' ')
                hptr++;
             if( !*bptr && !*hptr)         /* end of line */
