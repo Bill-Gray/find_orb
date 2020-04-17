@@ -3264,6 +3264,9 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
       for( i = 0; i < MONTE_N_ENTRIES; i++)
          snprintf_append( tbuff, sizeof( tbuff), "   %-7s", monte_label[i]);
       fprintf( ofile, "%s\n", tbuff);    /* label element covariance at top */
+                        /* also show units */
+      fprintf( ofile, " (days)    (unitless) (AU)      (AU)      (1/AU)"
+              "   (deg)     (deg)       (deg)     (deg)     (AU)    (mag)\n");
       for( i = 0; i < MONTE_N_ENTRIES; i++)
          {
          for( j = 0; j < MONTE_N_ENTRIES; j++)
