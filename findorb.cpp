@@ -2538,6 +2538,19 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
    return( ids);
 }
 
+   /* On any platform with ASLR,  the address of 'zval' will be
+   cyptographically selected at startup time.  (Or at least,  some
+   bits of it will be.)  It should be more than random enough for
+   our not-very-security-crucial needs. */
+
+static unsigned get_random_seed( void)
+{
+   unsigned long zval;
+
+   zval = (unsigned long)&zval;
+   return( (unsigned)( zval ^ (zval >> 32)));
+}
+
 int sanity_test_observations( const char *filename);
 
 /* main( ) begins by using the select_object_in_file( ) function (see above)
@@ -2585,7 +2598,9 @@ int main( int argc, const char **argv)
    bool sort_obs_by_code = false;
    int n_stations_shown = 0, top_obs_shown = 0, n_obs_shown = 0;
    bool single_obs_selected = false;
+   extern unsigned random_seed;
 
+   random_seed = get_random_seed( );
    if( !strcmp( argv[0], "find_orb"))
       use_config_directory = true;
    else

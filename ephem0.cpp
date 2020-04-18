@@ -1392,12 +1392,21 @@ static void make_path_available( const char *filename)
       }
 }
 
+static char ephem_mpc_code[4];
+
 /* By default,  JSON files are kept with fixed names in the ~/.find_orb
 directory.  However,  this can be overridden with parameters in
-'environ.dat' (q.v.)  The following function opens JSON files as specified
-therein (if you've actually done so) or in the default locations (if you
-haven't.)  See https://www.projectpluto.com/fo_usage#json_files for
-further information. */
+'environ.dat' (q.v.)  The following function opens JSON files as
+specified therein (if you've actually done so) or in the default
+locations (if you haven't.)  One can specify that the JSON filename
+include the packed designation,  and/or the observatory code used for
+the ephemeris (only works for ephems and 'combined'),  and/or a random
+number based on the process ID (used for server Find_Orb to provide a
+unique and semi-private ID for the JSON file). See
+https://www.projectpluto.com/fo_usage#json_files for further
+information. */
+
+unsigned random_seed;
 
 FILE *open_json_file( char *filename, const char *env_ptr, const char *default_name,
                   const char *packed_desig, const char *permits)
@@ -1422,6 +1431,9 @@ FILE *open_json_file( char *filename, const char *env_ptr, const char *default_n
       strcpy( filename, env_ptr);
       text_search_and_replace( tbuff, " ", "");
       text_search_and_replace( filename, "%p", tbuff);
+      text_search_and_replace( filename, "%c", ephem_mpc_code);
+      sprintf( tbuff, "%x", random_seed);
+      text_search_and_replace( filename, "%r", tbuff);
 #ifndef _WIN32
       if( *filename == '~')
          {
@@ -2702,6 +2714,8 @@ int ephemeris_in_a_file_from_mpc_code( const char *filename,
    const int planet_no = get_observer_data( mpc_code, buff, &lon,
                                            &rho_cos_phi, &rho_sin_phi);
 
+   assert( strlen( mpc_code) == 3);
+   strcpy( ephem_mpc_code, mpc_code);
    snprintf( note_text, sizeof( note_text),
                     "(%s) %s", mpc_code, mpc_station_name( buff));
    get_object_name( buff, obs->packed_id);
