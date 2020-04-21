@@ -62,6 +62,15 @@
    use decimal degrees and West longitudes if you wish -- but don't expect
    MPC to understand what you've done.
 
+      Also note that some information about codes can be gathered via URLs
+   of the form
+
+   https://cgi.minorplanetcenter.net/cgi-bin/cgipy/obscode?obscode=xxx
+
+      where xxx=code in question.  This can (sometimes) get you an 'owner',
+   which may help in tracking down information about a particular site.
+   My thanks to Peter Birtwhistle for pointing this out to me.
+
    Some artificial satellite observers :
 
 Alm !   5.258        +52.3713         -3.      Almere (satellite observatory)
@@ -1037,3 +1046,24 @@ L?3 !-111.665784   +35.202790        2197.     Unknown 170m WNW of Lowell Clark 
    This position is about 1 km north and 20 km west of the MPC one.  42-m
    added for geoid height.
 J45 !-015.532647   +28.011625         892.     Observatorio Montana Cabreja, Vega de San Mateo
+
+   Not entirely sure which instrument at Greenwich was used for (000).
+   (I would guess the transit circle early on,  and the 28" refractor later.)
+   The ATC location is from Wikipaedia;  the refractor coordinates are from
+   G__gle Earth.  46-m geoid height.
+
+000a!-000.001472   +51.477805          96.     Airy Transit Circle, Greenwich
+000b!-000.001144   +51.477720         101.     28" Great Refractor, Greenwich
+
+   Private communication,  Marco Micheli.  Corrected for 38m geoid height.
+
+W98 !-068.179722   -22.953055        2435.     Polonia Observatory, San Pedro de Atacama
+
+   Bernd Klemt was able to find Ernst Pollmann,  a well-known German amateur
+   spectroscopist and observer at (072) Scheuren Observatory,  near Koln in
+   Germany : https://astrospectroscopy.de/Observatory .  Pollmann was able
+   to confirm that this is the site from which measurements were made by
+   Mr. Ehring.  Bernd measured the coordinates below on Google Earth.  47
+   meters added for geoid height.
+
+072 !+007.167647   +51.042472         266.     Scheuren Observatory
