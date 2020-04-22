@@ -3252,7 +3252,7 @@ int main( int argc, const char **argv)
                            if( i >= idx1 && i <= idx2)
                               obs[i].flags ^= OBS_IS_SELECTED;
                         }
-                     else
+                     else if( button & (BUTTON1_RELEASED | BUTTON1_CLICKED))
                         {
                         for( i = 0; i < n_obs; i++)
                            if( i >= idx1 && i <= idx2)
