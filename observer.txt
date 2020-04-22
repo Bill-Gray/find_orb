@@ -115,6 +115,7 @@
  Pettarin                                  <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0007258">Pettarin</a>
  Piani                                     <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0010573">Piani</a>
  PinPoint                                  <a href="http://pinpoint.dc3.com/">PinPoint</a>
+ Piszkesteto                               Piszk%E9s-tet&#x151;ő
  Pittichova                                <a href="http://www.ifa.hawaii.edu/~jana/jana.html">Pittichova</a>
  Pizzetti                                  <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0233559">Pizzetti</a>
  Pons                                      <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0007645">Pons</a>
