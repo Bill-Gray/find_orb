@@ -83,6 +83,8 @@ ifdef W64
 	CURSES_LIB=-lpdcurses
 	LIB_DIR=$(INSTALL_DIR)/win_lib
 	LIBSADDED=-L $(LIB_DIR) -lm -lgdi32 -luser32 -mwindows -static-libgcc
+	FO_EXE=fo64.exe
+	FIND_ORB_EXE=find_orb64.exe
 endif
 
 ifdef W32
@@ -92,11 +94,20 @@ ifdef W32
 	CURSES_LIB=-lpdcurses
 	LIB_DIR=$(INSTALL_DIR)/win_lib32
 	LIBSADDED=-L $(LIB_DIR) -lm -lgdi32 -luser32 -mwindows -static-libgcc
+	FO_EXE=fo32.exe
+	FIND_ORB_EXE=find_orb32.exe
 endif
 
-all: fo$(EXE) find_orb$(EXE) fo_serve.cgi eph2tle$(EXE)
+ifndef FO_EXE
+	FO_EXE=fo
+	FIND_ORB_EXE=find_orb
+endif
 
-CFLAGS=-c -Wall -pedantic -Wextra -I $(INSTALL_DIR)/include
+all: $(FO_EXE) $(FIND_ORB_EXE) fo_serve.cgi eph2tle$(EXE)
+
+SECURITY_FLAGS=-fstack-protector-all
+
+CFLAGS=-c -Wall -pedantic -Wextra -I $(INSTALL_DIR)/include $(SECURITY_FLAGS)
 
 ifdef DEBUG
 	CFLAGS += -g -O0
@@ -112,8 +123,8 @@ OBJS=b32_eph.o bc405.o bias.o collide.o conv_ele.o details.o eigen.o \
 
 LIBS=$(LIBSADDED) -llunar -ljpl -lsatell
 
-find_orb$(EXE):          findorb.o clipfunc.o $(OBJS)
-	$(CC) -o find_orb$(EXE) findorb.o clipfunc.o $(OBJS) $(LIBS) $(CURSES_LIB)
+$(FIND_ORB_EXE):          findorb.o clipfunc.o $(OBJS)
+	$(CC) -o $(FIND_ORB_EXE) findorb.o clipfunc.o $(OBJS) $(LIBS) $(CURSES_LIB)
 
 findorb.o:         findorb.cpp
 	$(CC) $(CFLAGS) $(CURSES_FLAGS) $<
@@ -121,8 +132,8 @@ findorb.o:         findorb.cpp
 clipfunc.o:        clipfunc.cpp
 	$(CC) $(CFLAGS) $(CURSES_FLAGS) $<
 
-fo$(EXE):          fo.o $(OBJS)
-	$(CC) -o fo$(EXE) fo.o $(OBJS) $(LIBS)
+$(FO_EXE):          fo.o $(OBJS)
+	$(CC) -o $(FO_EXE) fo.o $(OBJS) $(LIBS)
 
 eph2tle$(EXE):          eph2tle.o conv_ele.o elem2tle.o simplex.o lsquare.o
 	$(CC) -o eph2tle$(EXE) eph2tle.o conv_ele.o elem2tle.o simplex.o lsquare.o $(LIBS)
@@ -142,7 +153,7 @@ fo_serve.cgi:          fo_serve.o $(OBJS)
 IDIR=$(HOME)/.find_orb
 
 clean:
-	$(RM) $(OBJS) fo.o findorb.o fo_serve.o find_orb$(EXE) fo$(EXE)
+	$(RM) $(OBJS) fo.o findorb.o fo_serve.o $(FIND_ORB_EXE) $(FO_EXE)
 	$(RM) fo_serve.cgi eph2tle.o eph2tle$(EXE) cssfield$(EXE)
 	$(RM) clipfunc.o cssfield.o neat_xvt.o neat_xvt$(EXE)
 
@@ -180,9 +191,14 @@ clean_temp:
 	$(RM) $(IDIR)/virtual.txt
 
 install:
-	-cp find_orb $(HOME)/bin
-	cp fo       $(HOME)/bin
 	$(MKDIR) $(IDIR)
+ifdef EXE
+	cp $(FIND_ORB_EXE) $(IDIR)
+	cp $(FO_EXE)       $(IDIR)
+else
+	cp $(FIND_ORB_EXE) $(HOME)/bin
+	cp $(FO_EXE)       $(HOME)/bin
+endif
 	cp command.txt details.txt dosephem.txt dos_help.txt ?findorb.txt           $(IDIR)
 	cp environ.def frame_he.txt geo_rect.txt header.htm jpl_eph.txt mpcorb.hdr  $(IDIR)
 	cp mu1.txt observer.txt obslinks.htm ObsCodes.htm ObsCodesF.html            $(IDIR)
@@ -190,8 +206,13 @@ install:
 	cp scopes.txt sigma.txt xdesig.txt bright2.pgm                              $(IDIR)
 
 uninstall:
-	rm -f $(HOME)/bin/find_orb
-	rm -f $(HOME)/bin/fo
+ifdef EXE
+	rm -f $(IDIR)/$(FIND_ORB_EXE)
+	rm -f $(IDIR)/$(FO_EXE)
+else
+	rm -f $(HOME)/bin/$(FIND_ORB_EXE)
+	rm -f $(HOME)/bin/$(FO_EXE)
+endif
 	rm -f $(IDIR)/*
 	rmdir $(IDIR)
 
