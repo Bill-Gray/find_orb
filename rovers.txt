@@ -1096,3 +1096,37 @@ W98 !-068.179722   -22.953055        2435.     Polonia Observatory, San Pedro de
 
 572c!+006.956572   +50.966817         114.     Planete und Sternwarte Koln, N dome
 572d!+006.956516   +50.966530         114.     Planete und Sternwarte Koln, S dome
+
+   https://www.konkoly.hu/staff/racz/piszkesteto-en.html provides links
+   to maps,  geodetic coordinates,  and other data for three telescopes at
+   at Piszkéstető Mountain Station (Konkoly Observatory).  The geodetic
+   coordinates are for the intersection of the RA/dec axes,  the very point
+   you really want for orbital calculations.  Those coordinates are given
+   below in their original degree/minutes/seconds form,  to 0.1 second.
+   Much lower relative uncertainties are claimed,  but 0.1 second = about
+   three meters.  They are about ten meters north and seven meters east of
+   the coordinates measured from G__gle Earth (in decimal degrees,  in
+   comments below).  I don't know who's wrong, and it may reflect a difference
+   in geodetic datum.  For both sources,  a 43m geoid height is added.
+      The Web site mentions a 40-cm scope with a roll-off roof,  but I
+   wasn't able to identify it on Google Earth.  I think the '60/90/180 cm'
+   designation for the Schmidt means a 60-cm corrector plate (the 'real'
+   aperture),  90-cm spherical primary,  and 180-cm focal length.
+      Krisztián Sárneczky tells me that (561) = the original MPC code for
+   this site,  starting in the 1960s or 70s,  and used only the Schmidt
+   telescope.  (The first observations in the MPC database from (561) are
+   from 1974.)  I've moved (561) accordingly.  (K88) and (461) observations
+   are split between the 1m RC and the Schmidt,  so I'm not moving either
+   (K88) or (461) and am instead storing coordinates for the other scopes
+   under new codes.
+      Krisztián also tells me that the '50-cm Cassegrain' mentioned at the
+   Konkoly Web site was retired in 2018 and replaced with an 80-cm RC.
+
+   G__gle : 561 !+19.893693    +47.917421         977.     60/90/180 cm Schmidt
+561 !+195339.6     +475505.9          980.55   Piszkesteto Stn. (Konkoly)
+
+   G__gle : Pis1!+19.894911    +47.916920         986.     1m RC, Piszkesteto
+Pi1 !+195344.1     +475504.2         1003.61   1m Ritchey-Chretien, Piszkesteto
+
+   G__gle : Pis3!+19.893097    +47.918461         977.     50cm Cassegrain, now 80cm RC
+Pi8 !+195337.8     +475509.81         991.1    80 cm Ritchey-Chretien, Piszkesteto
