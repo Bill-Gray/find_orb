@@ -294,10 +294,18 @@ UNDERLINE_OBS=
    'combined.json' will be made in the same directory as this file.
    But that default behavior can be overridden with the following
    three lines.  See https://www.projectpluto.com/fo_usage.htm#json_files
-   for details on how this works.
+   for details on how this works.  Note that different lines are used
+   for Windows(R) than for Linux,  OS/X,  and *BSD.
 JSON_EPHEM_NAME=
 JSON_ELEMENTS_NAME=
 JSON_COMBINED_NAME=
 WIN_JSON_EPHEM_NAME=
 WIN_JSON_ELEMENTS_NAME=
 WIN_JSON_COMBINED_NAME=
+
+   By default,  ecliptic elements are shown in the J2000 frame.  You
+   can set,  for example,  'ELEMENT_EPOCH=B1950 ecliptic' or
+   'ELEMENT_EPOCH=B1767.0 ecliptic' to get those frames.  Set
+   'ELEMENT_EPOCH=ecliptic of date' date to get elements in the epoch
+   of date.
+ELEMENT_EPOCH=J2000 ecliptic

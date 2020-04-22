@@ -1131,7 +1131,7 @@ int write_out_elements_to_file( const double *orbit,
    int planet_orbiting, n_lines, i, bad_elements = 0;
    ELEMENTS elem, helio_elem;
    char *tptr, *tbuff;
-   char impact_buff[80];
+   char impact_buff[80], elem_epoch_text[30];
    int n_more_moids = 0;
    int output_format = (precision | SHOWELEM_PERIH_TIME_MASK);
    extern int n_extra_params;
@@ -1188,7 +1188,25 @@ int write_out_elements_to_file( const double *orbit,
                   ELEMENT_FRAME_J2000_ECLIPTIC);
 
    if( elements_frame == ELEMENT_FRAME_J2000_ECLIPTIC)
-      body_frame_note = "(J2000 ecliptic)";
+      {
+      const char *elem_epoch = get_environment_ptr( "ELEMENT_EPOCH");
+
+      if( !*elem_epoch)
+         body_frame_note = "(J2000 ecliptic)";
+      else
+         {
+         double year = atof( elem_epoch + 1);
+         double precession_matrix[9];
+
+         body_frame_note = elem_epoch_text;
+         if( !year)
+             year = JD_TO_YEAR( epoch_shown);
+         snprintf( elem_epoch_text, sizeof( elem_epoch_text), "(%s)", elem_epoch);
+         setup_ecliptic_precession( precession_matrix, 2000., year);
+         precess_vector( precession_matrix, rel_orbit, rel_orbit);
+         precess_vector( precession_matrix, rel_orbit + 3, rel_orbit + 3);
+         }
+      }
    if( elements_frame == ELEMENT_FRAME_J2000_EQUATORIAL)
       {
       ecliptic_to_equatorial( rel_orbit);
@@ -1340,6 +1358,7 @@ int write_out_elements_to_file( const double *orbit,
                if( showing_sigmas)
                   if( !get_uncertainty( sig_name, sigma_buff + 4, false))
                      strcat( tbuff0, sigma_buff);
+/*             snprintf_append( tt_ptr, 180, "A%d: %s", j + 1, tbuff0); */
                snprintf_append( buff, sizeof( buff), "A%d: %s", j + 1, tbuff0);
                if( j == n_extra_params - 1)
                   {
@@ -1498,11 +1517,11 @@ int write_out_elements_to_file( const double *orbit,
 
                   fprintf( ofile, "%s", phg_line);
                   if( uncertainty_parameter < 90.)
-                     fprintf( ofile, "   U%5.1f  ", uncertainty_parameter);
+                     fprintf( ofile, "   U%5.1f", uncertainty_parameter);
                   if( available_sigmas == 2)
-                     fprintf( ofile, "MC");
+                     fprintf( ofile, "  MC");
                   if( available_sigmas == 3)
-                     fprintf( ofile, "SR");
+                     fprintf( ofile, "  SR");
                   fprintf( ofile, "\n");
                   memmove( buff, zptr, strlen( zptr) + 1);
                   consider_replacing( buff, "q", "sigma_q");
@@ -1538,8 +1557,14 @@ int write_out_elements_to_file( const double *orbit,
                memcpy( buff + 36, body_frame_note, strlen( body_frame_note));
                body_frame_note = NULL;
                }
-            }
-         }
+            else if( i > 5 && (j = strlen( buff)) < 58)
+               {
+               memset( buff + j, ' ', 58 - j);
+               strcpy( buff + 58, body_frame_note);
+               body_frame_note = NULL;
+               }        /* above basically says,  "if we haven't gotten */
+            }           /* the body frame note in the 'normal' places, try */
+         }              /* wedging it in at the end" */
       fprintf( ofile, "%s\n", buff);
       tptr += strlen( tptr) + 1;
       }
