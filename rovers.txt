@@ -1067,3 +1067,32 @@ W98 !-068.179722   -22.953055        2435.     Polonia Observatory, San Pedro de
    meters added for geoid height.
 
 072 !+007.167647   +51.042472         266.     Scheuren Observatory
+
+   Bernd found four possible positions for (572) Cologne,  listed below
+   as (572a) to (572d).  The MPC location is only given to 0.001 Earth
+   radius (about 6 km),  and no observations are listed from it;  we
+   don't know when it was active,  so any of these four could be the
+   "real" (572).  Bernd notes :
+
+   "In 1935 there was built an observatory on the roof of a school at
+   'Grosser Griechenmarkt' that was destroyed in WW II. Today there
+   exists an catholic elementary school with just this name at the
+   following coordinates :
+
+572a!+006.950649   +50.932411         101.     Cologne,  1935-194?
+
+   In 1962 a new public observatory was built at the roof of the 'Schiller
+   Gymnasium' [high school], Nikolausstrasse 55,  Koln-Sulz,
+   https://www.volkssternwartekoeln.de/ , which still exists..." (below
+   is 53m ASL,  plus 47m geoid,  plus 15m because the telescope is in a
+   dome on a roof.)
+
+572b!+006.930168   +50.923164         115.     Cologne, Schiller Gymnasium
+
+   "There is also the 'Planetarium und Sternwarte Koln' at the Blucherstr.
+   15-17,  also on top of a Gymnasium (high school),  built 1960-1963.
+   They have two domes,  as below.  http://www.koelner-planetarium.de/ "
+   47m ASL, 47m geoid,  ~20m building.
+
+572c!+006.956572   +50.966817         114.     Planete und Sternwarte Koln, N dome
+572d!+006.956516   +50.966530         114.     Planete und Sternwarte Koln, S dome
