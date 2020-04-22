@@ -4400,6 +4400,9 @@ int main( int argc, const char **argv)
             show_a_file( "debug.txt");
             break;
          case '.':
+            {
+            int eop_range[3];
+
             snprintf( tbuff, sizeof( tbuff), "%s\n%s\n%s\n",
                                  longname( ), termname( ), curses_version( ));
             snprintf_append( tbuff, sizeof( tbuff),
@@ -4407,7 +4410,20 @@ int main( int argc, const char **argv)
             if( can_change_color( ))
                strcat( tbuff, "Colors are changeable\n");
             format_jpl_ephemeris_info( tbuff + strlen( tbuff) - 1);
+            load_earth_orientation_params( NULL, eop_range);
+            if( eop_range[0])
+               {
+               char date_buff[3][50];
+
+               for( i = 0; i < 3; i++)
+                  full_ctime( date_buff[i], 2400000.5 + (double)eop_range[i],
+                        FULL_CTIME_DATE_ONLY | FULL_CTIME_YMD);
+               snprintf_append( tbuff, sizeof( tbuff),
+                        "EOPs run from %s to %s\n(%s with extrapolation)\n",
+                                 date_buff[0], date_buff[2], date_buff[1]);
+               }
             inquire( tbuff, NULL, 0, COLOR_DEFAULT_INQUIRY);
+            }
             break;
          case KEY_TIMER:
             break;

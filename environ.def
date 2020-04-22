@@ -309,3 +309,11 @@ WIN_JSON_COMBINED_NAME=
    'ELEMENT_EPOCH=ecliptic of date' date to get elements in the epoch
    of date.
 ELEMENT_EPOCH=J2000 ecliptic
+
+   Find_Orb can use an Earth Orientation Parameters (EOP) file such
+   ftp://ftp.iers.org/products/eop/rapid/standard/finals.all , with
+   the filename specified with the EOP_FILE parameter.  Correcting for
+   small variations in the earth's orientation (spin and spin axis)
+   can lead to differences at the millisecond level for close-in
+   objects.  By default,  Find_Orb will look for 'finals.all'.
+EOP_FILE=finals.all

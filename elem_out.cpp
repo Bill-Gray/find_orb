@@ -2683,6 +2683,7 @@ int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
    int use_sigmas_int;
    const char *override_fcct14_filename = get_environment_ptr( "FCCT14_FILE");
    const char *ephem_bitstring = get_environment_ptr( "EPHEM_OPTIONS");
+   const char *eop_filename = get_environment_ptr( "EOP_FILE");
 
 #ifndef _WIN32
    lock_file = fopen( lock_filename, "w");
@@ -2698,6 +2699,8 @@ int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
 
       fcct14_bias_file_name = override_fcct14_filename;
       }
+   if( eop_filename)
+      load_earth_orientation_params( eop_filename, NULL);
    reset_td_minus_dt_string( get_environment_ptr( "DELTA_T"));
    sscanf( get_environment_ptr( "MAX_OBSERVATION_SPAN"), "%lf",
                                   &maximum_observation_span);
