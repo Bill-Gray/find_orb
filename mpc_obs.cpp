@@ -4942,6 +4942,7 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff)
       {
       double mean_xresid = 0., mean_yresid = 0., mean_mresid = 0.;
       double mean_xresid2 = 0., mean_yresid2 = 0., mean_mresid2 = 0.;
+      int n_mags = 0;
 
       snprintf( buff, MAX_INFO_LEN, "%d observations selected of %d\n",
                           (int)n_selected, n_obs);
@@ -4949,28 +4950,37 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff)
          if( obs[i].flags & OBS_IS_SELECTED)
             {
             MOTION_DETAILS m;
-            const double mresid = obs[i].obs_mag - obs[i].computed_mag;
 
             compute_observation_motion_details( obs + i, &m);
             mean_xresid += m.xresid;
             mean_yresid += m.yresid;
-            mean_mresid +=   mresid;
             mean_xresid2 += m.xresid * m.xresid;
             mean_yresid2 += m.yresid * m.yresid;
-            mean_mresid2 +=   mresid *   mresid;
+            if( obs[i].obs_mag && obs[i].obs_mag != BLANK_MAG)
+               {
+               const double mresid = obs[i].obs_mag - obs[i].computed_mag;
+
+               mean_mresid +=   mresid;
+               mean_mresid2 +=   mresid *   mresid;
+               n_mags++;
+               }
             }
       mean_xresid /= (double)n_selected;
       mean_yresid /= (double)n_selected;
-      mean_mresid /= (double)n_selected;
       mean_xresid2 /= (double)n_selected;
       mean_yresid2 /= (double)n_selected;
-      mean_mresid2 /= (double)n_selected;
       snprintf_append( buff, 120,
-             "Mean RA residual %.3f +/- %.3f; dec %.3f +/- %.3f\n"
-             "mean mag residual %.2f +/- %.2f\n",
+             "Mean RA residual %.3f +/- %.3f; dec %.3f +/- %.3f\n",
              mean_xresid, sqrt( mean_xresid2 - mean_xresid * mean_xresid),
-             mean_yresid, sqrt( mean_yresid2 - mean_yresid * mean_yresid),
+             mean_yresid, sqrt( mean_yresid2 - mean_yresid * mean_yresid));
+      if( n_mags > 1)
+         {
+         mean_mresid /= (double)n_mags;
+         mean_mresid2 /= (double)n_mags;
+         snprintf_append( buff, 120,
+             "mean mag residual %.2f +/- %.2f\n",
              mean_mresid, sqrt( mean_mresid2 - mean_mresid * mean_mresid));
+         }
       n_lines += 2;
       if( n_selected == 2)
          {
