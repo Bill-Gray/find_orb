@@ -2541,13 +2541,18 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
    /* On any platform with ASLR,  the address of 'zval' will be
    cyptographically selected at startup time.  (Or at least,  some
    bits of it will be.)  It should be more than random enough for
-   our not-very-security-crucial needs. */
+   our not-very-security-crucial needs.  Gets a compile failure on
+   Windows,  though,  so we'll just use the clock there. */
 
 static unsigned get_random_seed( void)
 {
    unsigned long zval;
 
+#ifdef _WIN32
+   zval = (unsigned long)nanoseconds_since_1970( );
+#else
    zval = (unsigned long)&zval;
+#endif
    return( (unsigned)( zval ^ (zval >> 32)));
 }
 

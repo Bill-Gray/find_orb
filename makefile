@@ -105,9 +105,7 @@ endif
 
 all: $(FO_EXE) $(FIND_ORB_EXE) fo_serve.cgi eph2tle$(EXE)
 
-SECURITY_FLAGS=-fstack-protector-all
-
-CFLAGS=-c -Wall -pedantic -Wextra -I $(INSTALL_DIR)/include $(SECURITY_FLAGS)
+CFLAGS=-c -Wall -pedantic -Wextra -I $(INSTALL_DIR)/include
 
 ifdef DEBUG
 	CFLAGS += -g -O0
