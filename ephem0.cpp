@@ -2995,6 +2995,7 @@ void format_observation( const OBSERVE FAR *obs, char *text,
    double angle;
    char xresid[30], yresid[30];
    int i;
+   extern int apply_debiasing;
    const int base_format = (resid_format & 3);
    const int base_time_format = obs->time_precision / 10;
    const int n_time_digits = obs->time_precision % 10;
@@ -3078,7 +3079,8 @@ void format_observation( const OBSERVE FAR *obs, char *text,
       snprintf_append( text, 40, "\t%c\t%s\t",
                    (obs->is_included ? ' ' : 'X'), obs->mpc_code);
       angle = obs->ra * 12. / PI;
-      angle += obs->ra_bias / (3600. * 15. * cos( obs->dec));
+      if( apply_debiasing)
+         angle += obs->ra_bias / (3600. * 15. * cos( obs->dec));
       angle = fmod( angle, 24.);
       if( angle < 0.) angle += 24.;
       output_angle_to_buff( text + strlen( text), angle, obs->ra_precision);
@@ -3185,7 +3187,8 @@ void format_observation( const OBSERVE FAR *obs, char *text,
              ((base_format == RESIDUAL_FORMAT_FULL_WITH_TABS) ? "\t" : "");
 
       angle = obs->dec * 180. / PI;
-      angle += obs->dec_bias / 3600.;
+      if( apply_debiasing)
+         angle += obs->dec_bias / 3600.;
       if( angle < 0.)
          {
          angle = -angle;
