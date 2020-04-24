@@ -696,8 +696,11 @@ static int mpc_code_cmp( const char *ptr1, const char *ptr2)
             case;  0=sun, 1=mercury,  etc.)
 */
 
-static double roving_lon, roving_lat, roving_ht_in_meters;
-int n_obs_actually_loaded;
+#define MAX_ROVERS 10
+
+static double roving_lon[MAX_ROVERS], roving_lat[MAX_ROVERS];
+static double roving_height_in_meters[MAX_ROVERS];
+int n_obs_actually_loaded, n_rovers = 0;
 
 int get_observer_data( const char FAR *mpc_code, char *buff,
               double *lon_in_radians, double *rho_cos_phi, double *rho_sin_phi)
@@ -760,13 +763,16 @@ int get_observer_data( const char FAR *mpc_code, char *buff,
       if( !override_observatory_name)
          override_observatory_name = "Temporary MPC code";
 
-   if( !strcmp( mpc_code, "247"))
-      {
-      lat0 = roving_lat;
-      lon0 = roving_lon;
-      alt0 = roving_ht_in_meters;
-      override_observatory_name = "Roving observer";
-      }
+   if( mpc_code[0] == '2' && mpc_code[1] == '4')
+      if( mpc_code[2] == '7' || islower( mpc_code[2]))
+         {
+         const int idx = (mpc_code[2] == '7' ? 0 : mpc_code[2] - 'a' + 1);
+
+         lat0 = roving_lat[idx];
+         lon0 = roving_lon[idx];
+         alt0 = roving_height_in_meters[idx];
+         override_observatory_name = "Roving observer";
+         }
 
 #ifdef TRY_THIS_SOME_OTHER_TIME
    if( strchr( "nsew", tolower( mpc_code[0])))
@@ -3362,6 +3368,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
             /* tell you it's an artsat.                               */
    object_type = OBJECT_TYPE_ASTEROID;
    is_interstellar = 0;
+   n_rovers = 0;
    if( !obs_details)
       obs_details = init_observation_details( );
    ades_context = init_ades2mpc( );
@@ -3463,18 +3470,34 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
             else if( buff[14] == 'V' && observation_is_good)
                {
                double rho_sin_phi, rho_cos_phi;
+               const double rlon = atof( second_line + 34);
+               const double rlat = atof( second_line + 45);
+               const double ralt = atof( second_line + 56);
+               int idx = 0;
 
                lines_actually_read++;
                xref_designation( second_line);
-               roving_lon = atof( second_line + 34);
-               roving_lat = atof( second_line + 45);
-               roving_ht_in_meters = atof( second_line + 56);
-               lat_alt_to_parallax( roving_lat * PI / 180., roving_ht_in_meters,
+               while( idx < n_rovers && (rlon != roving_lon[idx] ||
+                           rlat != roving_lat[idx] || ralt != roving_height_in_meters[idx]))
+                  idx++;
+               assert( idx < MAX_ROVERS);
+               roving_lon[idx] = rlon;
+               if( idx == n_rovers)    /* got a new rover */
+                  {
+                  n_rovers++;
+                  roving_lat[idx] = rlat;
+                  roving_lon[idx] = rlon;
+                  roving_height_in_meters[idx] = ralt;
+                  debug_printf( "Rover %d\n%s\n", idx, second_line);
+                  }
+               if( idx)    /* not our first,  default (247) rover */
+                  second_line[79] = rval[i].mpc_code[2] = 'a' + idx - 1;
+               lat_alt_to_parallax( rlat * PI / 180., ralt,
                                     &rho_cos_phi, &rho_sin_phi, 3);
                compute_observer_loc( rval[i].jd, 3, rho_cos_phi, rho_sin_phi,
-                                      roving_lon * PI / 180., rval[i].obs_posn);
+                                      rlon * PI / 180., rval[i].obs_posn);
                compute_observer_vel( rval[i].jd, 3, rho_cos_phi, rho_sin_phi,
-                                      roving_lon * PI / 180., rval[i].obs_vel);
+                                      rlon * PI / 180., rval[i].obs_vel);
                set_obs_vect( rval + i);
                rval[i].second_line = (char *)malloc( 81);
                strcpy( rval[i].second_line, second_line);
