@@ -4905,8 +4905,10 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
          snprintf_append( buff, MAX_INFO_LEN, "time sigma %g",
                           optr->time_sigma * seconds_per_day);
          if( optr->ra_bias || optr->dec_bias)
-             snprintf_append( buff, MAX_INFO_LEN, "   RA bias %.3f\" dec bias %.3f\"",
-                           optr->ra_bias, optr->dec_bias);
+             snprintf_append( buff, MAX_INFO_LEN, "  %cRA bias %.3f\" dec bias %.3f\"%c",
+                           (apply_debiasing ? ' ' : '['),
+                           optr->ra_bias, optr->dec_bias,
+                           (apply_debiasing ? ' ' : ']'));
          if( show_alt_info)
             {
             if( !strcmp( optr->reference, "NEOCP") && optr->columns_57_to_65[3] == '~')
