@@ -674,6 +674,27 @@ static int mpc_code_cmp( const char *ptr1, const char *ptr2)
    return( rval);
 }
 
+/* The first (247) roving observer retains that code.  If another
+rover is found with a different lat/lon,  it is assigned (24a).
+The 27th rover is assigned (24z).  Rovers 28 to 53 get codes
+(24A) to (24Z).  53 rovers should be enough for anybody... */
+
+static int get_rover_index( const char *obscode)
+{
+   size_t rval = -1;
+
+   if( obscode[0] == '2' && obscode[1] == '4')
+      {
+      if( obscode[2] == '7')
+         rval = 0;
+      else if( obscode[2] >= 'a')
+         rval = obscode[2] - 'a' + 1;
+      else if( obscode[2] >= 'A')
+         rval = obscode[2] - 'A' + 27;
+      }
+   return( rval);
+}
+
 /* The following function paws through the STATIONS.TXT file (or the
    ObsCodes.html or .htm file),  looking for the observer code in
    question.  When it finds it,  it just copies the entire line into
@@ -696,10 +717,12 @@ static int mpc_code_cmp( const char *ptr1, const char *ptr2)
             case;  0=sun, 1=mercury,  etc.)
 */
 
-#define MAX_ROVERS 10
+typedef struct
+{
+   double lon, lat, alt;         /* alt is in meters */
+} rover_t;
 
-static double roving_lon[MAX_ROVERS], roving_lat[MAX_ROVERS];
-static double roving_height_in_meters[MAX_ROVERS];
+static rover_t *rovers = NULL;
 int n_obs_actually_loaded, n_rovers = 0;
 
 int get_observer_data( const char FAR *mpc_code, char *buff,
@@ -709,7 +732,7 @@ int get_observer_data( const char FAR *mpc_code, char *buff,
    static char **station_data = NULL;
    static int n_stations = 0;
    const char *blank_line = "!!!   0.0000 0.000000 0.000000Unknown Station Code";
-   int rval = -1;
+   int rval = -1, rover_idx;
    size_t i;
    const char *override_observatory_name = NULL;
    double lat0 = 0., lon0 = 0., alt0 = 0.;
@@ -763,16 +786,17 @@ int get_observer_data( const char FAR *mpc_code, char *buff,
       if( !override_observatory_name)
          override_observatory_name = "Temporary MPC code";
 
-   if( mpc_code[0] == '2' && mpc_code[1] == '4')
-      if( mpc_code[2] == '7' || islower( mpc_code[2]))
+   rover_idx = get_rover_index( mpc_code);
+   if( rover_idx >= 0)
+      {
+      if( rover_idx < n_rovers)
          {
-         const int idx = (mpc_code[2] == '7' ? 0 : mpc_code[2] - 'a' + 1);
-
-         lat0 = roving_lat[idx];
-         lon0 = roving_lon[idx];
-         alt0 = roving_height_in_meters[idx];
-         override_observatory_name = "Roving observer";
+         lat0 = rovers[rover_idx].lat;
+         lon0 = rovers[rover_idx].lon;
+         alt0 = rovers[rover_idx].alt;
          }
+      override_observatory_name = "Roving observer";
+      }
 
 #ifdef TRY_THIS_SOME_OTHER_TIME
    if( strchr( "nsew", tolower( mpc_code[0])))
@@ -3477,21 +3501,25 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
 
                lines_actually_read++;
                xref_designation( second_line);
-               while( idx < n_rovers && (rlon != roving_lon[idx] ||
-                           rlat != roving_lat[idx] || ralt != roving_height_in_meters[idx]))
+               while( idx < n_rovers && (rlon != rovers[idx].lon ||
+                           rlat != rovers[idx].lat || ralt != rovers[idx].alt))
                   idx++;
-               assert( idx < MAX_ROVERS);
-               roving_lon[idx] = rlon;
                if( idx == n_rovers)    /* got a new rover */
                   {
                   n_rovers++;
-                  roving_lat[idx] = rlat;
-                  roving_lon[idx] = rlon;
-                  roving_height_in_meters[idx] = ralt;
-                  debug_printf( "Rover %d\n%s\n", idx, second_line);
+                  assert( idx < 53);    /* can't handle more at the mo */
+                  rovers = (rover_t *)realloc( rovers, n_rovers * sizeof( rover_t));
+                  rovers[idx].lat = rlat;
+                  rovers[idx].lon = rlon;
+                  rovers[idx].alt = ralt;
                   }
                if( idx)    /* not our first,  default (247) rover */
-                  second_line[79] = rval[i].mpc_code[2] = 'a' + idx - 1;
+                  {
+                  if( idx < 27)
+                     second_line[79] = rval[i].mpc_code[2] = 'a' + idx - 1;
+                  else    /* if( idx < 53) */
+                     second_line[79] = rval[i].mpc_code[2] = 'A' + idx - 27;
+                  }
                lat_alt_to_parallax( rlat * PI / 180., ralt,
                                     &rho_cos_phi, &rho_sin_phi, 3);
                compute_observer_loc( rval[i].jd, 3, rho_cos_phi, rho_sin_phi,
