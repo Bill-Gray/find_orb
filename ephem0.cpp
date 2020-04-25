@@ -92,6 +92,9 @@ char *get_file_name( char *filename, const char *template_file_name);
 double current_jd( void);                       /* elem_out.cpp */
 double diameter_from_abs_mag( const double abs_mag,      /* ephem0.cpp */
                                      const double optical_albedo);
+double shadow_check( const double *planet_loc,           /* ephem0.cpp */
+                            const double *obs_posn,
+                            const double planet_radius_in_au);
 int get_object_name( char *obuff, const char *packed_desig);   /* mpc_obs.c */
 int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid);
 int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
@@ -1072,9 +1075,9 @@ static double sunlight_visible( double r_sun, double r_planet, double sep)
 (thus far,  only the earth,  but could be extended to other planets and
 their moons).  This is used in ephems to show "Sha" instead of a
 magnitude if the object is in the earth's umbra;  to show a fainter
-magnitude if it's in the penumbra; and (eventually) will be used to
-decrease solar radiation pressure (SRP) in the force model as an
-object goes through a shadow.
+magnitude if it's in the penumbra; and to decrease solar radiation
+pressure (SRP) in the force model as an object goes through the
+earth's shadow;  see 'runge.cpp'.
 
    To determine if an object is in the planet's shadow:  first,  we
 compute the elongation of the planet from the sun,  as seen from the
@@ -1105,7 +1108,7 @@ the center of the solar disk and R = radius of the solar disk.
 Ideally,  we'd integrate a series of bands using this function to
 compute a (probably only slightly) more accurate brightness drop. */
 
-static double shadow_check( const double *planet_loc,
+double shadow_check( const double *planet_loc,
                             const double *obs_posn,
                             const double planet_radius_in_au)
 {

@@ -100,6 +100,9 @@ void calc_approx_planet_orientation( const int planet,        /* runge.cpp */
          const int system_number, const double jde, double *matrix);
 double geo_potential_in_au( const double x, const double y, const double z,
                  double *derivs, const int n_terms);    /* geo_pot.c */
+double shadow_check( const double *planet_loc,           /* ephem0.cpp */
+                            const double *obs_posn,
+                            const double planet_radius_in_au);
 
 #define N_PERTURB 19
 #define IDX_MERCURY    1
@@ -770,6 +773,7 @@ int calc_derivatives( const double jd, const double *ival, double *oval,
    unsigned local_perturbers = perturbers;
    double lunar_loc[3], jupiter_loc[3], saturn_loc[3];
    double relativistic_accel[3];
+   double fraction_illum = 1.;
    extern int n_extra_params;
    static const double sphere_of_influence_radius[10] = {
             10000., 0.00075, 0.00412, 0.00618,   /* sun, mer, ven, ear */
@@ -792,11 +796,18 @@ int calc_derivatives( const double jd, const double *ival, double *oval,
    for( i = 0; i < 3; i++)
       r2 += ival[i] * ival[i];
    r = sqrt( r2);
+   if( n_extra_params) /* decrease non-gravs when in earth's shadow */
+      {
+      double earth_loc[3];
+
+      earth_lunar_posn( jd, earth_loc, NULL);
+      fraction_illum = shadow_check( earth_loc, ival, EARTH_R);
+      }
    if( n_extra_params == 1)  /* straightforward radiation pressure */
       {
       extern double solar_pressure[];
 
-      solar_accel -= solar_pressure[0];
+      solar_accel -= solar_pressure[0] * fraction_illum;
       }
    if( r < planet_radius[0])     /* special fudge to keep acceleration from reaching */
       {                          /* infinity inside the sun;  see above notes        */
@@ -833,7 +844,7 @@ int calc_derivatives( const double jd, const double *ival, double *oval,
 
    if( n_extra_params == 2 || n_extra_params == 3)
       {                  /* Marsden & Sekanina comet formula */
-      const double g = comet_g_func( r);
+      const double g = comet_g_func( r) * fraction_illum;
       extern double solar_pressure[];
       double transverse[3], dot_prod = 0.;
 
