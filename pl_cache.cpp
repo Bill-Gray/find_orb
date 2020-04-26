@@ -37,6 +37,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "afuncs.h"
 #include "jpleph.h"
 
+   /* MSVC/C++ lacks snprintf.  See 'ephem0.cpp' for details. */
+#if defined(_MSC_VER) && _MSC_VER < 1900
+int snprintf( char *string, const size_t max_len, const char *format, ...);
+#endif
 const char *get_find_orb_text( const int index);          /* elem_out.cpp */
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 int debug_printf( const char *format, ...)                 /* runge.cpp */
