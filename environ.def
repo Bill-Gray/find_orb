@@ -293,7 +293,7 @@ UNDERLINE_OBS=
    By default,  JSON files 'elements.json', 'ephemeri.json',  and
    'combined.json' will be made in the same directory as this file.
    But that default behavior can be overridden with the following
-   three lines.  See https://www.projectpluto.com/fo_usage.htm#json_files
+   lines.  See https://www.projectpluto.com/fo_usage.htm#json_files
    for details on how this works.  Note that different lines are used
    for Windows(R) than for Linux,  OS/X,  and *BSD.
 JSON_EPHEM_NAME=
