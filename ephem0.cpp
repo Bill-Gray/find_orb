@@ -1634,7 +1634,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    int i, hh_mm, n_step_digits;
    int n_lines_shown = 0;
    unsigned date_format;
-   const int ephem_type = ((options & 7) == 6 ? 0 : (options & 7));
+   const int ephem_type = ((int)(options & 7) == 6 ? 0 : (int)(options & 7));
    FILE *ofile, *computer_friendly_ofile = NULL;
    const bool computer_friendly = ((options & OPTION_COMPUTER_FRIENDLY) ? true : false);
    char step_units;

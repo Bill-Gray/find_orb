@@ -681,7 +681,7 @@ The 27th rover is assigned (24z).  Rovers 28 to 53 get codes
 
 static int get_rover_index( const char *obscode)
 {
-   size_t rval = -1;
+   int rval = -1;
 
    if( obscode[0] == '2' && obscode[1] == '4')
       {

@@ -2546,11 +2546,12 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
 
 static unsigned get_random_seed( void)
 {
-   unsigned long zval;
 
 #ifdef _WIN32
-   zval = (unsigned long)nanoseconds_since_1970( );
+   int64_t zval = nanoseconds_since_1970( );
 #else
+   unsigned long zval;
+
    zval = (unsigned long)&zval;
 #endif
    return( (unsigned)( zval ^ (zval >> 32)));
