@@ -279,7 +279,6 @@ void pop_all_orbits( void)
 }
 
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
-double dot_product( const double *v1, const double *v2);    /* sr.c */
 void set_distance( OBSERVE FAR *obs, double r);             /* orb_func.c */
 
 /* The linear regression fit here is used to determine a perihelion distance

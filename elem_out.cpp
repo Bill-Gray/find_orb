@@ -124,7 +124,6 @@ void get_relative_vector( const double jd, const double *ivect,
           double *relative_vect, const int planet_orbiting);  /* orb_func.c */
 double get_planet_mass( const int planet_idx);                /* orb_func.c */
 double observation_rms( const OBSERVE FAR *obs);            /* elem_out.cpp */
-double dot_product( const double *v1, const double *v2);    /* sr.c */
 double find_epoch_shown( const OBSERVE *obs, const int n_obs); /* elem_out */
 double evaluate_initial_orbit( const OBSERVE FAR *obs,      /* orb_func.c */
                               const int n_obs, const double *orbit);

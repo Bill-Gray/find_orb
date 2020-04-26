@@ -66,7 +66,6 @@ int lat_alt_to_parallax( const double lat, const double ht_in_meters,
 int write_residuals_to_file( const char *filename, const char *ast_filename,
           const int n_obs, const OBSERVE FAR *obs_data, const int format);
 void put_observer_data_in_text( const char FAR *mpc_code, char *buff);
-double dot_product( const double *v1, const double *v2);       /* sr.cpp */
 int make_pseudo_mpec( const char *mpec_filename, const char *obj_name);
                                               /* ephem0.cpp */
 int earth_lunar_posn( const double jd, double FAR *earth_loc,
