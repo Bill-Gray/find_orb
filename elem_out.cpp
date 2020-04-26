@@ -21,7 +21,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 
 #include <math.h>
 #include <stdlib.h>
-#include <inttypes.h>
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
@@ -2680,6 +2679,7 @@ int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
    extern double *sr_orbits;
    extern unsigned max_n_sr_orbits;
    int use_sigmas_int;
+   unsigned long obsolete_ephem_output_options;
    const char *override_fcct14_filename = get_environment_ptr( "FCCT14_FILE");
    const char *ephem_bitstring = get_environment_ptr( "EPHEM_OPTIONS");
    const char *eop_filename = get_environment_ptr( "EOP_FILE");
@@ -2720,14 +2720,15 @@ int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
       maximum_jd = YEAR_TO_JD( maximum_jd);
       }
    *ephemeris_output_options = 0;
-   sscanf( get_environment_ptr( "SETTINGS"), "%c,%d,%d,%" SCNu64 ",%lf,%lf",
+   sscanf( get_environment_ptr( "SETTINGS"), "%c,%d,%d,%lu,%lf,%lf",
                &default_comet_magnitude_type,
                element_format, element_precision,
-               ephemeris_output_options,
+               &obsolete_ephem_output_options,
                max_residual_for_filtering, noise_in_arcseconds);
 
-   if( *ephem_bitstring)
-      *ephemeris_output_options = parse_bit_string( ephem_bitstring);
+   if( !*ephem_bitstring)     /* set defaults;  see 'environ.def' */
+      ephem_bitstring = "10,16";
+   *ephemeris_output_options = parse_bit_string( ephem_bitstring);
 
    sscanf( get_environment_ptr( "FILTERING"), "%lf %lf %u %d",
                &probability_of_blunder,
