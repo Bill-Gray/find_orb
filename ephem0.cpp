@@ -1625,7 +1625,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
          const double lon,
          const double rho_cos_phi, const double rho_sin_phi,
          const int n_steps, const char *note_text,
-         const ephem_option_t options, const unsigned n_objects)
+         ephem_option_t options, unsigned n_objects)
 {
    double *orbits_at_epoch, step;
    DPT *stored_ra_decs;
@@ -1639,24 +1639,6 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    char step_units;
    const char *timescale = get_environment_ptr( "TT_EPHEMERIS");
    const char *override_date_format = get_environment_ptr( "DATE_FORMAT");
-   const bool show_topocentric_data =
-           ( rho_cos_phi && rho_sin_phi && ephem_type == OPTION_OBSERVABLES);
-   const bool show_alt_az = ((options & OPTION_ALT_AZ_OUTPUT)
-                        && show_topocentric_data);
-   const bool show_visibility = ((options & OPTION_VISIBILITY)
-                        && show_topocentric_data);
-   const bool show_uncertainties = ((options & OPTION_SHOW_SIGMAS)
-                        && n_objects > 1 && ephem_type == OPTION_OBSERVABLES);
-   const bool show_moon_alt = ((options & OPTION_MOON_ALT)
-                        && show_topocentric_data);
-   const bool show_moon_az  = ((options & OPTION_MOON_AZ )
-                        && show_topocentric_data);
-   const bool show_sun_alt = ((options & OPTION_SUN_ALT)
-                        && show_topocentric_data);
-   const bool show_sun_az  = ((options & OPTION_SUN_AZ )
-                        && show_topocentric_data);
-   const bool show_sky_brightness = ((options & OPTION_SKY_BRIGHTNESS)
-                        && show_topocentric_data);
    double abs_mag = calc_absolute_magnitude( obs, n_obs);
    double unused_ht_in_meters;
    DPT latlon;
@@ -1667,6 +1649,13 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
           planet_radius_in_meters( planet_no) / AU_IN_METERS;
    const int added_ra_dec_precision = atoi( get_environment_ptr( "ADDED_RA_DEC_PRECISION"));
    char buff[440], *header = NULL, alt_buff[500];
+
+   if( (!rho_cos_phi && !rho_sin_phi) || ephem_type != OPTION_OBSERVABLES)
+      options &= ~(OPTION_ALT_AZ_OUTPUT | OPTION_VISIBILITY | OPTION_MOON_ALT
+                     | OPTION_MOON_AZ | OPTION_SUN_ALT | OPTION_SUN_AZ
+                     | OPTION_SKY_BRIGHTNESS | OPTION_SUPPRESS_UNOBSERVABLE);
+   if( n_objects == 1 || ephem_type != OPTION_OBSERVABLES)
+      options &= ~OPTION_SHOW_SIGMAS;
 
    step = get_step_size( stepsize, &step_units, &n_step_digits);
    if( !step)
@@ -1709,6 +1698,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       return( -3);
    if( !abs_mag)
       abs_mag = atof( get_environment_ptr( "ABS_MAG"));
+   if( ephem_type == OPTION_OBSERVABLES && !(options & OPTION_SHOW_SIGMAS))
+      n_objects = 1;
    orbits_at_epoch = (double *)calloc( n_objects, 8 * sizeof( double));
    memcpy( orbits_at_epoch, orbit, n_objects * 6 * sizeof( double));
    stored_ra_decs = (DPT *)( orbits_at_epoch + 6 * n_objects);
@@ -1787,9 +1778,9 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
          snprintf_append( buff, sizeof( buff), "-r---- ");
       if( !(options & OPTION_SUPPRESS_ELONG))
          snprintf_append( buff, sizeof( buff), "elong ");
-      if( show_visibility)
+      if( options & OPTION_VISIBILITY)
          snprintf_append( buff, sizeof( buff), "SM ");
-      if( show_sky_brightness)
+      if( options & OPTION_SKY_BRIGHTNESS)
          snprintf_append( buff, sizeof( buff), "SkyBr ");
       if( options & OPTION_PHASE_ANGLE_OUTPUT)
          snprintf_append( buff, sizeof( buff), " ph_ang  ");
@@ -1818,15 +1809,15 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
          snprintf_append( buff, sizeof( buff),
                 (options & OPTION_SEPARATE_MOTIONS) ? " -RA-'/hr-dec-"
                                                     : " -'/hr- --PA--");
-      if( show_alt_az)
+      if( options & OPTION_ALT_AZ_OUTPUT)
          snprintf_append( buff, sizeof( buff), " alt -az");
-      if( show_sun_alt)
+      if( options & OPTION_SUN_ALT)
          snprintf_append( buff, sizeof( buff), " Sal");
-      if( show_sun_az)
+      if( options & OPTION_SUN_AZ)
          snprintf_append( buff, sizeof( buff), " Saz");
-      if( show_moon_alt)
+      if( options & OPTION_MOON_ALT)
          snprintf_append( buff, sizeof( buff), " Mal");
-      if( show_moon_az)
+      if( options & OPTION_MOON_AZ)
          snprintf_append( buff, sizeof( buff), " Maz");
       if( options & OPTION_RADIAL_VEL_OUTPUT)
          snprintf_append( buff, sizeof( buff), "  rvel-");
@@ -1836,7 +1827,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
          snprintf_append( buff, sizeof( buff), " -lon---- -lat---- -alt-(km)-");
       if( options & OPTION_SPACE_VEL_OUTPUT)
          snprintf_append( buff, sizeof( buff), "  svel ");
-      if( show_uncertainties)
+      if( options & OPTION_SHOW_SIGMAS)
          snprintf_append( buff, sizeof( buff), " \"-sig-PA");
       if( ephem_type == OPTION_OBSERVABLES)
          {
@@ -1917,7 +1908,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       memcpy( obs_posn_equatorial, obs_posn, 3 * sizeof( double));
       ecliptic_to_equatorial( obs_posn_equatorial);
       strcpy( buff, "Nothing to see here... move along... uninteresting... who cares?...");
-      for( obj_n = 0; obj_n < n_objects && (!obj_n || show_uncertainties); obj_n++)
+      for( obj_n = 0; obj_n < n_objects; obj_n++)
          {
          double *orbi = orbits_at_epoch + obj_n * 6;
          double radial_vel, v_dot_r;
@@ -2264,7 +2255,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   strcat( alt_buff, tbuff);
                   }
 
-               if( show_visibility)
+               if( options & OPTION_VISIBILITY)
                   {
                   tbuff[0] = ' ';
                   if( alt_az[1].y > 0.)
@@ -2306,7 +2297,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                      tbuff[1] = '-';
                   strcat( alt_buff, tbuff);
                   }
-               if( show_sky_brightness)
+               if( options & OPTION_SKY_BRIGHTNESS)
                   {
                   if( mags_per_arcsec2 > 99.9)
                      {
@@ -2491,32 +2482,33 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                      }
                   end_ptr[7] = ' ';
                   }
-               if( show_alt_az)
-                  for( j = 0; j < 3; j++)
-                     {
-                     bool show_alt = show_alt_az, show_az = show_alt_az;
+               for( j = 0; j < 3; j++)
+                  {
+                  bool show_alt, show_az;
 
-                     if( j == 1)
-                        {
-                        show_alt = show_sun_alt;
-                        show_az  = show_sun_az;
-                        }
-                     if( j == 2)
-                        {
-                        show_alt = show_moon_alt;
-                        show_az  = show_moon_az;
-                        }
-                     *tbuff = '\0';
-                     if( show_alt)
-                        snprintf( tbuff, sizeof( tbuff), " %c%02d",
-                                          (alt_az[j].y > 0. ? '+' : '-'),
-                                          (int)( fabs( alt_az[j].y * 180. / PI) + .5));
-                     if( show_az)
-                        snprintf_append( tbuff, sizeof( tbuff), " %03d",
-                                          (int)( alt_az[j].x * 180. / PI + .5));
-                     strcat( alt_buff, tbuff);
-                     strcat( buff, tbuff);
+                  if( j == 1)
+                     {
+                     show_alt = (options & OPTION_SUN_ALT);
+                     show_az  = (options & OPTION_SUN_AZ);
                      }
+                  else if( j == 2)
+                     {
+                     show_alt = (options & OPTION_MOON_ALT);
+                     show_az  = (options & OPTION_MOON_AZ);
+                     }
+                  else
+                     show_alt = show_az = (options & OPTION_ALT_AZ_OUTPUT);
+                  *tbuff = '\0';
+                  if( show_alt)
+                     snprintf( tbuff, sizeof( tbuff), " %c%02d",
+                                       (alt_az[j].y > 0. ? '+' : '-'),
+                                       (int)( fabs( alt_az[j].y * 180. / PI) + .5));
+                  if( show_az)
+                     snprintf_append( tbuff, sizeof( tbuff), " %03d",
+                                       (int)( alt_az[j].x * 180. / PI + .5));
+                  strcat( alt_buff, tbuff);
+                  strcat( buff, tbuff);
+                  }
                if( options & OPTION_RADIAL_VEL_OUTPUT)
                   {
                   char *end_ptr = buff + strlen( buff);
@@ -2575,7 +2567,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                      {     /* for radar, 'observable' = obj above horizon */
                      show_this_line = (alt_az[0].y > rdata.altitude_limit);
                      }
-                  else if( show_topocentric_data && show_this_line)
+                  else if( show_this_line)
                      {        /* "observable" = obj above horizon,  sun below it */
                      show_this_line = (alt_az[0].y > 0. && alt_az[1].y < 0.);
                      }
