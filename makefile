@@ -139,6 +139,9 @@ eph2tle$(EXE):          eph2tle.o conv_ele.o elem2tle.o simplex.o lsquare.o
 cssfield$(EXE):          cssfield.o
 	$(CC) -o cssfield$(EXE) cssfield.o $(LIBS)
 
+expcalc$(EXE):          expcalc.cpp
+	$(CC) -o expcalc$(EXE) -Wall -Wextra -pedantic -DTEST_CODE expcalc.cpp
+
 roottest$(EXE):          roottest.o
 	$(CC) -o roottest$(EXE) roottest.o roots.o
 
