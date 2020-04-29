@@ -680,7 +680,6 @@ static int find_precovery_plates( OBSERVE *obs, const int n_obs,
    if( !ifile)
       {
       fprintf( ofile, "Couldn't open %s\n", idx_filename);
-      fclose( ofile);
       return( -2);
       }
    p1 = (obj_location_t *)calloc( 3 * n_orbits, sizeof( obj_location_t));
@@ -1682,7 +1681,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       const char *precovery_header_line =
                "    RA (J2000) dec  Mag  YYYY MM DD HH:MM:SS.s Code"
                " Sigma  PA Prob   Directory  Image Filename\n";
-      int rval;
+      int rval = -1;
 
       if( max_jd < min_jd)
          {
@@ -1694,13 +1693,14 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       fprintf( ofile, "%s", precovery_header_line);
       for( i = 0; i < 2; i++)
          {
-         rval = find_precovery_plates( obs, n_obs,
+         const int err_val = find_precovery_plates( obs, n_obs,
                            (i ? "css.idx" : "css_new.idx"),
                            ofile, orbit,
                            n_objects, epoch_jd, min_jd, max_jd,
                            ephemeris_mag_limit);
-         if( rval)
-            fprintf( ofile, "Err %d on pass %d\n", rval, i);
+
+         if( !err_val)           /* at least one index worked */
+            rval = 0;
          }
       fclose( ofile);
       return( rval);
