@@ -2523,12 +2523,16 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
       {
       FILE *ofile =  fopen_ext( prev_fn, "fcw");
 #ifdef _WIN32
-      char *canonical_path = ifilename;
+      char canonical_path[MAX_PATH];
+      DWORD len =
+                 GetFullPathNameA( ifilename, MAX_PATH, canonical_path, NULL);
+
+      assert( len && len < MAX_PATH);
 #else
       char *canonical_path = realpath( ifilename, NULL);
-#endif
 
       assert( canonical_path);
+#endif
       set_solutions_found( ids, *n_ids);
       for( i = 0; i < n_lines; i++)
          if( strcmp( prev_files[i], canonical_path))
