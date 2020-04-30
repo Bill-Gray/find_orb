@@ -44,6 +44,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "mpc_func.h"
 #include "vislimit.h"
 #include "brentmin.h"
+#include "expcalc.h"
 
 #define J2000 2451545.0
 #define JD_TO_YEAR(jd)  (2000. + ((jd)-J2000) / 365.25)
@@ -122,6 +123,8 @@ const char *residual_filename = "residual.txt";
 const char *ephemeris_filename = "ephemeri.txt";
 bool is_default_ephem = true;
 const char *elements_filename = "elements.txt";
+
+static expcalc_config_t exposure_config;
 
 /* Returns parallax constants (rho_cos_phi, rho_sin_phi) in AU. */
 
@@ -1782,6 +1785,10 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
          snprintf_append( buff, sizeof( buff), "SM ");
       if( options & OPTION_SKY_BRIGHTNESS)
          snprintf_append( buff, sizeof( buff), "SkyBr ");
+      if( options & OPTION_SNR)
+         snprintf_append( buff, sizeof( buff), " -SNR ");
+      if( options & OPTION_EXPOSURE_TIME)
+         snprintf_append( buff, sizeof( buff), " ExpTime ");
       if( options & OPTION_PHASE_ANGLE_OUTPUT)
          snprintf_append( buff, sizeof( buff), " ph_ang  ");
       if( options & OPTION_PHASE_ANGLE_BISECTOR)
@@ -2328,9 +2335,51 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   snprintf_append( fake_line, sizeof( fake_line), "      %.3s",
                                            note_text + 1);
                   }
+               exposure_config.sky_brightness = mags_per_arcsec2;
+               exposure_config.airmass = 1. / sin( alt_az[0].y);
+
+               if( options & OPTION_SNR)
+                  {
+                  if( alt_az[0].y < 0.)
+                     {
+                     strcat( buff, " --.--");
+                     strcat( alt_buff, " 99999");
+                     }
+                  else
+                     {
+                     const double snr = snr_from_mag_and_exposure( &exposure_config,
+                                    curr_mag, atof( get_environment_ptr( "EXPTIME")));
+                     const char *fmt = (snr > 99. ? " %5.0f" : " %5.2f");
+
+                     snprintf( tbuff, sizeof( tbuff), fmt, snr);
+                     strcat( buff, tbuff);
+                     strcat( alt_buff, tbuff);
+                     }
+                  }
+
+               if( options & OPTION_EXPOSURE_TIME)
+                  {
+                  double exposure_time;
+
+                  if( alt_az[0].y < 0.)
+                     exposure_time = 999999.;
+                  else
+                     exposure_time = exposure_from_snr_and_mag( &exposure_config,
+                                     atof( get_environment_ptr( "SNR")), curr_mag);
+                  if( exposure_time > 999999.)
+                     exposure_time = 999999.;
+                  snprintf_append( alt_buff, sizeof( alt_buff), "%.1f", exposure_time);
+                  if( exposure_time > 99999.)
+                     strcat( buff, " -----");
+                  else
+                     snprintf_append( buff, sizeof( buff),
+                           (exposure_time < 999. ? " %5.1f" : " %5.0f"), exposure_time);
+                  }
+
                *tbuff = '\0';
                if( options & OPTION_PHASE_ANGLE_OUTPUT)
                   snprintf( tbuff, sizeof( tbuff), " %8.4f", phase_ang * 180. / PI);
+
 
                if( options & OPTION_PHASE_ANGLE_BISECTOR)
                   {
@@ -2701,7 +2750,7 @@ int ephemeris_in_a_file_from_mpc_code( const char *filename,
          OBSERVE *obs, const int n_obs,
          const double epoch_jd, const double jd_start, const char *stepsize,
          const int n_steps, const char *mpc_code,
-         const ephem_option_t options, const unsigned n_objects)
+         ephem_option_t options, const unsigned n_objects)
 {
    double rho_cos_phi, rho_sin_phi, lon;
    char note_text[100], buff[100];
@@ -2714,6 +2763,9 @@ int ephemeris_in_a_file_from_mpc_code( const char *filename,
                     "(%s) %s", mpc_code, mpc_station_name( buff));
    get_object_name( buff, obs->packed_id);
    snprintf_append( note_text, sizeof( note_text), ": %s", buff);
+   if( options & (OPTION_SNR | OPTION_EXPOSURE_TIME))
+      if( find_expcalc_config_from_mpc_code( mpc_code, &exposure_config))
+         options &= ~(OPTION_SNR | OPTION_EXPOSURE_TIME);
    return( ephemeris_in_a_file( filename, orbit, obs, n_obs, planet_no,
                epoch_jd, jd_start, stepsize, lon, rho_cos_phi, rho_sin_phi,
                n_steps, note_text, options, n_objects));

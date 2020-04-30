@@ -151,6 +151,8 @@ typedef uint64_t ephem_option_t;
 #define OPTION_ORBIT_PLANE_ANGLE        EPHEM_OPTION_BIT( 32)
 #define OPTION_GALACTIC_COORDS          EPHEM_OPTION_BIT( 33)
 #define OPTION_GALACTIC_CONFUSION       EPHEM_OPTION_BIT( 34)
+#define OPTION_SNR                      EPHEM_OPTION_BIT( 35)
+#define OPTION_EXPOSURE_TIME            EPHEM_OPTION_BIT( 36)
 
 #define HELIOCENTRIC_SIGMAS_ONLY       0
 #define ORBIT_SIGMAS_REQUESTED         1
@@ -222,13 +224,13 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
          const double lon,
          const double rho_cos_phi, const double rho_sin_phi,
          const int n_steps, const char *note_text,
-         const ephem_option_t options, const unsigned n_objects);
+         ephem_option_t options, unsigned n_objects);
 int ephemeris_in_a_file_from_mpc_code( const char *filename,
          const double *orbit,
          OBSERVE *obs, const int n_obs,
          const double epoch_jd, const double jd_start, const char *stepsize,
          const int n_steps, const char *mpc_code,
-         const ephem_option_t options, const unsigned n_objects);
+         ephem_option_t options, const unsigned n_objects);
 int find_best_fit_planet( const double jd, const double *ivect,
                      double *rel_vect);     /* runge.cpp */
 int integrate_orbit( double *orbit, const double t0, const double t1);

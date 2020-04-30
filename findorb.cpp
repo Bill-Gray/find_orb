@@ -738,6 +738,12 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
          case '9':
             ephemeris_output_options ^= OPTION_SKY_BRIGHTNESS;
             break;
+         case '{':
+            ephemeris_output_options ^= OPTION_SNR;
+            break;
+         case '}':
+            ephemeris_output_options ^= OPTION_EXPOSURE_TIME;
+            break;
          case 'a': case 'A':
             ephemeris_output_options ^= OPTION_ALT_AZ_OUTPUT;
             break;
