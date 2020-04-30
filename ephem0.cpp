@@ -2876,6 +2876,7 @@ static void output_angle_to_buff( char *obuff, double angle, int precision)
             }
             break;
          default:                  /* try to show the angle,  but indicate */
+            fraction = 0;   /* not really necessary;  evades nuisance GCC warning */
             if( angle > -1000. && angle < 1000.)   /* the format is weird  */
                snprintf( obuff, 10, "?%.5f", angle);
             else
