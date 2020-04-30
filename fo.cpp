@@ -519,6 +519,13 @@ int main( int argc, const char **argv)
                debug_printf( "fo: debug_level = %d; %s %s\n",
                            debug_level, __DATE__, __TIME__);
                break;
+            case 'D':
+               {
+               extern const char *environ_dot_dat;
+
+               environ_dot_dat = arg;
+               }
+               break;
             case 'e':
                {
                extern const char *ephemeris_filename;

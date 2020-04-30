@@ -4244,7 +4244,7 @@ void put_observer_data_in_text( const char FAR *mpc_code, char *buff)
       }
 }
 
-static const char *environ_dot_dat = "environ.dat";
+const char *environ_dot_dat = "environ.dat";
 
 const char *get_environment_ptr( const char *env_ptr)
 {
