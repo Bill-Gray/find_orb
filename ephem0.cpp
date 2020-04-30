@@ -1291,13 +1291,14 @@ static int create_json_ephemeris( FILE *ofile, FILE *ifile, char *header)
    int line_no = 0;
 
    text_search_and_replace( header, "-", "");
+   text_search_and_replace( header, " RA ", " RA RA60 ");
+   text_search_and_replace( header, " Dec ", " Dec Dec60 ");
    text_search_and_replace( header, "\"sigPA", "sigPos sigPA");
    text_search_and_replace( header, "ph_ang_bisector", "PABlon PABlat");
    text_search_and_replace( header, "topo_ecliptic", "topoLon topoLat");
    text_search_and_replace( header, "helio_ecliptic", "helioLon helioLat");
    text_search_and_replace( header, "RA'/hrdec", "RAvel decvel");
    text_search_and_replace( header, "'/hr PA", "motion_rate motionPA ");
-   header[4] = '-';     /* make 'Date (UTC)' into one token */
    while( fgets_trimmed( buff, sizeof( buff), ifile))
       if( memcmp( buff, "....", 4) && *buff != '#')         /* skip irrelevant lines */
          {
@@ -1308,7 +1309,7 @@ static int create_json_ephemeris( FILE *ofile, FILE *ifile, char *header)
          while( *hptr && *bptr)
             {
             int hlen = 0, blen = 0;
-            char out_token[20], out_text[20];
+            char out_token[20], out_text[30];
             bool is_text = false;
 
             while( *bptr && *bptr == ' ')
@@ -1334,17 +1335,30 @@ static int create_json_ephemeris( FILE *ofile, FILE *ifile, char *header)
             while( bptr[blen] && bptr[blen] != ' ')
                blen++;
             assert( hlen < 18);
-            assert( blen < 18);
+            assert( blen < 25);
             if( hptr == header)     /* first token -> date/time */
                strcpy( out_token, "JD");
             else
                {
-               memcpy( out_token, hptr, hlen);
-               out_token[hlen] = '\0';
+               if( hptr == header + 5)   /* second token -> ISO date */
+                  {
+                  strcpy( out_token, "ISO_time");
+                  is_text = true;
+                  }
+               else
+                  {
+                  memcpy( out_token, hptr, hlen);
+                  out_token[hlen] = '\0';
+                  }
                fprintf( ofile, ", ");
                }
             memcpy( out_text, bptr, blen);
             out_text[blen] = '\0';
+            if( out_token[hlen - 2] == '6' && out_token[hlen - 1] == '0')
+               {        /* RA60 or Dec60 */
+               is_text = true;
+               text_search_and_replace( out_text, "_", " ");
+               }
             if( !strcmp( out_token, "SM"))
                is_text = true;
             if( is_text)      /* Text must be enclosed in quotes for JSON */
@@ -2231,7 +2245,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   }
                full_ctime( buff, curr_jd, date_format);
                strcat( buff, " ");
-               snprintf( alt_buff, sizeof( alt_buff), "%15.7f", curr_jd);
+               snprintf( alt_buff, sizeof( alt_buff), "%15.7f ", curr_jd);
+               iso_time( alt_buff + strlen( alt_buff), curr_jd);
                if( !(options & OPTION_SUPPRESS_RA_DEC))
                   {
                   strcat( buff, " ");
@@ -2239,7 +2254,10 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   strcat( buff, "   ");
                   strcat( buff, dec_buff);
                   strcat( buff, " ");
-                  snprintf_append( alt_buff, sizeof( alt_buff), " %9.5f %9.5f", ra * 15, dec);
+                  text_search_and_replace( ra_buff, " ", "_");
+                  text_search_and_replace( dec_buff, " ", "_");
+                  snprintf_append( alt_buff, sizeof( alt_buff), " %9.5f %s %9.5f %s",
+                                    ra * 15, ra_buff, dec, dec_buff);
                   }
                if( !(options & OPTION_SUPPRESS_DELTA))
                   {
@@ -2368,7 +2386,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                                      atof( get_environment_ptr( "SNR")), curr_mag);
                   if( exposure_time > 999999.)
                      exposure_time = 999999.;
-                  snprintf_append( alt_buff, sizeof( alt_buff), "%.1f", exposure_time);
+                  snprintf_append( alt_buff, sizeof( alt_buff), " %.1f", exposure_time);
                   if( exposure_time > 99999.)
                      strcat( buff, " -----");
                   else
