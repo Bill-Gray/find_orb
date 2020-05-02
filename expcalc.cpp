@@ -149,19 +149,20 @@ static int find_filter( expcalc_internals_t *e, const char filter)
 
 int find_expcalc_config_from_mpc_code( const char *mpc_code, expcalc_config_t *c)
 {
-   int i = 0, rval;
+   int rval;
+   size_t i = 0;
    static expcalc_config_t configs[] = {
     /*   Code  Filt PrDi ObsDi Ape FWHM QE Rea  Pix   Sky  Airmass */
-       { "I52", 'N', 100., 40., 6., 3., .9, 8., 1.036, 20., 1.5 },
        { "703", 'N',  72., 25., 6., 3., .9, 8., 3.,    20., 1.5 },
-       { "G96", 'N', 152., 48., 6., 3., .9, 8., 1.5,   20., 1.5 },
-       { "V06", 'N', 154., 40., 6., 3., .9, 8., 0.572, 20., 1.5 },
        { "E12", 'N',  50., 23., 6., 3., .9, 8., 1.8,   20., 1.5 },
-       { NULL, ' ',    0.,  0., 0., 0., .0, 0., 0.0,    0., 0.0 } };
+       { "G96", 'N', 152., 48., 6., 3., .9, 8., 1.5,   20., 1.5 },
+       { "I52", 'N', 100., 40., 6., 3., .9, 8., 1.036, 20., 1.5 },
+       { "V06", 'N', 154., 40., 6., 3., .9, 8., 0.572, 20., 1.5 } };
+   const size_t n_configs = sizeof( configs) / sizeof( configs[0]);
 
-   while( configs[i].mpc_code && strcmp( configs[i].mpc_code, mpc_code))
+   while( i < n_configs && strcmp( configs[i].mpc_code, mpc_code))
       i++;
-   if( configs[i].mpc_code)
+   if( i < n_configs)
       {
       *c = configs[i];
       rval = 0;
@@ -282,6 +283,8 @@ int main( const int argc, const char **argv)
    if( find_expcalc_config_from_mpc_code( mpc_code, &c))
       {
       fprintf( stderr, "Unrecognized MPC code '%s'\n", mpc_code);
+      fprintf( stderr, "At present,  this program only knows about the following codes:\n"
+                       "(703) (E12) (I52) (G96) (V06)\n");
       usage( );
       }
    for( i = 1; i < argc; i++)
