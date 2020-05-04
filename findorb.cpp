@@ -102,6 +102,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "mpc_obs.h"
 #include "date.h"
 #include "monte0.h"
+#include "expcalc.h"
 
 int debug_level = 0;
 
@@ -120,12 +121,7 @@ devoted to station data.   */
 #define SHOW_MPC_CODES_NORMAL          1
 #define SHOW_MPC_CODES_MANY            2
 
-#ifndef BUTTON1_MOVED
-   #define BUTTON1_MOVED  0     /* I think only PDCurses has this */
-#endif
-
 #define button1_events (BUTTON1_CLICKED | BUTTON1_DOUBLE_CLICKED \
-      | BUTTON1_MOVED \
       | BUTTON1_TRIPLE_CLICKED | BUTTON1_PRESSED | BUTTON1_RELEASED)
 
       /* Not all Curses allow the following attributes. */
@@ -674,6 +670,13 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                   (ephemeris_output_options & OPTION_MOON_ALT) ? '*' : ' ');
             snprintf_append( buff, sizeof( buff), "8 [%c] Moon azimuth\n",
                   (ephemeris_output_options & OPTION_MOON_AZ) ? '*' : ' ');
+            if( !find_expcalc_config_from_mpc_code( mpc_code, NULL))
+               {
+               snprintf_append( buff, sizeof( buff), "{ [%c] SNR\n",
+                  (ephemeris_output_options & OPTION_SNR) ? '*' : ' ');
+               snprintf_append( buff, sizeof( buff), "} [%c] Exposure time\n",
+                  (ephemeris_output_options & OPTION_EXPOSURE_TIME) ? '*' : ' ');
+               }
             }
          }
       for( i = n_lines = 0; buff[i]; i++)
