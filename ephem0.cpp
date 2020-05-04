@@ -1802,7 +1802,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       if( options & OPTION_SNR)
          snprintf_append( buff, sizeof( buff), " -SNR ");
       if( options & OPTION_EXPOSURE_TIME)
-         snprintf_append( buff, sizeof( buff), " ExpTime ");
+         snprintf_append( buff, sizeof( buff), " ExpT ");
       if( options & OPTION_PHASE_ANGLE_OUTPUT)
          snprintf_append( buff, sizeof( buff), " ph_ang  ");
       if( options & OPTION_PHASE_ANGLE_BISECTOR)
