@@ -658,11 +658,27 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
       compute_observation_motion_details( obs + i, &m);
       fprintf( ofile, "\n          {\"JD\": %.6f, \"iso date\": \"%s\", \"obscode\": \"%s\",",
                   jd, iso_time( buff, jd), obs[i].mpc_code);
+      fprintf( ofile, "\n                 \"RA\" : %.6f, \"Dec\": %.6f,",
+                  obs[i].ra * 180. / PI, obs[i].dec * 180. / PI);
       fprintf( ofile, "\n                 \"dRA\" : %.3f, \"dDec\": %.3f, \"dTime\": %.3f, \"cross\": %.3f,",
          m.xresid, m.yresid, m.time_residual, m.cross_residual);
-      fprintf( ofile, "\n                 \"incl\" : %d", obs[i].is_included);
+      fprintf( ofile, "\n                 \"reference\" : \"%s\",", obs[i].reference);
+      fprintf( ofile, "\n                 \"sigma_1\" : %f,", obs[i].posn_sigma_1);
+      fprintf( ofile, "\n                 \"sigma_2\" : %f,", obs[i].posn_sigma_2);
+      fprintf( ofile, "\n                 \"posn_sigma_theta\" : %f,",
+                                                      obs[i].posn_sigma_theta * 180. / PI);
+      fprintf( ofile, "\n                 \"RAMotion\" : %.4f,", m.ra_motion);
+      fprintf( ofile, "\n                 \"decMotion\" : %.4f,", m.dec_motion);
+      fprintf( ofile, "\n                 \"TotalMotion\" : %.4f,", m.total_motion);
+      fprintf( ofile, "\n                 \"PAMotion\" : %.2f,", m.position_angle_of_motion);
       if( obs[i].obs_mag != BLANK_MAG)
-         fprintf( ofile, ", \"dMag\" : %.2f", obs[i].obs_mag - obs[i].computed_mag);
+         {
+         fprintf( ofile, " \"dMag\" : %.2f,", obs[i].obs_mag - obs[i].computed_mag);
+         fprintf( ofile, " \"MagObs\" : %.2f,", obs[i].obs_mag);
+         fprintf( ofile, "\n                 \"MagBand\" : \"%c\",", obs[i].mag_band);
+         fprintf( ofile, " \"MagSigma\" : %.4f,", obs[i].mag_sigma);
+         }
+      fprintf( ofile, "\n                 \"incl\" : %d", obs[i].is_included);
       fprintf( ofile, " }%c", (i == (int)n_obs - 1 ? ' ' : ','));
       }
    fprintf( ofile, "\n        ]\n      }");
