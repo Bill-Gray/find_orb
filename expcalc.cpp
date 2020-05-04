@@ -164,7 +164,8 @@ int find_expcalc_config_from_mpc_code( const char *mpc_code, expcalc_config_t *c
       i++;
    if( i < n_configs)
       {
-      *c = configs[i];
+      if( c)
+         *c = configs[i];
       rval = 0;
       }
    else              /* failed to find code */
