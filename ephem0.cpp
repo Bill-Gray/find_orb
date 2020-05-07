@@ -2495,8 +2495,13 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   const bool two_place_mags =
                                    (*get_environment_ptr( "MAG_DIGITS") == '2');
 
-                  if( fraction_illum && fraction_illum != 1.)
-                     curr_mag -= 2.5 * log10( fraction_illum);
+                  if( fraction_illum != 1.)
+                     {
+                     if( fraction_illum > 0.)
+                        curr_mag -= 2.5 * log10( fraction_illum);
+                     else
+                        curr_mag = 99.;
+                     }
                   if( two_place_mags)
                      snprintf_append( buff, sizeof( buff), " %5.2f", curr_mag + .005);
                   else if( fraction_illum == 0.)
