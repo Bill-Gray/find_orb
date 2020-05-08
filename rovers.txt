@@ -921,6 +921,20 @@ SN4 !+014.974534   +37.693119       1782.      Dome E of (SN3) at Serra La Nave
    for geoid height.
 099 !+025.535292   +61.130225        112.      Lahti
 
+   Jari also found a magazine article from 1985 in which Kari Kapanen
+   describes his setup at (100) Ähtäri.  The article gave a lat/lon,
+   but with the latitude seconds at 10",  not 01",  putting the observatory
+   in water.  Jari contacted Kapanen's daughter-in-law to confirm the
+   corrected location.  156m alt from G__gle Earth,  plus 18m geoid height.
+   Google doesn't provide a good map;  Jari supplied a link to the much
+   clearer National Land Survey map,
+   https://kartta.paikkatietoikkuna.fi/?zoomLevel=11&coord=353344.4967_6946189.4187&showIntro=false
+   The observatory (dismantled ~2000) reported exactly one observation,
+   of P/Halley,  on 1986 Sep 27.  It was in the small square building
+   SW of 142b on the 'background map'.  This is 5.8 km N of the (low
+   precision) MPC location.
+100 !+024.141444   +62.617194        174.      Ahtari
+
    MPC gives a link to astronomie.at for (563) Seewalchen,  the site for
    Sternwarte Gahberg,  which gives the coordinates below for (563a)
    after adding 45 meters for geoid height.  Robert Orso tells me the
