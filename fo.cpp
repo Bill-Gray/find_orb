@@ -603,6 +603,28 @@ int main( int argc, const char **argv)
                }
                break;
 #endif
+            case 'R':
+               {
+               const char *comma = strchr( arg, ',');
+
+               if( comma)
+                  {
+                  extern double minimum_observation_jd;  /* default is 1     */
+                  extern double maximum_observation_jd;  /* default is +1e+9. */
+                  const size_t len = comma - arg;
+
+                  assert( len < sizeof( tbuff));
+                  memcpy( tbuff, arg, len);
+                  tbuff[len] = '\0';
+                  minimum_observation_jd =
+                          get_time_from_string( 0., tbuff,
+                          FULL_CTIME_YMD | CALENDAR_JULIAN_GREGORIAN, NULL);
+                  maximum_observation_jd =
+                          get_time_from_string( 0., comma + 1,
+                          FULL_CTIME_YMD | CALENDAR_JULIAN_GREGORIAN, NULL);
+                  }
+               }
+               break;
             case 's':
                sanity_test_observations( argv[1]);
                printf( "Sanity check complete\n");

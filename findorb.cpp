@@ -2723,7 +2723,7 @@ int main( int argc, const char **argv)
                take_first_soln = true;
                }
                break;
-            case 'r':
+            case 'R':
                {
                const char *comma = strchr( arg, ',');
 
