@@ -158,6 +158,8 @@ int main( const int argc, const char **argv)
    extern double ephemeris_mag_limit;
    size_t i, bytes_written = 0;
    int element_format = ELEM_OUT_ALTERNATIVE_FORMAT;
+   int file_no = 0;
+   const char *file_names[4] = { "mpec.htm", "combined.json", "elements.json", "ephemeri.json" };
    extern bool neocp_redaction_turned_on;
    int center_object = -2;
 #ifndef _WIN32
@@ -170,7 +172,6 @@ int main( const int argc, const char **argv)
    INTENTIONALLY_UNUSED_PARAMETER( argc);
    setvbuf( lock_file, NULL, _IONBF, 0);
    neocp_redaction_turned_on = false;
-   printf( "Content-type: text/html\n\n");
    fprintf( lock_file, "We're in\n");
    combine_all_observations = 1;
    *ephemeris_step_size = '\0';
@@ -190,6 +191,7 @@ int main( const int argc, const char **argv)
 #ifndef _WIN32
    if( findorb_already_running)
       {
+      printf( "Content-type: text/html\n\n");
       printf( "<h1> Server is busy.  Try again in a minute or two. </h1>");
       printf( "<h3> Your orbit is very important to us! </h3>");
       printf( "<p> I've had some problems with this server suddenly getting a few hundred\n");
@@ -204,6 +206,7 @@ int main( const int argc, const char **argv)
    cgi_status = initialize_cgi_reading( );
    if( cgi_status <= 0)
       {
+      printf( "Content-type: text/html\n\n");
       printf( "<p> <b> CGI data reading failed : error %d </b>", cgi_status);
       printf( "This isn't supposed to happen.</p>\n");
       return( 0);
@@ -242,6 +245,7 @@ int main( const int argc, const char **argv)
 
          if( jd < min_jd || jd > max_jd)
             {
+            printf( "Content-type: text/html\n\n");
             printf( "<b>Ephemeris date out of range</b>\n");
             printf( "<p>'%s' parsed as JD %f\n", buff, jd);
             printf( "The ephemeris starting date must be between JD %.1f and %.1f.</p>\n",
@@ -261,6 +265,7 @@ int main( const int argc, const char **argv)
          if( user_selected_epoch
                   && (user_selected_epoch < min_jd || user_selected_epoch > max_jd))
             {
+            printf( "Content-type: text/html\n\n");
             printf( "Epoch of elements out of range\n");
             printf( "'%s' parsed as JD %f\n", buff, user_selected_epoch);
             printf( "The epoch must be between JD %.1f and %.1f.\n",
@@ -330,6 +335,12 @@ int main( const int argc, const char **argv)
          neocp_redaction_turned_on = true;
       else if( !strcmp( field, "ephem_type"))
          ephemeris_output_options += atoi( buff);
+      else if( !strcmp( field, "file_no"))
+         {
+         file_no = atoi( buff);
+         if( file_no < 0 || file_no > 3)
+            file_no = 0;
+         }
       else if( !strcmp( field, "ephem_opts"))
          ephemeris_output_options = parse_bit_string( buff);
       else if( *field == 'e' && isdigit( field[1]))
@@ -344,6 +355,7 @@ int main( const int argc, const char **argv)
    fprintf( lock_file, "Options read and parsed\n");
    if( !bytes_written)
       {
+      printf( "Content-type: text/html\n\n");
       show_problem_message( );
       return( 0);
       }
@@ -365,6 +377,7 @@ int main( const int argc, const char **argv)
    fprintf( lock_file, "%d objects found in file\n", n_ids);
    if( n_ids <= 0)
       {
+      printf( "Content-type: text/html\n\n");
       printf( n_ids == -1 ? "Couldn't open observation file\n" :
                             "No valid observations found in that data\n");
       return( 0);
@@ -451,7 +464,16 @@ int main( const int argc, const char **argv)
       strcpy( mpec_name, "mpec.htm");
    make_pseudo_mpec( mpec_name, ids[0].obj_name);
    unload_observations( obs, n_obs);
-   ifile = fopen( mpec_name, "rb");
+   if( !file_no)
+      {
+      printf( "Content-type: text/html\n\n");
+      ifile = fopen( mpec_name, "rb");
+      }
+   else
+      {
+      printf( "Content-type: application/json\n\n");
+      ifile = fopen( file_names[file_no], "rb");
+      }
    while( fgets( buff, max_buff_size, ifile))
       printf( "%s", buff);
    fclose( ifile);
