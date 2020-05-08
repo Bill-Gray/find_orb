@@ -158,9 +158,9 @@ static field_group_t *find_groups( const field_location_t *f,
          assert( rval);
          curr_f.max_jd = curr_f.min_jd = f->jd;
          rval[j] = curr_f;
-         printf( "Group %d: code %s, file %d, %fx%f\n",
+         printf( "Group %d: code %s, file %d, %.3fx%.3f\n",
                      (int)j, curr_f.obscode, curr_f.file_number,
-                     curr_f.width, curr_f.height);
+                     curr_f.width * 180 / PI, curr_f.height * 180. / PI);
          }
       else
          {
