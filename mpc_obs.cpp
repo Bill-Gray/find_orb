@@ -1551,6 +1551,9 @@ void set_obs_vect( OBSERVE FAR *obs)
 
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 void set_environment_ptr( const char *env_ptr, const char *new_value);
+int load_environment_file( const char *filename);          /* mpc_obs.cpp */
+static int load_default_environment_file( void);           /* mpc_obs.cpp */
+void update_environ_dot_dat( void);                        /* mpc_obs.cpp */
 
 int earth_lunar_posn( const double jd, double FAR *earth_loc, double FAR *lunar_loc)
 {
@@ -4244,86 +4247,134 @@ void put_observer_data_in_text( const char FAR *mpc_code, char *buff)
       }
 }
 
-const char *environ_dot_dat = "environ.dat";
+static const char *environ_dot_dat = "environ.dat";
+static char **edata = NULL;
+static size_t n_lines = 0, n_lines_allocated = 0;
+static bool is_default_environment = false;
+
+static size_t get_environment_ptr_index( const char *env_ptr)
+{
+   size_t i = 0;
+   const size_t len = strlen( env_ptr);
+
+   while( i < n_lines && (edata[i][len] != '=' || memcmp( edata[i], env_ptr, len)))
+      i++;
+   return( i);
+}
 
 const char *get_environment_ptr( const char *env_ptr)
 {
-   static char **edata;
-   static size_t n_lines;
-   size_t i, i1, step;
-   const char *rval = "";
-   size_t tbuff_len;
-   char tbuff[80];
-   int compare;
+   size_t i;
 
    if( !env_ptr)
       {
       if( edata)
-         free( edata);
-      edata = NULL;
-      return( rval);
-      }
-
-   if( !edata)
-      {
-      int sort_column = 0;
-
-      edata = load_file_into_memory( environ_dot_dat, NULL, false);
-      if( !edata)       /* fall back on a default version: */
-         edata = load_file_into_memory( "environ.def", NULL, true);
-                  /* remove blank/commented-out lines : */
-      for( i = n_lines = 0; edata[i]; i++)
-         if( edata[i][0] > ' ' && edata[i][0] != '#')
-            edata[n_lines++] = edata[i];
-                  /* sort remaining lines : */
-      shellsort_r( edata, n_lines, sizeof( char *),
-                     string_compare_for_sort, &sort_column);
-      }
-   assert( edata);
-   strcpy( tbuff, env_ptr);
-   strcat( tbuff, "=");
-   tbuff_len = strlen( tbuff);
-   for( i = (size_t)-1, step = 0x8000; step; step >>= 1)
-      if( (i1 = i + step) < n_lines &&
-               (compare = memcmp( edata[i1], tbuff, tbuff_len)) <= 0)
          {
-         i = i1;
-         if( !compare)
-            rval = edata[i] + tbuff_len;
+         for( i = 0; i < n_lines; i++)
+            free( edata[i]);
+         free( edata);
          }
-// if( !*rval)
-//    debug_printf( "Didn't find '%s'\n", env_ptr);
-   return( rval);
+      edata = NULL;
+      return( NULL);
+      }
+   if( !edata)
+      load_default_environment_file( );
+   i = get_environment_ptr_index( env_ptr);
+   if( i == n_lines)    /* didn't find it */
+      return( "");
+   else
+      return( edata[i] + strlen( env_ptr) + 1);
 }
 
 void set_environment_ptr( const char *env_ptr, const char *new_value)
 {
-   size_t i;
-   char **text = load_file_into_memory( environ_dot_dat, NULL, false);
-   FILE *ofile;
-   bool found_it = false;
-   const size_t env_ptr_len = strlen( env_ptr);
+   const size_t idx = get_environment_ptr_index( env_ptr);
 
-   assert( env_ptr);
-   assert( new_value);
-   if( !text)
-      text = load_file_into_memory( "environ.def", NULL, true);
-   ofile = fopen_ext( environ_dot_dat, "fcwb");
-   assert( ofile);
-   for( i = 0; text[i]; i++)
-      if( !memcmp( text[i], env_ptr, env_ptr_len) && text[i][env_ptr_len] == '=')
+   if( idx == n_lines_allocated)       /* need to expand array */
+      {
+      size_t i = idx;
+
+      n_lines_allocated *= 2;
+      if( !n_lines_allocated)
+         n_lines_allocated = 8;
+      edata = (char **)realloc( edata, n_lines_allocated * sizeof( char *));
+      while( i < n_lines_allocated)
+         edata[i++] = NULL;
+      }
+   if( idx == n_lines)       /* it's a new one */
+      n_lines++;
+   edata[idx] = (char *)realloc( edata[idx],
+                        strlen( env_ptr) + strlen( new_value) + 2);
+   strcpy( edata[idx], env_ptr);
+   strcat( edata[idx], "=");
+   strcat( edata[idx], new_value);
+}
+
+int load_environment_file( const char *filename)
+{
+   FILE *ifile = fopen_ext( filename, (is_default_environment ? "crb" : "rb"));
+   char buff[300], *tptr;
+   int n_lines = 0, n_set = 0;
+
+   if( !ifile)
+      return( -1);
+   if( edata)
+      is_default_environment = false;
+   while( fgets_trimmed( buff, sizeof( buff), ifile))
+      if( *buff != ' ' && (tptr = strchr( buff, '=')) != NULL)
          {
-         found_it = true;
-         fprintf( ofile, "%s=%s\n", env_ptr, new_value);
+         *tptr = '\0';
+         set_environment_ptr( buff, tptr + 1);
+         n_set++;
          }
       else
-         fprintf( ofile, "%s\n", text[i]);
+         n_lines++;
+   fclose( ifile);
+   return( 0);
+}
 
-   if( !found_it)       /* not a replacement,  but a new value: */
-      fprintf( ofile, "%s=%s\n", env_ptr, new_value);
-   fclose( ofile);
-   free( text);
-   get_environment_ptr( NULL);      /* force a reload of the env data */
+static int load_default_environment_file( void)
+{
+   int rval;
+
+   is_default_environment = true;
+   rval = load_environment_file( environ_dot_dat);
+   if( rval)
+      rval = load_environment_file( "environ.def");
+   assert( !rval);
+   return( rval);
+}
+
+void update_environ_dot_dat( void)
+{
+   if( is_default_environment)
+      {
+      size_t i, j;
+      char **text = load_file_into_memory( environ_dot_dat, NULL, false);
+      FILE *ofile;
+
+      if( !text)
+         text = load_file_into_memory( "environ.def", NULL, true);
+      ofile = fopen_ext( environ_dot_dat, "fcwb");
+      assert( ofile);
+      for( i = 0; text[i]; i++)
+         {
+         bool updated = false;
+         char *tptr = strchr( text[i], '=');
+
+         if( text[i][0] != ' ' && tptr)
+            for( j = 0; j < n_lines && !updated; j++)
+               if( !memcmp( text[i], edata[j], tptr - text[i]))
+                  {
+                  fprintf( ofile, "%s\n", edata[j]);
+                  updated = true;
+                  }
+         if( !updated)
+            fprintf( ofile, "%s\n", text[i]);
+         }
+      fclose( ofile);
+      free( text);
+      }
 }
 
 static inline void compute_relative_velocity_vectors( const OBSERVE FAR *obs,

@@ -699,8 +699,7 @@ seen by 'observer'.  */
 
 static void light_bending( const double *observer, double *result)
 {
-   const double bend_factor = 2. * SOLAR_GM / (AU_PER_DAY * AU_PER_DAY)
-               * (1. + atof( get_environment_ptr( "BENDING")));
+   const double bend_factor = 2. * SOLAR_GM / (AU_PER_DAY * AU_PER_DAY);
    size_t i;
    double p[3], plen, xprod[3], dir[3], dlen;
    const double olen = vector3_length( observer);
@@ -4491,6 +4490,7 @@ int metropolis_search( OBSERVE *obs, const int n_obs, double *orbit,
 #include "sigma.h"
 #include "pl_cache.h"
 
+void update_environ_dot_dat( void);     /* mpc_obs.cpp */
 int galactic_confusion( const double ra, const double dec);
 void pop_all_orbits( void);         /* orb_func2.cpp */
 
@@ -4517,6 +4517,7 @@ int clean_up_find_orb_memory( void)
    find_fcct_biases( 0., 0., 0, 0., NULL, NULL);
    get_find_orb_text( 0);
    load_cospar_file( NULL);
+   update_environ_dot_dat( );
    get_environment_ptr( NULL);
    pop_all_orbits( );
    galactic_confusion( -99., 0.);

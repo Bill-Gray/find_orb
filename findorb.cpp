@@ -225,6 +225,7 @@ int find_vaisala_orbit( double *orbit, const OBSERVE *obs1,   /* orb_func.c */
 int extended_orbit_fit( double *orbit, OBSERVE *obs, int n_obs,
                   const unsigned fit_type, double epoch);     /* orb_func.c */
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
+int load_environment_file( const char *filename);          /* mpc_obs.cpp */
 void set_environment_ptr( const char *env_ptr, const char *new_value);
 int orbital_monte_carlo( const double *orbit, OBSERVE *obs, const int n_obs,
          const double curr_epoch, const double epoch_shown);   /* orb_func.cpp */
@@ -2661,6 +2662,13 @@ int main( int argc, const char **argv)
                   debug_level = 1;
                debug_printf( "findorb: debug_level = %d; %s %s\n",
                            debug_level, __DATE__, __TIME__);
+               break;
+            case 'D':
+               if( load_environment_file( arg))
+                  {
+                  fprintf( stdout, "Couldn't read environment file '%s'\n", arg);
+                  return( -1);
+                  }
                break;
             case 'f':            /* obj designation;  fall through, */
                break;            /* handle below */

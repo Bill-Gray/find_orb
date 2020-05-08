@@ -96,6 +96,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name);
                                                /* ephem0.cpp */
 void set_environment_ptr( const char *env_ptr, const char *new_value);
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
+int load_environment_file( const char *filename);          /* mpc_obs.cpp */
 int reset_astrometry_filename( int *argc, const char **argv);
 uint64_t parse_bit_string( const char *istr);                /* miscell.cpp */
 FILE *open_json_file( char *filename, const char *env_ptr, const char *default_name,
@@ -520,11 +521,11 @@ int main( int argc, const char **argv)
                            debug_level, __DATE__, __TIME__);
                break;
             case 'D':
-               {
-               extern const char *environ_dot_dat;
-
-               environ_dot_dat = arg;
-               }
+               if( load_environment_file( arg))
+                  {
+                  fprintf( stderr, "Couldn't load environment file '%s'\n", arg);
+                  return( -1);
+                  }
                break;
             case 'e':
                {
