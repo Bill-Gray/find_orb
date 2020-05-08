@@ -435,11 +435,7 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
                rval = 27;
                curr_line = -1;
                }
-#ifdef PDCURSES
-            if( MOUSE_POS_REPORT)
-#else
             if( button & REPORT_MOUSE_POSITION)
-#endif
                rval = KEY_MOUSE;          /* ignore mouse moves */
             if( curr_line != highlit_line)   /* move the highlight */
                {
