@@ -117,6 +117,7 @@ static void put_residual_into_text( char *text, const double resid,
 FILE *open_json_file( char *filename, const char *env_ptr, const char *default_name,
                   const char *packed_desig, const char *permits); /* ephem0.cpp */
 size_t strlcat( char *dst, const char *src, size_t dsize);     /* miscell.cpp */
+size_t strlcpy( char *dst, const char *src, size_t dsize);     /* miscell.cpp */
 
 const char *observe_filename = "observe.txt";
 const char *residual_filename = "residual.txt";
@@ -1285,6 +1286,24 @@ inline void calc_sr_dist_and_posn_ang( const DPT *ra_decs, const unsigned n_obje
    free( x);
 }
 
+static inline void clean_up_json_number( char *out_text)
+{
+   size_t len = strlen( out_text);
+
+   assert( len > 0);
+               /* JSON numbers can't end with a decimal point... */
+   if( out_text[len - 1] == '.')
+      out_text[len - 1] = '\0';
+               /* ...nor begin with a '+'... */
+   if( *out_text == '+')
+      memmove( out_text, out_text + 1, strlen( out_text));
+   else if( *out_text == '-')    /* ...but a '-' is okay */
+      out_text++;
+               /* can't start with a zero,  unless before a decimal point */
+   while( *out_text == '0' && (out_text[1] != '.' && out_text[1]))
+      memmove( out_text, out_text + 1, strlen( out_text));
+}
+
 static int create_json_ephemeris( FILE *ofile, FILE *ifile, char *header)
 {
    char buff[1024];
@@ -1314,13 +1333,6 @@ static int create_json_ephemeris( FILE *ofile, FILE *ifile, char *header)
 
             while( *bptr && *bptr == ' ')
                bptr++;
-            if( !is_text)
-               {                    /* JSON objects to leading '+' */
-               if( *bptr == '+')    /* and to leading zeroes */
-                  bptr++;
-               while( *bptr == '0' && isdigit( bptr[1]))
-                  bptr++;
-               }
             while( *hptr && *hptr == ' ')
                hptr++;
             if( !*bptr && !*hptr)         /* end of line */
@@ -1367,6 +1379,8 @@ static int create_json_ephemeris( FILE *ofile, FILE *ifile, char *header)
                *out_text = out_text[blen + 1] = '\"';
                out_text[blen + 2] = '\0';
                }
+            else            /* numeric quantities can't end in '.'... */
+               clean_up_json_number( out_text);
             fprintf( ofile, "\"%s\": %s", out_token, out_text);
             hptr += hlen;
             bptr += blen;
@@ -2081,7 +2095,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
             {
             DPT ra_dec;
             const bool fake_astrometry = ((options & 7) == OPTION_FAKE_ASTROMETRY);
-            char tbuff[80];
+            char tbuff[80], *alt_tptr;
 
             ra_dec.x = atan2( topo[1], topo[0]);
             ra_dec.y = asin( topo[2] / r);
@@ -2243,17 +2257,28 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   strcat( fake_line, dec_buff);
                   strcat( fake_line, "         ");      /* columns 57 to 65 */
                   }
-               full_ctime( buff, curr_jd, date_format);
-               strcat( buff, " ");
                snprintf( alt_buff, sizeof( alt_buff), "%15.7f ", curr_jd);
+               if( computer_friendly)
+                  strlcpy( buff, alt_buff, sizeof( buff));
+               else
+                  {
+                  full_ctime( buff, curr_jd, date_format);
+                  strcat( buff, " ");
+                  }
                iso_time( alt_buff + strlen( alt_buff), curr_jd);
                if( !(options & OPTION_SUPPRESS_RA_DEC))
                   {
-                  strcat( buff, " ");
-                  strcat( buff, ra_buff);
-                  strcat( buff, "   ");
-                  strcat( buff, dec_buff);
-                  strcat( buff, " ");
+                  if( computer_friendly)
+                     snprintf_append( buff, sizeof( buff), " %9.5f %9.5f",
+                                    ra * 15, dec);
+                  else
+                     {
+                     strcat( buff, " ");
+                     strcat( buff, ra_buff);
+                     strcat( buff, "   ");
+                     strcat( buff, dec_buff);
+                     strcat( buff, " ");
+                     }
                   text_search_and_replace( ra_buff, " ", "_");
                   text_search_and_replace( dec_buff, " ", "_");
                   snprintf_append( alt_buff, sizeof( alt_buff), " %9.5f %s %9.5f %s",
@@ -2261,17 +2286,27 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   }
                if( !(options & OPTION_SUPPRESS_DELTA))
                   {
+                  alt_tptr = alt_buff + strlen( alt_buff);
                   snprintf_append( alt_buff, sizeof( alt_buff), " %14.9f", r);
+                  if( computer_friendly)
+                     strlcat( buff, alt_tptr, sizeof( buff));
+                  else
+                     {
                        /* the radar folks prefer the distance to be always in */
                        /* AU,  w/no switch to km for close approach objects: */
-                  use_au_only = show_radar_data;
-                  format_dist_in_buff( buff + strlen( buff), r);
-                  use_au_only = false;
+                     use_au_only = show_radar_data;
+                     format_dist_in_buff( buff + strlen( buff), r);
+                     use_au_only = false;
+                     }
                   }
                if( !(options & OPTION_SUPPRESS_SOLAR_R))
                   {
+                  alt_tptr = alt_buff + strlen( alt_buff);
                   snprintf_append( alt_buff, sizeof( alt_buff), " %14.9f", solar_r);
-                  format_dist_in_buff( buff + strlen( buff), solar_r);
+                  if( computer_friendly)
+                     strlcat( buff, alt_tptr, sizeof( buff));
+                  else
+                     format_dist_in_buff( buff + strlen( buff), solar_r);
                   }
                if( !(options & OPTION_SUPPRESS_ELONG))
                   {
@@ -2317,7 +2352,10 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                            tbuff[1] = (galact_conf > 60 ? 'G' : 'g');
                         }
                      }
-                  snprintf_append( buff, sizeof( buff), "$%06lx%s", rgb, tbuff);
+                  if( computer_friendly)
+                     strcat( buff, tbuff);
+                  else
+                     snprintf_append( buff, sizeof( buff), "$%06lx%s", rgb, tbuff);
                   if( tbuff[1] == ' ' && tbuff[2] == ' ')
                      tbuff[1] = '-';
                   strcat( alt_buff, tbuff);
@@ -2325,16 +2363,12 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                if( options & OPTION_SKY_BRIGHTNESS)
                   {
                   if( mags_per_arcsec2 > 99.9)
-                     {
-                     strcat( buff, " --.--");
-                     strcat( alt_buff, " 99.99");
-                     }
-                  else
-                     {
-                     snprintf( tbuff, sizeof( tbuff), " %5.2f", mags_per_arcsec2);
-                     strcat( buff, tbuff);
-                     strcat( alt_buff, tbuff);
-                     }
+                     mags_per_arcsec2 = 99.99;
+                  snprintf( tbuff, sizeof( tbuff), " %5.2f", mags_per_arcsec2);
+                  strcat( alt_buff, tbuff);
+                  if( mags_per_arcsec2 > 99.9 && !computer_friendly)
+                     strcpy( tbuff, " --.--");
+                  strcat( buff, tbuff);
                   }
 
                curr_mag = abs_mag + calc_obs_magnitude(
@@ -2360,7 +2394,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   {
                   if( alt_az[0].y < 0.)
                      {
-                     strcat( buff, " --.--");
+                     strcat( buff, (computer_friendly ? " 99999" : " --.--"));
                      strcat( alt_buff, " 99999");
                      }
                   else
@@ -2380,14 +2414,14 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   double exposure_time;
 
                   if( alt_az[0].y < 0.)
-                     exposure_time = 999999.;
+                     exposure_time = 99999.;
                   else
                      exposure_time = exposure_from_snr_and_mag( &exposure_config,
                                      atof( get_environment_ptr( "SNR")), curr_mag);
-                  if( exposure_time > 999999.)
-                     exposure_time = 999999.;
-                  snprintf_append( alt_buff, sizeof( alt_buff), " %.1f", exposure_time);
                   if( exposure_time > 99999.)
+                     exposure_time = 99999.;
+                  snprintf_append( alt_buff, sizeof( alt_buff), " %.1f", exposure_time);
+                  if( exposure_time > 99999. && !computer_friendly)
                      strcat( buff, " -----");
                   else
                      snprintf_append( buff, sizeof( buff),
@@ -2534,6 +2568,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   {
                   MOTION_DETAILS m;
                   char *end_ptr = buff + strlen( buff);
+                  char *alt_tptr = alt_buff + strlen( alt_buff);
 
                   compute_observation_motion_details( &temp_obs, &m);
                   strcat( buff, " ");
@@ -2553,10 +2588,14 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                                  " %f %.2f", m.total_motion, m.position_angle_of_motion);
                      }
                   end_ptr[7] = ' ';
+                  if( computer_friendly)
+                     strcpy( end_ptr, alt_tptr);
                   }
                for( j = 0; j < 3; j++)
                   {
                   bool show_alt, show_az;
+                  const double alt = alt_az[j].y * 180. / PI;
+                  const double az  = alt_az[j].x * 180. / PI;
 
                   if( j == 1)
                      {
@@ -2570,16 +2609,25 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                      }
                   else
                      show_alt = show_az = (options & OPTION_ALT_AZ_OUTPUT);
+                  alt_tptr = alt_buff + strlen( alt_buff);
                   *tbuff = '\0';
                   if( show_alt)
+                     {
                      snprintf( tbuff, sizeof( tbuff), " %c%02d",
-                                       (alt_az[j].y > 0. ? '+' : '-'),
-                                       (int)( fabs( alt_az[j].y * 180. / PI) + .5));
+                                       (alt > 0. ? '+' : '-'),
+                                       (int)( fabs( alt) + .5));
+                     snprintf_append( alt_buff, sizeof( alt_buff), " %6.2f", alt);
+                     }
                   if( show_az)
+                     {
                      snprintf_append( tbuff, sizeof( tbuff), " %03d",
-                                       (int)( alt_az[j].x * 180. / PI + .5));
-                  strcat( alt_buff, tbuff);
-                  strcat( buff, tbuff);
+                                       (int)( az + .5));
+                     snprintf_append( alt_buff, sizeof( alt_buff), " %6.2f", az);
+                     }
+                  if( !computer_friendly)
+                     strcat( buff, tbuff);
+                  else
+                     strcat( buff, alt_tptr);
                   }
                if( options & OPTION_RADIAL_VEL_OUTPUT)
                   {
@@ -2680,7 +2728,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
             n_lines_shown++;
          }
       if( *buff)
-         fprintf( ofile, "%s\n", (computer_friendly ? alt_buff : buff));
+         fprintf( ofile, "%s\n", buff);
       if( *alt_buff && computer_friendly_ofile)
          fprintf( computer_friendly_ofile, "%s\n", alt_buff);
       prev_ephem_t = ephemeris_t;
