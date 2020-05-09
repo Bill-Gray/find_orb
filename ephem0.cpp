@@ -1671,7 +1671,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    const char *timescale = get_environment_ptr( "TT_EPHEMERIS");
    const char *override_date_format = get_environment_ptr( "DATE_FORMAT");
    double abs_mag = calc_absolute_magnitude( obs, n_obs);
-   double unused_ht_in_meters;
+   double ht_in_meters;
    DPT latlon;
    bool last_line_shown = true;
    RADAR_DATA rdata;
@@ -1907,7 +1907,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    parallax_to_lat_alt(
             rho_cos_phi / planet_radius_in_au,
             rho_sin_phi / planet_radius_in_au, &latlon.y,
-                                &unused_ht_in_meters, planet_no);
+                                &ht_in_meters, planet_no);
 
    for( i = 0; i < n_steps; i++)
       {
@@ -2161,7 +2161,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                DPT alt_az[3], sun_ra_dec;
                double earth_r = 0.;
                char ra_buff[80], dec_buff[80];
-               double phase_ang, curr_mag;
+               double phase_ang, curr_mag, air_mass = 40.;
 
                solar_r = vector3_length( orbi_after_light_lag);
                earth_r = vector3_length( obs_posn_equatorial);
@@ -2212,8 +2212,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   {
                   BRIGHTNESS_DATA bdata;
 
-                  bdata.ht_above_sea_in_meters = 1000.;
-                  bdata.latitude = PI / 4.;    /* 45 degrees */
+                  bdata.ht_above_sea_in_meters = ht_in_meters;
+                  bdata.latitude = latlon.y;
                   bdata.temperature_in_c = 20.;      /* centigrade */
                   bdata.moon_elongation = lunar_elong;
                   bdata.relative_humidity = 20.;  /* 20% */
@@ -2240,6 +2240,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                         rgb |= (unsigned)component << (j * 8);
                      }
                   mags_per_arcsec2 = -2.5 * log10( bdata.brightness[3]) - 11.055;  /* R brightness */
+                  air_mass = bdata.air_mass;
                   }
                output_signed_angle_to_buff( dec_buff, dec, 2 + added_ra_dec_precision);
                if( added_ra_dec_precision < 0)
@@ -2388,7 +2389,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                                            note_text + 1);
                   }
                exposure_config.sky_brightness = mags_per_arcsec2;
-               exposure_config.airmass = 1. / sin( alt_az[0].y);
+               exposure_config.airmass = air_mass;
 
                if( options & OPTION_SNR)
                   {
