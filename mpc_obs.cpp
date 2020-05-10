@@ -3352,7 +3352,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                            const int n_obs)
 {
    const double days_per_year = 365.25;
-   char buff[350], mpc_code_from_neocp[4], desig_from_neocp[15];
+   char buff[650], mpc_code_from_neocp[4], desig_from_neocp[15];
    char obj_name[80];
    OBSERVE FAR *rval;
    bool including_obs = true;
