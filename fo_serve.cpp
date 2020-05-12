@@ -222,6 +222,9 @@ int main( const int argc, const char **argv)
                                (bytes_written ? "ab" : "wb"));
 
             assert( ofile);
+            for( i = 1; buff[i + 1]; i++)     /* cvt Mac-style CR endings */
+               if( buff[i] == 13 && buff[i + 1] != 10)   /* to LF endings */
+                  buff[i] = 10;
             bytes_written += fwrite( buff, 1, strlen( buff), ofile);
             fprintf( ofile, "\n");
             fclose( ofile);
