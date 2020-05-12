@@ -3939,31 +3939,31 @@ int main( int argc, const char **argv)
             }
             break;
          case CTRL( 'D'):
-            {
-            unsigned max_orbits =
-                    (unsigned)atoi( get_environment_ptr( "MAX_SR_ORBITS"));
-            double *orbits;
-            int n_found;
-
-            if( !max_orbits)
-               max_orbits = 1000;
-            orbits = (double *)calloc( max_orbits, 7 * sizeof( double));
-            for( i = 0; i < n_obs - 1 && !obs[i].is_included; i++)
-               ;
-            n_found = get_sr_orbits( orbits, obs + i, n_obs - i, 0, max_orbits, 3., 1.);
-            sprintf( message_to_user, "%d orbits computed: best score=%.3f\n",
-                   n_found, orbits[6]);
-            if( n_found)
+            inquire( "Number SR orbits: ", tbuff, sizeof( tbuff),
+                            COLOR_DEFAULT_INQUIRY);
+            if( *tbuff)
                {
-               push_orbit( curr_epoch, orbit);
-               memcpy( orbit, orbits, 6 * sizeof( double));
-               curr_epoch = obs[i].jd;
-               update_element_display = 1;
-               set_locs( orbit, curr_epoch, obs, n_obs);
-               show_a_file( "sr_elems.txt");
+               unsigned max_orbits = atoi( tbuff);
+               double *orbits;
+               int n_found;
+
+               orbits = (double *)calloc( max_orbits, 7 * sizeof( double));
+               for( i = 0; i < n_obs - 1 && !obs[i].is_included; i++)
+                  ;
+               n_found = get_sr_orbits( orbits, obs + i, n_obs - i, 0, max_orbits, 3., 1.);
+               sprintf( message_to_user, "%d orbits computed: best score=%.3f\n",
+                      n_found, orbits[6]);
+               if( n_found)
+                  {
+                  push_orbit( curr_epoch, orbit);
+                  memcpy( orbit, orbits, 6 * sizeof( double));
+                  curr_epoch = obs[i].jd;
+                  update_element_display = 1;
+                  set_locs( orbit, curr_epoch, obs, n_obs);
+                  show_a_file( "sr_elems.txt");
+                  }
+               free( orbits);
                }
-            free( orbits);
-            }
             break;
 #ifdef __PDCURSES__
          case CTRL( 'E'):
@@ -4297,11 +4297,17 @@ int main( int argc, const char **argv)
             {
             int n_selected = 0;
             double new_sig;
+            bool is_mul = false;
 
             inquire( "Uncertainty of selected observation(s), in arcsec: ",
                                 tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY);
             if( *tbuff == 't' || *tbuff == 'm')
                new_sig = atof( tbuff + 1);
+            else if( *tbuff == '*')
+               {
+               is_mul = true;
+               new_sig = atof( tbuff + 1);
+               }
             else
                new_sig = atof( tbuff);
             for( i = 0; new_sig > 0. && i < n_obs; i++)
@@ -4321,7 +4327,13 @@ int main( int argc, const char **argv)
                                "Time sigma reset to %.3e seconds", new_sig);
                         break;
                      default:
-                        set_tholen_style_sigmas( obs + i, tbuff);
+                        if( is_mul)
+                           {
+                           obs[i].posn_sigma_1 *= new_sig;
+                           obs[i].posn_sigma_2 *= new_sig;
+                           }
+                        else
+                           set_tholen_style_sigmas( obs + i, tbuff);
                         strcpy( message_to_user, "Positional uncertainty reset");
                         break;
                      }
