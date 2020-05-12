@@ -2388,12 +2388,19 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   snprintf_append( fake_line, sizeof( fake_line), "      %.3s",
                                            note_text + 1);
                   }
-               exposure_config.sky_brightness = mags_per_arcsec2;
-               exposure_config.airmass = air_mass;
+
+               if( rho_cos_phi || rho_sin_phi)
+                  {
+                  exposure_config.sky_brightness = mags_per_arcsec2;
+                  if( alt_az[0].y < 0.)
+                     exposure_config.airmass = 1e+10;
+                  else
+                     exposure_config.airmass = air_mass;
+                  }
 
                if( options & OPTION_SNR)
                   {
-                  if( alt_az[0].y < 0.)
+                  if( exposure_config.airmass > 1e+9)
                      {
                      strcat( buff, (computer_friendly ? " 99999" : " --.--"));
                      strcat( alt_buff, " 99999");
@@ -2414,7 +2421,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   {
                   double exposure_time;
 
-                  if( alt_az[0].y < 0.)
+                  if( exposure_config.airmass > 1e+9)
                      exposure_time = 99999.;
                   else
                      exposure_time = exposure_from_snr_and_mag( &exposure_config,
@@ -2836,8 +2843,7 @@ int ephemeris_in_a_file_from_mpc_code( const char *filename,
    get_object_name( buff, obs->packed_id);
    snprintf_append( note_text, sizeof( note_text), ": %s", buff);
    if( options & (OPTION_SNR | OPTION_EXPOSURE_TIME))
-      if( find_expcalc_config_from_mpc_code( mpc_code, &exposure_config))
-         options &= ~(OPTION_SNR | OPTION_EXPOSURE_TIME);
+      find_expcalc_config_from_mpc_code( mpc_code, &exposure_config);
    return( ephemeris_in_a_file( filename, orbit, obs, n_obs, planet_no,
                epoch_jd, jd_start, stepsize, lon, rho_cos_phi, rho_sin_phi,
                n_steps, note_text, options, n_objects));
