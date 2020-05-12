@@ -147,12 +147,18 @@ static int find_filter( expcalc_internals_t *e, const char filter)
    return( -1);
 }
 
+/* For codes where we lack real information,  we'll return the first
+entry in the table below : a one-meter scope similar (except in size) to
+(703).  It won't be right,  of course,  but may allow comparison of what
+you'd get at times t1 and t2,  or for objects A and B.  For some scopes,
+we can get primary diameters from 'scopes.txt' or 'details.txt'. */
+
 int find_expcalc_config_from_mpc_code( const char *mpc_code, expcalc_config_t *c)
 {
-   int rval;
-   size_t i = 0;
+   size_t i = 0, rval = 0;
    static expcalc_config_t configs[] = {
     /*   Code  Filt PrDi ObsDi Ape FWHM QE Rea  Pix   Sky  Airmass */
+       { "500", 'N', 100., 25., 6., 3., .9, 8., 3.,    20., 1.5 },
        { "703", 'N',  72., 25., 6., 3., .9, 8., 3.,    20., 1.5 },
        { "E12", 'N',  50., 23., 6., 3., .9, 8., 1.8,   20., 1.5 },
        { "G96", 'N', 152., 48., 6., 3., .9, 8., 1.5,   20., 1.5 },
@@ -162,14 +168,13 @@ int find_expcalc_config_from_mpc_code( const char *mpc_code, expcalc_config_t *c
 
    while( i < n_configs && strcmp( configs[i].mpc_code, mpc_code))
       i++;
-   if( i < n_configs)
+   if( i == n_configs)
       {
-      if( c)
-         *c = configs[i];
-      rval = 0;
-      }
-   else              /* failed to find code */
       rval = -1;
+      c = 0;
+      }
+   if( c)
+      *c = configs[i];
    return( rval);
 }
 
