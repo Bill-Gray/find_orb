@@ -4254,12 +4254,20 @@ static bool is_default_environment = false;
 
 static size_t get_environment_ptr_index( const char *env_ptr)
 {
-   size_t i = 0;
+   size_t i = 0, j;
    const size_t len = strlen( env_ptr);
 
-   while( i < n_lines && (edata[i][len] != '=' || memcmp( edata[i], env_ptr, len)))
+   while( i < n_lines)
+      {
+      assert( edata[i]);
+      j = 0;
+      while( j < len && env_ptr[j] == edata[i][j])
+         j++;
+      if( j == len && edata[i][j] == '=')
+         return( i);
       i++;
-   return( i);
+      }
+   return( n_lines);
 }
 
 const char *get_environment_ptr( const char *env_ptr)
