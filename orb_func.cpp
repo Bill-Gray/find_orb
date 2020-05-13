@@ -1672,8 +1672,8 @@ int get_sr_orbits( double *orbits, OBSERVE FAR *obs,
 // perturbers = AUTOMATIC_PERTURBERS;
    for( i = 0; i < max_orbits && clock( ) < end_clock; i++)
       {
-//    double *stored_ra_decs_mags_times =
-//                 add_gaussian_noise_to_obs( n_obs, obs, noise_in_sigmas);
+      double *stored_ra_decs_mags_times =
+                   add_gaussian_noise_to_obs( n_obs, obs, noise_in_sigmas);
 
       if( !find_nth_sr_orbit( tptr, obs, n_obs, i + starting_orbit)
                    && (n_obs == 2 || !adjust_herget_results( obs, n_obs, tptr)))
@@ -1683,8 +1683,8 @@ int get_sr_orbits( double *orbits, OBSERVE FAR *obs,
          rval++;
          tptr += 7;
          }
-//    restore_ra_decs_mags_times( n_obs, obs, stored_ra_decs_mags_times);
-//    free( stored_ra_decs_mags_times);
+      restore_ra_decs_mags_times( n_obs, obs, stored_ra_decs_mags_times);
+      free( stored_ra_decs_mags_times);
       }
    qsort( orbits, rval, 7 * sizeof( double), sr_orbit_compare);
    if( writing_sr_elems)
@@ -4518,6 +4518,7 @@ int clean_up_find_orb_memory( void)
    get_find_orb_text( 0);
    load_cospar_file( NULL);
    update_environ_dot_dat( );
+   load_earth_orientation_params( NULL, NULL);
    get_environment_ptr( NULL);
    pop_all_orbits( );
    galactic_confusion( -99., 0.);
