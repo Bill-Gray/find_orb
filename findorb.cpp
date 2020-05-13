@@ -317,7 +317,7 @@ static int *store_curr_screen( void)
    return( rval);
 }
 
-static void restore_curr_screen( const int *screen)
+static void restore_screen( const int *screen)
 {
    const int xsize = getmaxx( stdscr), ysize = getmaxy( stdscr);
    int y;
@@ -480,7 +480,7 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
       curs_set( 1);        /* turn cursor back on */
       }
    line -= n_lines;     /* put back to top of box */
-   restore_curr_screen( buffered_screen);
+   restore_screen( buffered_screen);
    free( buffered_screen);
    return( rval);
 }
@@ -706,12 +706,13 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
       snprintf_append( buff, sizeof( buff), "?  Help about making ephemerides\n");
       snprintf_append( buff, sizeof( buff), "M  Make ephemeris\n");
       snprintf_append( buff, sizeof( buff), "Q  Quit/return to main display");
+      n_lines += 4;
       c = inquire( buff, NULL, 0, COLOR_DEFAULT_INQUIRY);
                      /* Convert mouse clicks inside the 'dialog box'     */
                      /* to the corresponding first letter on that line   */
                      /* (except for the first two lines,  which wouldn't */
                      /* work;  they start with spaces) :                 */
-      if( c >= KEY_F( 3) && c < KEY_F( 40))
+      if( c >= KEY_F( 3) && c < (int)KEY_F( n_lines))
          {
          unsigned n = c - KEY_F( 1);
 
@@ -1695,7 +1696,7 @@ static void show_a_file( const char *filename)
    int n_lines = 0, msg_num = 0;
    bool search_text_found = true;
    int n_lines_alloced = 0, search_text_length = 0;
-   int *index = NULL, find_text = 0;
+   int *index = NULL, find_text = 0, *backup_screen;
    char search_text[100];
 
    if( !ifile)
@@ -1718,6 +1719,7 @@ static void show_a_file( const char *filename)
       }
    index[0] = 0;
    *err_text = '\0';
+   backup_screen = store_curr_screen( );
    while( keep_going)
       {
       int i, c;
@@ -1981,6 +1983,8 @@ static void show_a_file( const char *filename)
          find_text = 1;
          }
       }
+   restore_screen( backup_screen);
+   free( backup_screen);
    fclose( ifile);
    free( index);
 }
