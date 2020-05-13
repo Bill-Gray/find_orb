@@ -1164,7 +1164,6 @@ int write_out_elements_to_file( const double *orbit,
    extern int is_interstellar;         /* orb_func.cpp */
 
    setvbuf( ofile, NULL, _IONBF, 0);
-   setvbuf( stdout, NULL, _IONBF, 0);
    if( default_comet_magnitude_type == 'N')
       output_format |= SHOWELEM_COMET_MAGS_NUCLEAR;
    if (options & ELEM_OUT_ALTERNATIVE_FORMAT)
