@@ -301,6 +301,33 @@ static int extended_getch( void)
    return( rval);
 }
 
+static int *store_curr_screen( void)
+{
+   const int xsize = getmaxx( stdscr), ysize = getmaxy( stdscr);
+   int x, y;
+   int *rval = (int *)malloc( xsize * ysize * sizeof( chtype)
+                    + 2 * sizeof( int));
+   chtype *cptr = (chtype *)( rval + 2);
+
+   rval[0] = xsize;
+   rval[1] = ysize;
+   for( y = 0; y < ysize; y++)
+      for( x = 0; x < xsize; x++)
+         *cptr++ = mvinch( y, x);
+   return( rval);
+}
+
+static void restore_curr_screen( const int *screen)
+{
+   const int xsize = getmaxx( stdscr), ysize = getmaxy( stdscr);
+   int y;
+   const int n_out = (xsize > screen[0] ? screen[0] : xsize);
+   const chtype *cptr = (const chtype *)( screen + 2);
+
+   for( y = 0; y < ysize && y < screen[1]; y++, cptr += screen[0])
+      mvaddchnstr( y, 0, cptr, n_out);
+}
+
 int clipboard_to_file( const char *filename, const int append); /* clipfunc.cpp */
 int copy_file_to_clipboard( const char *filename);    /* clipfunc.cpp */
 
@@ -313,7 +340,7 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
    const int side_borders = 1;   /* leave a blank on either side */
    int real_width;
    char tbuff[200];
-   chtype *buffered_screen;
+   int *buffered_screen;
 
    if( !curses_running)    /* for error messages either before initscr() */
       {                    /* or after endwin( )                         */
@@ -359,13 +386,7 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
    assert( n_lines > 0 && n_lines < 200);
    assert( real_width > 0 && real_width < (int)sizeof( tbuff));
    tbuff[real_width] = '\0';
-         /* Store rectangle behind the 'inquiry box': */
-   buffered_screen = (chtype *)calloc( n_lines * real_width,
-                     sizeof( chtype));
-   for( i = 0; i < n_lines; i++)
-      for( j = 0; j < real_width; j++)
-         buffered_screen[j + i * real_width] =
-                  mvinch( line + i, col - side_borders + j);
+   buffered_screen = store_curr_screen( );
    for( i = 0; prompt[i]; )
       {
       int n_spaces, color_to_use = color;
@@ -459,9 +480,7 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
       curs_set( 1);        /* turn cursor back on */
       }
    line -= n_lines;     /* put back to top of box */
-   for( i = 0; i < n_lines; i++)
-      mvaddchnstr( line + i, col - side_borders,
-            buffered_screen + i * real_width, real_width);
+   restore_curr_screen( buffered_screen);
    free( buffered_screen);
    return( rval);
 }
