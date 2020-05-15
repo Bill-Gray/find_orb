@@ -485,6 +485,7 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
    line -= n_lines;     /* put back to top of box */
    restore_screen( buffered_screen);
    free( buffered_screen);
+   flushinp( );
    return( rval);
 }
 
