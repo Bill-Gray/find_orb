@@ -715,7 +715,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                      /* to the corresponding first letter on that line   */
                      /* (except for the first two lines,  which wouldn't */
                      /* work;  they start with spaces) :                 */
-      if( c >= KEY_F( 3) && c < (int)KEY_F( n_lines))
+      if( c >= KEY_F( 3) && c <= (int)KEY_F( n_lines))
          {
          unsigned n = c - KEY_F( 1);
 
@@ -3401,7 +3401,7 @@ int main( int argc, const char **argv)
                {                 /* right or middle button click/release */
                i = full_inquire( get_find_orb_text( 2037), NULL, 0,
                         COLOR_MENU, y, x);
-               c = 0;
+               c = KEY_MOUSE;
                switch( i)
                   {
                   case KEY_F( 1) :     /* elems->clipboard */
