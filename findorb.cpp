@@ -124,6 +124,8 @@ devoted to station data.   */
 #define button1_events (BUTTON1_CLICKED | BUTTON1_DOUBLE_CLICKED \
       | BUTTON1_TRIPLE_CLICKED | BUTTON1_PRESSED | BUTTON1_RELEASED)
 
+#define BUTTON_PRESS_EVENT (BUTTON1_PRESSED | BUTTON2_PRESSED | BUTTON3_PRESSED)
+
       /* Not all Curses allow the following attributes. */
 
 #ifndef A_ITALIC
@@ -154,6 +156,7 @@ devoted to station data.   */
 #define RESIDUAL_FORMAT_SHOW_DELTAS              0x1000
 #define RESIDUAL_FORMAT_SHOW_DESIGS              0x2000
 
+size_t strlcpy( char *dst, const char *src, size_t dsize);   /* miscell.c */
 static int user_select_file( char *filename, const char *title, const int flags);
 double get_planet_mass( const int planet_idx);                /* orb_func.c */
 int simplex_method( OBSERVE FAR *obs, int n_obs, double *orbit,
@@ -324,6 +327,7 @@ static void restore_screen( const int *screen)
    const int n_out = (xsize > screen[0] ? screen[0] : xsize);
    const chtype *cptr = (const chtype *)( screen + 2);
 
+   clear( );
    for( y = 0; y < ysize && y < screen[1]; y++, cptr += screen[0])
       mvaddchnstr( y, 0, cptr, n_out);
 }
@@ -457,7 +461,7 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
                rval = 27;
                curr_line = -1;
                }
-            if( button & REPORT_MOUSE_POSITION)
+            if( button & (REPORT_MOUSE_POSITION | BUTTON_PRESS_EVENT))
                rval = KEY_MOUSE;          /* ignore mouse moves */
             if( curr_line != highlit_line)   /* move the highlight */
                {
@@ -474,7 +478,6 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
          while( rval == KEY_RESIZE || rval == KEY_MOUSE);
 #ifndef PDCURSES
       printf("\033[?1003l");   /* ] used in ncurses with xterm-like */
-      printf("\033[?1000h");   /* ] terms to turn mouse move events off */
 #endif
       mousemask( ALL_MOUSE_EVENTS, NULL);
       curs_set( 1);        /* turn cursor back on */
@@ -995,11 +998,19 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
 static void select_element_frame( void)
 {
    int c;
+   const char *curr_frame = get_environment_ptr( "ELEMENTS_FRAME");
 
    do
       {
-      c = inquire( get_find_orb_text( 2034), NULL, 0, COLOR_DEFAULT_INQUIRY);
+      char buff[300];
+      size_t i;
 
+      strlcpy( buff, get_find_orb_text( 2034), sizeof( buff));
+      for( i = 0; buff[i]; i++)
+         if( buff[i] == *curr_frame && buff[i + 1] == ' ' &&
+                     buff[i + 2] == ' ')
+            buff[i + 2] = '*';
+      c = inquire( buff, NULL, 0, COLOR_DEFAULT_INQUIRY);
       if( c >= KEY_F( 1) && c <= KEY_F( 5))
          c += '0' - KEY_F( 1);
       if( c >= '0' && c <= '3')
@@ -3384,7 +3395,49 @@ int main( int argc, const char **argv)
          else if( (observation_display & DISPLAY_ORBITAL_ELEMENTS)
                   && c == KEY_MOUSE
                   && y >= top_line_orbital_elements)
+            {
+            if( button & (BUTTON2_RELEASED | BUTTON2_CLICKED
+                        | BUTTON3_RELEASED | BUTTON3_CLICKED))
+               {                 /* right or middle button click/release */
+               i = full_inquire( get_find_orb_text( 2037), NULL, 0,
+                        COLOR_MENU, y, x);
+               c = 0;
+               switch( i)
+                  {
+                  case KEY_F( 1) :     /* elems->clipboard */
+                     c = ALT_I;
+                     break;
+                  case KEY_F( 2) :     /* save elems       */
+                     c = 's';
+                     break;
+                  case KEY_F( 3) :     /* reference        */
+                     c = ALT_R;
+                     break;
+                  case KEY_F( 4) :     /* epoch            */
+                     c = 'e';
+                     break;
+                  case KEY_F( 5) :     /* frame            */
+                     c = ALT_N;
+                     break;
+                  case KEY_F( 6) :     /* constraints      */
+                     c = 'l';
+                     break;
+                  case KEY_F( 7) :     /* add digit prec   */
+                     c = 'p';
+                     break;
+                  case KEY_F( 8) :     /* sub digit prec   */
+                     c = 'P';
+                     break;
+                  case KEY_F( 9) :     /* elem centre      */
+                     c = '+';
+                     break;
+                  default:
+                     break;
+                  }
+               }
+            else
                c = CTRL( 'B');      /* toggle commented elems */
+            }
          }
 
       if( c >= '1' && c <= '9')
@@ -4779,9 +4832,13 @@ int main( int argc, const char **argv)
          case ALT_A:
             residual_format ^= RESIDUAL_FORMAT_SHOW_DESIGS;
             break;
-
-         case ALT_P:
-         case ALT_R: case ALT_X: case ALT_Y:
+         case ALT_R:
+            inquire( get_find_orb_text( 2038),
+                               tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY);
+            set_environment_ptr( "REFERENCE", tbuff);
+            update_element_display = 1;
+            break;
+         case ALT_P: case ALT_X: case ALT_Y:
          case ALT_Z: case '\'': case 'k':
          case ';':
          default:
