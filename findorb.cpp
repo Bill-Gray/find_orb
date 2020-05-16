@@ -337,6 +337,8 @@ int copy_file_to_clipboard( const char *filename);    /* clipfunc.cpp */
 
 static bool curses_running = false;
 
+static const char *help_file_name = NULL;
+
 static int full_inquire( const char *prompt, char *buff, const int max_len,
                      const int color, const int line0, const int col0)
 {
@@ -360,9 +362,11 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
       for( i = 0; prompt[i]; i++)
          if( prompt[i] == '\n')
             {
-            const int new_size = count_wide_chars_in_utf8_string(
+            int new_size = count_wide_chars_in_utf8_string(
                         prompt + line_start, prompt + i);
 
+            if( help_file_name && !line_start)
+               new_size += 4;       /* ensure room on top line for [?] */
             if( box_size < new_size)
                box_size = new_size;
             line_start = i;
@@ -418,6 +422,12 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
             color_to_use |= A_UNDERLINE;
          put_colored_text( tbuff, line, col - side_borders,
                 side_borders + j - i + n_spaces, color_to_use);
+         if( !i && help_file_name)
+            {
+            color_to_use |= A_REVERSE;
+            put_colored_text( "[?]", line, col - side_borders + real_width - 4,
+                             3, color_to_use);
+            }
          i = j;
          if( prompt[i] == '\n')
             i++;
@@ -436,6 +446,7 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
       else        /* we just want the user to pick a line */
          {
          int highlit_line = -1;     /* initially,  no line is highlit */
+         bool show_help = false;
 
          curs_set( 0);        /* turn cursor off */
          mousemask( ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
@@ -481,6 +492,12 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
                                     A_NORMAL, color, NULL);
                   highlit_line = curr_line;
                   }
+               if( !y && x >= real_width - 4 && x < real_width - 1
+                      && help_file_name && rval == KEY_F( 1))
+                  {
+                  show_help = true;
+                  rval = -1;
+                  }
                }
             }
             while( rval == KEY_MOUSE);
@@ -489,11 +506,14 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
 #endif
          mousemask( ALL_MOUSE_EVENTS, NULL);
          curs_set( 1);        /* turn cursor back on */
+         if( show_help)
+            show_a_file( help_file_name);
          }
       restore_screen( buffered_screen);
       free( buffered_screen);
       flushinp( );
       }
+   help_file_name = NULL;
    return( rval);
 }
 
@@ -715,10 +735,10 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                buff[i + 1] = '\0';
             }
       snprintf_append( buff, sizeof( buff), "C  %s\n", ephem_type_strings[ephem_type]);
-      snprintf_append( buff, sizeof( buff), "?  Help about making ephemerides\n");
       snprintf_append( buff, sizeof( buff), "M  Make ephemeris\n");
       snprintf_append( buff, sizeof( buff), "Q  Quit/return to main display");
       n_lines += 4;
+      help_file_name = "dosephem.txt";
       c = inquire( buff, NULL, 0, COLOR_DEFAULT_INQUIRY);
                      /* Convert mouse clicks inside the 'dialog box'     */
                      /* to the corresponding first letter on that line   */
@@ -1019,6 +1039,7 @@ static void select_element_frame( void)
          if( buff[i] == *curr_frame && buff[i + 1] == ' ' &&
                      buff[i + 2] == ' ')
             buff[i + 2] = '*';
+      help_file_name = "frame_he.txt";
       c = inquire( buff, NULL, 0, COLOR_DEFAULT_INQUIRY);
       if( c >= KEY_F( 1) && c <= KEY_F( 5))
          c += '0' - KEY_F( 1);
@@ -1029,11 +1050,6 @@ static void select_element_frame( void)
          obuff[0] = (char)c;
          obuff[1] = '\0';
          set_environment_ptr( "ELEMENTS_FRAME", obuff);
-         }
-      else if( c == '4' || c == '?')
-         {
-         c = 0;
-         show_a_file( "frame_he.txt");
          }
       }
       while( !c);
@@ -2037,7 +2053,7 @@ static void get_mouse_data( int *mouse_x, int *mouse_y,
 static void put_colored_text( const char *text, const int line_no,
                const int column, const int n_bytes, const int color)
 {
-   const attr_t attrib_mask = A_BOLD | A_BLINK | A_LEFTLINE
+   const attr_t attrib_mask = A_BOLD | A_BLINK | A_LEFTLINE | A_REVERSE
             | A_RIGHTLINE | A_ITALIC | A_UNDERLINE | A_OVERLINE;
 
 
