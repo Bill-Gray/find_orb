@@ -30,6 +30,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include <unistd.h>
 #endif
 
+size_t strlcpy( char *dst, const char *src, size_t dsize);   /* miscell.c */
+size_t strlcat( char *dst, const char *src, size_t dsize);   /* miscell.c */
+size_t strlcpy_err( char *dst, const char *src, size_t dsize); /* miscell.c */
+size_t strlcat_err( char *dst, const char *src, size_t dsize); /* miscell.c */
+
    /* MSVC/C++ lacks snprintf.  See 'ephem0.cpp' for details. */
 #if defined(_MSC_VER) && _MSC_VER < 1900
 int snprintf( char *string, const size_t max_len, const char *format, ...);
@@ -542,4 +547,35 @@ size_t strlcat( char *dst, const char *src, size_t dsize)
    *dst = '\0';
 
    return(dlen + (src - osrc));  /* count does not include NUL */
+}
+
+/* Same as strlcpy() and strlcat(),  except that if truncation occurs,
+we abort.  strlcpy()/strlcat() should only be used in situations where
+truncation is entirely to be expected;  if truncation indicates a bug,
+use the _err() versions instead.  */
+
+size_t strlcpy_err( char *dst, const char *src, size_t dsize)
+{
+   const size_t rval = strlcpy( dst, src, dsize);
+
+   if( rval >= dsize)
+      {
+      fprintf( stderr, "strlcpy overflow: dsize = %ld, rval %ld, '%s'\n",
+                     (long)dsize, (long)rval, src);
+      exit( -1);
+      }
+   return( rval);
+}
+
+size_t strlcat_err( char *dst, const char *src, size_t dsize)
+{
+   const size_t rval = strlcat( dst, src, dsize);
+
+   if( rval >= dsize)
+      {
+      fprintf( stderr, "strlcat overflow: dsize = %ld, rval %ld, '%s'\n",
+                     (long)dsize, (long)rval, src);
+      exit( -1);
+      }
+   return( rval);
 }
