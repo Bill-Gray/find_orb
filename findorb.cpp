@@ -1404,9 +1404,9 @@ static unsigned show_basic_info( const OBSERVE FAR *obs, const int n_obs,
    return( line);
 }
 
-int select_central_object( int *element_format)
+int select_central_object( int *element_format, char *buff,
+                                          const bool dialog_text_only)
 {
-   char buff[400];
    extern int forced_central_body;
    int i, c;
    const char *hotkeys = "AB0123456789L", *tptr;
@@ -1432,6 +1432,8 @@ int select_central_object( int *element_format)
          strcat( buff, "\n");
          }
       }
+   if( dialog_text_only)
+      return( 0);
    c = inquire( buff, NULL, 0, COLOR_DEFAULT_INQUIRY);
    if( c && (tptr = strchr( hotkeys, toupper( c))) != NULL)
       c = KEY_F( 1) + (int)( tptr - hotkeys);
@@ -2618,9 +2620,10 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
    return( ids);
 }
 
-static void setup_elements_dialog( char *buff, const char *constraints)
+static void setup_elements_dialog( char *buff, const char *constraints,
+                                             int element_format)
 {
-   char tbuff[300], *tptr;
+   int pass;
 
    strcpy( buff, get_find_orb_text( 2037));
    text_search_and_replace( buff, "$REF",
@@ -2629,20 +2632,30 @@ static void setup_elements_dialog( char *buff, const char *constraints)
       constraints = "(none)";
    text_search_and_replace( buff, "$CON", constraints);
 
-   element_frame_dialog_text( tbuff);
-   tptr = strchr( tbuff, '*');
-   if( *tptr)     /* found the element frame */
+   for( pass = 0; pass < 2; pass++)
       {
-      size_t i;
+      char tbuff[300], *tptr;
 
-      tptr += 2;
-      for( i = 0; tptr[i] >= ' '; i++)
-         tbuff[i] = tptr[i];
-      tbuff[i] = '\0';
+      if( pass)
+         select_central_object( &element_format, tbuff, true);
+      else
+         element_frame_dialog_text( tbuff);
+      tptr = strchr( tbuff, '*');
+      if( *tptr)     /* found the element frame */
+         {
+         size_t i;
+
+         tptr++;
+         while( *tptr == ' ')
+            tptr++;
+         for( i = 0; tptr[i] >= ' '; i++)
+            tbuff[i] = tptr[i];
+         tbuff[i] = '\0';
+         }
+      else
+         strcpy( tbuff, "(?!)");
+      text_search_and_replace( buff, (pass ? "$CEN" : "$FRA"), tbuff);
       }
-   else
-      strcpy( tbuff, "(?!)");
-   text_search_and_replace( buff, "$FRA", tbuff);
 }
 
    /* On any platform with ASLR,  the address of 'zval' will be
@@ -3462,7 +3475,7 @@ int main( int argc, const char **argv)
             if( button & (BUTTON2_RELEASED | BUTTON2_CLICKED
                         | BUTTON3_RELEASED | BUTTON3_CLICKED))
                {                 /* right or middle button click/release */
-               setup_elements_dialog( tbuff, orbit_constraints);
+               setup_elements_dialog( tbuff, orbit_constraints, element_format);
                i = full_inquire( tbuff, NULL, 0,
                                COLOR_MENU, y, x);
                c = KEY_MOUSE;
@@ -4530,7 +4543,7 @@ int main( int argc, const char **argv)
             add_off_on = (residual_format & RESIDUAL_FORMAT_MAG_RESIDS);
             break;
          case '+':
-            select_central_object( &element_format);
+            select_central_object( &element_format, tbuff, false);
             update_element_display = 1;
             break;
          case '[':
