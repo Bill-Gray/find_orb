@@ -1029,21 +1029,27 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
       }
 }
 
+static void element_frame_dialog_text( char *buff)
+{
+   const char *curr_frame = get_environment_ptr( "ELEMENTS_FRAME");
+   size_t i;
+
+   strcpy( buff, get_find_orb_text( 2034));
+   for( i = 0; buff[i]; i++)
+      if( buff[i] == *curr_frame && buff[i + 1] == ' ' &&
+                  buff[i + 2] == ' ')
+         buff[i + 2] = '*';
+}
+
 static void select_element_frame( void)
 {
    int c;
-   const char *curr_frame = get_environment_ptr( "ELEMENTS_FRAME");
 
    do
       {
       char buff[300];
-      size_t i;
 
-      strlcpy( buff, get_find_orb_text( 2034), sizeof( buff));
-      for( i = 0; buff[i]; i++)
-         if( buff[i] == *curr_frame && buff[i + 1] == ' ' &&
-                     buff[i + 2] == ' ')
-            buff[i + 2] = '*';
+      element_frame_dialog_text( buff);
       help_file_name = "frame_he.txt";
       c = inquire( buff, NULL, 0, COLOR_DEFAULT_INQUIRY);
       if( c >= KEY_F( 1) && c <= KEY_F( 5))
@@ -2612,6 +2618,33 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
    return( ids);
 }
 
+static void setup_elements_dialog( char *buff, const char *constraints)
+{
+   char tbuff[300], *tptr;
+
+   strcpy( buff, get_find_orb_text( 2037));
+   text_search_and_replace( buff, "$REF",
+                  get_environment_ptr( "REFERENCE"));
+   if( !*constraints)
+      constraints = "(none)";
+   text_search_and_replace( buff, "$CON", constraints);
+
+   element_frame_dialog_text( tbuff);
+   tptr = strchr( tbuff, '*');
+   if( *tptr)     /* found the element frame */
+      {
+      size_t i;
+
+      tptr += 2;
+      for( i = 0; tptr[i] >= ' '; i++)
+         tbuff[i] = tptr[i];
+      tbuff[i] = '\0';
+      }
+   else
+      strcpy( tbuff, "(?!)");
+   text_search_and_replace( buff, "$FRA", tbuff);
+}
+
    /* On any platform with ASLR,  the address of 'zval' will be
    cyptographically selected at startup time.  (Or at least,  some
    bits of it will be.)  It should be more than random enough for
@@ -3429,8 +3462,9 @@ int main( int argc, const char **argv)
             if( button & (BUTTON2_RELEASED | BUTTON2_CLICKED
                         | BUTTON3_RELEASED | BUTTON3_CLICKED))
                {                 /* right or middle button click/release */
-               i = full_inquire( get_find_orb_text( 2037), NULL, 0,
-                        COLOR_MENU, y, x);
+               setup_elements_dialog( tbuff, orbit_constraints);
+               i = full_inquire( tbuff, NULL, 0,
+                               COLOR_MENU, y, x);
                c = KEY_MOUSE;
                switch( i)
                   {
