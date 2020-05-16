@@ -3476,6 +3476,7 @@ int main( int argc, const char **argv)
                         | BUTTON3_RELEASED | BUTTON3_CLICKED))
                {                 /* right or middle button click/release */
                setup_elements_dialog( tbuff, orbit_constraints, element_format);
+               help_file_name = "elem_pop.txt";
                i = full_inquire( tbuff, NULL, 0,
                                COLOR_MENU, y, x);
                c = KEY_MOUSE;

@@ -1,0 +1,65 @@
+Right-clicking on the orbital elements gets you a popup dialog with the
+following options.
+
+COPY ELEMENTS TO CLIPBOARD
+SAVE ELEMENTS
+
+   These actually copy,  or save to a file,  both the currently displayed
+elements plus some auxiliary information : MOIDs,  encounter velocities with
+the earth,  perturbers used,  state vectors,  and so on.  You may find
+that you want to edit the results a bit.
+
+REFERENCE=
+
+   Find_Orb defaults to showing the reference in the elements as 'Find_Orb'.
+(On-line Find_Orb will show 'Auto-Find',  and the on-line NEOCP pages list
+the reference as 'AutoNEOCP'.)  It's generally good practice to change this
+so that anyone looking at the elements will know who computed them.
+
+EPOCH
+
+   The epoch of the elements defaults to somewhere near the date of the last
+observation,  but can be reset freely.  It's unusual to see epochs that are
+not at 00:00 UTC,  but that's just a convention.  MPC likes to use epochs
+that are a multiple of 200 in MJD form,  such as 2020 Dec 17.0 = JD 2459200.5.
+
+FRAME=Default frame
+
+   "Normally",  geocentric elements are in the J2000 equatorial frame,  and
+others are in the J2000 ecliptic frame;  Find_Orb will use those by default.
+Sometimes,  the other frame is used;  sometimes,  elements are in the frame
+of the body being orbited (this tends to happen for inner satellites of the
+other planets;  elements for,  say,  Deimos or Ganymede would usually be
+referenced to the equators of Mars or Jupiter.)
+
+CONSTRAINTS=
+
+   Here,  you can enter 'e=1' to constrain the orbit to be parabolic,  or
+'a=2.3' to constrain the semimajor axis to be 2.3 AU.  Having done so,
+'full steps' will generate orbits of the specified sort,  or as close to
+it as it can.  Constraints can be combined;  'q=13000km,e=0.3' to get that
+periapsis distance and eccentricity,  for example.
+
+   Constraints can be in the following quantities :
+
+   q  (periapsis distance)             a (semimajor axis)
+   Q  (apoapsis distance)              e (eccentricity)
+   i  (inclination)                    O (Omega=ascending node)
+   P  (period)                         o (omega=argument of periapsis)
+   n  (mean motion, deg/day)           T, Tp (time of periapsis)
+   A  (area/mass ratio, m^2/kg)
+   A1, A2, A3 (Marsden-Sekanina comet params)
+
+INCREASE PRECISION
+DECREASE PRECISION
+
+   Add/subtract a digit to the precision of most orbital element quantities.
+
+ELEMENT CENTER=Automatic
+
+   By default,  Find_Orb chooses the center of the orbit 'automatically' :
+usually heliocentric,  unless the object at the time of the epoch would
+be close to a planet or moon,  within its "sphere of influence".  In that
+case,  Find_Orb will shift to (say) geocentric or Neptune-centric elements.
+
+   You can,  however,  tell Find_Orb that you want a specific central object.
