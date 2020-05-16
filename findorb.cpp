@@ -2564,7 +2564,12 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
    if( *ifilename == ':')
       for( i = n_lines - 1; i; i--)
          if( *prev_files[i] != '#' && patMatch( ifilename + 1, prev_files[i]))
-            strcpy( ifilename, prev_files[i]);
+#ifdef _WIN32
+            if( strstr( prev_files[i], ":\\"))
+#else
+            if( !strstr( prev_files[i], ":\\"))
+#endif
+               strcpy( ifilename, prev_files[i]);
 
    ids = find_objects_in_file( ifilename, n_ids, NULL);
    if( *n_ids > 0 && drop_single_obs)
