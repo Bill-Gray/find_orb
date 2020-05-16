@@ -295,11 +295,10 @@
 
 2033    Use arrow keys to select object,  then hit the space bar or Enter (or use mouse)
 
-2034    0 Default element frame
-2034    1 J2000 ecliptic frame
-2034    2 J2000 equatorial frame
-2034    3 Body frame
-2034    ? Help
+2034    0   Default frame
+2034    1   J2000 ecliptic
+2034    2   J2000 equatorial
+2034    3   Body frame
 
 2035    English
 2035    French
@@ -307,3 +306,20 @@
 2035    Russian
 2035    Spanish
 2035    German
+
+2036    Help about this dialog
+2036    Select file of observations
+2036    Get observations from clipboard
+2036    Download observations from MPC
+
+2037    Copy elements to clipboard
+2037    Save elements
+2037    Reference=$REF
+2037    Epoch
+2037    Frame=$FRA
+2037    Constraints=$CON
+2037    Increase precision
+2037    Decrease precision
+2037    Element center=$CEN
+
+2038    Enter element reference :
