@@ -400,6 +400,7 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
       assert( real_width > 0 && real_width < (int)sizeof( tbuff));
       tbuff[real_width] = '\0';
       buffered_screen = store_curr_screen( );
+      col -= side_borders;
       for( i = 0; prompt[i]; )
          {
          int n_spaces, color_to_use = color;
@@ -420,12 +421,12 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
             color_to_use |= A_OVERLINE;
          if( !prompt[j] || !prompt[j + 1])
             color_to_use |= A_UNDERLINE;
-         put_colored_text( tbuff, line, col - side_borders,
+         put_colored_text( tbuff, line, col,
                 side_borders + j - i + n_spaces, color_to_use);
          if( !i && help_file_name)
             {
             color_to_use |= A_REVERSE;
-            put_colored_text( "[?]", line, col - side_borders + real_width - 4,
+            put_colored_text( "[?]", line, col + real_width - 4,
                              3, color_to_use);
             }
          i = j;
@@ -436,9 +437,8 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
       if( buff)         /* we're asking for text from the user */
          {
          memset( tbuff, ' ', real_width);
-         put_colored_text( tbuff, line, col - side_borders,
-                real_width, color);
-         move( line, col);
+         put_colored_text( tbuff, line, col, real_width, color);
+         move( line, col + side_borders);
          echo( );
          rval = getnstr( buff, max_len);
          noecho( );
@@ -466,12 +466,12 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
                     /* on the second line,  etc.                    */
             if( rval == KEY_MOUSE)
                {
-               int x, y, z, curr_line;
+               int x, y, z, curr_line, pass;
                unsigned long button;
 
                get_mouse_data( &x, &y, &z, &button);
                curr_line = y;
-               x -= col - side_borders;
+               x -= col;
                y -= line - n_lines;
                if( y >= 0 && y < n_lines && x >= 0 && x < real_width)
                   rval = KEY_F( y + 1);
