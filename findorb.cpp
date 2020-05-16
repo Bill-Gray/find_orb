@@ -338,13 +338,9 @@ int copy_file_to_clipboard( const char *filename);    /* clipfunc.cpp */
 static bool curses_running = false;
 
 static int full_inquire( const char *prompt, char *buff, const int max_len,
-                     const int color, int line, int col)
+                     const int color, const int line0, const int col0)
 {
-   int i, j, rval, n_lines = 1, line_start = 0, box_size = 0;
-   const int side_borders = 1;   /* leave a blank on either side */
-   int real_width;
-   char tbuff[200];
-   int *buffered_screen;
+   int rval = -1;
 
    if( !curses_running)    /* for error messages either before initscr() */
       {                    /* or after endwin( )                         */
@@ -352,140 +348,152 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
       getchar( );
       return( 0);
       }
-   for( i = 0; prompt[i]; i++)
-      if( prompt[i] == '\n')
-         {
-         const int new_size = count_wide_chars_in_utf8_string(
-                     prompt + line_start, prompt + i);
 
-         if( box_size < new_size)
-            box_size = new_size;
-         line_start = i;
-         if( prompt[i + 1])   /* ignore trailing '\n's */
-            n_lines++;
+   while( rval < 0)
+      {
+      int i, j, n_lines = 1, line_start = 0, box_size = 0;
+      const int side_borders = 1;   /* leave a blank on either side */
+      int real_width, line = line0, col = col0;
+      char tbuff[200];
+      int *buffered_screen;
+
+      for( i = 0; prompt[i]; i++)
+         if( prompt[i] == '\n')
+            {
+            const int new_size = count_wide_chars_in_utf8_string(
+                        prompt + line_start, prompt + i);
+
+            if( box_size < new_size)
+               box_size = new_size;
+            line_start = i;
+            if( prompt[i + 1])   /* ignore trailing '\n's */
+               n_lines++;
+            }
+      i = count_wide_chars_in_utf8_string( prompt + line_start, prompt + i);
+      if( box_size < i)
+         box_size = i;
+      if( box_size > getmaxx( stdscr) - 2)
+         box_size = getmaxx( stdscr) - 2;
+
+      real_width = side_borders * 2 + box_size;
+      if( line == -1)         /* just center the box */
+         {
+         line = (getmaxy( stdscr) - n_lines) / 2;
+         col = (getmaxx( stdscr) - box_size) / 2;
          }
-   i = count_wide_chars_in_utf8_string( prompt + line_start, prompt + i);
-   if( box_size < i)
-      box_size = i;
-   if( box_size > getmaxx( stdscr) - 2)
-      box_size = getmaxx( stdscr) - 2;
-
-   real_width = side_borders * 2 + box_size;
-   if( line == -1)         /* just center the box */
-      {
-      line = (getmaxy( stdscr) - n_lines) / 2;
-      col = (getmaxx( stdscr) - box_size) / 2;
-      }
-   else              /* pop-up; may move above or below */
-      {
-      if( line + n_lines >= getmaxy( stdscr))
-         line -= n_lines;
-      else
-         line++;
-      if( col + real_width >= getmaxx( stdscr))
-         col -= real_width;
-      else
-         col++;
-      }
-   assert( n_lines > 0 && n_lines < 200);
-   assert( real_width > 0 && real_width < (int)sizeof( tbuff));
-   tbuff[real_width] = '\0';
-   buffered_screen = store_curr_screen( );
-   for( i = 0; prompt[i]; )
-      {
-      int n_spaces, color_to_use = color;
-      int n_wchars;
-
-      for( j = i; prompt[j] && prompt[j] != '\n'; j++)
-         ;
-      memset( tbuff, ' ', side_borders);
-      memcpy( tbuff + side_borders, prompt + i, j - i);
-      n_wchars = count_wide_chars_in_utf8_string(
-                     prompt + i, prompt + j);
-      n_spaces = box_size + side_borders - n_wchars;
-      if( n_spaces > 0)
-         memset( tbuff + side_borders + j - i, ' ', n_spaces);
-      else
-         n_spaces = 0;
-      if( !i)
-         color_to_use |= A_OVERLINE;
-      if( !prompt[j] || !prompt[j + 1])
-         color_to_use |= A_UNDERLINE;
-      put_colored_text( tbuff, line, col - side_borders,
-             side_borders + j - i + n_spaces, color_to_use);
-      i = j;
-      if( prompt[i] == '\n')
-         i++;
-      line++;
-      }
-   if( buff)         /* we're asking for text from the user */
-      {
-      memset( tbuff, ' ', real_width);
-      put_colored_text( tbuff, line, col - side_borders,
-             real_width, color);
-      move( line, col);
-      echo( );
-      rval = getnstr( buff, max_len);
-      noecho( );
-      }
-   else        /* we just want the user to pick a line */
-      {
-      int highlit_line = -1;     /* initially,  no line is highlit */
-
-      curs_set( 0);        /* turn cursor off */
-      mousemask( ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
-#ifndef PDCURSES
-      printf("\033[?1003h");   /* ] used in ncurses with xterm-like */
-#endif                         /* terms to enable mouse move events */
-      do
+      else              /* pop-up; may move above or below */
          {
-         rval = extended_getch( );
-         if( rval == KEY_RESIZE)
-            resize_term( 0, 0);
+         if( line + n_lines >= getmaxy( stdscr))
+            line -= n_lines;
+         else
+            line++;
+         if( col + real_width >= getmaxx( stdscr))
+            col -= real_width;
+         else
+            col++;
+         }
+      assert( n_lines > 0 && n_lines < 200);
+      assert( real_width > 0 && real_width < (int)sizeof( tbuff));
+      tbuff[real_width] = '\0';
+      buffered_screen = store_curr_screen( );
+      for( i = 0; prompt[i]; )
+         {
+         int n_spaces, color_to_use = color;
+         int n_wchars;
+
+         for( j = i; prompt[j] && prompt[j] != '\n'; j++)
+            ;
+         memset( tbuff, ' ', side_borders);
+         memcpy( tbuff + side_borders, prompt + i, j - i);
+         n_wchars = count_wide_chars_in_utf8_string(
+                        prompt + i, prompt + j);
+         n_spaces = box_size + side_borders - n_wchars;
+         if( n_spaces > 0)
+            memset( tbuff + side_borders + j - i, ' ', n_spaces);
+         else
+            n_spaces = 0;
+         if( !i)
+            color_to_use |= A_OVERLINE;
+         if( !prompt[j] || !prompt[j + 1])
+            color_to_use |= A_UNDERLINE;
+         put_colored_text( tbuff, line, col - side_borders,
+                side_borders + j - i + n_spaces, color_to_use);
+         i = j;
+         if( prompt[i] == '\n')
+            i++;
+         line++;
+         }
+      if( buff)         /* we're asking for text from the user */
+         {
+         memset( tbuff, ' ', real_width);
+         put_colored_text( tbuff, line, col - side_borders,
+                real_width, color);
+         move( line, col);
+         echo( );
+         rval = getnstr( buff, max_len);
+         noecho( );
+         }
+      else        /* we just want the user to pick a line */
+         {
+         int highlit_line = -1;     /* initially,  no line is highlit */
+
+         curs_set( 0);        /* turn cursor off */
+         mousemask( ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
+#ifndef PDCURSES
+         printf("\033[?1003h\n");   /* ] used in ncurses with xterm-like */
+#endif                         /* terms to enable mouse move events */
+         do
+            {
+            rval = extended_getch( );
+            if( rval == KEY_RESIZE)
+               {
+               rval = -1;
+               resize_term( 0, 0);
+               }
                     /* If you click within the inquiry box borders, */
                     /* you get KEY_F(1) on the top line, KEY_F(2)   */
                     /* on the second line,  etc.                    */
-         if( rval == KEY_MOUSE)
-            {
-            int x, y, z, curr_line;
-            unsigned long button;
+            if( rval == KEY_MOUSE)
+               {
+               int x, y, z, curr_line;
+               unsigned long button;
 
-            get_mouse_data( &x, &y, &z, &button);
-            curr_line = y;
-            x -= col - side_borders;
-            y -= line - n_lines;
-            if( y >= 0 && y < n_lines && x >= 0 && x < real_width)
-               rval = KEY_F( y + 1);
-            else
-               {
-               rval = 27;
-               curr_line = -1;
-               }
-            if( button & (REPORT_MOUSE_POSITION | BUTTON_PRESS_EVENT))
-               rval = KEY_MOUSE;          /* ignore mouse moves */
-            if( curr_line != highlit_line)   /* move the highlight */
-               {
-               if( curr_line != -1)
-                  mvchgat( curr_line, col - side_borders, real_width,
-                                 A_REVERSE, color, NULL);
-               if( highlit_line != -1)
-                  mvchgat( highlit_line, col - side_borders, real_width,
-                                 A_NORMAL, color, NULL);
-               highlit_line = curr_line;
+               get_mouse_data( &x, &y, &z, &button);
+               curr_line = y;
+               x -= col - side_borders;
+               y -= line - n_lines;
+               if( y >= 0 && y < n_lines && x >= 0 && x < real_width)
+                  rval = KEY_F( y + 1);
+               else
+                  {
+                  rval = 27;
+                  curr_line = -1;
+                  }
+               if( button & (REPORT_MOUSE_POSITION | BUTTON_PRESS_EVENT))
+                  rval = KEY_MOUSE;          /* ignore mouse moves */
+               if( curr_line != highlit_line)   /* move the highlight */
+                  {
+                  if( curr_line != -1)
+                     mvchgat( curr_line, col - side_borders, real_width,
+                                    A_REVERSE, color, NULL);
+                  if( highlit_line != -1)
+                     mvchgat( highlit_line, col - side_borders, real_width,
+                                    A_NORMAL, color, NULL);
+                  highlit_line = curr_line;
+                  }
                }
             }
-         }
-         while( rval == KEY_RESIZE || rval == KEY_MOUSE);
+            while( rval == KEY_MOUSE);
 #ifndef PDCURSES
-      printf("\033[?1003l");   /* ] used in ncurses with xterm-like */
+         printf("\033[?1003l");   /* ] used in ncurses with xterm-like */
 #endif
-      mousemask( ALL_MOUSE_EVENTS, NULL);
-      curs_set( 1);        /* turn cursor back on */
+         mousemask( ALL_MOUSE_EVENTS, NULL);
+         curs_set( 1);        /* turn cursor back on */
+         }
+      restore_screen( buffered_screen);
+      free( buffered_screen);
+      flushinp( );
       }
-   line -= n_lines;     /* put back to top of box */
-   restore_screen( buffered_screen);
-   free( buffered_screen);
-   flushinp( );
    return( rval);
 }
 
