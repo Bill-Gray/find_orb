@@ -483,15 +483,20 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
                if( button & (REPORT_MOUSE_POSITION | BUTTON_PRESS_EVENT))
                   rval = KEY_MOUSE;          /* ignore mouse moves */
                if( curr_line != highlit_line)   /* move the highlight */
-                  {
-                  if( curr_line != -1)
-                     mvchgat( curr_line, col - side_borders, real_width,
-                                    A_REVERSE, color, NULL);
-                  if( highlit_line != -1)
-                     mvchgat( highlit_line, col - side_borders, real_width,
-                                    A_NORMAL, color, NULL);
-                  highlit_line = curr_line;
-                  }
+                  for( pass = 0; pass < 2; pass++)
+                     {
+                     if( highlit_line != -1)
+                        {
+                        const attr_t attr = (pass ? A_REVERSE : A_NORMAL);
+
+                        mvchgat( highlit_line, col, real_width, attr, color,
+                                                     NULL);
+                        if( highlit_line == line - n_lines && help_file_name)
+                           mvchgat( highlit_line, col + real_width - 4, 3,
+                                 attr ^ (A_REVERSE | A_NORMAL), color, NULL);
+                        }
+                     highlit_line = curr_line;
+                     }
                if( !y && x >= real_width - 4 && x < real_width - 1
                       && help_file_name && rval == KEY_F( 1))
                   {
