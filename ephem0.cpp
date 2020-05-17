@@ -2374,6 +2374,13 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
 
                curr_mag = abs_mag + calc_obs_magnitude(
                           solar_r, r, earth_r, &phase_ang);  /* elem_out.cpp */
+               if( fraction_illum != 1.)
+                  {
+                  if( fraction_illum > 0.)
+                     curr_mag -= 2.5 * log10( fraction_illum);
+                  else
+                     curr_mag = 999.;
+                  }
                if( curr_mag > 999.)       /* avoid overflow for objects     */
                   curr_mag = 999.;        /* essentially at zero elongation */
                if( curr_mag > ephemeris_mag_limit)
@@ -2537,13 +2544,6 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   const bool two_place_mags =
                                    (*get_environment_ptr( "MAG_DIGITS") == '2');
 
-                  if( fraction_illum != 1.)
-                     {
-                     if( fraction_illum > 0.)
-                        curr_mag -= 2.5 * log10( fraction_illum);
-                     else
-                        curr_mag = 99.;
-                     }
                   if( two_place_mags)
                      snprintf_append( buff, sizeof( buff), " %5.2f", curr_mag + .005);
                   else if( fraction_illum == 0.)
