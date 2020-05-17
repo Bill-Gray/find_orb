@@ -723,13 +723,10 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                   (ephemeris_output_options & OPTION_MOON_ALT) ? '*' : ' ');
             snprintf_append( buff, sizeof( buff), "8 [%c] Moon azimuth\n",
                   (ephemeris_output_options & OPTION_MOON_AZ) ? '*' : ' ');
-            if( !find_expcalc_config_from_mpc_code( mpc_code, NULL))
-               {
-               snprintf_append( buff, sizeof( buff), "{ [%c] SNR\n",
+            snprintf_append( buff, sizeof( buff), "{ [%c] SNR\n",
                   (ephemeris_output_options & OPTION_SNR) ? '*' : ' ');
-               snprintf_append( buff, sizeof( buff), "} [%c] Exposure time\n",
+            snprintf_append( buff, sizeof( buff), "} [%c] Exposure time\n",
                   (ephemeris_output_options & OPTION_EXPOSURE_TIME) ? '*' : ' ');
-               }
             }
          }
       for( i = n_lines = 0; buff[i]; i++)
@@ -2838,7 +2835,7 @@ int main( int argc, const char **argv)
                take_first_soln = true;
                }
                break;
-            case 'R':
+            case 'r':
                {
                const char *comma = strchr( arg, ',');
 
