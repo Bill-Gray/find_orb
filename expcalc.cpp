@@ -171,7 +171,7 @@ int find_expcalc_config_from_mpc_code( const char *mpc_code, expcalc_config_t *c
    if( i == n_configs)
       {
       rval = -1;
-      c = 0;
+      i = 0;     /* give default (500) configuration */
       }
    if( c)
       *c = configs[i];
