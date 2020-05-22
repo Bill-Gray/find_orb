@@ -1042,14 +1042,14 @@ static double sunlight_visible( double r_sun, double r_planet, double sep)
    assert( sep > 0.);
    assert( r_planet > 0.);
    assert( r_sun > 0.);
-   if( sep > r_planet + r_sun)         /* not even a partial eclipse */
-      return( 1.);
-   else if( sep < r_planet - r_sun)    /* total eclipse */
-      return( 0.);
-
    r_planet /= r_sun;      /* work in units of sun's apparent ang diam = 1 */
    sep /= r_sun;
    r_sun = 1.;
+   if( sep >= r_planet + r_sun)
+      return( 1.);               /* no actual eclipse,  not even partial */
+   else if( sep <= r_planet - r_sun)
+      return( 0.);               /* total eclipse */
+
    if( sep < r_sun - r_planet)         /* planet is transiting; */
       rval = 1. - r_planet * r_planet;      /* "annular eclipse" */
    else                  /* partial eclipse/transit */
@@ -1059,19 +1059,49 @@ static double sunlight_visible( double r_sun, double r_planet, double sep)
       const double r_planet2 = r_planet * r_planet;
 
       x = (sep * sep + 1. - r_planet2) * .5 / sep;
-      assert( x >= -1.);
-      assert( x <= 1.);
+      if( x >= 1.)     /* disks are barely touching; no real eclipse */
+         return( 1.);
+      if( x <= -1.)    /* disks are barely covering; totally eclipsed */
+         return( 0.);
       y = sqrt( 1. - x * x);
+      assert( y);
       ang1 = atan2( y, x);
       ang2 = atan2( y, x - sep);
       rval = 1 + (x * y - ang1) / PI;
       rval -= (1. - ang2 / PI) * r_planet2 + (x - sep) * y / PI;
-      assert( rval > 0.);
-      assert( rval < 1.);
       }
    return( rval);
 }
 
+/* See 'shadow.cpp' for an explanation of this function. */
+
+static double solar_disc_intensity( const double r)
+{
+#ifdef PIERCE_SLAUGHTER_COEFFS
+   const double I0 = 0.4067828571428571;   /* above integral for r=0, mu=1 */
+#else
+   const double I0 = 0.4062268095238096;   /* above integral for r=0, mu=1 */
+#endif
+   const double mu2 = 1. - r * r;
+   double mu, rval = 0, power = mu2;
+   size_t i;
+#ifdef PIERCE_SLAUGHTER_COEFFS
+   static const double coeffs[6] = { 0.30505, 1.13123, -0.78604,
+                                    0.40560,  0.02297, -0.07880 };
+#else       /* default Neckel & Labs coeffs */
+   static const double coeffs[6] = { 0.28392, 1.36896, -1.75998,
+                                    2.22154, -1.56074, 0.44630 };
+#endif
+
+   if( mu2 > 0.)        /* with roundoff,  we can be slightly negative */
+      mu = sqrt( mu2);
+   else
+      mu = 0.;
+   for( i = 0; i < sizeof( coeffs) / sizeof( coeffs[0]); i++, power *= mu)
+      rval += coeffs[i] * power / (double)( i + 2);
+// return( r * r);               /* for a uniformly intense solar disc */
+   return( (I0 - rval) / I0);
+}
 
 /*  'shadow_check' determines how much sunlight is blocked by a planet
 (thus far,  only the earth,  but could be extended to other planets and
@@ -1097,18 +1127,13 @@ of two instances where this matters.  2008 TC3 and 2018 LA,  impactors,
 are other examples of objects passing through earth's shadow,  as are
 numerous artsats.
 
-   Note further that the following assumes a uniformly bright sun
-across the entire disk.  The disk is actually darker near the limb;
-a formula on page 216 of the above paper gives a decent approximation
-of disk brightness as a function of radius (unfortunately,  the source
-it gives is no longer available) :
-
-I = 0.436 + 0.72 * mu - 0.16 mu^2,
-
-   where I = intensity and mu^2 = 1 - (r/R)^2,  r = distance from
-the center of the solar disk and R = radius of the solar disk.
-Ideally,  we'd integrate a series of bands using this function to
-compute a (probably only slightly) more accurate brightness drop. */
+   The partially eclipsed portion of the sun's disk is divided into a
+series of rings,  equal in area, and the total intensity (after correcting
+for limb darkening and fraction of the ring in eclipse) is added up.
+Unless the earth's disk cuts exactly through the center of the sun, there
+is usually a central part that is completely eclipsed or uneclipsed,
+which is handled analytically.  See 'shadow.cpp' for details on how limb
+darkening is computed.  */
 
 double shadow_check( const double *planet_loc,
                             const double *obs_posn,
@@ -1134,7 +1159,34 @@ double shadow_check( const double *planet_loc,
    angular_sep = acos( (dot - r2) / (d * r));
    ang_size_sun = SUN_RADIUS_IN_AU / r;
    ang_size_planet = planet_radius_in_au / d;
-   return( sunlight_visible( ang_size_sun, ang_size_planet, angular_sep));
+   if( ang_size_sun + ang_size_planet < angular_sep)
+      return( 1.);         /* no overlap */
+   else if( ang_size_planet > ang_size_sun + angular_sep)
+      return( 0.);         /* opposite extreme : total eclipse */
+   else        /* partial eclipse */
+      {
+      double rval = 0., prev_fraction = 0., prev_intensity = 0.;
+      const double r0 = fabs( angular_sep - ang_size_planet) / ang_size_sun;
+      double prev_area = 0.;
+      const size_t n_splits = 5;
+
+      assert( r0 >= 0. && r0 <= 1.);
+      for( i = 0; i <= n_splits; i++)
+         {
+         const double area = r0 * r0 + (1. - r0 * r0) * (double)i / (double)n_splits;
+         const double r = sqrt( area);
+         const double intensity = solar_disc_intensity( r);
+         const double fraction =
+                sunlight_visible( ang_size_sun * r, ang_size_planet, angular_sep) * r * r;
+
+         rval += (intensity - prev_intensity) * (fraction - prev_fraction)
+                        / (area - prev_area);
+         prev_fraction = fraction;
+         prev_intensity = intensity;
+         prev_area = area;
+         }
+      return( rval);
+      }
 }
 
 double vector_to_polar( double *lon, double *lat, const double *vector)
