@@ -1,30 +1,27 @@
-/* Code that works,  but is not yet currently integrated into Find_Orb,
-to compute the intensity of sunlight as a function of radius on the solar
-disk (limb darkening),  and to compute the integrated intensity of the
-sunlight within a given radius.  I have two possible uses for this :
+/* Code to compute the intensity of sunlight as a function of radius
+on the solar disk (limb darkening),  and to compute the integrated
+intensity of the sunlight within a given radius.  This has two uses
+within Find_Orb :
 
    -- Find_Orb adjusts the brightness of an asteroid or artsat downward
-as it passes through the earth's shadow,  according to the portion of the
-sun's area blocked by the earth.  Ideally,  this would be done by
-splitting the sun's disk into a series of rings,  and computing
-analytically for each ring the portion covered by the earth (see the
-sunlight_visible() function in 'ephem0.cpp').  The result would be
-a smaller brightness drop at the start of an eclipse (the eclipsed
-bit at the edge isn't contributing as much light as the central
-parts),  and a much larger drop in brightness near totality (because
-the remaining uneclipsed bit isn't as bright as the "average" solar
-disk).
+as it passes through the earth's shadow.  Originally,  this was done
+solely according to the portion of the sun's area blocked by the earth,
+as if the sun's disk was uniformly bright.  It actually darkens as one
+approaches the limb :
+
+https://en.wikipedia.org/wiki/Limb_darkening
 
    -- The same fraction of illumination during partial eclipses is used
 for computing non-gravitational effects on artsats.  For some lightweight
 objects,  this is a surprisingly strong effect;  eclipses matter.  It
 _may_ be the case that the non-uniform solar disk also matters,  though
-I'm not sure of this yet and probably won't be until I write the code.
+I've not seen such a case yet.
 
-   The solar disk (and the disks of other stars) darkens slightly as
-one gets to its edge :
-
-https://en.wikipedia.org/wiki/Limb_darkening
+   Find_Orb now splits the sun's disk into a series of rings and
+computes,  for each ring,  the fraction of the sun's intensity within
+that ring and the fraction of that ring which is uneclipsed.  Summing
+up those ring contributions gets you a value between 0% (total eclipse)
+and 100% (no eclipse).
 
    A formula on page 216 of
 http://www.minorplanet.info/MPB/issues/MPB_45-3.pdf gives a decent
@@ -109,26 +106,42 @@ intensity (0 if no disk visible,  1 if r=R.  I0 = TI(1) / 2pi.)     */
 
 #include <math.h>
 
+#define NECKEL_LABS_COEFFS
+// #define YOULES_COEFFS
+
 static double total_intensity( const double r)
 {
+#ifdef PIERCE_SLAUGHTER_COEFFS
+   const double I0 = 0.4067828571428571;   /* above integral for r=0, mu=1 */
+#endif
+#ifdef NECKEL_LABS_COEFFS
    const double I0 = 0.4062268095238096;   /* above integral for r=0, mu=1 */
+#endif
+#ifdef YOULES_COEFFS
+   const double I0 = 0.418;                /* above integral for r=0, mu=1 */
+#endif
    const double mu2 = 1. - r * r;
    double mu, rval = 0, power = mu2;
-   int i;
+   size_t i;
 #ifdef PIERCE_SLAUGHTER_COEFFS
    static const double coeffs[6] = { 0.30505, 1.13123, -0.78604,
                                     0.40560,  0.02297, -0.07880 };
-#else       /* default Neckel & Labs coeffs */
+#endif
+#ifdef NECKEL_LABS_COEFFS
    static const double coeffs[6] = { 0.28392, 1.36896, -1.75998,
                                     2.22154, -1.56074, 0.44630 };
+#endif
+#ifdef YOULES_COEFFS
+   static const double coeffs[3] = { 0.436,   0.72,    -0.16 };
 #endif
 
    if( mu2 > 0.)        /* with roundoff,  we can be slightly negative */
       mu = sqrt( mu2);
    else
       mu = 0.;
-   for( i = 0; i < 6; i++, power *= mu)
+   for( i = 0; i < sizeof( coeffs) / sizeof( coeffs[0]); i++, power *= mu)
       rval += coeffs[i] * power / (double)( i + 2);
+// return( r * r);               /* for a uniformly intense solar disc */
    return( (I0 - rval) / I0);
 }
 
