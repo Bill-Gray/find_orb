@@ -1161,4 +1161,4 @@ COD W88
 TEL 0.35-m f/11 Schmidt-Cassegrain + CCD
 
 COD W96
-0.4-m f/8 Ritchey-Chretien + CCD
+TEL 0.4-m f/8 Ritchey-Chretien + CCD
