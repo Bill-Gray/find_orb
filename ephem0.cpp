@@ -937,13 +937,19 @@ constant known in this code as 'radar_constant'.
 
    He also mentioned that Arecibo operates at about 500 kW,  Tsys = 25 K,
 gain = 10 K/Jy;  Goldstone at 450 kW,  Tsys = 15, gain = 0.94.  These
-values are enshrined in the RADAR_251 and RADAR_253 lines in 'environ.dat',
-along with the 'radar_constant' values.  I got those essentially by guessing,
-then scaling them until they matched values in radar planning documents.
+values are enshrined in the RADAR_251 and RADAR_253 lines in
+'environ.dat', along with the 'radar_constant' values.  I got those
+essentially by guessing, then scaling them until they matched values in
+radar planning documents.  (Unfortunately, Arecibo is now at 350 kW and
+gain=7 K/Jy due to Maria damage.)
 
    See also Lance's comments at
 
 https://groups.io/g/mpml/message/28412
+
+   and an excellent page on the subject at
+
+http://www.naic.edu/~pradar/detect.php
 
    Lance also noted that there's also a more subtle dependence due to the subradar
 latitude (you get a better echo if the pole is pointing straight at the radar).
