@@ -83,7 +83,11 @@ MAX_OBSERVATION_SPAN=200
    replace the power,  temperature,  etc. values with the ones that actually
    apply for that telescope;  then scale up/down the "radar constant" to get
    SNRs that are the appropriate multiple of (253) Goldstone.]
-RADAR_251=900000,25,10,70.5,1.5e-11
+      2020 May 22: corrected Arecibo parameters based on
+   http://www.naic.edu/~pradar/detect.php . As that page explains,  Hurricane
+   Maria downgraded the power level to 350 kW (was 900) and the gain to 7
+   (was 10).  Hope I'll be able to bump those values back up someday soon...
+RADAR_251=350000,24,7,70.5,1.5e-11
 RADAR_253=430000,17,.94,20,1e-11
    The Parkes radio telescope in Australia lacks an official MPC code.  But it
    has an unofficial MPC code in 'rovers.txt' (q.v.).
@@ -317,3 +321,36 @@ ELEMENT_EPOCH=J2000 ecliptic
    can lead to differences at the millisecond level for close-in
    objects.  By default,  Find_Orb will look for 'finals.all'.
 EOP_FILE=finals.all
+
+   [NOTE : NOT ACTUALLY WORKING YET... also will be including some
+   other site parameters,  such as altitude,  dec,  hour angle,
+   elongation,  and time-of-day limits.  Still working on best
+   way to achieve all that.]
+   Find_Orb can compute the exposure time required to achieve a given
+   SNR,  and/or the SNR you'd get for a given exposure time.  To do that
+   for a given MPC code,  it needs to know some data about that site.
+   For example,  the line below tells you that (703) uses no filter ('N'),
+   and has a primary with a 72-cm diameter and a 25-cm obstruction.  The
+   measuring aperture is six arcseconds in diameter,  and the seeing is
+   usually about three arcseconds (Full-Width Half Maximum).  The quantum
+   efficiency is 90%,  and there's a readout noise from the camera of
+   about 8 counts/pixel.  The pixels are three arcseconds across.  The
+   target SNR is 4,  and exposures are usually 30 seconds long.  You need
+   not be as picky about column alignment as shown below,  but it does
+   help you see what's going on.
+      If you don't have a line here,  OBS_DATA_500 will be used,  with
+   the primary diameter replaced if you have a TEL line.  Or you can
+   add a line for your scope.
+           Fil Pri Ob Ape FWHM QE Rea  Pix   SNR Exposure
+OBS_DATA_500=N 100 25 6.0 3.0 .00  8.0 0.572  4    30
+OBS_DATA_703=N  72 25 6.0 3.0 .90  8.0 3.     4    30
+OBS_DATA_E12=N  50 23 6.0 3.0 .90  8.0 1.8    4    30
+OBS_DATA_G96=N 152 48 6.0 3.0 .90  8.0 1.5    4    30
+OBS_DATA_I52=N 100 40 6.0 3.0 .90  8.0 1.036  4    30
+OBS_DATA_V06=N 154 40 6.0 3.0 .00  8.0 0.572  4    30
+
+   By default,  magnitudes in ephemerides are shown to tenths.  Set
+   the following to MAG_DIGITS=2 to get hundredths (almost always
+   a meaningless level of precision,  but some people do get good
+   photometry...)
+MAG_DIGITS=2
