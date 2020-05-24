@@ -451,7 +451,7 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
          curs_set( 0);        /* turn cursor off */
          mousemask( ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
 #ifndef PDCURSES
-         printf("\033[?1003h\n");   /* ] used in ncurses with xterm-like */
+         printf("\033[?1003h");   /* ] used in ncurses with xterm-like */
 #endif                         /* terms to enable mouse move events */
          do
             {
@@ -2626,6 +2626,8 @@ static void setup_elements_dialog( char *buff, const char *constraints,
                                              int element_format)
 {
    int pass;
+   char tbuff[300], *tptr;
+   FILE *ifile = fopen_ext( get_file_name( tbuff, elements_filename), "tfcrb");
 
    strcpy( buff, get_find_orb_text( 2037));
    text_search_and_replace( buff, "$REF",
@@ -2636,8 +2638,6 @@ static void setup_elements_dialog( char *buff, const char *constraints,
 
    for( pass = 0; pass < 2; pass++)
       {
-      char tbuff[300], *tptr;
-
       if( pass)
          select_central_object( &element_format, tbuff, true);
       else
@@ -2658,6 +2658,14 @@ static void setup_elements_dialog( char *buff, const char *constraints,
          strcpy( tbuff, "(?!)");
       text_search_and_replace( buff, (pass ? "$CEN" : "$FRA"), tbuff);
       }
+   while( fgets( tbuff, sizeof( tbuff), ifile))
+      if( !memcmp( tbuff, "Epoch ", 6)
+                     && (tptr = strstr( tbuff + 6, " TT")) != NULL)
+         {
+         *tptr = '\0';
+         text_search_and_replace( buff, "Epoch", tbuff);
+         }
+   fclose( ifile);
 }
 
    /* On any platform with ASLR,  the address of 'zval' will be
