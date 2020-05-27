@@ -2603,7 +2603,11 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                                    (*get_environment_ptr( "MAG_DIGITS") == '2');
 
                   if( two_place_mags)
-                     snprintf_append( buff, sizeof( buff), " %5.2f", curr_mag + .005);
+                     {
+                     const char *fmt = (curr_mag > 99.8 ? " %5.1f" : " %5.2f");
+
+                     snprintf_append( buff, sizeof( buff), fmt, curr_mag + .005);
+                     }
                   else if( fraction_illum == 0.)
                      strcat( buff, " Sha ");
                   else if( curr_mag < 99 && curr_mag > -9.9)
