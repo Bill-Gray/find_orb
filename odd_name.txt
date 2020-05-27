@@ -288,3 +288,4 @@ STEREO-B     2006-047B = NORAD 29511 = STEREO-B
      SolCent Solar Orbiter Centaur
      S512009 S512009 = ZTF0D86
              [Unnamed]
+     ZTF09ps ZTF09ps = ZTF09iM = ZTF0CjS
