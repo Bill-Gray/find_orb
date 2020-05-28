@@ -1482,7 +1482,7 @@ static void make_path_available( const char *filename)
       }
 }
 
-static char ephem_mpc_code[4];
+static char ephem_mpc_code[5];
 
 /* By default,  JSON files are kept with fixed names in the ~/.find_orb
 directory.  However,  this can be overridden with parameters in
@@ -2898,7 +2898,7 @@ int ephemeris_in_a_file_from_mpc_code( const char *filename,
    const int planet_no = get_observer_data( mpc_code, buff, &lon,
                                            &rho_cos_phi, &rho_sin_phi);
 
-   assert( strlen( mpc_code) == 3);
+   assert( strlen( mpc_code) == 3 || strlen( mpc_code) == 4);
    strcpy( ephem_mpc_code, mpc_code);
    snprintf( note_text, sizeof( note_text),
                     "(%s) %s", mpc_code, mpc_station_name( buff));
