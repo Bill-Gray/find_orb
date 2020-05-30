@@ -1602,7 +1602,6 @@ static double find_closest_approach( const double *input_orbit, double jde,
    while( !is_done)
       {
       double loc[3], r2, new_jde;
-      char buff[80];
       int i;
 
       assert( b.n_iterations < 30);
@@ -1614,11 +1613,6 @@ static double find_closest_approach( const double *input_orbit, double jde,
          loc[i] -= orbit[i];
       r2 = dot_product( loc, loc);
       is_done = brent_min_add( &b, r2);
-      full_ctime( buff, jde,
-                        FULL_CTIME_FORMAT_SECONDS
-                      | FULL_CTIME_YEAR_FIRST | FULL_CTIME_MONTH_DAY
-                      | FULL_CTIME_MONTHS_AS_DIGITS
-                      | FULL_CTIME_LEADING_ZEROES);
       *dist = sqrt( r2);
       }
    return( jde);
