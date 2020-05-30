@@ -1144,3 +1144,12 @@ Pi1 !+195344.1     +475504.2         1003.61   1m Ritchey-Chretien, Piszkesteto
 
    G__gle : Pis3!+19.893097    +47.918461         977.     50cm Cassegrain, now 80cm RC
 Pi8 !+195337.8     +475509.81         991.1    80 cm Ritchey-Chretien, Piszkesteto
+
+   (H21) Astronomical Research Observatory scopes,  measured with G__gle and
+   identified from http://www.astro-research.org/observatory_directory.htm .
+   215m ASL, -33m geoid height.
+
+H21a!-087.968341   +39.482992         182.     ARO 0.76-m
+H21b!-087.968249   +39.483006         182.     ARO 1.3-m
+H21c!-087.968174   +39.482998         182.     ARO 0.81-m
+H21d!-087.968107   +39.482990         182.     ARO 0.61-m
