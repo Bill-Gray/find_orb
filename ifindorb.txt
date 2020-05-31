@@ -121,8 +121,8 @@
 12      La latitudine deve iniziare con una 'N' o una 'S'!
 13      La longitudine deve iniziare con una 'E' o una 'W'!
 14      Invalid date!
-15      %d of %d observations
-16      From %d observations
+15      %d of %d osservazioni utili
+16      %d osservazioni utili
 17      ; mean residual %s
 18      Find_Orb -- Orbit Determination
 19      Weighting of posns/mags/times is
