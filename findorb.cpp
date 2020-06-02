@@ -24,26 +24,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #endif
 
 #define PDC_NCMOUSE
+#define PDC_FORCE_UTF8
 
 #ifdef __APPLE__
    #define _XOPEN_SOURCE_EXTENDED
    /* https://stackoverflow.com/questions/48042203/curses-library-doesnt-support-wide-char-on-os-x-high-sierra */
-#endif
-
-            /* Pretty much every platform I've run into supports */
-            /* Unicode display,  except OpenWATCOM and early     */
-            /* versions of MSVC.                                 */
-#if !defined( __WATCOMC__)
-   #define HAVE_UNICODE
-#endif
-
-#ifdef _MSC_VER
-   #if _MSC_VER <= 1100
-      #undef HAVE_UNICODE
-   #else
-      #define PDC_WIDE
-      #define PDC_FORCE_UTF8
-   #endif
 #endif
 
 #ifdef __WATCOMC__
@@ -1482,9 +1467,7 @@ static MPC_STATION *mpc_color_codes = NULL;
    'default_color' unless it's excluded.  If it is,  the residuals
    are shown in COLOR_EXCLUDED_OBS. */
 
-#ifdef HAVE_UNICODE
 static int make_unicode_substitutions = 1;
-#endif
 
 static const char *legend =
 "   YYYY MM DD.DDDDD   RA (J2000)   dec      sigmas   mag     ref Obs     Xres  Yres   delta  R";
@@ -1512,11 +1495,9 @@ static void show_residual_text( char *buff, const int line_no,
       tbuff[residual_field_size - 1] = ')';
       }
    tbuff[residual_field_size] = '\0';
-#ifdef HAVE_UNICODE
             /* cvt 'u' = 'micro' = 'mu' to the Unicode U+00B5,  in UTF-8: */
    if( make_unicode_substitutions)
       text_search_and_replace( tbuff, "u", "\xc2\xb5");
-#endif
    put_colored_text( tbuff, line_no, column + resid_column - 2,
             (int)strlen( tbuff), resid_color);
 }
@@ -2877,11 +2858,9 @@ int main( int argc, const char **argv)
                sanity_check_observations = 0;
                }
                break;
-#ifdef HAVE_UNICODE
             case 'u':
                make_unicode_substitutions = 0;
                break;
-#endif
             case 'z':
                {
                extern const char *alt_config_directory;
@@ -3066,7 +3045,6 @@ int main( int argc, const char **argv)
          if( sort_obs_by_code)
             shellsort_r( obs, n_obs, sizeof( OBSERVE), compare_observations, &i);
          generate_obs_text( obs, n_obs, tbuff);
-#ifdef HAVE_UNICODE
          if( make_unicode_substitutions)
             {
                      /* cvt +/- to the Unicode U+00B1,  in UTF-8: */
@@ -3074,7 +3052,6 @@ int main( int argc, const char **argv)
                      /* cvt OEM degree symbol (0xf8) to U+00B0,  in UTF-8: */
                text_search_and_replace( tbuff, "\xf8", "\xc2\xb0 ");
             }
-#endif
          if( sort_obs_by_code)
             shellsort_r( obs, n_obs, sizeof( OBSERVE), compare_observations, NULL);
          while( *tptr)
@@ -3135,13 +3112,11 @@ int main( int argc, const char **argv)
 
                   if( !memcmp( tbuff, "IMPACT", 6))
                      elem_color = COLOR_ATTENTION + A_BLINK;
-#ifdef HAVE_UNICODE
                   if( make_unicode_substitutions)
                      {
                      text_search_and_replace( tbuff, " +/- ", " \xc2\xb1 ");
                      text_search_and_replace( tbuff, "^2", "\xc2\xb2");
                      }
-#endif
                   put_colored_text( tbuff, line_no + iline, 0, -1, elem_color);
                   if( right_side_col < (unsigned)strlen( tbuff) + spacing)
                      right_side_col = (unsigned)strlen( tbuff) + spacing;
