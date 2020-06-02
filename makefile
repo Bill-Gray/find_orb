@@ -71,7 +71,7 @@ endif
 
 ifdef VT
 	CURSES_FLAGS=-DPDC_WIDE -DVT -I$(HOME)/PDCurses
-	CURSES_LIB=$(HOME)/PDCurses/vt/libpdcurses.a
+	CURSES_LIB=-lpdcurses
 endif
 
 LIB_DIR=$(INSTALL_DIR)/lib
