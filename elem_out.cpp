@@ -2310,6 +2310,8 @@ static int obj_desig_to_perturber( const char *packed_desig)
       else if( *packed_desig == 'E' && packed_desig[3] == '1')
          rval = 10;           /* Earth's moon */
       }
+   if( strstr( packed_desig, "D4340"))    /* Pluto as an asteroid */
+      rval = 9;
    if( rval > 0)
       excluded_perturbers |= (1 << rval);
    object_mass = 0.;
