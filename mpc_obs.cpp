@@ -4252,6 +4252,18 @@ static char **edata = NULL;
 static size_t n_lines = 0, n_lines_allocated = 0;
 static bool is_default_environment = false;
 
+int write_environment_pointers( void)
+{
+   FILE *ofile = fopen_ext( "env.txt", "fcw");
+   size_t i;
+
+   fprintf( ofile, "%d vars\n", (int)n_lines);
+   for( i = 0; i < n_lines; i++)
+      fprintf( ofile, "%s\n", edata[i]);
+   fclose( ofile);
+   return( n_lines);
+}
+
 static size_t get_environment_ptr_index( const char *env_ptr)
 {
    size_t i = 0, j;
@@ -4318,6 +4330,67 @@ void set_environment_ptr( const char *env_ptr, const char *new_value)
    strcat( edata[idx], new_value);
 }
 
+static int load_json_environment_file( const char *buff)
+{
+   char key[300];
+   const char *tptr;
+   int depth = 0, starts[30];
+
+   *key = '\0';
+   starts[0] = 0;
+   for( tptr = buff; *tptr; tptr++)
+      if( *tptr == '{')
+         {
+         depth++;
+         starts[depth] = strlen( key);
+         }
+      else if( *tptr == '}')
+         {
+         depth--;
+         assert( depth >= 0);
+         }
+      else if( *tptr == '"')
+         {
+         const char *tptr2;
+         char *kptr;
+
+         tptr++;
+         tptr2 = strchr( tptr, '"');
+         assert( tptr2);
+         kptr = key + starts[depth];
+         if( kptr != key)
+            *kptr++ = '_';
+         memcpy( kptr, tptr, tptr2 - tptr);
+         kptr[tptr2 - tptr] = '\0';
+         tptr = tptr2 + 2;
+         while( *tptr <= ' ' || *tptr == ':')
+            tptr++;
+         if( *tptr != '{')     /* we're setting a parameter */
+            {
+            const char *param = tptr;
+            char value[100];
+
+            if( *tptr == '"')
+               {
+               tptr++;
+               param++;
+               while( *tptr && *tptr != '"')
+                  tptr++;
+               }
+            else
+               while( *tptr > ' ' && *tptr != ',')
+                  tptr++;
+            memcpy( value, param, tptr - param);
+            value[tptr - param] = '\0';
+            set_environment_ptr( key, value);
+            key[starts[depth]] = '\0';
+            }
+         else
+            tptr--;
+         }
+   return( 0);
+}
+
 int load_environment_file( const char *filename)
 {
    FILE *ifile = fopen_ext( filename, (is_default_environment ? "crb" : "rb"));
@@ -4328,6 +4401,26 @@ int load_environment_file( const char *filename)
       return( -1);
    if( edata)
       is_default_environment = false;
+   if( fgets_trimmed( buff, sizeof( buff), ifile) && *buff == '{')
+      {
+      size_t len, n_read;
+
+      fseek( ifile, 0L, SEEK_END);
+      len = (size_t)ftell( ifile);
+      fseek( ifile, 0L, SEEK_SET);
+      tptr = (char *)malloc( len + 1);
+      n_read = fread( tptr, 1, (int)len, ifile);
+      fclose( ifile);
+      assert( n_read == len);
+      if( n_read != len)
+         exit( -2);
+      tptr[len] = '\0';
+      is_default_environment = false;
+      load_json_environment_file( tptr);
+      free( tptr);
+      return( 0);
+      }
+   fseek( ifile, 0L, SEEK_SET);
    while( fgets_trimmed( buff, sizeof( buff), ifile))
       if( *buff != ' ' && (tptr = strchr( buff, '=')) != NULL)
          {

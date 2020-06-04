@@ -175,6 +175,7 @@ int create_b32_ephemeris( const char *filename, const double epoch,
                 const double *orbit, const int n_steps,         /* b32_eph.c */
                 const double ephem_step, const double jd_start);
 void put_observer_data_in_text( const char FAR *mpc_code, char *buff);
+int write_environment_pointers( void);             /* mpc_obs.cpp */
 int add_ephemeris_details( FILE *ofile, const double start_jd,  /* b32_eph.c */
                                                const double end_jd);
 void set_distance( OBSERVE FAR *obs, double r);             /* orb_func.c */
@@ -4888,9 +4889,13 @@ int main( int argc, const char **argv)
             set_environment_ptr( "REFERENCE", tbuff);
             update_element_display = 1;
             break;
+         case 'k':
+            write_environment_pointers( );
+            show_a_file( "env.txt");
+            break;
          case 'c': case 'C':
          case ALT_P: case ALT_X: case ALT_Y:
-         case ALT_Z: case '\'': case 'k':
+         case ALT_Z: case '\'':
          case ';':
          default:
             debug_printf( "Key %d hit\n", c);
