@@ -31,11 +31,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    /* https://stackoverflow.com/questions/48042203/curses-library-doesnt-support-wide-char-on-os-x-high-sierra */
 #endif
 
-#ifdef __WATCOMC__
-   #include <stdbool.h>
-   #include <io.h>
-#endif
-
 #if defined( _WIN32)
    #ifdef MOUSE_MOVED
       #undef MOUSE_MOVED
@@ -3680,18 +3675,6 @@ int main( int argc, const char **argv)
                  "Showing observation times as HH:MM:SS" :
                  "Showing observation times as decimal days");
             break;
-         case 'c': case 'C':
-            {
-            int new_xsize, new_ysize;
-
-            inquire( "New screen size: ", tbuff, sizeof( tbuff),
-                              COLOR_DEFAULT_INQUIRY);
-            if( sscanf( tbuff, "%d %d", &new_xsize, &new_ysize) == 2)
-               resize_term( new_ysize, new_xsize);
-            }
-            sprintf( message_to_user, "%d x %d text mode selected",
-                        getmaxx( stdscr), getmaxy( stdscr));
-            break;
          case '!':
             perturbers = ((perturbers == 0x3fe) ? 0 : 0x3fe);
             break;
@@ -4010,7 +3993,11 @@ int main( int argc, const char **argv)
             create_ephemeris( orbit, curr_epoch, obs, n_obs, obj_name,
                            ifilename, residual_format);
             break;
-         case 'n': case 'N':   /* select a new object from the input file */
+         case 'N':             /* select a new file */
+            get_new_file = get_new_object = 1;
+            *ifilename = '\0';
+            break;
+         case 'n':             /* select a new object from the input file */
             get_new_object = 1;
             update_element_display = 1;
             pop_all_orbits( );
@@ -4901,6 +4888,7 @@ int main( int argc, const char **argv)
             set_environment_ptr( "REFERENCE", tbuff);
             update_element_display = 1;
             break;
+         case 'c': case 'C':
          case ALT_P: case ALT_X: case ALT_Y:
          case ALT_Z: case '\'': case 'k':
          case ';':

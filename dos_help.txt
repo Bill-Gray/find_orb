@@ -112,9 +112,6 @@ o      Toggles display of the orbital elements.  You normally wouldn't want
          get a full-screen display of observations/residuals.
 ;      Toggles display of the "residual legend",  which explains what the
          assorted data in the residual area mean.
-c      (WATCOM-compiled under DOS version only) Select a different text
-         mode from the default 80x25 one.  Modes include 100x50, 132x60,
-         etc.  Not all modes may work with your video card.
 -      Cycles display of the list of observatories among three options:
          just data for the observatory for the currently-selected observation;
          use about a third of the observation area for observatory data;
@@ -136,9 +133,6 @@ x      Toggle the inclusion of the currently selected observation.
          residuals (values under a milliarcsecond are shown as micro, nano,
          pico,  etc.)  No one will normally use this;  I did so to verify
          the level of roundoff/integration error in the software.
-k      Cycle from long residual format to short (such as MPC uses),  to
-         showing the original 80-byte observation record,  back to the
-         long residual format.
 b      When in "usual" one-obs-per-line residual formats,  toggles
          between decimal day display and HH:MM:SS display.
 d      Show resiDuals in current format & save to file 'residual.txt'
@@ -176,6 +170,7 @@ m      Make an ephemeris.  You get a menu asking for a starting date/time,
 )      Show a user-selected text file.  I added this because I'm sometimes
          in the midst of solving an object and would like to look at some
          file or another,  without needing to exit or start a new console.
+N      Select a new file of astrometry.
 n      Select a different object from the input file of astrometry.
 `      (that's a backward-quote-mark!) Toggles between N(uclear) and T(otal)
          comet magnitudes.  When a full-step is done,  you'll see that
