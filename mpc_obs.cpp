@@ -4467,6 +4467,7 @@ void update_environ_dot_dat( void)
       size_t i, j;
       char **text = load_file_into_memory( environ_dot_dat, NULL, false);
       FILE *ofile;
+      char *found = (char *)calloc( n_lines, sizeof( char));
 
       if( !text)
          text = load_file_into_memory( "environ.def", NULL, true);
@@ -4482,13 +4483,18 @@ void update_environ_dot_dat( void)
                if( !memcmp( text[i], edata[j], tptr - text[i] + 1))
                   {
                   fprintf( ofile, "%s\n", edata[j]);
+                  found[j] = 1;
                   updated = true;
                   }
          if( !updated)
             fprintf( ofile, "%s\n", text[i]);
          }
+      for( i = 0; i < n_lines; i++)
+         if( !found[i])
+            fprintf( ofile, "%s\n", edata[i]);
       fclose( ofile);
       free( text);
+      free( found);
       }
 }
 
