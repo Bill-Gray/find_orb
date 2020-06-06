@@ -4264,27 +4264,40 @@ int write_environment_pointers( void)
    return( n_lines);
 }
 
-static size_t get_environment_ptr_index( const char *env_ptr)
+static size_t get_environment_ptr_index( const char *env_ptr, bool *got_it)
 {
-   size_t i = 0, j;
+   size_t i = 0, n = n_lines;
    const size_t len = strlen( env_ptr);
 
-   while( i < n_lines)
+   *got_it = false;
+   while( !*got_it && n)
       {
-      assert( edata[i]);
+      size_t j = 0, mid = i + n / 2;
+
+      assert( edata[mid]);
       j = 0;
-      while( j < len && env_ptr[j] == edata[i][j])
+      while( j < len && env_ptr[j] == edata[mid][j])
          j++;
-      if( j == len && edata[i][j] == '=')
-         return( i);
-      i++;
+      if( j == len && edata[mid][j] == '=')
+         {
+         *got_it = true;
+         i = mid;
+         }
+      else if( j < len && edata[mid][j] > env_ptr[j])
+         n /= 2;
+      else
+         {
+         n -= n / 2 + 1;
+         i = mid + 1;
+         }
       }
-   return( n_lines);
+   return( i);
 }
 
 const char *get_environment_ptr( const char *env_ptr)
 {
    size_t i;
+   bool got_it;
 
    if( !env_ptr)
       {
@@ -4299,8 +4312,8 @@ const char *get_environment_ptr( const char *env_ptr)
       }
    if( !edata)
       load_default_environment_file( );
-   i = get_environment_ptr_index( env_ptr);
-   if( i == n_lines)    /* didn't find it */
+   i = get_environment_ptr_index( env_ptr, &got_it);
+   if( !got_it)
       return( "");
    else
       return( edata[i] + strlen( env_ptr) + 1);
@@ -4308,21 +4321,22 @@ const char *get_environment_ptr( const char *env_ptr)
 
 void set_environment_ptr( const char *env_ptr, const char *new_value)
 {
-   const size_t idx = get_environment_ptr_index( env_ptr);
+   bool got_it;
+   const size_t idx = get_environment_ptr_index( env_ptr, &got_it);
 
-   if( idx == n_lines_allocated)       /* need to expand array */
+   if( !got_it && n_lines == n_lines_allocated)       /* need to expand array */
       {
-      size_t i = idx;
-
       n_lines_allocated *= 2;
       if( !n_lines_allocated)
          n_lines_allocated = 8;
       edata = (char **)realloc( edata, n_lines_allocated * sizeof( char *));
-      while( i < n_lines_allocated)
-         edata[i++] = NULL;
       }
-   if( idx == n_lines)       /* it's a new one */
+   if( !got_it)
+      {
       n_lines++;
+      memmove( edata + idx + 1, edata + idx, (n_lines - idx) * sizeof( edata[0]));
+      edata[idx] = NULL;
+      }
    edata[idx] = (char *)realloc( edata[idx],
                         strlen( env_ptr) + strlen( new_value) + 2);
    strcpy( edata[idx], env_ptr);
@@ -4465,7 +4479,7 @@ void update_environ_dot_dat( void)
 
          if( text[i][0] != ' ' && tptr)
             for( j = 0; j < n_lines && !updated; j++)
-               if( !memcmp( text[i], edata[j], tptr - text[i]))
+               if( !memcmp( text[i], edata[j], tptr - text[i] + 1))
                   {
                   fprintf( ofile, "%s\n", edata[j]);
                   updated = true;
