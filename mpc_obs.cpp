@@ -74,6 +74,7 @@ int compute_observer_loc( const double jde, const int planet_no,
 int compute_observer_vel( const double jde, const int planet_no,
              const double rho_cos_phi,           /* mpc_obs.cpp */
              const double rho_sin_phi, const double lon, double FAR *vel);
+int get_satellite_offset( const char *iline, double *xyz);  /* mpc_obs.cpp */
 int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid);
 static int xref_designation( char *desig);
 int debug_printf( const char *format, ...)                 /* runge.cpp */
@@ -966,7 +967,7 @@ inline double get_satellite_coordinate( const char *iptr, int *decimal_loc)
    return( rval);
 }
 
-static int get_satellite_offset( const char *iline, double *xyz)
+int get_satellite_offset( const char *iline, double *xyz)
 {
    unsigned i;
    int error_code = 0, decimal_loc;
