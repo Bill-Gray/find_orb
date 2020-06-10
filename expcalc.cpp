@@ -163,7 +163,10 @@ int find_expcalc_config_from_mpc_code( const char *mpc_code, expcalc_config_t *c
        { "E12", 'N',  50., 23., 6., 3., .9, 8., 1.8,   20., 1.5 },
        { "G96", 'N', 152., 48., 6., 3., .9, 8., 1.5,   20., 1.5 },
        { "I52", 'N', 100., 40., 6., 3., .9, 8., 1.036, 20., 1.5 },
-       { "V06", 'N', 154., 40., 6., 3., .9, 8., 0.572, 20., 1.5 } };
+       { "V06", 'N', 154., 40., 6., 3., .9, 8., 0.572, 20., 1.5 },
+       { "H21c", 'N', 81., 17., 6., 3., .9, 8., 1.34,  20., 1.5 },    /* http://www.astro-research.org/phase2.htm */
+       { "H21d", 'N', 61., 17., 6., 3., .9, 8., 1.55,  20., 1.5 },    /* http://www.astro-research.org/phase2.htm */
+         };
    const size_t n_configs = sizeof( configs) / sizeof( configs[0]);
 
    while( i < n_configs && strcmp( configs[i].mpc_code, mpc_code))
