@@ -113,7 +113,7 @@ else
 	CFLAGS += -O3
 endif
 
-OBJS=b32_eph.o bc405.o bias.o collide.o conv_ele.o details.o eigen.o \
+OBJS=ades_out.o b32_eph.o bc405.o bias.o collide.o conv_ele.o details.o eigen.o \
 	elem2tle.o elem_out.o elem_ou2.o ephem0.o errors.o expcalc.o gauss.o \
 	geo_pot.o healpix.o lsquare.o miscell.o         monte0.o \
 	mpc_obs.o mt64.o nanosecs.o orb_func.o orb_fun2.o pl_cache.o roots.o  \

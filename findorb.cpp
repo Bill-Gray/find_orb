@@ -151,6 +151,7 @@ int search_for_trial_orbit( double *orbit, OBSERVE FAR *obs, int n_obs,
               const double r1, double *angle_param);  /* orb_func.cpp */
 int find_nth_sr_orbit( double *orbit, OBSERVE FAR *obs, int n_obs,
                             const int orbit_number);       /* orb_func.cpp */
+void create_ades_file( const char *filename, const OBSERVE FAR *obs, int n_obs);
 char *fgets_trimmed( char *buff, size_t max_bytes, FILE *ifile);
 int debug_printf( const char *format, ...)                 /* runge.cpp */
 #ifdef __GNUC__
@@ -4913,7 +4914,10 @@ Shutdown_program:
 #endif
    curses_running = false;
    if( obs && n_obs)
+      {
       create_obs_file( obs, n_obs, 0);
+      create_ades_file( "observe.xml",  obs, n_obs);
+      }
    unload_observations( obs, n_obs);
 
    sprintf( tbuff, "%s %d %d %d", mpc_code,
