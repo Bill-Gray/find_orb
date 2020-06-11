@@ -2881,6 +2881,40 @@ bool is_topocentric_mpc_code( const char *mpc_code)
    return( planet_idx >= 0 && (rho_cos_phi != 0. || rho_sin_phi != 0.));
 }
 
+static void get_scope_params( const char *mpc_code, expcalc_config_t *c)
+{
+   const char *tptr;
+
+   find_expcalc_config_from_mpc_code( mpc_code, c);
+   tptr = get_environment_ptr( "Scope_Filter");
+   if( *tptr)
+      c->filter = *tptr;
+   tptr = get_environment_ptr( "Scope_Primary");
+   if( *tptr)
+      c->primary_diam = atof( tptr);
+   tptr = get_environment_ptr( "Scope_Obstruction");
+   if( *tptr)
+      c->obstruction_diam = atof( tptr);
+   tptr = get_environment_ptr( "Scope_Aperture");
+   if( *tptr)
+      c->aperture = atof( tptr);
+   tptr = get_environment_ptr( "Scope_FWHM");
+   if( *tptr)
+      c->fwhm = atof( tptr);
+   tptr = get_environment_ptr( "Scope_QE");
+   if( *tptr)
+      c->qe = atof( tptr);
+   tptr = get_environment_ptr( "Scope_ReadNoise");
+   if( *tptr)
+      c->readnoise = atof( tptr);
+   tptr = get_environment_ptr( "Scope_PixelSize");
+   if( *tptr)
+      c->pixel_size = atof( tptr);
+   tptr = get_environment_ptr( "Scope_SkyBrightness");
+   if( *tptr)
+      c->sky_brightness = atof( tptr);
+}
+
 int ephemeris_in_a_file_from_mpc_code( const char *filename,
          const double *orbit,
          OBSERVE *obs, const int n_obs,
@@ -2900,7 +2934,7 @@ int ephemeris_in_a_file_from_mpc_code( const char *filename,
    get_object_name( buff, obs->packed_id);
    snprintf_append( note_text, sizeof( note_text), ": %s", buff);
    if( options & (OPTION_SNR | OPTION_EXPOSURE_TIME))
-      find_expcalc_config_from_mpc_code( mpc_code, &exposure_config);
+      get_scope_params( mpc_code, &exposure_config);
    return( ephemeris_in_a_file( filename, orbit, obs, n_obs, planet_no,
                epoch_jd, jd_start, stepsize, lon, rho_cos_phi, rho_sin_phi,
                n_steps, note_text, options, n_objects));
