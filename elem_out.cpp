@@ -563,6 +563,7 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
    fprintf( ofile, "  \"objects\":\n  {\n");
    fprintf( ofile, "    \"%s\":\n", obj_name);
    fprintf( ofile, "    {\n    \"object\": \"%s\",\n", obj_name);
+   fprintf( ofile, "      \"packed\": \"%s\",\n", obs->packed_id);
    fprintf( ofile, "      \"created\": %.5f,\n", jd);
    fprintf( ofile, "      \"created iso\": \"%s\",\n", iso_time( buff, jd));
    fprintf( ofile, "      \"elements\":\n      {\n");

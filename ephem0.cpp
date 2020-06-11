@@ -2810,6 +2810,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                               obs->packed_id, "w+");
       fprintf( ofile, "{\n  \"ephemeris\":\n  {\n");
       fprintf( ofile, "    \"obscode\": \"%.3s\",\n", note_text + 1);
+      fprintf( ofile, "    \"packed\": \"%s\",\n", obs->packed_id);
       fprintf( ofile, "    \"count\": %d,\n", n_lines_shown);
       fprintf( ofile, "    \"start\": %f,\n", jd_start);
       fprintf( ofile, "    \"step\": %.9f,\n", step);
