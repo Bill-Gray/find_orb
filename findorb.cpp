@@ -3025,6 +3025,8 @@ int main( int argc, const char **argv)
          debug_printf( "elements written\n");
       update_element_display = 0;
       top_line_basic_info_perturbers = line_no;
+      if( list_codes & 8)           /* temporarily show _only_ MPC codes */
+         observation_display = 0;
       if( observation_display & DISPLAY_BASIC_INFO)
          {
          n_command_lines = show_basic_info( obs, n_obs, 1);
@@ -3167,7 +3169,7 @@ int main( int argc, const char **argv)
          int lines_available;
 
          n_stations_shown = show_station_info( NULL, n_obs,
-                     line_no, curr_obs, list_codes);
+                     line_no, curr_obs, list_codes & 7);
 
          lines_available = getmaxy( stdscr) - n_stations_shown - line_no;
          n_obs_shown = (lines_available > n_obs ? n_obs : lines_available);
@@ -3188,7 +3190,7 @@ int main( int argc, const char **argv)
          show_observations( obs, top_obs_shown, top_line_residuals,
                                  residual_format, n_obs_shown);
          show_station_info( obs, n_obs,
-                     line_no, curr_obs, list_codes);
+                     line_no, curr_obs, list_codes & 7);
 
          show_right_hand_scroll_bar( line_no,
                             n_obs_shown, top_obs_shown, n_obs);
@@ -3242,7 +3244,8 @@ int main( int argc, const char **argv)
             {
             napms( 50);
             if( t0 != time( NULL))  /* wait one second for a key hit */
-               c = KEY_TIMER;
+               if( !(list_codes & 8))     /* except in 'pick an MPC code' mode */
+                  c = KEY_TIMER;
             }
          if( !c)
             c = extended_getch( );
@@ -3250,6 +3253,12 @@ int main( int argc, const char **argv)
          }
       if( c != KEY_TIMER)
          *message_to_user = '\0';
+      if( list_codes & 8)          /* restore from 'show all MPC codes' mode */
+         {
+         observation_display = DISPLAY_BASIC_INFO | DISPLAY_OBSERVATION_DETAILS
+                                       | DISPLAY_ORBITAL_ELEMENTS;
+         list_codes = SHOW_MPC_CODES_NORMAL;
+         }
 
       if( c == KEY_MOUSE)
          {
@@ -3308,16 +3317,21 @@ int main( int argc, const char **argv)
             top_obs_shown++;
          else if( y >= station_start_line)
             {
-            const char *search_code =
-                    mpc_color_codes[y - station_start_line].code;
-                                                  /* clicked on MPC station; */
-            for( i = 1; i <= n_obs; i++)          /* find next or prev obs   */
-               {                                  /* from that stn           */
-               curr_obs = (curr_obs + dir + n_obs) % n_obs;
-               if( !strcmp( obs[curr_obs].mpc_code, search_code))
-                  break;
+            if( button & BUTTON1_DOUBLE_CLICKED)
+               list_codes = SHOW_MPC_CODES_MANY | 8;
+            else
+               {
+               const char *search_code =
+                       mpc_color_codes[y - station_start_line].code;
+                                                     /* clicked on MPC station; */
+               for( i = 1; i <= n_obs; i++)          /* find next or prev obs   */
+                  {                                  /* from that stn           */
+                  curr_obs = (curr_obs + dir + n_obs) % n_obs;
+                  if( !strcmp( obs[curr_obs].mpc_code, search_code))
+                     break;
+                  }
+               single_obs_selected = true;
                }
-            single_obs_selected = true;
             }
          else if( y >= top_line_residuals)
             {
