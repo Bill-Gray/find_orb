@@ -193,9 +193,9 @@ Sub !-1552833.66719  +194931.81425  4189.001   Subaru, Mauna Kea
 Gem !-1552808.56831  +194925.68521  4239.439   Gemini North, Mauna Kea
 
    From http://cso.caltech.edu/wiki/cso/telescope/telescope : a position
-about 400 meters northwest of the above aerial survey position,  and
-dozens of meters lower in altitude!  (Again with 26 meters added on
-the assumption that the altitude given at the page is ASL,  not ellipsoidal.)
+   about 400 meters northwest of the above aerial survey position,  and
+   dozens of meters lower in altitude!  (Again with 26 meters added on
+   the assumption that the altitude given at the page is ASL,  not ellipsoidal.)
 
 Cso !-1552842.124    +194931.698    4165       Caltech Submillimeter Observatory (CSO)
 
@@ -446,22 +446,22 @@ J95 ! 358.552997     51.474969       152.6     Great Shefford
 CSS !   0.0000       0.00000   +0.00000        CSS precoveries
 
    Fixed position for (H01), private communication from Bill Ryan.
-Height above geoid 3250 m, geoid height -23 meters.
+   Height above geoid 3250 m, geoid height -23 meters.
 
 H01 !-1071121.6      +335905.4      3227       Magdalena Ridge Observatory, Socorro
 
    Spacewatch telescope positions are off.  (691) was wrong by
-almost half a kilometer,  but fixed January 2019.  (291) is still
-wrong,  though only by about 20 meters.  Altitude is from
+   almost half a kilometer,  but fixed January 2019.  (291) is still
+   wrong,  though only by about 20 meters.  Altitude is from
 
-https://spacewatch.lpl.arizona.edu/telescopes
+   https://spacewatch.lpl.arizona.edu/telescopes
 
    with 30 meters subtracted for geoid height.
 
 291 !-111.599905     +31.961669     2045.      LPL/Spacewatch II
 
    Other scopes measured while looking at Kitt Peak in Google Earth.
-30m substracted to get ellipsoidal altitudes.
+   30m substracted to get ellipsoidal altitudes.
 
 May !-111.599895     +31.964027     2051.      Mayall telescope,  Kitt Peak
 1.3 !-111.598406     +31.959634     2042.      1.3-m telescope, Kitt Peak
@@ -473,19 +473,19 @@ Unk2!-111.599620     +31.958041     2060.      Unkn 2.1-m 90 meters east of WIYN
 WIY2!-111.600237     +31.958013     2058.      WIYN 0.9-m, Kitt Peak
 
    From http://kp12m.as.arizona.edu/12m_docs/12_meter_description.htm .
-Again,  I subtracted 30 meters for geoid height.  The odd mismatch in
-precision for latitude and longitude makes me suspect mistakes.
+   Again,  I subtracted 30 meters for geoid height.  The odd mismatch in
+   precision for latitude and longitude makes me suspect mistakes.
 
 12m !-1113653.475    +315712.0      1884.      ARO 12 Meter Telescope
 
    The MDM Observatory at Kitt Peak has the 1.3-m McGraw-Hill Telescope and
-the 2.4-m Hiltner Telescope,  separated by roughly 60 meters. The MPC
-coordinates for (697) appear to come from
-http://mdm.kpno.noao.edu/13_manual/mgh03.html , and are given to arcminute
-precision,  about 1.5 km from the positions below. I've measured both scopes
-on Google Maps;  Eric Galayda provided altitudes and IDs as to which scope was
-which (not really apparent otherwise). As with other Kitt Peak scopes, 30
-meters is subtracted from the geoid heights to get ellipsoidal heights.
+   the 2.4-m Hiltner Telescope,  separated by roughly 60 meters. The MPC
+   coordinates for (697) appear to come from
+   http://mdm.kpno.noao.edu/13_manual/mgh03.html , and are given to arcminute
+   precision,  about 1.5 km from the positions below. I've measured both scopes
+   on Google Maps;  Eric Galayda provided altitudes and IDs as to which scope was
+   which (not really apparent otherwise). As with other Kitt Peak scopes, 30
+   meters is subtracted from the geoid heights to get ellipsoidal heights.
 
 Hil !-111.615864     +31.951503     1908.5     Kitt Peak, Hiltner
 697 !-111.616685     +31.951754     1895.      Kitt Peak, McGraw-Hill
@@ -653,7 +653,7 @@ Nar !  98.4856944    +18.589972     2559       NARIT, Chiangmai
 9999!   5.5151       +47.348         100       Graves
 
    Luca Buzzi supplied coordinates for the two telescopes at (204),
-both about 1230m above sea level (geoid height is 48 meters).
+   both about 1230m above sea level (geoid height is 48 meters).
 
 Sch !   8.76993      +45.86833      1278       Schiaparelli Observatory, 0.85-m scope
 Sc2 !   8.77061      +45.86845      1278       Schiaparelli Observatory, 0.60-m scope
@@ -663,9 +663,9 @@ G34 !  13.701403     +50.860289      490.67    Oberfrauendorf
 920 ! -77.664299     +43.075229      141       RIT Observatory,  Rochester
 
    David Briggs supplied corrected coordinates for (J69).  The scope
-is 155 metres above sea level;  the geoid height is about 46 metres.
-(J69) is one of five domes visible on G__gle Earth as part of the
-Hampshire Astronomical Group site.  The altitudes appear to be identical.
+   is 155 metres above sea level;  the geoid height is about 46 metres.
+   (J69) is one of five domes visible on G__gle Earth as part of the
+   Hampshire Astronomical Group site.  The altitudes appear to be identical.
 
 J69 !  -1.0196556    +50.9390167     201       North Observatory, Clanfield
 Ha1 !  -1.019663     +50.939114      201       HAG about 10m north of (J69)
@@ -716,8 +716,8 @@ Un3 !  -2.546037   +37.223133       2112.      Unknown about 200m ESE of Z84
 Z79 !  -2.546678   +37.220850       2210.      Calar Alto TNO Survey
 
    Two ASAS-SN scopes,  both sharing LCO domes.  These are essentially
-duplicates of (V37) and (T03),  measured from G__gle Maps with altitudes
-copied from the MPC data.
+   duplicates of (V37) and (T03),  measured from G__gle Maps with altitudes
+   copied from the MPC data.
 
 HSL !-104.015183   +30.679849       2010       ASAS-SN, Henrietta Swan Leavitt/McDonald Obs
 AHa !-156.257494   +20.707009       3050       ASAS-SN, Haleakala 'Brutus'
@@ -978,7 +978,7 @@ SN4 !+014.974534   +37.693119       1782.      Dome E of (SN3) at Serra La Nave
    to identify all but one of the domes measured below.  51m added for
    geoid height.
 
-51m added for geoid height.
+   51m added for geoid height.
 OH1 !+005.712526   +43.931481        705.      Observatoire Haute-Provence, 1.93-m
 OH2 !+005.711704   +43.933394        719.      Observatoire Haute-Provence, 1.52-m
 OH3 !+005.714509   +43.932374        695.      Observatoire Haute-Provence, 80-cm
