@@ -106,7 +106,7 @@ i      Toggles the 'information' about the currently-selected observation
 j      Toggles the two lines showing which perturbers are included,  R1 and R2,
          orbital restrictions,  and the step size.  When shut off,  two
          more lines of residuals are shown.
-o      Toggles display of the orbital elements.  You normally wouldn't want
+O      Toggles display of the orbital elements.  You normally wouldn't want
          to shut them off,  but if you do,  ten more lines of residuals are
          shown.  Combine with the above 'i' and 'j' commands,  and you can
          get a full-screen display of observations/residuals.
@@ -170,7 +170,7 @@ m      Make an ephemeris.  You get a menu asking for a starting date/time,
 )      Show a user-selected text file.  I added this because I'm sometimes
          in the midst of solving an object and would like to look at some
          file or another,  without needing to exit or start a new console.
-N      Select a new file of astrometry.
+o      Select a new file of astrometry.
 n      Select a different object from the input file of astrometry.
 `      (that's a backward-quote-mark!) Toggles between N(uclear) and T(otal)
          comet magnitudes.  When a full-step is done,  you'll see that

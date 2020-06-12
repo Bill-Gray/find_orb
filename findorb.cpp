@@ -4050,16 +4050,16 @@ int main( int argc, const char **argv)
             create_ephemeris( orbit, curr_epoch, obs, n_obs, obj_name,
                            ifilename, residual_format);
             break;
-         case 'N':             /* select a new file */
+         case 'o':             /* select a new file */
             get_new_file = get_new_object = 1;
             *ifilename = '\0';
             break;
-         case 'n':             /* select a new object from the input file */
+         case 'n': case 'N':   /* select a new object from the input file */
             get_new_object = 1;
             update_element_display = 1;
             pop_all_orbits( );
             break;
-         case 'o': case 'O':
+         case 'O':
             observation_display ^= DISPLAY_ORBITAL_ELEMENTS;
             strcpy( message_to_user, "Display of orbital elements toggled");
             add_off_on = (observation_display & DISPLAY_ORBITAL_ELEMENTS);

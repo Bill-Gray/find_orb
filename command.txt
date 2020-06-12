@@ -1,13 +1,14 @@
 ?              help
+q              Quit
+o              Open...
+n              NewObj
+m              epheM
 f              Full
 h              Herget
-m              epheM
 v              Vaisa
 d              resiD
 g              Gauss
 l              constr
-n              New
-q              Quit
 e              Epoch
 !              all_perts
 u              Undo
