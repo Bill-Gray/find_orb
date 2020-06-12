@@ -4334,8 +4334,8 @@ void set_environment_ptr( const char *env_ptr, const char *new_value)
       }
    if( !got_it)
       {
-      n_lines++;
       memmove( edata + idx + 1, edata + idx, (n_lines - idx) * sizeof( edata[0]));
+      n_lines++;
       edata[idx] = NULL;
       }
    edata[idx] = (char *)realloc( edata[idx],
@@ -4481,7 +4481,7 @@ void update_environ_dot_dat( void)
 
          if( text[i][0] != ' ' && tptr)
             for( j = 0; j < n_lines && !updated; j++)
-               if( !memcmp( text[i], edata[j], tptr - text[i] + 1))
+               if( !strncmp( text[i], edata[j], tptr - text[i] + 1))
                   {
                   fprintf( ofile, "%s\n", edata[j]);
                   found[j] = 1;
