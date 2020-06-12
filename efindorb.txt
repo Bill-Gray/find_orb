@@ -323,3 +323,7 @@
 2037    Element center=$CEN
 
 2038    Enter element reference :
+
+2039    Clipboard functions require 'xclip' to be installed.  Run,  for
+2039    example,  'sudo apt install xclip',  'sudo yum install xclip',
+2039    or similar command.

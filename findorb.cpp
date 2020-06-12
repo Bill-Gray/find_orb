@@ -4863,8 +4863,8 @@ int main( int argc, const char **argv)
             make_config_dir_name( tbuff, elements_filename);
             i = copy_file_to_clipboard( tbuff);
             if( i)
-               sprintf( message_to_user,
-                              "Error %d in copying elements to clipboard", i);
+               inquire( get_find_orb_text( 2039), NULL, 0,
+                                    COLOR_MESSAGE_TO_USER);
             else
                strcpy( message_to_user, "Elements copied to clipboard");
             }
