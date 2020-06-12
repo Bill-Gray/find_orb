@@ -2486,24 +2486,6 @@ static int toggle_selected_observations( OBSERVE *obs, const unsigned n_obs,
    return( rval);
 }
 
-/* Simplified regular expression matching.  Enough for our humble needs. */
-
-static bool patMatch( const char *pattern, const char *string)
-{
-   while( pattern[0])
-      if( pattern[0] == '*')
-            return patMatch(pattern+1, string) || (string[0] && patMatch(pattern, string+1));
-      else
-         {
-         if( pattern[0] == '?' && !string[0])
-            return 0;
-         if( pattern[0] != '?' && pattern[0] != string[0])
-            return 0;
-         pattern++;
-         string++;
-         }
-   return !string[0];
-}
 
 /* In Windows,  a canonical file path will contain :\.  Under everything
 else I know about,  it won't.  */
@@ -2604,15 +2586,6 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
       clipboard_to_file( temp_obs_filename, ifilename[1] == '+');
       strcpy( ifilename, temp_obs_filename);
       }
-   if( *ifilename == ':')
-      for( i = n_lines - 1; i; i--)
-         if( *prev_files[i] != '#' && patMatch( ifilename + 1, prev_files[i]))
-#ifdef _WIN32
-            if( strstr( prev_files[i], ":\\"))
-#else
-            if( !strstr( prev_files[i], ":\\"))
-#endif
-               strcpy( ifilename, prev_files[i]);
 
    ids = find_objects_in_file( ifilename, n_ids, NULL);
    if( *n_ids > 0 && drop_single_obs)
