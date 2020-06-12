@@ -481,10 +481,7 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
                      }
                if( !y && x >= real_width - 4 && x < real_width - 1
                       && help_file_name && rval == KEY_F( 1))
-                  {
                   show_help = true;
-                  rval = -1;
-                  }
                }
             }
             while( rval == KEY_MOUSE);
@@ -493,8 +490,13 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
 #endif
          mousemask( ALL_MOUSE_EVENTS, NULL);
          curs_set( 1);        /* turn cursor back on */
+         if( rval == '?' && help_file_name)
+            show_help = true;
          if( show_help)
+            {
             show_a_file( help_file_name);
+            rval = -1;
+            }
          }
       restore_screen( buffered_screen);
       free( buffered_screen);
