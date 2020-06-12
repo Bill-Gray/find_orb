@@ -44,10 +44,10 @@ c 10 80ffff 804000         Menu text : white text on orange
 c 11 00ff00 808080         Scroll bar : green on gray
 c 12 000000 80ffff         Inquiry dialog : black on cyan
 c 13 ffffff ff0000         'Attention' : white on red
-c 14 ffff00 000000         MPC code 1 : yellow on black
+c 16 ffff00 000000         MPC code 1 : yellow on black
 c 15 ffffff 000000         MPC code 2 : white on black
-c 16 ff00ff 000000         MPC code 3 : magenta on black
-c 17 00ffff 000000         MPC code 4 : cyan on black
+c 14 8e82fe 000000         MPC code 3 : light blue on black
+c 17 ff2000 000000         MPC code 4 : red on black
 c 18 00ff00 000000         MPC code 5 : green on black
 
    Color assignments for 8-color terminals.  Here,  we just have the
