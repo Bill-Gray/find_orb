@@ -74,6 +74,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include <ctype.h>
 #include <time.h>
 #include <assert.h>
+#include <sys/stat.h>
 #include <locale.h>
 #include "watdefs.h"
 #include "sigma.h"
@@ -158,6 +159,7 @@ int debug_printf( const char *format, ...)                 /* runge.cpp */
          __attribute__ (( format( printf, 1, 2)))
 #endif
 ;
+int fetch_astrometry_from_mpc( FILE *ofile, const char *desig);
 static void get_mouse_data( int *mouse_x, int *mouse_y, int *mouse_z, unsigned long *button);
 int get_object_name( char *obuff, const char *packed_desig);   /* mpc_obs.c */
 int make_pseudo_mpec( const char *mpec_filename, const char *obj_name);
@@ -2390,13 +2392,7 @@ static int user_select_file( char *filename, const char *title, const int flags)
 {
    const bool is_save_dlg = (flags & 1);
    char cmd[256];
-   int rval, i;
-   FILE *ifile = fopen_ext( "openfile.txt", "fcrb");
-
-   for( i = 1; i < getmaxy( stdscr) && fgets_trimmed( cmd, sizeof( cmd), ifile); i++)
-      put_colored_text( cmd, i, 0, -1, COLOR_BACKGROUND);
-   fclose( ifile);
-   refresh( );
+   int rval;
 
    strcpy( cmd, "zenity --file-selection");
    if( is_save_dlg)
@@ -2509,6 +2505,20 @@ static bool patMatch( const char *pattern, const char *string)
    return !string[0];
 }
 
+/* In Windows,  a canonical file path will contain :\.  Under everything
+else I know about,  it won't.  */
+
+static bool filename_fits_current_os( const char *filename)
+{
+#ifdef _WIN32
+   return( strstr( filename, ":\\"));
+#else
+   return( !strstr( filename, ":\\"));
+#endif
+}
+
+#define MAX_PREV_FILES  10
+
 static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
                                  const bool drop_single_obs)
 {
@@ -2523,8 +2533,64 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
    assert( prev_files);
    *err_buff = '\0';
    if( !*ifilename)
-      user_select_file( ifilename, "Open astrometry file", 0);
+      {
+      const size_t buffsize = 3000;
+      char *buff = (char *)malloc( buffsize);
+      int c, base_key = (int)KEY_F( 4);
+      size_t n_prev = 0, prev_idx[MAX_PREV_FILES];
+      struct stat file_info;
 
+      strcpy( buff, get_find_orb_text( 2031));
+      for( i = n_lines - 1; i && n_prev < MAX_PREV_FILES; i--)
+         if( prev_files[i][0] != '#' && filename_fits_current_os( prev_files[i]))
+            {
+            if( !stat( prev_files[i], &file_info))
+               {
+               snprintf_append( buff, buffsize, "\n%d ", (int)n_prev);
+               strcat( buff, prev_files[i]);
+#ifndef _WIN32
+               text_search_and_replace( buff, getenv( "HOME"), "~");
+#endif
+               prev_idx[n_prev++] = i;
+               }
+            else      /* file doesn't exist anymore;  remove from list */
+               prev_files[i] = NULL;
+            }
+      help_file_name = "openfile.txt";
+      c = inquire( buff, NULL, 30, COLOR_DEFAULT_INQUIRY);
+      free( buff);
+      if( c >= '0' && c < '0' + (int)n_prev)
+         c += base_key - '0';
+      i = c - base_key;
+      if( i < n_prev)
+         strcpy( ifilename, prev_files[prev_idx[i]]);
+      switch( c)
+         {
+         case 'F': case 'f': case KEY_F( 1):
+            user_select_file( ifilename, "Open astrometry file", 0);
+            break;
+         case 'C': case 'c': case KEY_F( 2):
+            strcpy( ifilename, "c");
+            break;
+         case 'N': case 'n': case KEY_F( 3):
+            {
+            char object_name[80];
+
+            inquire( "Enter object name :", object_name, 40, COLOR_DEFAULT_INQUIRY);
+            if( *object_name)
+               {
+               extern const char *temp_obs_filename;        /* miscell.cpp */
+               FILE *ofile = fopen( temp_obs_filename, "wb");
+
+               assert( ofile);
+               fetch_astrometry_from_mpc( ofile, object_name);
+               fclose( ofile);
+               strcpy( ifilename, temp_obs_filename);
+               }
+            }
+            break;
+         }
+      }
    if( !*ifilename)
       {
       free( prev_files);
@@ -2589,7 +2655,7 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
 #endif
       set_solutions_found( ids, *n_ids);
       for( i = 0; i < n_lines; i++)
-         if( strcmp( prev_files[i], canonical_path))
+         if( prev_files[i] && strcmp( prev_files[i], canonical_path))
             fprintf( ofile, "%s\n", prev_files[i]);
       if( strcmp( canonical_path, temp_obs_filename))
          fprintf( ofile, "%s\n", canonical_path);
