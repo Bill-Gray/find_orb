@@ -408,11 +408,8 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
          put_colored_text( tbuff, line, col,
                 side_borders + j - i + n_spaces, color_to_use);
          if( !i && help_file_name)
-            {
-            color_to_use |= A_REVERSE;
             put_colored_text( "[?]", line, col + real_width - 4,
-                             3, color_to_use);
-            }
+                             3, color_to_use | A_REVERSE);
          i = j;
          if( prompt[i] == '\n')
             i++;
@@ -1089,9 +1086,10 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
       clear( );
       while( rval == -1)
          {
+         const int xmax = getmaxx( stdscr);
          const int n_lines = getmaxy( stdscr) - 3;
          int column_width = (force_full_width_display ? 40 : 16);
-         int c, n_cols = getmaxx( stdscr) / column_width;
+         int c, n_cols = xmax / column_width;
          char buff[280];
 
          if( choice < 0)
@@ -1106,7 +1104,7 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
             curr_page = 0;
          if( n_ids < n_lines * n_cols)
             n_cols = n_ids / n_lines + 1;
-         column_width = getmaxx( stdscr) / n_cols;
+         column_width = xmax / n_cols;
 //       if( column_width > 80)
 //          column_width = 80;
          for( i = 0; i < n_lines * n_cols; i++)
@@ -1162,6 +1160,8 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
          put_colored_text( "Prev", n_lines + 2, 65, 4, COLOR_HIGHLIT_BUTTON);
          put_colored_text( "End", n_lines + 2, 61, 3, COLOR_HIGHLIT_BUTTON);
          put_colored_text( "Start", n_lines + 2, 55, 5, COLOR_HIGHLIT_BUTTON);
+         put_colored_text( "[?]", 0, xmax - 4, 3,
+                              A_REVERSE | COLOR_BACKGROUND);
          if( *search_text)
             put_colored_text( search_text, n_lines + 1, 55,
                       (int)strlen( search_text), COLOR_FINAL_LINE);
@@ -1179,6 +1179,8 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
                c = KEY_UP;
             else if( button5_pressed)   /* actually 'wheel down' */
                c = KEY_DOWN;
+            else if( !y && x >= xmax - 4 && x < xmax - 1)
+               c = '?';
             else if( y < n_lines)
                choice = curr_page + y + (x / column_width) * n_lines;
             else if( y == n_lines + 1 || y == n_lines)
@@ -1822,7 +1824,7 @@ static void show_a_file( const char *filename)
       sprintf( buff, "   Line %d of %d", line_no, n_lines);
       put_colored_text( buff, i, getmaxx( stdscr) - (int)strlen( buff) - 1,
                                  (int)strlen( buff), COLOR_FINAL_LINE);
-      put_colored_text( "Quit", i, 25, 4, COLOR_FINAL_LINE);
+      put_colored_text( "Back", i, 25, 4, COLOR_FINAL_LINE);
       if( line_no < n_lines - 1)
          {
          put_colored_text( "pgDown", i, 30, 6, COLOR_FINAL_LINE);
