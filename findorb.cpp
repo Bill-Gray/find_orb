@@ -2573,6 +2573,11 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
                }
             }
             break;
+         case 'q': case 'Q': case 27:
+            free( prev_files);
+            *err_buff = '\0';    /* signals 'cancel' */
+            return( NULL);
+            break;
          }
       }
    if( !*ifilename)
@@ -2741,7 +2746,7 @@ int main( int argc, const char **argv)
    int update_element_display = 1, gauss_soln = 0;
    int residual_format = RESIDUAL_FORMAT_80_COL, bad_elements = 0;
    int element_format = 0, debug_mouse_messages = 0, prev_getch = 0;
-   int auto_repeat_full_improvement = 0, n_ids, planet_orbiting = 0;
+   int auto_repeat_full_improvement = 0, n_ids = 0, planet_orbiting = 0;
    OBJECT_INFO *ids = NULL;
    double noise_in_arcseconds = 1.;
    double monte_data[MONTE_DATA_SIZE];
@@ -2962,18 +2967,30 @@ int main( int argc, const char **argv)
 
       if( c != KEY_TIMER)
          prev_getch = c;
-      if( get_new_file)
+      while( get_new_file)
          {
-         if( ids)
-            free( ids);
-         ids = load_file( ifilename, &n_ids, tbuff, drop_single_obs);
-         if( !ids)
-            {
-            inquire( tbuff, NULL, 30, COLOR_DEFAULT_INQUIRY);
+         OBJECT_INFO *new_ids;
+         int n_new_ids;
+
+         new_ids = load_file( ifilename, &n_new_ids, tbuff, drop_single_obs);
+         if( !new_ids && !*tbuff && !ids)   /* at startup,  and hit Quit */
             goto Shutdown_program;
+         if( !new_ids && *tbuff)
+            {
+            *ifilename = '\0';
+            inquire( tbuff, NULL, 30, COLOR_DEFAULT_INQUIRY);
             }
-         get_new_file = 0;
-         get_new_object = 1;
+         if( new_ids)
+            {
+            if( ids)
+               free( ids);
+            ids = new_ids;
+            n_ids = n_new_ids;
+            get_new_object = 1;
+            get_new_file = 0;
+            }
+         else if( !*tbuff)    /* hit Cancel,  going back to curr obj */
+            get_new_object = get_new_file = 0;
          }
       if( debug_level > 3)
          debug_printf( "get_new_object = %d\n", get_new_object);
