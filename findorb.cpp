@@ -721,7 +721,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             }
       snprintf_append( buff, sizeof( buff), "C  %s\n", ephem_type_strings[ephem_type]);
       snprintf_append( buff, sizeof( buff), "M  Make ephemeris\n");
-      snprintf_append( buff, sizeof( buff), "Q  Quit/return to main display");
+      snprintf_append( buff, sizeof( buff), "Q  Return to main display");
       n_lines += 4;
       help_file_name = "dosephem.txt";
       c = inquire( buff, NULL, 0, COLOR_DEFAULT_INQUIRY);
