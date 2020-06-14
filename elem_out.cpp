@@ -2836,11 +2836,18 @@ int find_mpc_color( const MPC_STATION *sdata, const char *mpc_code)
 static void set_mpc_colors_semirandomly( MPC_STATION *sdata,
                const int max_n_colors, unsigned long seed)
 {
+   int i;
+
+   for( i = 0; sdata[i].code[0]; i++)
+      sdata[i].color = (char)( i % max_n_colors);
    srand( seed);
-   while( sdata->code[0])
+   while( --i)
       {
-      sdata->color = (char)( rand( ) % (unsigned long)max_n_colors);
-      sdata++;
+      const int j = (int)( rand( ) % i);
+      const int color = sdata[j].color;
+
+      sdata[j].color = sdata[i].color;
+      sdata[i].color = color;
       }
 }
 
