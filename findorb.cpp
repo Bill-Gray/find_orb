@@ -2504,7 +2504,7 @@ static bool filename_fits_current_os( const char *filename)
 #define MAX_PREV_FILES  10
 
 static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
-                                 const bool drop_single_obs)
+                    const bool drop_single_obs, const bool already_got_obs)
 {
    OBJECT_INFO *ids;
    extern const char *temp_obs_filename;     /* miscell.cpp */
@@ -2540,6 +2540,7 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
             else      /* file doesn't exist anymore;  remove from list */
                prev_files[i] = NULL;
             }
+      strncat( buff, (already_got_obs ? "\nQ Cancel" : "\nQ Quit"), buffsize);
       help_file_name = "openfile.txt";
       c = inquire( buff, NULL, 30, COLOR_DEFAULT_INQUIRY);
       free( buff);
@@ -2548,6 +2549,8 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
       i = c - base_key;
       if( i < n_prev)
          strcpy( ifilename, prev_files[prev_idx[i]]);
+      else if( i == n_prev)
+         c = 'q';
       switch( c)
          {
          case 'F': case 'f': case KEY_F( 1):
@@ -2972,7 +2975,8 @@ int main( int argc, const char **argv)
          OBJECT_INFO *new_ids;
          int n_new_ids;
 
-         new_ids = load_file( ifilename, &n_new_ids, tbuff, drop_single_obs);
+         new_ids = load_file( ifilename, &n_new_ids, tbuff, drop_single_obs,
+                                  (ids ? true : false));
          if( !new_ids && !*tbuff && !ids)   /* at startup,  and hit Quit */
             goto Shutdown_program;
          if( !new_ids && *tbuff)
