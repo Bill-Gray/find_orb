@@ -326,6 +326,8 @@ COM Valid: 2014 - 2100
 OBS R. L. Seaman
 COM Valid: 2014 - 2100
 OBS F. C. Shelly
+COM Valid: 2019 Oct 1 - 2100
+OBS K. W. Wierzchos
 COM Valid: 2003 jan 1 - 2100
 TEL 0.68 m Schmidt
 COM Valid: 2003 jan 1 - 2016 Dec 02
@@ -548,6 +550,8 @@ COM Valid: 2014 - 2100
 OBS R. L. Seaman
 COM Valid: 2014 - 2100
 OBS F. C. Shelly
+COM Valid: 2019 Oct 1 - 2100
+OBS K. W. Wierzchos
 COM Valid: 1900 - 2100
 TEL 0.5-m Uppsala Schmidt + CCD
 NET UCAC2
@@ -638,6 +642,8 @@ COM Valid: 2014 - 2100
 OBS R. L. Seaman
 COM Valid: 2014 - 2100
 OBS F. C. Shelly
+COM Valid: 2019 Oct 1 - 2100
+OBS K. W. Wierzchos
 COM Valid: 2003 jan 1 - 2100
 TEL 1.5-m reflector
 COM Valid: 2003 jan 1 - 2016 May 26
@@ -747,6 +753,8 @@ COM Valid: 2014 - 2100
 OBS R. L. Seaman
 COM Valid: 2014 - 2100
 OBS F. C. Shelly
+COM Valid: 2019 Oct 1 - 2100
+OBS K. W. Wierzchos
 COM Valid: 1999-2100
 TEL 1.0-m reflector + CCD
 
@@ -1000,6 +1008,8 @@ COM Valid: 2014 - 2100
 OBS R. L. Seaman
 COM Valid: 2014 - 2100
 OBS F. C. Shelly
+COM Valid: 2019 Oct 1 - 2100
+OBS K. W. Wierzchos
 COM Valid: 1900-2100
 TEL 1.55-m reflector + CCD
 

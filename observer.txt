@@ -94,7 +94,7 @@
  Masiero                                   <a href="http://twitter.com/joemasiero">Masiero</a>
  Matson                                    <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0073491">Matson</a>
  Mattiazzo                                 <a href="https://www.researchgate.net/scientific-contributions/2004893480_M_Mattiazzo">Mattiazzo</a>
- Micheli                                   <a href="http://www.spacedys.com/images/cv_pdf/micheli.pdf">Micheli</a>
+ Micheli                                   <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0010277">Micheli</a>
  Mikuz                                     Miku&#382;
  McGaha                                    <a href="http://www.3towers.com/s3towers/AboutUs.asp?section=AboutUs">McGaha</a>
  McNaught                                  <a href="http://www2.abc.net.au/science/week/forum1/mcnaught.htm">McNaught</a>
@@ -160,6 +160,7 @@
  Watters                                   <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0133009">Watters</a>
  Wells                                     <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0072834">Wells</a>
  Weryk                                     <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0009281">Weryk</a>
+ Wierzchos                                 <a href="https://twitter.com/WierzchosKacper">Wierzcho&#347;</a>
  Wiggins                                   <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0004099">Wiggins</a>
  Q.-Z. Ye                                  <a href="http://yeqzids.github.io/">Q.-Z. Ye</a>
  Zolnowski                                 <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0384815">&#379;o&#322;nowski</a>
