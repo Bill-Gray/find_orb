@@ -1156,10 +1156,16 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
             put_colored_text( "Not a valid choice",
                                  n_lines + 2, 0, -1, COLOR_FINAL_LINE);
          put_colored_text( "Quit", n_lines + 2, 75, 4, COLOR_HIGHLIT_BUTTON);
-         put_colored_text( "Next", n_lines + 2, 70, 4, COLOR_HIGHLIT_BUTTON);
-         put_colored_text( "Prev", n_lines + 2, 65, 4, COLOR_HIGHLIT_BUTTON);
-         put_colored_text( "End", n_lines + 2, 61, 3, COLOR_HIGHLIT_BUTTON);
-         put_colored_text( "Start", n_lines + 2, 55, 5, COLOR_HIGHLIT_BUTTON);
+         if( curr_page + i < n_ids)
+            {
+            put_colored_text( "Next", n_lines + 2, 70, 4, COLOR_HIGHLIT_BUTTON);
+            put_colored_text( "End", n_lines + 2, 61, 3, COLOR_HIGHLIT_BUTTON);
+            }
+         if( curr_page)
+            {
+            put_colored_text( "Prev", n_lines + 2, 65, 4, COLOR_HIGHLIT_BUTTON);
+            put_colored_text( "Start", n_lines + 2, 55, 5, COLOR_HIGHLIT_BUTTON);
+            }
          put_colored_text( "[?]", 0, xmax - 4, 3,
                               A_REVERSE | COLOR_BACKGROUND);
          if( *search_text)
