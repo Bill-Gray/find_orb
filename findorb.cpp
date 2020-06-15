@@ -1091,7 +1091,7 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
          int column_width = (force_full_width_display ? 40 : 16);
          int c, n_cols = xmax / column_width;
          char buff[280];
-         const int x0 = 55;         /* column where buttons start */
+         const int x0 = xmax - 25;  /* column where buttons start */
 
          if( choice < 0)
             choice = 0;
@@ -1174,6 +1174,7 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
          if( *search_text)
             put_colored_text( search_text, n_lines + 1, x0,
                       (int)strlen( search_text), COLOR_FINAL_LINE);
+         put_colored_text( "Open...", n_lines + 1, x0 + 12, 7, COLOR_HIGHLIT_BUTTON);
          put_colored_text( "HELP", n_lines + 1, x0 + 20, 4, COLOR_HIGHLIT_BUTTON);
          flushinp( );
          c = extended_getch( );
@@ -1189,9 +1190,11 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
             else if( button5_pressed)   /* actually 'wheel down' */
                c = KEY_DOWN;
             else if( !y && x >= xmax - 4 && x < xmax - 1)
-               c = '?';
+               c = '?';                 /* clicked on [?] at upper right */
             else if( y < n_lines)
                choice = curr_page + y + (x / column_width) * n_lines;
+            else if( y == n_lines + 1 && x >= x0 - 12 && x < x0 + 19)
+               c = ALT_F;           /* clicked on 'Open...' */
             else if( y == n_lines + 1 || y == n_lines)
                c = '?';
             else if( y == n_lines + 2 && x >= x0)
@@ -1317,6 +1320,9 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
                break;
             case ',':
                show_packed ^= 1;
+               break;
+            case ALT_F:
+               rval = -3;
                break;
             case KEY_MOUSE:      /* already handled above */
                break;
@@ -2981,100 +2987,107 @@ int main( int argc, const char **argv)
 
       if( c != KEY_TIMER)
          prev_getch = c;
-      while( get_new_file)
+      while( get_new_file || get_new_object)
          {
-         OBJECT_INFO *new_ids;
-         int n_new_ids;
+         while( get_new_file)
+            {
+            OBJECT_INFO *new_ids;
+            int n_new_ids;
 
-         new_ids = load_file( ifilename, &n_new_ids, tbuff, drop_single_obs,
-                                  (ids ? true : false));
-         if( !new_ids && !*tbuff && !ids)   /* at startup,  and hit Quit */
-            goto Shutdown_program;
-         if( !new_ids && *tbuff)
-            {
-            *ifilename = '\0';
-            inquire( tbuff, NULL, 30, COLOR_DEFAULT_INQUIRY);
+            new_ids = load_file( ifilename, &n_new_ids, tbuff, drop_single_obs,
+                                     (ids ? true : false));
+            if( !new_ids && !*tbuff && !ids)   /* at startup,  and hit Quit */
+               goto Shutdown_program;
+            if( !new_ids && *tbuff)
+               {
+               *ifilename = '\0';
+               inquire( tbuff, NULL, 30, COLOR_DEFAULT_INQUIRY);
+               }
+            if( new_ids)
+               {
+               if( ids)
+                  free( ids);
+               ids = new_ids;
+               n_ids = n_new_ids;
+               get_new_object = 1;
+               get_new_file = 0;
+               }
+            else if( !*tbuff)    /* hit Cancel,  going back to curr obj */
+               get_new_object = get_new_file = 0;
             }
-         if( new_ids)
+         if( debug_level > 3)
+            debug_printf( "get_new_object = %d\n", get_new_object);
+         if( get_new_object)
             {
-            if( ids)
-               free( ids);
-            ids = new_ids;
-            n_ids = n_new_ids;
-            get_new_object = 1;
-            get_new_file = 0;
+            int id_number = 0;
+
+            if( n_ids > 1)
+               id_number = select_object_in_file( ids, n_ids);
+            if( debug_level > 3 && id_number >= 0)
+               debug_printf( "id_number = %d; '%s'\n", id_number,
+                                       ids[id_number].obj_name);
+            get_new_object = 0;
+            *orbit_constraints = '\0';
+            if( id_number == -3)          /* 'Open...' clicked */
+               {
+               *ifilename = '\0';
+               get_new_object = get_new_file = 1;
+               }
+            else if( id_number < 0)
+               goto Shutdown_program;
+            else
+               {
+               FILE *ifile;
+               long file_offset;
+
+               strcpy( obj_name, ids[id_number].obj_name);
+               sprintf( tbuff, "Loading '%s'...", obj_name);
+               put_colored_text( tbuff, getmaxy( stdscr) - 3,
+                                    0, -1, COLOR_FINAL_LINE);
+               if( debug_level)
+                  debug_printf( "%s: ", tbuff);
+               refresh( );
+               monte_carlo_object_count = 0;
+
+               ifile = fopen( ifilename, "rb");
+                   /* Start quite a bit ahead of the actual data,  just in case */
+                   /* there's a #Sigma: or something in the observation header */
+                   /* to which we should pay attention:                        */
+               file_offset = ids[id_number].file_offset - 4000L;
+               if( file_offset < 0L)
+                  file_offset = 0L;
+               fseek( ifile, file_offset, SEEK_SET);
+               if( obs)
+                  unload_observations( obs, n_obs);
+
+               obs = load_object( ifile, ids + id_number, &curr_epoch,
+                                                     &epoch_shown, orbit);
+               fclose( ifile);
+               n_obs = ids[id_number].n_obs;
+               if( !curr_epoch || !epoch_shown || !obs || n_obs < 2)
+                  debug_printf( "Curr epoch %f; shown %f; obs %p; %d obs\n",
+                                 curr_epoch, epoch_shown, (void *)obs, n_obs);
+               if( debug_level)
+                  debug_printf( "got obs; ");
+               if( mpc_color_codes)
+                  free( mpc_color_codes);
+               if( max_mpc_color_codes)
+                  mpc_color_codes = find_mpc_color_codes( n_obs, obs,
+                             max_mpc_color_codes);
+               if( debug_level)
+                  debug_printf( "got color codes; ");
+               get_r1_and_r2( n_obs, obs, &r1, &r2);    /* orb_func.cpp */
+               if( debug_level)
+                  debug_printf( "R1 = %f; R2 = %f\n", r1, r2);
+               for( i = 0; i < n_obs - 1 && !obs[i].is_included; i++)
+                  ;
+               curr_obs = top_obs_shown = i;
+               update_element_display = 1;
+               clear( );
+               }
+            force_bogus_orbit = false;
             }
-         else if( !*tbuff)    /* hit Cancel,  going back to curr obj */
-            get_new_object = get_new_file = 0;
          }
-      if( debug_level > 3)
-         debug_printf( "get_new_object = %d\n", get_new_object);
-      if( get_new_object)
-         {
-         int id_number = 0;
-
-         if( n_ids > 1)
-            id_number = select_object_in_file( ids, n_ids);
-         if( debug_level > 3 && id_number >= 0)
-            debug_printf( "id_number = %d; '%s'\n", id_number,
-                                    ids[id_number].obj_name);
-         get_new_object = 0;
-         *orbit_constraints = '\0';
-         if( id_number < 0)
-            goto Shutdown_program;
-         else
-            {
-            FILE *ifile;
-            long file_offset;
-
-            strcpy( obj_name, ids[id_number].obj_name);
-            sprintf( tbuff, "Loading '%s'...", obj_name);
-            put_colored_text( tbuff, getmaxy( stdscr) - 3,
-                                 0, -1, COLOR_FINAL_LINE);
-            if( debug_level)
-               debug_printf( "%s: ", tbuff);
-            refresh( );
-            monte_carlo_object_count = 0;
-
-            ifile = fopen( ifilename, "rb");
-                /* Start quite a bit ahead of the actual data,  just in case */
-                /* there's a #Sigma: or something in the observation header */
-                /* to which we should pay attention:                        */
-            file_offset = ids[id_number].file_offset - 4000L;
-            if( file_offset < 0L)
-               file_offset = 0L;
-            fseek( ifile, file_offset, SEEK_SET);
-            if( obs)
-               unload_observations( obs, n_obs);
-
-            obs = load_object( ifile, ids + id_number, &curr_epoch,
-                                                  &epoch_shown, orbit);
-            fclose( ifile);
-            n_obs = ids[id_number].n_obs;
-            if( !curr_epoch || !epoch_shown || !obs || n_obs < 2)
-               debug_printf( "Curr epoch %f; shown %f; obs %p; %d obs\n",
-                              curr_epoch, epoch_shown, (void *)obs, n_obs);
-            if( debug_level)
-               debug_printf( "got obs; ");
-            if( mpc_color_codes)
-               free( mpc_color_codes);
-            if( max_mpc_color_codes)
-               mpc_color_codes = find_mpc_color_codes( n_obs, obs,
-                          max_mpc_color_codes);
-            if( debug_level)
-               debug_printf( "got color codes; ");
-            get_r1_and_r2( n_obs, obs, &r1, &r2);    /* orb_func.cpp */
-            if( debug_level)
-               debug_printf( "R1 = %f; R2 = %f\n", r1, r2);
-            for( i = 0; i < n_obs - 1 && !obs[i].is_included; i++)
-               ;
-            curr_obs = top_obs_shown = i;
-            update_element_display = 1;
-            clear( );
-            }
-         force_bogus_orbit = false;
-         }
-
       if( curr_obs > n_obs - 1)
          curr_obs = n_obs - 1;
       if( curr_obs < 0)
