@@ -1,4 +1,4 @@
-?              help
+?              [?]
 q              Quit
 o              Open...
 n              NewObj
