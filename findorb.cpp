@@ -1091,6 +1091,7 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
          int column_width = (force_full_width_display ? 40 : 16);
          int c, n_cols = xmax / column_width;
          char buff[280];
+         const int x0 = 55;         /* column where buttons start */
 
          if( choice < 0)
             choice = 0;
@@ -1123,9 +1124,11 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
                   {
                   sprintf( buff, "Object %d of %d: %s",
                               choice + 1, n_ids, desig);
+                  buff[x0] = '\0';
                   put_colored_text( buff, n_lines + 1, 0, -1,
                                                 COLOR_SELECTED_OBS);
                   object_comment_text( buff, ids + choice);
+                  buff[x0] = '\0';
                   put_colored_text( buff, n_lines + 2, 0, -1,
                                                 COLOR_SELECTED_OBS);
                   color = COLOR_HIGHLIT_BUTTON;
@@ -1155,23 +1158,23 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
          if( err_message)
             put_colored_text( "Not a valid choice",
                                  n_lines + 2, 0, -1, COLOR_FINAL_LINE);
-         put_colored_text( "Quit", n_lines + 2, 75, 4, COLOR_HIGHLIT_BUTTON);
+         put_colored_text( "Quit", n_lines + 2, x0 + 20, 4, COLOR_HIGHLIT_BUTTON);
          if( curr_page + i < n_ids)
             {
-            put_colored_text( "Next", n_lines + 2, 70, 4, COLOR_HIGHLIT_BUTTON);
-            put_colored_text( "End", n_lines + 2, 61, 3, COLOR_HIGHLIT_BUTTON);
+            put_colored_text( "Next", n_lines + 2, x0 + 15, 4, COLOR_HIGHLIT_BUTTON);
+            put_colored_text( "End", n_lines + 2, x0 + 6, 3, COLOR_HIGHLIT_BUTTON);
             }
          if( curr_page)
             {
-            put_colored_text( "Prev", n_lines + 2, 65, 4, COLOR_HIGHLIT_BUTTON);
-            put_colored_text( "Start", n_lines + 2, 55, 5, COLOR_HIGHLIT_BUTTON);
+            put_colored_text( "Prev", n_lines + 2, x0 + 10, 4, COLOR_HIGHLIT_BUTTON);
+            put_colored_text( "Start", n_lines + 2, x0, 5, COLOR_HIGHLIT_BUTTON);
             }
          put_colored_text( "[?]", 0, xmax - 4, 3,
                               A_REVERSE | COLOR_BACKGROUND);
          if( *search_text)
-            put_colored_text( search_text, n_lines + 1, 55,
+            put_colored_text( search_text, n_lines + 1, x0,
                       (int)strlen( search_text), COLOR_FINAL_LINE);
-         put_colored_text( "HELP", n_lines + 1, 75, 4, COLOR_HIGHLIT_BUTTON);
+         put_colored_text( "HELP", n_lines + 1, x0 + 20, 4, COLOR_HIGHLIT_BUTTON);
          flushinp( );
          c = extended_getch( );
          err_message = 0;
@@ -1191,17 +1194,19 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
                choice = curr_page + y + (x / column_width) * n_lines;
             else if( y == n_lines + 1 || y == n_lines)
                c = '?';
-            else if( y == n_lines + 2)
+            else if( y == n_lines + 2 && x >= x0)
                {
-               if( x >= 75)
+               const int dx = x - x0;
+
+               if( dx >= 20)
                   c = 27;          /* quit */
-               else if( x >= 70)
+               else if( dx >= 15)
                   c = KEY_NPAGE;   /* 'next page' */
-               else if( x >= 65)
+               else if( dx >= 10)
                   c = KEY_PPAGE;   /* 'prev page' */
-               else if( x >= 61)
+               else if( dx >= 6)
                   c = KEY_END;     /* end of list */
-               else if( x >= 55)
+               else
                   c = KEY_HOME;    /* start of list */
                }
             if( button & BUTTON1_DOUBLE_CLICKED)
