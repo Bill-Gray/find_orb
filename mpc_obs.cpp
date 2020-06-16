@@ -1761,7 +1761,7 @@ void set_up_observation( OBSERVE FAR *obs)
    set_obs_vect( obs);
 }
 
-static char get_net_used_from_obs_header( const char *mpc_code);
+static int set_data_from_obs_header( OBSERVE *obs);
 
 /* Some historical observations are provided in apparent coordinates of date.
 When that happens,  they have to be adjusted for both aberration of light
@@ -1858,8 +1858,7 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
    obs->is_included = (buff[64] != 'x' && buff[12] != '-');
    FMEMCPY( obs->mpc_code, buff + 77, 3);
    obs->mpc_code[3] = '\0';
-   if( obs->astrometric_net_code == ' ' && obs_details)
-      obs->astrometric_net_code = get_net_used_from_obs_header( obs->mpc_code);
+   set_data_from_obs_header( obs);
    FMEMCPY( obs->columns_57_to_65, buff + 56, 9);
    obs->columns_57_to_65[9] = '\0';
    if( !strcmp( obs->columns_57_to_65, "Apparent "))
@@ -4854,23 +4853,36 @@ static size_t strip_trailing_zeroes( char *buff)
    return( i);
 }
 
-
 /* get_net_used_from_obs_header( ) looks through the observation header
 for the given MPC code for a line starting with 'NET '.  It then looks
 through the above 'net_codes' array in hopes of finding a match to the
 rest of the line. If it does, we've got our byte for column 72 of the
 punched-card astrometry format. */
 
-static char get_net_used_from_obs_header( const char *mpc_code)
+static int set_data_from_obs_header( OBSERVE *obs)
 {
    const char **lines;
-   char rval = ' ';
+   int rval = 0;
    size_t i;
 
-   if( obs_details && (lines = get_code_details( obs_details, mpc_code)) != NULL)
-      for( i = 0; lines[i] && rval == ' '; i++)
+   if( obs->astrometric_net_code != ' ')
+      rval = 1;
+   if( obs->mag_band != ' ')
+      rval |= 2;
+   if( obs_details && (lines = get_code_details( obs_details, obs->mpc_code)) != NULL)
+      for( i = 0; lines[i] && rval != 3; i++)
+         {
          if( !memcmp( lines[i], "NET ", 4))
-            rval = net_name_to_byte_code( lines[i] + 4);
+            {
+            obs->astrometric_net_code = net_name_to_byte_code( lines[i] + 4);
+            rval |= 1;
+            }
+         if( !memcmp( lines[i], "BND ", 4))
+            {
+            obs->mag_band = lines[i][4];
+            rval |= 2;
+            }
+         }
    return( rval);
 }
 
