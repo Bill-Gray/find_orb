@@ -1,10 +1,20 @@
-   Select a file containing astrometric observations.  These can be in the
-MPC's 80-column format,  or PSV ADES,  or XML ADES.  See
+   Click on the '?' or hit '?' for more help.  Here's the short version :
+
+   Find_Orb can import astrometric data from a file,  or from the clipboard.
+Or you can enter a designation and Find_Orb will download the observational
+data from the MPC.
+$000000
+   Observations can be in the MPC's 80-column format,  or PSV ADES,  or XML
+ADES,  or the .rwo format.  You can mix these freely.  For details,  see
 
 https://projectpluto.com/astromet.htm
 
    for details on what formats this program will accept.
 
-   If the file has data on one object,  that data will immediately be read
+   If the input has data on one object,  that data will immediately be read
 and an orbit calculated.  If it has data for two or more objects,  you'll
 be able to select the one in which you're interested.
+
+   Click on "Give object name and get data from MPC",  and you'll be asked
+to enter a name/designation such as Ceres,  2014 AA, C/1986 A1, etc.  Find_Orb
+will then attempt to download the astrometry for that object from the MPC.
