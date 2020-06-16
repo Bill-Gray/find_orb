@@ -281,7 +281,7 @@
 2030    range,  you'll need a different/larger JPL ephemeris file.  See
 2030    https://www.projectpluto.com/find_orb.htm#de_eph for more info.
 
-2031    F Select file from hard drive
+2031    F Select file containing astrometry
 2031    C Copy astrometry from clipboard
 2031    N Give object name and get data from MPC
 

@@ -7,5 +7,5 @@ cursor keys and hit Enter or Space,  and Find_Orb will load astrometry
 for that object.
 
    If you have a _lot_ of objects in the file,  you can just type the
-object's name to find it.
-
+object's name to find it (or type a few letters/numbers to go to that
+part of the list.)
