@@ -3322,6 +3322,39 @@ static void set_satellite_velocities( OBSERVE FAR *obs, const int n_obs)
          }
 }
 
+/* If photometry is provided,  we count both comet and asteroid obs
+to decide if we ought to use a comet or asteroid magnitude formula.
+(If it's not provided,  a default judgment is made based on the desig.) */
+
+static void reset_object_type( const OBSERVE *obs, const int n_obs)
+{
+   int i, n_asteroid = 0, n_nuclear = 0, n_total = 0;
+
+   for( i = 0; i < n_obs; i++)
+      if( obs[i].obs_mag != BLANK_MAG && obs[i].is_included)
+         {
+         if( obs[i].mag_band == 'N')
+            n_nuclear++;
+         else if( obs[i].mag_band == 'T')
+            n_total++;
+         else
+            n_asteroid++;
+         }
+   if( n_total + n_nuclear > n_asteroid)
+      object_type = OBJECT_TYPE_COMET;
+   else if( n_asteroid)
+      object_type = OBJECT_TYPE_ASTEROID;
+   if( object_type == OBJECT_TYPE_COMET)
+      {
+      extern char default_comet_magnitude_type;
+
+      if( default_comet_magnitude_type == 'N' && !n_nuclear && n_total)
+         default_comet_magnitude_type = 'T';
+      if( default_comet_magnitude_type == 'T' && n_nuclear && !n_total)
+         default_comet_magnitude_type = 'N';
+      }
+}
+
 /* Uncertainties on time,  magnitude,  and the error ellipse all will have
 default values.  If ADES or Tholen or .rwo uncertainties have been set,  or
 uncertainties in columns 57-65,  we use them.  (Such uncertainties apply to
@@ -3895,6 +3928,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                memcpy( rval[i].obs_vel, rval[j].obs_vel, 3 * sizeof( double));
                }
             }
+      reset_object_type( rval, n_obs_actually_loaded);
       }
    return( rval);
 }
