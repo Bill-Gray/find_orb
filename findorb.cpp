@@ -1815,8 +1815,8 @@ static void show_a_file( const char *filename)
 
             if( tptr)
                color_col = (int)( tptr - buff);
-            rgb = remove_rgb_code( buff);
             }
+         rgb = remove_rgb_code( buff);
          if( i >= 3 || !is_ephem)
             put_colored_text( buff, i, 0, -1,
                (line_no == curr_line ? COLOR_ORBITAL_ELEMENTS : COLOR_BACKGROUND));
@@ -2540,6 +2540,15 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
       int c, base_key = (int)KEY_F( 4);
       size_t n_prev = 0, prev_idx[MAX_PREV_FILES];
       struct stat file_info;
+      FILE *ifile;
+
+      help_file_name = "openfile.txt";
+      clear( );
+      ifile = fopen_ext( help_file_name, "fclrb");
+      i = 0;
+      while( fgets_trimmed( buff, buffsize, ifile) && *buff != '$')
+         put_colored_text( buff, (int)i++, 0, -1, COLOR_BACKGROUND);
+      fclose( ifile);
 
       strcpy( buff, get_find_orb_text( 2031));
       for( i = n_lines - 1; i && n_prev < MAX_PREV_FILES; i--)
@@ -2558,7 +2567,7 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
                prev_files[i] = NULL;
             }
       strncat( buff, (already_got_obs ? "\nQ Cancel" : "\nQ Quit"), buffsize);
-      help_file_name = "openfile.txt";
+
       c = inquire( buff, NULL, 30, COLOR_DEFAULT_INQUIRY);
       free( buff);
       if( c >= '0' && c < '0' + (int)n_prev)
