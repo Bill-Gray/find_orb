@@ -1858,7 +1858,6 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
    obs->is_included = (buff[64] != 'x' && buff[12] != '-');
    FMEMCPY( obs->mpc_code, buff + 77, 3);
    obs->mpc_code[3] = '\0';
-   set_data_from_obs_header( obs);
    FMEMCPY( obs->columns_57_to_65, buff + 56, 9);
    obs->columns_57_to_65[9] = '\0';
    if( !strcmp( obs->columns_57_to_65, "Apparent "))
@@ -1911,6 +1910,7 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
       obs->obs_mag = BLANK_MAG;
    FMEMCPY( obs->reference, buff + 72, 5);
    obs->reference[5] = '\0';
+   set_data_from_obs_header( obs);
    if( memcmp( buff + 72, ".rwo ", 5) &&
           find_fcct_biases( obs->ra, obs->dec, obs->astrometric_net_code, obs->jd,
                                 &obs->ra_bias, &obs->dec_bias) == -2)
@@ -4867,17 +4867,17 @@ static int set_data_from_obs_header( OBSERVE *obs)
 
    if( obs->astrometric_net_code != ' ')
       rval = 1;
-   if( obs->mag_band != ' ')
+   if( obs->mag_band != ' ' || obs->obs_mag == BLANK_MAG)
       rval |= 2;
    if( obs_details && (lines = get_code_details( obs_details, obs->mpc_code)) != NULL)
       for( i = 0; lines[i] && rval != 3; i++)
          {
-         if( !memcmp( lines[i], "NET ", 4))
+         if( !(rval & 1) && !memcmp( lines[i], "NET ", 4))
             {
             obs->astrometric_net_code = net_name_to_byte_code( lines[i] + 4);
             rval |= 1;
             }
-         if( !memcmp( lines[i], "BND ", 4))
+         if( !(rval & 2) && !memcmp( lines[i], "BND ", 4))
             {
             obs->mag_band = lines[i][4];
             rval |= 2;
