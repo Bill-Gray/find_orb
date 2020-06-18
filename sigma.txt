@@ -95,6 +95,30 @@
  249 B                             -1.2 168               SOHO
  C49                                    10                STEREO-A
  C50                                    10                STEREO-B
+# Repetition of above (249) SOHO records.  Pre-2013 observations used 2 and 3
+# instead of A and B.  Note that there's similar trickery for STEREO A and B;
+# if we get more specific about their uncertainties,  we'll have to do a
+# similar duplication of their records.
+ 249 2                         8.7      36                SOHO
+ 249 2                         8.2  8.8 24                SOHO
+ 249 2                         7.2  8.2 12                SOHO
+ 249 2                         4.2  7.2  6                SOHO
+ 249 2                         2.7  4.2 12                SOHO
+ 249 2                         1.7  2.7 18                SOHO
+ 249 2                         0.2  1.7 24                SOHO
+ 249 2                        -1.8  0.2 36                SOHO
+ 249 2                             -1.8 48                SOHO
+ 249 3                         9.7      280               SOHO
+ 249 3                         9.2  9.7 224               SOHO
+ 249 3                         7.7  9.2 168               SOHO
+ 249 3                         7.2  7.7 112               SOHO
+ 249 3                         6.7  7.2 84                SOHO
+ 249 3                         5.7  6.7 56                SOHO
+ 249 3                         2.7  5.7 28                SOHO
+ 249 3                         1.2  2.7 56                SOHO
+ 249 3                        -0.2  1.2 84                SOHO
+ 249 3                        -1.2 -0.2 112               SOHO
+ 249 3                             -1.2 168               SOHO
 # MPC appears to be weighting (C51) WISE data lightly,  which appears to
 # be... well... wise.  I am also informed by Joe Masiero that the mag
 # data from WISE (which is an R magnitude guesstimated from W1 and W2)
