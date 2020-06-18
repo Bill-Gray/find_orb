@@ -2743,22 +2743,6 @@ static int rwo_to_mpc( char *buff, double *ra_bias, double *dec_bias,
    return( rval);
 }
 
-#ifndef memicmp
-#ifndef __WATCOMC__
-static int memicmp( const char *s1, const char *s2, int n)
-{
-   int c1, c2;
-
-   while( n--)
-      {
-      if( (c1 = tolower( *s1++)) != (c2 = tolower( *s2++)))
-         return( c1 - c2);
-      }
-   return( 0);
-}
-#endif
-#endif
-
 /* For the 'two-line' MPC formats (roving observers,  spacecraft-based
 observations,  radar obs),  the two lines should match in many columns
 and have a mismatch in case for column 14 ('V' vs. 'v', 'S' vs. 's',
