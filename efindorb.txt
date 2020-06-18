@@ -327,3 +327,11 @@
 2039    Clipboard functions require 'xclip' to be installed.  Run,  for
 2039    example,  'sudo apt install xclip',  'sudo yum install xclip',
 2039    or similar command.
+
+2040    %d roving observer lines lacked lat/lon/alt lines.\n
+2041    %d roving observer lat/lon/alt lines didn't match an RA/dec.\n
+2042    %d 'line 1' radar observations didn't have a 'line 2' match.\n
+2043    %d 'line 2' radar observations didn't have a 'line 1' match.\n
+2044    %d satellite observations lacked spacecraft locations.\n
+2045    %d satellite observations lacked RA/decs.\n
+2046    See https://www.projectpluto.com/mismatch.htm for more info.\n

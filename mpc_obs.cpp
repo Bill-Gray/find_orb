@@ -2759,6 +2759,21 @@ static int memicmp( const char *s1, const char *s2, int n)
 #endif
 #endif
 
+/* For the 'two-line' MPC formats (roving observers,  spacecraft-based
+observations,  radar obs),  the two lines should match in many columns
+and have a mismatch in case for column 14 ('V' vs. 'v', 'S' vs. 's',
+or 'R' vs. 'r'.)        */
+
+static inline bool matching_lines( const char *line1, const char *line2)
+{
+   bool rval = (!memcmp( line1, line2, 12)         /* desigs match */
+             && !memcmp( line1 + 15, line2 + 15, 16)  /* times match */
+             && !memcmp( line1 + 77, line2 + 77, 3)   /* MPC codes match */
+             && line1[14] == (line2[14] ^ 32));
+
+   return( rval);
+}
+
    /* Satellite,  radar,  and roving observer observations are stored     */
    /* as two-line pairs in the MPC 80-column punched-card format.  Sadly, */
    /* you can't count on them being in the "proper" order.  (True of the  */
@@ -2783,16 +2798,35 @@ static int look_for_matching_line( char *iline, char *oline)
    static mpc_line *stored_lines = NULL;
    int i;
 
+   *oline = '\0';    /* assume no match found */
    if( !iline)                /* just checking for leftover lines */
       {
       const int rval = n_stored;
 
-      if( n_stored)
+      if( n_stored)          /* we _do_ have leftovers;  make an error msg */
+         {
+         const char *bytes = "VvRrSs";
+         const int oline_size = 600;
+
+         for( i = 0; bytes[i]; i++)
+            {
+            int j = 0, n_matches = 0;
+
+            for( j = 0; j < n_stored; j++)
+               if( stored_lines[j][14] == bytes[i])
+                  n_matches++;
+            if( n_matches)       /* we have this specific sort of error */
+               snprintf_append( oline, oline_size, get_find_orb_text( 2040 + i),
+                           n_matches);
+            }
+                    /* now add a general 'look here for info' message */
+         strlcat( oline, get_find_orb_text( 2046), oline_size);
          debug_printf( "%d unmatched satellite/roving observer lines:\n",
-                        n_stored);
-      for( i = 0; i < n_stored; i++)
-         debug_printf( "%s\n", stored_lines[i]);
-      n_stored = 0;
+                           n_stored);
+         for( i = 0; i < n_stored; i++)
+            debug_printf( "%s\n", stored_lines[i]);
+         n_stored = 0;
+         }
       if( stored_lines)
          {
          free( stored_lines);
@@ -2800,14 +2834,9 @@ static int look_for_matching_line( char *iline, char *oline)
          }
       return( rval);
       }
-   *oline = '\0';    /* assume no match found */
-   for( i = 0; i < n_stored; i++)
-      {
-              /* Lines should compare to byte 31,  except possibly for */
-              /* a discovery asterisk in column 13 _or_ (added 2014 Oct */
-              /* 17) a note in column 14:  */
-      if( !memicmp( stored_lines[i], iline, 12) &&
-                      !memicmp( stored_lines[i] + 14, iline + 14, 17))
+
+   for( i = 0; i < n_stored && !*oline; i++)
+      if( matching_lines( stored_lines[i], iline))
          {        /* we have a match */
          memcpy( oline, stored_lines[i], sizeof( mpc_line));
          n_stored--;
@@ -2815,7 +2844,6 @@ static int look_for_matching_line( char *iline, char *oline)
                /* now-matched line: */
          memcpy( stored_lines[i], stored_lines[n_stored], sizeof( mpc_line));
          }
-      }
    if( !*oline)    /* we didn't find a match: */
       n_stored++;
             /* We've now either found a match,  and therefore removed a */
@@ -3776,11 +3804,8 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
 
    monte_carlo_object_count = 0;
    n_monte_carlo_impactors = 0;
-   if( look_for_matching_line( NULL, NULL))
-      {
-      debug_printf( "%s:\n", rval->packed_id);
-      generic_message_box( get_find_orb_text( 2008), "o");
-      }
+   if( look_for_matching_line( NULL, buff))
+      generic_message_box( buff, "o");
    if( n_fixes_made)
       {
       snprintf( buff, sizeof( buff), get_find_orb_text( 2028),
