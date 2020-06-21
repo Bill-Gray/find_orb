@@ -1153,3 +1153,32 @@ H21a!-087.968341   +39.482992         182.     ARO 0.76-m
 H21b!-087.968249   +39.483006         182.     ARO 1.3-m
 H21c!-087.968174   +39.482998         182.     ARO 0.81-m
 H21d!-087.968107   +39.482990         182.     ARO 0.61-m
+
+   Crimea-Nauchnij telescopes,  identified with https://mapcarta.com/W389837286
+   and http://crao.ru/en/telescopes-en,  measured with G__gle Earth.  I think
+   (ZTE) = (L51) MARGO,  but it could be (AZT5) = (L51).  MPC provides only
+   low-precision coordinates for MARGO,  and lists it as a 65-cm f/1.5
+   astrograph.  26 m added for geoid height.  (L52) MASTER-Tavrida may be
+   (z60N).  Somebody who has been there would be required to sort it out.
+
+ZTE !+034.016123   +44.729590         621.     ZTE, Crimea-Nauchnij
+z60S!+034.016711   +44.729219         619.     Zeiss 60-cm (S), Crimea-Nauchnij
+z40N!+034.016138   +44.729130         623.     Zeiss 40-cm, Crimea-Nauchnij
+z60N!+034.016591   +44.729742         623.     Zeiss 60-cm (N), Crimea-Nauchnij
+AZT5!+034.015764   +44.729285         624.     AZT-5
+
+ZTSh!+034.015824   +44.727959         628.     2.6-m Shajn (ZTSh), Crimea-Nauchnij
+
+   AZTe = 1.25-m Ritchey-Chretien, 16-m focal length
+AZTe!+034.017138   +44.726993         620.     1.25-m AZT-11, Crimea-Nauchnij
+BabZ!+034.015562   +44.726860         621.     Babelsberg Zeiss 122cm, Crimea-Nauchnij
+
+z40S!+034.014549   +44.726602         614.     Zeiss 40-cm (S), Crimea-Nauchnij
+
+   MTM = 50-cm Maksutov.  RK8 = 80-cm Ritchey-Chretien.  K380 = 38-cm Cassegrain.
+MTM !+034.015159   +44.726339         612.     MTM-500, Crimea-Nauchnij
+RK8 !+034.014463   +44.726117         607.     RK-800, Crimea-Nauchnij
+K380!+034.015660   +44.726292         611.     K-380, Crimea-Nauchnij
+AT64!+034.016021   +44.726321         612.     AT-64, Crimea-Nauchnij
+
+AZT8!+034.013314   +44.727013         614.     AZT-8, Crimea-Nauchnij
