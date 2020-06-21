@@ -1471,8 +1471,10 @@ int write_out_elements_to_file( const double *orbit,
          {
          if( i >= 4 && i <= 6)        /* lines w/Peri., Node, & Incl. */
             {
-            memmove( buff + 36, buff + 19, strlen( buff + 18));
-            memset( buff + 19, ' ', 36 - 19);
+            char *tptr = buff + (precision < 10 ? 19 : 9 + precision);
+
+            memmove( tptr + 17, tptr, strlen( tptr) + 1);
+            memset( tptr, ' ', 17);
             consider_replacing( buff, "Peri.", "sigma_omega");
             consider_replacing( buff, "Node", "sigma_Omega");
             consider_replacing( buff, "Incl.", "sigma_i");
