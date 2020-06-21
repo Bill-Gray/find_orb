@@ -37,6 +37,7 @@ double get_planet_mass( const int planet_idx);                /* orb_func.c */
 void remove_insignificant_digits( char *tbuff);          /* monte0.c */
 void set_up_observation( OBSERVE FAR *obs);                 /* mpc_obs.c */
 void set_obs_vect( OBSERVE FAR *obs);        /* mpc_obs.h */
+const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 
 #define PI 3.1415926535897932384626433832795028841971693993751058209749445923
 
@@ -252,17 +253,33 @@ double *add_gaussian_noise_to_obs( int n_obs, OBSERVE *obs,
       beyond six digits... purely a matter of personal preference;  I didn't
       want four,  five,  and six-digit numbers shown in SN.)  Also,  this
       code will remove leading zeroes in the exponent,  so that 'e+004',
-      for example,  becomes 'e+4'.           */
+      for example,  becomes 'e+4'.
+         (2020 Jun 18) One can set SIGMA_
+       */
 
-static const char *full_sigmas = "";
+static char format[10];
+static int precision;
 
 char *put_double_in_buff( char *buff, const double ival)
 {
-   if( fabs( ival) < 999.999 || fabs( ival) > 999999.)
+   int i;
+   double low_end = .999999;
+
+   if( !precision)
+      {
+      precision = atoi( get_environment_ptr( "FULL_SIGMAS"));
+      if( !precision)
+         precision = 3;
+      snprintf( format, sizeof( format), "%%%d.%dg", precision + 7, precision);
+      }
+   for( i = precision; i; i--)
+      low_end *= 10.;
+
+   if( fabs( ival) < low_end || fabs( ival) > low_end * 1000.)
       {
       char *tptr;
 
-      sprintf( buff, (*full_sigmas ? "%13.6g" : "%10.3g"), ival);
+      sprintf( buff, format, ival);
       while( (tptr = strchr( buff, 'e')) != NULL
                      &&  tptr[2] == '0')
          {           /* remove a leading zero from exponent */
@@ -271,7 +288,7 @@ char *put_double_in_buff( char *buff, const double ival)
          }
       }
    else
-      sprintf( buff, "%10d", (int)ival);
+      sprintf( buff, "%*ld", precision + 7, (long)ival);
    while( *buff == ' ')
       buff++;
    return( buff);
@@ -292,10 +309,12 @@ char *put_double_in_buff( char *buff, const double ival)
 
 void remove_insignificant_digits( char *tbuff)
 {
-   int total = 0;
+   int total = 0, i, limit = 6;
    char *tptr;
 
-   while( *tbuff && total < 6)
+   for( i = precision; i > 3; i--)
+      limit *= 10;
+   while( *tbuff && total < limit)
       {
       if( *tbuff >= '0' && *tbuff <= '9')
          total = total * 10 + (*tbuff - '0');
@@ -327,8 +346,6 @@ sigma_P_years = sigma_a * 1.5 * sqrt(a)
 sigma_n = 360 * sigma_P_in_days / P_days^2
 */
 
-const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
-
 double dump_monte_data_to_file( FILE *ofile, const double *sigmas,
             const double semimajor_axis, const double ecc,
             const int planet_orbiting)
@@ -343,7 +360,6 @@ double dump_monte_data_to_file( FILE *ofile, const double *sigmas,
    char tbuff[40], *tptr;
    extern int available_sigmas;
 
-   full_sigmas = get_environment_ptr( "FULL_SIGMAS");
    fprintf( ofile, "Planet orbiting: %d\n", planet_orbiting);
    fprintf( ofile, "Sigmas:\n");
    for( i = 0; i < MONTE_N_ENTRIES; i++)
@@ -353,14 +369,9 @@ double dump_monte_data_to_file( FILE *ofile, const double *sigmas,
          char zbuff[40];
 
          sprintf( zbuff, "%.8f", sigmas[i]);
-         if( !*full_sigmas)
-            {
-            remove_insignificant_digits( zbuff);
-            if( strlen( zbuff) == 10)   /* very low value */
-               put_double_in_buff( zbuff, sigmas[i]);
-            }
-         else
-            zbuff[9] = '\0';
+         remove_insignificant_digits( zbuff);
+         if( strlen( zbuff) == 10)   /* very low value */
+            put_double_in_buff( zbuff, sigmas[i]);
          sprintf( tbuff, "%10s", zbuff);
          }
       else
@@ -420,7 +431,6 @@ double dump_monte_data_to_file( FILE *ofile, const double *sigmas,
       fprintf( ofile, "U=%.1f\n", uparam);
       }
    available_sigmas = MONTE_CARLO_SIGMAS_AVAILABLE;
-   full_sigmas = "";
    return( uparam);
 }
 

@@ -322,35 +322,17 @@ ELEMENT_EPOCH=J2000 ecliptic
    objects.  By default,  Find_Orb will look for 'finals.all'.
 EOP_FILE=finals.all
 
-   [NOTE : NOT ACTUALLY WORKING YET... also will be including some
-   other site parameters,  such as altitude,  dec,  hour angle,
-   elongation,  and time-of-day limits.  Still working on best
-   way to achieve all that.]
-   Find_Orb can compute the exposure time required to achieve a given
-   SNR,  and/or the SNR you'd get for a given exposure time.  To do that
-   for a given MPC code,  it needs to know some data about that site.
-   For example,  the line below tells you that (703) uses no filter ('N'),
-   and has a primary with a 72-cm diameter and a 25-cm obstruction.  The
-   measuring aperture is six arcseconds in diameter,  and the seeing is
-   usually about three arcseconds (Full-Width Half Maximum).  The quantum
-   efficiency is 90%,  and there's a readout noise from the camera of
-   about 8 counts/pixel.  The pixels are three arcseconds across.  The
-   target SNR is 4,  and exposures are usually 30 seconds long.  You need
-   not be as picky about column alignment as shown below,  but it does
-   help you see what's going on.
-      If you don't have a line here,  OBS_DATA_500 will be used,  with
-   the primary diameter replaced if you have a TEL line.  Or you can
-   add a line for your scope.
-           Fil Pri Ob Ape FWHM QE Rea  Pix   SNR Exposure
-OBS_DATA_500=N 100 25 6.0 3.0 .00  8.0 0.572  4    30
-OBS_DATA_703=N  72 25 6.0 3.0 .90  8.0 3.     4    30
-OBS_DATA_E12=N  50 23 6.0 3.0 .90  8.0 1.8    4    30
-OBS_DATA_G96=N 152 48 6.0 3.0 .90  8.0 1.5    4    30
-OBS_DATA_I52=N 100 40 6.0 3.0 .90  8.0 1.036  4    30
-OBS_DATA_V06=N 154 40 6.0 3.0 .00  8.0 0.572  4    30
-
    By default,  magnitudes in ephemerides are shown to tenths.  Set
    the following to MAG_DIGITS=2 to get hundredths (almost always
    a meaningless level of precision,  but some people do get good
    photometry...)
 MAG_DIGITS=2
+
+   By default,  sigmas and covariance matrix values in 'covar.txt'
+   are shown to an abbreviated precision.  It normally makes no sense
+   to say that you have determined,  for example,  the semimajor axis
+   to +/- 0.3141592653 AU;  0.31 AU would suffice,  and many would
+   argue for 0.3.  In some cases,  though,  you may want/need more
+   digits.  Increment FULL_SIGMAS,  and you get an extra digit of
+   precision in both sigmas and in (most) 'covar.txt' values.
+FULL_SIGMAS=3
