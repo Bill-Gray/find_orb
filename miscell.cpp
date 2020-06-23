@@ -279,6 +279,8 @@ int fetch_astrometry_from_mpc( FILE *ofile, const char *desig)
    int bytes_written = 0, pass;
    const char *grab_program = get_environment_ptr( "MPC_GRAB_PROGRAM");
 
+   if( !*grab_program)
+      grab_program = "grab_mpc";
    assert( ofile);
    if( is_neocp_desig( desig))
       for( pass = 0; pass < 5 && !bytes_written; pass++)
@@ -296,7 +298,11 @@ int fetch_astrometry_from_mpc( FILE *ofile, const char *desig)
 
       for( i = 0; desig[i]; i++)
          j = j * 314159u + (unsigned)desig[i];
+#ifdef _WIN32
+      snprintf( filename, sizeof( filename),      "temp%02u.ast", j % 100);
+#else
       snprintf( filename, sizeof( filename), "/tmp/temp%02u.ast", j % 100);
+#endif
       snprintf( tbuff, sizeof( tbuff), "%s %s %s", grab_program,
                                                 filename, desig);
       if( !system( tbuff))
