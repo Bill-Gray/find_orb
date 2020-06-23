@@ -84,7 +84,7 @@ ifdef W64
 	LIB_DIR=$(INSTALL_DIR)/win_lib
 	LIBSADDED=-L $(LIB_DIR) -lm -lgdi32 -luser32 -mwindows -static-libgcc
 	FO_EXE=fo64.exe
-	FIND_ORB_EXE=find_orb64.exe
+	FIND_ORB_EXE=find_o64.exe
 endif
 
 ifdef W32
@@ -95,7 +95,7 @@ ifdef W32
 	LIB_DIR=$(INSTALL_DIR)/win_lib32
 	LIBSADDED=-L $(LIB_DIR) -lm -lgdi32 -luser32 -mwindows -static-libgcc
 	FO_EXE=fo32.exe
-	FIND_ORB_EXE=find_orb32.exe
+	FIND_ORB_EXE=find_o32.exe
 endif
 
 ifndef FO_EXE
