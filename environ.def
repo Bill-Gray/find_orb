@@ -326,7 +326,7 @@ EOP_FILE=finals.all
    the following to MAG_DIGITS=2 to get hundredths (almost always
    a meaningless level of precision,  but some people do get good
    photometry...)
-MAG_DIGITS=2
+MAG_DIGITS=1
 
    By default,  sigmas and covariance matrix values in 'covar.txt'
    are shown to an abbreviated precision.  It normally makes no sense
