@@ -1362,7 +1362,8 @@ static inline void clean_up_json_number( char *out_text)
       memmove( out_text, out_text + 1, strlen( out_text));
 }
 
-static int create_json_ephemeris( FILE *ofile, FILE *ifile, char *header)
+static int create_json_ephemeris( FILE *ofile, FILE *ifile, char *header,
+                     const double jd_start, const double step)
 {
    char buff[1024];
    int line_no = 0;
@@ -1381,8 +1382,9 @@ static int create_json_ephemeris( FILE *ofile, FILE *ifile, char *header)
          {
          char *hptr = header, *bptr = buff;
          const char *preceder = (line_no ? ",\n" : "");
+         const int step_number = (int)(( atof( buff) - jd_start) / step + .5);
 
-         fprintf( ofile, "%s      \"%d\": {", preceder, line_no);
+         fprintf( ofile, "%s      \"%d\": {", preceder, step_number);
          while( *hptr && *bptr)
             {
             int hlen = 0, blen = 0;
@@ -2819,7 +2821,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       fprintf( ofile, "    \"entries\":\n");
       fprintf( ofile, "    {\n");
       fseek( computer_friendly_ofile, 0L, SEEK_SET);
-      create_json_ephemeris( ofile, computer_friendly_ofile, header);
+      create_json_ephemeris( ofile, computer_friendly_ofile, header, jd_start, step);
       fprintf( ofile, "    }\n");
       free( header);
       fprintf( ofile, "  }\n}\n");
