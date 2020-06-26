@@ -575,7 +575,7 @@ int integrate_orbit( double *orbit, const double t0, const double t1)
                   min_stepsize = 1e-5;   /* 1e-5 day = 0.864 seconds */
                }
             if( !stepsize)
-               exit( 0);
+               exit( -6);
 //          if( err >= integration_tolerance && fabs( stepsize) < min_stepsize)
 //             debug_printf( "Err %f x tolerance; stepsize %f seconds\n",
 //                         err / integration_tolerance, delta_t * seconds_per_day);
