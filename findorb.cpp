@@ -2518,8 +2518,6 @@ static bool filename_fits_current_os( const char *filename)
 #endif
 }
 
-#define MAX_PREV_FILES  10
-
 static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
                     const bool drop_single_obs, const bool already_got_obs)
 {
@@ -2535,12 +2533,13 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
    *err_buff = '\0';
    if( !*ifilename)
       {
-      const size_t buffsize = 3000;
+      const size_t buffsize = 8000;
       char *buff = (char *)malloc( buffsize);
       int c, base_key = (int)KEY_F( 4);
-      size_t n_prev = 0, prev_idx[MAX_PREV_FILES];
+      size_t n_prev = 0, prev_idx[30];
       struct stat file_info;
       FILE *ifile;
+      const char *hotkeys = "0123456789abdeghijklmoprstuv", *tptr;
 
       help_file_name = "openfile.txt";
       clear( );
@@ -2551,12 +2550,13 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
       fclose( ifile);
 
       strcpy( buff, get_find_orb_text( 2031));
-      for( i = n_lines - 1; i && n_prev < MAX_PREV_FILES; i--)
+      for( i = n_lines - 1; i && hotkeys[n_prev]
+                                     && n_prev + 6 < (size_t)getmaxy( stdscr); i--)
          if( prev_files[i][0] != '#' && filename_fits_current_os( prev_files[i]))
             {
             if( !stat( prev_files[i], &file_info))
                {
-               snprintf_append( buff, buffsize, "\n%d ", (int)n_prev);
+               snprintf_append( buff, buffsize, "\n%c ", hotkeys[n_prev]);
                strcat( buff, prev_files[i]);
 #ifndef _WIN32
                text_search_and_replace( buff, getenv( "HOME"), "~");
@@ -2570,8 +2570,9 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
 
       c = inquire( buff, NULL, 30, COLOR_DEFAULT_INQUIRY);
       free( buff);
-      if( c >= '0' && c < '0' + (int)n_prev)
-         c += base_key - '0';
+      tptr = strchr( hotkeys, c);
+      if( tptr)
+         c = base_key + (int)( tptr - hotkeys);
       i = c - base_key;
       if( i < n_prev)
          strcpy( ifilename, prev_files[prev_idx[i]]);
