@@ -4304,7 +4304,7 @@ int write_environment_pointers( void)
    for( i = 0; i < n_lines; i++)
       fprintf( ofile, "%s\n", edata[i]);
    fclose( ofile);
-   return( n_lines);
+   return( (int)n_lines);
 }
 
 static size_t get_environment_ptr_index( const char *env_ptr, bool *got_it)
@@ -4391,7 +4391,7 @@ static int load_json_environment_file( const char *buff)
 {
    char key[300];
    const char *tptr;
-   int depth = 0, starts[30];
+   size_t depth = 0, starts[30];
 
    *key = '\0';
    starts[0] = 0;
@@ -4403,8 +4403,8 @@ static int load_json_environment_file( const char *buff)
          }
       else if( *tptr == '}')
          {
+         assert( depth);
          depth--;
-         assert( depth >= 0);
          }
       else if( *tptr == '"')
          {
