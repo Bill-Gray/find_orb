@@ -683,7 +683,7 @@ static int find_precovery_plates( OBSERVE *obs, const int n_obs,
    ifile = fopen_ext( idx_filename, "crb");
    if( !ifile)
       {
-      fprintf( ofile, "Couldn't open %s\n", idx_filename);
+      debug_printf( "Couldn't open %s\n", idx_filename);
       return( -2);
       }
    p1 = (obj_location_t *)calloc( 3 * n_orbits, sizeof( obj_location_t));
@@ -1522,6 +1522,8 @@ FILE *open_json_file( char *filename, const char *env_ptr, const char *default_n
       strcpy( tbuff, packed_desig);
       strcpy( filename, env_ptr);
       text_search_and_replace( tbuff, " ", "");
+      if( strlen( tbuff) == 12)      /* packed desig contains both perm */
+         tbuff[5] = '\0';            /* & prov IDs;  just use the perm */
       text_search_and_replace( filename, "%p", tbuff);
       text_search_and_replace( filename, "%c", ephem_mpc_code);
       sprintf( tbuff, "%x", random_seed);
