@@ -2823,8 +2823,8 @@ int main( int argc, const char **argv)
       use_config_directory = true;
    else
       use_config_directory = false;
-   if( !setlocale( LC_ALL, "C.UTF-8") && !setlocale( LC_ALL, "en_US.utf8"))
-      debug_printf( "Couldn't set a UTF-8 locale\n");
+   if( !setlocale( LC_ALL, "C.UTF-8"))
+      setlocale( LC_ALL, "en_US.utf8");
    *ifilename = '\0';
 
    if( reset_astrometry_filename( &argc, argv))
