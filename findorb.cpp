@@ -1972,26 +1972,32 @@ static void show_a_file( const char *filename)
             keep_going = 0;
             break;
          case ALT_C:
-            make_config_dir_name( buff, filename);
-            if( copy_file_to_clipboard( buff))
-               inquire( get_find_orb_text( 2039), NULL, 0,
-                                    COLOR_MESSAGE_TO_USER);
-            break;
          case ALT_S:
             {
-            user_select_file( buff, "Save file", 1);
+            if( c == ALT_C)
+               make_config_dir_name( buff, "tfile");
+            else
+               user_select_file( buff, "Save file", 1);
             if( *buff)
                {
                FILE *ofile = fopen( buff, "wb");
 
                if( ofile)
                   {
+                  char tbuff[500];
+
                   fseek( ifile, 0L, SEEK_SET);
-                  while( fgets( buff, sizeof( buff), ifile))
-                     fputs( buff, ofile);
+                  while( fgets( tbuff, sizeof( tbuff), ifile))
+                     {
+                     remove_rgb_code( tbuff);
+                     fputs( tbuff, ofile);
+                     }
                   fclose( ofile);
                   }
                }
+            if( c == ALT_C && copy_file_to_clipboard( buff))
+               inquire( get_find_orb_text( 2039), NULL, 0,
+                                    COLOR_MESSAGE_TO_USER);
             }
             break;
          case 'q':
