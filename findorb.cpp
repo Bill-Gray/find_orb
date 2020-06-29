@@ -570,6 +570,22 @@ static double *set_up_alt_orbits( const double *orbit, unsigned *n_orbits)
    return( sr_orbits);
 }
 
+/* Outputs residuals in the 'short',  three-columns-wide format
+used in MPECs and pseudo-MPECs.   */
+
+static void create_resid_file( const OBSERVE *obs, const int n_obs,
+         const char *input_filename, int residual_format)
+{
+   char buff[260];
+   extern const char *residual_filename;
+
+   residual_format &= (RESIDUAL_FORMAT_TIME_RESIDS | RESIDUAL_FORMAT_MAG_RESIDS
+               | RESIDUAL_FORMAT_PRECISE | RESIDUAL_FORMAT_OVERPRECISE);
+   residual_format |= RESIDUAL_FORMAT_SHORT;
+   write_residuals_to_file( get_file_name( buff, residual_filename),
+                    input_filename, n_obs, obs, residual_format);
+}
+
 /* Here's a simplified example of the use of the 'ephemeris_in_a_file'
    function... nothing fancy,  but it shows how it's used.  */
 
@@ -580,7 +596,7 @@ static ephem_option_t ephemeris_output_options;
 
 static void create_ephemeris( const double *orbit, const double epoch_jd,
          OBSERVE *obs, const int n_obs, const char *obj_name,
-         const char *input_filename, int residual_format)
+         const char *input_filename, const int residual_format)
 {
    int c = 1;
    char buff[2000];
@@ -987,14 +1003,8 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                               COLOR_MESSAGE_TO_USER);
          else
             {
-            extern const char *residual_filename;
-
-            residual_format &= (RESIDUAL_FORMAT_TIME_RESIDS | RESIDUAL_FORMAT_MAG_RESIDS
-                        | RESIDUAL_FORMAT_PRECISE | RESIDUAL_FORMAT_OVERPRECISE);
-            residual_format |= RESIDUAL_FORMAT_SHORT;
             show_a_file( get_file_name( buff, ephemeris_filename));
-            write_residuals_to_file( get_file_name( buff, residual_filename),
-                             input_filename, n_obs, obs, residual_format);
+            create_resid_file( obs, n_obs, input_filename, residual_format);
             make_pseudo_mpec( get_file_name( buff, "mpec.htm"), obj_name);
             if( ephemeris_output_options
                      & (OPTION_STATE_VECTOR_OUTPUT | OPTION_POSITION_OUTPUT))
@@ -3819,12 +3829,20 @@ int main( int argc, const char **argv)
             strcpy( message_to_user, "Automatic full improvement repeat is");
             add_off_on = auto_repeat_full_improvement;
             break;
-         case 'd': case 'D':
+         case 'D':
             {
             extern const char *observe_filename;
 
             create_obs_file( obs, n_obs, 0);
             show_a_file( get_file_name( tbuff, observe_filename));
+            }
+            break;
+         case 'd':
+            {
+            extern const char *residual_filename;
+
+            create_resid_file( obs, n_obs, ifilename, residual_format);
+            show_a_file( get_file_name( tbuff, residual_filename));
             }
             break;
          case 'e': case'E':
