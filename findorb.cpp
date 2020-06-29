@@ -1853,6 +1853,7 @@ static void show_a_file( const char *filename)
          put_colored_text( "Top", i, 46, 3, COLOR_FINAL_LINE);
          }
       put_colored_text( "Save", i, 50, 4, COLOR_FINAL_LINE);
+      put_colored_text( "Copy", i, 55, 4, COLOR_FINAL_LINE);
 
       strcpy( buff, msgs[msg_num] + 1);
       if( *err_text)
@@ -1895,6 +1896,8 @@ static void show_a_file( const char *filename)
                c = KEY_HOME;
             else if( x >= 50 && x <= 53)  /* "Save" */
                c = ALT_S;
+            else if( x >= 55 && x <= 58)  /* "Copy" */
+               c = ALT_C;
             }
          else if( x == getmaxx( stdscr) - 1)  /* clicked scroll bar */
             line_no = y * n_lines / n_lines_to_show;
@@ -1957,6 +1960,12 @@ static void show_a_file( const char *filename)
          case KEY_EXIT:
 #endif
             keep_going = 0;
+            break;
+         case ALT_C:
+            make_config_dir_name( buff, filename);
+            if( copy_file_to_clipboard( buff))
+               inquire( get_find_orb_text( 2039), NULL, 0,
+                                    COLOR_MESSAGE_TO_USER);
             break;
          case ALT_S:
             {
