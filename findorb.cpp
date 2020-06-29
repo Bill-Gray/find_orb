@@ -25,6 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 
 #define PDC_NCMOUSE
 #define PDC_FORCE_UTF8
+#define PDC_WIDE
 
 #ifdef __APPLE__
    #define _XOPEN_SOURCE_EXTENDED

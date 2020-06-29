@@ -65,12 +65,12 @@ else
 endif
 
 ifdef X
-	CURSES_FLAGS=-DXCURSES -DPDC_WIDE -I../PDCurses
+	CURSES_FLAGS=-DXCURSES -I../PDCurses
 	CURSES_LIB=-lXCurses -lXaw -lXmu -lXt -lX11 -lSM -lICE -lXext -lXpm
 endif
 
 ifdef VT
-	CURSES_FLAGS=-DPDC_WIDE -DVT -I$(HOME)/PDCurses
+	CURSES_FLAGS=-DVT -I$(HOME)/PDCurses
 	CURSES_LIB=-lpdcurses
 endif
 
@@ -78,7 +78,7 @@ LIB_DIR=$(INSTALL_DIR)/lib
 
 ifdef W64
 	CC=x86_64-w64-mingw32-g++
-	CURSES_FLAGS=-DUTF8 -DPDC_WIDE -I $(INSTALL_DIR)/include -I../PDCurses
+	CURSES_FLAGS=-I $(INSTALL_DIR)/include -I../PDCurses
 	EXE=.exe
 	CURSES_LIB=-lpdcurses
 	LIB_DIR=$(INSTALL_DIR)/win_lib
@@ -89,7 +89,7 @@ endif
 
 ifdef W32
 	CC=i686-w64-mingw32-g++
-	CURSES_FLAGS=-DUTF8 -DPDC_WIDE -I $(INSTALL_DIR)/include -I../PDCurses
+	CURSES_FLAGS=-I $(INSTALL_DIR)/include -I../PDCurses
 	EXE=.exe
 	CURSES_LIB=-lpdcurses
 	LIB_DIR=$(INSTALL_DIR)/win_lib32
