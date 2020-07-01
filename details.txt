@@ -98,7 +98,7 @@ TEL 1.0-m f/3.0 reflector + CCD
 COD 304
 OBS M. Holman, D. Trilling, W. Fraser
 MEA M. Holman
-TEL 6.5-m Clay reflector + CCD
+TEL 6.5-m f/1.25 Clay reflector + CCD
 
 COD 322
 OBS J. Biggs
@@ -126,11 +126,11 @@ TEL 1.0-m f/8 reflector + CCD
 
 COD 415
 CON D. Herald, P.O. Box 254, Woden, ACT 2606, Australia
-CON [DRHerald (at) bigpond.net.au]
+CON [DRHerald (at) bigpond (dot) net.au]
 OBS D. Herald
 TEL 0.36-m f/3.9 Schmidt-Cassegrain + CCD
 ACK MPCReport file updated 2009.03.03 00:42:01
-AC2 [DRHerald (at) bigpond.net.au]
+AC2 [DRHerald (at) bigpond (dot) net (dot) au]
 
 COD 422
 OBS G. J. Garradd
@@ -163,7 +163,7 @@ COD 461
 CON K. S\'arneczky, 6701 Szeged, POB 406. Hungary
 CON [sky (at) titan (dot) physx.u-szeged (dot) hu]
 OBS K. Sarneczky
-TEL 0.60-m Schmidt + CCD
+TEL 0.60-m f/3 Schmidt + CCD
 NET USNO-B1.0
 COM Posn sigma 0.2", mag sigma 0.3, time sigma 0.5s
 
@@ -184,7 +184,7 @@ NET PPMXL
 
 COD 493
 OBS F. Hormuth
-TEL 1.23-m reflector + CCD
+TEL 1.23-m f/8 reflector + CCD
 
 COD 511
 CON J. E. Arlot, IMCCE, Observatoire de Paris
@@ -244,7 +244,7 @@ TEL 2.5-m SDSS Telescope + SDSS camera
 
 COD 649
 CON Powell Observatory Louisburg, KS USA
-CON [lrobinsn (at) ix.netcom (dot) com]
+CON [lrobinsn (at) ix (dot) netcom (dot) com]
 OBS M. Glaze, R. Trentman
 NET USNO-A2.0
 TEL 0.75-m Newtonian + CCD
@@ -400,7 +400,7 @@ CON M. Schwartz, Tenagra Observatories, HC 2 Box 292, Nogales, AZ 85621, U.S.A.
 CON [mbs (at) tenagraobservatories (dot) com]
 OBS M. Schwartz, P. R. Holvorcem
 MEA M. Schwartz
-AC2 [holvorcem (at) mpc.com (dot) br], [mbs (at) tenagraobservatories (dot) com]
+AC2 [holvorcem (at) mpc (dot) com (dot) br], [mbs (at) tenagraobservatories (dot) com]
 TEL 0.41-m f/3.75 astrograph + CCD
 NET UCAC-3
 ACK Batch 160511b.txt (926) - NEOCP follow-up
@@ -409,7 +409,7 @@ COD 938
 OBS R. Goncalves
 MEA R. Goncalves
 NET USNO-A2.0
-TEL LX200 10" SC at f/6.72 + CCD (MX916 2x2)
+TEL 0.25-m f/6.72 Schmidt-Cassegrain + CCD (MX916 2x2)
 ACK MPCReport J002E3
 
 COD 939
@@ -447,11 +447,11 @@ TEL 0.35-m f/4.7 reflector + CCD
 
 COD A60
 OBS N. Loaring, P. Vaisanen, T. Kwiatkowski, M. Polinska
-MEA
 TEL 10.50-m reflector + CCD
 
 COD A77
 OBS J.-F. Soulier, C. Rinner, F. Kugel, J. Nicolas
+TEL 0.4-m f/2.8 reflector + CCD
 
 COD B04
 OBS A. Carbognani
@@ -802,7 +802,7 @@ TEL 0.30-m f/3.3 Schmidt-Cassegrain + CCD
 COD J95
 CON Phlox Cottage, Wantage Road, Gt Shefford
 CON Berkshire England RG17 7DA
-CON [peter (at) birtwhi (dot) demon.co (dot) uk]
+CON [peter (at) birtwhistle (dot) org (dot) uk]
 OBS P. Birtwhistle
 COM Valid: 2002-2005 sep 15
 TEL 0.30-m f/6.3 Schmidt-Cassegrain + CCD
@@ -833,7 +833,7 @@ MEA T. Lister
 TEL 1.0-m f/8 Ritchey-Chretien + CCD
 ACK M70pEPX(=ExoMars1)_K91_8x6imstacks (at) Leiden
 COM LCOGT CPT Node 1m0 Dome A at Sutherland, South Africa
-AC2 [tlister (at) lcogt.net], [sgreenstreet (at) lcogt (dot) net]
+AC2 [tlister (at) lcogt (dot) net], [sgreenstreet (at) lcogt (dot) net]
 NET UCAC-4
 BND R
 
@@ -924,7 +924,7 @@ TEL 0.5-m f/2.0 Schmidt + CCD
 COD T09
 CON D. J. Tholen, Institute for Astronomy, 2680 Woodlawn Drive, Honolulu, HI 96822
 CON [tholen (at) ifa (dot) hawaii (dot) edu]
-TEL 8.2-m Subaru reflector
+TEL 8.2-m f/2.2 Subaru reflector
 COM Valid: 2016-2018 mar 1
 NET Gaia-DR1
 COM Valid: 2018 mar 1-2100
