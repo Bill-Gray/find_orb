@@ -1359,11 +1359,11 @@ int write_out_elements_to_file( const double *orbit,
          if( n_extra_params == 2 || n_extra_params == 3)
             {
             char tbuff0[40], sig_name[20];
-            int j;
+            int j = (!strcmp( constraints, "A=0") ? 1 : 0);
 
             strcat( tt_ptr, "\n");
             tt_ptr += strlen( tt_ptr);
-            for( j = 0; j < n_extra_params; j++)
+            for( ; j < n_extra_params; j++)
                {
                put_double_in_buff( tbuff0, solar_pressure[j]);
                text_search_and_replace( tbuff0, " ", "");
