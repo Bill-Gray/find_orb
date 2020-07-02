@@ -419,14 +419,10 @@ double dump_monte_data_to_file( FILE *ofile, const double *sigmas,
          fprintf( ofile, "sigma_a:   %s AU", tbuff);
          tptr = put_double_in_buff( tbuff, sigma_a * AU_IN_KM);
          fprintf( ofile, " (%s km)\n", tptr);
-         if( sigma_P_in_days < 999.)
-            {
-            put_double_in_buff( tbuff, sigma_P_in_days);
-            fprintf( ofile, "sigma_P:   %s days\n", tbuff);
-            }
-         else
-            fprintf( ofile, "sigma_P: %12.3g years\n",
-                        sigma_P_in_days / 365.25);
+         put_double_in_buff( tbuff, sigma_P_in_days);
+         fprintf( ofile, "sigma_P:   %s days\n", tbuff);
+         put_double_in_buff( tbuff, sigma_P_in_days / 365.25);
+         fprintf( ofile, "sigma_Py: %s years\n", tbuff);
          }
       fprintf( ofile, "U=%.1f\n", uparam);
       }

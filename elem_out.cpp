@@ -570,6 +570,10 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
    fprintf( ofile, "        \"epoch\": %17.8f,", elem->epoch);
    if( elem->ecc < 1.)
       {
+      fprintf( ofile, "\n        \"P\": %12.8f,", 2. * PI * elem->t0);
+      if( !get_uncertainty( "sigma_P:", buff, 0))
+         fprintf( ofile, " \"P sigma\": %s,", buff);
+
       fprintf( ofile, "\n        \"M\": %12.8f,", elem->mean_anomaly * 180. / PI);
       if( !get_uncertainty( "sigma_M", buff, 0))
          fprintf( ofile, " \"M sigma\": %s,", buff);
