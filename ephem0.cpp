@@ -1734,7 +1734,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    bool show_radar_data = (get_radar_data( note_text + 1, &rdata) == 0);
    const double planet_radius_in_au =
           planet_radius_in_meters( planet_no) / AU_IN_METERS;
-   const int added_ra_dec_precision = atoi( get_environment_ptr( "ADDED_RA_DEC_PRECISION"));
+   int ra_format = 3, dec_format = 2;
    char buff[440], *header = NULL, alt_buff[500];
 
    if( (!rho_cos_phi && !rho_sin_phi) || ephem_type != OPTION_OBSERVABLES)
@@ -1744,6 +1744,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    if( n_objects == 1 || ephem_type != OPTION_OBSERVABLES)
       options &= ~OPTION_SHOW_SIGMAS;
 
+   sscanf( get_environment_ptr( "RA_DEC_FORMAT"), "%d,%d", &ra_format, &dec_format);
    step = get_step_size( stepsize, &step_units, &n_step_digits);
    if( !step)
       return( -2);
@@ -1833,12 +1834,14 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       const char *pre_texts[4] = { "", "-HH", "-HH:MM", "-HH:MM:SS" };
 
       strcpy( hr_min_text, pre_texts[hh_mm]);
+#if 0
       if( added_ra_dec_precision > 0)
          {
          memset( added_prec_text, '-', added_ra_dec_precision);
          added_prec_text[added_ra_dec_precision] = '\0';
          }
       else
+#endif
          *added_prec_text = '\0';
       if( n_step_digits)
          {
@@ -2218,6 +2221,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                double earth_r = 0.;
                char ra_buff[80], dec_buff[80];
                double phase_ang, curr_mag, air_mass = 40.;
+               bool output_ra_in_degrees = (ra_format >= 100 && ra_format < 110);
 
                solar_r = vector3_length( orbi_after_light_lag);
                earth_r = vector3_length( obs_posn_equatorial);
@@ -2226,8 +2230,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                elong = acose( cos_elong);
                if( ra < 0.) ra += 24.;
                if( ra >= 24.) ra -= 24.;
-               output_angle_to_buff( ra_buff, ra, 3 + added_ra_dec_precision);
-
+               output_angle_to_buff( ra_buff, ra * (output_ra_in_degrees ? 15. : 1.),
+                                               ra_format);
                for( j = 0; j < 3; j++)    /* compute alt/azzes of object (j=0), */
                   {                       /* sun (j=1), and moon (j=2)          */
                   DPT obj_ra_dec = ra_dec;
@@ -2298,11 +2302,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   mags_per_arcsec2 = -2.5 * log10( bdata.brightness[3]) - 11.055;  /* R brightness */
                   air_mass = bdata.air_mass;
                   }
-               output_signed_angle_to_buff( dec_buff, dec, 2 + added_ra_dec_precision);
-               if( added_ra_dec_precision < 0)
-                  dec_buff[12] = '\0';
-               else
-                  dec_buff[12 + added_ra_dec_precision] = '\0';
+               output_signed_angle_to_buff( dec_buff, dec, dec_format);
                if( fake_astrometry)
                   {
                   strcpy( fake_line, obs->packed_id);
@@ -2962,8 +2962,8 @@ static void output_angle_to_buff( char *obuff, double angle, int precision)
    int64_t power_mul, fraction;
    size_t i, full_len = 12;
 
-   if( (precision >= 100 && precision <= 109) /* decimal quantity, dd.dd... */
-        || ( precision >= 200 && precision <= 208)) /* decimal ddd.dd... */
+   if( (precision >= 100 && precision <= 116) /* decimal quantity, dd.dd... */
+        || ( precision >= 200 && precision <= 215)) /* decimal ddd.dd... */
       {
       const int two_digits = (precision <= 200);
 
@@ -3038,8 +3038,14 @@ static void output_angle_to_buff( char *obuff, double angle, int precision)
                strcpy( obuff, "?");
             break;
          }
-   if( precision >= 4 && precision <= 11)
+                  /* Formats not used in astrometry -- they don't fit the */
+                  /* field size for punched-card data,  but are used in ephems */
+   if( precision >= 4 && precision <= 11)    /* 'overlong' dd mm ss.ssss... */
       full_len += (size_t)( precision - 3);
+   if( precision >= 209 && precision <= 215) /* 'overlong' ddd mm ss.sss... */
+      full_len += (size_t)( precision - 208);
+   if( precision >= 110 && precision <= 116) /* 'overlong' dd mm ss.sss... */
+      full_len += (size_t)( precision - 109);
    if( n_digits_to_show)
       {
       char format[7];
