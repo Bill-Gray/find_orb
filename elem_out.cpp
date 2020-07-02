@@ -568,6 +568,7 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
    fprintf( ofile, "      \"created iso\": \"%s\",\n", iso_time( buff, jd));
    fprintf( ofile, "      \"elements\":\n      {\n");
    fprintf( ofile, "        \"central body\": \"%s\",\n", object_name( buff, elem->central_obj));
+   fprintf( ofile, "        \"epoch_iso\": \"%s\",\n", iso_time( buff, elem->epoch));
    fprintf( ofile, "        \"epoch\": %17.8f,", elem->epoch);
    if( elem->ecc < 1.)
       {
@@ -615,6 +616,7 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
    fprintf( ofile, "\n        \"Tp\": %16.8f,", elem->perih_time);
    if( !get_uncertainty( "sigma_Tp", buff, 0))
       fprintf( ofile, " \"Tp sigma\": %s,", buff);
+   fprintf( ofile, "\n        \"Tp_iso\": \"%s\",", iso_time( buff, elem->perih_time));
    if( elem->abs_mag)
       {
       fprintf( ofile, "\n        \"H\": %6.2f,", elem->abs_mag);
