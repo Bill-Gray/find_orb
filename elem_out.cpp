@@ -87,9 +87,6 @@ static int elements_in_mpcorb_format( char *buff, const char *packed_desig,
 static int elements_in_guide_format( char *buff, const ELEMENTS *elem,
                      const char *obj_name, const OBSERVE *obs,
                      const unsigned n_obs);                /* orb_func.c */
-static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
-                     const char *obj_name, const OBSERVE *obs,
-                     const unsigned n_obs, const double *moids);
 FILE *open_json_file( char *filename, const char *env_ptr, const char *default_name,
                   const char *packed_desig, const char *permits); /* ephem0.cpp */
 int find_worst_observation( const OBSERVE FAR *obs, const int n_obs);
@@ -548,7 +545,8 @@ static char *object_name( char *buff, const int obj_index)
 
 static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
                      const char *obj_name, const OBSERVE *obs,
-                     const unsigned n_obs, const double *moids)
+                     const unsigned n_obs, const double *moids,
+                     const char *body_frame_note)
 {
    double jd = current_jd( );
    double jd_first, jd_last;
@@ -566,6 +564,10 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
    fprintf( ofile, "      \"created iso\": \"%s\",\n", iso_time( buff, jd, 0));
    fprintf( ofile, "      \"elements\":\n      {\n");
    fprintf( ofile, "        \"central body\": \"%s\",\n", object_name( buff, elem->central_obj));
+   strcpy( buff, body_frame_note + 1);
+   i = strlen( buff);
+   buff[i - 1] = '\0';    /* strip trailing paren */
+   fprintf( ofile, "        \"frame\": \"%s\",\n", buff);
    fprintf( ofile, "        \"epoch_iso\": \"%s\",\n", iso_time( buff, elem->epoch, 0));
    fprintf( ofile, "        \"epoch\": %17.8f,", elem->epoch);
    if( elem->ecc < 1.)
@@ -1163,6 +1165,7 @@ int write_out_elements_to_file( const double *orbit,
    const bool rms_ok = (compute_rms( obs, n_obs) < max_monte_rms);
    extern int available_sigmas;
    const char *body_frame_note = NULL;
+   bool body_frame_note_shown = false;
    int showing_sigmas = available_sigmas;
    int elements_frame = atoi( get_environment_ptr( "ELEMENTS_FRAME"));
    const unsigned orbit_summary_options = atoi( get_environment_ptr( "ORBIT_SUMMARY_OPTIONS"));
@@ -1556,7 +1559,8 @@ int write_out_elements_to_file( const double *orbit,
                break;
             }
          }
-      if( body_frame_note)
+      assert( body_frame_note);
+      if( !body_frame_note_shown)
          {
          size_t j = strlen( buff);
 
@@ -1565,7 +1569,7 @@ int write_out_elements_to_file( const double *orbit,
             while( j < 36)
                buff[j++] = ' ';
             strcpy( buff + j, body_frame_note);
-            body_frame_note = NULL;
+            body_frame_note_shown = true;
             }
          else
             {
@@ -1575,13 +1579,13 @@ int write_out_elements_to_file( const double *orbit,
             if( j >= 60)    /* spaces to put the note in */
                {
                memcpy( buff + 36, body_frame_note, strlen( body_frame_note));
-               body_frame_note = NULL;
+               body_frame_note_shown = true;
                }
             else if( i > 5 && (j = strlen( buff)) < 58)
                {
                memset( buff + j, ' ', 58 - j);
                strcpy( buff + 58, body_frame_note);
-               body_frame_note = NULL;
+               body_frame_note_shown = true;
                }        /* above basically says,  "if we haven't gotten */
             }           /* the body frame note in the 'normal' places, try */
          }              /* wedging it in at the end" */
@@ -1922,7 +1926,8 @@ int write_out_elements_to_file( const double *orbit,
    ofile = open_json_file( tbuff, "JSON_ELEMENTS_NAME", "elements.json", obs->packed_id,
                      "wb");
    assert( ofile);
-   elements_in_json_format( ofile, &elem, object_name, obs, n_obs, moids);
+   elements_in_json_format( ofile, &elem, object_name, obs, n_obs, moids,
+                                             body_frame_note);
    fclose( ofile);
    free( tbuff);
    return( bad_elements);
