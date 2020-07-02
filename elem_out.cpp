@@ -136,8 +136,7 @@ void get_find_orb_text_filename( char *filename);     /* elem_out.cpp */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 static int names_compare( const char *name1, const char *name2);
 static int get_uncertainty( const char *key, char *obuff, const bool in_km);
-char *iso_time( char *buff, const double jd);         /* elem_out.cpp */
-
+char *iso_time( char *buff, const double jd, const int precision); /* elem_out.cpp */
 extern int debug_level;
 double asteroid_magnitude_slope_param = .15;
 double comet_magnitude_slope_param = 10.;
@@ -525,15 +524,14 @@ static int elements_in_mpcorb_format( char *buff, const char *packed_desig,
    return( 0);
 }
 
-char *iso_time( char *buff, const double jd)
+char *iso_time( char *buff, const double jd, const int precision)
 {
    full_ctime( buff, jd, CALENDAR_JULIAN_GREGORIAN
                 | FULL_CTIME_YMD | FULL_CTIME_MONTHS_AS_DIGITS
-                | FULL_CTIME_LEADING_ZEROES | FULL_CTIME_HUNDREDTH_SEC);
+                | FULL_CTIME_LEADING_ZEROES | (precision << 4));
    buff[4] = buff[7] = '-';
    buff[10] = 'T';
-   buff[19] = 'Z';
-   buff[20] = '\0';
+   strcat( buff, "Z");
    return( buff);
 }
 
@@ -565,10 +563,10 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
    fprintf( ofile, "    {\n    \"object\": \"%s\",\n", obj_name);
    fprintf( ofile, "      \"packed\": \"%s\",\n", obs->packed_id);
    fprintf( ofile, "      \"created\": %.5f,\n", jd);
-   fprintf( ofile, "      \"created iso\": \"%s\",\n", iso_time( buff, jd));
+   fprintf( ofile, "      \"created iso\": \"%s\",\n", iso_time( buff, jd, 0));
    fprintf( ofile, "      \"elements\":\n      {\n");
    fprintf( ofile, "        \"central body\": \"%s\",\n", object_name( buff, elem->central_obj));
-   fprintf( ofile, "        \"epoch_iso\": \"%s\",\n", iso_time( buff, elem->epoch));
+   fprintf( ofile, "        \"epoch_iso\": \"%s\",\n", iso_time( buff, elem->epoch, 0));
    fprintf( ofile, "        \"epoch\": %17.8f,", elem->epoch);
    if( elem->ecc < 1.)
       {
@@ -616,7 +614,7 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
    fprintf( ofile, "\n        \"Tp\": %16.8f,", elem->perih_time);
    if( !get_uncertainty( "sigma_Tp", buff, 0))
       fprintf( ofile, " \"Tp sigma\": %s,", buff);
-   fprintf( ofile, "\n        \"Tp_iso\": \"%s\",", iso_time( buff, elem->perih_time));
+   fprintf( ofile, "\n        \"Tp_iso\": \"%s\",", iso_time( buff, elem->perih_time, 3));
    if( elem->abs_mag)
       {
       fprintf( ofile, "\n        \"H\": %6.2f,", elem->abs_mag);
@@ -650,8 +648,8 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
    jd_last  = obs[last].jd - td_minus_utc( obs[last].jd) / seconds_per_day;
    fprintf( ofile, "\n        \"earliest\": %16.8f,", jd_first);
    fprintf( ofile, "\n        \"latest\": %16.8f,", jd_last);
-   fprintf( ofile, "\n        \"earliest iso\": \"%s\",", iso_time( buff, jd_first));
-   fprintf( ofile, "\n        \"latest iso\": \"%s\",", iso_time( buff, jd_last));
+   fprintf( ofile, "\n        \"earliest iso\": \"%s\",", iso_time( buff, jd_first, 3));
+   fprintf( ofile, "\n        \"latest iso\": \"%s\",", iso_time( buff, jd_last, 3));
    fprintf( ofile, "\n        \"residuals\":\n        [");
    for( i = 0; i < (int)n_obs; i++)
       {
@@ -660,7 +658,7 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
       jd = obs[i].jd - td_minus_utc( obs[i].jd) / seconds_per_day;
       compute_observation_motion_details( obs + i, &m);
       fprintf( ofile, "\n          {\"JD\": %.6f, \"iso date\": \"%s\", \"obscode\": \"%s\",",
-                  jd, iso_time( buff, jd), obs[i].mpc_code);
+                  jd, iso_time( buff, jd, 3), obs[i].mpc_code);
       fprintf( ofile, "\n                 \"RA\" : %.6f, \"Dec\": %.6f,",
                   obs[i].ra * 180. / PI, obs[i].dec * 180. / PI);
       fprintf( ofile, "\n                 \"dRA\" : %.3f, \"dDec\": %.3f, \"dTime\": %.3f, \"cross\": %.3f,",

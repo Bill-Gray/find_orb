@@ -86,7 +86,7 @@ int debug_printf( const char *format, ...)                 /* runge.cpp */
 ;
 int calc_derivatives( const double jd, const double *ival, double *oval,
                            const int reference_planet);     /* runge.cpp */
-char *iso_time( char *buff, const double jd);         /* elem_out.cpp */
+char *iso_time( char *buff, const double jd, const int precision);   /* elem_out.c */
 double mag_band_shift( const char mag_band);                /* elem_out.c */
 char *get_file_name( char *filename, const char *template_file_name);
 double current_jd( void);                       /* elem_out.cpp */
@@ -2322,7 +2322,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   full_ctime( buff, curr_jd, date_format);
                   strcat( buff, " ");
                   }
-               iso_time( alt_buff + strlen( alt_buff), curr_jd);
+               iso_time( alt_buff + strlen( alt_buff), curr_jd, 0);
                if( !(options & OPTION_SUPPRESS_RA_DEC))
                   {
                   if( computer_friendly)
@@ -2819,7 +2819,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       fprintf( ofile, "    \"start\": %f,\n", jd_start);
       fprintf( ofile, "    \"step\": %.9f,\n", step);
       fprintf( ofile, "    \"n_steps\": %d,\n", n_steps);
-      fprintf( ofile, "    \"start iso\": \"%s\",\n", iso_time( time_buff, jd_start));
+      fprintf( ofile, "    \"start iso\": \"%s\",\n", iso_time( time_buff, jd_start, 3));
       fprintf( ofile, "    \"entries\":\n");
       fprintf( ofile, "    {\n");
       fseek( computer_friendly_ofile, 0L, SEEK_SET);
