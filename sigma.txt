@@ -93,12 +93,15 @@
  249 B                        -0.2  1.2 84                SOHO
  249 B                        -1.2 -0.2 112               SOHO
  249 B                             -1.2 168               SOHO
- C49                                    10                STEREO-A
- C50                                    10                STEREO-B
-# Repetition of above (249) SOHO records.  Pre-2013 observations used 2 and 3
-# instead of A and B.  Note that there's similar trickery for STEREO A and B;
-# if we get more specific about their uncertainties,  we'll have to do a
-# similar duplication of their records.
+# Karl also guesstimates sigmas for HI-1 to be pretty bad,  maybe
+# two 70" pixels.  COR-2 is much better by comparison,  10".
+ C49 G                                  140               STEREO-A
+ C49 H                                  10                STEREO-A
+ C50 O                                  140               STEREO-B
+ C50 P                                  10                STEREO-B
+# Repetition of above (249) SOHO and (C49), (C50) STEREO-A, B records.
+# Pre-2013 observations used 2 and 3 instead of A and B (SOHO) and
+# 4, 5 instead of G, H and O, P (STEREO).
  249 2                         8.7      36                SOHO
  249 2                         8.2  8.8 24                SOHO
  249 2                         7.2  8.2 12                SOHO
@@ -119,6 +122,10 @@
  249 3                        -0.2  1.2 84                SOHO
  249 3                        -1.2 -0.2 112               SOHO
  249 3                             -1.2 168               SOHO
+ C49 4                                  140               STEREO-A
+ C49 4                                  10                STEREO-A
+ C50 4                                  140               STEREO-B
+ C50 5                                  10                STEREO-B
 # MPC appears to be weighting (C51) WISE data lightly,  which appears to
 # be... well... wise.  I am also informed by Joe Masiero that the mag
 # data from WISE (which is an R magnitude guesstimated from W1 and W2)
