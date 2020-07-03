@@ -576,7 +576,8 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
       if( !get_uncertainty( "sigma_P:", buff, 0))
          fprintf( ofile, " \"P sigma\": %s,", buff);
 
-      fprintf( ofile, "\n        \"M\": %12.8f,", elem->mean_anomaly * 180. / PI);
+      fprintf( ofile, "\n        \"M\": %12.8f,",
+                        centralize_ang( elem->mean_anomaly) * 180. / PI);
       if( !get_uncertainty( "sigma_M", buff, 0))
          fprintf( ofile, " \"M sigma\": %s,", buff);
       }
@@ -609,11 +610,13 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
    if( !get_uncertainty( "sigma_i", buff, 0))
       fprintf( ofile, " \"i sigma\": %s,", buff);
 
-   fprintf( ofile, "\n        \"arg_per\":  %12.8f,", elem->arg_per * 180. / PI);
+   fprintf( ofile, "\n        \"arg_per\":  %12.8f,",
+                        centralize_ang( elem->arg_per) * 180. / PI);
    if( !get_uncertainty( "sigma_omega", buff, 0))
       fprintf( ofile, " \"arg_per sigma\":  %s,", buff);
 
-   fprintf( ofile, "\n        \"asc_node\": %12.8f,", elem->asc_node * 180. / PI);
+   fprintf( ofile, "\n        \"asc_node\": %12.8f,",
+                        centralize_ang( elem->asc_node) * 180. / PI);
    if( !get_uncertainty( "sigma_Omega", buff, 0))
       fprintf( ofile, " \"asc_node sigma\": %s,", buff);
 
