@@ -134,6 +134,7 @@ FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 static int names_compare( const char *name1, const char *name2);
 static int get_uncertainty( const char *key, char *obuff, const bool in_km);
 char *iso_time( char *buff, const double jd, const int precision); /* elem_out.cpp */
+char *real_packed_desig( char *obuff, const char *packed_id);  /* ephem0.cpp */
 extern int debug_level;
 double asteroid_magnitude_slope_param = .15;
 double comet_magnitude_slope_param = 10.;
@@ -559,7 +560,8 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
    fprintf( ofile, "  \"objects\":\n  {\n");
    fprintf( ofile, "    \"%s\":\n", obj_name);
    fprintf( ofile, "    {\n    \"object\": \"%s\",\n", obj_name);
-   fprintf( ofile, "      \"packed\": \"%s\",\n", obs->packed_id);
+   fprintf( ofile, "      \"packed\": \"%s\",\n",
+                  real_packed_desig( buff, obs->packed_id));
    fprintf( ofile, "      \"created\": %.5f,\n", jd);
    fprintf( ofile, "      \"created iso\": \"%s\",\n", iso_time( buff, jd, 0));
    fprintf( ofile, "      \"elements\":\n      {\n");

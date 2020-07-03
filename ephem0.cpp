@@ -1484,6 +1484,15 @@ static void make_path_available( const char *filename)
       }
 }
 
+char *real_packed_desig( char *obuff, const char *packed_id)
+{
+   strcpy( obuff, packed_id);
+   text_search_and_replace( obuff, " ", "");
+   if( strlen( obuff) == 12)      /* packed desig contains both perm */
+      obuff[5] = '\0';            /* & prov IDs;  just use the perm */
+   return( obuff);
+}
+
 static char ephem_mpc_code[5];
 
 /* By default,  JSON files are kept with fixed names in the ~/.find_orb
@@ -1519,11 +1528,8 @@ FILE *open_json_file( char *filename, const char *env_ptr, const char *default_n
       }
    else
       {
-      strcpy( tbuff, packed_desig);
       strcpy( filename, env_ptr);
-      text_search_and_replace( tbuff, " ", "");
-      if( strlen( tbuff) == 12)      /* packed desig contains both perm */
-         tbuff[5] = '\0';            /* & prov IDs;  just use the perm */
+      real_packed_desig( tbuff, packed_desig);
       text_search_and_replace( filename, "%p", tbuff);
       text_search_and_replace( filename, "%c", ephem_mpc_code);
       sprintf( tbuff, "%x", random_seed);
