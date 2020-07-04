@@ -138,7 +138,7 @@ devoted to station data.   */
 #define RESIDUAL_FORMAT_SHOW_DELTAS              0x1000
 #define RESIDUAL_FORMAT_SHOW_DESIGS              0x2000
 
-size_t strlcpy( char *dst, const char *src, size_t dsize);   /* miscell.c */
+size_t strlcat_err( char *dst, const char *src, size_t dsize); /* miscell.c */
 static int user_select_file( char *filename, const char *title, const int flags);
 double get_planet_mass( const int planet_idx);                /* orb_func.c */
 int simplex_method( OBSERVE FAR *obs, int n_obs, double *orbit,
@@ -2592,7 +2592,7 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
             else      /* file doesn't exist anymore;  remove from list */
                prev_files[i] = NULL;
             }
-      strncat( buff, (already_got_obs ? "\nQ Cancel" : "\nQ Quit"), buffsize);
+      strlcat_err( buff, (already_got_obs ? "\nQ Cancel" : "\nQ Quit"), buffsize);
 
       c = inquire( buff, NULL, 30, COLOR_DEFAULT_INQUIRY);
       free( buff);
