@@ -270,6 +270,7 @@ char *put_double_in_buff( char *buff, const double ival)
       precision = atoi( get_environment_ptr( "FULL_SIGMAS"));
       if( !precision)
          precision = 3;
+      assert( precision > 0 && precision < 20);
       snprintf( format, sizeof( format), "%%%d.%dg", precision + 7, precision);
       }
    for( i = precision; i; i--)
