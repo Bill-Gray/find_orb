@@ -2662,28 +2662,7 @@ static void set_fixed_unit_vectors( double **unit_vectors, const OBSERVE *obs)
 
    for( i = 0; i < 6; i++)
       for( j = 0; j < 6; j++)
-         unit_vectors[i][j] = 0.;
-            /* dir[0] points in direction of observation : */
-   for( i = 0; i < 3; i++)
-      dir[0][i] = obs->vect[i];
-            /* dir[1] points at right angles to dir[0] : */
-   dir[1][0] = dir[0][1];
-   dir[1][1] = -dir[0][0];
-   dir[1][2] = 0.;
-            /* dir[2] is at right angles to them both : */
-   vector_cross_product( dir[2], dir[0], dir[1]);
-   for( i = 0; i < 3; i++)
-      {
-      const double xscale = (PI / 180.) / 3600.;
-      const double tscale = .04;
-
-      unit_vectors[0][i] = dir[0][i] * .01 / obs->r;
-      unit_vectors[1][i] = dir[1][i] * xscale / obs->r;
-      unit_vectors[2][i] = dir[2][i] * xscale / obs->r;
-      unit_vectors[3][i + 3] = dir[0][i] * tscale * .01 / obs->r;
-      unit_vectors[4][i + 3] = dir[1][i] * tscale * xscale / obs->r;
-      unit_vectors[5][i + 3] = dir[2][i] * tscale * xscale / obs->r;
-      }
+         unit_vectors[i][j] = (i == j ? 1. : 0.);
 }
 
 /* Describing what 'full_improvement()' does requires an entire separate
