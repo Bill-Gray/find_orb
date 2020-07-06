@@ -850,28 +850,29 @@ static int set_locs_extended( const double *orbit, const double epoch_jd,
    for( pass = 0; pass < 2; pass++)
       {
       int j = (pass ? i : i - 1);
-      double curr_orbit[6];
+      long double curr_orbit[6];
       double curr_t = epoch_jd;
 
-      memcpy( curr_orbit, orbit, 6 * sizeof( double));
+      double_to_ldouble( curr_orbit, orbit, 6);
       while( j < n_obs && j >= 0)
          {
-         double light_lagged_orbit[6];
+         double light_lagged_orbit[6], temp_orbit[6];
          OBSERVE FAR *optr = obs + j;
 
          if( orbit2 && is_between( curr_t, epoch2, optr->jd))
             {
-            rval = integrate_orbit( curr_orbit, curr_t, epoch2);
+            rval = integrate_orbitl( curr_orbit, curr_t, epoch2);
             if( rval)
                return( rval);
-            memcpy( orbit2, curr_orbit, 6 * sizeof( double));
+            ldouble_to_double( orbit2, curr_orbit, 6);
             curr_t = epoch2;
             }
-         rval = integrate_orbit( curr_orbit, curr_t, optr->jd);
+         rval = integrate_orbitl( curr_orbit, curr_t, optr->jd);
          if( rval)
             return( rval);
          curr_t = optr->jd;
-         light_time_lag( curr_orbit, optr->obs_posn, light_lagged_orbit);
+         ldouble_to_double( temp_orbit, curr_orbit, 6);
+         light_time_lag( temp_orbit, optr->obs_posn, light_lagged_orbit);
          FMEMCPY( optr->obj_posn, light_lagged_orbit, 3 * sizeof( double));
          FMEMCPY( optr->obj_vel, light_lagged_orbit + 3, 3 * sizeof( double));
          j += (pass ? 1 : -1);
@@ -879,10 +880,10 @@ static int set_locs_extended( const double *orbit, const double epoch_jd,
       if( orbit2)
          if( (!pass && curr_t >= epoch2) || (pass && curr_t <= epoch2))
             {
-            rval = integrate_orbit( curr_orbit, curr_t, epoch2);
+            rval = integrate_orbitl( curr_orbit, curr_t, epoch2);
             if( rval)
                return( rval);
-            memcpy( orbit2, curr_orbit, 6 * sizeof( double));
+            ldouble_to_double( orbit2, curr_orbit, 6);
             }
       }
 
