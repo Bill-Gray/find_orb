@@ -2702,7 +2702,6 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
                    { 1e-4, 1e-4, 1e-5, 1e-5, 1e-3, 1e-3,
                     .001, .001, .1 };
    static double delta_vals[9];
-   double **new_unit_vectors = NULL;
    double constraint[MAX_CONSTRAINTS];
    double sigma_squared = 0.;       /* see Danby, p. 243, (7.5.20) */
    double scale_factor = 1.;
@@ -3238,24 +3237,12 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
          {
          int k;
 
-         fprintf( ofile, "\n\nNew unit vectors: \n");
-         new_unit_vectors = (double **)calloc_double_dimension_array(
-                                n_params, n_params, sizeof( double));
          eigenvects       = (double **)calloc_double_dimension_array(
                                 n_params, n_params, sizeof( double));
-         for( k = 0; k < n_params; k++)
-            for( i = 0; i < n_params; i++)
-               {
-               for( j = 0; j < n_params; j++)
-                  new_unit_vectors[k][i] +=
-                        unit_vectors[j][i] * eigenvectors[j + k * n_params];
-               put_double_in_buff( tbuff, new_unit_vectors[k][i]);
-               fprintf( ofile, "%s%s", tbuff, (i == n_params - 1 ? "\n" : ""));
-               }
 
          for( i = 0; i < n_params; i++)
             for( j = 0; j < n_params; j++)
-               eigenvects[j][i] = new_unit_vectors[j][i] / sqrt( eigenvals[j]);
+               eigenvects[j][i] = eigenvectors[i + j * n_params] / sqrt( eigenvals[j]);
          fprintf( ofile, "\nOne-sigma eigenvect:\n");
          for( i = 0; i < n_params; i++)
             {
@@ -3417,14 +3404,6 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
          i = 0;
       }
       while( i);
-
-   if( new_unit_vectors)
-      {
-      for( i = 0; i < n_params; i++)
-         for( j = 0; j < n_params; j++)
-            unit_vectors[i][j] = new_unit_vectors[i][j];
-      free( new_unit_vectors);
-      }
 
    if( debug_level > 1)
       debug_printf( "full_improve done\n");
