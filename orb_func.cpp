@@ -3363,16 +3363,18 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
    memcpy( orbit2, orbit, 6 * sizeof( double));
    for( i = 0; i < n_params && !err_code; i++)
       {
-      for( j = 0; j < 6; j++)
-         orbit[j] += unit_vectors[i][j] * differences[i] / scale_factor;
+      if( i < 6)
+         orbit[i] += differences[i] / scale_factor;
       if( i == 5)    /* is our new 'orbit' state vector reasonable?  */
          err_code = is_unreasonable_orbit( orbit);
 
-      if( asteroid_mass)
-         *asteroid_mass += unit_vectors[i][6] * differences[i] / scale_factor;
-      else
-         for( j = 6; j < n_params; j++)
-            solar_pressure[j - 6] += unit_vectors[i][j] * differences[i] / scale_factor;
+      if( i >= 6)
+         {
+         if( asteroid_mass)
+            *asteroid_mass += differences[i] / scale_factor;
+         else
+            solar_pressure[i - 6] += differences[i] / scale_factor;
+         }
       }
                /* If the orbit "blew up" or otherwise failed,  restore */
                /* the original version:  */
