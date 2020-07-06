@@ -3144,13 +3144,6 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
       fprintf( ofile, "Orbit: %.7f %.7f %.7f %.7f %.7f %.7f\nepoch JD %.5f\n",
                orbit[0], orbit[1], orbit[2],
                orbit[3], orbit[4], orbit[5], epoch2);
-      fprintf( ofile, "Unit vectors:\n");
-      for( i = 0; i < n_params; i++)
-         for( j = 0; j < n_params; j++)
-            {
-            put_double_in_buff( tbuff, unit_vectors[i][j]);
-            fprintf( ofile, "%s%s", tbuff, (j == 5 ? "\n" : " "));
-            }
       jacobi_eigenvalues( wtw, n_params, eigenvals, eigenvectors);
 
       fprintf( ofile, "Eigenvalues computed: sigma_squared = %g\n", sigma_squared);
@@ -3201,23 +3194,15 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
             fprintf( ofile, "\n");
             }
 
-
-         if( pass == 1)
-            fprintf( ofile, "Unit vects: test for orthogonality\n");
-         else
-            fprintf( ofile, "%s: test for orthogonality\n", titles[pass]);
-         for( i = 0; i < n_params; i++)
+         if( pass != 1)
             {
-            for( j = 0; j < n_params; j++)
+            fprintf( ofile, "%s: test for orthogonality\n", titles[pass]);
+            for( i = 0; i < n_params; i++)
                {
-               double oval = 0.;
-               unsigned k;
-
-               if( pass == 1)
-                  for( k = 0; k < (unsigned)n_params; k++)
-                     oval += unit_vectors[i][k] * unit_vectors[j][k];
-               else
+               for( j = 0; j < n_params; j++)
                   {
+                  double oval = 0.;
+                  unsigned k;
                   double *matrix_ptr;
 
                   if( pass == 0)
@@ -3228,14 +3213,14 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
                      matrix_ptr = eigenvectors;
                   for( k = 0; k < (unsigned)n_params; k++)
                      oval += matrix_ptr[i * n_params + k] * matrix_ptr[j * n_params + k];
+                  if( pass == 3)      /* eigenvects are normalized; */
+                     sprintf( tbuff, "%10.6f", oval);  /* values are -1 to 1 */
+                  else                             /* covar/WtW values can be */
+                     put_double_in_buff( tbuff, oval);   /* huge or tiny */
+                  fprintf( ofile, "%s", tbuff);
                   }
-               if( pass == 1 || pass == 3)      /* correlation or eigenvects */
-                  sprintf( tbuff, "%10.6f", oval);  /* values are -1 to 1 */
-               else                             /* covar/WtW values can be */
-                  put_double_in_buff( tbuff, oval);   /* huge or tiny */
-               fprintf( ofile, "%s", tbuff);
+               fprintf( ofile, "\n");
                }
-            fprintf( ofile, "\n");
             }
          }
       fprintf( ofile, "Eigenvalues:\n");
