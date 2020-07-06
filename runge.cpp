@@ -126,6 +126,18 @@ double shadow_check( const double *planet_loc,           /* ephem0.cpp */
 #define IDX_IAPETUS   19
 #define IDX_ASTEROIDS 20
 
+static ldouble vector3_lengthl( const ldouble *vect)
+{
+   return( sqrtl( vect[0] * vect[0] + vect[1] * vect[1] + vect[2] * vect[2]));
+}
+
+static void vector_cross_productl( ldouble *xprod, const ldouble *a, const ldouble *b)
+{
+   xprod[0] = a[1] * b[2] - a[2] * b[1];
+   xprod[1] = a[2] * b[0] - a[0] * b[2];
+   xprod[2] = a[0] * b[1] - a[1] * b[0];
+}
+
       /* The following value for various J2s come from the _Explanatory  */
       /* Supplement_,  p 697.  They're in units of planetary radii,  and */
       /* must be converted to AU squared. */
@@ -353,24 +365,24 @@ static void numerical_gradient( double *grad, const double *loc,
 
 double general_relativity_factor = 1.;
 
-static void set_relativistic_accel( double *accel, const double *posnvel)
+static void set_relativistic_accel( ldouble *accel, const ldouble *posnvel)
 {
    int i;
-   const double c = AU_PER_DAY;           /* speed of light in AU per day */
-   const double r_squared = posnvel[0] * posnvel[0] + posnvel[1] * posnvel[1]
-                                                    + posnvel[2] * posnvel[2];
-   const double v_squared = posnvel[3] * posnvel[3] + posnvel[4] * posnvel[4]
-                                                    + posnvel[5] * posnvel[5];
-   const double v_dot_r   = posnvel[0] * posnvel[3] + posnvel[1] * posnvel[4]
-                                                    + posnvel[2] * posnvel[5];
-   const double r = sqrt( r_squared), r_cubed_c_squared = r_squared * r * c * c;
+   const ldouble c = AU_PER_DAY;           /* speed of light in AU per day */
+   const ldouble r_squared = posnvel[0] * posnvel[0] + posnvel[1] * posnvel[1]
+                                                     + posnvel[2] * posnvel[2];
+   const ldouble v_squared = posnvel[3] * posnvel[3] + posnvel[4] * posnvel[4]
+                                                     + posnvel[5] * posnvel[5];
+   const ldouble v_dot_r   = posnvel[0] * posnvel[3] + posnvel[1] * posnvel[4]
+                                                     + posnvel[2] * posnvel[5];
+   const ldouble r = sqrtl( r_squared), r_cubed_c_squared = r_squared * r * c * c;
 #ifndef PREVIOUS_EQUATION
    const double r_component =
                   (4. * SOLAR_GM / r - v_squared) / r_cubed_c_squared;
    const double v_component = 4. * v_dot_r / r_cubed_c_squared;
 #else
-   const double v_component = 3. * v_dot_r / r_cubed_c_squared;
-   const double r_component = 0.;
+   const ldouble v_component = 3. * v_dot_r / r_cubed_c_squared;
+   const ldouble r_component = 0.;
 #endif
 
    for( i = 0; i < 3; i++)
@@ -407,27 +419,32 @@ by setting alpha = 1,  determining what value we get for g(1),  and setting
 alpha to the inverse of that.
 */
 
-static inline double comet_g_func( const double r)
+static inline double comet_g_func( const ldouble r)
 {
    if( object_type == OBJECT_TYPE_COMET)
       {                      /* default, Marsden/Sekanina formula */
-      static double r0 = 2.808;         /* AU */
-      static double m = 2.15;
-      static double n = 5.093;
-      static double k = 4.6142;
-      static double alpha = 0.;
-      double r_over_r0;
+      static ldouble r0 = 2.808;         /* AU */
+      static ldouble m = 2.15;
+      static ldouble n = 5.093;
+      static ldouble k = 4.6142;
+      static ldouble alpha = 0.;
+      ldouble r_over_r0;
 
       if( !alpha)
          {
          const char *comet_params = get_environment_ptr( "COMET_CONSTANTS");
+         double d_r0, d_m, d_n, d_k;
 
-         sscanf( comet_params, "%lf,%lf,%lf,%lf", &r0, &m, &n, &k);
+         sscanf( comet_params, "%lf,%lf,%lf,%lf", &d_r0, &d_m, &d_n, &d_k);
+         r0 = (ldouble)d_r0;
+         m = (ldouble)d_m;
+         n = (ldouble)d_n;
+         k = (ldouble)d_k;
          alpha = 1.;
          alpha = 1. / comet_g_func( 1.);
          }
       r_over_r0 = r / r0;
-      return( alpha * pow( r_over_r0, -m) * pow( 1. + pow( r_over_r0, n), -k));
+      return( alpha * powl( r_over_r0, -m) * powl( 1. + powl( r_over_r0, n), -k));
       }
    else        /* just an inverse-square force,  used for 2009 BD */
       return( 1. / (r * r));
@@ -530,9 +547,9 @@ extern const double planet_mass[N_PERTURB + 1] = { 1.,             /*  0 */
          MASS_TITAN,                                                 /* 18 */
          MASS_IAPETUS };                                             /* 19 */
 
-static double planetary_system_mass( const int planet_no)
+static ldouble planetary_system_mass( const int planet_no)
 {
-   double rval;
+   ldouble rval;
 // const int bc405_start = 100;
 
    if( planet_no == 5)
@@ -599,13 +616,13 @@ up the mass thrown into the sun linearly.  The reason for this is to avoid
 a discontinuity,  and to instead have a gradual,  linear increase in the
 mass we use for the sun.         */
 
-static double include_thrown_in_planets( const double r)
+static ldouble include_thrown_in_planets( const ldouble r)
 {
    const int n_radii = 9;
-   const double radii[9] = { 0., .38709927, .72333566, 1.00000261,
+   const ldouble radii[9] = { 0., .38709927, .72333566, 1.00000261,
                1.52371034, 5.20288799, 9.53667594,  19.18916464,  30.06992276};
-   const double fraction = .2;
-   double rval = 1.;
+   const ldouble fraction = .2;
+   ldouble rval = 1.;
    int i;
 
    for( i = 1; i < n_radii && r > radii[i]; i++)
@@ -645,10 +662,10 @@ That was the easiest way of avoiding problems with the density climbing to
 absurd heights as one approached the center of the earth... doing this
 avoids discontinuities that it would be awkward to code around.   */
 
-static double atmospheric_density( const double ht_in_km)
+static ldouble atmospheric_density( const ldouble ht_in_km)
 {
 #ifdef ORIGINAL_TABLE_FOR_REFERENCE_ONLY
-   const double rho[] = {          1.22500e+0,  4.13510e-1,  8.89099e-2,
+   const ldouble rho[] = {          1.22500e+0,  4.13510e-1,  8.89099e-2,
          1.84102e-2,  3.99568e-3,  1.02688e-3,  3.09678e-4,  8.28286e-5,
          1.84580e-5,  3.40454e-6,  5.60400e-7,  9.39781e-8,  2.22485e-8,
          8.15200e-9,  3.81812e-9,  2.07600e-9,  1.23365e-9, 7.81486e-10,
@@ -670,7 +687,7 @@ static double atmospheric_density( const double ht_in_km)
         4.92236e-15, 4.68680e-15, 4.46826e-15, 4.26448e-15, 4.07349e-15,
         3.89356e-15, 3.72317e-15, 3.56100e-15  };
 #endif
-   const double log_rho[] = { 0.2029, -0.8831, -2.4201, -3.9949,
+   const ldouble log_rho[] = { 0.2029, -0.8831, -2.4201, -3.9949,
          -5.5225, -6.8812, -8.0800, -9.3987, -10.9000, -12.5904,
         -14.3946, -16.1802, -17.6210, -18.6250, -19.3835, -19.9928,
         -20.5133, -20.9698, -21.3783, -21.7503, -22.0933, -22.4136,
@@ -688,7 +705,7 @@ static double atmospheric_density( const double ht_in_km)
         -32.6731, -32.7317, -32.7880, -32.8422, -32.8945, -32.9450,
         -32.9940, -33.0418, -33.0885, -33.1343, -33.1795, -33.2242,
         -33.2687 };
-   double fraction, log_rval;
+   ldouble fraction, log_rval;
    int range = (int)( ht_in_km / 10.);
    const int table_size = sizeof( log_rho) / sizeof( log_rho[0]);  /* = 101 */
 
@@ -701,7 +718,7 @@ static double atmospheric_density( const double ht_in_km)
                 - (fraction < 0. ? fraction * fraction : 0.);    /* (1) */
    if( !range && log_rval < -4.)
       log_rval = -4.;
-   return( exp( log_rval));
+   return( expl( log_rval));
 }
 
 
@@ -743,10 +760,10 @@ This ensures that both the accelerations and their derivatives will
 be continuous.
 */
 
-static double compute_accel_multiplier( double fraction)
+static ldouble compute_accel_multiplier( double fraction)
 {
-   const double r0 = .8;  /* acceleration drops to zero at 80% of planet radius */
-   double rval;
+   const ldouble r0 = .8;  /* acceleration drops to zero at 80% of planet radius */
+   ldouble rval;
 
    assert( fraction >= 0. && fraction <= 1.);
    if( fraction < r0)
@@ -764,22 +781,22 @@ static double compute_accel_multiplier( double fraction)
 
 int planet_hit = -1;
 
-int calc_derivatives( const double jd, const double *ival, double *oval,
+int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
                            const int reference_planet)
 {
-   double r, r2 = 0., solar_accel = 1. + object_mass;
-   double accel_multiplier = 1.;
+   ldouble r, r2 = 0., solar_accel = 1. + object_mass;
+   ldouble accel_multiplier = 1.;
    int i, j;
    unsigned local_perturbers = perturbers;
    double lunar_loc[3], jupiter_loc[3], saturn_loc[3];
-   double relativistic_accel[3];
-   double fraction_illum = 1.;
+   ldouble relativistic_accel[3];
+   double fraction_illum = 1., ival_as_double[3];
    extern int n_extra_params;
    static const double sphere_of_influence_radius[10] = {
             10000., 0.00075, 0.00412, 0.00618,   /* sun, mer, ven, ear */
             0.00386, 0.32229, 0.36466, 0.34606,  /* mar, jup, sat, ura */
             0.57928, 0.02208 };                  /* nep, plu */
-   static const double planet_radius[11] = {
+   static const ldouble planet_radius[11] = {
                         SUN_R * FUDGE_FACTOR, MERCURY_R * FUDGE_FACTOR,
                         VENUS_R * FUDGE_FACTOR, EARTH_R * FUDGE_FACTOR,
                         MARS_R * FUDGE_FACTOR, JUPITER_R * FUDGE_FACTOR,
@@ -787,21 +804,23 @@ int calc_derivatives( const double jd, const double *ival, double *oval,
                         NEPTUNE_R * FUDGE_FACTOR, PLUTO_R * FUDGE_FACTOR,
                         MOON_R * FUDGE_FACTOR };
 
-   assert( fabs( jd) < 1e+9);
+   assert( fabsl( jd) < 1e+9);
    oval[0] = ival[3];
    oval[1] = ival[4];
    oval[2] = ival[5];
+   for( i = 0; i < 3; i++)
+      ival_as_double[i] = (double)ival[i];
    best_fit_planet = 0;
    planet_hit = -1;
    for( i = 0; i < 3; i++)
       r2 += ival[i] * ival[i];
-   r = sqrt( r2);
+   r = sqrtl( r2);
    if( n_extra_params) /* decrease non-gravs when in earth's shadow */
       {
       double earth_loc[3];
 
       earth_lunar_posn( jd, earth_loc, NULL);
-      fraction_illum = shadow_check( earth_loc, ival, EARTH_R);
+      fraction_illum = shadow_check( earth_loc, ival_as_double, EARTH_R);
       }
    if( n_extra_params == 1)  /* straightforward radiation pressure */
       {
@@ -814,7 +833,7 @@ int calc_derivatives( const double jd, const double *ival, double *oval,
       accel_multiplier = compute_accel_multiplier( r / planet_radius[0]);
       planet_hit = 0;
       if( debug_level)
-         debug_printf( "Inside the sun: %f km\n", r * AU_IN_KM);
+         debug_printf( "Inside the sun: %f km\n", (double)r * AU_IN_KM);
       if( !accel_multiplier)
          {
          for( i = 3; i < 6; i++)
@@ -839,30 +858,37 @@ int calc_derivatives( const double jd, const double *ival, double *oval,
 
    if( (local_perturbers >> IDX_ASTEROIDS) & 1)
       if( r < 11.5 && r > 1.)
-         detect_perturbers( jd, ival, oval);        /* bc405.cpp */
+         {
+         double asteroid_accel[6];
 
+         for( i = 3; i < 6; i++)
+            asteroid_accel[i] = 0.;
+         detect_perturbers( jd, ival_as_double, asteroid_accel);        /* bc405.cpp */
+         for( i = 3; i < 6; i++)
+            oval[i] += asteroid_accel[i];
+         }
 
    if( n_extra_params == 2 || n_extra_params == 3)
       {                  /* Marsden & Sekanina comet formula */
-      const double g = comet_g_func( r) * fraction_illum;
+      const ldouble g = comet_g_func( r) * fraction_illum;
       extern double solar_pressure[];
-      double transverse[3], dot_prod = 0.;
+      ldouble transverse[3], dot_prod = 0.;
 
-      memcpy( transverse, ival + 3, 3 * sizeof( double));
+      memcpy( transverse, ival + 3, 3 * sizeof( ldouble));
       for( i = 0; i < 3; i++)
          dot_prod += transverse[i] * ival[i];
       for( i = 0; i < 3; i++)
          transverse[i] -= ival[i] * dot_prod / r;
-      dot_prod = vector3_length( transverse);
+      dot_prod = vector3_lengthl( transverse);
       for( i = 0; i < 3; i++)
          oval[i + 3] += g * (solar_pressure[0] * ival[i] / r
                      + solar_pressure[1] * transverse[i] / dot_prod);
       if( n_extra_params == 3)
          {
-         double out_of_plane[3];
+         ldouble out_of_plane[3];
 
-         vector_cross_product( out_of_plane, ival, transverse);
-         dot_prod = vector3_length( out_of_plane);
+         vector_cross_productl( out_of_plane, ival, transverse);
+         dot_prod = vector3_lengthl( out_of_plane);
          for( i = 0; i < 3; i++)
             oval[i + 3] += g * solar_pressure[2] * out_of_plane[i] / dot_prod;
          }
@@ -1069,7 +1095,7 @@ int calc_derivatives( const double jd, const double *ival, double *oval,
 
 //          if( accel_multiplier)
                {
-               const double accel_factor =
+               const ldouble accel_factor =
                                -SOLAR_GM * mass_to_use / (r * r * r);
 
                for( j = 0; j < 3; j++)
@@ -1108,19 +1134,19 @@ int calc_derivatives( const double jd, const double *ival, double *oval,
    return( planet_hit);
 }
 
-int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
+int calc_derivatives( const double jd, const double *ival, double *oval,
                            const int reference_planet)
 {
-   unsigned i;
+   size_t i;
    int rval;
-   double ival1[6], oval1[6];
+   ldouble ival1[6], oval1[6];
 
    assert( fabs( (double)jd) < 1e+9);
    for( i = 0; i < 6; i++)
-      ival1[i] = (double)ival[i];
-   rval = calc_derivatives( (double)jd, ival1, oval1, reference_planet);
+      ival1[i] = (ldouble)ival[i];
+   rval = calc_derivativesl( (ldouble)jd, ival1, oval1, reference_planet);
    for( i = 0; i < 6; i++)
-      oval[i] = (ldouble)oval1[i];
+      oval[i] = (double)oval1[i];
    return( rval);
 }
 
