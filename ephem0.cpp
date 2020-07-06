@@ -2217,10 +2217,9 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                {
                const double dec = ra_dec.y * 180. / PI;
                double ra = ra_dec.x * 12. / PI;
-               double lunar_elong = 0.;
+               double lunar_elong = 99., dist_moon = 99.;  /* values are ignored */
                char fake_line[81];
                double cos_elong, solar_r, elong;
-               bool moon_more_than_half_lit = false;
                double fraction_illum = 1.;    /* i.e.,  not in earth's shadow */
                double mags_per_arcsec2 = 99.99;    /* sky brightness */
                DPT alt_az[3], sun_ra_dec;
@@ -2255,14 +2254,15 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                         earth_lunar_posn( ephemeris_t, earth_loc, vect);
                         for( k = 0; k < 3; k++)
                            vect[k] -= earth_loc[k];
-                        moon_more_than_half_lit =
-                              (dot_product( earth_loc, vect) > 0.);
+                        cos_elong = dot_product( earth_loc, vect)
+                                 / (vector3_length( earth_loc) * vector3_length( vect));
+                        lunar_elong = acose( -cos_elong);
                         ecliptic_to_equatorial( vect);   /* mpc_obs.cpp */
                         fraction_illum = shadow_check( earth_loc, orbi_after_light_lag,
                                     EARTH_MAJOR_AXIS_IN_AU);
                         cos_elong = dot_product( vect, geo)
                                  / (vector3_length( vect) * vector3_length( geo));
-                        lunar_elong = acose( cos_elong);
+                        dist_moon = acose( cos_elong);
                         }
                      vector_to_polar( &obj_ra_dec.x, &obj_ra_dec.y, vect);
                      if( j == 1)
@@ -2285,7 +2285,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   bdata.relative_humidity = 20.;  /* 20% */
                   bdata.year = 2000. + (ephemeris_t - J2000) / 365.25;
                   bdata.month = bdata.year * 12. - floor( bdata.year * 12.);
-                  bdata.dist_moon = lunar_elong;
+                  bdata.dist_moon = dist_moon;
                   bdata.dist_sun = elong;
                   bdata.zenith_angle    = PI / 2. - alt_az[0].y;
                   bdata.zenith_ang_sun  = PI / 2. - alt_az[1].y;
@@ -2392,7 +2392,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   else
                      tbuff[1] = ' ';         /* plain ol' night */
                   if( alt_az[2].y > 0.)      /* moon's up */
-                     tbuff[2] = (moon_more_than_half_lit ? 'M' : 'm');
+                     tbuff[2] = (lunar_elong > PI / 2. ? 'M' : 'm');
                   else
                      tbuff[2] = ' ';         /* moon's down */
                   tbuff[3] = '\0';
@@ -2633,7 +2633,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
 
                if( options & OPTION_LUNAR_ELONGATION)
                   {
-                  snprintf( tbuff, sizeof( tbuff), " %6.1f", lunar_elong * 180. / PI);
+                  snprintf( tbuff, sizeof( tbuff), " %6.1f", dist_moon * 180. / PI);
                   strcat( alt_buff, tbuff);
                   strcat( buff, tbuff);
                   }
