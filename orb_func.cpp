@@ -352,15 +352,16 @@ int find_parabolic_orbit( OBSERVE FAR *obs, const int n_obs,
 
 int calc_derivatives( const double jd, const double *ival, double *oval,
                            const int reference_planet);
-double take_rk_step( const double jd, ELEMENTS *ref_orbit,
-                 const double *ival, double *ovals,
-                 const int n_vals, const double step);      /* runge.cpp */
+long double take_rk_stepl( const long double jd, ELEMENTS *ref_orbit,
+                 const long double *ival, long double *ovals,
+                 const int n_vals, const long double step);     /* runge.cpp */
 double take_pd89_step( const double jd, ELEMENTS *ref_orbit,
                  const double *ival, double *ovals,
                  const int n_vals, const double step);      /* runge.cpp */
 int symplectic_6( double jd, ELEMENTS *ref_orbit, double *vect,
                                           const double dt);
 static int is_unreasonable_orbit( const double *orbit);     /* orb_func.cpp */
+static int is_unreasonable_orbitl( const long double *orbit);
 
 double integration_tolerance = 1.e-12;
 double minimum_jd = 77432.5;      /* 1 Jan -4500 */
@@ -403,19 +404,33 @@ clock_t integration_timeout = (clock_t)0;
 #define INTEGRATION_TIMED_OUT       -3
 #define HIT_A_PLANET                -4
 
-int integrate_orbit( double *orbit, const double t0, const double t1)
+static void double_to_ldouble( long double *ovals, const double *ivals,
+                                          size_t n)
 {
-   double stepsize = 2.;
-   static double fixed_stepsize = -1.;
-   const double chicken = .9;
+   while( n--)
+      *ovals++ = (long double)*ivals++;
+}
+
+static void ldouble_to_double( double *ovals, const long double *ivals,
+                                          size_t n)
+{
+   while( n--)
+      *ovals++ = (double)*ivals++;
+}
+
+int integrate_orbitl( long double *orbit, const long double t0, const long double t1)
+{
+   long double stepsize = 2.;
+   static long double fixed_stepsize = -1.;
+   const long double chicken = .9;
    int reset_of_elements_needed = 1;
-   const double step_increase = chicken * integration_tolerance
-                 / pow( STEP_INCREMENT, (integration_method ? 9. : 5.));
+   const long double step_increase = chicken * integration_tolerance
+                 / powl( STEP_INCREMENT, (integration_method ? 9. : 5.));
    static int use_encke = -1;
-   double t = t0;
+   long double t = t0;
 #ifdef CONSOLE
    static time_t real_time = (time_t)0;
-   double prev_t = t, last_err = 0.;
+   long double prev_t = t, last_err = 0.;
 #endif
    int n_rejects = 0, rval;
    unsigned saved_perturbers = perturbers;
@@ -424,8 +439,8 @@ int integrate_orbit( double *orbit, const double t0, const double t1)
    static int n_changes;
    ELEMENTS ref_orbit;
 
-   assert( fabs( t0) < 1e+9);
-   assert( fabs( t1) < 1e+9);
+   assert( fabsl( t0) < 1e+9);
+   assert( fabsl( t1) < 1e+9);
    if( use_encke == -1)
       use_encke = atoi( get_environment_ptr( "ENCKE"));
    if( t0 > maximum_jd || t1 > maximum_jd
@@ -434,13 +449,13 @@ int integrate_orbit( double *orbit, const double t0, const double t1)
       char buff[300];
 
       snprintf( buff, sizeof( buff), get_find_orb_text( 2027),
-               JD_TO_YEAR( t0), JD_TO_YEAR( t1));
+               (double)JD_TO_YEAR( t0), (double)JD_TO_YEAR( t1));
       generic_message_box( buff, "o");
       exit( -1);
       }
    if( debug_level > 7)
-      debug_printf( "Integrating %f to %f\n", t0, t1);
-   rval = is_unreasonable_orbit( orbit);
+      debug_printf( "Integrating %f to %f\n", (double)t0, (double)t1);
+   rval = is_unreasonable_orbitl( orbit);
    if( rval)
       {
       debug_printf( "Unreasonable %d\n", rval);
@@ -448,23 +463,25 @@ int integrate_orbit( double *orbit, const double t0, const double t1)
       }
    ref_orbit.central_obj = -1;
    if( fixed_stepsize < 0.)
-      fixed_stepsize = atof( get_environment_ptr( "FIXED_STEPSIZE"));
+      fixed_stepsize = (long double)atof( get_environment_ptr( "FIXED_STEPSIZE"));
    if( fixed_stepsize > 0.)
       stepsize = fixed_stepsize;
    if( going_backward)
       stepsize = -stepsize;
    while( t != t1 && !rval)
       {
-      double delta_t, new_t = ceil( (t - .5) / stepsize + .5) * stepsize + .5;
+      long double delta_t, new_t = ceill( (t - .5) / stepsize + .5) * stepsize + .5;
+      double dorbit[6];
       bool step_taken = true;
 
-      reset_auto_perturbers( t, orbit);
+      ldouble_to_double( dorbit, orbit, 6);
+      reset_auto_perturbers( t, dorbit);
       if( reset_of_elements_needed || !(n_steps % 50))
          if( use_encke)
             {
             extern int best_fit_planet;
 
-            find_relative_orbit( t, orbit, &ref_orbit, best_fit_planet);
+            find_relative_orbit( t, dorbit, &ref_orbit, best_fit_planet);
             reset_of_elements_needed = 0;
             }
       n_steps++;
@@ -483,15 +500,15 @@ int integrate_orbit( double *orbit, const double t0, const double t1)
          if( runtime_message)
             move_add_nstr( 9, 10, runtime_message, -1);
          sprintf( buff, "t = %.5f; %.5f to %.5f; step ",
-                 JD_TO_YEAR( t), JD_TO_YEAR( t0), JD_TO_YEAR( t1));
-         if( fabs( stepsize) > .1)
-            snprintf_append( buff, sizeof( buff), "%.3f   ", stepsize);
-         else if( fabs( stepsize) > .91)
+                 (double)JD_TO_YEAR( t), (double)JD_TO_YEAR( t0), (double)JD_TO_YEAR( t1));
+         if( fabsl( stepsize) > .1)
+            snprintf_append( buff, sizeof( buff), "%.3f   ", (double)stepsize);
+         else if( fabsl( stepsize) > .91)
             snprintf_append( buff, sizeof( buff), "%.3fm   ",
-                                          stepsize * minutes_per_day);
+                                          (double)stepsize * minutes_per_day);
          else
             snprintf_append( buff, sizeof( buff), "%.3fs   ",
-                                          stepsize * seconds_per_day);
+                                          (double)stepsize * seconds_per_day);
          if( prev_n_steps)    /* i.e.,  not our first time through here */
             snprintf_append( buff, sizeof( buff), "%d step/sec  ",
                         n_steps - prev_n_steps);
@@ -501,7 +518,7 @@ int integrate_orbit( double *orbit, const double t0, const double t1)
          sprintf( buff, " %02d:%02d:%02d; %f; %d cached   ",
                      (int)( (real_time / 3600) % 24L),
                      (int)( (real_time / 60) % 60),
-                     (int)( real_time % 60), t - prev_t,
+                     (int)( real_time % 60), (double)( t - prev_t),
                      n_posns_cached);
          prev_t = t;
          move_add_nstr( 11, 10, buff, -1);
@@ -519,7 +536,7 @@ int integrate_orbit( double *orbit, const double t0, const double t1)
          strcat( buff, "  ");
          move_add_nstr( 12, 10, buff, -1);
          sprintf( buff, "last err: %.3e/%.3e  n changes: %d  ",
-                        last_err, step_increase, n_changes);
+                        (double)last_err, (double)step_increase, n_changes);
          move_add_nstr( 13, 10, buff, -1);
          if( use_encke)
             {
@@ -529,10 +546,10 @@ int integrate_orbit( double *orbit, const double t0, const double t1)
             move_add_nstr( 18, 10, buff, -1);
             }
          sprintf( buff, "Pos: %11.6f %11.6f %11.6f",
-                     orbit[0], orbit[1], orbit[2]);
+                     dorbit[0], dorbit[1], dorbit[2]);
          move_add_nstr( 14, 10, buff, -1);
          sprintf( buff, "Vel: %11.6f %11.6f %11.6f",
-                     orbit[3], orbit[4], orbit[5]);
+                     dorbit[3], dorbit[4], dorbit[5]);
          move_add_nstr( 15, 10, buff, -1);
 #ifdef TEST_PLANET_CACHING_HASH_FUNCTION
          if( total_n_searches)
@@ -556,20 +573,24 @@ int integrate_orbit( double *orbit, const double t0, const double t1)
 
       switch( integration_method)
          {
+#ifdef NOT_READY_FOR_LONG_DOUBLES
          case 1:
             symplectic_6( t, &ref_orbit, orbit, delta_t);
             break;
+#endif
          default:
             {
-            double new_vals[6];
-            static double min_stepsize;
-            const double err = (integration_method ?
-                   take_pd89_step( t, &ref_orbit, orbit, new_vals, 6, delta_t) :
-                   take_rk_step( t, &ref_orbit, orbit, new_vals, 6, delta_t));
+            long double new_vals[6];
+            static long double min_stepsize;
+//          const double err = (integration_method ?
+//                 take_pd89_step( t, &ref_orbit, orbit, new_vals, 6, delta_t) :
+//                 take_rk_step( t, &ref_orbit, orbit, new_vals, 6, delta_t));
+            const long double err =
+                   take_rk_stepl( t, &ref_orbit, orbit, new_vals, 6, delta_t);
 
             if( !min_stepsize)
                {
-               min_stepsize = atof( get_environment_ptr( "MIN_STEPSIZE"))
+               min_stepsize = (long double)atof( get_environment_ptr( "MIN_STEPSIZE"))
                                              / seconds_per_day;
                if( !min_stepsize)
                   min_stepsize = 1e-5;   /* 1e-5 day = 0.864 seconds */
@@ -582,9 +603,9 @@ int integrate_orbit( double *orbit, const double t0, const double t1)
             if( err < integration_tolerance || fixed_stepsize > 0.
                         || fabs( stepsize) < min_stepsize)  /* it's good! */
                {
-               memcpy( orbit, new_vals, 6 * sizeof( double));
+               memcpy( orbit, new_vals, 6 * sizeof( long double));
                if( err < step_increase && !fixed_stepsize)
-                  if( fabs( delta_t - stepsize) < fabs( stepsize * .01))
+                  if( fabsl( delta_t - stepsize) < fabsl( stepsize * .01))
                      {
                      n_changes++;
                      stepsize *= STEP_INCREMENT;
@@ -605,12 +626,12 @@ int integrate_orbit( double *orbit, const double t0, const double t1)
             break;
          }
       t = new_t;
-      rval = is_unreasonable_orbit( orbit);
+      rval = is_unreasonable_orbitl( orbit);
       if( rval)
          {
          debug_printf( "Unreasonable %d at %.5g (%.5f to %.5f)\n",
-                rval, t - t0, t0, t1);
-         debug_printf( "Stepsize %g\n", stepsize);
+                  rval, (double)(t - t0), (double)t0, (double)t1);
+         debug_printf( "Stepsize %g\n", (double)stepsize);
          }
       else if( integration_timeout && !(n_steps % 100))
          if( clock( ) > integration_timeout)
@@ -622,7 +643,7 @@ int integrate_orbit( double *orbit, const double t0, const double t1)
          if( planet_hit != -1)
             rval = HIT_A_PLANET;
          }
-
+#ifdef PROBABLY_UNNEEDED
       if( debug_level && n_steps % 10000 == 0)
          {
          extern int best_fit_planet;
@@ -634,10 +655,22 @@ int integrate_orbit( double *orbit, const double t0, const double t1)
          debug_printf( "Posn: %f %f %f\n", orbit[0], orbit[1], orbit[2]);
          debug_printf( "Posn: %f %f %f\n", orbit[3], orbit[4], orbit[5]);
          }
+#endif
       }
    if( debug_level > 7)
       debug_printf( "Integration done: %d\n", rval);
    perturbers = saved_perturbers;
+   return( rval);
+}
+
+int integrate_orbit( double *orbit, const double t0, const double t1)
+{
+   long double tarray[6];
+   int rval;
+
+   double_to_ldouble( tarray, orbit, 6);
+   rval = integrate_orbitl( tarray, (long double)t0, (long double)t1);
+   ldouble_to_double( orbit, tarray, 6);
    return( rval);
 }
 
@@ -687,6 +720,14 @@ static int is_unreasonable_orbit( const double *orbit)
       if( !isfinite( orbit[i]))
          rval |= (1 << i);
    return( rval);
+}
+
+static int is_unreasonable_orbitl( const long double *orbit)
+{
+   double tarray[6];
+
+   ldouble_to_double( tarray, orbit, 6);
+   return( is_unreasonable_orbit( tarray));
 }
 
 /* See Explanatory Supplement,  3.26, p. 135, "Gravitational Light
