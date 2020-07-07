@@ -568,6 +568,9 @@ COD F84
 OBS N. Teamo
 TEL 0.35-m f/2.0 Schmidt + 1392x1040 CCD
 
+COD G37
+TEL 4.3-m Lowell Discovery Telescope + CCD
+
 COD G40
 CON Goran Gasparovic, Actarius Grupa, Badaliceva 25, 10000 Zagreb, Croatia
 CON [gasparovic (at) actarius (dot) hr]
@@ -1061,6 +1064,9 @@ COD Z18
 OBS J. Licandro, A. Cabrera-Lavers
 MEA M. Micheli, F. J. Pozuelos, D. Farnocchia
 TEL 10.40-m reflector + CCD
+
+COD Z23
+TEL 2.56-m f/11 reflector + CCD
 
 COD Z37
 COM Details from D. Bamberger for Z37, Z48, Z80, 2018 Jul 7
