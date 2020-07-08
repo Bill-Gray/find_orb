@@ -4693,7 +4693,10 @@ int compute_observation_motion_details( const OBSERVE FAR *obs,
       m->dec_motion = vel[2] * (180. / PI) / obs->r;
       m->ra_motion *= -60. / hours_per_day;       /* cvt to arcmin/hr, or */
       m->dec_motion *= 60. / hours_per_day;       /* arcsec/minute        */
-      m->position_angle_of_motion =
+      if( !m->ra_motion && !m->dec_motion)
+         m->position_angle_of_motion = 0.;
+      else
+         m->position_angle_of_motion =
                   180. + (180. / PI) * atan2( -m->ra_motion, -m->dec_motion);
       }
    m->total_motion = sqrt( m->ra_motion * m->ra_motion
@@ -4705,9 +4708,12 @@ int compute_observation_motion_details( const OBSERVE FAR *obs,
    m->yresid *= (180. / PI) * 3600.;
                /* time residual is in seconds */
    m->time_residual = m->xresid * m->ra_motion + m->yresid * m->dec_motion;
-   m->time_residual *= 60. / (m->total_motion * m->total_motion);
    m->cross_residual = m->xresid * m->dec_motion - m->yresid * m->ra_motion;
-   m->cross_residual /= m->total_motion;
+   if( m->total_motion)
+      {
+      m->cross_residual /= m->total_motion;
+      m->time_residual *= 60. / (m->total_motion * m->total_motion);
+      }
    m->radial_vel = vel[0] * AU_IN_KM / seconds_per_day;
    return( 0);
 }
