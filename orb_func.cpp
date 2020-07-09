@@ -2650,21 +2650,6 @@ const char *monte_label[MONTE_N_ENTRIES] = {
                            "Tp", "e", "q", "Q", "1/a", "i", "M",
                            "omega", "Omega", "MOID", "H" };
 
-/* See 'full.txt' for an explanation of why we do this.  Basically,  this
-sets up initial axes for the least-squares fit that are passably close to
-some of the principal axes of the covariance matrix (eigenvectors),  giving
-us slightly better stability for the first full_improvement() or two.  */
-
-static void set_fixed_unit_vectors( double **unit_vectors, const OBSERVE *obs)
-{
-   size_t i, j;
-   double dir[3][3];
-
-   for( i = 0; i < 6; i++)
-      for( j = 0; j < 6; j++)
-         unit_vectors[i][j] = (i == j ? 1. : 0.);
-}
-
 /* Describing what 'full_improvement()' does requires an entire separate
 file of commentary: see 'full.txt'.  Note,  though,  that this should be
 given an orbit that is somewhere within the arc of observations,  for
@@ -2765,7 +2750,6 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
          unit_vectors[k][k] = 1.;
       memcpy( delta_vals, default_delta_vals, sizeof( delta_vals));
       unit_vector_dimension = n_params;
-      set_fixed_unit_vectors( unit_vectors, obs + i);
       }
    available_sigmas = NO_SIGMAS_AVAILABLE;
                /* We save the input orbit;  if there's an error,  we can */
@@ -3235,8 +3219,6 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
          }
       if( n_params >= 6)
          {
-         int k;
-
          eigenvects       = (double **)calloc_double_dimension_array(
                                 n_params, n_params, sizeof( double));
 
@@ -3302,16 +3284,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
          double sigma;
          char title_text[20];
 
-         sigma_squared = 0.;
-         for( j = 0; j < n_params; j++)
-            {
-            int k;
-            double dot = 0.;
-
-            for( k = 0; k < n_params; k++)
-               dot += unit_vectors[k][i] * matrix[k + j * n_params];
-            sigma_squared += dot * unit_vectors[j][i];
-            }
+         sigma_squared = matrix[i + i * n_params];
          assert( sigma_squared >= 0.);
          sigma = sqrt( sigma_squared);
          if( n_params == 7 && !asteroid_mass)
@@ -3352,7 +3325,10 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
 
          if( j > 2)     /* velocity component */
             max_difference /= (obs[n_obs - 1].jd - obs[0].jd) * .5;
-         ratio = fabs( differences[i] * unit_vectors[i][j] / max_difference);
+         if( i == j)
+            ratio = fabs( differences[i] / max_difference);
+         else
+            ratio = 0.;
          if( ratio > scale_factor)
             scale_factor = ratio;
          }
