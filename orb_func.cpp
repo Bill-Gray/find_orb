@@ -2679,8 +2679,6 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
    double differences[10];
    double original_orbit[6], original_params[3];
    double central_obj_state[6], tvect[6];
-   static double **unit_vectors = NULL;
-   static int unit_vector_dimension = 0;
    const double default_delta_vals[9] =
 //                  { 1e-12, 1e-12, 1e-12, 1e-11, 1e-11, 1e-11,
 //                  .001, .001, .1 };
@@ -2721,36 +2719,20 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
       n_params = 6 + n_extra_params;
    if( !obs)
       {
-      if( unit_vectors)
-         {
-         free( unit_vectors);
-         unit_vectors = NULL;
-         }
       if( eigenvects)
          {
          free( eigenvects);
          eigenvects = NULL;
          }
-      unit_vector_dimension = 0;
+      *delta_vals = 0.;
       return( 0);
       }
    if( get_idx1_and_idx2( n_obs, obs, &i, &j) < 3)
       return( -1);
    if( is_unreasonable_orbit( orbit))
       return( -2);
-   if( unit_vector_dimension != n_params)
-      {          /* force a reset to default values */
-      int k;
-
-      if( unit_vectors)
-         free( unit_vectors);
-      unit_vectors = (double **)calloc_double_dimension_array(
-                     n_params, n_params, sizeof( double));
-      for( k = 0; k < n_params; k++)
-         unit_vectors[k][k] = 1.;
+   if( !*delta_vals)    /* force a reset to default values */
       memcpy( delta_vals, default_delta_vals, sizeof( delta_vals));
-      unit_vector_dimension = n_params;
-      }
    available_sigmas = NO_SIGMAS_AVAILABLE;
                /* We save the input orbit;  if there's an error,  we can */
                /* restore it:         */
@@ -2907,13 +2889,15 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
             memcpy( tweaked_orbit, orbit, 6 * sizeof( double));
             memcpy( solar_pressure, original_solar_pressure,
                                 n_extra_params * sizeof( double));
-            for( j = 0; j < 6; j++)  /* adjust position/velocity */
-               tweaked_orbit[j] -= unit_vectors[i][j] * delta_val;
-            if( asteroid_mass)
-               *asteroid_mass -= delta_val * unit_vectors[i][6];
+            if( i < 6)              /* adjust position/velocity */
+               tweaked_orbit[i] -= delta_val;
             else
-               for( j = 6; j < n_params; j++)
-                  solar_pressure[j - 6] -= unit_vectors[i][j] * delta_val;
+               {
+               if( asteroid_mass)
+                  *asteroid_mass -= delta_val;
+               else
+                  solar_pressure[i - 6] -= delta_val;
+               }
             sprintf( tstr, "Evaluating %d of %d : iter %d   ", i + 1,
                                     n_params, n_iterations);
             if( debug_level > 4)
