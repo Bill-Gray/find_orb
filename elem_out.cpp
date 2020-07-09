@@ -690,6 +690,12 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
          fprintf( ofile, "\n                 \"MagBand\" : \"%c\",", obs[i].mag_band);
          fprintf( ofile, " \"MagSigma\" : %.4f,", obs[i].mag_sigma);
          }
+      fprintf( ofile, "\n                 \"net\" : \"%c\",", obs[i].astrometric_net_code);
+      fprintf( ofile, "\n                 \"note1\" : \"%c\",", obs[i].note1);
+      fprintf( ofile, "\n                 \"note2\" : \"%c\",", obs[i].note2);
+      fprintf( ofile, "\n                 \"discovery_asterisk\" : \"%c\",",
+                                       obs[i].discovery_asterisk);
+      fprintf( ofile, "\n                 \"flags\" : %d,", obs[i].flags);
       fprintf( ofile, "\n                 \"incl\" : %d", obs[i].is_included);
       fprintf( ofile, " }%c", (i == (int)n_obs - 1 ? ' ' : ','));
       }
