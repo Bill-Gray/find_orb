@@ -4558,14 +4558,15 @@ int main( int argc, const char **argv)
             }
             break;
          case '$':
-            inquire( "Tolerance: ",
-                                tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY);
-            if( atof( tbuff) != 0.)
-               {
-               extern double integration_tolerance;
+            {
+            extern double integration_tolerance;
 
+            snprintf( tbuff, sizeof( tbuff), "Integration tolerance: (currently %.4g)",
+                                 integration_tolerance);
+            inquire( tbuff, tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY);
+            if( atof( tbuff) != 0.)
                integration_tolerance = atof( tbuff);
-               }
+            }
             break;
          case '%':
             {
