@@ -1537,7 +1537,7 @@ FILE *open_json_file( char *filename, const char *env_ptr, const char *default_n
       sprintf( tbuff, "%x", random_seed);
       text_search_and_replace( filename, "%r", tbuff);
 #ifndef _WIN32
-      if( *filename == '~')
+      if( filename[0] == '~' && filename[1] == '/')
          {
          strcpy( tbuff, getenv( "HOME"));
          text_search_and_replace( filename, "~", tbuff);
