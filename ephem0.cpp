@@ -393,6 +393,8 @@ double get_step_size( const char *stepsize, char *step_units, int *step_digits)
    double step = 0.;
    char units = 'd';
 
+   if( !strncmp( stepsize, "Obs", 3))     /* dummy value */
+      step = 1e-6;
    if( sscanf( stepsize, "%lf%c", &step, &units) >= 1)
       if( step)
          {
@@ -1382,7 +1384,7 @@ static int create_json_ephemeris( FILE *ofile, FILE *ifile, char *header,
          {
          char *hptr = header, *bptr = buff;
          const char *preceder = (line_no ? ",\n" : "");
-         const int step_number = (int)(( atof( buff) - jd_start) / step + .5);
+         const int step_number = (step ? (int)(( atof( buff) - jd_start) / step + .5) : line_no);
 
          fprintf( ofile, "%s      \"%d\": {", preceder, step_number);
          while( *hptr && *bptr)
@@ -1742,6 +1744,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
           planet_radius_in_meters( planet_no) / AU_IN_METERS;
    int ra_format = 3, dec_format = 2;
    char buff[440], *header = NULL, alt_buff[500];
+   const bool use_observation_times = !strncmp( stepsize, "Obs", 3);
 
    if( (!rho_cos_phi && !rho_sin_phi) || ephem_type != OPTION_OBSERVABLES)
       options &= ~(OPTION_ALT_AZ_OUTPUT | OPTION_VISIBILITY | OPTION_MOON_ALT
@@ -1751,9 +1754,18 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       options &= ~OPTION_SHOW_SIGMAS;
 
    sscanf( get_environment_ptr( "RA_DEC_FORMAT"), "%d,%d", &ra_format, &dec_format);
-   step = get_step_size( stepsize, &step_units, &n_step_digits);
-   if( !step)
-      return( -2);
+   if( !use_observation_times)
+      {
+      step = get_step_size( stepsize, &step_units, &n_step_digits);
+      if( !step)
+         return( -2);
+      }
+   else
+      {
+      step_units = 'd';
+      n_step_digits = 6;
+      step = 0.;
+      }
    ofile = fopen_ext( filename, is_default_ephem ? "tfcw" : "fw");
    if( !ofile)
       return( -1);
@@ -1985,9 +1997,13 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       double curr_jd = jd_start + (double)i * step, delta_t;
       long rgb = 0;
 
-      if( options & OPTION_ROUND_TO_NEAREST_STEP)
+      if( use_observation_times)
+         curr_jd = obs[i].jd;
+      else if( options & OPTION_ROUND_TO_NEAREST_STEP)
          curr_jd = floor( (curr_jd - .5) / step + .5) * step + .5;
       delta_t = td_minus_utc( curr_jd) / seconds_per_day;
+      if( use_observation_times)
+         curr_jd -= delta_t;
       if( *timescale)                     /* we want a TT ephemeris */
          {
          ephemeris_t = curr_jd;
@@ -2947,7 +2963,8 @@ int ephemeris_in_a_file_from_mpc_code( const char *filename,
       get_scope_params( mpc_code, &exposure_config);
    return( ephemeris_in_a_file( filename, orbit, obs, n_obs, planet_no,
                epoch_jd, jd_start, stepsize, lon, rho_cos_phi, rho_sin_phi,
-               n_steps, note_text, options, n_objects));
+               strcmp( stepsize, "Obs") ? n_steps : n_obs,
+               note_text, options, n_objects));
 }
 
 static int64_t ten_to_the_nth( int n)
