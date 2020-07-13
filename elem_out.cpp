@@ -574,50 +574,50 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
    fprintf( ofile, "        \"epoch\": %17.8f,", elem->epoch);
    if( elem->ecc < 1.)
       {
-      fprintf( ofile, "\n        \"P\": %12.8f,", 2. * PI * elem->t0);
+      fprintf( ofile, "\n        \"P\": %17.13f,", 2. * PI * elem->t0);
       if( !get_uncertainty( "sigma_P:", buff, 0))
          fprintf( ofile, " \"P sigma\": %s,", buff);
 
-      fprintf( ofile, "\n        \"M\": %12.8f,",
+      fprintf( ofile, "\n        \"M\": %17.13f,",
                         centralize_ang( elem->mean_anomaly) * 180. / PI);
       if( !get_uncertainty( "sigma_M", buff, 0))
          fprintf( ofile, " \"M sigma\": %s,", buff);
       }
 
-   fprintf( ofile, "\n        \"n\": %12.8f,", (180 / PI) / elem->t0);
+   fprintf( ofile, "\n        \"n\": %17.13f,", (180 / PI) / elem->t0);
    if( !get_uncertainty( "sigma_n:", buff, 0))
       fprintf( ofile, " \"n sigma\": %s,", buff);
 
-   fprintf( ofile, "\n        \"a\": %12.8f,", elem->major_axis);
+   fprintf( ofile, "\n        \"a\": %17.13f,", elem->major_axis);
    if( !get_uncertainty( "sigma_a:", buff, 0))
       fprintf( ofile, " \"a sigma\": %s,", buff);
 
-   fprintf( ofile, "\n        \"e\": %12.8f,", elem->ecc);
+   fprintf( ofile, "\n        \"e\": %17.13f,", elem->ecc);
    if( !get_uncertainty( "sigma_e", buff, 0))
       fprintf( ofile, " \"e sigma\": %s,", buff);
 
-   fprintf( ofile, "\n        \"q\": %12.8f,", elem->q);
+   fprintf( ofile, "\n        \"q\": %17.13f,", elem->q);
    if( !get_uncertainty( "sigma_q", buff, 0))
       fprintf( ofile, " \"q sigma\": %s,", buff);
    if( elem->ecc < 1.)
       {
       const double big_q = elem->q * (1. + elem->ecc) / (1. - elem->ecc);
 
-      fprintf( ofile, "\n        \"Q\": %12.8f,", big_q);
+      fprintf( ofile, "\n        \"Q\": %17.13f,", big_q);
       if( !get_uncertainty( "sigma_Q", buff, 0))
          fprintf( ofile, " \"Q sigma\": %s,", buff);
       }
 
-   fprintf( ofile, "\n        \"i\": %12.8f,", elem->incl * 180. / PI);
+   fprintf( ofile, "\n        \"i\": %17.13f,", elem->incl * 180. / PI);
    if( !get_uncertainty( "sigma_i", buff, 0))
       fprintf( ofile, " \"i sigma\": %s,", buff);
 
-   fprintf( ofile, "\n        \"arg_per\":  %12.8f,",
+   fprintf( ofile, "\n        \"arg_per\":  %17.13f,",
                         centralize_ang( elem->arg_per) * 180. / PI);
    if( !get_uncertainty( "sigma_omega", buff, 0))
       fprintf( ofile, " \"arg_per sigma\":  %s,", buff);
 
-   fprintf( ofile, "\n        \"asc_node\": %12.8f,",
+   fprintf( ofile, "\n        \"asc_node\": %17.13f,",
                         centralize_ang( elem->asc_node) * 180. / PI);
    if( !get_uncertainty( "sigma_Omega", buff, 0))
       fprintf( ofile, " \"asc_node sigma\": %s,", buff);
