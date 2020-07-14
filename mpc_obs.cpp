@@ -799,31 +799,33 @@ int get_observer_data( const char FAR *mpc_code, char *buff,
       override_observatory_name = "Roving observer";
       }
 
-#ifdef TRY_THIS_SOME_OTHER_TIME
    if( strchr( "nsew", tolower( mpc_code[0])))
       {
-      char sign2, sign1 = tolower( mpc_code[0]);
+      int got_em = 0, c;
 
-      debug_printf( "Looks like lat/lon: '%s'\n", mpc_code);
-      if( sscanf( mpc_code + 1, "%lf%c%lf %lf", &lat0, &sign2, &lon0, &alt0) >= 3)
-         {
-         sign2 = tolower( sign2);
-
-         if( sign1 == 'w' || sign1 == 's')
-            lat0 = -lat0;
-         if( sign2 == 'w' || sign2 == 's')
-            lat0 = -lon0;
-         if( sign1 == 'w' || sign1 == 'e')
-            {                     /* actually gave longitude first; */
-            lon0 += lat0;         /* swap lat & lon */
-            lat0 = lon0 - lat0;
-            lon0 -= lat0;
+      for( i = 0; mpc_code[i]; i++)
+         switch( (c = tolower( mpc_code[i])))
+            {
+            case 'n': case 's':
+               lat0 = atof( mpc_code + i + 1);
+               if( c == 's')
+                  lat0 = -lat0;
+               got_em ^= 1;
+               break;
+            case 'e': case 'w':
+               lon0 = atof( mpc_code + i + 1);
+               if( c == 'w')
+                  lon0 = -lon0;
+               got_em ^= 2;
+               break;
+            case 'a':
+               if( !strncasecmp( mpc_code + i, "alt", 3))
+                  alt0 = atof( mpc_code + i + 3);
+               break;
             }
-         format_string = "%11.5%9.5%7.1User-supplied observer";
-         }
-      debug_printf( "lat %f sign2 '%c' lon %f\n", lon0, sign2, lat0);
+      if( got_em == 3)
+         override_observatory_name = "User-supplied observer";
       }
-#endif
 
    if( override_observatory_name)
       {
