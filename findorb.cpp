@@ -854,7 +854,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             break;
          case 'l': case 'L':
             inquire( "Enter MPC code: ", buff, sizeof( buff), COLOR_MESSAGE_TO_USER);
-            if( strlen( buff) < 5 || !memcmp( buff, "Ast", 3))
+            if( strlen( buff) < 50 || !memcmp( buff, "Ast", 3))
                strcpy( mpc_code, buff);
             else if( !get_observer_data( buff, buff, NULL, NULL, NULL))
                {
@@ -2990,8 +2990,9 @@ int main( int argc, const char **argv)
          else if( !*ifilename)
             strcpy( ifilename, argv[i]);
          }
-   sscanf( get_environment_ptr( "CONSOLE_OPTS"), "%9s %d %d %u",
+   sscanf( get_environment_ptr( "CONSOLE_OPTS"), "%s %d %d %u",
                mpc_code, &observation_display, &residual_format, &list_codes);
+   text_search_and_replace( mpc_code, "_", " ");
 
    residual_format |= RESIDUAL_FORMAT_80_COL;      /* force 80-column mode */
 
@@ -5067,6 +5068,7 @@ Shutdown_program:
       }
    unload_observations( obs, n_obs);
 
+   text_search_and_replace( mpc_code, " ", "_");
    sprintf( tbuff, "%s %d %d %d", mpc_code,
              observation_display, residual_format, list_codes);
    set_environment_ptr( "CONSOLE_OPTS", tbuff);
