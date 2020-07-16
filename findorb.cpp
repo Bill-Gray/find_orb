@@ -1333,6 +1333,7 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
                show_packed ^= 1;
                break;
             case ALT_F:
+            case 'o': case 'O':
                rval = -3;
                break;
             case KEY_MOUSE:      /* already handled above */
@@ -3050,7 +3051,10 @@ int main( int argc, const char **argv)
                get_new_file = 0;
                }
             else if( !*tbuff)    /* hit Cancel,  going back to curr obj */
-               get_new_object = get_new_file = 0;
+               {
+               get_new_file = 0;
+               get_new_object = !obs;
+               }
             }
          if( debug_level > 3)
             debug_printf( "get_new_object = %d\n", get_new_object);
@@ -3058,6 +3062,8 @@ int main( int argc, const char **argv)
             {
             int id_number = 0;
 
+            assert( ids);
+            assert( n_ids);
             if( n_ids > 1)
                id_number = select_object_in_file( ids, n_ids);
             if( debug_level > 3 && id_number >= 0)
