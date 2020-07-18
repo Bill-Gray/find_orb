@@ -78,9 +78,9 @@ int planet_posn( const int planet_no, const double jd, double *vect_2000);
                                                 /* mpc_obs.cpp */
 int earth_lunar_posn( const double jd, double FAR *earth_loc, double FAR *lunar_loc);
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
-double take_rk_step( const double jd, ELEMENTS *ref_orbit,
-                 const double *ival, double *ovals,
-                 const int n_vals, const double step);      /* runge.cpp */
+ldouble take_rk_stepl( const ldouble jd, ELEMENTS *ref_orbit,
+                 const ldouble *ival, ldouble *ovals,
+                 const int n_vals, const ldouble step);     /* runge.cpp */
 double take_pd89_step( const double jd, ELEMENTS *ref_orbit,
                  const double *ival, double *ovals,
                  const int n_vals, const double step);      /* runge.cpp */
@@ -1671,22 +1671,6 @@ ldouble take_rk_stepl( const ldouble jd, ELEMENTS *ref_orbit,
    if( n_vals > 6)
       free( ivals[0]);
    return( sqrtl( rval * step * step));
-}
-
-double take_rk_step( const double jd, ELEMENTS *ref_orbit,
-                 const double *ival, double *ovals,
-                 const int n_vals, const double step)
-{
-   ldouble ivall[6], ovalsl[6], rvall;
-   unsigned i;
-
-   for( i = 0; i < 6; i++)
-      ivall[i] = (ldouble)ival[i];
-   rvall = take_rk_stepl( (long double)jd, ref_orbit, ivall,
-               ovalsl, n_vals, (long double)step);
-   for( i = 0; i < 6; i++)
-      ovals[i] = (double)ovalsl[i];
-   return( (double)rvall);
 }
 
 int symplectic_6( double jd, ELEMENTS *ref_orbit, double *vect,
