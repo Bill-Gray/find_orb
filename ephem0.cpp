@@ -2336,7 +2336,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                          | FULL_CTIME_MONTHS_AS_DIGITS | FULL_CTIME_LEADING_ZEROES);
                   strcat( fake_line, ra_buff);
                   strcat( fake_line, dec_buff);
-                  strcat( fake_line, "         ");      /* columns 57 to 65 */
+                  strcat( fake_line, "        ");      /* columns 57 to 65 */
                   }
                snprintf( alt_buff, sizeof( alt_buff), "%15.7f ", curr_jd);
                if( computer_friendly)
@@ -2472,7 +2472,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                      snprintf_append( fake_line, sizeof( fake_line), "%4.1f V", curr_mag);
                   else
                      strcat( fake_line, "      ");
-                  snprintf_append( fake_line, sizeof( fake_line), "      %.3s",
+                  snprintf_append( fake_line, sizeof( fake_line), " Synth%.3s",
                                            note_text + 1);
                   }
 
