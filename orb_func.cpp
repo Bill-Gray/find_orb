@@ -355,9 +355,9 @@ int calc_derivatives( const double jd, const double *ival, double *oval,
 long double take_rk_stepl( const long double jd, ELEMENTS *ref_orbit,
                  const long double *ival, long double *ovals,
                  const int n_vals, const long double step);     /* runge.cpp */
-double take_pd89_step( const double jd, ELEMENTS *ref_orbit,
-                 const double *ival, double *ovals,
-                 const int n_vals, const double step);      /* runge.cpp */
+long double take_pd89_step( const long double jd, ELEMENTS *ref_orbit,
+                 const long double *ival, long double *ovals,
+                 const int n_vals, const long double step);    /* runge.cpp */
 int symplectic_6( double jd, ELEMENTS *ref_orbit, double *vect,
                                           const double dt);
 static int is_unreasonable_orbit( const double *orbit);     /* orb_func.cpp */
@@ -582,11 +582,9 @@ int integrate_orbitl( long double *orbit, const long double t0, const long doubl
             {
             long double new_vals[6];
             static long double min_stepsize;
-//          const double err = (integration_method ?
-//                 take_pd89_step( t, &ref_orbit, orbit, new_vals, 6, delta_t) :
-//                 take_rk_step( t, &ref_orbit, orbit, new_vals, 6, delta_t));
-            const long double err =
-                   take_rk_stepl( t, &ref_orbit, orbit, new_vals, 6, delta_t);
+            const double err = (integration_method ?
+                   take_pd89_step( t, &ref_orbit, orbit, new_vals, 6, delta_t) :
+                   take_rk_stepl( t, &ref_orbit, orbit, new_vals, 6, delta_t));
 
             if( !min_stepsize)
                {

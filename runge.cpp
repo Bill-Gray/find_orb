@@ -50,8 +50,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 /* perturbers
    excluded_perturbers = -1;
    general_relativity_factor
-   integration_method
-   integration_tolerance
    n_extra_params
    planet_mass[],  sort of
    solar_pressure
@@ -81,9 +79,9 @@ const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 ldouble take_rk_stepl( const ldouble jd, ELEMENTS *ref_orbit,
                  const ldouble *ival, ldouble *ovals,
                  const int n_vals, const ldouble step);     /* runge.cpp */
-double take_pd89_step( const double jd, ELEMENTS *ref_orbit,
-                 const double *ival, double *ovals,
-                 const int n_vals, const double step);      /* runge.cpp */
+ldouble take_pd89_step( const ldouble jd, ELEMENTS *ref_orbit,
+                 const ldouble *ival, ldouble *ovals,
+                 const int n_vals, const ldouble step);    /* runge.cpp */
 int symplectic_6( double jd, ELEMENTS *ref_orbit, double *vect,
                                           const double dt);
 int get_planet_posn_vel( const double jd, const int planet_no,
@@ -1412,13 +1410,13 @@ static void compute_ref_state( ELEMENTS *ref_orbit, double *ref_state,
 #define N_EVALS 13
 #define N_EVALS_PLUS_ONE 14
 
-double take_pd89_step( const double jd, ELEMENTS *ref_orbit,
-                 const double *ival, double *ovals,
-                 const int n_vals, const double step)
+ldouble take_pd89_step( const ldouble jd, ELEMENTS *ref_orbit,
+                 const ldouble *ival, ldouble *ovals,
+                 const int n_vals, const ldouble step)
 {
-   double *ivals[N_EVALS_PLUS_ONE], *ivals_p[N_EVALS], rval = 0.;
+   ldouble *ivals[N_EVALS_PLUS_ONE], *ivals_p[N_EVALS], rval = 0.;
    int i, j, k;
-   const double bvals[91] = { B_2_1,
+   const ldouble bvals[91] = { B_2_1,
        B_3_1, B_3_2,
        B_4_1, B_4_2, B_4_3,
        B_5_1, B_5_2, B_5_3, B_5_4,
@@ -1431,11 +1429,11 @@ double take_pd89_step( const double jd, ELEMENTS *ref_orbit,
        B_12_1, B_12_2, B_12_3, B_12_4, B_12_5, B_12_6, B_12_7, B_12_8, B_12_9, B_12_10, B_12_11,
        B_13_1, B_13_2, B_13_3, B_13_4, B_13_5, B_13_6, B_13_7, B_13_8, B_13_9, B_13_10, B_13_11, B_13_12,
        CHAT_1, CHAT_2, CHAT_3, CHAT_4, CHAT_5, CHAT_6, CHAT_7, CHAT_8, CHAT_9, CHAT_10, CHAT_11, CHAT_12, CHAT_13 };
-   const double avals[N_EVALS_PLUS_ONE] = { 0, A_1, A_2, A_3, A_4, A_5,
+   const ldouble avals[N_EVALS_PLUS_ONE] = { 0, A_1, A_2, A_3, A_4, A_5,
              A_6, A_7, A_8, A_9, A_10, A_11, A_12, A_13 };
-   const double *bptr = bvals;
+   const ldouble *bptr = bvals;
 
-   ivals[0] = (double *)calloc( (2 * N_EVALS + 1) * n_vals, sizeof( double));
+   ivals[0] = (ldouble *)calloc( (2 * N_EVALS + 1) * n_vals, sizeof( ldouble));
    assert( ivals[0]);
    if( !ivals[0])
       return( 0.);
@@ -1447,13 +1445,16 @@ double take_pd89_step( const double jd, ELEMENTS *ref_orbit,
 
    for( j = 0; j <= N_EVALS; j++)
       {
-      double ref_state_j[9], state_j[6];
-      const double jd_j = jd + step * avals[j];
+      ldouble ref_state_j[9], state_j[6];
+      const ldouble jd_j = jd + step * avals[j];
+      double temp_array[9];
 
-      compute_ref_state( ref_orbit, ref_state_j, jd_j);
+      compute_ref_state( ref_orbit, temp_array, jd_j);
+      for( i = 0; i < 9; i++)
+         ref_state_j[i] = (ldouble)temp_array[i];
       if( !j)
          {
-         memcpy( state_j, ival, 6 * sizeof( double));
+         memcpy( state_j, ival, 6 * sizeof( ldouble));
                /* subtract the analytic posn/vel from the numeric: */
          for( i = 0; i < n_vals; i++)
             ivals[0][i] = ival[i] - ref_state_j[i];
@@ -1461,7 +1462,7 @@ double take_pd89_step( const double jd, ELEMENTS *ref_orbit,
       else
          for( i = 0; i < n_vals; i++)
             {
-            double tval = 0.;
+            ldouble tval = 0.;
 
             for( k = 0; k < j; k++)
                tval += bptr[k] * ivals_p[k][i];
@@ -1471,19 +1472,19 @@ double take_pd89_step( const double jd, ELEMENTS *ref_orbit,
       bptr += j;
       if( j != N_EVALS)
          {
-         assert( fabs( jd_j) < 1e+9);
-         calc_derivatives( jd_j, state_j, ivals_p[j], ref_orbit->central_obj);
+         assert( fabsl( jd_j) < 1e+9);
+         calc_derivativesl( jd_j, state_j, ivals_p[j], ref_orbit->central_obj);
          for( k = 0; k < 6; k++)
             ivals_p[j][k] -= ref_state_j[k + 3];
          }
       else     /* on last iteration,  we have our answer: */
-         memcpy( ovals, state_j, n_vals * sizeof( double));
+         memcpy( ovals, state_j, n_vals * sizeof( ldouble));
       }
 
    for( i = 0; i < n_vals; i++)
       {
-      double tval = 0.;
-      const double err_coeff[N_EVALS] = { CHAT_1 - C_1, CHAT_2 - C_2,
+      ldouble tval = 0.;
+      const ldouble err_coeff[N_EVALS] = { CHAT_1 - C_1, CHAT_2 - C_2,
                CHAT_3  -  C_3, CHAT_4  -  C_4, CHAT_5  -  C_5, CHAT_6 - C_6,
                CHAT_7  -  C_7, CHAT_8  -  C_8, CHAT_9  -  C_9, CHAT_10 - C_10,
                CHAT_11 - C_11, CHAT_12 - C_12, CHAT_13 - C_13 };
@@ -1492,7 +1493,7 @@ double take_pd89_step( const double jd, ELEMENTS *ref_orbit,
          tval += err_coeff[k] * ivals_p[k][i];
       rval += tval * tval;
       }
-   return( sqrt( rval * step * step));
+   return( sqrtl( rval * step * step));
 }
 
 #define ORIGINAL_FEHLBERG_CONSTANTS
