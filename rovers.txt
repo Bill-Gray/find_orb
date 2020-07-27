@@ -585,7 +585,7 @@ TRT !  98.485555     +18.586944     2559       TRT (Thai Robotic Observatory)
 Nar !  98.4856944    +18.589972     2559       NARIT, Chiangmai
 
    Artsat observers,  from
-   https://github.com/cbassa/sattools/blob/master/data/sites.txt
+   https://github.com/cbassa/sattools/blob/1da489eb347683f1eb70bbd6575e8fcd289ca567/data/sites.txt
 
 1111!-104.5614       +38.9478       2073       Ron Lee
 4171!   6.3785       +52.8344         10       Cees Bassa
@@ -605,6 +605,7 @@ Nar !  98.4856944    +18.589972     2559       NARIT, Chiangmai
 0899! -56.1227       -34.8961         30       Fernando Mederos
 1056!  23.9833       +57.0122          4       Martins Keruss
 1086!  30.7556       +46.4778         56       Nikolay Koshkin
+1234! 024.7882       +60.1746         24       Tomi Simola
 1244!  33.9701       +44.3932         69       Andriy Makeyev
 1747! -72.3526       +45.7275        191       Daniel Deak
 1775! -75.6910       +44.6062        200       Kevin Fetter
@@ -617,6 +618,7 @@ Nar !  98.4856944    +18.589972     2559       NARIT, Chiangmai
 2701! -79.3924       +43.6876        230       Ted Molczan
 2751!  -1.9849       +51.3440        125       Bruce MacDonald
 2756!  -3.1623       +56.0907         25       Andy Kirkham
+3333! 010.2205       +53.4506          0       Roland Proesch
 4353!   4.4908       +52.1541          0       Marco Langbroek
 4354!   4.5602       +52.1168         -2       Marco Langbroek
 4355!   4.4994       +52.1388         -2       Marco Langbroek
@@ -630,6 +632,7 @@ Nar !  98.4856944    +18.589972     2559       NARIT, Chiangmai
 7777!  -2.3267       +38.1656       1608       Brad Young remote
 7778! 149.0644       -31.2733       1122       Brad Young SSO
 7779!-105.5283       +32.9204       2225       Brad Young NM
+0797! 022.1448       +36.9708          6       Pierros Papadeas
 8048!-123.6420       +49.4175          1.      Scott Tilley
 8049!-123.6685       +49.4348         40.      Scott Tilley
 8305! -98.2163       +26.2431         30       Paul Gabriel
@@ -640,6 +643,7 @@ Nar !  98.4856944    +18.589972     2559       NARIT, Chiangmai
 8539! -79.3388       +39.4707        839       Steve Newcomb
 8597! 138.6333       -34.9638        100       Tony Beresford
 8600! 151.6477       -32.9770         18       Paul Camilleri
+8831!-121.9040       +47.7717        220       Chris Lewicki
 0699! 132.2369       -14.4733        108       Paul Camilleri
 8730! -97.7279       +30.3086        150       Ed Cannon
 8739!-121.7028       +37.1133        282       Derek Breit
@@ -649,6 +653,11 @@ Nar !  98.4856944    +18.589972     2559       NARIT, Chiangmai
 6242!  -2.8284       +42.9453        623       Jon Mikel
 6241!  -2.8203       +42.9565        619       Jon Mikel
 4160!   5.4768       +51.2793         35       Bram Dorreman
+9900! 004.900        +52.3666          0       Amsterdam
+9901!-070.8065       -30.1696       2000       CTIO
+9910!-002.4083       +37.5011       1200       Telescope Live Spain
+9911! 148.9763       -34.8641        350       Telescope Live Australia
+9997!-121.9040       +47.7717        220       Chris Lewicki
 9998!   6.3961       +52.8119         10       Dwingeloo telescoop
 9999!   5.5151       +47.348         100       Graves
 
