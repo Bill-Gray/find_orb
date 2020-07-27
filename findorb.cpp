@@ -139,6 +139,7 @@ devoted to station data.   */
 #define RESIDUAL_FORMAT_SHOW_DESIGS              0x2000
 
 size_t strlcat_err( char *dst, const char *src, size_t dsize); /* miscell.c */
+size_t strlcpy_err( char *dst, const char *src, size_t dsize); /* miscell.c */
 static int user_select_file( char *filename, const char *title, const int flags);
 double get_planet_mass( const int planet_idx);                /* orb_func.c */
 int simplex_method( OBSERVE FAR *obs, int n_obs, double *orbit,
@@ -5048,10 +5049,18 @@ int main( int argc, const char **argv)
             write_environment_pointers( );
             show_a_file( "env.txt");
             break;
+         case ALT_Z:
+            {
+            extern int integration_method;
+
+            integration_method ^= 1;
+            strlcpy_err( message_to_user, integration_method ?
+                           "Using PD89" : "Using RKF", sizeof( message_to_user));
+            }
+            break;
          case 'c': case 'C':
          case ALT_P: case ALT_X: case ALT_Y:
-         case ALT_Z: case '\'':
-         case ';':
+         case ';': case '\'':
          default:
             debug_printf( "Key %d hit\n", c);
             show_a_file( "dos_help.txt");
