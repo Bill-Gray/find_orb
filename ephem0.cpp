@@ -2770,8 +2770,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                              vector3_length( topo_vel) * AU_IN_KM / seconds_per_day;
 
                   format_velocity_in_buff( tbuff, total_vel);
-                  strcat( alt_buff, tbuff);
                   strcat( buff, tbuff);
+                  snprintf_append( alt_buff, sizeof( alt_buff),  " %11.6f", total_vel);
                   }
                if( options & OPTION_SUPPRESS_UNOBSERVABLE)
                   {
