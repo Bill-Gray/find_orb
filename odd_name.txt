@@ -289,3 +289,7 @@ STEREO-B     2006-047B = NORAD 29511 = STEREO-B
      S512009 S512009 = ZTF0D86
              [Unnamed]
      ZTF09ps ZTF09ps = ZTF09iM = ZTF0CjS
+     EMM-01  2020-047A = NORAD 45918 = EMM (Hope) spacecraft
+     EMM-02  2020-047B = NORAD 45919 = EMM (Hope) booster
+     TianweA 2020-049A = NORAD 45935 = Tianwen-1 spacecraft
+     TianweB 2020-049B = NORAD 45936 = Tianwen-1 booster
