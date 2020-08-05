@@ -188,11 +188,13 @@ When we find one,  we call the above function to create or add ADES data
 for just that code.  We also add that code to the 'codes' string so we
 do all this only once per code.   */
 
+#define OBSCODE_BUFF_SIZE 20000
+
 void create_ades_file( const char *filename, const OBSERVE FAR *obs,
                                            int n_obs)
 {
    int i, j;
-   char codes[801];
+   char *codes = (char *)malloc( OBSCODE_BUFF_SIZE);
 
    *codes = '\0';
    for( i = 0; i < n_obs; i++)
@@ -207,9 +209,10 @@ void create_ades_file( const char *filename, const OBSERVE FAR *obs,
          j += 4;
       if( !codes[j])
          {
-         assert( strlen( codes) + 1 < sizeof( codes));
+         assert( strlen( codes) + 1 < OBSCODE_BUFF_SIZE);
          strcat( codes, new_search);
          create_ades_file_for_one_code( filename, obs + i, n_obs - i, i != 0);
          }
       }
+   free( codes);
 }
