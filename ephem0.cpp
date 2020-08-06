@@ -397,6 +397,12 @@ double get_step_size( const char *stepsize, char *step_units, int *step_digits)
 
    if( !strncmp( stepsize, "Obs", 3))     /* dummy value */
       step = 1e-6;
+   if( *stepsize == 'a')
+      {
+      step = 1e-6;
+      if( step_digits)
+         *step_digits = 0;
+      }
    if( sscanf( stepsize, "%lf%c", &step, &units) >= 1)
       if( step)
          {
@@ -1713,6 +1719,58 @@ int galactic_confusion( const double ra, const double dec)
    return( buff[loc - buff_offset]);
 }
 
+/* In 'auto-step' mode,  the step size text is a(number),  where (number)
+sets an upper limit on how far the object is to move relative to the observer.
+a.02 means don't move more than 2%;  a-.01 mean step backward such that the
+object doesn't move by more than 1%.  In the latter case,  the object would
+move by,  at most,  0.01 radians,  or about 34'.
+
+We try to retain common step sizes such as ten minutes or two hours.  We
+do this by figuring out how long it will take to move the desired fraction
+(time = fraction * speed / distance),  and picking the 'common step size'
+that gets us closest to that without going over.
+
+As the object gets closer to us or goes away from us,  we should see the
+auto-step vary.  */
+
+double find_next_auto_step( const double target_diff, const bool going_backward,
+                  const double curr_jd)
+{
+   static const double sizes[] = { 1. / 86400., 2. / 86400., 5. / 86400.,
+            10. / 86400., 15. / 86400., 30. / 86400., 1. / 1440., 2. / 1440.,
+            5. / 1440., 10. / 1440., 15. / 1440., 30. / 1440., 1. / 24.,
+            2. / 24., 3. / 24., 4. / 24., 6. / 24., 12. / 24.,
+            1., 2., 4., 8., 16., 32., 64. };
+   size_t i;
+   double max_diff = 0., rval = curr_jd;
+
+   for( i = 0; i < sizeof( sizes) / sizeof( sizes[0]); i++)
+      {
+      double diff, new_t;
+
+      if( going_backward)
+         new_t = curr_jd - sizes[i] * .5 - .5;
+      else
+         new_t = curr_jd + sizes[i] * 1.5 - .5;
+      if( sizes[i] > 0.9)
+         new_t = sizes[i] * floor( new_t / sizes[i]);
+      else        /* roundoff avoidance... */
+         {
+         const double int_t = floor( new_t);
+
+         new_t = int_t + sizes[i] * floor( (new_t - int_t) / sizes[i]);
+         }
+      new_t += 0.5;
+      diff = fabs( new_t - curr_jd);
+      if( diff < target_diff && diff > max_diff && diff > sizes[i] * .9)
+         {
+         rval = new_t;
+         max_diff = diff;
+         }
+      }
+   return( rval);
+}
+
 double ephemeris_mag_limit = 22.;
 
 int ephemeris_in_a_file( const char *filename, const double *orbit,
@@ -1737,7 +1795,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    const char *timescale = get_environment_ptr( "TT_EPHEMERIS");
    const char *override_date_format = get_environment_ptr( "DATE_FORMAT");
    double abs_mag = calc_absolute_magnitude( obs, n_obs);
-   double ht_in_meters;
+   double ht_in_meters, max_auto_step = 0.;
    DPT latlon;
    bool last_line_shown = true;
    RADAR_DATA rdata;
@@ -1747,6 +1805,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    int ra_format = 3, dec_format = 2;
    char buff[440], *header = NULL, alt_buff[500];
    const bool use_observation_times = !strncmp( stepsize, "Obs", 3);
+   double curr_jd = jd_start;
 
    if( (!rho_cos_phi && !rho_sin_phi) || ephem_type != OPTION_OBSERVABLES)
       options &= ~(OPTION_ALT_AZ_OUTPUT | OPTION_VISIBILITY | OPTION_MOON_ALT
@@ -1759,7 +1818,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    if( !use_observation_times)
       {
       step = get_step_size( stepsize, &step_units, &n_step_digits);
-      if( !step)
+      if( !step && *stepsize != 'a')
          return( -2);
       }
    else
@@ -1996,13 +2055,23 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       double obs_posn[3], obs_vel[3];
       double obs_posn_equatorial[3];
       double geo_posn[3], geo_vel[3];
-      double curr_jd = jd_start + (double)i * step, delta_t;
+      double delta_t;
       long rgb = 0;
 
       if( use_observation_times)
          curr_jd = obs[i].jd;
-      else if( options & OPTION_ROUND_TO_NEAREST_STEP)
-         curr_jd = floor( (curr_jd - .5) / step + .5) * step + .5;
+      else if( *stepsize == 'a')
+         {
+         if( i)
+            curr_jd = find_next_auto_step( max_auto_step,
+                                 stepsize[1] == '-', curr_jd);
+         }
+      else
+         {
+         curr_jd = jd_start + (double)i * step;
+         if( options & OPTION_ROUND_TO_NEAREST_STEP)
+            curr_jd = floor( (curr_jd - .5) / step + .5) * step + .5;
+         }
       delta_t = td_minus_utc( curr_jd) / seconds_per_day;
       if( use_observation_times)
          curr_jd -= delta_t;
@@ -2086,7 +2155,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
             v_dot_r += topo[j] * topo_vel[j];
          r = vector3_length( topo);
          radial_vel = v_dot_r / r;
-
+         if( *stepsize == 'a')
+            max_auto_step = fabs( atof( stepsize + 1)) * r / vector3_length( topo_vel);
          if( ephem_type == OPTION_STATE_VECTOR_OUTPUT ||
                ephem_type == OPTION_POSITION_OUTPUT)
             {
