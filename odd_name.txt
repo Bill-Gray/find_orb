@@ -293,3 +293,5 @@ STEREO-B     2006-047B = NORAD 29511 = STEREO-B
      EMM-02  2020-047B = NORAD 45919 = EMM (Hope) booster
      TianweA 2020-049A = NORAD 45935 = Tianwen-1 spacecraft
      TianweB 2020-049B = NORAD 45936 = Tianwen-1 booster
+Perseverance 2020-052A = NORAD 45984 = Mars 2020 (Perseverance)
+2020-052B    2020-052B = NORAD 45985 = Mars 2020 (Perseverance) booster
