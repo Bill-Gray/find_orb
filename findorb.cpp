@@ -894,7 +894,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                err_msg = "You need to set a valid starting date!";
             else if( !n_ephemeris_steps)
                err_msg = "You need to set the number of ephemeris steps!";
-            else if( !step)
+            else if( !step && *ephemeris_step_size != 'a')
                err_msg = "You need to set a valid step size!";
             else                 /* yes,  we can make an ephemeris */
                c = -2;
@@ -3809,7 +3809,7 @@ int main( int argc, const char **argv)
          case KEY_F(8):     /* show original screens */
             endwin( );
             extended_getch( );
-            initialize_curses( argc, argv);
+            refresh( );
             break;
          case 'a': case 'A':
             perturbers ^= (7 << 20);
