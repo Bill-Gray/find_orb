@@ -1377,8 +1377,10 @@ int write_out_elements_to_file( const double *orbit,
          if( n_extra_params == 2 || n_extra_params == 3)
             {
             char tbuff0[40], sig_name[20];
-            int j = (!strcmp( constraints, "A=0") ? 1 : 0);
+            int j = 0;
 
+            if( !strcmp( constraints, "A=0") || !strcmp( constraints, "A1=0"))
+               j = 1;      /* A1 constrained to be zero -> don't show it */
             strcat( tt_ptr, "\n");
             tt_ptr += strlen( tt_ptr);
             for( ; j < n_extra_params; j++)
