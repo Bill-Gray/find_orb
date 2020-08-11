@@ -1,0 +1,100 @@
+{
+  "0":
+  {
+     "1":   "JSON has no regular provision for comments.  So they're",
+     "2":   "stored irregularly here.",
+     "3":   "   Site details default to (500),  with specifics being",
+     "4":   "overridden on a site-by-site basis.  Report your site",
+     "5":   "info to pluto (at) projectpluto (.) com to be added to",
+     "6":   "this file.  2020 Aug 6 version."
+  },
+  "500":
+  {
+     "Filter": "N",
+     "Primary": 72,
+     "Obstruction": 25,
+     "Aperture": 6,
+     "FWHM": 3,
+     "QE": 0.9,
+     "ReadNoise": 8,
+     "PixelSize": 3,
+     "SkyBrightness": 19.5,
+     "MinAlt": 0.0,
+     "MaxAlt": 90.0,
+     "MinDec": -90.0,
+     "MaxDec": 90.0,
+     "MinHA": -180.0,
+     "MaxHA": 180.0,
+     "MinElong": 0.0,
+     "MaxElong": 180.0
+  },
+  "703":
+  {
+     "Primary": 72,
+     "Obstruction": 25,
+     "Aperture": 6,
+     "FWHM": 3,
+     "QE": 0.9,
+     "ReadNoise": 8,
+     "PixelSize": 3,
+     "SkyBrightness": 20
+  },
+  "E12":
+  {
+     "Primary": 50,
+     "Obstruction": 23,
+     "Aperture": 6,
+     "FWHM": 3,
+     "QE": 0.9,
+     "ReadNoise": 8,
+     "PixelSize": 1.8,
+     "SkyBrightness": 20
+  },
+  "G96":
+  {
+     "Primary": 152,
+     "Obstruction": 58,
+     "Aperture": 6,
+     "FWHM": 3,
+     "QE": 0.9,
+     "ReadNoise": 8,
+     "PixelSize": 1.5,
+     "SkyBrightness": 20
+  },
+  "I52":
+  {
+     "Primary": 100,
+     "Obstruction": 40,
+     "Aperture": 6,
+     "FWHM": 3,
+     "QE": 0.9,
+     "ReadNoise": 8,
+     "PixelSize": 1.036,
+     "SkyBrightness": 20
+  },
+  "V06":
+  {
+     "Primary": 154,
+     "Obstruction": 40,
+     "Aperture": 6,
+     "FWHM": 3,
+     "QE": 0.9,
+     "ReadNoise": 8,
+     "PixelSize": 0.572,
+     "SkyBrightness": 20
+  },
+  "H21c":
+  {
+     "Primary": 81,
+     "Obstruction": 17,
+     "PixelSize": 1.34,
+     "Comment": "http://www.astro-research.org/phase2.htm"
+  },
+  "H21d":
+  {
+     "Primary": 61,
+     "Obstruction": 17,
+     "PixelSize": 1.55,
+     "Comment": "http://www.astro-research.org/phase3.htm"
+  }
+}
