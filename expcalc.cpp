@@ -147,40 +147,6 @@ static int find_filter( expcalc_internals_t *e, const char filter)
    return( -1);
 }
 
-/* For codes where we lack real information,  we'll return the first
-entry in the table below : a one-meter scope similar (except in size) to
-(703).  It won't be right,  of course,  but may allow comparison of what
-you'd get at times t1 and t2,  or for objects A and B.  For some scopes,
-we can get primary diameters from 'scopes.txt' or 'details.txt'. */
-
-int find_expcalc_config_from_mpc_code( const char *mpc_code, expcalc_config_t *c)
-{
-   size_t i = 0, rval = 0;
-   static expcalc_config_t configs[] = {
-    /*   Code  Filt PrDi ObsDi Ape FWHM QE Rea  Pix   Sky  Airmass */
-       { "500", 'N', 100., 25., 6., 3., .9, 8., 3.,    20., 1.5 },
-       { "703", 'N',  72., 25., 6., 3., .9, 8., 3.,    20., 1.5 },
-       { "E12", 'N',  50., 23., 6., 3., .9, 8., 1.8,   20., 1.5 },
-       { "G96", 'N', 152., 48., 6., 3., .9, 8., 1.5,   20., 1.5 },
-       { "I52", 'N', 100., 40., 6., 3., .9, 8., 1.036, 20., 1.5 },
-       { "V06", 'N', 154., 40., 6., 3., .9, 8., 0.572, 20., 1.5 },
-       { "H21c", 'N', 81., 17., 6., 3., .9, 8., 1.34,  20., 1.5 },    /* http://www.astro-research.org/phase2.htm */
-       { "H21d", 'N', 61., 17., 6., 3., .9, 8., 1.55,  20., 1.5 },    /* http://www.astro-research.org/phase2.htm */
-         };
-   const size_t n_configs = sizeof( configs) / sizeof( configs[0]);
-
-   while( i < n_configs && strcmp( configs[i].mpc_code, mpc_code))
-      i++;
-   if( i == n_configs)
-      {
-      rval = -1;
-      i = 0;     /* give default (500) configuration */
-      }
-   if( c)
-      *c = configs[i];
-   return( rval);
-}
-
 static int set_internals( expcalc_internals_t *e, const expcalc_config_t *c)
 {
    if( find_filter( e, c->filter))
@@ -239,7 +205,70 @@ double exposure_from_snr_and_mag( const expcalc_config_t *c,
    return( exposure);
 }
 
+static const char *get_config( const char *buff, const char *config_var)
+{
+   char search_str[40];
+
+   snprintf( search_str, sizeof( search_str), "\"%s\":", config_var);
+   buff = strstr( buff, search_str);
+   if( buff)
+      {
+      buff += strlen( search_str);
+      while( *buff == ' ')
+         buff++;
+      if( *buff == '"')
+         buff++;
+      }
+   return( buff);
+}
+
+static void set_config_double( const char *buff, const char *config_var,
+            double *value)
+{
+   buff = get_config( buff, config_var);
+   if( buff)
+      *value = atof( buff);
+}
+
+int find_expcalc_config_from_mpc_code( const char *mpc_code,
+             FILE *ifile, expcalc_config_t *c)
+{
+   int rval = 0;
+   char buff[200];
+   const char *tptr;
+   bool getting_data = false;
+
+   c->airmass = 1.5;
+   while( fgets( buff, sizeof( buff), ifile))
+      if( get_config( buff, "500") || get_config( buff, mpc_code))
+         {
+         rval++;
+         getting_data = true;
+         }
+      else if( strchr( buff, '}'))
+         getting_data = false;
+      else if( getting_data)
+         {
+         if( (tptr = get_config( buff, "Filter")) != NULL)
+            c->filter = *tptr;
+         set_config_double( buff, "Primary", &c->primary_diam);
+         set_config_double( buff, "Obstruction", &c->obstruction_diam);
+         set_config_double( buff, "Aperture", &c->aperture);
+         set_config_double( buff, "FWHM", &c->fwhm);
+         set_config_double( buff, "QE", &c->qe);
+         set_config_double( buff, "ReadNoise", &c->readnoise);
+         set_config_double( buff, "PixelSize", &c->pixel_size);
+         set_config_double( buff, "SkyBrightness", &c->sky_brightness);
+         set_config_double( buff, "MinAlt", &c->min_alt);
+         set_config_double( buff, "MaxAlt", &c->max_alt);
+         set_config_double( buff, "MinDec", &c->min_dec);
+         set_config_double( buff, "MaxDec", &c->max_dec);
+         }
+   return( (int)rval);
+}
+
 #ifdef TEST_CODE
+
 
 const char *usage_statement =
  "Usage:  /home/observer/bin/expcalc <switches>\n"
@@ -285,16 +314,30 @@ int main( const int argc, const char **argv)
    int i;
    const char *mpc_code = "I52";
    bool debug = false;
+   FILE *ifile = fopen( "scope.json", "rb");
 
+   if( !ifile)
+      {
+      fprintf( stderr, "Couldn't open 'scope.json'\n");
+      usage( );
+      }
    for( i = 1; i < argc; i++)
       if( !strcmp( argv[i], "-mpc"))
           mpc_code = argv[i + 1];
-   if( find_expcalc_config_from_mpc_code( mpc_code, &c))
+   switch( find_expcalc_config_from_mpc_code( mpc_code, ifile, &c))
       {
-      fprintf( stderr, "Unrecognized MPC code '%s'\n", mpc_code);
-      fprintf( stderr, "At present,  this program only knows about the following codes:\n"
+      case 0:
+         fprintf( stderr, "No default details (not supposed to happen)\n");
+         usage( );
+         break;
+      case 1:
+         fprintf( stderr, "No details for MPC code '%s'\n", mpc_code);
+         fprintf( stderr, "Using default 'geocentric' values\n");
+         fprintf( stderr, "At present,  this program only knows about the following codes:\n"
                        "(703) (E12) (I52) (G96) (V06)\n");
-      usage( );
+         break;
+      case 2:           /* got the details we wanted for the site */
+         break;
       }
    for( i = 1; i < argc; i++)
       if( argv[i][0] == '-' && argv[i][1])
