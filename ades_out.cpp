@@ -89,18 +89,13 @@ static char program_code( const OBSERVE *obs)
 /* Outputs _only_ those observations from the station and program code
 specified by the first observation.      */
 
-static void create_ades_file_for_one_code( const char *filename,
-                   const OBSERVE FAR *obs, int n_obs, const bool append)
+static void create_ades_file_for_one_code( FILE *ofile,
+                   const OBSERVE FAR *obs, int n_obs)
 {
    char buff[200];
-   FILE *ofile = fopen_ext( get_file_name( buff, filename),
-                         (append ? "tfcab" : "tfcwb"));
    const char *code = obs->mpc_code;
    const char progcode = program_code( obs);
 
-   setbuf( ofile, NULL);
-   fprintf( ofile, "<?xml version=\"1.0\" ?>\n");
-   fprintf( ofile, "<ades version=\"2017\">\n");
    fprintf( ofile, "  <obsBlock>\n");
    fprintf( ofile, "    <obsContext>\n");
    fprintf( ofile, "      <observatory>\n");
@@ -180,8 +175,6 @@ static void create_ades_file_for_one_code( const char *filename,
       }
    fprintf( ofile, "    </obsData>\n");
    fprintf( ofile, "  </obsBlock>\n");
-   fprintf( ofile, "</ades>\n\n");
-   fclose( ofile);
 }
 
 /* We dig through the entire set of observations looking for new codes.
@@ -196,8 +189,13 @@ void create_ades_file( const char *filename, const OBSERVE FAR *obs,
 {
    int i, j;
    char *codes = (char *)malloc( OBSCODE_BUFF_SIZE);
+   char buff[200];
+   FILE *ofile = fopen_ext( get_file_name( buff, filename), "tfcwb");
 
    *codes = '\0';
+   setbuf( ofile, NULL);
+   fprintf( ofile, "<?xml version=\"1.0\" ?>\n");
+   fprintf( ofile, "<ades version=\"2017\">\n");
    for( i = 0; i < n_obs; i++)
       {
       char new_search[5];
@@ -212,8 +210,10 @@ void create_ades_file( const char *filename, const OBSERVE FAR *obs,
          {
          assert( strlen( codes) + 1 < OBSCODE_BUFF_SIZE);
          strcat( codes, new_search);
-         create_ades_file_for_one_code( filename, obs + i, n_obs - i, i != 0);
+         create_ades_file_for_one_code( ofile, obs + i, n_obs - i);
          }
       }
    free( codes);
+   fprintf( ofile, "</ades>\n\n");
+   fclose( ofile);
 }
