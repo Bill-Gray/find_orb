@@ -2014,6 +2014,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
          computer_friendly_ofile = fopen_ext( cf_filename, is_default_ephem ? "tfcw+" : "fw+");
          assert( computer_friendly_ofile);
          }
+      if( show_radar_data)
+         exposure_config.min_alt = rdata.altitude_limit * 180. / PI;
       if( !computer_friendly)
          {
          if( show_radar_data)
@@ -2046,7 +2048,6 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
             rho_cos_phi / planet_radius_in_au,
             rho_sin_phi / planet_radius_in_au, &latlon.y,
                                 &ht_in_meters, planet_no);
-
    for( i = 0; i < n_steps; i++)
       {
       unsigned obj_n;
@@ -2315,6 +2316,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                char ra_buff[80], dec_buff[80];
                double phase_ang, curr_mag, air_mass = 40.;
                bool output_ra_in_degrees = (ra_format >= 100 && ra_format < 110);
+               char visibility_char = ' ';
 
                solar_r = vector3_length( orbi_after_light_lag);
                earth_r = vector3_length( obs_posn_equatorial);
@@ -2360,9 +2362,21 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   full_ra_dec_to_alt_az( &obj_ra_dec, &alt_az[j], NULL, &latlon, utc, NULL);
                   alt_az[j].x = centralize_ang( alt_az[j].x + PI);
                   }
+               if( alt_az[0].y < exposure_config.min_alt * PI / 180. ||
+                   alt_az[0].y > exposure_config.max_alt * PI / 180.)
+                  {
+                  visibility_char = 'a';
+                  rgb = 0xffff00;   /* yellow = below alt limits */
+                  }
                if( alt_az[0].y < 0.)
-                  rgb = 0x653700;   /* brown = below horizon */
-               else
+                  {
+                  if( visibility_char == 'a')
+                     {
+                     visibility_char = '*';
+                     rgb = 0x653700;   /* brown = below horizon */
+                     }
+                  }
+               if( visibility_char == ' ')
                   {
                   BRIGHTNESS_DATA bdata;
 
@@ -2844,16 +2858,12 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   snprintf_append( alt_buff, sizeof( alt_buff),  " %11.6f", total_vel);
                   }
                if( options & OPTION_SUPPRESS_UNOBSERVABLE)
-                  {
-                  if( show_radar_data)
-                     {     /* for radar, 'observable' = obj above horizon */
-                     show_this_line = (alt_az[0].y > rdata.altitude_limit);
+                  if( show_this_line)
+                     {
+                     show_this_line = (visibility_char == ' ');
+                     if( !show_radar_data && alt_az[1].y > 0.)
+                        show_this_line = false;  /* optical data must be taken at night */
                      }
-                  else if( show_this_line)
-                     {        /* "observable" = obj above horizon,  sun below it */
-                     show_this_line = (alt_az[0].y > 0. && alt_az[1].y < 0.);
-                     }
-                  }
 
                if( fake_astrometry)
                   strcpy( buff, fake_line);
@@ -3005,8 +3015,7 @@ int ephemeris_in_a_file_from_mpc_code( const char *filename,
                     "(%s) %s", mpc_code, mpc_station_name( buff));
    get_object_name( buff, obs->packed_id);
    snprintf_append( note_text, sizeof( note_text), ": %s", buff);
-   if( options & (OPTION_SNR | OPTION_EXPOSURE_TIME))
-      get_scope_params( mpc_code, &exposure_config);
+   get_scope_params( mpc_code, &exposure_config);
    return( ephemeris_in_a_file( filename, orbit, obs, n_obs, planet_no,
                epoch_jd, jd_start, stepsize, lon, rho_cos_phi, rho_sin_phi,
                strcmp( stepsize, "Obs") ? n_steps : n_obs,
