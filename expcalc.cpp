@@ -263,6 +263,10 @@ int find_expcalc_config_from_mpc_code( const char *mpc_code,
          set_config_double( buff, "MaxAlt", &c->max_alt);
          set_config_double( buff, "MinDec", &c->min_dec);
          set_config_double( buff, "MaxDec", &c->max_dec);
+         set_config_double( buff, "MinHA", &c->min_ha);
+         set_config_double( buff, "MaxHA", &c->max_ha);
+         set_config_double( buff, "MinElong", &c->min_elong);
+         set_config_double( buff, "MaxElong", &c->max_elong);
          }
    return( (int)rval);
 }
