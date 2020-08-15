@@ -2929,18 +2929,18 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    fclose( ofile);
    if( header && computer_friendly_ofile)
       {
-      char time_buff[40];
-
       ofile = open_json_file( buff, "JSON_EPHEM_NAME", "ephemeri.json",
                               obs->packed_id, "w+");
       fprintf( ofile, "{\n  \"ephemeris\":\n  {\n");
       fprintf( ofile, "    \"obscode\": \"%.3s\",\n", note_text + 1);
-      fprintf( ofile, "    \"packed\": \"%s\",\n", obs->packed_id);
+      strcpy( buff, obs->packed_id);
+      text_search_and_replace( buff, " ", "");
+      fprintf( ofile, "    \"packed\": \"%s\",\n", buff);
       fprintf( ofile, "    \"count\": %d,\n", n_lines_shown);
       fprintf( ofile, "    \"start\": %f,\n", real_jd_start);
       fprintf( ofile, "    \"step\": %.9f,\n", step);
       fprintf( ofile, "    \"n_steps\": %d,\n", n_steps);
-      fprintf( ofile, "    \"start iso\": \"%s\",\n", iso_time( time_buff, real_jd_start, 3));
+      fprintf( ofile, "    \"start iso\": \"%s\",\n", iso_time( buff, real_jd_start, 3));
       fprintf( ofile, "    \"entries\":\n");
       fprintf( ofile, "    {\n");
       fseek( computer_friendly_ofile, 0L, SEEK_SET);
