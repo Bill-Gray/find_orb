@@ -1719,6 +1719,12 @@ int galactic_confusion( const double ra, const double dec)
    return( buff[loc - buff_offset]);
 }
 
+static double round_to( const double x, const double step)
+{
+   return( floor( x / step + .5) * step);
+}
+
+
 /* In 'auto-step' mode,  the step size text is a(number),  where (number)
 sets an upper limit on how far the object is to move relative to the observer.
 a.02 means don't move more than 2%;  a-.01 mean step backward such that the
@@ -1805,7 +1811,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    int ra_format = 3, dec_format = 2;
    char buff[440], *header = NULL, alt_buff[500];
    const bool use_observation_times = !strncmp( stepsize, "Obs", 3);
-   double curr_jd = jd_start;
+   double curr_jd = jd_start, real_jd_start = jd_start;
 
    if( (!rho_cos_phi && !rho_sin_phi) || ephem_type != OPTION_OBSERVABLES)
       options &= ~(OPTION_ALT_AZ_OUTPUT | OPTION_VISIBILITY | OPTION_MOON_ALT
@@ -1898,13 +1904,15 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                      /* For ease of automated processing,  people may want */
    if( *override_date_format)     /* the time in some consistent format... */
       sscanf( override_date_format, "%x", &date_format);
+   if( options & OPTION_ROUND_TO_NEAREST_STEP)
+       real_jd_start = round_to( jd_start - .5, step) + .5;
    if( ephem_type == OPTION_STATE_VECTOR_OUTPUT ||
        ephem_type == OPTION_POSITION_OUTPUT ||
        ephem_type == OPTION_MPCORB_OUTPUT ||
        ephem_type == OPTION_8_LINE_OUTPUT)
       {
       timescale = "y";        /* force TT output */
-      fprintf( ofile, "%.5f %f %d %s %s\n", jd_start, step, n_steps,
+      fprintf( ofile, "%.5f %f %d %s %s\n", real_jd_start, step, n_steps,
                      get_environment_ptr( "VECTOR_OPTS"), note_text);
       }
    else if( ephem_type != OPTION_CLOSE_APPROACHES)
@@ -2071,7 +2079,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
          {
          curr_jd = jd_start + (double)i * step;
          if( options & OPTION_ROUND_TO_NEAREST_STEP)
-            curr_jd = floor( (curr_jd - .5) / step + .5) * step + .5;
+            curr_jd = round_to( curr_jd - .5, step) + .5;
          }
       delta_t = td_minus_utc( curr_jd) / seconds_per_day;
       if( use_observation_times)
@@ -2929,14 +2937,14 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       fprintf( ofile, "    \"obscode\": \"%.3s\",\n", note_text + 1);
       fprintf( ofile, "    \"packed\": \"%s\",\n", obs->packed_id);
       fprintf( ofile, "    \"count\": %d,\n", n_lines_shown);
-      fprintf( ofile, "    \"start\": %f,\n", jd_start);
+      fprintf( ofile, "    \"start\": %f,\n", real_jd_start);
       fprintf( ofile, "    \"step\": %.9f,\n", step);
       fprintf( ofile, "    \"n_steps\": %d,\n", n_steps);
-      fprintf( ofile, "    \"start iso\": \"%s\",\n", iso_time( time_buff, jd_start, 3));
+      fprintf( ofile, "    \"start iso\": \"%s\",\n", iso_time( time_buff, real_jd_start, 3));
       fprintf( ofile, "    \"entries\":\n");
       fprintf( ofile, "    {\n");
       fseek( computer_friendly_ofile, 0L, SEEK_SET);
-      create_json_ephemeris( ofile, computer_friendly_ofile, header, jd_start, step);
+      create_json_ephemeris( ofile, computer_friendly_ofile, header, real_jd_start, step);
       fprintf( ofile, "    }\n");
       free( header);
       fprintf( ofile, "  }\n}\n");
