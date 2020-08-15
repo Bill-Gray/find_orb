@@ -2368,13 +2368,22 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   visibility_char = 'a';
                   rgb = 0xffff00;   /* yellow = below alt limits */
                   }
-               if( alt_az[0].y < 0.)
+               else if( elong < exposure_config.min_elong * PI / 180. ||
+                        elong > exposure_config.max_elong * PI / 180.)
                   {
-                  if( visibility_char == 'a')
-                     {
-                     visibility_char = '*';
-                     rgb = 0x653700;   /* brown = below horizon */
-                     }
+                  visibility_char = 'e';
+                  rgb = 0xffff00;   /* yellow = below alt limits */
+                  }
+               else if( dec < exposure_config.min_dec ||
+                        dec > exposure_config.max_dec)
+                  {
+                  visibility_char = 'd';
+                  rgb = 0xffff00;   /* yellow = below alt limits */
+                  }
+               if( alt_az[0].y < 0. && visibility_char != ' ')
+                  {
+                  visibility_char = 'B';
+                  rgb = 0x653700;   /* brown = below horizon */
                   }
                if( visibility_char == ' ')
                   {
@@ -2492,7 +2501,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   else if( alt_az[1].y > -18. * PI / 180.)
                      tbuff[1] = 'A';         /* civil twilight */
                   else
-                     tbuff[1] = ' ';         /* plain ol' night */
+                     tbuff[1] = visibility_char;  /* plain ol' night */
                   if( alt_az[2].y > 0.)      /* moon's up */
                      tbuff[2] = (lunar_elong > PI / 2. ? 'M' : 'm');
                   else
