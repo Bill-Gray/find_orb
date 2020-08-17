@@ -295,3 +295,4 @@ STEREO-B     2006-047B = NORAD 29511 = STEREO-B
      TianweB 2020-049B = NORAD 45936 = Tianwen-1 booster
 Perseverance 2020-052A = NORAD 45984 = Mars 2020 (Perseverance)
 2020-052B    2020-052B = NORAD 45985 = Mars 2020 (Perseverance) booster
+     TMG0027 TMG0027 = A10nE6r = A10o4jb = ZTF0Dfv = 64001 = 40001 = S513197
