@@ -1921,6 +1921,8 @@ static void show_a_file( const char *filename)
       if( c >= ALT_0 && c <= ALT_9)
          line_no = (n_lines - 1) * (c - ALT_0 + 1) / 11;
 #endif
+      if( !find_text && c >= 'a' && c <= 'z')
+         c += ALT_A - 'a';
       switch( c)
          {
          case KEY_C1:
