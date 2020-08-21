@@ -115,6 +115,8 @@ void convert_ades_sigmas_to_error_ellipse( const double sig_ra,
 #ifndef strlcpy
 size_t strlcpy(char *dest, const char *src, size_t size);   /* miscell.cpp */
 size_t strlcat(char *dest, const char *src, size_t size);   /* miscell.cpp */
+size_t strlcpy_err( char *dst, const char *src, size_t dsize); /* miscell.c */
+size_t strlcat_err( char *dst, const char *src, size_t dsize); /* miscell.c */
 #endif
 
 int debug_printf( const char *format, ...)
@@ -1303,19 +1305,44 @@ static int is_artsat_desig( const char *desig)
 #define OBJ_DESIG_ARTSAT                 6
 #define OBJ_DESIG_OTHER                 -1
 
+typedef struct
+{
+   void *next;
+   char *line;
+} odd_name_t;
+
 int get_object_name( char *obuff, const char *packed_desig)
 {
    int rval = OBJ_DESIG_OTHER;
    size_t i, gap;
    static size_t n_lines;
    static char **extra_names = NULL;
+   static odd_name_t *added = NULL;
    char provisional_desig[40], xdesig[40];
 
-   if( !packed_desig)   /* flag to free up internal memory */
+   if( !packed_desig && !obuff)   /* flag to free up internal memory */
       {
       if( extra_names)
          free( extra_names);
       extra_names = NULL;
+      while( added)
+         {
+         odd_name_t *next = (odd_name_t *)added->next;
+         free( added->line);
+         free( added);
+         added = next;
+         }
+      return( 0);
+      }
+
+   if( !packed_desig && obuff)
+      {
+      odd_name_t *next = (odd_name_t *)calloc( 1, sizeof( odd_name_t));
+
+      next->line = (char *)malloc( strlen( obuff) + 1);
+      strcpy( next->line, obuff);
+      next->next = (odd_name_t *)added;
+      added = next;
       return( 0);
       }
 
@@ -1346,6 +1373,23 @@ int get_object_name( char *obuff, const char *packed_desig)
                return( get_object_name( NULL, packed_desig));
                }
             }
+
+   if( obuff && added)
+      {
+      odd_name_t *tptr = added;
+
+      while( tptr)
+         {
+         if( !memcmp( xdesig, tptr->line, 12))
+            {
+            strcpy( obuff, tptr->line + 13);
+            if( is_artsat_desig( obuff))
+               return( OBJ_DESIG_ARTSAT);
+            return( get_object_name( NULL, packed_desig));
+            }
+         tptr = (odd_name_t *)tptr->next;
+         }
+      }
 
    if( *xdesig == '$')         /* Find_Orb extension to allow storing of */
       {                        /* an unpacked name,  up to 11 chars */
@@ -4034,7 +4078,7 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
 {
    static void *obj_name_stack;
    FILE *ifile = (filename ? fopen( filename, "rb") : NULL);
-   char new_xdesig[50];
+   char new_xdesig[80];
    OBJECT_INFO *rval;
    int i, n = 0, n_alloced = 20, prev_loc = -1;
    const int fixing_trailing_and_leading_spaces =
@@ -4104,12 +4148,19 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
       jd = observation_jd( buff);
       if( jd && *new_xdesig)   /* previous line was "COM = (xdesig)";   */
          {                    /* add a new cross-designation to the table */
+         const char xdesig_type = *new_xdesig;
+
          memcpy( new_xdesig, buff, 12);
          new_xdesig[12] = ' ';
-         for( i = (int)strlen( new_xdesig); i < 26; i++)
-            new_xdesig[i] = ' ';
-         strcpy( new_xdesig + 26, new_xdesig_indicator);
-         xref_designation( new_xdesig);
+         if( xdesig_type == '!')
+            {
+            for( i = (int)strlen( new_xdesig); i < 26; i++)
+               new_xdesig[i] = ' ';
+            strcpy( new_xdesig + 26, new_xdesig_indicator);
+            xref_designation( new_xdesig);
+            }
+         else        /* 'odd name' sort of xdesig */
+            get_object_name( new_xdesig, NULL);
          *new_xdesig = '\0';
          }
       if( is_in_range( jd) && !is_second_line( buff))
@@ -4229,6 +4280,11 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
          {
          *new_xdesig = '!';
          strlcpy( new_xdesig + 13, buff + 3, 20);
+         }
+      if( !memcmp( buff, "#xdesig ", 8))
+         {
+         *new_xdesig = '*';
+         strlcpy_err( new_xdesig + 13, buff + 8, sizeof( new_xdesig) - 13);
          }
       if( !strcmp( buff, "#ignore obs"))
          while( fgets_trimmed( buff, sizeof( buff), ifile)
