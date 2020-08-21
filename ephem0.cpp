@@ -2918,7 +2918,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
          }
       if( *buff)
          fprintf( ofile, "%s\n", buff);
-      if( *alt_buff && computer_friendly_ofile)
+      if( computer_friendly_ofile && *alt_buff)
          fprintf( computer_friendly_ofile, "%s\n", alt_buff);
       prev_ephem_t = ephemeris_t;
       }
