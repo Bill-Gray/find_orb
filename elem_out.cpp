@@ -691,7 +691,18 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
          fprintf( ofile, " \"MagSigma\" : %.4f,", obs[i].mag_sigma);
          }
       fprintf( ofile, "\n                 \"net\" : \"%c\",", obs[i].astrometric_net_code);
-      fprintf( ofile, "\n                 \"note1\" : \"%c\",", obs[i].note1);
+      if( obs[i].note1 == '\\' || obs[i].note1 == '\"')
+         {
+         buff[0] = '\\';
+         buff[1] = obs[i].note1;
+         buff[2] = '\0';
+         }
+      else
+         {
+         buff[0] = obs[i].note1;
+         buff[1] = '\0';
+         }
+      fprintf( ofile, "\n                 \"note1\" : \"%s\",", buff);
       fprintf( ofile, "\n                 \"note2\" : \"%c\",", obs[i].note2);
       fprintf( ofile, "\n                 \"discovery_asterisk\" : \"%c\",",
                                        obs[i].discovery_asterisk);
