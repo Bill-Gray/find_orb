@@ -180,6 +180,7 @@ int create_b32_ephemeris( const char *filename, const double epoch,
                 const double *orbit, const int n_steps,         /* b32_eph.c */
                 const double ephem_step, const double jd_start);
 void put_observer_data_in_text( const char FAR *mpc_code, char *buff);
+void fix_home_dir( char *filename);                /* ephem0.cpp */
 int write_environment_pointers( void);             /* mpc_obs.cpp */
 int add_ephemeris_details( FILE *ofile, const double start_jd,  /* b32_eph.c */
                                                const double end_jd);
@@ -2442,7 +2443,16 @@ static int user_select_file( char *filename, const char *title, const int flags)
    const bool is_save_dlg = (flags & 1);
    char cmd[256];
    int rval;
+   const bool x_is_running = (NULL != getenv( "DISPLAY"));
 
+   if( !x_is_running)
+      {
+      inquire( "Enter filename: ", filename, 80, COLOR_DEFAULT_INQUIRY);
+#ifndef _WIN32
+      fix_home_dir( filename);
+#endif
+      return( 0);
+      }
    strcpy( cmd, "zenity --file-selection");
    if( is_save_dlg)
       strcat( cmd, " --save --confirm-overwrite");
@@ -2470,7 +2480,10 @@ static int user_select_file( char *filename, const char *title, const int flags)
       return( 0);
 
          /* dialog and Xdialog take the same options : */
-   if( !try_a_file_dialog_program( filename, cmd + 1))
+   endwin( );
+   rval = try_a_file_dialog_program( filename, cmd + 1);
+   refresh( );
+   if( !rval)
       return( 0);
 
    assert( 1);
@@ -4326,6 +4339,9 @@ int main( int argc, const char **argv)
                char filename[80];
                double orbit2[6];
 
+#ifndef _WIN32
+               fix_home_dir( tbuff);
+#endif
                sscanf( tbuff, "%79s", filename);
                ofile = fopen( filename, "wb");
                if( ofile)
