@@ -158,51 +158,79 @@ static int set_internals( expcalc_internals_t *e, const expcalc_config_t *c)
    return( 0);
 }
 
-double mag_from_snr_and_exposure( const expcalc_config_t *c,
+static double internal_mag_from_snr_and_exposure(
+                              expcalc_internals_t *e,
+                              const expcalc_config_t *c,
                               const double snr, const double exposure)
 {
    const double tval = snr * snr * exposure;
    double n_star, mag_exp, mag;
-   expcalc_internals_t e;
 
-   if( set_internals( &e, c))
+   if( set_internals( e, c))
       return( EXPCALC_FAILED);
    n_star = solve_quadratic( exposure * exposure, -tval,
-                    e.n_pixels_in_aperture * (e.noise2 - tval * e.s));
-   mag_exp = n_star / (e.zero_point * effective_area( c) * c->qe * fraction_inside( c));
+                    e->n_pixels_in_aperture * (e->noise2 - tval * e->s));
+   mag_exp = n_star / (e->zero_point * effective_area( c) * c->qe * fraction_inside( c));
    mag = -2.5 * log10( mag_exp);
-   mag -=  c->airmass * e.extinction;
+   mag -=  c->airmass * e->extinction;
    return( mag);
+}
+
+double mag_from_snr_and_exposure( const expcalc_config_t *c,
+                              const double snr, const double exposure)
+{
+   expcalc_internals_t e;
+
+   return( internal_mag_from_snr_and_exposure( &e, c, snr, exposure));
+}
+
+static double internal_snr_from_mag_and_exposure(
+                              expcalc_internals_t *e,
+                              const expcalc_config_t *c,
+                              const double mag, const double exposure)
+{
+
+   double n_star, signal, noise;
+
+   if( set_internals( e, c))
+      return( EXPCALC_FAILED);
+   n_star = star_electrons_per_second_per_pixel( c, mag, e);
+   signal = n_star * exposure;
+   noise = sqrt( signal
+             + e->n_pixels_in_aperture * (e->s * exposure + e->noise2));
+   return( signal / noise);
 }
 
 double snr_from_mag_and_exposure( const expcalc_config_t *c,
                               const double mag, const double exposure)
 {
    expcalc_internals_t e;
-   double n_star, signal, noise;
 
-   if( set_internals( &e, c))
+   return( internal_snr_from_mag_and_exposure( &e, c, mag, exposure));
+}
+
+static double internal_exposure_from_snr_and_mag(
+                              expcalc_internals_t *e,
+                              const expcalc_config_t *c,
+                              const double snr, const double mag)
+{
+   double n_star, exposure;
+
+   if( set_internals( e, c))
       return( EXPCALC_FAILED);
-   n_star = star_electrons_per_second_per_pixel( c, mag, &e);
-   signal = n_star * exposure;
-   noise = sqrt( signal
-             + e.n_pixels_in_aperture * (e.s * exposure + e.noise2));
-   return( signal / noise);
+   n_star = star_electrons_per_second_per_pixel( c, mag, e);
+   exposure = solve_quadratic( n_star * n_star,
+                        -snr * snr * (n_star + e->n_pixels_in_aperture * e->s),
+                        -snr * snr * e->n_pixels_in_aperture * e->noise2);
+   return( exposure);
 }
 
 double exposure_from_snr_and_mag( const expcalc_config_t *c,
                               const double snr, const double mag)
 {
    expcalc_internals_t e;
-   double n_star, exposure;
 
-   if( set_internals( &e, c))
-      return( EXPCALC_FAILED);
-   n_star = star_electrons_per_second_per_pixel( c, mag, &e);
-   exposure = solve_quadratic( n_star * n_star,
-                        -snr * snr * (n_star + e.n_pixels_in_aperture * e.s),
-                        -snr * snr * e.n_pixels_in_aperture * e.noise2);
-   return( exposure);
+   return( internal_exposure_from_snr_and_mag( &e, c, snr, mag));
 }
 
 static const char *get_config( const char *buff, const char *config_var)
@@ -314,6 +342,7 @@ SNR 2.38 with exposure time 30 seconds and magnitude 20.50
 int main( const int argc, const char **argv)
 {
    expcalc_config_t c;
+   expcalc_internals_t e;
    double mag = 0., exposure = 0., snr = 0.;
    int i;
    const char *mpc_code = "I52";
@@ -403,18 +432,18 @@ int main( const int argc, const char **argv)
                   c.primary_diam, c.obstruction_diam);
       printf( "Filter %c, QE %.2f, read noise %.2f electrons/pixel\n",
                   c.filter, c.qe, c.readnoise);
-      printf( "Pixels are %.2f arcsec;  aperture %.2f pixels, FWHM %.2f pixels\n",
+      printf( "Pixels are %.2f arcsec;  aperture %.2f arcsec, FWHM %.2f arcsec\n",
                   c.pixel_size, c.aperture, c.fwhm);
       printf( "Sky brightness %.2f mag/arcsec^2; airmass %.2f\n",
                   c.sky_brightness, c.airmass);
       }
 
    if( mag && exposure)
-      snr = snr_from_mag_and_exposure( &c, mag, exposure);
+      snr = internal_snr_from_mag_and_exposure( &e, &c, mag, exposure);
    else if( mag && snr)
-      exposure = exposure_from_snr_and_mag( &c, snr, mag);
+      exposure = internal_exposure_from_snr_and_mag( &e, &c, snr, mag);
    else if( snr && exposure)
-      mag = mag_from_snr_and_exposure( &c, snr, exposure);
+      mag = internal_mag_from_snr_and_exposure( &e, &c, snr, exposure);
    else
       usage( );
    printf( "SNR %.2f with exposure time %.0f seconds and magnitude %.2f\n",
