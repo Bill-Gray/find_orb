@@ -65,7 +65,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    #define button5_pressed (button & BUTTON5_PRESSED)
 #else
    #define button5_pressed (!button)
+   #define BUTTON5_PRESSED 0
+   #define MOUSE_WHEEL_SCROLL 0
 #endif
+
+#define default_mouse_events (BUTTON1_CLICKED | BUTTON1_DOUBLE_CLICKED \
+                            | BUTTON2_CLICKED | BUTTON2_DOUBLE_CLICKED \
+                            | BUTTON3_CLICKED | BUTTON3_DOUBLE_CLICKED \
+                            | MOUSE_WHEEL_SCROLL                       \
+                            | BUTTON4_PRESSED | BUTTON5_PRESSED)
 
 #include <wchar.h>
 #include <math.h>
@@ -433,7 +441,7 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
          bool show_help = false;
 
          curs_set( 0);        /* turn cursor off */
-         mousemask( ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
+         mousemask( default_mouse_events | REPORT_MOUSE_POSITION, NULL);
 #ifndef PDCURSES
          printf("\033[?1003h");   /* ] used in ncurses with xterm-like */
 #endif                         /* terms to enable mouse move events */
@@ -490,7 +498,7 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
 #ifndef PDCURSES
          printf("\033[?1003l");   /* ] used in ncurses with xterm-like */
 #endif
-         mousemask( ALL_MOUSE_EVENTS, NULL);
+         mousemask( default_mouse_events, NULL);
          curs_set( 1);        /* turn cursor back on */
          if( rval == '?' && help_file_name)
             show_help = true;
@@ -2391,7 +2399,7 @@ static inline int initialize_curses( const int argc, const char **argv)
    if( debug_level > 2)
       debug_printf( "(3)\n");
    keypad( stdscr, 1);
-   mousemask( ALL_MOUSE_EVENTS, NULL);
+   mousemask( default_mouse_events, NULL);
    return( 0);
 }
 
