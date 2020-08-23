@@ -158,7 +158,7 @@ static void create_ades_file_for_one_code( FILE *ofile,
          fprintf( ofile, "        <rmsDec>%.4f</rmsDec>\n", obs->posn_sigma_2);
          fprintf( ofile, "        <rmsCorr>%.4f</rmsCorr>\n", correlation);
          if( !catalogue)
-            catalogue = "?";
+            catalogue = "UNK";
          strcpy( buff, catalogue);
          text_search_and_replace( buff, "-", "");
          text_search_and_replace( buff, " ", "");
