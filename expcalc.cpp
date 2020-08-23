@@ -448,6 +448,19 @@ int main( const int argc, const char **argv)
       usage( );
    printf( "SNR %.2f with exposure time %.0f seconds and magnitude %.2f\n",
                   snr, exposure, mag);
+   if( debug)
+      {
+      const double signal = e.n_star * exposure;
+      const double sky_count = e.s * exposure * e.n_pixels_in_aperture;
+      const double read_noise = e.noise2 * e.n_pixels_in_aperture;
+
+      printf( "%.3f star electrons (total exposure)\n", signal);
+      printf( "Noise from star %.3f (square root of the above line)\n", sqrt( signal));
+      printf( "Noise from sky %.3f\n", sqrt( sky_count));
+      printf( "Read noise %.3f (from %.3f pixels)\n", sqrt( read_noise), e.n_pixels_in_aperture);
+      printf( "Total noise %.3f (above three lines added in quadrature)\n",
+               sqrt( signal + sky_count + read_noise));
+      }
    return( 0);
 }
 #endif         /* #ifdef TEST_CODE */
