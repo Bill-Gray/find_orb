@@ -2006,11 +2006,8 @@ static void show_a_file( const char *filename)
                                     COLOR_MESSAGE_TO_USER);
             }
             break;
-         case 'q':
-            if( find_text)
-               search_text[search_text_length++] = (char)c;
-            else
-               keep_going = 0;
+         case ALT_Q:
+            keep_going = 0;
             break;
 #if defined( __linux)
          case 127:                     /* backspace */
