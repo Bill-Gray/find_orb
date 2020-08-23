@@ -102,7 +102,7 @@ typedef struct
 {
    double extinction, zero_point;
    double n_pixels_in_aperture, s, noise2;
-   double area;
+   double n_star, area;
 } expcalc_internals_t;
 
 static double star_electrons_per_second_per_pixel( const expcalc_config_t *c, const double mag,
@@ -164,13 +164,13 @@ static double internal_mag_from_snr_and_exposure(
                               const double snr, const double exposure)
 {
    const double tval = snr * snr * exposure;
-   double n_star, mag_exp, mag;
+   double mag_exp, mag;
 
    if( set_internals( e, c))
       return( EXPCALC_FAILED);
-   n_star = solve_quadratic( exposure * exposure, -tval,
+   e->n_star = solve_quadratic( exposure * exposure, -tval,
                     e->n_pixels_in_aperture * (e->noise2 - tval * e->s));
-   mag_exp = n_star / (e->zero_point * effective_area( c) * c->qe * fraction_inside( c));
+   mag_exp = e->n_star / (e->zero_point * effective_area( c) * c->qe * fraction_inside( c));
    mag = -2.5 * log10( mag_exp);
    mag -=  c->airmass * e->extinction;
    return( mag);
@@ -190,12 +190,12 @@ static double internal_snr_from_mag_and_exposure(
                               const double mag, const double exposure)
 {
 
-   double n_star, signal, noise;
+   double signal, noise;
 
    if( set_internals( e, c))
       return( EXPCALC_FAILED);
-   n_star = star_electrons_per_second_per_pixel( c, mag, e);
-   signal = n_star * exposure;
+   e->n_star = star_electrons_per_second_per_pixel( c, mag, e);
+   signal = e->n_star * exposure;
    noise = sqrt( signal
              + e->n_pixels_in_aperture * (e->s * exposure + e->noise2));
    return( signal / noise);
@@ -214,13 +214,13 @@ static double internal_exposure_from_snr_and_mag(
                               const expcalc_config_t *c,
                               const double snr, const double mag)
 {
-   double n_star, exposure;
+   double exposure;
 
    if( set_internals( e, c))
       return( EXPCALC_FAILED);
-   n_star = star_electrons_per_second_per_pixel( c, mag, e);
-   exposure = solve_quadratic( n_star * n_star,
-                        -snr * snr * (n_star + e->n_pixels_in_aperture * e->s),
+   e->n_star = star_electrons_per_second_per_pixel( c, mag, e);
+   exposure = solve_quadratic( e->n_star * e->n_star,
+                        -snr * snr * (e->n_star + e->n_pixels_in_aperture * e->s),
                         -snr * snr * e->n_pixels_in_aperture * e->noise2);
    return( exposure);
 }
