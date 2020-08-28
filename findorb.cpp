@@ -69,10 +69,16 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    #define MOUSE_WHEEL_SCROLL 0
 #endif
 
+#ifdef __PDCURSES__
+   #define BUTTON_MODIFIERS  (BUTTON_MODIFIER_SHIFT | BUTTON_MODIFIER_CONTROL | BUTTON_MODIFIER_ALT)
+#else       /* ncurses lacks these */
+   #define BUTTON_MODIFIERS 0
+#endif
+
 #define default_mouse_events (BUTTON1_CLICKED | BUTTON1_DOUBLE_CLICKED \
                             | BUTTON2_CLICKED | BUTTON2_DOUBLE_CLICKED \
                             | BUTTON3_CLICKED | BUTTON3_DOUBLE_CLICKED \
-                            | MOUSE_WHEEL_SCROLL                       \
+                            | MOUSE_WHEEL_SCROLL | BUTTON_MODIFIERS    \
                             | BUTTON4_PRESSED | BUTTON5_PRESSED)
 
 #include <wchar.h>
