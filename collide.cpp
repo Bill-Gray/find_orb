@@ -36,8 +36,6 @@ const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 double find_collision_time( ELEMENTS *elem, double *latlon, const int is_impact);
 double find_lat_lon_alt( const double ut, const double *ivect,
                   const int planet_no, double *lat_lon, const bool geometric);
-void calc_approx_planet_orientation( const int planet,        /* runge.cpp */
-         const int system_number, const double jde, double *matrix);
 
 int debug_printf( const char *format, ...)                 /* runge.cpp */
 #ifdef __GNUC__
