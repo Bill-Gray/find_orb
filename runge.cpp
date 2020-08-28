@@ -1027,7 +1027,7 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
                for( j = 0; j < 3; j++)
                   oval[j + 3] -= j2_multiplier * delta_j2000[j];
                if( i == IDX_EARTH && r < ATMOSPHERIC_LIMIT && n_extra_params == 1
-                           && !*get_environment_ptr( "DRAG_SHUTOFF"))
+                           && *get_environment_ptr( "DRAG_SHUTOFF") != '1')
                   {
                   extern double solar_pressure[];
                   const double SRP1AU = 2.3e-7;   /* kg*AU^3 / (m^2*d^2) */
@@ -1057,12 +1057,17 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
                      const double earth_rotation_rate = 360.98564736629;
                                     /* ...and converted to radians/day:    */
                      const double earth_omega = earth_rotation_rate * (PI / 180.);
-                     const double earth_vel = (earth_loc[j] - planet_loc[j + 12]) / dt;
                      const double topo_vel = earth_omega *
                              (delta_planet[0] * matrix[j + 3] - delta_planet[1] * matrix[j]);
 
-                     vel[j] = earth_vel - oval[j];       /* in AU/day */
-                     vel[j] -= topo_vel * accel_multiplier;
+                     vel[j] = -topo_vel * accel_multiplier;
+                     }
+                  equatorial_to_ecliptic( vel);
+                  for( j = 0; j < 3; j++)
+                     {
+                     const double earth_vel = (earth_loc[j] - planet_loc[j + 12]) / dt;
+
+                     vel[j] += earth_vel - oval[j];       /* in AU/day */
                      vel[j] *= AU_IN_METERS / seconds_per_day;  /* cvt to m/s */
                      }
                   speed = vector3_length( vel);    /* also in m/s */
