@@ -933,7 +933,8 @@ int main( const int argc, const char **argv)
          use_damping = 0;
          if( lsquare_rval)
             {
-            printf( "ERROR %d in lsquare soln: MJD %f\n",
+            if( tle.ephemeris_type != EPHEM_TYPE_HIGH)
+                           printf( "ERROR %d in lsquare soln: MJD %f\n",
                            lsquare_rval, tdt - 2400000.5);
             use_damping = 1;
             }
