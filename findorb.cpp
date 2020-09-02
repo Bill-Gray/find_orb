@@ -2350,6 +2350,15 @@ static int find_rgb( const unsigned irgb)
    return( n_colors - 1);
 }
 
+#ifndef __PDCURSES__
+      /* In ncurses,  use the xterm command for setting title and */
+      /* hope it works (it usually will)                          */
+static void PDC_set_title( const char *title)
+{
+   printf( "\033\x5d\x32;%s\a", title);
+}
+#endif
+
 static inline int initialize_curses( const int argc, const char **argv)
 {
    FILE *ifile = fopen_ext( "command.txt", "fcrb");
@@ -2360,6 +2369,8 @@ static inline int initialize_curses( const int argc, const char **argv)
    ttytype[1] = 55;    /* Window can have a max of 55 lines in Win32a */
    ttytype[2] = 70;    /* Window must have at least 70 columns in Win32a */
    ttytype[3] = (char)200; /* Window can have a max of 200 columns in Win32a */
+#else
+   PDC_set_title( get_find_orb_text( 18));
 #endif
 
 #ifdef XCURSES
