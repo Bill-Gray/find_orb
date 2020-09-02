@@ -551,6 +551,7 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
 {
    double jd = current_jd( );
    double jd_first, jd_last;
+   double q_sigma = 0.;
    char buff[180];
    int first, last, i, n_used;
 
@@ -598,7 +599,10 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
 
    fprintf( ofile, "\n        \"q\": %17.13f,", elem->q);
    if( !get_uncertainty( "sigma_q", buff, 0))
+      {
+      q_sigma = atof( buff);
       fprintf( ofile, " \"q sigma\": %s,", buff);
+      }
    if( elem->ecc < 1.)
       {
       const double big_q = elem->q * (1. + elem->ecc) / (1. - elem->ecc);
@@ -635,7 +639,12 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
       if( !get_uncertainty( "sigma_G:", buff, 0))
          fprintf( ofile, " \"G sigma\": %s,", buff);
       }
+   if( q_sigma && !elem->central_obj)
+      {
+      double neo_score = erf( (1.3 - elem->q) / q_sigma) * .5 + .5;
 
+      fprintf( ofile, "\n        \"p_NEO\": \"%.4f\",", neo_score);
+      }
 /* if( moids[1])        */
       {
       char tbuff[80];
