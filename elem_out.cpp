@@ -547,7 +547,7 @@ static char *object_name( char *buff, const int obj_index)
 static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
                      const char *obj_name, const OBSERVE *obs,
                      const unsigned n_obs, const double *moids,
-                     const char *body_frame_note)
+                     const char *body_frame_note, const bool show_obs)
 {
    double jd = current_jd( );
    double jd_first, jd_last;
@@ -662,7 +662,7 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
    fprintf( ofile, "\n        \"earliest iso\": \"%s\",", iso_time( buff, jd_first, 3));
    fprintf( ofile, "\n        \"latest iso\": \"%s\",", iso_time( buff, jd_last, 3));
    fprintf( ofile, "\n        \"residuals\":\n        [");
-   for( i = 0; i < (int)n_obs; i++)
+   for( i = 0; show_obs && i < (int)n_obs; i++)
       {
       MOTION_DETAILS m;
 
@@ -1951,7 +1951,13 @@ int write_out_elements_to_file( const double *orbit,
                      "wb");
    assert( ofile);
    elements_in_json_format( ofile, &elem, object_name, obs, n_obs, moids,
-                                             body_frame_note);
+                                             body_frame_note, true);
+   fclose( ofile);
+   ofile = open_json_file( tbuff, "JSON_SHORT_ELEMENTS", "elem_short.json", obs->packed_id,
+                     "wb");
+   assert( ofile);
+   elements_in_json_format( ofile, &elem, object_name, obs, n_obs, moids,
+                                             body_frame_note, false);
    fclose( ofile);
    free( tbuff);
    return( bad_elements);
