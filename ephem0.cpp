@@ -1443,11 +1443,14 @@ static int create_json_ephemeris( FILE *ofile, FILE *ifile, char *header,
                }
             if( !strcmp( out_token, "SM"))
                is_text = true;
+            remove_trailing_cr_lf( out_text);
             if( is_text)      /* Text must be enclosed in quotes for JSON */
                {
-               memmove( out_text + 1, out_text, strlen( out_text) + 1);
-               *out_text = out_text[blen + 1] = '\"';
-               out_text[blen + 2] = '\0';
+               const size_t len = strlen( out_text);
+
+               memmove( out_text + 1, out_text, len + 1);
+               *out_text = out_text[len + 1] = '\"';
+               out_text[len + 2] = '\0';
                }
             else            /* numeric quantities can't end in '.'... */
                clean_up_json_number( out_text);
