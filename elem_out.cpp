@@ -568,7 +568,7 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
    fprintf( ofile, "      \"elements\":\n      {\n");
    fprintf( ofile, "        \"central body\": \"%s\",\n", object_name( buff, elem->central_obj));
    strcpy( buff, body_frame_note + 1);
-   i = strlen( buff);
+   i = (int)strlen( buff);
    buff[i - 1] = '\0';    /* strip trailing paren */
    fprintf( ofile, "        \"frame\": \"%s\",\n", buff);
    fprintf( ofile, "        \"epoch_iso\": \"%s\",\n", iso_time( buff, elem->epoch, 0));

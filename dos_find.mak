@@ -6,7 +6,7 @@
 # I tried it.  If you see failure,  let me know and I can probably update
 # it without much trouble.
 
-all: find_orb.exe fo.exe fo_serve.exe
+all: find_orb.exe fo.exe
 
 OBJS=ades_out.obj b32_eph.obj bc405.obj bias.obj collide.obj   \
   conv_ele.obj details.obj eigen.obj elem2tle.obj elem_out.obj  \
