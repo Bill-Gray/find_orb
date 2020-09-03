@@ -4,7 +4,7 @@
 
 OBJS=about.obj b32_eph.obj bc405.obj bias.obj clipfunc.obj \
   collide.obj conv_ele.obj details.obj eigen.obj elem2tle.obj elem_ou2.obj \
-  elem_out.obj ephem0.obj ephem.obj generic.obj gauss.obj \
+  elem_out.obj ephem0.obj ephem.obj expcalc.obj generic.obj gauss.obj \
   geo_pot.obj healpix.obj lsquare.obj miscell.obj \
   monte0.obj errors.obj monte.obj  \
   mpc_obs.obj mt64.obj nanosecs.obj orbitdlg.obj \
@@ -12,17 +12,18 @@ OBJS=about.obj b32_eph.obj bc405.obj bias.obj clipfunc.obj \
   runge.obj settings.obj shellsor.obj stackall.obj \
   sigma.obj simplex.obj sm_vsop.obj sr.obj stdafx.obj
 
-!ifdef BITS_32
-COMMON_FLAGS=-nologo -W3 -EHsc -c -FD
-COMMON_LINK=lunar.lib jpleph.lib sat_code.lib /nologo /stack:0x8800 /subsystem:windows
-EXE_NAME=find_o32.exe
-RM=rm
-!else
 COMMON_FLAGS=-nologo -W3 -EHsc -c -FD -D_CRT_SECURE_NO_WARNINGS
-COMMON_LINK=lunar64.lib jpleph.lib sat_code.lib /nologo /stack:0x8800 /subsystem:windows -ENTRY:"wWinMainCRTStartup"
-EXE_NAME=find_o64.exe
-RM=del
+
+!ifdef BITS_32
+BITS=32
+# COMMON_LINK=lunar64.lib jpleph.lib sat_code.lib /nologo /stack:0x8800 /subsystem:windows /MACHINE:IX86
+!else
+BITS=64
 !endif
+
+RM=del
+EXE_NAME=find_o$(BITS).exe
+COMMON_LINK=lunar$(BITS).lib jpleph$(BITS).lib sat_code$(BITS).lib /nologo /stack:0x8800 /subsystem:windows -ENTRY:"wWinMainCRTStartup"
 
 !ifdef DEBUG
 CFLAGS=-MDd -Gm -Zi -Od -D "_DEBUG" -Fp"find_orb.pch" $(COMMON_FLAGS) -D "_AFXDLL"
