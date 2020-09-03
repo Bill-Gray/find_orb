@@ -95,6 +95,8 @@ FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 #ifdef _MSC_VER
      /* Microsoft Visual C/C++ has no snprintf.  See 'ephem0.cpp'.  */
 int snprintf( char *string, const size_t max_len, const char *format, ...);
+     /* Doesn't have a strncasecmp,  either.   strncmp will do. */
+#define strncasecmp strncmp
 #endif
 int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
                                    const char *format, ...)
