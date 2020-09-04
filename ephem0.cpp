@@ -2399,7 +2399,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   visibility_char = 'B';
                   rgb = 0x653700;   /* brown = below horizon */
                   }
-               if( visibility_char == ' ')
+               if( alt_az[0].y > 0.)
                   {
                   BRIGHTNESS_DATA bdata;
 
