@@ -2313,7 +2313,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                tbuff[0] = ' ';
                int_pa = put_ephemeris_posn_angle_sigma( tbuff + 1, dist, posn_ang, false);
                strcat( buff, tbuff);
-               snprintf_append( alt_buff, sizeof( alt_buff), " %8.1f %3d",
+               snprintf_append( alt_buff, sizeof( alt_buff), " %8.3f %3d",
                                     dist * 3600. * 180. / PI, int_pa);
                }
             if( !obj_n)
