@@ -327,12 +327,8 @@ int find_mpc_color( const MPC_STATION *sdata, const char *mpc_code);
 MPC_STATION *find_mpc_color_codes( const int n_obs, const OBSERVE FAR *obs,
                    const int max_n_colors);           /* elem_out.cpp */
 
-#define FILTERING_CHANGES_MADE            1
-#define FILTERING_NO_CHANGES_MADE         2
-#define FILTERING_FAILED                  3
-
 int filter_obs( OBSERVE FAR *obs, const int n_obs,           /* orb_fun2.cpp */
-                  const double max_residual_in_arcseconds);
+                  const double max_residual_in_sigmas);
 
     /* Functions used to store and restore orbits for the 'undo' function. */
     /* Orbits are stored on a stack and can be retrieved from it.          */

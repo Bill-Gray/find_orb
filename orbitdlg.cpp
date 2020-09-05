@@ -1386,7 +1386,7 @@ void COrbitDlg::OnFilterObs()
       const int rval = filter_obs( (OBSERVE FAR *)obs_data, n_obs,
                               max_residual_for_filtering);
 
-      if( rval != FILTERING_CHANGES_MADE)
+      if( rval <= 0)
          {
          char buff[80];
 

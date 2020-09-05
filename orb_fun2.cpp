@@ -43,6 +43,7 @@ double evaluate_for_simplex_method( const OBSERVE FAR *obs,
 void init_simplex( double **vects, double *fvals,
          double (*f)( void *context, const double *vect),
                void *context, const int n);        /* simplex.c */
+int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid);
 int simplex_step( double **vects, double *fvals,
          double (*f)( void *context, const double *vect),
                void *context, const int n);        /* simplex.c */
@@ -171,41 +172,38 @@ int superplex_method( OBSERVE FAR *obs, int n_obs, double *orbit, const char *co
  /* residuals inside the desired max_residual limit.  We do one pass  */
  /* just to make sure there are at least three observations that'll   */
  /* still be active when the filtering is done.  If not,  we make     */
- /* no changes and return FILTERING_FAILED.                           */
-
-#define FILTERING_CHANGES_MADE            1
-#define FILTERING_NO_CHANGES_MADE         2
-#define FILTERING_FAILED                  3
+ /* no changes and return -1.  If we succeed,  we return the number   */
+ /* of 'flipped' observations.                                        */
 
 int filter_obs( OBSERVE FAR *obs, const int n_obs,
-                  const double max_residual_in_arcseconds)
+                  const double max_residual_in_sigmas)
 {
-   const double max_resid =            /* cvt arcseconds to radians */
-                   max_residual_in_arcseconds * PI / (180. * 3600.);
-   int i, pass, n_active = 0, rval = FILTERING_NO_CHANGES_MADE;
+   int i, pass, n_active = 0, rval = 0;
 
    for( pass = 0; pass < 2; pass++)
       {
-      for( i = 0; i < n_obs && rval != FILTERING_FAILED; i++)
-         {
-         const double dy = obs[i].dec - obs[i].computed_dec;
-         const double dx = (obs[i].ra - obs[i].computed_ra) * cos( obs[i].dec);
-         const int is_okay = (dx * dx + dy * dy < max_resid * max_resid);
+      double dx, dy;
 
-         if( !pass && is_okay)
+      for( i = 0; i < n_obs; i++)
+         if( get_residual_data( obs + i, &dx, &dy))
             {
-            n_active++;
-            if( n_active == 3)      /* found enough;  break out of loop */
-               break;
+            const int is_okay = (dx * dx + dy * dy
+                        < max_residual_in_sigmas * max_residual_in_sigmas);
+
+            if( !pass && is_okay)
+               {
+               n_active++;
+               if( n_active == 3)      /* found enough;  break out of loop */
+                  break;
+               }
+            if( pass && is_okay != obs[i].is_included)
+               {
+               obs[i].is_included ^= 1;
+               rval++;
+               }
             }
-         if( pass && is_okay != obs[i].is_included)
-            {
-            obs[i].is_included ^= 1;
-            rval = FILTERING_CHANGES_MADE;
-            }
-         }
-      if( n_active < 3)
-         rval = FILTERING_FAILED;
+      if( n_active < 3)    /* failure */
+         return( -1);
       }
    return( rval);
 }

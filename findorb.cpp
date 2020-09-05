@@ -199,8 +199,6 @@ int write_environment_pointers( void);             /* mpc_obs.cpp */
 int add_ephemeris_details( FILE *ofile, const double start_jd,  /* b32_eph.c */
                                                const double end_jd);
 void set_distance( OBSERVE FAR *obs, double r);             /* orb_func.c */
-int filter_obs( OBSERVE FAR *obs, const int n_obs,          /* mpc_obs.c */
-                  const double max_residual_in_arcseconds);
 void set_statistical_ranging( const int new_using_sr);      /* elem_out.cpp */
 int link_arcs( OBSERVE *obs, int n_obs, const double r1, const double r2);
 int find_circular_orbits( OBSERVE FAR *obs1, OBSERVE FAR *obs2,
@@ -4801,11 +4799,15 @@ int main( int argc, const char **argv)
             rms = atof( tbuff);
             if( rms > 0.)
                {
-               if( filter_obs( obs, n_obs, rms)
-                        != FILTERING_CHANGES_MADE)
+               const int n_changed = filter_obs( obs, n_obs, rms);
+
+               if( !n_changed)
                   strcpy( message_to_user, "No filtering done");
+               else if( n_changed == -1)
+                  strcpy( message_to_user, "Filtering FAILED");
                else
-                  sprintf( message_to_user, "Rejections at %.3f sigmas", rms);
+                  sprintf( message_to_user, "Rejections at %.3f sigmas; %d changes",
+                           rms, n_changed);
                }
             }
             break;
