@@ -2505,23 +2505,20 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
 
                if( options & OPTION_VISIBILITY)
                   {
-                  tbuff[0] = ' ';
+                  tbuff[0] = tbuff[2] = ' ';
+                  tbuff[1] = visibility_char;
                   if( alt_az[1].y > 0.)
-                     tbuff[1] = '*';         /* daylight */
+                     tbuff[2] = '*';         /* daylight */
                   else if( alt_az[1].y > -6. * PI / 180.)
-                     tbuff[1] = 'C';         /* civil twilight */
+                     tbuff[2] = 'C';         /* civil twilight */
                   else if( alt_az[1].y > -12. * PI / 180.)
-                     tbuff[1] = 'N';         /* civil twilight */
+                     tbuff[2] = 'N';         /* civil twilight */
                   else if( alt_az[1].y > -18. * PI / 180.)
-                     tbuff[1] = 'A';         /* civil twilight */
-                  else
-                     tbuff[1] = visibility_char;  /* plain ol' night */
-                  if( alt_az[2].y > 0.)      /* moon's up */
+                     tbuff[2] = 'A';         /* civil twilight */
+                  else if( alt_az[2].y > 0.)      /* moon's up */
                      tbuff[2] = (lunar_elong > PI / 2. ? 'M' : 'm');
-                  else
-                     tbuff[2] = ' ';         /* moon's down */
                   tbuff[3] = '\0';
-                  if( tbuff[1] == ' ')
+                  if( visibility_char == ' ')
                      {
                      int galact_conf = galactic_confusion( ra * 15, dec);
 
