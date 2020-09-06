@@ -25,6 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include <stdio.h>
 #include <time.h>
 #include <assert.h>
+#include <ctype.h>
 #include <stdbool.h>
 #include "watdefs.h"
 #include "comets.h"
@@ -1981,67 +1982,62 @@ int string_compare_for_sort( const void *a, const void *b, void *context)
    const char **b1 = (const char **)b;
    const int *sort_column = (int *)context;
 
-   if( *sort_column == -11)
-      return( names_compare( a1[0] + 11, b1[0] + 11));
+   if( *sort_column == -1)
+      return( names_compare( a1[0], b1[0]));
    return( strcmp( a1[0] + *sort_column, b1[0] + *sort_column));
 }
 
 static const char *vector_data_file = "vectors.dat";
 
 /* For each object,  we'd like to know if a solution has already been
-computed for it and stored as a state vector in 'vectors.dat'.  The state
-vectors are stored as sets of three lines,  in no particular order.  We
-_could_ (and used to) just read in three lines at a time,  then hunt
-through all the OBJECT_INFO structures looking for a matching name.  The
-problem is that if you have millions of objects (as happens with the
-entire set of one-night stands,  for example) and thousands of stored
-vectors,  you're doing billions of compares.  So instead,  we load up
-the state vector file and sort it by object name.  Now that it's sorted
-instead of in its default semi-random order,  we can do a binary search.
-*/
+computed for it and stored as a state vector in 'vectors.dat'.  We
+do this by digging through the file and looking for lines with a
+space,  epoch,  and object name,  such as
+
+ 2458127.5 2020 CD3
+
+   We sort those names,  then go through each OBJECT_INFO structure
+and binary-search through the sorted list to see if a match can be
+found.  If one is,  then a 'stored solution' exists in 'vectors.dat'
+for that object.   */
 
 void set_solutions_found( OBJECT_INFO *ids, const int n_ids)
 {
    size_t n_lines;
    char **ilines = load_file_into_memory( vector_data_file, &n_lines, false);
-   int i, j;
+   int i, n_objs, sort_column = -1;
 
    for( i = 0; i < n_ids; i++)
       ids[i].solution_exists = 0;
-   if( ilines)
-      {
-      int sort_column = -11;
-
-      for( i = 0; (size_t)i < n_lines; i += 3)
+   if( !ilines)
+      return;
+   for( i = n_objs = 0; (size_t)i < n_lines; i++)
+      if( ilines[i][0] == ' ' && isdigit( ilines[i][1]))
          {
-         j = 10;
-         while( ilines[i][j] != ' ')
-            j++;
-         if( j != 10)
-            memmove( ilines[i] + 10, ilines[i] + j,
-                                       strlen( ilines[i] + j + 1));
+         const char *space = strchr( ilines[i] + 1, ' ');
+
+         assert( space);     /* object name starts after a space */
+         memmove( ilines[i], space + 1, strlen( space));
+         ilines[n_objs++] = ilines[i];
          }
-      assert( n_lines % 3 == 0);
-      n_lines /= 3;   /* three lines in 'vectors.dat' for each set of elems */
-      shellsort_r( ilines, n_lines, 3 * sizeof( char *),
+   shellsort_r( ilines, n_objs, sizeof( char *),
                            string_compare_for_sort, &sort_column);
-      for( i = 0; i < n_ids; i++)
-         {
-         size_t loc = 0, loc1, step;
+   for( i = 0; i < n_ids; i++)
+      {
+      size_t loc = 0, loc1, step;
 
-         for( step = 0x80000000; step; step >>= 1)
-            if( (loc1 = loc + step) < n_lines)
-               {
-               const int compare = names_compare( ilines[loc1 * 3] + 11, ids[i].obj_name);
+      for( step = 0x80000000; step; step >>= 1)
+         if( (loc1 = loc + step) < (size_t)n_objs)
+            {
+            const int compare = names_compare( ilines[loc1], ids[i].obj_name);
 
-               if( compare < 0)
-                  loc = loc1;
-               if( !compare)
-                  ids[i].solution_exists = 1;
-               }
-         }
-      free( ilines);
+            if( compare < 0)
+               loc = loc1;
+            if( !compare)
+               ids[i].solution_exists = 1;
+            }
       }
+   free( ilines);
 }
 
 /* Can get some comet elements from
