@@ -3488,16 +3488,31 @@ int main( int argc, const char **argv)
                list_codes = SHOW_MPC_CODES_MANY | 8;
             else
                {
+               int c;
                const char *search_code =
                        mpc_color_codes[y - station_start_line].code;
-                                                     /* clicked on MPC station; */
-               for( i = 1; i <= n_obs; i++)          /* find next or prev obs   */
-                  {                                  /* from that stn           */
-                  curr_obs = (curr_obs + dir + n_obs) % n_obs;
-                  if( !strcmp( obs[curr_obs].mpc_code, search_code))
-                     break;
+               char *tptr;
+
+               strcpy( tbuff, get_find_orb_text( 2050));
+               tptr = tbuff + 1;
+               for( i = 0; i < (list_codes & 3); i++)
+                   tptr = strstr( tptr, "[ ]") + 1;
+               *tptr = '*';
+               text_search_and_replace( tbuff, "$", search_code);
+               c = full_inquire( tbuff, NULL, 0, COLOR_MENU, y, x);
+               if( c <= KEY_F(3))
+                  list_codes = c - KEY_F(1);
+               else if( c == KEY_F(4) || c == KEY_F(5))
+                  {                              /* find next or prev */
+                  for( i = 0; i < n_obs; i++)    /* obs from this code */
+                     {
+                     curr_obs += (c == KEY_F( 5) ? n_obs - 1 : 1);
+                     curr_obs %= n_obs;
+                     if( !strcmp( obs[curr_obs].mpc_code, search_code))
+                        break;
+                     }
+                  single_obs_selected = true;
                   }
-               single_obs_selected = true;
                }
             }
          else if( y >= top_line_residuals)
