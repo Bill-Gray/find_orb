@@ -45,6 +45,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "vislimit.h"
 #include "brentmin.h"
 #include "expcalc.h"
+#include "rgb_defs.h"
 
 #define J2000 2451545.0
 #define JD_TO_YEAR(jd)  (2000. + ((jd)-J2000) / 365.25)
@@ -1783,6 +1784,9 @@ double find_next_auto_step( const double target_diff, const bool going_backward,
    return( rval);
 }
 
+#define RGB_OUTSIDE_POINTING_LIMITS      RGB_ORANGE
+#define RGB_BELOW_HORIZON                RGB_DIRT
+
 double ephemeris_mag_limit = 22.;
 
 int ephemeris_in_a_file( const char *filename, const double *orbit,
@@ -2380,24 +2384,24 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                    alt_az[0].y > exposure_config.max_alt * PI / 180.)
                   {
                   visibility_char = 'a';
-                  rgb = 0xffff00;   /* yellow = below alt limits */
+                  rgb = RGB_OUTSIDE_POINTING_LIMITS;
                   }
                else if( elong < exposure_config.min_elong * PI / 180. ||
                         elong > exposure_config.max_elong * PI / 180.)
                   {
                   visibility_char = 'e';
-                  rgb = 0xffff00;   /* yellow = below alt limits */
+                  rgb = RGB_OUTSIDE_POINTING_LIMITS;
                   }
                else if( dec < exposure_config.min_dec ||
                         dec > exposure_config.max_dec)
                   {
                   visibility_char = 'd';
-                  rgb = 0xffff00;   /* yellow = below alt limits */
+                  rgb = RGB_OUTSIDE_POINTING_LIMITS;
                   }
                if( alt_az[0].y < 0. && visibility_char != ' ')
                   {
                   visibility_char = 'B';
-                  rgb = 0x653700;   /* brown = below horizon */
+                  rgb = RGB_BELOW_HORIZON;
                   }
                if( alt_az[0].y > 0.)
                   {
@@ -2418,6 +2422,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   bdata.mask = 31;
                   set_brightness_params( &bdata);
                   compute_sky_brightness( &bdata);
+                  rgb = 0;
                   for( j = 0; j < 3; j++)
                      {
                      double component = log10( bdata.brightness[j + 1]);
