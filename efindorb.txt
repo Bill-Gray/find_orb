@@ -335,3 +335,9 @@
 2044    %d satellite observations lacked spacecraft locations.\n
 2045    %d satellite observations lacked RA/decs.\n
 2046    See https://www.projectpluto.com/mismatch.htm for more info.\n
+
+2050    [ ] Show one MPC code
+2050    [ ] Show some MPC codes
+2050    [ ] Show all MPC codes
+2050    Find next from $
+2050    Find prev from $
