@@ -2330,7 +2330,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                double fraction_illum = 1.;    /* i.e.,  not in earth's shadow */
                double mags_per_arcsec2 = 99.99;    /* sky brightness */
                DPT alt_az[3], sun_ra_dec;
-               double earth_r = 0.;
+               double earth_r = 0., hour_angle[3];
                char ra_buff[80], dec_buff[80];
                double phase_ang, curr_mag, air_mass = 40.;
                bool output_ra_in_degrees = (ra_format >= 100 && ra_format < 110);
@@ -2377,7 +2377,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                         sun_ra_dec = obj_ra_dec;
                      }
                   obj_ra_dec.x = -obj_ra_dec.x;
-                  full_ra_dec_to_alt_az( &obj_ra_dec, &alt_az[j], NULL, &latlon, utc, NULL);
+                  full_ra_dec_to_alt_az( &obj_ra_dec, &alt_az[j], NULL, &latlon, utc,
+                                              &hour_angle[j]);
                   alt_az[j].x = centralize_ang( alt_az[j].x + PI);
                   }
                if( alt_az[0].y < exposure_config.min_alt * PI / 180. ||
@@ -2396,6 +2397,12 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                         dec > exposure_config.max_dec)
                   {
                   visibility_char = 'd';
+                  rgb = RGB_OUTSIDE_POINTING_LIMITS;
+                  }
+               else if( -hour_angle[0] < exposure_config.min_ha * PI / 180. ||
+                        -hour_angle[0] > exposure_config.max_ha * PI / 180.)
+                  {
+                  visibility_char = 'h';
                   rgb = RGB_OUTSIDE_POINTING_LIMITS;
                   }
                if( alt_az[0].y < 0. && visibility_char != ' ')
