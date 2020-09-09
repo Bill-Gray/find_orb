@@ -441,10 +441,19 @@ been sufficiently effective thus far... */
 
 static const char *get_arg( const int argc, const char **argv, const int idx)
 {
-   if( argv[idx][2] || idx == argc - 1)
-      return( argv[idx] + 2);
+   const char *rval;
+
+   argv += idx;
+   if( argv[0][2] || idx == argc - 1)
+      rval = argv[0] + 2;
    else
-      return( argv[idx + 1]);
+      {
+      if( argv[1][0] == '-')
+         rval = "";
+      else
+         rval = argv[1];
+      }
+   return( rval);
 }
 
 int main( int argc, const char **argv)
