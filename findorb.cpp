@@ -337,6 +337,7 @@ int copy_file_to_clipboard( const char *filename);    /* clipfunc.cpp */
 static bool curses_running = false;
 
 static const char *help_file_name = NULL;
+static bool mpc_code_select = false;
 
 static int full_inquire( const char *prompt, char *buff, const int max_len,
                      const int color, const int line0, const int col0)
@@ -442,6 +443,7 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
       else        /* we just want the user to pick a line */
          {
          int highlit_line = -1;     /* initially,  no line is highlit */
+         int highlit_x = 0;
          bool show_help = false;
 
          curs_set( 0);        /* turn cursor off */
@@ -469,8 +471,15 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
                curr_line = y;
                x -= col;
                y -= line - n_lines;
+               if( mpc_code_select && x > real_width - 3)
+                  x = -1;        /* ignore some of the right margin */
                if( y >= 0 && y < n_lines && x >= 0 && x < real_width)
-                  rval = KEY_F( y + 1);
+                  {
+                  if( mpc_code_select)
+                     rval = KEY_F( 1 + x / 4 + y * (box_size / 4));
+                  else
+                     rval = KEY_F( y + 1);
+                  }
                else
                   {
                   rval = 27;
@@ -478,20 +487,26 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
                   }
                if( button & (REPORT_MOUSE_POSITION | BUTTON_PRESS_EVENT))
                   rval = KEY_MOUSE;          /* ignore mouse moves */
-               if( curr_line != highlit_line)   /* move the highlight */
+               if( curr_line != highlit_line || /* move the highlight */
+                           (mpc_code_select && x / 4 != highlit_x / 4))
                   for( pass = 0; pass < 2; pass++)
                      {
                      if( highlit_line != -1)
                         {
                         const attr_t attr = (pass ? A_REVERSE : A_NORMAL);
 
-                        mvchgat( highlit_line, col, real_width, attr, color,
+                        if( mpc_code_select)
+                           mvchgat( highlit_line, col + highlit_x - highlit_x % 4,
+                                               5, attr, color, NULL);
+                        else
+                           mvchgat( highlit_line, col, real_width, attr, color,
                                                      NULL);
                         if( highlit_line == line - n_lines && help_file_name)
                            mvchgat( highlit_line, col + real_width - 4, 3,
                                  attr ^ (A_REVERSE | A_NORMAL), color, NULL);
                         }
                      highlit_line = curr_line;
+                     highlit_x = x;
                      }
                if( !y && x >= real_width - 4 && x < real_width - 1
                       && help_file_name && rval == KEY_F( 1))
@@ -524,6 +539,51 @@ int inquire( const char *prompt, char *buff, const int max_len,
                      const int color)
 {
    return( full_inquire( prompt, buff, max_len, color, -1, -1));
+}
+
+static int select_mpc_code( const OBSERVE *obs, const int n_obs, int curr_obs)
+{
+   char *buff = (char *)malloc( 1000);
+   int n_codes = 0, i, nx = 0, c;
+
+   *buff = '\0';
+   for( i = 0; i < n_obs; i++)
+      if( !strstr( buff, obs[i].mpc_code))
+         {
+         int j = 0;
+         char *tptr = buff;
+
+         while( j < n_codes && memcmp( tptr, obs[i].mpc_code, 4) < 0)
+            {
+            j++;
+            tptr += 4;
+            }
+         memmove( tptr + 4, tptr, (n_codes - j) * 4 + 1);
+         memcpy( tptr, obs[i].mpc_code, 3);
+         tptr[3] = ' ';
+         n_codes++;
+         if( nx * nx < n_codes)
+            nx++;
+         }
+   for( i = nx; i <= n_codes; i += nx)
+      buff[i * 4 - 1] = '\n';
+   mpc_code_select = true;
+   c = inquire( buff, NULL, 0, COLOR_DEFAULT_INQUIRY);
+   mpc_code_select = false;
+   c -= KEY_F( 1);
+   if( c >= 0 && c < n_codes)
+      {
+      char *tptr = buff + c * 4;
+
+      for( i = 0; i < n_obs; i++)
+         {
+         curr_obs = (curr_obs + 1) % n_obs;
+         if( !memcmp( obs[curr_obs].mpc_code, tptr, 3))
+            break;
+         }
+      }
+   free( buff);
+   return( curr_obs);
 }
 
 /* In the (interactive) console Find_Orb,  these allow some functions
@@ -3192,8 +3252,6 @@ int main( int argc, const char **argv)
          debug_printf( "elements written\n");
       update_element_display = 0;
       top_line_basic_info_perturbers = line_no;
-      if( list_codes & 8)           /* temporarily show _only_ MPC codes */
-         observation_display = 0;
       if( observation_display & DISPLAY_BASIC_INFO)
          {
          n_command_lines = show_basic_info( obs, n_obs, 1);
@@ -3336,7 +3394,7 @@ int main( int argc, const char **argv)
          int lines_available;
 
          n_stations_shown = show_station_info( NULL, n_obs,
-                     line_no, curr_obs, list_codes & 7);
+                     line_no, curr_obs, list_codes);
 
          lines_available = getmaxy( stdscr) - n_stations_shown - line_no;
          n_obs_shown = (lines_available > n_obs ? n_obs : lines_available);
@@ -3357,7 +3415,7 @@ int main( int argc, const char **argv)
          show_observations( obs, top_obs_shown, top_line_residuals,
                                  residual_format, n_obs_shown);
          show_station_info( obs, n_obs,
-                     line_no, curr_obs, list_codes & 7);
+                     line_no, curr_obs, list_codes);
 
          show_right_hand_scroll_bar( line_no,
                             n_obs_shown, top_obs_shown, n_obs);
@@ -3411,8 +3469,7 @@ int main( int argc, const char **argv)
             {
             napms( 50);
             if( t0 != time( NULL))  /* wait one second for a key hit */
-               if( !(list_codes & 8))     /* except in 'pick an MPC code' mode */
-                  c = KEY_TIMER;
+               c = KEY_TIMER;
             }
          if( !c)
             c = extended_getch( );
@@ -3420,12 +3477,6 @@ int main( int argc, const char **argv)
          }
       if( c != KEY_TIMER)
          *message_to_user = '\0';
-      if( list_codes & 8)          /* restore from 'show all MPC codes' mode */
-         {
-         observation_display = DISPLAY_BASIC_INFO | DISPLAY_OBSERVATION_DETAILS
-                                       | DISPLAY_ORBITAL_ELEMENTS;
-         list_codes = SHOW_MPC_CODES_NORMAL;
-         }
 
       if( c == KEY_MOUSE)
          {
@@ -3484,8 +3535,8 @@ int main( int argc, const char **argv)
             top_obs_shown++;
          else if( y >= station_start_line)
             {
-            if( button & BUTTON1_DOUBLE_CLICKED)
-               list_codes = SHOW_MPC_CODES_MANY | 8;
+            if( button & (BUTTON2_CLICKED | BUTTON3_CLICKED))
+               c = ALT_X;
             else
                {
                int c;
@@ -3495,12 +3546,12 @@ int main( int argc, const char **argv)
 
                strcpy( tbuff, get_find_orb_text( 2050));
                tptr = tbuff + 1;
-               for( i = 0; i < (list_codes & 3); i++)
+               for( i = 0; i < (int)(list_codes & 3); i++)
                    tptr = strstr( tptr, "[ ]") + 1;
                *tptr = '*';
                text_search_and_replace( tbuff, "$", search_code);
                c = full_inquire( tbuff, NULL, 0, COLOR_MENU, y, x);
-               if( c <= KEY_F(3))
+               if( c >= KEY_F(1) && c <= KEY_F(3))
                   list_codes = c - KEY_F(1);
                else if( c == KEY_F(4) || c == KEY_F(5))
                   {                              /* find next or prev */
@@ -5115,8 +5166,12 @@ int main( int argc, const char **argv)
                            "Using PD89" : "Using RKF", sizeof( message_to_user));
             }
             break;
+         case ALT_X:
+            curr_obs = select_mpc_code( obs, n_obs, curr_obs);
+            single_obs_selected = true;
+            break;
          case 'c': case 'C':
-         case ALT_P: case ALT_X: case ALT_Y:
+         case ALT_P: case ALT_Y:
          case ';': case '\'':
          default:
             debug_printf( "Key %d hit\n", c);
