@@ -1337,7 +1337,7 @@ int get_object_name( char *obuff, const char *packed_desig)
       return( 0);
       }
 
-   if( !packed_desig && obuff)
+   if( !packed_desig && obuff)      /* adding a new name using 'COM desig' */
       {
       odd_name_t *next = (odd_name_t *)calloc( 1, sizeof( odd_name_t));
 
