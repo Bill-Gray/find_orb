@@ -724,6 +724,7 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
       fprintf( ofile, "\n                 \"dRA\" : %.3f, \"dDec\": %.3f, \"dTime\": %.3f, \"cross\": %.3f,",
          m.xresid, m.yresid, m.time_residual, m.cross_residual);
       fprintf( ofile, "\n                 \"reference\" : \"%s\",", obs[i].reference);
+      fprintf( ofile, "  \"packed\" : \"%s\",", obs[i].packed_id);
       fprintf( ofile, "\n                 \"sigma_1\" : %f,", obs[i].posn_sigma_1);
       fprintf( ofile, "\n                 \"sigma_2\" : %f,", obs[i].posn_sigma_2);
       fprintf( ofile, "\n                 \"posn_sigma_theta\" : %f,",
