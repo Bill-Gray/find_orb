@@ -2949,11 +2949,16 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    fclose( ofile);
    if( header && computer_friendly_ofile)
       {
+      extern const char *combine_all_observations;
+
       ofile = open_json_file( buff, "JSON_EPHEM_NAME", "ephemeri.json",
                               obs->packed_id, "w+");
       fprintf( ofile, "{\n  \"ephemeris\":\n  {\n");
       fprintf( ofile, "    \"obscode\": \"%.3s\",\n", note_text + 1);
-      strcpy( buff, obs->packed_id);
+      if( combine_all_observations && *combine_all_observations)
+         strcpy( buff, combine_all_observations);
+      else
+         strcpy( buff, obs->packed_id);
       text_search_and_replace( buff, " ", "");
       fprintf( ofile, "    \"packed\": \"%s\",\n", buff);
       fprintf( ofile, "    \"count\": %d,\n", n_lines_shown);

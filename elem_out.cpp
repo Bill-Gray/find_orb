@@ -533,6 +533,32 @@ char *iso_time( char *buff, const double jd, const int precision)
    strcat( buff, "Z");
    return( buff);
 }
+/* _Usually_,  you can tell what type of object you have from the
+length of the packed designation,  and from that,  what the alignment
+within the first twelve bytes of a punched-card record should be.
+The only exception I know of is cases where somebody uses a five-byte
+temporary identifier;  that can't be distinguished from a numbered
+minor planet or comet so easily.  It may not really be a problem
+for us,  though it's probably an issue for MPC.  */
+
+static inline void align_packed_desig( char *obuff, const char *packed_desig)
+{
+   int loc;
+   const size_t len = strlen( packed_desig);
+
+   assert( len > 0 && len < 13);
+   if( len == 8)     /* mostly comet desigs */
+      loc = 4;
+   else if( len == 5)         /* mostly permanent desigs */
+      loc = 0;
+   else if( len > 8)       /* artsat,  "overlong" non-standard desigs */
+      loc = 0;
+   else                    /* short,  usually temporary desigs */
+      loc = 5;
+   memset( obuff, ' ', 12);
+   memcpy( obuff + loc, packed_desig, strlen( packed_desig));
+   obuff[12] = '\0';
+}
 
 static char *object_name( char *buff, const int obj_index)
 {
@@ -555,7 +581,20 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
    double q_sigma = 0.;
    char buff[180];
    int first, last, i, n_used;
+   extern const char *combine_all_observations;
+   const char *packed_id;
 
+   if( combine_all_observations && *combine_all_observations)
+      {
+      char aligned_desig[13];
+
+      obj_name = buff;
+      packed_id = combine_all_observations;
+      align_packed_desig( aligned_desig, packed_id);
+      get_object_name( buff, aligned_desig);
+      }
+   else
+      packed_id = obs->packed_id;
    fprintf( ofile, "{\n  \"num\": 1,\n");
    fprintf( ofile, "  \"ids\":\n  [\n    \"%s\"\n", obj_name);
    fprintf( ofile, "  ],\n");
@@ -563,7 +602,7 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
    fprintf( ofile, "    \"%s\":\n", obj_name);
    fprintf( ofile, "    {\n    \"object\": \"%s\",\n", obj_name);
    fprintf( ofile, "      \"packed\": \"%s\",\n",
-                  real_packed_desig( buff, obs->packed_id));
+                  real_packed_desig( buff, packed_id));
    fprintf( ofile, "      \"created\": %.5f,\n", jd);
    fprintf( ofile, "      \"created iso\": \"%s\",\n", iso_time( buff, jd, 0));
    fprintf( ofile, "      \"elements\":\n      {\n");
