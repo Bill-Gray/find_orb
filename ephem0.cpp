@@ -1549,8 +1549,13 @@ FILE *open_json_file( char *filename, const char *env_ptr, const char *default_n
       }
    else
       {
+      extern const char *combine_all_observations;
+
       strcpy( filename, env_ptr);
-      real_packed_desig( tbuff, packed_desig);
+      if( combine_all_observations && *combine_all_observations)
+         strcpy( tbuff, combine_all_observations);
+      else
+         real_packed_desig( tbuff, packed_desig);
       text_search_and_replace( filename, "%p", tbuff);
       text_search_and_replace( filename, "%c", ephem_mpc_code);
       sprintf( tbuff, "%x", random_seed);

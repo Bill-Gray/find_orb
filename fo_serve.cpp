@@ -147,7 +147,7 @@ int main( const int argc, const char **argv)
    OBJECT_INFO *ids;
    FILE *ifile;
    FILE *lock_file = fopen( "lock.txt", "w");
-   extern int combine_all_observations;
+   extern const char *combine_all_observations;
    extern const char *temp_obs_filename;     /* miscell.cpp */
    double jd_start = 0., jd_end = 0., user_selected_epoch = 0.;
    const double min_jd = 2378527.5;    /* 1800 feb 1 */
@@ -173,7 +173,7 @@ int main( const int argc, const char **argv)
    setvbuf( lock_file, NULL, _IONBF, 0);
    neocp_redaction_turned_on = false;
    fprintf( lock_file, "We're in\n");
-   combine_all_observations = 1;
+   combine_all_observations = "";
    *ephemeris_step_size = '\0';
 #ifndef _WIN32
    for( i = 0; environ[i]; i++)

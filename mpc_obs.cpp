@@ -2024,7 +2024,7 @@ static void reduce_designation( char *desig, const char *idesig)
 /* useful if you're trying to link two arcs,  or if the designations from */
 /* different sources aren't the same.  */
 
-int combine_all_observations = 0;
+const char *combine_all_observations;
 
 static int compare_desigs( const char *desig1, const char *desig2)
 {
@@ -4135,7 +4135,7 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
          remove_html_tags( buff);
       convert_com_to_pound_sign( buff);
       if( !strcmp( buff, "#Combine all"))
-         combine_all_observations = 1;
+         combine_all_observations = "";
       if( !n || *mpc_code_from_neocp)
          is_neocp = get_neocp_data( buff, desig_from_neocp,
                                                  mpc_code_from_neocp);

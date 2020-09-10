@@ -514,9 +514,9 @@ int main( int argc, const char **argv)
                break;
             case 'c':
                {
-               extern int combine_all_observations;
+               extern const char *combine_all_observations;
 
-               combine_all_observations = 1;
+               combine_all_observations = arg;
                }
                break;
             case 'C':
