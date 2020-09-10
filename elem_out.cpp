@@ -1047,8 +1047,7 @@ static double shoemaker_helin_encounter_velocity( const ELEMENTS *elem)
 
 #endif
 
-
-static void get_periapsis_loc( double *ecliptic_lon, double *ecliptic_lat,
+void get_periapsis_loc( double *ecliptic_lon, double *ecliptic_lat,
              const ELEMENTS *elem)
 {
    *ecliptic_lon = elem->asc_node +

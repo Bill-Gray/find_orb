@@ -4251,7 +4251,7 @@ int main( int argc, const char **argv)
                strcpy( message_to_user, "Orbit is now unconstrained");
                }
             if( !strcmp( orbit_constraints, "K"))
-               strcpy( orbit_constraints, "e=1,i=144");
+               strcpy( orbit_constraints, "e=1,b=282.81,l=35.22");
             if( !strcmp( orbit_constraints, "Me"))
                strcpy( orbit_constraints, "e=1,i=72,O=72");
             if( !strcmp( orbit_constraints, "Ma"))

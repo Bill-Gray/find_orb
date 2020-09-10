@@ -2273,6 +2273,9 @@ static int parse_constraint( const char *tptr)
    return( rval);
 }
 
+void get_periapsis_loc( double *ecliptic_lon, double *ecliptic_lat,
+             const ELEMENTS *elem);             /* elem_out.cpp */
+
 static int evaluate_limited_orbit( const double *orbit,
                     const int planet_orbiting, const double epoch,
                     const char *limited_orbit, double *constraints)
@@ -2386,6 +2389,16 @@ static int evaluate_limited_orbit( const double *orbit,
 
                if( tp)
                   constraints[rval++] = (tp - elem.perih_time) * 1e+5;
+               }
+               break;
+            case 'b':      /* constraints in ecliptic lat/lon are quite */
+            case 'l':      /* useful with sungrazers such as Kreutz objects */
+               {
+               double ecliptic_lon, ecliptic_lat, ang;
+
+               get_periapsis_loc( &ecliptic_lon, &ecliptic_lat, &elem);
+               ang = ((variable == 'b') ? ecliptic_lon : ecliptic_lat);
+               constraints[rval++] = (ang * 180. / PI - value) * .001;
                }
                break;
             }
