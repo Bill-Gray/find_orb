@@ -310,7 +310,8 @@ char *put_double_in_buff( char *buff, const double ival)
 
 void remove_insignificant_digits( char *tbuff)
 {
-   int total = 0, i, limit = 6;
+   int i;
+   long total = 0, limit = 6;
    char *tptr;
 
    for( i = precision; i > 3; i--)
