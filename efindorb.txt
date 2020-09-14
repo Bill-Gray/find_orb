@@ -341,3 +341,4 @@
 2050    [ ] Show all MPC codes
 2050    Find next from $
 2050    Find prev from $
+2050    Find obs from a given code

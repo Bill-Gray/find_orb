@@ -201,7 +201,8 @@ else
 	cp $(FO_EXE)       $(HOME)/bin
 endif
 	cp command.txt details.txt dosephem.txt dos_help.txt ?findorb.txt           $(IDIR)
-	cp environ.def frame_he.txt geo_rect.txt header.htm jpl_eph.txt mpcorb.hdr  $(IDIR)
+	cp environ.def frame_he.txt geo_rect.txt header.htm jpl_eph.txt             $(IDIR)
+	cp mpc_area.txt mpcorb.hdr                                                  $(IDIR)
 	cp mu1.txt observer.txt obslinks.htm ObsCodes.htm ObsCodesF.html            $(IDIR)
 	cp obj_help.txt odd_name.txt openfile.txt previous.def rovers.txt           $(IDIR)
 	cp scope.json scopes.txt sigma.txt xdesig.txt bright2.pgm elem_pop.txt     $(IDIR)

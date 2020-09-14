@@ -1,0 +1,20 @@
+Clicking on the listing of MPC codes at the bottom of the screen brings
+up a small dialog of options.
+
+First,  you can select between three ways of displaying MPC codes :
+just the code for the currently selected observation;  or "some"
+codes (the default,  just enough codes to usually list the major
+observers and those for observations currently on screen);  or
+"all MPC codes" (really,  all those that will fit in the screen area;
+if there are enough observatories involved,  Find_Orb can't fit all
+of them at once.)
+
+Next,  you can find the preceding/following observation from whichever
+MPC code you clicked on.  This helps if you can see from the MPC code
+listing that observations were made from (XYZ),  but none of them
+are currently on screen.
+
+If there are so many observatories that they don't all fit,  the
+"Find obs from a given code" option can help.  It will provide a
+compact dialog with just the MPC codes showing;  click on one,  and
+the next observation from that code will be found.
