@@ -3635,10 +3635,13 @@ int main( int argc, const char **argv)
                      if( button & (BUTTON2_RELEASED | BUTTON2_CLICKED
                                  | BUTTON3_RELEASED | BUTTON3_CLICKED))
                         {                 /* right or middle button click/release */
+                        char *search_code = obs[new_curr].mpc_code;
+
                         show_observations( obs, top_obs_shown, top_line_residuals,
                                  residual_format, n_obs_shown);
-                        i = full_inquire( get_find_orb_text( 2022), NULL, 0,
-                                 COLOR_MENU, y, x);
+                        strlcpy_err( tbuff, get_find_orb_text( 2022), sizeof( tbuff));
+                        text_search_and_replace( tbuff, "$", search_code);
+                        i = full_inquire( tbuff, NULL, 0, COLOR_MENU, y, x);
                         switch( i)
                            {
                            case KEY_F( 1) :       /* toggle obs */
@@ -3650,7 +3653,6 @@ int main( int argc, const char **argv)
                            case KEY_F( 3) :       /* select all this obscode */
                               {
                               int n_selected = 0, n_deselected = 0;
-                              char *search_code = obs[new_curr].mpc_code;
 
                               for( i = 0; i < n_obs; i++)
                                  if( !FSTRCMP( obs[i].mpc_code, search_code))
