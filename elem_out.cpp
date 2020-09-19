@@ -583,6 +583,7 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
    int first, last, i, n_used;
    extern const char *combine_all_observations;
    const char *packed_id;
+   extern double uncertainty_parameter;
 
    if( combine_all_observations && *combine_all_observations)
       {
@@ -679,6 +680,8 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
       if( !get_uncertainty( "sigma_G:", buff, 0))
          fprintf( ofile, " \"G sigma\": %s,", buff);
       }
+   if( uncertainty_parameter < 90.)
+      fprintf( ofile, "\n        \"U\": %.4f,", uncertainty_parameter);
    if( q_sigma && !elem->central_obj)
       {
       double neo_score = erf( (1.3 - elem->q) / q_sigma) * .5 + .5;
