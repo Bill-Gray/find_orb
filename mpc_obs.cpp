@@ -4278,10 +4278,10 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
          *new_xdesig = '!';
          strlcpy( new_xdesig + 13, buff + 3, 20);
          }
-      if( !memcmp( buff, "#xdesig ", 8))
+      if( !memcmp( buff, "#fullname ", 10))
          {
          *new_name = '!';
-         strlcpy_err( new_name + 13, buff + 8, sizeof( new_name) - 13);
+         strlcpy_err( new_name + 13, buff + 10, sizeof( new_name) - 13);
          }
       if( !strcmp( buff, "#ignore obs"))
          while( fgets_trimmed( buff, sizeof( buff), ifile)
@@ -4300,6 +4300,8 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
          rval[n++] = rval[i];
    assert( n == *n_found);
    rval = (OBJECT_INFO *)realloc( rval, n * sizeof( OBJECT_INFO));
+           /* Only now do we set the 'full' object names,  because  */
+           /* some may have been added mid-file using COM fullname. */
    for( i = 0; i < n; i++)
       {
       get_object_name( buff, rval[i].packed_desig);
