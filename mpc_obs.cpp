@@ -1343,6 +1343,7 @@ int get_object_name( char *obuff, const char *packed_desig)
 
       next->line = (char *)malloc( strlen( obuff) + 1);
       strcpy( next->line, obuff);
+      xref_designation( next->line);
       next->next = (odd_name_t *)added;
       added = next;
       return( 0);
@@ -4148,13 +4149,6 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
       if( debug_level > 8)
          debug_printf( "After fixup: %d\n", (int)strlen( buff));
       jd = observation_jd( buff);
-      if( jd && *new_name)    /* 'odd name' sort of xdesig */
-         {
-         memcpy( new_name, buff, 12);
-         new_name[12] = ' ';
-         get_object_name( new_name, NULL);
-         *new_name = '\0';
-         }
       if( jd && *new_xdesig)   /* previous line was "COM = (xdesig)";   */
          {                    /* add a new cross-designation to the table */
          memcpy( new_xdesig, buff, 12);
@@ -4164,6 +4158,13 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
          strcpy( new_xdesig + 26, new_xdesig_indicator);
          xref_designation( new_xdesig);
          *new_xdesig = '\0';
+         }
+      if( jd && *new_name)    /* 'odd name' sort of xdesig */
+         {
+         memcpy( new_name, buff, 12);
+         new_name[12] = ' ';
+         get_object_name( new_name, NULL);
+         *new_name = '\0';
          }
       if( is_in_range( jd) && !is_second_line( buff))
          if( !station || !memcmp( buff + 76, station, 3))
@@ -4184,14 +4185,8 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
                loc = 0;
             else if( !rval[loc].packed_desig[0])   /* it's a new one */
                {
-               char obj_name[80];
-
                memcpy( rval[loc].packed_desig, buff, 12);
                rval[loc].packed_desig[12] = '\0';
-               get_object_name( obj_name, rval[loc].packed_desig);
-               rval[loc].obj_name = (char *)stack_alloc(
-                          obj_name_stack, strlen( obj_name) + 1);
-               strcpy( rval[loc].obj_name, obj_name);
                rval[loc].n_obs = 0;
                rval[loc].jd_start = rval[loc].jd_end = jd;
                rval[loc].jd_updated = jd;    /* at minimum */
@@ -4305,6 +4300,12 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
          rval[n++] = rval[i];
    assert( n == *n_found);
    rval = (OBJECT_INFO *)realloc( rval, n * sizeof( OBJECT_INFO));
+   for( i = 0; i < n; i++)
+      {
+      get_object_name( buff, rval[i].packed_desig);
+      rval[i].obj_name = (char *)stack_alloc( obj_name_stack, strlen( buff) + 1);
+      strcpy( rval[i].obj_name, buff);
+      }
    sort_object_info( rval, n, OBJECT_INFO_COMPARE_PACKED);
    return( rval);
 }
