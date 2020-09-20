@@ -4080,7 +4080,7 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
 {
    static void *obj_name_stack;
    FILE *ifile = (filename ? fopen( filename, "rb") : NULL);
-   char new_xdesig[80];
+   char new_xdesig[80], new_name[90];
    OBJECT_INFO *rval;
    int i, n = 0, n_alloced = 20, prev_loc = -1;
    const int fixing_trailing_and_leading_spaces =
@@ -4115,7 +4115,7 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
 #endif
    *mpc_code_from_neocp = '\0';
    *desig_from_neocp = '\0';
-   *new_xdesig = '\0';
+   *new_xdesig = *new_name = '\0';
    strcpy( mpc_code_from_neocp, "500");   /* default is geocenter */
    neocp_file_type = NEOCP_FILE_TYPE_UNKNOWN;
    rval = (OBJECT_INFO *)calloc( n_alloced + 1, sizeof( OBJECT_INFO));
@@ -4148,21 +4148,21 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
       if( debug_level > 8)
          debug_printf( "After fixup: %d\n", (int)strlen( buff));
       jd = observation_jd( buff);
+      if( jd && *new_name)    /* 'odd name' sort of xdesig */
+         {
+         memcpy( new_name, buff, 12);
+         new_name[12] = ' ';
+         get_object_name( new_name, NULL);
+         *new_name = '\0';
+         }
       if( jd && *new_xdesig)   /* previous line was "COM = (xdesig)";   */
          {                    /* add a new cross-designation to the table */
-         const char xdesig_type = *new_xdesig;
-
          memcpy( new_xdesig, buff, 12);
          new_xdesig[12] = ' ';
-         if( xdesig_type == '!')
-            {
-            for( i = (int)strlen( new_xdesig); i < 26; i++)
-               new_xdesig[i] = ' ';
-            strcpy( new_xdesig + 26, new_xdesig_indicator);
-            xref_designation( new_xdesig);
-            }
-         else        /* 'odd name' sort of xdesig */
-            get_object_name( new_xdesig, NULL);
+         for( i = (int)strlen( new_xdesig); i < 26; i++)
+            new_xdesig[i] = ' ';
+         strcpy( new_xdesig + 26, new_xdesig_indicator);
+         xref_designation( new_xdesig);
          *new_xdesig = '\0';
          }
       if( is_in_range( jd) && !is_second_line( buff))
@@ -4285,8 +4285,8 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
          }
       if( !memcmp( buff, "#xdesig ", 8))
          {
-         *new_xdesig = '*';
-         strlcpy_err( new_xdesig + 13, buff + 8, sizeof( new_xdesig) - 13);
+         *new_name = '!';
+         strlcpy_err( new_name + 13, buff + 8, sizeof( new_name) - 13);
          }
       if( !strcmp( buff, "#ignore obs"))
          while( fgets_trimmed( buff, sizeof( buff), ifile)
