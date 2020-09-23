@@ -3448,6 +3448,7 @@ double maximum_observation_span = 200.;
 int sanity_check_observations = 1;
 bool use_sigmas = true;
 extern int is_interstellar;
+bool suppress_private_obs = true;
 
 OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                            const int n_obs)
@@ -3457,7 +3458,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
    char obj_name[80];
    OBSERVE FAR *rval;
    bool including_obs = true;
-   int i = 0, n_fixes_made = 0;
+   int i = 0, n_fixes_made = 0, n_private_obs = 0;
    unsigned line_no = 0;
    unsigned n_below_horizon = 0, n_in_sunlight = 0;
    unsigned lines_actually_read = 0;
@@ -3633,6 +3634,11 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                set_obs_vect( rval + i);
                rval[i].second_line = (char *)malloc( 81);
                strcpy( rval[i].second_line, second_line);
+               }
+            if( suppress_private_obs && rval[i].reference[0] == '!')
+               {
+               observation_is_good = false;
+               n_private_obs++;
                }
             if( observation_is_good)
                {
@@ -3815,6 +3821,15 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
          }
       }
    free_ades2mpc_context( ades_context);
+   if( n_private_obs)
+      {
+      snprintf( buff, sizeof( buff), "%d observations were marked as 'private'.\n"
+               "Re-run Find_Orb with the -P switch to include them.\n"
+               "See https://www.projectpluto.com/private.htm for details.",
+               n_private_obs);
+
+      generic_message_box( buff, "o");
+      }
    n_obs_actually_loaded = i;
    if( debug_level)
       debug_printf( "%u obs found in file\n",  n_obs_actually_loaded);
