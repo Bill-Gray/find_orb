@@ -1463,6 +1463,29 @@ int get_object_name( char *obuff, const char *packed_desig)
          }
       }
    unpack_provisional_packed_desig( provisional_desig, xdesig + 5);
+
+            /* Check for numbered asteroids (620000) or greater.  See MPEC
+            2019-O55 for explanation of this 'extended numbering scheme'. */
+   if( xdesig[0] == '~' && !memcmp( xdesig + 5, "       ", 5))
+      {
+      int num = 0;
+
+      for( i = 1; i < 5; i++)
+         {
+         const int digit = mutant_hex_char_to_int( xdesig[i]);
+
+         if( digit == -1)
+            break;
+         else
+            num = num * 62 + digit;
+         }
+      if( i == 5)    /* yes,  it's a valid 'extended' numbered object */
+         {
+         if( obuff)
+            sprintf( obuff, "(%d)", num + 620000);
+         return( OBJ_DESIG_ASTEROID_NUMBERED);
+         }
+      }
             /* For numbered asteroids or comets,  we require either that
             columns 6-12 be blank (usually the case) or have a valid
             provisional designation.  And,  of course,  the packed desig must
