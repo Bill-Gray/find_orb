@@ -1611,6 +1611,9 @@ inline double minimum_sr_distance( const double time_span)
 
 double sr_min_r = 0., sr_max_r = 0.;
 
+int n_sr_ranges;
+double sr_roots[10];
+
 int find_nth_sr_orbit( double *orbit, OBSERVE FAR *obs, int n_obs,
                             const int orbit_number)
 {
@@ -1629,39 +1632,38 @@ int find_nth_sr_orbit( double *orbit, OBSERVE FAR *obs, int n_obs,
       const double rand2 = haltonize( (unsigned)orbit_number + 1, 3);
       double dist = 0., search_dist;
       int i;
-      static int n_ranges;
-      static double roots[10], total_dist;
+      static double total_dist;
 
       if( !orbit_number)
          {
          if( sr_max_r)        /* user override of SR ranges */
             {
-            roots[0] = sr_min_r;
-            roots[1] = sr_max_r;
-            n_ranges = 1;
+            sr_roots[0] = sr_min_r;
+            sr_roots[1] = sr_max_r;
+            n_sr_ranges = 1;
             }
          else        /* "normal" determination of possible ranges */
             {
             const double time_range = obs[n_obs - 1].jd - obs[0].jd;
             const double min_range = minimum_sr_distance( time_range);
 
-            n_ranges = find_sr_ranges( roots,
+            n_sr_ranges = find_sr_ranges( sr_roots,
                         obs[n_obs - 1].obs_posn, obs[n_obs - 1].vect,
                         obs[    0    ].obs_posn, obs[    0    ].vect,
                         SOLAR_GM, time_range);
-            for( i = 0; i < n_ranges * 2; i++)
-               if( roots[i] < min_range)
-                  roots[i] = min_range;
+            for( i = 0; i < n_sr_ranges * 2; i++)
+               if( sr_roots[i] < min_range)
+                  sr_roots[i] = min_range;
             }
          if( debug_level > 1)
             {
-            debug_printf( "%d ranges\n", n_ranges);
-            for( i = 0; i < n_ranges * 2; i++)
-               debug_printf( "Root %d: %f\n", i, roots[i]);
+            debug_printf( "%d ranges\n", n_sr_ranges);
+            for( i = 0; i < n_sr_ranges * 2; i++)
+               debug_printf( "Root %d: %f\n", i, sr_roots[i]);
             }
          total_dist = 0.;
-         for( i = 0; i < n_ranges * 2; i += 2)
-            total_dist += roots[i + 1] - roots[i];
+         for( i = 0; i < n_sr_ranges * 2; i += 2)
+            total_dist += sr_roots[i + 1] - sr_roots[i];
          if( debug_level > 1)
             debug_printf( "Total dist: %f\n", total_dist);
          }
@@ -1669,15 +1671,15 @@ int find_nth_sr_orbit( double *orbit, OBSERVE FAR *obs, int n_obs,
             /* It will still be in the range 0 <= rand1 < 1.      */
       rand1 = rand1 * (1. + rand1) / 2.;
       search_dist = total_dist * rand1;
-      for( i = 0; i < n_ranges * 2; i += 2)
+      for( i = 0; i < n_sr_ranges * 2; i += 2)
          {
-         const double d2 = dist + roots[i + 1] - roots[i];
+         const double d2 = dist + sr_roots[i + 1] - sr_roots[i];
 
          if( d2 < search_dist)
             dist = d2;
          else
             {
-            dist = roots[i] + (search_dist - dist);
+            dist = sr_roots[i] + (search_dist - dist);
             break;
             }
          }
