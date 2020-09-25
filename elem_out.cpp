@@ -686,7 +686,7 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
       {
       double neo_score = erf( (1.3 - elem->q) / q_sigma) * .5 + .5;
 
-      fprintf( ofile, "\n        \"p_NEO\": %.4f,", neo_score);
+      fprintf( ofile, "\n        \"p_NEO\": %.4f,", neo_score * 100.);
       }
 /* if( moids[1])        */
       {
