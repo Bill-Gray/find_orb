@@ -1,0 +1,62 @@
+# I'm keeping track of a lot of junk lacking official COSPAR (YYYY-NNNletter)
+# and NORAD (five-digit,  eventually to be nine-digit) identifiers.  The
+# following gives my unofficial IDs for such objects.  'eph2tle' uses these
+# to set both identifiers.  Eventually,  'sat_id' may use it as well.
+# 2020 Sep 26 version.  Comments can be added freely if starting with #.
+
+# A few identifiers were eventually associated with other objects and are
+# commented out.  They're kept here to keep the ordering right and because
+# they may occur in older TLEs.
+
+# This one is from the amateur tracking community.
+
+  000090084 09710A   9O0DC57 = unk P=2.26d, i=25
+
+# And these are my additions.  I started with 89999 and worked backward.
+# The amateur tracking community uses numbers starting with 90000;  in
+# recent years,  Space-Track has had 'analyst' objects starting with 80000.
+# For COSPAR,  I've started with 00000AAA and went up.
+#
+# In a few cases,  objects appear under multiple names,  either because I
+# made an identification later (00000AAQ,  for example) or just messed up
+# (00000AAU,  for example).
+
+  000089999 00000AAA ZR3BAD8
+# 000089998 00000AAB ZTF00V9                       /* = 89991 = 00000AAI */
+  000089997 00000AAC WT1190F = UDA34A3 = UW8551D = 9U01FF6
+  000089996 00000AAD XL8D89E
+# 000089995 00000AAE ZGBD4BF = ZJ15031 = unknown   /* 1965-058B */
+  000089994 00000AAF ZTF00Y9 = ZTF00Yp = ZTF00ah
+  000089993 00000AAG ZTF00hf = ZTF00YB
+  000089992 00000AAH ZTF00pm = ZTF01Ls
+  000089991 00000AAI ZTF00V9 = ZTF00Vv = ZTF00Y5
+  000089990 00000AAJ S509559
+# 000089989 00000AAK ZV2F779                       /* 'Multijunk' */
+  000089988 00000AAL ZTF01sS = ZTF01sX = ZTF01wl
+# 000089987 00000AAM JNS023 = ZTF02BI = A10boIy    /* = 1969-046D */
+  000089986 00000AAN A10bMLz
+# 000089985 00000AAO ZTF02Rj                       /* = 'Multijunk' */
+  000089984 00000AAP ZTF02Uy = ZTF02rw = ZTF02V0
+
+# 'Multijunk' has appeared under a variety of names.
+
+  000089983 00000AAQ C05GHG1 = C04W5Q1 = C073CX1
+  000089983 00000AAQ C0Z1JL1 = ZTF0Csc = C21KXA2 = ZTF0Czu = 'Multijunk'
+  000089983 00000AAQ C1AUGE1 = ZTF0Edd = 'Multijunk'
+
+  000089982 00000AAR S511502
+  000089981 00000AAS S512009 = ZTF0D86
+  000089980 00000AAT ZTF09ps = ZTF09iM = ZTF0CjS
+  000089979 00000AAU TMG0027 = A10nE6r = A10o4jb = ZTF0Dfv = 64001 = 40001 = S513197
+  000089979 00000AAU TMG0027 = A10nE6r = A10o4jb = 64001 = 40001 = JNS053
+  000089978 00000AAV ZTF0Ew1 = ZTF0F7k = ETBO
+  000089977 00000AAW A10pgty = A10pgtz = ZTF0Dxq
+  000089976 00000AAX TMG0011
+  000089975 00000AAY TMG0025 = ZTF0EK3
+  000089974 00000AAZ ZTF0Dy2 = ZTF0E1U = ZTF0E2T
+  000089973 00000ABA ZTF0Dip = ZTF0DkY = ZTF0DcD
+  000089973 00000ABA ZTF0DcD = ZTF0Dip = ZTF0DkY
+  000089972 00000ABB ZTF0EWD = C1A3AQ1 = 67040 obj
+  000089971 00000ABC ZTF0DXh
+  000089970 00000ABD S512009 = ZTF0D86
+  000089969 00000ABE ZTF09oP = ZTF09mO = A10jyaB

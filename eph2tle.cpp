@@ -469,53 +469,22 @@ amateurs tracking classified objects use NORAD desigs starting at 90000,
 so I'll use 89999 and count down... except for 9O0DC57;  the "classified"
 tracking community already has designations for that.
 
-   Note also that the following designations were used in the past,
-when the objects in question hadn't been linked to something else.  Now
-that such linkage has been made,  these are all obsolete.  You won't
-find them in my current TLEs,  but you may have some 'historical' data
-that uses them.
-
-   Also note that the repeated use of 89983 = 2000-00AAAQ is deliberate.
-This is an object that has been found and designated at least twenty times.
-
-         "89998 00000AAB ZTF00V9",   = 89991 = 00000AAI
-         "89995 00000AAE ZGBD4BF = ZJ15031 = unknown", = 1965-058B
-         "89989 00000AAK ZV2F779",         = C05GHG1 = many others ('Multijunk')
-         "89987 00000AAM JNS023 = ZTF02BI = A10boIy",  = 1969-046D
-         "89985 00000AAO ZTF02Rj",         = C05GHG1 = many others ('Multijunk')
-*/
+   'sat_xref.txt' has further comments on this.     */
 
 static void reset_desigs_by_name( const char *obj_name, tle_t *tle)
 {
-   const char *remaps[] = {
-         "89999 00000AAA ZR3BAD8",
-         "89997 00000AAC WT1190F = UDA34A3 = UW8551D = 9U01FF6",
-         "89996 00000AAD XL8D89E",
-         "89994 00000AAF ZTF00Y9 = ZTF00Yp = ZTF00ah",
-         "89993 00000AAG ZTF00hf = ZTF00YB",
-         "89992 00000AAH ZTF00pm = ZTF01Ls",
-         "89991 00000AAI ZTF00V9 = ZTF00Vv = ZTF00Y5",
-         "89990 00000AAJ S509559",
-         "89988 00000AAL ZTF01sS = ZTF01sX = ZTF01wl",
-         "89986 00000AAN A10bMLz",
-         "89984 00000AAP ZTF02Uy = ZTF02rw = ZTF02V0",
-         "89983 00000AAQ C05GHG1 = C04W5Q1 = C073CX1",
-         "89983 00000AAQ C0Z1JL1 = ZTF0Csc = C21KXA2 = ZTF0Czu = 'Multijunk'",
-         "89982 00000AAR S511502",
-         "89981 00000AAS S512009 = ZTF0D86",
-         "89980 00000AAT ZTF09ps = ZTF09iM = ZTF0CjS",
-         "89979 00000AAU TMG0027 = A10nE6r = A10o4jb = ZTF0Dfv = 64001 = 40001 = S513197",
-         "90084 09710A   9O0DC57 = unk P=2.26d, i=25",
-         NULL };
-   size_t i;
+   FILE *ifile = fopen( "sat_xref.txt", "rb");
+   char buff[100];
 
-   for( i = 0; remaps[i]; i++)
-      if( !strcmp( obj_name, remaps[i] + 15))
+   assert( ifile);
+   while( fgets_trimmed( buff, sizeof( buff), ifile))
+      if( !strcmp( obj_name, buff + 21))
          {
-         tle->norad_number = atoi( remaps[i]);
-         memcpy( tle->intl_desig, remaps[i] + 6, 8);
+         tle->norad_number = atoi( buff);
+         memcpy( tle->intl_desig, buff + 12, 8);
          tle->intl_desig[8] = '\0';
          }
+   fclose( ifile);
 }
 
 /* NOTE:  this precesses input J2000 state vectors to mean equator/ecliptic
