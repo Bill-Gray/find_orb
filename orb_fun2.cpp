@@ -31,7 +31,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #define GAUSS_K .01720209895
 #define SOLAR_GM (GAUSS_K * GAUSS_K)
 
-int generate_mc_variant_from_covariance( double *orbit);    /* orb_fun2.cpp */
+double generate_mc_variant_from_covariance( double *var_orbit,
+                                                     const double *orbit);
 double improve_along_lov( double *orbit, const double epoch, const double *lov,
           const unsigned n_params, unsigned n_obs, OBSERVE *obs);
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
@@ -768,20 +769,24 @@ double improve_along_lov( double *orbit, const double epoch, const double *lov,
 
 double gaussian_random( void);                           /* monte0.c */
 
-int generate_mc_variant_from_covariance( double *orbit)
+double generate_mc_variant_from_covariance( double *var_orbit,
+                                                     const double *orbit)
 {
    int i, j;
    extern double **eigenvects;
+   double rval = 0.;
 
    assert( eigenvects);
+   memcpy( var_orbit, orbit, 6 * sizeof( double));
    for( i = 0; i < 6 + n_extra_params; i++)
       {
       const double g_rand = gaussian_random( );
 
       for( j = 0; j < 6; j++)
-         orbit[j] += g_rand * eigenvects[i][j];
+         var_orbit[j] += g_rand * eigenvects[i][j];
       for( j = 0; j < n_extra_params; j++)
          solar_pressure[j] += g_rand * eigenvects[i][j + 6];
+      rval += g_rand * g_rand;
       }
-   return( 0);
+   return( rval);
 }

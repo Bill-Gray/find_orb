@@ -4111,7 +4111,8 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
    return( obs[start].jd);    /* ...and return epoch = JD of first observation */
 }
 
-int generate_mc_variant_from_covariance( double *orbit);    /* orb_fun2.cpp */
+double generate_mc_variant_from_covariance( double *var_orbit,
+                                                     const double *orbit);
 
 int orbital_monte_carlo( const double *orbit, OBSERVE *obs, const int n_obs,
          const double curr_epoch, const double epoch_shown)
@@ -4129,8 +4130,7 @@ int orbital_monte_carlo( const double *orbit, OBSERVE *obs, const int n_obs,
       {
       double *torbit = sr_orbits + i * 6;
 
-      memcpy( torbit, orbit, 6 * sizeof( double));
-      generate_mc_variant_from_covariance( torbit);
+      generate_mc_variant_from_covariance( torbit, orbit);
       write_out_elements_to_file( torbit, curr_epoch, epoch_shown,
            obs, n_obs, "", 6, 1, ELEM_OUT_ALTERNATIVE_FORMAT);
       append_elements_to_element_file = 1;
