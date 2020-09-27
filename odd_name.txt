@@ -234,7 +234,6 @@ XMM          1999-066A = XMM-Newton = NORAD 25989
      RK252A5 RK252A5 = 2010 KQ = Luna ?? stage
      TJ7B205 TJ7B205 = unk Molniya
      UR29394 UR29394 = unk P=2.15d, i=12
-     UV18B9C 1967-040A = NORAD 02765 = UU0E325 = UV18B9C = Vela 7
      VA3730D VA3730D = unk P=.9d, i=18
      WF12200 WF12200 = unk P=1.04d, i=21
      WJ2AD07 WJ2AD07 = unk P=4.04d, i=53
@@ -269,30 +268,16 @@ STEREO-B     2006-047B = NORAD 29511 = STEREO-B
     AK17U010 1I/`Oumuamua
      ZGBD4BF ZGBD4BF = ZJ15031 = unknown
 2018-045D    2018-045D = NORAD 43473 = Queqiao booster
-2018-045A    2018-045A = NORAD 43470 = Queqiao
-     ZTF00V9 ZTF00V9 = ZTF00Vv = ZTF00Y5
-     ZTF00Y9 ZTF00Y9 = ZTF00Yp = ZTF00ah
-     ZTF00hf ZTF00hf = ZTF00YB
      ZTF00pm ZTF00pm = ZTF01Ls
      ZTF01sS ZTF01sS = ZTF01sX = ZTF01wl
 2018-103B    2018-103B = NORAD 43846 = Chang'e 4 booster
      JNS023  1969-046D = NORAD 03954 = Vela 5a
      C05GHG1 C05GHG1 = C04W5Q1 = C073CX1
 1964-040B    1964-040B = NORAD 00837 = Vela 2B
-     S511502 S511503 = S511502 = S511497 = others
-2019-040A    2019-040A = NORAD 44432 = Spektr-RG
-2019-040B    2019-040B = NORAD 44433 = Spektr-RG Booster
-     ZTF09oP ZTF09oP = ZTF09mO = A10jyaB
-     C0Z1JL1 C0Z1JL1 = ZTF0Csc = C21KXA2 = ZTF0Czu = 'Multijunk'
-     SolO    Solar Orbiter
-     SolCent Solar Orbiter Centaur
-     S512009 S512009 = ZTF0D86
              [Unnamed]
-     ZTF09ps ZTF09ps = ZTF09iM = ZTF0CjS
      EMM-01  2020-047A = NORAD 45918 = EMM (Hope) spacecraft
      EMM-02  2020-047B = NORAD 45919 = EMM (Hope) booster
      TianweA 2020-049A = NORAD 45935 = Tianwen-1 spacecraft
      TianweB 2020-049B = NORAD 45936 = Tianwen-1 booster
 Perseverance 2020-052A = NORAD 45984 = Mars 2020 (Perseverance)
 2020-052B    2020-052B = NORAD 45985 = Mars 2020 (Perseverance) booster
-     TMG0027 TMG0027 = A10nE6r = A10o4jb = ZTF0Dfv = 64001 = 40001 = S513197
