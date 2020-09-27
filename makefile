@@ -205,7 +205,8 @@ endif
 	cp mpc_area.txt mpcorb.hdr                                                  $(IDIR)
 	cp mu1.txt observer.txt obslinks.htm ObsCodes.htm ObsCodesF.html            $(IDIR)
 	cp obj_help.txt odd_name.txt openfile.txt previous.def rovers.txt           $(IDIR)
-	cp scope.json scopes.txt sigma.txt xdesig.txt bright2.pgm elem_pop.txt     $(IDIR)
+	cp sat_xref.txt scope.json scopes.txt sigma.txt                             $(IDIR)
+	cp xdesig.txt bright2.pgm elem_pop.txt                                      $(IDIR)
 
 uninstall:
 ifdef EXE
