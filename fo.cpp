@@ -204,7 +204,8 @@ static void combine_element_files( const char *filename, const int n_processes)
       if( !fgets( buff, sizeof( buff), ifile))
          {        /* get header line */
          printf( "Failed to read sof.txt\n");
-         exit( -1);
+         free( input_files);
+         return;
          }
       fclose( ifile);
       ofile = fopen( filename, "w");
