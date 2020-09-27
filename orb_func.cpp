@@ -1614,6 +1614,30 @@ double sr_min_r = 0., sr_max_r = 0.;
 int n_sr_ranges;
 double sr_roots[10];
 
+double find_sr_dist( const double fraction)
+{
+   double total_dist = 0., dist = 0., target_dist;
+   int i;
+
+   assert( fraction >= 0.);
+   assert( fraction <= 1.);
+   for( i = 0; i < n_sr_ranges * 2; i += 2)
+      total_dist += sr_roots[i + 1] - sr_roots[i];
+   target_dist = total_dist * fraction;
+   for( i = 0; i < n_sr_ranges * 2; i += 2)
+      {
+      const double delta = sr_roots[i + 1] - sr_roots[i];
+      const double new_dist = dist + delta;
+
+      if( new_dist < target_dist)
+         dist = new_dist;
+      else
+         return( sr_roots[i] + target_dist - dist);
+      }
+   assert( 1);
+   return( sr_roots[n_sr_ranges * 2 - 1]);         /* maxed out */
+}
+
 int find_nth_sr_orbit( double *orbit, OBSERVE FAR *obs, int n_obs,
                             const int orbit_number)
 {
@@ -1630,9 +1654,8 @@ int find_nth_sr_orbit( double *orbit, OBSERVE FAR *obs, int n_obs,
       {
       double rand1 = haltonize( (unsigned)orbit_number + 1, 2);
       const double rand2 = haltonize( (unsigned)orbit_number + 1, 3);
-      double dist = 0., search_dist;
+      double dist = 0.;
       int i;
-      static double total_dist;
 
       if( !orbit_number)
          {
@@ -1661,28 +1684,11 @@ int find_nth_sr_orbit( double *orbit, OBSERVE FAR *obs, int n_obs,
             for( i = 0; i < n_sr_ranges * 2; i++)
                debug_printf( "Root %d: %f\n", i, sr_roots[i]);
             }
-         total_dist = 0.;
-         for( i = 0; i < n_sr_ranges * 2; i += 2)
-            total_dist += sr_roots[i + 1] - sr_roots[i];
-         if( debug_level > 1)
-            debug_printf( "Total dist: %f\n", total_dist);
          }
             /* We give 'rand1' a slight bias toward lower values. */
             /* It will still be in the range 0 <= rand1 < 1.      */
       rand1 = rand1 * (1. + rand1) / 2.;
-      search_dist = total_dist * rand1;
-      for( i = 0; i < n_sr_ranges * 2; i += 2)
-         {
-         const double d2 = dist + sr_roots[i + 1] - sr_roots[i];
-
-         if( d2 < search_dist)
-            dist = d2;
-         else
-            {
-            dist = sr_roots[i] + (search_dist - dist);
-            break;
-            }
-         }
+      dist = find_sr_dist( rand1);
       fail_on_hitting_planet = true;
       rval = find_trial_orbit( orbit, obs, n_obs, dist, 2. * rand2 - 1.);
       fail_on_hitting_planet = false;
