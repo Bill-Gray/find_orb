@@ -1515,7 +1515,6 @@ int get_object_name( char *obuff, const char *packed_desig)
          }
       else if( strchr( "PCDXA", xdesig[4]))   /* it's a numbered comet */
          {
-         const char extra_suffix_char = xdesig[10];
          const char suffix_char = xdesig[11];
          char tbuff[20];
 
@@ -1528,12 +1527,17 @@ int get_object_name( char *obuff, const char *packed_desig)
                i++;
             while( xdesig[i] >= '0' && xdesig[i] <= '9')   /* read digits... */
                *obuff++ = xdesig[i++];
+            if( suffix_char >= 'a' && suffix_char <= 'z')
+               {
+               const char extra_suffix_char = xdesig[10];
+
+               *obuff++ = '-';
                   /* possibly _two_ suffix letters... so far,  only the  */
                   /* components of 73P/Schwassmann-Wachmann 3 have this: */
-            if( extra_suffix_char >= 'a' && extra_suffix_char <= 'z')
-               *obuff++ = extra_suffix_char;
-            if( suffix_char >= 'a' && suffix_char <= 'z')
-               *obuff++ = suffix_char;
+               if( extra_suffix_char >= 'a' && extra_suffix_char <= 'z')
+                  *obuff++ = extra_suffix_char + 'A' - 'a';
+               *obuff++ = suffix_char + 'A' - 'a';
+               }
             sprintf( tbuff, "%3d%c/", atoi( xdesig), xdesig[4]);
             try_adding_comet_name( tbuff, obuff);
             }
