@@ -1157,7 +1157,7 @@ static int unpack_provisional_packed_desig( char *obuff, const char *ibuff)
          else
             sprintf( obuff, "%d", output_no);
          if( islower( ibuff[6]))    /* comet fragment letter */
-            sprintf( obuff + strlen( obuff), "%c", ibuff[6]);
+            snprintf_append( obuff, 20, "-%c", ibuff[6] + 'A' - 'a');
          }
       }
    else
