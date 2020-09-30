@@ -2585,7 +2585,6 @@ static int user_select_file( char *filename, const char *title, const int flags)
 
 extern const char *elements_filename;
 
-#define DISPLAY_BASIC_INFO           1
 #define DISPLAY_OBSERVATION_DETAILS  2
 #define DISPLAY_ORBITAL_ELEMENTS     4
 
@@ -3271,14 +3270,11 @@ int main( int argc, const char **argv)
          debug_printf( "elements written\n");
       update_element_display = 0;
       top_line_basic_info_perturbers = line_no;
-      if( observation_display & DISPLAY_BASIC_INFO)
-         {
-         n_command_lines = show_basic_info( obs, n_obs, 1);
-         show_perturbers( n_command_lines);
-         if( debug_level)
-            refresh( );
-         line_no = n_command_lines + 1;
-         }
+      n_command_lines = show_basic_info( obs, n_obs, 1);
+      show_perturbers( n_command_lines);
+      if( debug_level)
+         refresh( );
+      line_no = n_command_lines + 1;
       if( observation_display & DISPLAY_OBSERVATION_DETAILS)
          {
          bool clock_shown = false;
@@ -4238,13 +4234,6 @@ int main( int argc, const char **argv)
             add_off_on = (observation_display & DISPLAY_OBSERVATION_DETAILS);
             clear( );
             break;
-         case 'j': case 'J':
-            observation_display ^= DISPLAY_BASIC_INFO;
-            strcpy( message_to_user,
-                     "Perturber/R1 & R2/step size data display toggled");
-            add_off_on = (observation_display & DISPLAY_BASIC_INFO);
-            clear( );
-            break;
          case 'l': case 'L':
             if( !*orbit_constraints)
                inquire(
@@ -5190,6 +5179,7 @@ int main( int argc, const char **argv)
             single_obs_selected = true;
             break;
          case 'c': case 'C':
+         case 'j': case 'J':
          case ALT_P: case ALT_Y:
          case ';': case '\'':
          default:
