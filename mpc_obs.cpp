@@ -65,7 +65,6 @@ void set_obs_vect( OBSERVE FAR *obs);        /* mpc_obs.h */
 int planet_posn( const int planet_no, const double jd, double *vect_2000);
 void remove_trailing_cr_lf( char *buff);            /* ephem0.cpp */
 void format_dist_in_buff( char *buff, const double dist_in_au); /* ephem0.c */
-char int_to_mutant_hex_char( const int ival);               /* mpc_obs.c */
 double current_jd( void);                       /* elem_out.cpp */
 void remove_insignificant_digits( char *tbuff);          /* monte0.c */
 int compute_observer_loc( const double jde, const int planet_no,
@@ -90,6 +89,7 @@ void shellsort_r( void *base, const size_t n_elements, const size_t esize,
 int string_compare_for_sort( const void *a, const void *b, void *context);
 int format_jpl_ephemeris_info( char *buff);                 /* pl_cache.c */
 const char *get_find_orb_text( const int index);      /* elem_out.cpp */
+static void reduce_designation( char *desig, const char *idesig);
 int set_tholen_style_sigmas( OBSERVE *obs, const char *buff);  /* mpc_obs.c */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 #ifdef _MSC_VER
@@ -1090,85 +1090,6 @@ static int get_obs_alt_azzes( const OBSERVE FAR *obs, DPT *sun_alt_az,
    return( rval);
 }
 
-/* "Mutant hex" is frequently used by MPC.  It uses the usual hex digits
-   0123456789ABCDEF for numbers 0 to 15,  followed by G...Z for 16...35
-   and a...z for 36...61.  */
-
-static int mutant_hex_char_to_int( const char c)
-{
-   int rval;
-
-   if( c >= '0' && c <= '9')
-      rval = (int)c - '0';
-   else if( c >= 'A' && c <= 'Z')
-      rval = (int)c - 'A' + 10;
-   else if( c >= 'a' && c <= 'z')
-      rval = (int)c - 'a' + 36;
-   else
-      rval = -1;
-   return( rval);
-}
-
-char int_to_mutant_hex_char( const int ival)
-{
-   int rval;
-
-   if( ival < 0 || ival > 61)
-      rval = '\0';
-   else if( ival < 10)
-      rval = '0';
-   else if( ival < 36)
-      rval = 'A' - 10;
-   else
-      rval = 'a' - 36;
-   return( rval ? (char)( rval + ival) : '\0');
-}
-
-/* This will unpack a packed designation such as 'K04J42X' into
-'2004 JX42'. Returns 0 if it's a packed desig,  non-zero otherwise. Call
-with obuff == NULL just to find out if ibuff is actually a packed desig. */
-
-static int unpack_provisional_packed_desig( char *obuff, const char *ibuff)
-{
-   int rval = 0;
-
-   if( *ibuff >= 'G' && *ibuff <= 'K' && isdigit( ibuff[1])
-            && isdigit( ibuff[2]) && isupper( ibuff[3])
-            && isdigit( ibuff[5]) && isalnum( ibuff[6]))
-      {
-      int output_no = mutant_hex_char_to_int( ibuff[4]);
-
-      if( output_no == -1)
-         rval = -2;
-
-      if( obuff)
-         {
-         *obuff++ = ((*ibuff >= 'K') ? '2' : '1');          /* millennium */
-         *obuff++ = (char)( '0' + ((*ibuff - 'A') % 10));   /* century   */
-         *obuff++ = ibuff[1];                               /* decade   */
-         *obuff++ = ibuff[2];                               /* year    */
-         *obuff++ = ' ';
-         *obuff++ = ibuff[3];       /* half-month designator */
-         if( isupper( ibuff[6]))    /* asteroid second letter */
-            *obuff++ = ibuff[6];
-         output_no = output_no * 10 + ibuff[5] - '0';
-         if( !output_no)
-            *obuff = '\0';
-         else
-            sprintf( obuff, "%d", output_no);
-         if( islower( ibuff[6]))    /* comet fragment letter */
-            snprintf_append( obuff, 20, "-%c", ibuff[6] + 'A' - 'a');
-         }
-      }
-   else
-      {
-      if( obuff)
-         *obuff = '\0';
-      rval = -1;
-      }
-   return( rval);
-}
-
 char **load_file_into_memory( const char *filename, size_t *n_lines,
                         const bool fail_if_not_found)
 {
@@ -1212,7 +1133,6 @@ static void try_adding_comet_name( const char *search, char *name)
    FILE *ifile = fopen_ext( "ELEMENTS.COMET", "crb");
    bool found_name = false;
 
-   *name = '\0';
    if( ifile)
       {
       char buff[200];
@@ -1226,8 +1146,8 @@ static void try_adding_comet_name( const char *search, char *name)
                {
                buff[44] = '\0';
                remove_trailing_cr_lf( buff);
-               *name++ = ' ';
-               strcpy( name, buff + slen);
+               strcat( name, " ");
+               strcat( name, buff + slen);
                }
             }
       fclose( ifile);
@@ -1298,15 +1218,6 @@ static int is_artsat_desig( const char *desig)
    Return values are as follows.  Note that 'other' includes artsats and
    temporary designations.        */
 
-#define OBJ_DESIG_ASTEROID_PROVISIONAL   0
-#define OBJ_DESIG_ASTEROID_NUMBERED      1
-#define OBJ_DESIG_COMET_PROVISIONAL      2
-#define OBJ_DESIG_COMET_NUMBERED         3
-#define OBJ_DESIG_NATSAT_PROVISIONAL     4
-#define OBJ_DESIG_NATSAT_NUMBERED        5
-#define OBJ_DESIG_ARTSAT                 6
-#define OBJ_DESIG_OTHER                 -1
-
 typedef struct
 {
    void *next;
@@ -1315,12 +1226,12 @@ typedef struct
 
 int get_object_name( char *obuff, const char *packed_desig)
 {
-   int rval = OBJ_DESIG_OTHER;
+   int rval;
    size_t i, gap;
    static size_t n_lines;
    static char **extra_names = NULL;
    static odd_name_t *added = NULL;
-   char provisional_desig[40], xdesig[40];
+   char xdesig[40];
 
    if( !packed_desig && !obuff)   /* flag to free up internal memory */
       {
@@ -1357,7 +1268,8 @@ int get_object_name( char *obuff, const char *packed_desig)
       shellsort_r( extra_names, n_lines, sizeof( char *),
                      string_compare_for_sort, &sort_column);
       }
-   strcpy( xdesig, packed_desig);
+
+   reduce_designation( xdesig, packed_desig);
    xref_designation( xdesig);
 
    if( obuff)
@@ -1394,222 +1306,22 @@ int get_object_name( char *obuff, const char *packed_desig)
          }
       }
 
-   if( *xdesig == '$')         /* Find_Orb extension to allow storing of */
-      {                        /* an unpacked name,  up to 11 chars */
-      if( obuff)
-         strcpy( obuff, xdesig + 1);
-      return( OBJ_DESIG_ASTEROID_NUMBERED);     /* fix later... will be a project! */
-      }
+   rval = unpack_mpc_desig( obuff, xdesig);
 
-   if( xdesig[4] == 'S')   /* Possible natural satellite */
+   if( obuff)
       {
-      if( strchr( "MVEJSUNP", *xdesig) && isdigit( xdesig[1])
-                  && isdigit( xdesig[2]) && isdigit( xdesig[3]) &&
-                  !memcmp( xdesig + 5, "       ", 7))
-         {
-         if( obuff)
-            {
-            const char *planet_names[8] = { "Venus", "Earth", "Mars", "Jupiter",
-                  "Saturn", "Uranus", "Neptune", "Pluto" };
-            const char *roman_digits[10] = { "", "I", "II", "III", "IV",
-                     "V", "VI", "VII", "VIII", "IX" };
-            const char *roman_tens[10] = { "", "X", "XX", "XXX", "XL",
-                     "L", "LX", "LXX", "LXXX", "XL" };
-            const char *roman_hundreds[10] = { "", "C", "CC", "CCC", "CD",
-                     "D", "DC", "DCC", "DCCC", "CD" };
-            const int obj_number = atoi( xdesig + 1);
-
-            for( i = 0; i < 8; i++)
-               if( planet_names[i][0] == *xdesig)
-                  {
-                  strcpy( obuff, planet_names[i]);
-                  strcat( obuff, " ");
-                  }
-            if( obj_number / 100)
-               strcat( obuff, roman_hundreds[obj_number / 100]);
-            if( (obj_number / 10) % 10)
-               strcat( obuff, roman_tens[(obj_number / 10) % 10]);
-            if( obj_number % 10)
-               strcat( obuff, roman_digits[obj_number % 10]);
-            }
-         rval = OBJ_DESIG_NATSAT_NUMBERED;
-         }
-      else if( strchr( "MVEJSUNP", xdesig[8]) && isdigit( xdesig[6])
-               && isdigit( xdesig[7]) && isdigit( xdesig[9])
-               && isdigit( xdesig[10]) && xdesig[11] == '0'
-               && !memcmp( xdesig + 1, "   ", 3) && xdesig[5] >= 'H'
-               && xdesig[5] <= 'Z')
-         {
-         if( obuff)
-            {
-            sprintf( obuff, "S/%d%c%c", 20 + xdesig[5] - 'K',
-                                     xdesig[6], xdesig[7]);
-            obuff[6] = ' ';
-            obuff[7] = xdesig[8];       /* planet identifier */
-            obuff[8] = ' ';
-            if( xdesig[9] > '0')     /* double-digit ID (unlikely, */
-               {                           /* but it _can_ happen)       */
-               obuff[9] = xdesig[9];
-               obuff[10] = xdesig[10];
-               obuff[11] = '\0';
-               }
-            else                 /* more usual single-digit case: */
-               {
-               obuff[9] = xdesig[10];
-               obuff[10] = '\0';
-               }
-            }
-         rval = OBJ_DESIG_NATSAT_PROVISIONAL;
-         }
-      }
-   unpack_provisional_packed_desig( provisional_desig, xdesig + 5);
-
-            /* Check for numbered asteroids (620000) or greater.  See MPEC
-            2019-O55 for explanation of this 'extended numbering scheme'. */
-   if( xdesig[0] == '~' && !memcmp( xdesig + 5, "       ", 5))
-      {
-      int num = 0;
-
-      for( i = 1; i < 5; i++)
-         {
-         const int digit = mutant_hex_char_to_int( xdesig[i]);
-
-         if( digit == -1)
-            break;
-         else
-            num = num * 62 + digit;
-         }
-      if( i == 5)    /* yes,  it's a valid 'extended' numbered object */
-         {
-         if( obuff)
-            sprintf( obuff, "(%d)", num + 620000);
-         return( OBJ_DESIG_ASTEROID_NUMBERED);
-         }
-      }
-            /* For numbered asteroids or comets,  we require either that
-            columns 6-12 be blank (usually the case) or have a valid
-            provisional designation.  And,  of course,  the packed desig must
-            start with an alphanumeric and be followed by three digits. */
-   if( isalnum( xdesig[0]) && isdigit( xdesig[1]) &&  /* possible numbered */
-       isdigit( xdesig[2]) && isdigit( xdesig[3]) &&  /* asteroid or comet */
-               (*provisional_desig || !memcmp( xdesig + 5, "       ", 5)))
-      {
-      if( isdigit( xdesig[4]))
-         {                                /* it's a numbered asteroid */
-         int number = mutant_hex_char_to_int( *xdesig);
-
-         if( number >= 0)
-            {
-            number = number * 10000L + atol( xdesig + 1);
-            rval = OBJ_DESIG_ASTEROID_NUMBERED;
-            if( obuff)
-               {
-               sprintf( obuff, "(%d)", number);
-                  /* Desig may be,  e.g., "U4330K06SL7X" : both the number */
-                  /* and the provisional desig.  We'd like to decipher this */
-                  /* as (for the example) "304330 = 2006 SX217".            */
-               if( *provisional_desig)
-                  sprintf( obuff + strlen( obuff), " = %s", provisional_desig);
-               }
-            }
-         }
-      else if( strchr( "PCDXA", xdesig[4]))   /* it's a numbered comet */
-         {
-         const char suffix_char = xdesig[11];
-         char tbuff[20];
-
-         if( obuff)
-            {
-            *obuff++ = xdesig[4];
-            *obuff++ = '/';
-            i = 0;
-            while( xdesig[i] == '0')         /* skip leading zeroes */
-               i++;
-            while( xdesig[i] >= '0' && xdesig[i] <= '9')   /* read digits... */
-               *obuff++ = xdesig[i++];
-            if( suffix_char >= 'a' && suffix_char <= 'z')
-               {
-               const char extra_suffix_char = xdesig[10];
-
-               *obuff++ = '-';
-                  /* possibly _two_ suffix letters... so far,  only the  */
-                  /* components of 73P/Schwassmann-Wachmann 3 have this: */
-               if( extra_suffix_char >= 'a' && extra_suffix_char <= 'z')
-                  *obuff++ = extra_suffix_char + 'A' - 'a';
-               *obuff++ = suffix_char + 'A' - 'a';
-               }
-            sprintf( tbuff, "%3d%c/", atoi( xdesig), xdesig[4]);
-            try_adding_comet_name( tbuff, obuff);
-            }
-         rval = OBJ_DESIG_COMET_NUMBERED;
-         }
-      }
-
-   if( rval == OBJ_DESIG_OTHER && !memcmp( xdesig, "    ", 4)
-            && strchr( " PCDXA", xdesig[4]))
-      {
-      if( obuff && xdesig[4] != ' ')
-         {
-         *obuff++ = xdesig[4];
-         *obuff++ = '/';
-         }
-      if( !unpack_provisional_packed_desig( obuff, xdesig + 5))
-         rval = ((xdesig[4] == ' ' || xdesig[4] == 'A') ?
-                                      OBJ_DESIG_ASTEROID_PROVISIONAL
-                                    : OBJ_DESIG_COMET_PROVISIONAL);
-      if( rval != OBJ_DESIG_OTHER && xdesig[4] != ' '
-                                  && xdesig[4] != 'A' && obuff)
-         {
-         char tbuff[40];
-
-         sprintf( tbuff, "   %s ", obuff - 2);
-         try_adding_comet_name( tbuff, obuff + strlen( obuff));
-         }
-      }
-
-#ifdef POSSIBLY_USEFUL_LATER
-               /* Look for CSS/SSS/Mt. Lemmon/LAB desigs.  These should be  */
-               /* a hex digit,  plus a half-month character,  plus five hex */
-               /* more hex digits,  all uppercase.  The first of these is   */
-               /* 0-3 for an object found at CSS,  4-7 for SSS, 8-B for Mt. */
-               /* Lemmon,  C-F for LAB (which apparently is rare).          */
-   if( rval == -1 && !memcmp( xdesig, "     ", 5))
-      {
-      int is_valid = 1;
-
-      if( xdesig[6] < 'A' || xdesig[6] > 'Z')
-         is_valid = 0;           /* not a valid half-month designation */
-      for( i = 5; i < 12 && is_valid; i++)
-         if( i != 6)       /* skip the half-month designation */
-            if( !isdigit( xdesig[i]))
-               if( xdesig[i] < 'A' || xdesig[i] > 'F')
-                  is_valid = 0;
-      if( is_valid && obuff)
-         {
-         const char *suffixes[4] = { " (CSS)", " (SSS)", " (MtL)", " (LAB)" };
-         const int stn = mutant_hex_char_to_int( xdesig[7]) / 4;
-
-         memcpy( obuff, xdesig + 5, 7);
-         strcpy( obuff + 7, suffixes[stn]);
-         rval = 0;
-         }
-      }
-#endif
-
-   if( rval == OBJ_DESIG_OTHER && obuff)    /* store the name "as is",   */
-      {             /* assuming no encoding (except skip leading spaces) */
-      for( i = 0; i < 12 && xdesig[i] == ' '; i++)
-         ;
-      memcpy( obuff, xdesig + i, 12 - i);
-      obuff[12 - i] = '\0';
-      remove_trailing_cr_lf( obuff);      /* ephem0.cpp */
-      }
-
-   if( rval == OBJ_DESIG_OTHER && is_artsat_desig( packed_desig))
-      {
-      rval = OBJ_DESIG_ARTSAT;
-      if( obuff)
+      if( rval == OBJ_DESIG_ARTSAT)
          try_artsat_xdesig( obuff);
+      if( rval == OBJ_DESIG_COMET_NUMBERED)
+         {
+         sprintf( xdesig, "%3d%c/", atoi( obuff + 2), *obuff);
+         try_adding_comet_name( xdesig, obuff);
+         }
+      if( rval == OBJ_DESIG_COMET_PROVISIONAL)
+         {
+         sprintf( xdesig, "   %s ", obuff);
+         try_adding_comet_name( xdesig, obuff);
+         }
       }
    return( rval);
 }

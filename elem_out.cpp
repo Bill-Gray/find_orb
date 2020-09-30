@@ -30,6 +30,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "watdefs.h"
 #include "comets.h"
 #include "mpc_obs.h"
+#include "mpc_func.h"
 #include "date.h"
 #include "afuncs.h"
 #include "lunar.h"
@@ -110,7 +111,6 @@ double find_collision_time( ELEMENTS *elem, double *latlon, const int is_impact)
 char *fgets_trimmed( char *buff, size_t max_bytes, FILE *ifile); /*elem_out.c*/
 int get_idx1_and_idx2( const int n_obs, const OBSERVE FAR *obs,
                                 int *idx1, int *idx2);      /* elem_out.c */
-char int_to_mutant_hex_char( const int ival);               /* mpc_obs.c */
 double mag_band_shift( const char mag_band);                /* elem_out.c */
 int get_jpl_ephemeris_info( int *de_version, double *jd_start, double *jd_end);
 double *get_asteroid_mass( const int astnum);   /* bc405.cpp */
