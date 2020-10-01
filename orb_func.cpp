@@ -4129,13 +4129,23 @@ int orbital_monte_carlo( const double *orbit, OBSERVE *obs, const int n_obs,
    for( i = 0; i < n_sr_orbits; i++)
       {
       double *torbit = sr_orbits + i * 6;
+      const double sig_squared = generate_mc_variant_from_covariance( torbit, orbit);
 
-      generate_mc_variant_from_covariance( torbit, orbit);
       write_out_elements_to_file( torbit, curr_epoch, epoch_shown,
            obs, n_obs, "", 6, 1, ELEM_OUT_ALTERNATIVE_FORMAT);
       append_elements_to_element_file = 1;
+      if( i < 1000)
+         {
+         double rms;
+         int n_resids;
+
+         set_locs( torbit, curr_epoch, obs, n_obs);
+         rms = compute_weighted_rms( obs, n_obs, &n_resids);
+         debug_printf( "Var %4d: %9.6f %.8f\n", i, sig_squared,
+                        rms * rms * n_resids);
+         }
       }
-// set_locs( orbit, curr_epoch, obs, n_obs);
+   set_locs( orbit, curr_epoch, obs, n_obs);
    compute_sr_sigmas( sr_orbits, n_sr_orbits, curr_epoch, epoch_shown);
    available_sigmas_hash = compute_available_sigmas_hash( obs, n_obs,
          epoch_shown, perturbers, 0);
