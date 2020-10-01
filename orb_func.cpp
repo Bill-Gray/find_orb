@@ -167,7 +167,8 @@ int get_idx1_and_idx2( const int n_obs, const OBSERVE FAR *obs,
                                 int *idx1, int *idx2);      /* elem_out.c */
 void set_distance( OBSERVE FAR *obs, double r);             /* orb_func.c */
 double find_r_given_solar_r( const OBSERVE FAR *obs, const double solar_r);
-static void attempt_extensions( OBSERVE *obs, const int n_obs, double *orbit);
+void attempt_extensions( OBSERVE *obs, const int n_obs, double *orbit,
+                  const double epoch);                  /* orb_func.cpp */
 double *get_asteroid_mass( const int astnum);   /* bc405.cpp */
 char *get_file_name( char *filename, const char *template_file_name);
 int compute_observer_loc( const double jde, const int planet_no,
@@ -4102,7 +4103,7 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
    perturbers = perturbers_automatically_found & (~AUTOMATIC_PERTURBERS);
    perturbers |= always_included_perturbers;
    fail_on_hitting_planet = false;
-   attempt_extensions( obs, n_obs, orbit);
+   attempt_extensions( obs, n_obs, orbit, obs[start].jd);
 // available_sigmas = NO_SIGMAS_AVAILABLE;
    integration_timeout = 0;
    if( *get_environment_ptr( "INCLUDE_ALL"))
@@ -4300,9 +4301,10 @@ int extend_orbit_solution( OBSERVE FAR *obs, const int n_obs,
    return( n_added);
 }
 
-static void attempt_extensions( OBSERVE *obs, const int n_obs, double *orbit)
+void attempt_extensions( OBSERVE *obs, const int n_obs, double *orbit,
+                                    const double epoch)
 {
-   double best_orbit[6], epoch;
+   double best_orbit[6];
    int best_start, best_end, i;
    bool done = false;
    const double residual_limit = 200.;   /* allow up to 200" in orbit extension */
@@ -4319,7 +4321,6 @@ static void attempt_extensions( OBSERVE *obs, const int n_obs, double *orbit)
    memcpy( best_orbit, orbit, 6 * sizeof( double));
    best_available_sigmas = available_sigmas;
    get_first_and_last_included_obs( obs, n_obs, &best_start, &best_end);
-   epoch = obs[best_start].jd;
    do
       {
 //    debug_printf( "Orbit: %f %f %f %f %f %f\n",
