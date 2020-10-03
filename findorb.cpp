@@ -107,9 +107,11 @@ int debug_level = 0;
 
 extern unsigned perturbers;
 
-#define KEY_TIMER      31001
-#define AUTO_REPEATING 31002
+#define KEY_TIMER              31001
+#define AUTO_REPEATING         31002
 #define KEY_ALREADY_HANDLED    31003
+#define KEY_ADD_MENU_LINE      31004
+#define KEY_REMOVE_MENU_LINE   31005
 
 /* You can cycle between showing only the station data for the currently
 selected observation;  or the "normal" having,  at most,  a third of
@@ -1438,10 +1440,23 @@ void format_dist_in_buff( char *buff, const double dist_in_au); /* ephem0.c */
 
 #define MAX_CMD_AREAS 100
 
-struct cmd_area
+typedef struct
    {
    unsigned key, line, col1, col2;
-   } command_areas[MAX_CMD_AREAS];
+   } command_area_t;
+
+static command_area_t command_areas[MAX_CMD_AREAS];
+
+static void set_cmd_area( const unsigned cmd_number, const unsigned key,
+              const unsigned line, const unsigned col1, const unsigned col2)
+{
+   command_area_t *tptr = command_areas + cmd_number;
+
+   tptr->key = key;
+   tptr->line = line;
+   tptr->col1 = col1;
+   tptr->col2 = col2;
+}
 
 static unsigned show_basic_info( const OBSERVE FAR *obs, const int n_obs,
                                           const unsigned max_lines_to_show)
@@ -1460,18 +1475,16 @@ static unsigned show_basic_info( const OBSERVE FAR *obs, const int n_obs,
    format_dist_in_buff( buff + 5, r2);
    put_colored_text( buff, 0, 10, -1, COLOR_BACKGROUND);
 
-   command_areas[0].key = 'r';
-   command_areas[0].line = 0;
-   command_areas[0].col1 = 1;
-   command_areas[0].col2 = 24;
+   set_cmd_area( 0, 'r', 0, 1, 24);
    if( ifile)
       {
       while( fgets_trimmed( buff, sizeof( buff), ifile)
                      && memcmp( buff, "End", 3))
          {
          const unsigned len = (unsigned)strlen( buff + 15);
+         unsigned max_len = (unsigned)getmaxx( stdscr);
 
-         if( column + len >= (unsigned)getmaxx( stdscr))
+         if( column + len >= max_len)
             {
             if( line == max_lines_to_show)
                {
@@ -1482,16 +1495,13 @@ static unsigned show_basic_info( const OBSERVE FAR *obs, const int n_obs,
             line++;
             put_colored_text( "", line - 1, column, -1, COLOR_BACKGROUND);
             }
-         command_areas[n_commands].key = (unsigned)*buff;
-         command_areas[n_commands].line = line - 1;
-         command_areas[n_commands].col1 = column;
-         command_areas[n_commands].col2 = column + len;
-         n_commands++;
+         set_cmd_area( n_commands++, (unsigned)*buff, line - 1, column, column + len);
          put_colored_text( buff + 15, line - 1, column, len, COLOR_MENU);
          column += len + 1;
          }
       fclose( ifile);
       }
+   command_areas[n_commands].key = 0;
    return( line);
 }
 
