@@ -1448,14 +1448,14 @@ typedef struct
 static command_area_t command_areas[MAX_CMD_AREAS];
 
 static void set_cmd_area( const unsigned cmd_number, const unsigned key,
-              const unsigned line, const unsigned col1, const unsigned col2)
+              const unsigned line, const unsigned col1, const unsigned len)
 {
    command_area_t *tptr = command_areas + cmd_number;
 
    tptr->key = key;
    tptr->line = line;
    tptr->col1 = col1;
-   tptr->col2 = col2;
+   tptr->col2 = col1 + len;
 }
 
 static unsigned show_basic_info( const OBSERVE FAR *obs, const int n_obs,
@@ -1464,6 +1464,7 @@ static unsigned show_basic_info( const OBSERVE FAR *obs, const int n_obs,
    char buff[80];
    double r1, r2;
    unsigned line = 1, column = 24, n_commands = 1;
+   unsigned max_column = (unsigned)getmaxx( stdscr);
    FILE *ifile = fopen_ext( "command.txt", "fcrb");
 
    get_r1_and_r2( n_obs, obs, &r1, &r2);    /* orb_func.cpp */
@@ -1475,32 +1476,43 @@ static unsigned show_basic_info( const OBSERVE FAR *obs, const int n_obs,
    format_dist_in_buff( buff + 5, r2);
    put_colored_text( buff, 0, 10, -1, COLOR_BACKGROUND);
 
-   set_cmd_area( 0, 'r', 0, 1, 24);
+   set_cmd_area( 0, 'r', 0, 1, 23);
    if( ifile)
       {
       while( fgets_trimmed( buff, sizeof( buff), ifile)
                      && memcmp( buff, "End", 3))
          {
          const unsigned len = (unsigned)strlen( buff + 15);
-         unsigned max_len = (unsigned)getmaxx( stdscr);
+         unsigned max_column_this_line = max_column;
 
-         if( column + len >= max_len)
+         if( line == 1)
+            max_column_this_line -= (max_lines_to_show > 1 ? 8 : 4);
+         if( column + len >= max_column_this_line)
             {
             if( line == max_lines_to_show)
                {
                fclose( ifile);
+               set_cmd_area( n_commands++, KEY_ADD_MENU_LINE, 0, max_column - 4, 3);
+               put_colored_text( "[+]", 0, max_column - 4, 3, COLOR_MENU);
                return( line);
+               }
+            if( line == 1)        /* we could subtract lines */
+               {
+               set_cmd_area( n_commands++, KEY_REMOVE_MENU_LINE, 0, max_column - 8, 3);
+               put_colored_text( "[-]", 0, max_column - 8, 3, COLOR_MENU);
                }
             column = 0;
             line++;
             put_colored_text( "", line - 1, column, -1, COLOR_BACKGROUND);
             }
-         set_cmd_area( n_commands++, (unsigned)*buff, line - 1, column, column + len);
+         set_cmd_area( n_commands++, (unsigned)*buff, line - 1, column, len);
          put_colored_text( buff + 15, line - 1, column, len, COLOR_MENU);
          column += len + 1;
          }
       fclose( ifile);
       }
+   if( line != 1)
+      max_column -= 4;
    command_areas[n_commands].key = 0;
    return( line);
 }
@@ -2933,6 +2945,7 @@ int main( int argc, const char **argv)
    bool drop_single_obs = true;
    bool sort_obs_by_code = false;
    int n_stations_shown = 0, top_obs_shown = 0, n_obs_shown = 0;
+   int max_basic_info_lines = 2;
    bool single_obs_selected = false;
    extern unsigned random_seed;
 
@@ -3280,7 +3293,7 @@ int main( int argc, const char **argv)
          debug_printf( "elements written\n");
       update_element_display = 0;
       top_line_basic_info_perturbers = line_no;
-      n_command_lines = show_basic_info( obs, n_obs, 1);
+      n_command_lines = show_basic_info( obs, n_obs, max_basic_info_lines);
       show_perturbers( n_command_lines);
       if( debug_level)
          refresh( );
@@ -5187,6 +5200,14 @@ int main( int argc, const char **argv)
          case ALT_X:
             curr_obs = select_mpc_code( obs, n_obs, curr_obs);
             single_obs_selected = true;
+            break;
+         case KEY_ADD_MENU_LINE:
+            max_basic_info_lines++;
+            strcpy( message_to_user, "Adding a menu line");
+            break;
+         case KEY_REMOVE_MENU_LINE:
+            max_basic_info_lines--;
+            strcpy( message_to_user, "Removing a menu line");
             break;
          case 'c': case 'C':
          case 'j': case 'J':
