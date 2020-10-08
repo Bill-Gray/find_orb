@@ -478,7 +478,8 @@ static void reset_desigs_by_name( const char *obj_name, tle_t *tle)
 
    assert( ifile);
    while( fgets_trimmed( buff, sizeof( buff), ifile))
-      if( !strcmp( obj_name, buff + 21))
+      if( *buff == ' ' && strlen( buff) > 21
+                            && !strcmp( obj_name, buff + 21))
          {
          tle->norad_number = atoi( buff);
          memcpy( tle->intl_desig, buff + 12, 8);
