@@ -1918,7 +1918,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                      /* For ease of automated processing,  people may want */
    if( *override_date_format)     /* the time in some consistent format... */
       sscanf( override_date_format, "%x", &date_format);
-   if( options & OPTION_ROUND_TO_NEAREST_STEP)
+   if( step && (options & OPTION_ROUND_TO_NEAREST_STEP))
        real_jd_start = round_to( jd_start - .5, step) + .5;
    if( ephem_type == OPTION_STATE_VECTOR_OUTPUT ||
        ephem_type == OPTION_POSITION_OUTPUT ||
