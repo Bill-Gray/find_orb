@@ -1797,8 +1797,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
          OBSERVE *obs, const int n_obs,
          const int planet_no,
          const double epoch_jd, const double jd_start, const char *stepsize,
-         const double lon,
-         const double rho_cos_phi, const double rho_sin_phi,
+         double lon, double rho_cos_phi, double rho_sin_phi,
          const int n_steps, const char *note_text,
          ephem_option_t options, unsigned n_objects)
 {
@@ -1815,7 +1814,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    const char *timescale = get_environment_ptr( "TT_EPHEMERIS");
    const char *override_date_format = get_environment_ptr( "DATE_FORMAT");
    double abs_mag = calc_absolute_magnitude( obs, n_obs);
-   double ht_in_meters, max_auto_step = 0.;
+   double ht_in_meters = 0., max_auto_step = 0.;
    DPT latlon;
    bool last_line_shown = true;
    RADAR_DATA rdata;
@@ -1826,8 +1825,10 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    char buff[440], *header = NULL, alt_buff[500];
    const bool use_observation_times = !strncmp( stepsize, "Obs", 3);
    double curr_jd = jd_start, real_jd_start = jd_start;
+   bool reset_lat_alt = false;
 
-   if( (!rho_cos_phi && !rho_sin_phi) || ephem_type != OPTION_OBSERVABLES)
+   if( (!rho_cos_phi && !rho_sin_phi && !use_observation_times)
+                                 || ephem_type != OPTION_OBSERVABLES)
       options &= ~(OPTION_ALT_AZ_OUTPUT | OPTION_VISIBILITY | OPTION_MOON_ALT
                      | OPTION_MOON_AZ | OPTION_SUN_ALT | OPTION_SUN_AZ
                      | OPTION_SKY_BRIGHTNESS | OPTION_SUPPRESS_UNOBSERVABLE);
@@ -2066,10 +2067,6 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
 
    prev_r[0] = prev_r[1] = 0.;
    latlon.x = lon;
-   parallax_to_lat_alt(
-            rho_cos_phi / planet_radius_in_au,
-            rho_sin_phi / planet_radius_in_au, &latlon.y,
-                                &ht_in_meters, planet_no);
    for( i = 0; i < n_steps; i++)
       {
       unsigned obj_n;
@@ -2082,7 +2079,16 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       long rgb = 0;
 
       if( use_observation_times)
+         {
+         if( !i || strcmp( obs[i].mpc_code, obs[i - 1].mpc_code))
+            {
+            get_observer_data( obs[i].mpc_code, buff, &lon,
+                                             &rho_cos_phi, &rho_sin_phi);
+            latlon.x = lon;
+            reset_lat_alt = true;
+            }
          curr_jd = obs[i].jd;
+         }
       else if( *stepsize == 'a')
          {
          if( i)
@@ -2095,6 +2101,12 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
          if( options & OPTION_ROUND_TO_NEAREST_STEP)
             curr_jd = round_to( curr_jd - .5, step) + .5;
          }
+      if( reset_lat_alt)
+         parallax_to_lat_alt(
+                  rho_cos_phi / planet_radius_in_au,
+                  rho_sin_phi / planet_radius_in_au, &latlon.y,
+                                      &ht_in_meters, planet_no);
+      reset_lat_alt = false;
       delta_t = td_minus_utc( curr_jd) / seconds_per_day;
       if( use_observation_times)
          curr_jd -= delta_t;
