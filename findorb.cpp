@@ -2916,13 +2916,14 @@ int main( int argc, const char **argv)
    char obj_name[80], tbuff[500], orbit_constraints[90];
    char ifilename[256];
    unsigned n_command_lines = 4;
-   int c = 1, element_precision, get_new_object = 1, add_off_on = -1;
+   int c = 1, element_precision,  add_off_on = -1;
+   bool get_new_object = true, get_new_file = true;
    unsigned top_line_basic_info_perturbers;
    unsigned top_line_orbital_elements;
    unsigned top_line_residuals;
    bool is_monte_orbit = false;
    unsigned list_codes = SHOW_MPC_CODES_NORMAL;
-   int i, quit = 0, n_obs = 0, get_new_file = 1;
+   int i, quit = 0, n_obs = 0;
    int observation_display = 0;
    OBSERVE FAR *obs = NULL;
    int curr_obs = 0;
@@ -3184,17 +3185,17 @@ int main( int argc, const char **argv)
                   free( ids);
                ids = new_ids;
                n_ids = n_new_ids;
-               get_new_object = 1;
-               get_new_file = 0;
+               get_new_object = true;
+               get_new_file = false;
                }
             else if( !*tbuff)    /* hit Cancel,  going back to curr obj */
                {
-               get_new_file = 0;
+               get_new_file = false;
                get_new_object = !obs;
                }
             }
          if( debug_level > 3)
-            debug_printf( "get_new_object = %d\n", get_new_object);
+            debug_printf( "get_new_object = %d\n", (int)get_new_object);
          if( get_new_object)
             {
             int id_number = 0;
@@ -3206,12 +3207,12 @@ int main( int argc, const char **argv)
             if( debug_level > 3 && id_number >= 0)
                debug_printf( "id_number = %d; '%s'\n", id_number,
                                        ids[id_number].obj_name);
-            get_new_object = 0;
+            get_new_object = false;
             *orbit_constraints = '\0';
             if( id_number == -3)          /* 'Open...' clicked */
                {
                *ifilename = '\0';
-               get_new_object = get_new_file = 1;
+               get_new_object = get_new_file = true;
                }
             else if( id_number < 0)
                goto Shutdown_program;
@@ -3242,6 +3243,7 @@ int main( int argc, const char **argv)
 
                obs = load_object( ifile, ids + id_number, &curr_epoch,
                                                      &epoch_shown, orbit);
+               assert( obs);
                fclose( ifile);
                n_obs = ids[id_number].n_obs;
                if( !curr_epoch || !epoch_shown || !obs || n_obs < 2)
@@ -3264,6 +3266,11 @@ int main( int argc, const char **argv)
                curr_obs = top_obs_shown = i;
                update_element_display = 1;
                clear( );
+               if( !n_obs)
+                  {
+                  get_new_file = true;
+                  *ifilename = '\0';
+                  }
                }
             force_bogus_orbit = false;
             }
@@ -4282,11 +4289,11 @@ int main( int argc, const char **argv)
                            ifilename, residual_format);
             break;
          case 'o':             /* select a new file */
-            get_new_file = get_new_object = 1;
+            get_new_file = get_new_object = true;
             *ifilename = '\0';
             break;
          case 'n': case 'N':   /* select a new object from the input file */
-            get_new_object = 1;
+            get_new_object = true;
             update_element_display = 1;
             pop_all_orbits( );
             break;
