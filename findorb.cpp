@@ -3266,13 +3266,13 @@ int main( int argc, const char **argv)
                curr_obs = top_obs_shown = i;
                update_element_display = 1;
                clear( );
-               if( !n_obs)
-                  {
-                  get_new_file = true;
-                  *ifilename = '\0';
-                  }
                }
             force_bogus_orbit = false;
+            }
+         if( !n_obs)
+            {
+            get_new_file = true;
+            *ifilename = '\0';
             }
          }
       if( curr_obs > n_obs - 1)
