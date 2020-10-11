@@ -2185,6 +2185,7 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
    extern int n_extra_params;
    extern double solar_pressure[];
    char object_name[80];
+   bool do_full_improvement = false;
    double abs_mag = 10.;         /* default value for 'dummy' use */
 
    get_object_name( object_name, obs->packed_id);
@@ -2284,6 +2285,7 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
                         observation_rms( obs + i) > residual_filter_threshhold)
                      obs[i].is_included = 0;
             }
+         do_full_improvement = true;
          }
       fclose( ifile);
       }
@@ -2299,7 +2301,20 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
             *perturbers = 0x7fe;    /* Merc-Pluto plus moon */
          set_locs( orbit, *orbit_epoch, obs, n_obs);
          abs_mag = elems.abs_mag;
+         do_full_improvement = true;
          }
+      }
+   if( do_full_improvement)
+      {
+      if( *get_environment_ptr( "SHIFT_EPOCH"))
+         {
+         const double new_epoch  = find_epoch_shown( obs, n_obs);
+
+         integrate_orbit( orbit, *orbit_epoch, new_epoch);
+         *orbit_epoch = new_epoch;
+         }
+      full_improvement( obs, n_obs, orbit, *orbit_epoch, NULL,
+                           ORBIT_SIGMAS_REQUESTED, *orbit_epoch);
       }
    if( !got_vectors)
       {
@@ -2929,7 +2944,7 @@ static void set_mpc_colors_semirandomly( MPC_STATION *sdata,
    for( i = 0; sdata[i].code[0]; i++)
       sdata[i].color = (char)( i % max_n_colors);
    srand( seed);
-   while( --i)
+   while( --i > 0)
       {
       const int j = (int)( rand( ) % i);
       const int color = sdata[j].color;
