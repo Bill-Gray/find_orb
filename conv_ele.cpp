@@ -81,21 +81,45 @@ void convert_elements( const double epoch_from, const double epoch_to,
 
 #include <stdio.h>
 
-void main( int argc, char **argv)
+static void show_angles( const double incl, const double Omega, const double omega)
 {
-   const double PI = 3.141592653589793238462643383279502884197169399375;
-            /* test case from Meeus,  _Astro Algorithms_, p 148: */
-   double incl = 47.1220 * PI / 180.;
-   double omega = 151.4486 * PI / 180.;
-   double Omega = 45.7481 * PI / 180.;
+   printf( "incl %11.7f   asc %11.7f   argper %11.7f\n",
+               incl * 180. / PI, Omega * 180. / PI, omega * 180. / PI);
+}
 
-   convert_elements( 1744., 1950., &incl, &Omega, &omega);
-   printf( "Results:   %f %f %f\n", incl * 180. / PI,
-                omega * 180. / PI, Omega * 180. / PI);
-   printf( "Should be: 47.1380   151.4782   48.6037\n");
-   convert_elements( 1950., 1744., &incl, &Omega, &omega);
-   printf( "Converted back: %f %f %f\n", incl * 180. / PI,
-                omega * 180. / PI, Omega * 180. / PI);
-   printf( "Should be:      47.1220   151.4486   45.7481\n");
+int main( const int argc, const char **argv)
+{
+            /* test case from Meeus,  _Astro Algorithms_, p 148: */
+
+   if( argc == 6)
+      {
+      double incl = atof( argv[1]) * PI / 180.;
+      double omega = atof( argv[2]) * PI / 180.;
+      double Omega = atof( argv[3]) * PI / 180.;
+      double epoch_from = atof( argv[4]);
+      double epoch_to   = atof( argv[5]);
+
+      show_angles( incl, omega, Omega);
+      convert_elements( epoch_from, epoch_to, &incl, &Omega, &omega);
+      printf( "After conversion from %f to %f\n", epoch_from, epoch_to);
+      show_angles( incl, omega, Omega);
+      }
+   else           /* test case from Meeus' _Astronomical Algorithms_ */
+      {
+      double incl = 47.1220 * PI / 180.;
+      double omega = 151.4486 * PI / 180.;
+      double Omega = 45.7481 * PI / 180.;
+
+      show_angles( incl, omega, Omega);
+      convert_elements( 1744., 1950., &incl, &Omega, &omega);
+      printf( "After conversion from 1744 to 1950 :\n");
+      show_angles( incl, omega, Omega);
+      printf( "Should be: 47.1380   151.4782   48.6037\n");
+      convert_elements( 1950., 1744., &incl, &Omega, &omega);
+      printf( "Converted back to 1744 :\n");
+      show_angles( incl, omega, Omega);
+      printf( "Should be:      47.1220   151.4486   45.7481\n");
+      }
+   return( 0);
 }
 #endif
