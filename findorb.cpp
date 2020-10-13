@@ -2192,7 +2192,6 @@ static void put_colored_text( const char *text, const int line_no,
    const attr_t attrib_mask = A_BOLD | A_BLINK | A_LEFTLINE | A_REVERSE
             | A_RIGHTLINE | A_ITALIC | A_UNDERLINE | A_OVERLINE;
 
-
    attrset( COLOR_PAIR( color & 255));
    attron( color & attrib_mask);
    if( n_bytes > 0)
@@ -2915,7 +2914,7 @@ int main( int argc, const char **argv)
 {
    char obj_name[80], tbuff[500], orbit_constraints[90];
    char ifilename[256];
-   unsigned n_command_lines = 4;
+   unsigned n_command_lines = 1;
    int c = 1, element_precision,  add_off_on = -1;
    bool get_new_object = true, get_new_file = true;
    unsigned top_line_basic_info_perturbers;
@@ -2946,7 +2945,6 @@ int main( int argc, const char **argv)
    bool drop_single_obs = true;
    bool sort_obs_by_code = false;
    int n_stations_shown = 0, top_obs_shown = 0, n_obs_shown = 0;
-   int max_basic_info_lines = 2;
    bool single_obs_selected = false;
    extern unsigned random_seed;
 
@@ -3300,7 +3298,7 @@ int main( int argc, const char **argv)
          debug_printf( "elements written\n");
       update_element_display = 0;
       top_line_basic_info_perturbers = line_no;
-      n_command_lines = show_basic_info( obs, n_obs, max_basic_info_lines);
+      n_command_lines = show_basic_info( obs, n_obs, n_command_lines);
       show_perturbers( n_command_lines);
       if( debug_level)
          refresh( );
@@ -5209,11 +5207,11 @@ int main( int argc, const char **argv)
             single_obs_selected = true;
             break;
          case KEY_ADD_MENU_LINE:
-            max_basic_info_lines++;
+            n_command_lines++;
             strcpy( message_to_user, "Adding a menu line");
             break;
          case KEY_REMOVE_MENU_LINE:
-            max_basic_info_lines--;
+            n_command_lines--;
             strcpy( message_to_user, "Removing a menu line");
             break;
          case 'c': case 'C':
