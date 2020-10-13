@@ -2090,14 +2090,13 @@ void set_solutions_found( OBJECT_INFO *ids, const int n_ids)
 ELEMENTS.COMET,  Find_Orb can sometimes flounder about a bit in its
 efforts to determine an orbit. */
 
-const char *mpcorb_dot_sof_filename = "mpcorb.sof";
-
 int extract_sof_data( ELEMENTS *elem, const char *buff, const char *header);
 
-static int get_orbit_from_mpcorb_sof( const char *object_name, double *orbit,
-                                          ELEMENTS *elems)
+static int get_orbit_from_mpcorb_sof( const char *filename,
+                 const char *object_name, double *orbit, ELEMENTS *elems)
+
 {
-   FILE *ifile = fopen_ext( mpcorb_dot_sof_filename, "crb");
+   FILE *ifile = fopen_ext( filename, "crb");
    int got_vectors = 0;
 
    memset( elems, 0, sizeof( ELEMENTS));
@@ -2107,7 +2106,7 @@ static int get_orbit_from_mpcorb_sof( const char *object_name, double *orbit,
 
       if( !fgets_trimmed( header, sizeof( header), ifile))
          {
-         fprintf( stderr, "Error in mpcorb.sof header\n");
+         fprintf( stderr, "Error in %s header\n", filename);
          exit( -1);
          }
       while( *object_name == ' ')
@@ -2174,6 +2173,7 @@ static int names_compare( const char *name1, const char *name2)
    return( strcmp( name1, name2));
 }
 
+const char *mpcorb_dot_sof_filename = "mpcorb.sof";
 int ignore_prev_solns;
 bool take_first_soln = false;
 
@@ -2293,7 +2293,10 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
       {
       ELEMENTS elems;
 
-      got_vectors = get_orbit_from_mpcorb_sof( object_name, orbit, &elems);
+      got_vectors = get_orbit_from_mpcorb_sof( "orbits.sof", object_name, orbit, &elems);
+      if( !got_vectors)
+         got_vectors = get_orbit_from_mpcorb_sof( mpcorb_dot_sof_filename,
+                                                             object_name, orbit, &elems);
       if( got_vectors)
          {
          *orbit_epoch = elems.epoch;
