@@ -1825,7 +1825,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    char buff[440], *header = NULL, alt_buff[500];
    const bool use_observation_times = !strncmp( stepsize, "Obs", 3);
    double curr_jd = jd_start, real_jd_start = jd_start;
-   bool reset_lat_alt = false;
+   bool reset_lat_alt = true;
 
    if( (!rho_cos_phi && !rho_sin_phi && !use_observation_times)
                                  || ephem_type != OPTION_OBSERVABLES)
