@@ -2691,10 +2691,10 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
       const size_t buffsize = 8000;
       char *buff = (char *)malloc( buffsize);
       int c, base_key = (int)KEY_F( 4);
-      size_t n_prev = 0, prev_idx[30];
+      size_t n_prev = 0, prev_idx[60];
       struct stat file_info;
       FILE *ifile;
-      const char *hotkeys = "0123456789abdeghijklmoprstuv", *tptr;
+      const char *hotkeys = "0123456789abdeghijklmoprstuvwxyz;',./=-[]()*&^%$#@!:<>", *tptr;
 
       help_file_name = "openfile.txt";
       clear( );
