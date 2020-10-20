@@ -2237,20 +2237,16 @@ OBSERVE *add_observations( FILE *ifile, OBSERVE *obs,
                   const OBJECT_INFO *ids, int *n_obs)
 {
    OBSERVE *obs2 = load_observations( ifile, ids->packed_desig, ids->n_obs);
-   OBSERVE *temp_obs;
    extern int n_obs_actually_loaded;
 
    if( debug_level)
       printf( "Got %d new obs\n", n_obs_actually_loaded);
    fclose( ifile);
-   temp_obs = (OBSERVE *)calloc( *n_obs + n_obs_actually_loaded,
-                           sizeof( OBSERVE));
-   memcpy( temp_obs, obs, *n_obs * sizeof( OBSERVE));
-   memcpy( temp_obs + *n_obs, obs2, n_obs_actually_loaded * sizeof( OBSERVE));
+   obs = (OBSERVE *)realloc( obs,
+                 (*n_obs + n_obs_actually_loaded) * sizeof( OBSERVE));
+   memcpy( obs + *n_obs, obs2, n_obs_actually_loaded * sizeof( OBSERVE));
    *n_obs += n_obs_actually_loaded;
-   free( obs);
    free( obs2);
-   obs = temp_obs;
    *n_obs = sort_obs_by_date_and_remove_duplicates( obs, *n_obs);
    return( obs);
 }
