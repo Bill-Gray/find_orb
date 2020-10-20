@@ -805,28 +805,35 @@ int get_observer_data( const char FAR *mpc_code, char *buff,
 
    if( strchr( "nsew", tolower( mpc_code[0])))
       {
-      int got_em = 0, c;
+      int got_em = 0, j;
 
       for( i = 0; mpc_code[i]; i++)
-         switch( (c = tolower( mpc_code[i])))
+         {
+         const int c = tolower( mpc_code[i]);
+
+         j = i + 1;
+         while( mpc_code[j] == ' ')
+            j++;
+         if( !strncasecmp( mpc_code + i, "alt", 3))
+            alt0 = atof( mpc_code + i + 3);
+         if( isdigit( mpc_code[j]))
             {
-            case 'n': case 's':
+            if( c == 'n' || c == 's')
+               {
                lat0 = atof( mpc_code + i + 1);
                if( c == 's')
                   lat0 = -lat0;
                got_em ^= 1;
-               break;
-            case 'e': case 'w':
+               }
+            if( c == 'e' || c == 'w')
+               {
                lon0 = atof( mpc_code + i + 1);
                if( c == 'w')
                   lon0 = -lon0;
                got_em ^= 2;
-               break;
-            case 'a':
-               if( !strncasecmp( mpc_code + i, "alt", 3))
-                  alt0 = atof( mpc_code + i + 3);
-               break;
+               }
             }
+         }
       if( got_em == 3)
          override_observatory_name = "User-supplied observer";
       }
@@ -837,7 +844,7 @@ int get_observer_data( const char FAR *mpc_code, char *buff,
 
       strcpy( tbuff, mpc_code);
       strcat( tbuff, "   ");
-      sprintf( tbuff + 4, "!%15.9f%13.9f%10.3f    %s",
+      sprintf( tbuff + 4, "!%15.9f%13.9f%13.3f %s",
                     lon0, lat0, alt0, override_observatory_name);
       if( buff)
          strcpy( buff, tbuff);
