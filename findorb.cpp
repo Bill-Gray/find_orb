@@ -211,6 +211,8 @@ int find_circular_orbits( OBSERVE FAR *obs1, OBSERVE FAR *obs2,
 void set_up_observation( OBSERVE FAR *obs);               /* mpc_obs.cpp */
 char *get_file_name( char *filename, const char *template_file_name);
 double euler_function( const OBSERVE FAR *obs1, const OBSERVE FAR *obs2);
+int find_relative_orbit( const double jd, const double *ivect,
+               ELEMENTS *elements, const int ref_planet);     /* runge.cpp */
 int find_parabolic_orbit( OBSERVE FAR *obs, const int n_obs,
             double *orbit, const int direction);         /* orb_func.cpp */
 int format_jpl_ephemeris_info( char *buff);
@@ -4022,6 +4024,17 @@ int main( int argc, const char **argv)
                if( *tbuff == 'm')
                   epoch_shown = (obs[first].jd + obs[last].jd) / 2.;
                epoch_shown = floor( epoch_shown) + .5;
+               }
+            else if( *tbuff == 'p')
+               {
+               ELEMENTS elem;
+               double orbit2[6];
+
+               memcpy( orbit2, orbit, 6 * sizeof( double));
+               integrate_orbit( orbit2, curr_epoch, epoch_shown);
+               find_relative_orbit( epoch_shown, orbit2, &elem,
+                        (tbuff[1] == 'g' ? 3 : 0));
+               epoch_shown = floor( elem.perih_time * 10. + 0.5) / 10.;
                }
             else if( extract_date( tbuff, &new_jd) >= 0)
                if( new_jd > minimum_jd && new_jd < maximum_jd)
