@@ -3869,7 +3869,6 @@ int main( int argc, const char **argv)
                FILE *ifile = fopen( ifilename, "rb");
 
                obs = add_observations( ifile, obs, ids + i, &n_obs);
-               fclose( ifile);
                if( debug_level)
                   printf( "Now have %d obs\n", n_obs);
                if( mpc_color_codes)
