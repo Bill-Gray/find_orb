@@ -4038,6 +4038,8 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
          {
          *new_xdesig = '!';
          strlcpy( new_xdesig + 13, buff + 3, 20);
+         strlcat( new_xdesig + 13, "            ", 14);
+         check_packed_desig_alignment( new_xdesig + 13);
          }
       if( !memcmp( buff, "#fullname ", 10))
          {
