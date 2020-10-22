@@ -1,0 +1,12 @@
+# Comments may be added freely,  starting with #.
+# See https://minorplanetcenter.net/mpcops/documentation/identifications/submission_format/
+# Obviously,  you should change the name and e-mail address,  and probably
+# the comment,  too.
+{
+  "header": {
+    "name": "J. Doe",
+    "email": "john_doe@example.com",
+    "comment": "Here are some identifications that I gone and done."
+  },
+  "links": {
+    "link_0": {

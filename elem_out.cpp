@@ -533,6 +533,100 @@ char *iso_time( char *buff, const double jd, const int precision)
    strcat( buff, "Z");
    return( buff);
 }
+
+/* This is ludicrously high,  but let's say that we'll never
+report a linkage between 50 or more tracklets at once. */
+
+#define MAX_LINKAGE_IDS 50
+
+static int make_linkage_json( const int n_obs, const OBSERVE *obs, const ELEMENTS *elem)
+{
+   int i, j, n_ids = 0, idx[MAX_LINKAGE_IDS], n_designated = 0;
+   FILE *ofile, *ifile;
+   char buff[200];
+
+   for( i = 0; i < n_obs && n_ids < MAX_LINKAGE_IDS; i++)
+      {
+      j = 0;
+      while( j < n_ids && strcmp( obs[i].packed_id, obs[idx[j]].packed_id))
+         j++;
+      if( j == n_ids)
+         {
+         const int desig_type = unpack_mpc_desig( NULL, obs[i].packed_id);
+
+         if( desig_type != OBJ_DESIG_OTHER && desig_type != OBJ_DESIG_ARTSAT)
+            n_designated++;
+         idx[n_ids++] = i;
+         }
+      }
+   if( n_ids < 2 || n_ids >= MAX_LINKAGE_IDS)    /* no ID to be made */
+      return( n_ids);
+   ifile = fopen_ext( "link_hdr.json", "fcr");
+   ofile = fopen_ext( "linkage.json", "fcw");
+   while( fgets( buff, sizeof( buff), ifile))
+      if( *buff != '#')
+         fputs( buff, ofile);
+   fclose( ifile);
+   if( n_designated)
+      {
+      fprintf( ofile, "      \"designations\": [\n");
+      for( i = j = 0; i < n_ids; i++)
+         {
+         const int desig_type = unpack_mpc_desig( NULL, obs[idx[i]].packed_id);
+
+         if( desig_type != OBJ_DESIG_OTHER && desig_type != OBJ_DESIG_ARTSAT)
+            {
+            strcpy( buff, obs[idx[i]].packed_id);
+            text_search_and_replace( buff, " ", "");
+            j++;
+            fprintf( ofile, "        \"%s\"%s\n", buff, (j == n_designated ? "" : ","));
+            }
+         }
+      fprintf( ofile, "      ],\n");
+      }
+   if( n_ids != n_designated)
+      {
+      fprintf( ofile, "      \"trksubs\": [\n");
+      for( i = j = 0; i < n_ids; i++)
+         {
+         const int desig_type = unpack_mpc_desig( NULL, obs[idx[i]].packed_id);
+
+         if( desig_type == OBJ_DESIG_OTHER || desig_type == OBJ_DESIG_ARTSAT)
+            {
+            strcpy( buff, obs[idx[i]].packed_id);
+            text_search_and_replace( buff, " ", "");
+            j++;
+            fprintf( ofile, "        [\n");
+            fprintf( ofile, "        \"%s\",\n", buff);
+            full_ctime( buff, obs[idx[i]].jd, FULL_CTIME_YMD | FULL_CTIME_LEADING_ZEROES
+                           | FULL_CTIME_MONTHS_AS_DIGITS
+                           | FULL_CTIME_FORMAT_DAY | FULL_CTIME_5_PLACES);
+            fprintf( ofile, "        \"%s\",\n", buff);
+            fprintf( ofile, "        \"%s\"\n", obs[idx[i]].mpc_code);
+            fprintf( ofile, "        ]%s\n", (j == n_ids - n_designated ? "" : ","));
+            }
+         }
+      fprintf( ofile, "      ],\n");
+      }
+   i = 0;
+   while( i < n_obs && strcmp( obs[i].reference, "NEOCP"))
+      i++;
+   if( i < n_obs)         /* no NEOCP observations */
+   fprintf( ofile, "      \"identification_type\": \"neocp\",\n");
+   fprintf( ofile, "      \"orbit\": {\n");
+   fprintf( ofile, "        \"arg_pericenter\": %f,\n", elem->arg_per * 180. / PI);
+   fprintf( ofile, "        \"eccentricity\": %.8f,\n", elem->ecc);
+   fprintf( ofile, "        \"epoch\": %f,\n", elem->epoch);
+   fprintf( ofile, "        \"inclination\": %f,\n", elem->incl * 180. / PI);
+   fprintf( ofile, "        \"lon_asc_node\": %f,\n", elem->asc_node * 180. / PI);
+   fprintf( ofile, "        \"pericenter_distance\": %.8f,\n", elem->q);
+   fprintf( ofile, "        \"pericenter_time\": %f\n", elem->perih_time);
+   fprintf( ofile, "      }\n");
+   fprintf( ofile, "    }\n  }\n}\n");
+   fclose( ofile);
+   return( n_ids);
+}
+
 /* _Usually_,  you can tell what type of object you have from the
 length of the packed designation,  and from that,  what the alignment
 within the first twelve bytes of a punched-card record should be.
@@ -2011,6 +2105,7 @@ int write_out_elements_to_file( const double *orbit,
    elements_in_json_format( ofile, &elem, object_name, obs, n_obs, moids,
                                              body_frame_note, false);
    fclose( ofile);
+   make_linkage_json( n_obs, obs, &helio_elem);
    free( tbuff);
    return( bad_elements);
 }
