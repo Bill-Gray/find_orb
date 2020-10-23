@@ -25,7 +25,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "mpc_obs.h"
 #include "afuncs.h"
 #include "monte0.h"
-#include "mt64.h"
 
 double gaussian_random( void);                           /* monte0.c */
 int debug_printf( const char *format, ...)                 /* runge.cpp */
@@ -143,27 +142,42 @@ void restore_ra_decs_mags_times( unsigned n_obs, OBSERVE *obs,
       }
 }
 
+/* Mostly cut & pasted from http://www.pcg-random.org/download.html */
+/* Permuted Congruential Generator */
+
+#include <stdint.h>
+
+typedef struct { uint64_t state;  uint64_t inc; } pcg32_random_t;
+
+static uint32_t pcg32_random_r( pcg32_random_t* rng)
+{
+    const uint32_t xorshifted = ((rng->state >> 18u) ^ rng->state) >> 27u;
+    const uint32_t rot = rng->state >> 59u;
+    const uint64_t multiplier = 6364136223846793005ULL;
+
+    /* Advance internal state                                         */
+    rng->state = rng->state * multiplier + (rng->inc | 1);
+    /* Calculate output function (XSH RR), uses old state for max ILP */
+    return (xorshifted >> rot) | (xorshifted << ((-rot) & 31));
+}
+
+static uint64_t pcg_64_bits( pcg32_random_t* rng)
+{
+   return( (uint64_t)pcg32_random_r( rng)
+          | ((uint64_t)pcg32_random_r( rng) << 32));
+}
+
 /* Returns a uniform random variable,  0 <= rval < 1.  See 'mt64.c'.  */
 
-static double uniform_random( const int free_up)
+double uniform_random( const int free_up)
 {
-   static uint64_t *mt64_state = NULL;
+   static pcg32_random_t rng = { 314159265, 358979323 };
+   const double two_to_the_63rd_power = 9223372036854775808.;
 
    if( free_up)         /* flag to free up memory */
-      {
-      if( mt64_state)
-         free( mt64_state);
-      mt64_state = NULL;
       return( 0.);
-      }
-   if( !mt64_state)
-      {
-      const uint64_t mt64_seed_value = (uint64_t)0x31415926;
-
-      mt64_state = (uint64_t *)calloc( MT_STATE_SIZE, sizeof( uint64_t));
-      init_mt64( mt64_seed_value, mt64_state);
-      }
-   return( mt64_double( mt64_state));
+   else
+      return( (double)( pcg_64_bits( &rng) >> 1) / two_to_the_63rd_power);
 }
 
 /* The Box-Muller transform converts two uniformly-distributed random
