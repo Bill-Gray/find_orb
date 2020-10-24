@@ -835,7 +835,10 @@ int get_observer_data( const char FAR *mpc_code, char *buff,
             }
          }
       if( got_em == 3)
+         {
+         mpc_code = "zzzz";
          override_observatory_name = "User-supplied observer";
+         }
       }
 
    if( override_observatory_name)
