@@ -1485,7 +1485,7 @@ static unsigned show_basic_info( const OBSERVE FAR *obs, const int n_obs,
                      && memcmp( buff, "End", 3))
          {
          const unsigned len = (unsigned)strlen( buff + 15);
-         unsigned max_column_this_line = max_column;
+         unsigned max_column_this_line = max_column, key;
 
          if( line == 1)
             max_column_this_line -= (max_lines_to_show > 1 ? 8 : 4);
@@ -1507,7 +1507,15 @@ static unsigned show_basic_info( const OBSERVE FAR *obs, const int n_obs,
             line++;
             put_colored_text( "", line - 1, column, -1, COLOR_BACKGROUND);
             }
-         set_cmd_area( n_commands++, (unsigned)*buff, line - 1, column, len);
+         if( *buff == 'F' && buff[1] != ' ')
+            key = KEY_F( atof( buff + 1));
+         else if (!memcmp( buff, "Alt-", 4))
+            key = ALT_A + buff[4] - 'A';
+         else if (!memcmp( buff, "Ctrl-", 5))
+            key = buff[5] - 'A';
+         else
+            key = buff[0];
+         set_cmd_area( n_commands++, key, line - 1, column, len);
          put_colored_text( buff + 15, line - 1, column, len, COLOR_MENU);
          column += len + 1;
          }

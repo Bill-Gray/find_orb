@@ -2,6 +2,7 @@
 q              Quit
 o              Open...
 n              NewObj
+F16 (shift-f4) AddObj
 m              epheM
 f              Full
 h              Herget
