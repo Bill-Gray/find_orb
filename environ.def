@@ -341,3 +341,11 @@ MAG_DIGITS=1
    digits.  Increment FULL_SIGMAS,  and you get an extra digit of
    precision in both sigmas and in (most) 'covar.txt' values.
 FULL_SIGMAS=3
+
+   In computing SNRs in ephemerides,  Find_Orb defaults to assuming
+   30-second exposures.  That can be modified below.
+EXPTIME=30
+
+   In computing exposure durations in ephemerides,  Find_Orb defaults
+   to assuming a target SNR=4.  That can be modified below.
+SNR=4

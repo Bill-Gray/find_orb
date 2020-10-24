@@ -2626,8 +2626,9 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                      }
                   else
                      {
+                     const double exp_time = atof( get_environment_ptr( "EXPTIME"));
                      const double snr = snr_from_mag_and_exposure( &exposure_config,
-                                    curr_mag, atof( get_environment_ptr( "EXPTIME")));
+                                    curr_mag, (exp_time ? exp_time : 30.));
                      const char *fmt = (snr > 99. ? " %5.0f" : " %5.2f");
 
                      snprintf( tbuff, sizeof( tbuff), fmt, snr);
@@ -2638,13 +2639,14 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
 
                if( options & OPTION_EXPOSURE_TIME)
                   {
+                  const double target_snr = atof( get_environment_ptr( "SNR"));
                   double exposure_time;
 
                   if( exposure_config.airmass > 1e+9)
                      exposure_time = 99999.;
                   else
                      exposure_time = exposure_from_snr_and_mag( &exposure_config,
-                                     atof( get_environment_ptr( "SNR")), curr_mag);
+                                  (target_snr ? target_snr : 4.), curr_mag);
                   if( exposure_time > 99999.)
                      exposure_time = 99999.;
                   snprintf_append( alt_buff, sizeof( alt_buff), " %.1f", exposure_time);
