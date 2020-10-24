@@ -1,12 +1,14 @@
 # Comments may be added freely,  starting with #.
 # See https://minorplanetcenter.net/mpcops/documentation/identifications/submission_format/
-# Obviously,  you should change the name and e-mail address,  and probably
-# the comment,  too.
+# You should change the name and e-mail address,  and probably the
+# comment,  too.  Then rename this to 'link_hdr.json'.  Find_Orb
+# will use that instead of the default 'link_def.json'.  (And when
+# you update,  your name and e-mail won't get overwritten.)
 {
   "header": {
     "name": "J. Doe",
     "email": "john_doe@example.com",
-    "comment": "Here are some identifications that I gone and done."
+    "comment": "Default Find_Orb identification comment."
   },
   "links": {
     "link_0": {
