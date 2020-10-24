@@ -561,7 +561,9 @@ static int make_linkage_json( const int n_obs, const OBSERVE *obs, const ELEMENT
       }
    if( n_ids < 2 || n_ids >= MAX_LINKAGE_IDS)    /* no ID to be made */
       return( n_ids);
-   ifile = fopen_ext( "link_hdr.json", "fcr");
+   ifile = fopen_ext( "link_hdr.json", "cr");
+   if( !ifile)   /* no user-modified header; fall back to default hdr */
+      ifile = fopen_ext( "link_def.json", "fcr");
    ofile = fopen_ext( "linkage.json", "fcw");
    while( fgets( buff, sizeof( buff), ifile))
       if( *buff != '#')
@@ -614,11 +616,13 @@ static int make_linkage_json( const int n_obs, const OBSERVE *obs, const ELEMENT
    if( i < n_obs)         /* no NEOCP observations */
    fprintf( ofile, "      \"identification_type\": \"neocp\",\n");
    fprintf( ofile, "      \"orbit\": {\n");
-   fprintf( ofile, "        \"arg_pericenter\": %f,\n", elem->arg_per * 180. / PI);
+   fprintf( ofile, "        \"arg_pericenter\": %f,\n",
+                                 centralize_ang( elem->arg_per) * 180. / PI);
    fprintf( ofile, "        \"eccentricity\": %.8f,\n", elem->ecc);
    fprintf( ofile, "        \"epoch\": %f,\n", elem->epoch);
    fprintf( ofile, "        \"inclination\": %f,\n", elem->incl * 180. / PI);
-   fprintf( ofile, "        \"lon_asc_node\": %f,\n", elem->asc_node * 180. / PI);
+   fprintf( ofile, "        \"lon_asc_node\": %f,\n",
+                                centralize_ang( elem->asc_node) * 180. / PI);
    fprintf( ofile, "        \"pericenter_distance\": %.8f,\n", elem->q);
    fprintf( ofile, "        \"pericenter_time\": %f\n", elem->perih_time);
    fprintf( ofile, "      }\n");
