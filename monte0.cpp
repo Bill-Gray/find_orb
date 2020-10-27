@@ -142,6 +142,21 @@ void restore_ra_decs_mags_times( unsigned n_obs, OBSERVE *obs,
       }
 }
 
+/* Defining 64-bit constants portably and avoiding nuisance warnings
+is rather difficult to arrange,  but can be done. */
+
+#ifndef UINT64_C
+   #ifdef _MSC_VER
+      #define UINT64_C( a) (a##ui64)
+   #else
+      #ifdef _WIN32
+         #define UINT64_C( a) (a##ULL)
+      #else
+         #define UINT64_C( a) ((uint64_t)(a##UL))
+      #endif
+   #endif
+#endif
+
 /* Mostly cut & pasted from http://www.pcg-random.org/download.html */
 /* Permuted Congruential Generator */
 
@@ -153,7 +168,7 @@ static uint32_t pcg32_random_r( pcg32_random_t* rng)
 {
     const uint32_t xorshifted = ((rng->state >> 18u) ^ rng->state) >> 27u;
     const uint32_t rot = rng->state >> 59u;
-    const uint64_t multiplier = 6364136223846793005ULL;
+    const uint64_t multiplier = UINT64_C( 6364136223846793005);
 
     /* Advance internal state                                         */
     rng->state = rng->state * multiplier + (rng->inc | 1);
