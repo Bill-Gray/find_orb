@@ -68,14 +68,14 @@ jobs:
         git clone https://github.com/Bill-Gray/sat_code
         cd sat_code
         nmake -f msvc.mak sat_code.lib
-        copy sat_code.lib ..
+        copy sat_code.lib ..\sat_code64.lib
         nmake -f msvc.mak install
         cd ..
         git clone https://github.com/Bill-Gray/jpl_eph
         cd jpl_eph
         set CL=/I"../myincl"
         nmake -f vc.mak jpleph.lib
-        copy jpleph.lib ..
+        copy jpleph.lib ..\jpleph64.lib
         copy jpleph.h ..\myincl
         cd ..
         set CL=/I"./myincl"
