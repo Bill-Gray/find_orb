@@ -19,17 +19,17 @@ OBJS=ades_out.obj b32_eph.obj bc405.obj bias.obj collide.obj   \
 CCLIBS      = user32.lib gdi32.lib advapi32.lib shell32.lib comdlg32.lib
 !ifdef BITS_32
 CFLAGS=-c -Ot -W3 -nologo -MT -DCONSOLE -I../PDCurses
-ADD_LIBS    = pdcurses.lib sat_code32.lib jpleph32.lib lunar.lib
+ADD_LIBS    = sat_code32.lib jpleph32.lib lunar.lib
 RM=rm
 !else
 CFLAGS=-c -Ot -W3 -nologo -MT -DCONSOLE -I../PDCurses -D_CRT_SECURE_NO_WARNINGS
-ADD_LIBS    = pdcurses.lib sat_code64.lib jpleph64.lib lunar64.lib
+ADD_LIBS    = sat_code64.lib jpleph64.lib lunar64.lib
 RM=del
 !endif
 
 find_orb.exe:               findorb.obj $(OBJS) clipfunc.obj
      link /out:find_orb.exe findorb.obj $(OBJS) clipfunc.obj $(ADD_LIBS) \
-                       user32.lib $(CCLIBS)
+                       pdcurses.lib user32.lib $(CCLIBS)
 
 fo.exe:                     fo.obj $(OBJS)
      link /out:fo.exe       fo.obj $(OBJS) $(ADD_LIBS)
