@@ -778,6 +778,7 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
       if( !get_uncertainty( "sigma_G:", buff, 0))
          fprintf( ofile, " \"G sigma\": %s,", buff);
       }
+   fprintf( ofile, "\n        \"rms_residual\": %.4f,", compute_rms( obs, n_obs));
    if( uncertainty_parameter < 90.)
       fprintf( ofile, "\n        \"U\": %.4f,", uncertainty_parameter);
    if( q_sigma && !elem->central_obj)
@@ -805,12 +806,21 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
       n_used += (obs[i].is_included & 1);
    fprintf( ofile, "\n        \"count\": %u,", n_obs);
    fprintf( ofile, "\n        \"used\": %u,", n_used);
-   jd_first = obs[first].jd - td_minus_utc( obs[first].jd) / seconds_per_day;
-   jd_last  = obs[last].jd - td_minus_utc( obs[last].jd) / seconds_per_day;
+
+   jd_first = obs[0].jd - td_minus_utc( obs[0].jd) / seconds_per_day;
+   jd_last  = obs[n_obs - 1].jd - td_minus_utc( obs[n_obs - 1].jd) / seconds_per_day;
    fprintf( ofile, "\n        \"earliest\": %16.8f,", jd_first);
    fprintf( ofile, "\n        \"latest\": %16.8f,", jd_last);
    fprintf( ofile, "\n        \"earliest iso\": \"%s\",", iso_time( buff, jd_first, 3));
    fprintf( ofile, "\n        \"latest iso\": \"%s\",", iso_time( buff, jd_last, 3));
+
+   jd_first = obs[first].jd - td_minus_utc( obs[first].jd) / seconds_per_day;
+   jd_last  = obs[last].jd - td_minus_utc( obs[last].jd) / seconds_per_day;
+   fprintf( ofile, "\n        \"earliest_used\": %16.8f,", jd_first);
+   fprintf( ofile, "\n        \"latest_used\": %16.8f,", jd_last);
+   fprintf( ofile, "\n        \"earliest_used iso\": \"%s\",", iso_time( buff, jd_first, 3));
+   fprintf( ofile, "\n        \"latest_used iso\": \"%s\",", iso_time( buff, jd_last, 3));
+
    fprintf( ofile, "\n        \"residuals\":\n        [");
    for( i = 0; show_obs && i < (int)n_obs; i++)
       {
