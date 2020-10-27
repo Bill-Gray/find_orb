@@ -805,7 +805,8 @@ int get_observer_data( const char FAR *mpc_code, char *buff,
 
    if( strchr( "nsew", tolower( mpc_code[0])))
       {
-      int got_em = 0, j;
+      int got_em = 0;
+      size_t j;
 
       for( i = 0; mpc_code[i]; i++)
          {
