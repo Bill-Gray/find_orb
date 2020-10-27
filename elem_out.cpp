@@ -2408,9 +2408,9 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
       }
    if( do_full_improvement)
       {
-      if( *get_environment_ptr( "SHIFT_EPOCH"))
+      if( !*get_environment_ptr( "KEEP_PREVIOUS_EPOCH"))
          {
-         const double new_epoch  = find_epoch_shown( obs, n_obs);
+         const double new_epoch = find_epoch_shown( obs, n_obs);
 
          integrate_orbit( orbit, *orbit_epoch, new_epoch);
          *orbit_epoch = new_epoch;
