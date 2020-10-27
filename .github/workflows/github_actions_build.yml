@@ -1,5 +1,5 @@
 # Shameless copy of @AlastairUK's fine work for the jpl_eph repo.
-# Aside from the comment,  this is almost a byte-for-byte copy.
+# Extended a bit to include additional libraries.
 name: Build
 
 on: [push, pull_request]
@@ -59,7 +59,6 @@ jobs:
       run: |
         call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
         mkdir myincl
-        set CL=/I"./myincl"
         git clone https://github.com/Bill-Gray/lunar
         cd lunar
         nmake -f lunar.mak lunar64.lib
@@ -74,9 +73,11 @@ jobs:
         cd ..
         git clone https://github.com/Bill-Gray/jpl_eph
         cd jpl_eph
+        set CL=/I"../myincl"
         nmake -f vc.mak
         copy jpleph.lib ..
         copy jpleph.h ..\myincl
         cd ..
-        nmake -f dos_find.mak fo64.exe
+        set CL=/I"./myincl"
+        nmake -f dos_find.mak fo.exe
       shell: cmd
