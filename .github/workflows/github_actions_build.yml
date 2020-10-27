@@ -74,7 +74,7 @@ jobs:
         git clone https://github.com/Bill-Gray/jpl_eph
         cd jpl_eph
         set CL=/I"../myincl"
-        nmake -f vc.mak
+        nmake -f vc.mak jpleph.lib
         copy jpleph.lib ..
         copy jpleph.h ..\myincl
         cd ..
