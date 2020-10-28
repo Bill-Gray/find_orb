@@ -122,6 +122,8 @@ double centralize_ang( double ang);             /* elem_out.cpp */
 char *get_file_name( char *filename, const char *template_file_name);
 void get_relative_vector( const double jd, const double *ivect,
           double *relative_vect, const int planet_orbiting);  /* orb_func.c */
+void push_orbit( const double epoch, const double *orbit);  /* orb_fun2.c */
+int pop_orbit( double *epoch, double *orbit);               /* orb_fun2.c */
 double get_planet_mass( const int planet_idx);                /* orb_func.c */
 double observation_rms( const OBSERVE FAR *obs);            /* elem_out.cpp */
 double find_epoch_shown( const OBSERVE *obs, const int n_obs); /* elem_out */
@@ -2421,6 +2423,9 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
       }
    if( do_full_improvement)
       {
+      OBSERVE *saved_obs = (OBSERVE *)calloc( n_obs, sizeof( OBSERVE));
+      double prev_score;
+
       if( !*get_environment_ptr( "KEEP_PREVIOUS_EPOCH"))
          {
          const double new_epoch = find_epoch_shown( obs, n_obs);
@@ -2428,8 +2433,19 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
          integrate_orbit( orbit, *orbit_epoch, new_epoch);
          *orbit_epoch = new_epoch;
          }
+      memcpy( saved_obs, obs, n_obs * sizeof( OBSERVE));
+      push_orbit( *orbit_epoch, orbit);
+      prev_score = evaluate_initial_orbit( obs, n_obs, orbit);
       full_improvement( obs, n_obs, orbit, *orbit_epoch, NULL,
                            ORBIT_SIGMAS_REQUESTED, *orbit_epoch);
+      if( prev_score < evaluate_initial_orbit( obs, n_obs, orbit))
+         {
+         pop_orbit( orbit_epoch, orbit);    /* we were better off with the old orbit */
+         memcpy( obs, saved_obs, n_obs * sizeof( OBSERVE));
+         }
+      else        /* throw out the saved orbit;  we've got something better */
+         pop_orbit( NULL, NULL);
+      free( saved_obs);
       }
    if( !got_vectors)
       {
