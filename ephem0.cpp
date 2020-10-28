@@ -1220,14 +1220,14 @@ static void format_motion( char *buff, const double motion)
    const double fabs_motion = fabs( motion);
 
    if( fabs_motion > 999999.)
-      motion_format = "------";
+      motion_format = "-------";
    else if( fabs_motion > 999.)
-      motion_format = "%6.0f";
+      motion_format = "%7.1f";
    else if( fabs_motion > 99.9)
-      motion_format = "%6.1f";
+      motion_format = "%7.2f";
    else
-      motion_format = "%6.2f";
-   snprintf( buff, 7, motion_format, motion);
+      motion_format = "%7.3f";
+   snprintf( buff, 8, motion_format, motion);
 }
 
 #ifdef NOT_CURRENTLY_USED
@@ -2003,8 +2003,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
          snprintf_append( buff, sizeof( buff), "  LuElo");
       if( options & OPTION_MOTION_OUTPUT)
          snprintf_append( buff, sizeof( buff),
-                (options & OPTION_SEPARATE_MOTIONS) ? " -RA-'/hr-dec-"
-                                                    : " -'/hr- --PA--");
+                (options & OPTION_SEPARATE_MOTIONS) ? " -RA--'/hr--dec-"
+                                                    : " -'/hr-- --PA--");
       if( options & OPTION_ALT_AZ_OUTPUT)
          snprintf_append( buff, sizeof( buff), " alt -az");
       if( options & OPTION_SUN_ALT)
@@ -2801,19 +2801,19 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   if( options & OPTION_SEPARATE_MOTIONS)
                      {
                      format_motion( end_ptr + 1, m.ra_motion);
-                     format_motion( end_ptr + 8, m.dec_motion);
+                     format_motion( end_ptr + 9, m.dec_motion);
                      snprintf_append( alt_buff, sizeof( alt_buff),
                                  " %f %f", m.ra_motion, m.dec_motion);
                      }
                   else
                      {
                      format_motion( end_ptr + 1, m.total_motion);
-                     snprintf( end_ptr + 8, 7, "%5.1f ",
+                     snprintf( end_ptr + 9, 7, "%5.1f ",
                                      m.position_angle_of_motion);
                      snprintf_append( alt_buff, sizeof( alt_buff),
                                  " %f %.2f", m.total_motion, m.position_angle_of_motion);
                      }
-                  end_ptr[7] = ' ';
+                  end_ptr[8] = ' ';
                   if( computer_friendly)
                      strcpy( end_ptr, alt_tptr);
                   }
