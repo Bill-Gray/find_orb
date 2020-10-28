@@ -31,6 +31,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #define GAUSS_K .01720209895
 #define SOLAR_GM (GAUSS_K * GAUSS_K)
 
+void push_orbit( const double epoch, const double *orbit);  /* orb_fun2.c */
+int pop_orbit( double *epoch, double *orbit);               /* orb_fun2.c */
 double generate_mc_variant_from_covariance( double *var_orbit,
                                                      const double *orbit);
 double improve_along_lov( double *orbit, const double epoch, const double *lov,
@@ -270,10 +272,7 @@ int pop_orbit( double *epoch, double *orbit)
 
 void pop_all_orbits( void)
 {
-   double unused_epoch;
-   double unused_orbit[6];
-
-   while( !pop_orbit( &unused_epoch, unused_orbit))
+   while( !pop_orbit( NULL, NULL))
       ;
 }
 

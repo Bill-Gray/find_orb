@@ -1932,19 +1932,16 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       }
    else if( ephem_type != OPTION_CLOSE_APPROACHES)
       {
-      char hr_min_text[80], added_prec_text[10];
+      char hr_min_text[80], added_prec_text_ra[20], added_prec_text_dec[20];
       const char *pre_texts[4] = { "", "-HH", "-HH:MM", "-HH:MM:SS" };
 
+      output_angle_to_buff( added_prec_text_ra, 0., ra_format);
+      output_signed_angle_to_buff( added_prec_text_dec, 0., dec_format);
+      remove_trailing_cr_lf( added_prec_text_ra);
+      remove_trailing_cr_lf( added_prec_text_dec);
+      memset( added_prec_text_ra,  '-', strlen( added_prec_text_ra));
+      memset( added_prec_text_dec, '-', strlen( added_prec_text_dec));
       strcpy( hr_min_text, pre_texts[hh_mm]);
-#if 0
-      if( added_ra_dec_precision > 0)
-         {
-         memset( added_prec_text, '-', added_ra_dec_precision);
-         added_prec_text[added_ra_dec_precision] = '\0';
-         }
-      else
-#endif
-         *added_prec_text = '\0';
       if( n_step_digits)
          {
          strcat( hr_min_text, ".");
@@ -1962,10 +1959,10 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       snprintf( buff, sizeof( buff), "Date %s%s  ",
                      (*timescale ? "(TT)"  : "(UTC)"), hr_min_text);
       if( !(options & OPTION_SUPPRESS_RA_DEC))
-         snprintf_append( buff, sizeof( buff), "-RA%s-----------  -Dec%s-------  ",
-                                    added_prec_text, added_prec_text);
+         snprintf_append( buff, sizeof( buff), "-RA%s   -Dec%s  ",
+                                    added_prec_text_ra + 3, added_prec_text_dec + 4);
       if( !(options & OPTION_SUPPRESS_DELTA))
-         snprintf_append( buff, sizeof( buff), "delta  ");
+         snprintf_append( buff, sizeof( buff), "-delta ");
       if( !(options & OPTION_SUPPRESS_SOLAR_R))
          snprintf_append( buff, sizeof( buff), "-r---- ");
       if( !(options & OPTION_SUPPRESS_ELONG))
@@ -2022,7 +2019,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       if( options & OPTION_GROUND_TRACK)
          snprintf_append( buff, sizeof( buff), " -lon---- -lat---- -alt-(km)-");
       if( options & OPTION_SPACE_VEL_OUTPUT)
-         snprintf_append( buff, sizeof( buff), "  svel ");
+         snprintf_append( buff, sizeof( buff), "  svel-");
       if( options & OPTION_SHOW_SIGMAS)
          snprintf_append( buff, sizeof( buff), " \"-sig-PA");
       if( ephem_type == OPTION_OBSERVABLES)
@@ -2361,6 +2358,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                if( ra >= 24.) ra -= 24.;
                output_angle_to_buff( ra_buff, ra * (output_ra_in_degrees ? 15. : 1.),
                                                ra_format);
+               remove_trailing_cr_lf( ra_buff);
                for( j = 0; j < 3; j++)    /* compute alt/azzes of object (j=0), */
                   {                       /* sun (j=1), and moon (j=2)          */
                   DPT obj_ra_dec = ra_dec;
@@ -2462,6 +2460,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   air_mass = bdata.air_mass;
                   }
                output_signed_angle_to_buff( dec_buff, dec, dec_format);
+               remove_trailing_cr_lf( dec_buff);
                if( fake_astrometry)
                   {
                   strcpy( fake_line, obs->packed_id);
