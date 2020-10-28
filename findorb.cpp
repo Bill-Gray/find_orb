@@ -3650,16 +3650,27 @@ int main( int argc, const char **argv)
                      {
                      int idx1 = new_curr, idx2 = new_curr;
 
-                     if( button & (BUTTON1_RELEASED | BUTTON2_RELEASED | BUTTON3_RELEASED))
+                     if( button & (BUTTON1_RELEASED | BUTTON2_RELEASED | BUTTON3_RELEASED
+                                          | BUTTON_SHIFT))
                         {                          /* selected a range of obs */
                         idx1 = min( curr_obs, new_curr);
                         idx2 = max( curr_obs, new_curr);
                         }
                      if( button & BUTTON_CTRL)
+                        obs[new_curr].flags ^= OBS_IS_SELECTED;
+                     else if( button & BUTTON_SHIFT)
                         {
-                        for( i = 0; i < n_obs; i++)
-                           if( i >= idx1 && i <= idx2)
-                              obs[i].flags ^= OBS_IS_SELECTED;
+                        int n_selected = 0, n_unselected;
+
+                        for( i = idx1; i <= idx2; i++)
+                           if( obs[i].flags & OBS_IS_SELECTED)
+                              n_selected++;
+                        n_unselected = (idx2 - idx1 + 1) - n_selected;
+                        for( i = idx1; i <= idx2; i++)
+                           if( n_selected > n_unselected)
+                              obs[i].flags &= ~OBS_IS_SELECTED;
+                           else
+                              obs[i].flags |= OBS_IS_SELECTED;
                         }
                      else if( button & (BUTTON1_RELEASED | BUTTON1_CLICKED))
                         {

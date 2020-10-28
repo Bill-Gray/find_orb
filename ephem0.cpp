@@ -1014,7 +1014,7 @@ trip times (<10 seconds), the transmitter tripped frequently, so we try
 not to push it too much."  I gather they _could_ go a bit closer,  but
 it'd require a really,  really good reason.  */
 
-const double optical_albedo = .1;
+double optical_albedo = .1;
 
 static double radar_snr_per_day( const RADAR_DATA *rdata,
                      const double abs_mag,

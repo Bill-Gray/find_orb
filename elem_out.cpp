@@ -62,6 +62,9 @@ FILE *lock_file;
 #define JD_TO_YEAR(jd)  (2000. + ((jd)-J2000) / 365.25)
 #define YEAR_TO_JD( year) (J2000 + (year - 2000.) * 365.25)
 
+
+extern double optical_albedo;
+
 #ifdef _MSC_VER   /* MSVC/C++ lacks snprintf.  See 'ephem0.cpp' for details. */
 int snprintf( char *string, const size_t max_len, const char *format, ...);
 #endif
@@ -1905,11 +1908,11 @@ int write_out_elements_to_file( const double *orbit,
                               barbee_style_delta_v);
       if( elem.abs_mag && elem.is_asteroid)
          {
-         const double diam = diameter_from_abs_mag( elem.abs_mag, .1);
+         const double diam = diameter_from_abs_mag( elem.abs_mag, optical_albedo);
 
-         fprintf( ofile, "# Diameter %.1f %s (assuming 10%% albedo)\n",
+         fprintf( ofile, "# Diameter %.1f %s (assuming %.0f%% albedo)\n",
                (diam > 10000. ? diam / 1000. : diam),
-               (diam > 10000. ? "km" : "meters"));
+               (diam > 10000. ? "km" : "meters"), optical_albedo * 100.);
          }
 
       fprintf( ofile, "# Score: %f\n", evaluate_initial_orbit( obs, n_obs, orbit));
@@ -2916,6 +2919,7 @@ int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
    const char *override_fcct14_filename = get_environment_ptr( "FCCT14_FILE");
    const char *ephem_bitstring = get_environment_ptr( "EPHEM_OPTIONS");
    const char *eop_filename = get_environment_ptr( "EOP_FILE");
+   const char *albedo = get_environment_ptr( "OPTICAL_ALBEDO");
 
 #ifndef _WIN32
    lock_file = fopen( lock_filename, "w");
@@ -2994,6 +2998,8 @@ int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
    sr_orbits = (double *)calloc( (size_t)max_n_sr_orbits, 7 * sizeof( double));
    assert( sr_orbits);
    sscanf( get_environment_ptr( "PERTURBERS"), "%x", &always_included_perturbers);
+   if( *albedo)
+      optical_albedo = atof( albedo);
    return( 0);
 }
 

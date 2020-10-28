@@ -349,3 +349,8 @@ EXPTIME=30
    In computing exposure durations in ephemerides,  Find_Orb defaults
    to assuming a target SNR=4.  That can be modified below.
 SNR=4
+
+   Diameters for asteroids are estimated based on an assumed albedo
+   of 10%.  Your assumed (or measured) albedo may be different,  in
+   which case you should modify the following.
+OPTICAL_ALBEDO=0.10
