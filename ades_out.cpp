@@ -51,7 +51,7 @@ int text_search_and_replace( char FAR *str, const char *oldstr,
 static void output_names( FILE *ofile, const OBSERVE FAR *obs, const char *target)
 {
    int i;
-   size_t tlen = strlen( target);
+   const size_t tlen = strlen( target);
    const char *tptr, *tptr2;
 
    if( obs->obs_details)
@@ -61,14 +61,16 @@ static void output_names( FILE *ofile, const OBSERVE FAR *obs, const char *targe
             tptr += tlen;
             while( tptr && *tptr)
                {
+               size_t name_len;
+
                if( *tptr == ',')
                   tptr++;
                while( *tptr == ' ')
                   tptr++;
                tptr2 = strchr( tptr, ',');
-               tlen = (tptr2 ? tptr2 - tptr : strlen( tptr));
-               if( tlen)
-                  fprintf( ofile, "        <name>%.*s</name>\n", (int)tlen, tptr);
+               name_len = (tptr2 ? tptr2 - tptr : strlen( tptr));
+               if( name_len)
+                  fprintf( ofile, "        <name>%.*s</name>\n", (int)name_len, tptr);
                tptr = tptr2;
                }
             }
