@@ -681,7 +681,7 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
 {
    double jd = current_jd( );
    double jd_first, jd_last;
-   double q_sigma = 0.;
+   double q_sigma = 0., weighted_rms;
    char buff[180];
    int first, last, i, n_used;
    extern const char *combine_all_observations;
@@ -784,6 +784,9 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
          fprintf( ofile, " \"G sigma\": %s,", buff);
       }
    fprintf( ofile, "\n        \"rms_residual\": %.4f,", compute_rms( obs, n_obs));
+   weighted_rms = compute_weighted_rms( obs, n_obs, &n_used);
+   fprintf( ofile, "\n        \"weighted_rms_residual\": %.4f,", weighted_rms);
+   fprintf( ofile, "\n        \"n_resids\": %d,", n_used);
    if( uncertainty_parameter < 90.)
       fprintf( ofile, "\n        \"U\": %.4f,", uncertainty_parameter);
    if( q_sigma && !elem->central_obj)
