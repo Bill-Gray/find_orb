@@ -959,6 +959,8 @@ double compute_rms( const OBSERVE FAR *obs, const int n_obs)
          rval += obs_rms * obs_rms;
          n_included++;
          }
+   if( !n_included)           /* avoid NaN */
+      n_included = 1;
    return( sqrt( rval / (double)(n_included * 2)));
 }
 
@@ -978,6 +980,8 @@ double compute_weighted_rms( const OBSERVE FAR *obs, const int n_obs, int *n_res
          }
    if( n_resids)
       *n_resids = n;
+   if( !n)           /* avoid NaN */
+      n = 1;
    return( sqrt( rval / (double)n));
 }
 
@@ -2697,7 +2701,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
    double element_slopes[MAX_N_PARAMS][MONTE_N_ENTRIES];
    double elements_in_array[MONTE_N_ENTRIES];
    double differences[10];
-   double original_orbit[6], original_params[3];
+   double original_orbit[6], original_params[MAX_N_NONGRAV_PARAMS];
    double central_obj_state[6], tvect[6];
    const double default_delta_vals[9] =
 //                  { 1e-12, 1e-12, 1e-12, 1e-11, 1e-11, 1e-11,
