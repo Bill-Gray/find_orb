@@ -3952,7 +3952,7 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
                {
                memcpy( rval[loc].packed_desig, buff, 12);
                rval[loc].packed_desig[12] = '\0';
-               rval[loc].n_obs = 0;
+               rval[loc].n_obs = rval[loc].solution_exists = 0;
                rval[loc].jd_start = rval[loc].jd_end = jd;
                rval[loc].jd_updated = jd;    /* at minimum */
                if( is_neocp)   /* for NEOCP obs,  we need to start at the */
@@ -3967,6 +3967,8 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
                n++;
                }
             rval[loc].n_obs++;
+            if( buff[14] == 'x' || buff[14] == 'X')   /* deleted observation */
+               rval[loc].solution_exists++;     /* ..flagged via soln exists */
             if( rval[loc].jd_start > jd)
                rval[loc].jd_start = jd;
             if( rval[loc].jd_end < jd)

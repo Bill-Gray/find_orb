@@ -2791,7 +2791,7 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
       int i, j;
 
       for( i = j = 0; i < *n_ids; i++)
-         if( ids[i].n_obs > 1)
+         if( ids[i].n_obs - ids[i].solution_exists > 1)
             ids[j++] = ids[i];
       *n_ids = j;
       }
