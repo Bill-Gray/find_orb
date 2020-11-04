@@ -2484,7 +2484,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                if( !(options & OPTION_SUPPRESS_RA_DEC))
                   {
                   if( computer_friendly)
-                     snprintf_append( buff, sizeof( buff), " %9.5f %9.5f",
+                     snprintf_append( buff, sizeof( buff), " %12.8f %12.8f",
                                     ra * 15, dec);
                   else
                      {
@@ -2496,7 +2496,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                      }
                   text_search_and_replace( ra_buff, " ", "_");
                   text_search_and_replace( dec_buff, " ", "_");
-                  snprintf_append( alt_buff, sizeof( alt_buff), " %9.5f %s %9.5f %s",
+                  snprintf_append( alt_buff, sizeof( alt_buff), " %12.8f %s %12.8f %s",
                                     ra * 15, ra_buff, dec, dec_buff);
                   }
                if( !(options & OPTION_SUPPRESS_DELTA))
@@ -2525,9 +2525,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   }
                if( !(options & OPTION_SUPPRESS_ELONG))
                   {
-                  snprintf( tbuff, sizeof( tbuff), " %5.1f", elong * 180. / PI);
-                  strcat( buff, tbuff);
-                  strcat( alt_buff, tbuff);
+                  snprintf_append( buff, sizeof( buff), " %5.1f", elong * 180. / PI);
+                  snprintf_append( alt_buff, sizeof( alt_buff), " %9.5f", elong * 180. / PI);
                   }
 
                if( options & OPTION_VISIBILITY)
@@ -2784,9 +2783,9 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
 
                if( options & OPTION_LUNAR_ELONGATION)
                   {
-                  snprintf( tbuff, sizeof( tbuff), " %6.1f", dist_moon * 180. / PI);
-                  strcat( alt_buff, tbuff);
-                  strcat( buff, tbuff);
+                  snprintf_append( buff, sizeof( buff), " %6.1f", dist_moon * 180. / PI);
+                  snprintf_append( alt_buff, sizeof( alt_buff), " %10.5f",
+                                                             dist_moon * 180. / PI);
                   }
 
                if( options & OPTION_MOTION_OUTPUT)
@@ -2810,7 +2809,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                      snprintf( end_ptr + 9, 7, "%5.1f ",
                                      m.position_angle_of_motion);
                      snprintf_append( alt_buff, sizeof( alt_buff),
-                                 " %f %.2f", m.total_motion, m.position_angle_of_motion);
+                                 " %f %.4f", m.total_motion, m.position_angle_of_motion);
                      }
                   end_ptr[8] = ' ';
                   if( computer_friendly)
@@ -2841,13 +2840,13 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                      snprintf( tbuff, sizeof( tbuff), " %c%02d",
                                        (alt > 0. ? '+' : '-'),
                                        (int)( fabs( alt) + .5));
-                     snprintf_append( alt_buff, sizeof( alt_buff), " %6.2f", alt);
+                     snprintf_append( alt_buff, sizeof( alt_buff), " %8.4f", alt);
                      }
                   if( show_az)
                      {
                      snprintf_append( tbuff, sizeof( tbuff), " %03d",
                                        (int)( az + .5));
-                     snprintf_append( alt_buff, sizeof( alt_buff), " %6.2f", az);
+                     snprintf_append( alt_buff, sizeof( alt_buff), " %8.4f", az);
                      }
                   if( !computer_friendly)
                      strcat( buff, tbuff);
