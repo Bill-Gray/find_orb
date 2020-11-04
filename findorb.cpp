@@ -2953,6 +2953,8 @@ int main( int argc, const char **argv)
    int n_stations_shown = 0, top_obs_shown = 0, n_obs_shown = 0;
    bool single_obs_selected = false;
    extern unsigned random_seed;
+   unsigned mouse_x = 0, mouse_y = 0, mouse_z = 0;
+   unsigned long button;
 
    random_seed = get_random_seed( );
    if( !strcmp( argv[0], "find_orb"))
@@ -3521,7 +3523,11 @@ int main( int argc, const char **argv)
                c = KEY_TIMER;
             }
          if( !c)
+            {
             c = extended_getch( );
+            if( c == KEY_MOUSE)
+               get_mouse_data( (int *)&mouse_x, (int *)&mouse_y, (int *)&mouse_z, &button);
+            }
          auto_repeat_full_improvement = 0;
          }
       if( c != KEY_TIMER)
@@ -3529,10 +3535,8 @@ int main( int argc, const char **argv)
 
       if( c == KEY_MOUSE)
          {
-         unsigned x, y, z;
          int dir = 1;
          const unsigned station_start_line = getmaxy( stdscr) - n_stations_shown;
-         unsigned long button;
          wchar_t text[100], *search_ptr;
          const wchar_t *search_strings[] = { L"YY MM DD.DDD", L"Peri",
                   L"Epoch", L"(J2000 ecliptic)",
@@ -3542,21 +3546,20 @@ int main( int argc, const char **argv)
          const int search_char[] = { KEY_ALREADY_HANDLED, '+', 'e',
                   ALT_N, ALT_N, ALT_N, ALT_K, 't', 't', '=', '%' };
 
-         get_mouse_data( (int *)&x, (int *)&y, (int *)&z, &button);
          dir = (( button & button1_events) ? 1 : -1);
          if( debug_mouse_messages)
             sprintf( message_to_user, "x=%d y=%d z=%d button=%lx",
-                              x, y, z, button);
+                              mouse_x, mouse_y, mouse_z, button);
          for( i = 0; i < 99 && i < getmaxx( stdscr); i++)
             {
-            move( y, i);
+            move( mouse_y, i);
             text[i] = (wchar_t)( inch( ) & A_CHARTEXT);
             }
          text[i] = '\0';
          for( i = 0; search_strings[i]; i++)
             if( (search_ptr = wcsstr( text, search_strings[i])) != NULL)
                {
-               const unsigned loc = x - (unsigned)( search_ptr - text);
+               const unsigned loc = mouse_x - (unsigned)( search_ptr - text);
 
                if( loc < (unsigned)wcslen( search_strings[i]))
                   {
@@ -3582,11 +3585,11 @@ int main( int argc, const char **argv)
             top_obs_shown--;
          else if( button5_pressed)   /* actually 'wheel down' */
             top_obs_shown++;
-         else if( y >= station_start_line)
+         else if( mouse_y >= station_start_line)
             {
             int c1;
             const char *search_code =
-                    mpc_color_codes[y - station_start_line].code;
+                    mpc_color_codes[mouse_y - station_start_line].code;
             char *tptr;
 
             strcpy( tbuff, get_find_orb_text( 2050));
@@ -3596,7 +3599,7 @@ int main( int argc, const char **argv)
             *tptr = '*';
             text_search_and_replace( tbuff, "$", search_code);
             help_file_name = "mpc_area.txt";
-            c1 = full_inquire( tbuff, NULL, 0, COLOR_MENU, y, x);
+            c1 = full_inquire( tbuff, NULL, 0, COLOR_MENU, mouse_y, mouse_x);
             if( c1 >= KEY_F(1) && c1 <= KEY_F(3))
                list_codes = c1 - KEY_F(1);
             else if( c1 == KEY_F(4) || c1 == KEY_F(5))
@@ -3613,21 +3616,21 @@ int main( int argc, const char **argv)
             else if( c1 == KEY_F(6))
                c = ALT_X;
             }
-         else if( y >= top_line_residuals)
+         else if( mouse_y >= top_line_residuals)
             {
             const unsigned max_x = getmaxx( stdscr);
 
-            if( x == max_x - 1)    /* clicked on 'scroll bar' right of obs */
+            if( mouse_x == max_x - 1)    /* clicked on 'scroll bar' right of obs */
                {
                dir = 0;
-               if( y == top_line_residuals)
+               if( mouse_y == top_line_residuals)
                   dir = -1;        /* similar to mouse wheel up */
-               else if( y == top_line_residuals + n_obs_shown - 1)
+               else if( mouse_y == top_line_residuals + n_obs_shown - 1)
                   dir =  1;        /* similar to mouse wheel down */
                else
                   {              /* clicked on scroll bar */
                   top_obs_shown =
-                          (y - top_line_residuals) * n_obs / n_obs_shown;
+                          (mouse_y - top_line_residuals) * n_obs / n_obs_shown;
                   top_obs_shown -= n_obs_shown / 2;  /* Center display */
                   }
                if( button & BUTTON1_DOUBLE_CLICKED)
@@ -3638,7 +3641,7 @@ int main( int argc, const char **argv)
                }
             else
                {              /* clicked among the observations */
-               int new_curr = top_obs_shown + (y - top_line_residuals);
+               int new_curr = top_obs_shown + (mouse_y - top_line_residuals);
 
                if( new_curr < n_obs)  /* "normal" click in the observations area */
                   {
@@ -3689,7 +3692,7 @@ int main( int argc, const char **argv)
                                  residual_format, n_obs_shown);
                         strlcpy_err( tbuff, get_find_orb_text( 2022), sizeof( tbuff));
                         text_search_and_replace( tbuff, "$", search_code);
-                        i = full_inquire( tbuff, NULL, 0, COLOR_MENU, y, x);
+                        i = full_inquire( tbuff, NULL, 0, COLOR_MENU, mouse_y, mouse_x);
                         switch( i)
                            {
                            case KEY_F( 1) :       /* toggle obs */
@@ -3736,30 +3739,30 @@ int main( int argc, const char **argv)
                }
             }
          else if( n_command_lines &&
-                          y == top_line_basic_info_perturbers + n_command_lines)
+                          mouse_y == top_line_basic_info_perturbers + n_command_lines)
             {                      /* clicked on a perturber 'radio button' */
-            if( x / 7 == 9)
+            if( mouse_x / 7 == 9)
                c = '0';
-            else if( x / 7 == 10)
+            else if( mouse_x / 7 == 10)
                c = 'a';
             else
-               c = '1' + (x / 7);
+               c = '1' + (mouse_x / 7);
             }
-         else if( y > top_line_basic_info_perturbers + n_command_lines
-               && y < top_line_orbital_elements)   /* in obs details area: */
+         else if( mouse_y > top_line_basic_info_perturbers + n_command_lines
+               && mouse_y < top_line_orbital_elements)   /* in obs details area: */
             c = ALT_Q;         /* toggle display header/'traditional' data */
-         else if( y >= top_line_basic_info_perturbers &&
-                  y < top_line_basic_info_perturbers + n_command_lines)
+         else if( mouse_y >= top_line_basic_info_perturbers &&
+                  mouse_y < top_line_basic_info_perturbers + n_command_lines)
             {
             for( i = 0; command_areas[i].key; i++)
-               if( y == command_areas[i].line &&
-                             x >= command_areas[i].col1 &&
-                             x < command_areas[i].col2)
+               if( mouse_y == command_areas[i].line &&
+                          mouse_x >= command_areas[i].col1 &&
+                          mouse_x < command_areas[i].col2)
                   c = command_areas[i].key;
             }
          else if( (observation_display & DISPLAY_ORBITAL_ELEMENTS)
                   && c == KEY_MOUSE
-                  && y >= top_line_orbital_elements)
+                  && mouse_y >= top_line_orbital_elements)
             {
             if( button & (BUTTON2_RELEASED | BUTTON2_CLICKED
                         | BUTTON3_RELEASED | BUTTON3_CLICKED))
@@ -3767,7 +3770,7 @@ int main( int argc, const char **argv)
                setup_elements_dialog( tbuff, orbit_constraints, element_format);
                help_file_name = "elem_pop.txt";
                i = full_inquire( tbuff, NULL, 0,
-                               COLOR_MENU, y, x);
+                               COLOR_MENU, mouse_y, mouse_x);
                c = KEY_MOUSE;
                switch( i)
                   {
@@ -3805,7 +3808,7 @@ int main( int argc, const char **argv)
             else
                c = CTRL( 'B');      /* toggle commented elems */
             }
-         }
+         }           /* end of mouse-handling code */
 
       if( c >= '1' && c <= '9')
          perturbers ^= (1 << (c - '0'));
