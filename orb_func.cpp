@@ -2670,6 +2670,22 @@ int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid)
    return( n_residuals);
 }
 
+static void output_json_matrix( FILE *ofile, const char *title, const double *matrix,
+               const size_t dim)
+{
+   size_t i, j;
+
+   fprintf( ofile, "\"%s\": [\n", title);
+   for( i = 0; i < dim; i++)
+      {
+      fprintf( ofile, "   [");
+      for( j = 0; j < dim; j++)
+         fprintf( ofile, "%.8g%c ", *matrix++, (j == dim - 1) ? ' ' : ',');
+      fprintf( ofile, "]%s\n", (i == dim - 1) ? "" : ",");
+      }
+   fprintf( ofile, "]\n");
+}
+
 const char *monte_label[MONTE_N_ENTRIES] = {
                            "Tp", "e", "q", "Q", "1/a", "i", "M",
                            "omega", "Omega", "MOID", "H" };
@@ -3124,6 +3140,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
       {
       char tbuff[200];
       FILE *ofile = fopen_ext( get_file_name( tbuff, covariance_filename), "tfcwb");
+      FILE *json_ofile = fopen_ext( get_file_name( tbuff, "covar.json"), "tfcwb");
       double *matrix = lsquare_covariance_matrix( lsquare);
       double *wtw = lsquare_wtw_matrix( lsquare);
       double eigenvals[10], eigenvectors[100], element_sigmas[MONTE_N_ENTRIES];
@@ -3154,6 +3171,10 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
                }
             fprintf( ofile, "\n");
             }
+      fprintf( json_ofile, "{ ");
+      output_json_matrix( json_ofile, "covar", matrix, n_params);
+      fprintf( json_ofile, "} ");
+      fclose( json_ofile);
       for( pass = (matrix ? 0 : 2); pass < 4; pass++)
          {
          const char *titles[] = {  "Covariance", "Correlation",
