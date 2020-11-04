@@ -336,7 +336,7 @@ static int make_fake_astrometry( const char *obj_name, const char *filename)
    if( ofile)
       {
       const char *dummy_line =
-        "  C2000 01 01.00000 00 00 00.00 +00 00 00.0                 Dummy500";
+        "  C2000 01 01.00000 00 00 00.00 +00 00 00.0               V Dummy500";
       char packed_desig[20];
 
       create_mpc_packed_desig( packed_desig, obj_name);
