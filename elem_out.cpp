@@ -2290,14 +2290,81 @@ static int names_compare( const char *name1, const char *name2)
    return( strcmp( name1, name2));
 }
 
+/* You can specify a state vector on the command line (for fo and
+Find_Orb) using the -v(state vect) switch.  The state vector must
+have,  at minimum,  an epoch and six numbers (position and velocity).
+Further options can be added after those numbers.  For example,
+
+fo -oMade-up -v2020jan13,1.2,2.3,3.4,-.005,.002,.001,H=17,eq
+
+would make a dummy object 'Made-up',  at epoch 2020 Jan 13,
+position 1.2, 2.3, 3.4 (AU),  velocity -.005,-.002,.001 (AU/day),
+with an absolute mag of 17,  in the J2000 equatorial frame.
+(All heliocentric,  although a 'geo' option would be nice.)
+You can also use km and seconds as units,  by adding 'km' or 's'. */
+
+static double extract_state_vect_from_text( const char *text,
+            double *orbit, double *solar_pressure, double *abs_mag)
+{
+   char tbuff[81];
+   size_t i = 0;
+   double epoch = 0.;
+   int bytes_read;
+
+   while( text[i] && text[i] != ',' && i < 80)
+      i++;
+   if( text[i] == ',')
+      {
+      memcpy( tbuff, text, i);
+      tbuff[i] = '\0';
+      epoch = get_time_from_string( 0., tbuff, 0, NULL);
+      }
+   if( epoch)
+      {
+      text += i + 1;
+      for( i = 0; i < 6 && sscanf( text, "%lf%n", orbit + i, &bytes_read) == 1; i++)
+         text += bytes_read + 1;
+      if( i != 6)       /* didn't read a whole state vect */
+         epoch = 0.;
+      }
+   assert( epoch);
+   *abs_mag = 18.;
+   while( *text)
+      {
+      if( !memcmp( text, "eq", 2))
+         {
+         equatorial_to_ecliptic( orbit);
+         equatorial_to_ecliptic( orbit + 3);
+         text += 2;
+         }
+      else if( !memcmp( text, "H=", 2))
+         *abs_mag = atof( text + 2);
+      else if( !memcmp( text, "km", 2))
+         for( i = 0; i < 6; i++)
+            orbit[i] /= AU_IN_KM;
+      else if( *text == 's')
+         for( i = 3; i < 6; i++)
+            orbit[i] *= seconds_per_day;
+      else if( *text == 'A' && text[1] >= '1' && text[1] <= '3'
+                  && text[2] == '=')
+         solar_pressure[text[1] - '1'] = atof( text + 3);
+      while( *text != ',' && *text)
+         text++;
+      if( *text == ',')
+         text++;
+      }
+   return( epoch);
+}
+
 const char *mpcorb_dot_sof_filename = "mpcorb.sof";
+const char *state_vect_text = NULL;
 int ignore_prev_solns;
 bool take_first_soln = false;
 
 static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit,
                double *orbit_epoch, unsigned *perturbers)
 {
-   FILE *ifile = (ignore_prev_solns ? NULL : fopen_ext( vector_data_file, "crb"));
+   FILE *ifile = NULL;
    int got_vectors = 0, i;
    extern int n_extra_params;
    extern double solar_pressure[];
@@ -2309,6 +2376,14 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
    for( i = 0; i < MAX_N_NONGRAV_PARAMS; i++)
       solar_pressure[i] = 0.;
    n_extra_params = 0;
+   if( state_vect_text)    /* state vect supplied on cmd line w/ '-v' */
+      {
+      *orbit_epoch = extract_state_vect_from_text(
+                  state_vect_text, orbit, solar_pressure, &abs_mag);
+      got_vectors = (*orbit_epoch != 0.);
+      }
+   if( !got_vectors)
+      ifile = (ignore_prev_solns ? NULL : fopen_ext( vector_data_file, "crb"));
    if( ifile)
       {
       char buff[120];
@@ -2464,7 +2539,8 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
       obs->dec = obs->computed_dec;
       obs->obs_mag = abs_mag + calc_obs_magnitude( obs->solar_r,
                  obs->r, vector3_length( obs->obs_posn), NULL);
-      obs->obs_mag = floor( obs->obs_mag * 10.) * .1;
+      obs->obs_mag = floor( obs->obs_mag * 10. + .5) * .1;
+      obs->mag_precision = 1;         /* start out assuming mag to .1 mag */
       }
    return( got_vectors);
 }

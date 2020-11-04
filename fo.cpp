@@ -675,8 +675,15 @@ int main( int argc, const char **argv)
                else
                   total_objects = atoi( arg);
                break;
-            case 'v':
+            case 'V':
                use_colors = false;
+               break;
+            case 'v':
+               {
+               extern const char *state_vect_text;
+
+               state_vect_text = arg;
+               }
                break;
             case 'x':
                {

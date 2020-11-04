@@ -3107,6 +3107,13 @@ int main( int argc, const char **argv)
             case 'u':
                make_unicode_substitutions = 0;
                break;
+            case 'v':
+               {
+               extern const char *state_vect_text;
+
+               state_vect_text = arg;
+               }
+               break;
             case 'z':
                {
                extern const char *alt_config_directory;
