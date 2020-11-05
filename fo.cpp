@@ -867,7 +867,7 @@ int main( int argc, const char **argv)
                   {
                   int n_orbits_in_ephem = 1;
                   int n_ephemeris_steps = 50;
-                  char ephemeris_step_size[20];
+                  char ephemeris_step_size[80];
                   extern const char *ephemeris_filename;
                   extern const char *residual_filename;
                   extern int available_sigmas;
@@ -878,7 +878,7 @@ int main( int argc, const char **argv)
                            CALENDAR_JULIAN_GREGORIAN | FULL_CTIME_YMD
                            | FULL_CTIME_TWO_DIGIT_YEAR, NULL);
 
-                  sscanf( get_environment_ptr( "EPHEM_STEPS"), "%d %9s",
+                  sscanf( get_environment_ptr( "EPHEM_STEPS"), "%d %79s",
                          &n_ephemeris_steps, ephemeris_step_size);
                   if( ephem_end_jd)
                      {

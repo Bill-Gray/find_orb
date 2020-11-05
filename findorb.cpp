@@ -3154,7 +3154,7 @@ int main( int argc, const char **argv)
          &noise_in_arcseconds);
 
    strcpy( ephemeris_start, get_environment_ptr( "EPHEM_START"));
-   sscanf( get_environment_ptr( "EPHEM_STEPS"), "%d %9s",
+   sscanf( get_environment_ptr( "EPHEM_STEPS"), "%d %79s",
                &n_ephemeris_steps, ephemeris_step_size);
    if( debug_level)
       debug_printf( "Options read\n");
