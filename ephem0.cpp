@@ -395,7 +395,7 @@ double get_step_size( const char *stepsize, char *step_units, int *step_digits)
    double step = 0.;
    char units = 'd';
 
-   if( !strncmp( stepsize, "Obs", 3))     /* dummy value */
+   if( !strncmp( stepsize, "Obs", 3) || *stepsize == 't')     /* dummy value */
       step = 1e-6;
    if( *stepsize == 'a')
       {
@@ -1788,6 +1788,30 @@ double find_next_auto_step( const double target_diff, const bool going_backward,
    return( rval);
 }
 
+static double *list_of_ephem_times = NULL;
+
+static int get_ephem_times_from_file( const char *filename)
+{
+   FILE *ifile;
+   char buff[80];
+   int n_times = 0, byte_offset = 0;
+   double jd;
+
+   while( *filename == ' ')
+      filename++;
+   ifile = fopen_ext( filename, "frb");
+   while( fgets( buff, sizeof( buff), ifile))
+      n_times++;
+   list_of_ephem_times = (double *)calloc( n_times, sizeof( double));
+   fseek( ifile, 0L, SEEK_SET);
+   n_times = 0;
+   while( fgets_trimmed( buff, sizeof( buff), ifile))
+      if( (jd = get_time_from_string( 0., buff + byte_offset, FULL_CTIME_YMD, NULL)) > 1.)
+         list_of_ephem_times[n_times++] = jd;
+   fclose( ifile);
+   return( n_times);
+}
+
 #define RGB_OUTSIDE_POINTING_LIMITS      RGB_ORANGE
 #define RGB_BELOW_HORIZON                RGB_DIRT
 
@@ -1836,7 +1860,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       options &= ~OPTION_SHOW_SIGMAS;
 
    sscanf( get_environment_ptr( "RA_DEC_FORMAT"), "%d,%d", &ra_format, &dec_format);
-   if( !use_observation_times)
+   if( !use_observation_times && *stepsize != 't')
       {
       step = get_step_size( stepsize, &step_units, &n_step_digits);
       if( !step && *stepsize != 'a')
@@ -2086,6 +2110,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
             }
          curr_jd = obs[i].jd;
          }
+      else if( *stepsize == 't')
+         curr_jd = list_of_ephem_times[i];
       else if( *stepsize == 'a')
          {
          if( i)
@@ -2989,6 +3015,11 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       }
    if( computer_friendly_ofile)
       fclose( computer_friendly_ofile);
+   if( list_of_ephem_times)
+      {
+      free( list_of_ephem_times);
+      list_of_ephem_times = NULL;
+      }
    return( 0);
 }
 /* The above ephemeris code may insert a six-character hexadecimal
@@ -3059,6 +3090,7 @@ int ephemeris_in_a_file_from_mpc_code( const char *filename,
 {
    double rho_cos_phi, rho_sin_phi, lon;
    char note_text[100], buff[100];
+   int real_number_of_steps;
    const int planet_no = get_observer_data( mpc_code, buff, &lon,
                                            &rho_cos_phi, &rho_sin_phi);
 
@@ -3069,9 +3101,15 @@ int ephemeris_in_a_file_from_mpc_code( const char *filename,
    get_object_name( buff, obs->packed_id);
    snprintf_append( note_text, sizeof( note_text), ": %s", buff);
    get_scope_params( mpc_code, &exposure_config);
+   if( !strcmp( stepsize, "Obs"))
+      real_number_of_steps = n_obs;
+   else if( *stepsize == 't')
+      real_number_of_steps = get_ephem_times_from_file( stepsize + 1);
+   else
+      real_number_of_steps = n_steps;
    return( ephemeris_in_a_file( filename, orbit, obs, n_obs, planet_no,
                epoch_jd, jd_start, stepsize, lon, rho_cos_phi, rho_sin_phi,
-               strcmp( stepsize, "Obs") ? n_steps : n_obs,
+               real_number_of_steps,
                note_text, options, n_objects));
 }
 
