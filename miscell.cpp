@@ -83,6 +83,27 @@ const char *write_bit_string( char *ibuff, const uint64_t bits);
 int use_config_directory = false;
 const char *alt_config_directory;
 
+/* Users may specify files such as ~/this/that.txt on non-Windows boxes.
+The following function replaces ~ with the home directory. */
+
+static FILE *fopen_tilde( const char *filename, const char *permits)
+{
+#ifdef _WIN32
+   return( fopen( filename, permits));
+#else
+   if( *filename != '~' && filename[1] != '/')
+      return( fopen( filename, permits));
+   else
+      {
+      char fullname[255];
+
+      strlcpy_err( fullname, getenv( "HOME"), sizeof( fullname));
+      strlcat_err( fullname, filename + 1, sizeof( fullname));
+      return( fopen( fullname, permits));
+      }
+#endif
+}
+
 void make_config_dir_name( char *oname, const char *iname)
 {
 #ifndef _WIN32
@@ -148,7 +169,7 @@ FILE *fopen_ext( const char *filename, const char *permits)
       {     /* try local,  then config version */
       try_local = false;
       permits++;
-      rval = fopen( filename, permits + 1);
+      rval = fopen_tilde( filename, permits + 1);
       }
 #ifndef _WIN32
    if( is_temporary)
@@ -179,10 +200,10 @@ FILE *fopen_ext( const char *filename, const char *permits)
          permits++;
       else                       /* check config version only */
          try_local = false;
-      rval = fopen( tname, permits);
+      rval = fopen_tilde( tname, permits);
       }
    if( try_local && !rval && !is_temporary)
-      rval = fopen( filename, permits);
+      rval = fopen_tilde( filename, permits);
    if( !rval && is_fatal)
       {
       char buff[300];
