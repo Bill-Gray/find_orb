@@ -29,11 +29,13 @@ EPHEM_OPTIONS=10,16
 
 DEFAULTS=N4
 EPHEM_START=+0
-EPHEM_STEPS=100 1
+
+   By default,  ephems start 'now' (above line),  and run for twenty
+   one-hour steps (next two lines.)
+
+EPHEM_STEPS=10
+EPHEM_STEP_SIZE=1
 REFERENCE=Find_Orb
-EPHEM_LON=W 69.900
-EPHEM_LAT=N 44.010
-EPHEM_MPC_CODE=1 500
 
    'filtering' gives the assumed probability that an observation is a blunder
    (defaults to 2%);  the over-observing time span (defaults to one day);  the

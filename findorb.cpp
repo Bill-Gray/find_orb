@@ -3153,7 +3153,10 @@ int main( int argc, const char **argv)
          &element_precision, &max_residual_for_filtering,
          &noise_in_arcseconds);
 
-   strcpy( ephemeris_start, get_environment_ptr( "EPHEM_START"));
+   strlcpy_err( ephemeris_start, get_environment_ptr( "EPHEM_START"),
+                  sizeof( ephemeris_start));
+   strlcpy_err( ephemeris_step_size, get_environment_ptr( "EPHEM_STEP_SIZE"),
+                  sizeof( ephemeris_step_size));
    sscanf( get_environment_ptr( "EPHEM_STEPS"), "%d %79s",
                &n_ephemeris_steps, ephemeris_step_size);
    if( debug_level)
@@ -5285,8 +5288,9 @@ Shutdown_program:
          element_precision, max_residual_for_filtering,
          noise_in_arcseconds);
    set_environment_ptr( "EPHEM_START", ephemeris_start);
-   sprintf( tbuff, "%d %s", n_ephemeris_steps, ephemeris_step_size);
+   sprintf( tbuff, "%d", n_ephemeris_steps);
    set_environment_ptr( "EPHEM_STEPS", tbuff);
+   set_environment_ptr( "EPHEM_STEP_SIZE", ephemeris_step_size);
    if( ids)
       free( ids);
    if( mpc_color_codes)

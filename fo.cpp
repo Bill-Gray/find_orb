@@ -60,9 +60,8 @@ for Windows and other non-*nix systems. */
 
 extern int debug_level;
 
-#ifndef strlcpy
-size_t strlcpy(char *dest, const char *src, size_t size);   /* miscell.cpp */
-#endif
+size_t strlcpy_err( char *dst, const char *src, size_t dsize); /* miscell.c */
+size_t strlcat_err( char *dst, const char *src, size_t dsize); /* miscell.c */
 
    /* MSVC/C++ lacks snprintf.  See 'ephem0.cpp' for details. */
 #if defined(_MSC_VER) && _MSC_VER < 1900
@@ -521,7 +520,7 @@ int main( int argc, const char **argv)
                }
                break;
             case 'C':
-               strlcpy( mpc_code, arg, sizeof( mpc_code));
+               strlcpy_err( mpc_code, arg, sizeof( mpc_code));
                break;
             case 'd':
                debug_level = atoi( arg);
@@ -878,6 +877,9 @@ int main( int argc, const char **argv)
                            CALENDAR_JULIAN_GREGORIAN | FULL_CTIME_YMD
                            | FULL_CTIME_TWO_DIGIT_YEAR, NULL);
 
+                  strlcpy_err( ephemeris_step_size,
+                        get_environment_ptr( "EPHEM_STEP_SIZE"),
+                        sizeof( ephemeris_step_size));
                   sscanf( get_environment_ptr( "EPHEM_STEPS"), "%d %79s",
                          &n_ephemeris_steps, ephemeris_step_size);
                   if( ephem_end_jd)
