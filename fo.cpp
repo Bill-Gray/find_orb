@@ -701,6 +701,13 @@ int main( int argc, const char **argv)
                return( -1);
             }
          }
+               /* get_defaults( ) collects a lot of data that's for the  */
+               /* interactive find_orb program.  But it also sets some   */
+               /* important internal values for blunder detection,  etc. */
+               /* So we still call it:                                   */
+   get_defaults( &ephemeris_output_options,
+                         NULL, &element_precision, NULL, NULL);
+
    for( i = 1; i < argc; i++)
       {
       const char *tptr = strchr( argv[i], '=');
@@ -715,12 +722,6 @@ int main( int argc, const char **argv)
          }
       }
 
-               /* get_defaults( ) collects a lot of data that's for the  */
-               /* interactive find_orb program.  But it also sets some   */
-               /* important internal values for blunder detection,  etc. */
-               /* So we still call it:                                   */
-   get_defaults( &ephemeris_output_options,
-                         NULL, &element_precision, NULL, NULL);
    if( all_heliocentric)
       forced_central_body = 0;
    if( ephem_option_string)
