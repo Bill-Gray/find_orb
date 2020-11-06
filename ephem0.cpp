@@ -2048,13 +2048,11 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
          snprintf_append( buff, sizeof( buff), " \"-sig-PA");
       if( ephem_type == OPTION_OBSERVABLES)
          {
-         char cf_filename[256];
+         const char *cf_filename = "eph_json.txt";
 
          header = (char *)malloc( 1024);
          assert( header);
          strcpy( header, buff);
-         strcpy( cf_filename, filename);
-         text_search_and_replace( cf_filename, ".txt", ".eph");
          computer_friendly_ofile = fopen_ext( cf_filename, is_default_ephem ? "tfcw+" : "fw+");
          assert( computer_friendly_ofile);
          }
