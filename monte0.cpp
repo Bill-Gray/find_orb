@@ -166,8 +166,8 @@ typedef struct { uint64_t state;  uint64_t inc; } pcg32_random_t;
 
 static uint32_t pcg32_random_r( pcg32_random_t* rng)
 {
-    const uint32_t xorshifted = ((rng->state >> 18u) ^ rng->state) >> 27u;
-    const uint32_t rot = rng->state >> 59u;
+    const uint32_t xorshifted = (uint32_t)( ((rng->state >> 18u) ^ rng->state) >> 27u);
+    const int rot = (int)( rng->state >> 59u);
     const uint64_t multiplier = UINT64_C( 6364136223846793005);
 
     /* Advance internal state                                         */
@@ -182,7 +182,7 @@ static uint64_t pcg_64_bits( pcg32_random_t* rng)
           | ((uint64_t)pcg32_random_r( rng) << 32));
 }
 
-/* Returns a uniform random variable,  0 <= rval < 1.  See 'mt64.c'.  */
+/* Returns a uniform random variable,  0 <= rval < 1. */
 
 double uniform_random( const int free_up)
 {
