@@ -161,15 +161,25 @@ clean:
 clean_temp:
 	$(RM) $(IDIR)/bc405pre.txt
 	$(RM) $(IDIR)/cmt_sof.txt
+	$(RM) $(IDIR)/combined.json
 	$(RM) $(IDIR)/covar.txt
+	$(RM) $(IDIR)/covar.json
 	$(RM) $(IDIR)/covar?.txt
 	$(RM) $(IDIR)/debug.txt
+	$(RM) $(IDIR)/dummy.txt
+	$(RM) $(IDIR)/elem_?.json
 	$(RM) $(IDIR)/eleme?.txt
 	$(RM) $(IDIR)/elements.txt
+	$(RM) $(IDIR)/elements.json
+	$(RM) $(IDIR)/elem_short.json
 	$(RM) $(IDIR)/ephemeri.txt
+	$(RM) $(IDIR)/ephemeri.json
+	$(RM) $(IDIR)/eph_json.txt
 	$(RM) $(IDIR)/gauss.out
 	$(RM) $(IDIR)/guide.txt
 	$(RM) $(IDIR)/guide?.txt
+	$(RM) $(IDIR)/linkage.json
+	$(RM) $(IDIR)/lock.txt
 	$(RM) $(IDIR)/monte.txt
 	$(RM) $(IDIR)/monte?.txt
 	$(RM) $(IDIR)/mpcorb.dat
@@ -179,6 +189,8 @@ clean_temp:
 	$(RM) $(IDIR)/mpec.htm
 	$(RM) $(IDIR)/obser?.txt
 	$(RM) $(IDIR)/observe.txt
+	$(RM) $(IDIR)/observe.xml
+	$(RM) $(IDIR)/obs_temp.txt
 	$(RM) $(IDIR)/residual.txt
 	$(RM) $(IDIR)/sof.txt
 	$(RM) $(IDIR)/sof?.txt
@@ -187,6 +199,8 @@ clean_temp:
 	$(RM) $(IDIR)/sr_elems.txt
 	$(RM) $(IDIR)/state.txt
 	$(RM) $(IDIR)/state?.txt
+	$(RM) $(IDIR)/total.json
+	$(RM) $(IDIR)/total?.json
 	$(RM) $(IDIR)/vectors.txt
 	$(RM) $(IDIR)/virtu?.txt
 	$(RM) $(IDIR)/virtual.txt
