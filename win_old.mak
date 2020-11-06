@@ -9,7 +9,7 @@ OBJS=about.obj clipfunc.obj ephem.obj generic.obj monte.obj  \
   orbitdlg.obj settings.obj stdafx.obj \
   b32_eph.obj bc405.obj collide.obj conv_ele.obj eigen.obj \
   elem2tle.obj elem_out.obj ephem0.obj gauss.obj \
-  jpleph.obj lsquare.obj moid4.obj monte0.obj mpc_obs.obj mt64.obj \
+  jpleph.obj lsquare.obj moid4.obj monte0.obj mpc_obs.obj \
   orb_func.obj orb_fun2.obj pl_cache.obj roots.obj runge.obj \
   sigma.obj sm_vsop.obj sr.obj tle_out.obj
 

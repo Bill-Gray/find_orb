@@ -16,7 +16,7 @@ LINKOPTS=option stub=dos32a option map=find_orb.map option stack=20000
 OBJS=b32_eph.obj bc405.obj bias.obj collide.obj conv_ele.obj &
   details.obj eigen.obj elem2tle.obj elem_out.obj elem_ou2.obj ephem0.obj &
   errors.obj gauss.obj geo_pot.obj healpix.obj lsquare.obj &
-  miscell.obj moid4.obj monte0.obj mpc_fmt.obj mpc_obs.obj mt64.obj &
+  miscell.obj moid4.obj monte0.obj mpc_fmt.obj mpc_obs.obj &
 !ifeq DOS Y
   $(CURSES_OBJ) &
 !endif

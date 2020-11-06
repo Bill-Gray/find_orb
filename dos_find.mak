@@ -12,7 +12,7 @@ OBJS=ades_out.obj b32_eph.obj bc405.obj bias.obj collide.obj   \
   conv_ele.obj details.obj eigen.obj elem2tle.obj elem_out.obj  \
   elem_ou2.obj ephem0.obj errors.obj expcalc.obj gauss.obj  \
   geo_pot.obj healpix.obj lsquare.obj miscell.obj  \
-  monte0.obj mpc_obs.obj mt64.obj nanosecs.obj \
+  monte0.obj mpc_obs.obj nanosecs.obj \
   orb_func.obj orb_fun2.obj pl_cache.obj roots.obj runge.obj \
   shellsor.obj sigma.obj simplex.obj sm_vsop.obj sr.obj stackall.obj
 
