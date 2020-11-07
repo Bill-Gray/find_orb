@@ -144,8 +144,20 @@ ASTEROID_THRESH=10
    By default,  we consider all 300 asteroids listed in BC-405.  You can
    get a good speed-up by cutting this down,  at the risk of maybe ignoring
    some tiny rock that just happens to pull your target around more than
-   you expected.
+   you expected.  (See the next option,  too.)
 BC405_ASTEROIDS=300
+
+   By default,  Find_Orb uses a bit of logic to determine which asteroids
+   are close enough to have detectable perturbations.  (If it just added
+   in perturbations from all 300 all the time,  it would slow to a crawl.)
+   You can set the ASTEROID_PERT_LIST line to list a set of asteroids to
+   be used at all times,  to the exclusion of others.  This can help in
+   replicating the results of other programs;  if an integrator always
+   uses Ceres,  Pallas,  and Vesta (a common choice),  you would set
+   ASTEROID_PERT_LIST=1,2,4.  To replicate JPL's "Big-16" scheme,  you
+   would use ASTEROID_PERT_LIST=1,2,4,10,3,6,7,15,16,29,52,65,87,88,511,704
+   (the order doesn't matter.)
+ASTEROID_PERT_LIST=
 
    By default,  geoocentric elements are referred to the J2000 _equator_.
    Everything else (heliocentric and other non-earth-centric) is referred

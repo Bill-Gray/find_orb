@@ -242,7 +242,15 @@ the asteroid.  Initially,  it did seem as if scaling by the inverse of
 the mass of the asteroid would be correct.  However,  in a resonant
 situation,  (GM)^-0.5 is actually right.  Currently,  it's set up so
 that (2) Pallas has an effective range of 10 AU,  and all others are
-scaled to this.            */
+scaled to this.
+
+   And a final note : if you look at the comments for ASTEROID_PERT_LIST
+in 'environ.def',  you'll see that one can override Find_Orb's judgment
+and say "just use asteroids A, B, C, ...".  This helps if you're trying
+to replicate results from a particular integrator.  (JPL,  for example,
+has a "Big-16" list of asteroid perturbers they use frequently.)
+Normally,  Find_Orb's method will be more accurate,  but it'll be
+different,  making comparisons difficult.   */
 
 static FILE *get_precomputed_data_fp( void)
 {
@@ -375,8 +383,6 @@ double *get_asteroid_mass( const int astnum)
    return( rval);
 }
 
-const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
-
 int detect_perturbers( const double jd, const double * __restrict xyz,
                        double *accel)
 {
@@ -388,7 +394,9 @@ int detect_perturbers( const double jd, const double * __restrict xyz,
    static bool bc405_available = true;
    static int n_asteroids_to_use = 0;
    double thresh = atof( get_environment_ptr( "ASTEROID_THRESH"));
-   int i, load_posn0 = 0, load_posn1 = 0, chunk;
+   int i, load_posn0 = 0, load_posn1 = 0, chunk, n_fixed = 0;
+   const char *fixed_perturber_list = get_environment_ptr( "ASTEROID_PERT_LIST");
+   int fixed_perturbers[MAX_BC405_N_ASTEROIDS];
 
    if( !bc405_available)
       return( NO_BC405_FILE);
@@ -420,6 +428,15 @@ int detect_perturbers( const double jd, const double * __restrict xyz,
       {
       bc405_available = false;
       return( NO_BC405_FILE);
+      }
+
+   while( *fixed_perturber_list)  /* see ASTEROID_PERT_LIST comments in */
+      {                           /* 'environ.def' for info on this */
+      fixed_perturbers[n_fixed++] = atoi( fixed_perturber_list);
+      while( *fixed_perturber_list && *fixed_perturber_list != ',')
+         fixed_perturber_list++;
+      if( *fixed_perturber_list == ',')
+         fixed_perturber_list++;
       }
 
    chunk = (int)( (jd - bc405_start_jd) / bc405_chunk_time + .5);
@@ -459,17 +476,21 @@ int detect_perturbers( const double jd, const double * __restrict xyz,
       {
       const int16_t *p0 = posns0 + i * 3;
       const int16_t *p1 = posns1 + i * 3;
-      int j, possible_perturber = 1;
+      int j, possible_perturber = 1, fixed_perturber = 0;
       const double dthresh = thresh * sqrt( masses[i]) + .1 * integer_scale;
       const int16_t ithresh = (int16_t)( dthresh > 27000. ? 27000 : dthresh);
 
+      for( j = 0; j < n_fixed; j++)
+         if( asteroid_numbers[i] == fixed_perturbers[j])
+            fixed_perturber = 1;
       if( *p0 > *p1)
          possible_perturber = (ixyz[0] + ithresh > *p1 && ixyz[0] - ithresh < *p0);
       else
          possible_perturber = (ixyz[0] + ithresh > *p0 && ixyz[0] - ithresh < *p1);
       if( asteroid_numbers[i] == excluded_asteroid_number)
-         possible_perturber = 0;    /* don't let an asteroid perturb itself! */
-      if( possible_perturber)
+         possible_perturber = fixed_perturber = 0;  /* don't let an asteroid perturb itself! */
+
+      if( possible_perturber || fixed_perturber)
          {
          p0++;
          p1++;
@@ -477,7 +498,7 @@ int detect_perturbers( const double jd, const double * __restrict xyz,
             possible_perturber = (ixyz[1] + ithresh > *p1 && ixyz[1] - ithresh < *p0);
          else
             possible_perturber = (ixyz[1] + ithresh > *p0 && ixyz[1] - ithresh < *p1);
-         if( possible_perturber)
+         if( possible_perturber || fixed_perturber)
             {
             p0++;
             p1++;
@@ -485,7 +506,9 @@ int detect_perturbers( const double jd, const double * __restrict xyz,
                possible_perturber = (ixyz[2] + ithresh > *p1 && ixyz[2] - ithresh < *p0);
             else
                possible_perturber = (ixyz[2] + ithresh > *p0 && ixyz[2] - ithresh < *p1);
-            if( possible_perturber)
+            if( n_fixed)          /* fixed perturbers set;  only consider them */
+               possible_perturber = 0;
+            if( possible_perturber || fixed_perturber)
                {
                double asteroid_loc[4], dist2 = 0., delta[3], sun_dist2 = 0.;
                double factor1, factor2;
@@ -512,7 +535,7 @@ int detect_perturbers( const double jd, const double * __restrict xyz,
 
                   fprintf( debug_file, "%.5f: %3d, %f: mass %g\n",
                            (jd - j2000) / 365.25 + 2000.,
-                           i, sqrt( dist2) * AU_IN_KM, masses[i]);
+                           asteroid_numbers[i], sqrt( dist2) * AU_IN_KM, masses[i]);
                   fclose( debug_file);
                   }
 #endif
