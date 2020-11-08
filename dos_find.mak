@@ -52,3 +52,35 @@ clean:
    $(RM) find_orb.exp vc*.pdb obs_temp.txt guide.txt
    $(RM) find_orb.map find_orb.pdb find_orb.lib vc*.idb
 
+clean_temp:
+   $(RM) bc405pre.txt
+   $(RM) cmt_sof.txt
+   $(RM) combined.json
+   $(RM) covar.txt
+   $(RM) covar.json
+   $(RM) debug.txt
+   $(RM) dummy.txt
+   $(RM) elements.txt
+   $(RM) elements.json
+   $(RM) elem_short.json
+   $(RM) ephemeri.txt
+   $(RM) ephemeri.json
+   $(RM) eph_json.txt
+   $(RM) gauss.out
+   $(RM) guide.txt
+   $(RM) linkage.json
+   $(RM) lock.txt
+   $(RM) monte.txt
+   $(RM) mpcorb.dat
+   $(RM) mpc_fmt.txt
+   $(RM) mpec.htm
+   $(RM) observe.txt
+   $(RM) observe.xml
+   $(RM) obs_temp.txt
+   $(RM) residual.txt
+   $(RM) sof.txt
+   $(RM) sr_elems.txt
+   $(RM) state.txt
+   $(RM) total.json
+   $(RM) vectors.txt
+   $(RM) virtual.txt
