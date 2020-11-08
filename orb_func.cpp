@@ -579,6 +579,7 @@ int integrate_orbitl( long double *orbit, const long double t0, const long doubl
             symplectic_6( t, &ref_orbit, orbit, delta_t);
             break;
 #endif
+         case 0:
          default:
             {
             long double new_vals[6];
@@ -2683,7 +2684,7 @@ static void output_json_matrix( FILE *ofile, const char *title, const double *ma
          fprintf( ofile, "%.8g%c ", *matrix++, (j == dim - 1) ? ' ' : ',');
       fprintf( ofile, "]%s\n", (i == dim - 1) ? "" : ",");
       }
-   fprintf( ofile, "]\n");
+   fprintf( ofile, "]");
 }
 
 const char *monte_label[MONTE_N_ENTRIES] = {
@@ -3173,7 +3174,11 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
             }
       fprintf( json_ofile, "{ ");
       output_json_matrix( json_ofile, "covar", matrix, n_params);
-      fprintf( json_ofile, "} ");
+      fprintf( json_ofile, ", \"state_vect\": [\n");
+      for( i = 0; i < 6; i++)
+         fprintf( json_ofile, "    %.12g%s\n", orbit[i],
+                        (i == 5 ? " ]," : ","));
+      fprintf( json_ofile, "  \"epoch\": %f\n}", epoch);
       fclose( json_ofile);
       for( pass = (matrix ? 0 : 2); pass < 4; pass++)
          {
