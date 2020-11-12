@@ -13,6 +13,8 @@ typedef struct
    double min_dec, max_dec;                 /* degrees */
    double min_ha, max_ha;                   /* degrees */
    double min_elong, max_elong;             /* degrees */
+   double *horizon;                         /* degrees */
+   int n_horizon_points;
 } expcalc_config_t;
 
 double mag_from_snr_and_exposure( const expcalc_config_t *c,
@@ -22,4 +24,7 @@ double snr_from_mag_and_exposure( const expcalc_config_t *c,
 double exposure_from_snr_and_mag( const expcalc_config_t *c,
                               const double snr, const double mag);
 int find_expcalc_config_from_mpc_code( const char *mpc_code,
-             FILE *ifile, expcalc_config_t *c);
+                              FILE *ifile, expcalc_config_t *c);
+void free_expcalc_config_t( expcalc_config_t *c);
+int is_under_horizon( const double alt, const double az,
+                              const expcalc_config_t *c);

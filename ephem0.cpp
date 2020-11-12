@@ -1173,6 +1173,8 @@ double shadow_check( const double *planet_loc,
       d += diff * diff;
       }
    d = sqrt( d);        /* d = planet-object dist */
+   if( d < planet_radius_in_au)     /* inside a planet, */
+      return( 0.);                  /* it's dark */
    r = sqrt( r2);
    angular_sep = acos( (dot - r2) / (d * r));
    ang_size_sun = SUN_RADIUS_IN_AU / r;
@@ -2457,8 +2459,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                                               &hour_angle[j]);
                   alt_az[j].x = centralize_ang( alt_az[j].x + PI);
                   }
-               if( alt_az[0].y < exposure_config.min_alt * PI / 180. ||
-                   alt_az[0].y > exposure_config.max_alt * PI / 180.)
+               if( is_under_horizon( alt_az[0].y * 180. / PI,
+                                     alt_az[0].x * 180. / PI, &exposure_config))
                   {
                   visibility_char = 'a';
                   rgb = RGB_OUTSIDE_POINTING_LIMITS;
@@ -3126,7 +3128,7 @@ int ephemeris_in_a_file_from_mpc_code( const char *filename,
 {
    double rho_cos_phi, rho_sin_phi, lon;
    char note_text[100], buff[100];
-   int real_number_of_steps;
+   int real_number_of_steps, rval;
    const int planet_no = get_observer_data( mpc_code, buff, &lon,
                                            &rho_cos_phi, &rho_sin_phi);
 
@@ -3143,10 +3145,12 @@ int ephemeris_in_a_file_from_mpc_code( const char *filename,
       real_number_of_steps = get_ephem_times_from_file( stepsize + 1);
    else
       real_number_of_steps = n_steps;
-   return( ephemeris_in_a_file( filename, orbit, obs, n_obs, planet_no,
+   rval = ephemeris_in_a_file( filename, orbit, obs, n_obs, planet_no,
                epoch_jd, jd_start, stepsize, lon, rho_cos_phi, rho_sin_phi,
                real_number_of_steps,
-               note_text, options, n_objects));
+               note_text, options, n_objects);
+   free_expcalc_config_t( &exposure_config);
+   return( rval);
 }
 
 static int64_t ten_to_the_nth( int n)

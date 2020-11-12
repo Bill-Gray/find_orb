@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include <stdbool.h>
 #include <assert.h>
 #include <stdio.h>
+#include <ctype.h>
 #include <math.h>
 #include "expcalc.h"
 
@@ -258,6 +259,8 @@ static void set_config_double( const char *buff, const char *config_var,
       *value = atof( buff);
 }
 
+#define IS_POWER_OF_TWO( n)    (((n) & ((n)-1)) == 0)
+
 int find_expcalc_config_from_mpc_code( const char *mpc_code,
              FILE *ifile, expcalc_config_t *c)
 {
@@ -295,8 +298,69 @@ int find_expcalc_config_from_mpc_code( const char *mpc_code,
          set_config_double( buff, "MaxHA", &c->max_ha);
          set_config_double( buff, "MinElong", &c->min_elong);
          set_config_double( buff, "MaxElong", &c->max_elong);
+         if( strstr( buff, "\"Horizon\""))
+            {
+            int i, n_found = 0;
+
+            while( !strchr( buff, 0x5d) && fgets( buff, sizeof( buff), ifile))
+               {
+               char *endptr;
+
+               for( i = 0; buff[i]; i++)
+                  if( isdigit( buff[i]))
+                     {
+                     n_found++;
+                     if( IS_POWER_OF_TWO( n_found))
+                        c->horizon = (double *)realloc( c->horizon, n_found * 2 * sizeof( double));
+                     c->horizon[n_found - 1] = strtod( buff + i, &endptr);
+                     i = (int)( endptr - buff) - 1;
+                     }
+               }
+            assert( n_found > 2);
+            assert( !(n_found & 1));
+            c->n_horizon_points = n_found / 2;
+            }
          }
    return( (int)rval);
+}
+
+void free_expcalc_config_t( expcalc_config_t *c)
+{
+   if( c->horizon)
+      free( c->horizon);
+   c->horizon = NULL;
+}
+
+static int under_horizon_slice( const double alt, const double az,
+         const double *p1, const double *p2)
+{
+   const double x1 = fmod( az - p1[0] + 900., 360.) - 180.;
+   const double x2 = fmod( az - p2[0] + 900., 360.) - 180.;
+   int rval = 0;
+
+   if( x1 * x2 <= 0. && fabs( x1 - x2) < 180.)
+      {
+      const double y = (p1[1] * x2 - p2[1] * x1) / (x2 - x1);
+
+      if( y > alt)
+         rval = 1;
+      }
+   return( rval);
+}
+
+int is_under_horizon( const double alt, const double az,
+                              const expcalc_config_t *c)
+{
+   int i, rval = (alt < c->min_alt || alt > c->max_alt);
+
+   if( c->horizon && !rval)
+      {
+      for( i = 0; i < c->n_horizon_points; i++)
+         rval ^= under_horizon_slice( alt, az,
+                     c->horizon + 2 * i,
+                     c->horizon + 2 * ((i + 1) % c->n_horizon_points));
+      }
+   return( rval);
 }
 
 #ifdef TEST_CODE
@@ -461,6 +525,7 @@ int main( const int argc, const char **argv)
       printf( "Total noise %.3f (above three lines added in quadrature)\n",
                sqrt( signal + sky_count + read_noise));
       }
+   free_expcalc_config_t( &c);
    return( 0);
 }
 #endif         /* #ifdef TEST_CODE */

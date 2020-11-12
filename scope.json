@@ -6,7 +6,7 @@
      "3":   "   Site details default to (500),  with specifics being",
      "4":   "overridden on a site-by-site basis.  Report your site",
      "5":   "info to pluto (at) projectpluto (.) com to be added to",
-     "6":   "this file.  2020 Aug 6 version."
+     "6":   "this file.  2020 Nov 09 version."
   },
   "500":
   {
@@ -134,5 +134,28 @@
      "Obstruction": 17,
      "PixelSize": 1.55,
      "Comment": "http://www.astro-research.org/phase3.htm"
+  },
+  "310":
+  {
+    "Comment1": "MPC test code.  Let's use it as a test code here,  with",
+    "Comment2": "a very unusual horizon profile.  Horizon profile format",
+    "Comment3": "documented at https://www.projectpluto.com/findhist.htm#horizon",
+    "Horizon":
+     [
+     355, 10,
+     15, 25,
+     60, 25,
+     90, 10,
+     110, 20,
+     110, 5,
+     170, 15,
+     180, 15,
+     175, 40,
+     200, 30,
+     190, 4,
+     230, 0,
+     240, 15,
+     300, 20
+     ]
   }
 }
