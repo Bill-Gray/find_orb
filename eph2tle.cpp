@@ -516,7 +516,7 @@ int main( const int argc, const char **argv)
    double *slopes = (double *)calloc( max_n_params * 6, sizeof( double));
    double *vectors, worst_resid_in_run = 0., worst_mjd = 0.;
    double tdt = 0., *computed_vects;
-   int ephem, progress_bar_freq = 2;
+   int ephem, progress_bar_freq = 2, ref_frame = -1;
    tle_t tle;
    const time_t t0 = time( NULL);
    bool use_precession = true, archival = false;
@@ -665,7 +665,6 @@ int main( const int argc, const char **argv)
       bool writing_data = false;
       double mjdt;
       char *tptr = strstr( buff, "(500) Geocentric: ");
-      int ref_frame = -1;
 
       sscanf( buff, "%lf %lf %u %d,%lf,%lf\n", &tdt, &step, &total_lines,
                   &ref_frame, &dist_units, &time_units);
@@ -674,7 +673,6 @@ int main( const int argc, const char **argv)
          use_precession = false;       /* of date;  don't precess 'em */
          ref_frame = 0;
          }
-      assert( !ref_frame);       /* input ephems must be equatorial */
       mjdt = tdt - 2400000.5;
       if( tptr)
          strcpy( obj_name, tptr + 18);
@@ -760,6 +758,11 @@ int main( const int argc, const char **argv)
             ivect[j] /= dist_units;
          for( j = 3; j < 6; j++)
             ivect[j] *= time_units;
+         if( ref_frame == 1)
+            {
+            ecliptic_to_equatorial( ivect);
+            ecliptic_to_equatorial( ivect + 3);
+            }
          if( use_precession)
             setup_precession( precession_matrix, 2000.,
                                       2000. + (jd_utc - 2451545.) / 365.25);
