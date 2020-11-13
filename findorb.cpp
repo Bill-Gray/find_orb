@@ -1508,7 +1508,7 @@ static unsigned show_basic_info( const OBSERVE FAR *obs, const int n_obs,
             put_colored_text( "", line - 1, column, -1, COLOR_BACKGROUND);
             }
          if( *buff == 'F' && buff[1] != ' ')
-            key = KEY_F( atof( buff + 1));
+            key = KEY_F( atoi( buff + 1));
          else if (!memcmp( buff, "Alt-", 4))
             key = ALT_A + buff[4] - 'A';
          else if (!memcmp( buff, "Ctrl-", 5))
