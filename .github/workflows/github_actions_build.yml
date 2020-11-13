@@ -26,8 +26,9 @@ jobs:
         make libjpl.a
         make install
         cd ..
+        make fo eph2tle cssfield roottest
         wget https://raw.githubusercontent.com/Bill-Gray/PDCursesMod/master/curses.h
-        make CLANG=Y fo find_orb.o eph2tle cssfield roottest
+        make VT=Y findorb.o
 
   buildOSX:
     runs-on: macOS-latest
@@ -50,8 +51,9 @@ jobs:
         make CLANG=Y libjpl.a
         make install
         cd ..
+        make CLANG=Y fo eph2tle cssfield roottest
         wget https://raw.githubusercontent.com/Bill-Gray/PDCursesMod/master/curses.h
-        make CLANG=Y fo find_orb.o eph2tle cssfield roottest
+        make CLANG=Y VT=Y findorb.o
 
   buildWindows:
     runs-on: windows-latest
@@ -61,18 +63,21 @@ jobs:
       run: |
         call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
         mkdir myincl
+
         git clone https://github.com/Bill-Gray/lunar
         cd lunar
         nmake -f lunar.mak lunar64.lib
         copy lunar64.lib ..
         nmake -f lunar.mak install
         cd ..
+
         git clone https://github.com/Bill-Gray/sat_code
         cd sat_code
         nmake -f msvc.mak sat_code64.lib
         copy sat_code64.lib ..
         nmake -f msvc.mak install
         cd ..
+
         git clone https://github.com/Bill-Gray/jpl_eph
         cd jpl_eph
         set CL=/I"../myincl"
@@ -80,8 +85,7 @@ jobs:
         copy jpleph.lib ..\jpleph64.lib
         copy jpleph.h ..\myincl
         cd ..
+
         set CL=/I"./myincl"
         nmake -f dos_find.mak fo.exe cssfield.exe eph2tle.exe roottest.exe
-        wget https://raw.githubusercontent.com/Bill-Gray/PDCursesMod/master/curses.h
-        nmake -f dos_find.mak find_orb.o
       shell: cmd
