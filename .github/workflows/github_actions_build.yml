@@ -49,7 +49,7 @@ jobs:
         make CLANG=Y libjpl.a
         make install
         cd ..
-        make fo
+        make CLANG=Y fo
 
   buildWindows:
     runs-on: windows-latest
