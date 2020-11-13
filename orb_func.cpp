@@ -2893,11 +2893,8 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
       really_use_symmetric_derivatives = true;
    else
       really_use_symmetric_derivatives = use_symmetric_derivatives;
-   if( really_use_symmetric_derivatives == false)
-      {
-      orig_obs = (OBSERVE *)calloc( n_obs, sizeof( OBSERVE));
-      memcpy( orig_obs, obs, n_obs * sizeof( OBSERVE));
-      }
+   orig_obs = (OBSERVE *)calloc( n_obs, sizeof( OBSERVE));
+   memcpy( orig_obs, obs, n_obs * sizeof( OBSERVE));
 
    for( i = 0; i < n_params; i++)
       {
@@ -3013,8 +3010,11 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
             memcpy( tstr, "Reverse   ", 10);
             fail_on_hitting_planet = true;
             set_locs_rval = set_locs( tweaked_orbit, epoch, obs, n_obs);
-            if( set_locs_rval)
+            if( set_locs_rval)      /* fall back on simple, asymmetric method */
+               {
                debug_printf( "Symmetric fail : %d\n", set_locs_rval);
+               memcpy( obs, orig_obs, n_obs * sizeof( OBSERVE));
+               }
             fail_on_hitting_planet = saved_fail_on_hitting_planet;
             }
          else
@@ -3039,8 +3039,8 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
                   }
                slope_ptr[0]        /= delta_val;
                slope_ptr[n_params] /= delta_val;
-               if( really_use_symmetric_derivatives)      /* delta is actually twice */
-                  {                                /* the 'specified' value:  */
+               if( really_use_symmetric_derivatives && !set_locs_rval)
+                  {       /* delta is actually twice the 'specified' value */
                   slope_ptr[0]        /= 2.;
                   slope_ptr[n_params] /= 2.;
                   }
@@ -3089,8 +3089,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
             }
          }
       }
-   if( orig_obs)
-      free( orig_obs);
+   free( orig_obs);
 
    lsquare = lsquare_init( n_params);
    assert( lsquare);
