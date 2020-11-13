@@ -26,7 +26,8 @@ jobs:
         make libjpl.a
         make install
         cd ..
-        make fo
+        wget https://raw.githubusercontent.com/Bill-Gray/PDCursesMod/master/curses.h
+        make CLANG=Y fo find_orb.o eph2tle cssfield roottest
 
   buildOSX:
     runs-on: macOS-latest
@@ -49,7 +50,8 @@ jobs:
         make CLANG=Y libjpl.a
         make install
         cd ..
-        make CLANG=Y fo
+        wget https://raw.githubusercontent.com/Bill-Gray/PDCursesMod/master/curses.h
+        make CLANG=Y fo find_orb.o eph2tle cssfield roottest
 
   buildWindows:
     runs-on: windows-latest
@@ -79,5 +81,7 @@ jobs:
         copy jpleph.h ..\myincl
         cd ..
         set CL=/I"./myincl"
-        nmake -f dos_find.mak fo.exe
+        nmake -f dos_find.mak fo.exe cssfield.exe eph2tle.exe roottest.exe
+        wget https://raw.githubusercontent.com/Bill-Gray/PDCursesMod/master/curses.h
+        nmake -f dos_find.mak find_orb.o
       shell: cmd
