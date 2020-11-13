@@ -267,7 +267,7 @@ static void error_exit( const int exit_value)
 
 static char *fgets_trimmed( char *buff, const size_t buffsize, FILE *ifile)
 {
-   char *rval = fgets( buff, buffsize, ifile);
+   char *rval = fgets( buff, (int)buffsize, ifile);
 
    if( rval)
       {
@@ -396,7 +396,7 @@ static double simplex_scoring( void *icontext, const double *ivect)
 {
    const simplex_context_t *context = (const simplex_context_t *)icontext;
    double err = 0.;
-   unsigned i, j;
+   size_t i, j;
    tle_t tle = *(context->base_tle);
 
    set_tle_from_params( &tle, ivect);
