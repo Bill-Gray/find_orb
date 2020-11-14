@@ -1165,6 +1165,88 @@ static void try_adding_comet_name( const char *search, char *name)
       }
 }
 
+/* To get data for a particular numbered object from the MPC's file at
+
+https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt.gz
+
+we do a search based on the fact that the average line is 88.6 bytes
+long (including line feed at the end).  So we search to an estimated
+location,  almost certainly in the middle of a line;  fgets() the
+rest of the line;  then fgets() a full line.  The minor planet number
+read from that line will either be slightly less than the target
+number (in which case we just read a few lines),  or will let us
+compute a more accurate place in the file to seek to.
+
+At present,  this program uses the object name or provisional designation.
+At some point,  we might show discovery date, location,  reference,
+and/or discoverer name.       */
+
+static char *find_numbered_mp_info( const int number)
+{
+   long loc = (number - 1) * 886 / 10;
+   int i, curr_no;
+   bool got_it = false;
+   const int tolerance = 10;        /* try to get within ten lines */
+   static int cached_number = -1;
+   static char *cached = NULL;
+   char buff[200];
+   FILE *ifile;
+
+   if( !number)
+      {
+      if( cached)
+         free( cached);
+      cached = NULL;
+      cached_number = -1;
+      return( 0);
+      }
+   if( cached_number == -2)      /* haven't got the file */
+      return( NULL);
+   ifile = fopen_ext( "NumberedMPs.txt", "crb");
+   if( !ifile)
+      {
+      cached_number = -2;
+      return( NULL);
+      }
+   while( !got_it)
+      {
+      if( number < tolerance)
+         curr_no = 0;
+      else
+         {
+         fseek( ifile, loc, SEEK_SET);
+         for( i = 0; i < 2; i++)
+            if( !fgets( buff, sizeof( buff), ifile))
+               {
+               fclose( ifile);
+               return( NULL);
+               }
+         loc += 190;
+         for( i = 0; i < 7 && buff[i] != '('; i++)
+            ;
+         curr_no = atoi( buff + i + 1);
+         }
+      if( curr_no > number - tolerance && curr_no <= number)
+         {
+         for( i = number - curr_no; i; i--)
+            if( !fgets( buff, 200, ifile))
+               {
+               fclose( ifile);
+               return( NULL);
+               }
+         got_it = true;    /* success */
+         }
+      else
+         loc += (number - curr_no - 4) * 89;
+      }
+   fclose( ifile);
+   if( !cached)
+      cached = (char *)malloc( 200);
+   strlcpy_err( cached, buff, 200);
+   cached_number = number;
+   return( cached);
+}
+
 /* An object with a name such as 1989-013A is probably an artsat,  and
 probably has a NORAD designation,  name,  and other info in 'satcat.txt',
 a master list of artsats available at
@@ -1332,6 +1414,20 @@ int get_object_name( char *obuff, const char *packed_desig)
          {
          sprintf( xdesig, "   %s ", obuff);
          try_adding_comet_name( xdesig, obuff);
+         }
+      if( rval == OBJ_DESIG_ASTEROID_NUMBERED)
+         {
+         char *info = find_numbered_mp_info( atoi( obuff + 1));
+
+         obuff += strlen( obuff);
+         if( info)
+            {
+            if( info[9] != ' ')              /* append name */
+               strlcpy( obuff, info + 8, 19);
+            else if( info[29] != ' ')        /* prov ID */
+               strlcpy( obuff, info + 28, 12);
+            remove_trailing_cr_lf( obuff);
+            }
          }
       }
    return( rval);
