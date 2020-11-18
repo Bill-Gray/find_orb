@@ -2671,6 +2671,19 @@ int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid)
    return( n_residuals);
 }
 
+static double vect_diff2( const double *a, const double *b)
+{
+   size_t i;
+   double rval = 0, delta;
+
+   for( i = 3; i; i--)
+      {
+      delta = *a++ - *b++;
+      rval += delta * delta;
+      }
+   return( rval);
+}
+
 static void output_json_matrix( FILE *ofile, const char *title, const double *matrix,
                const size_t dim)
 {
@@ -2898,7 +2911,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
 
    for( i = 0; i < n_params; i++)
       {
-      const double min_change = 0.3, max_change = 30.0, optimal_change = 1.0;
+      const double min_change = 0.3, max_change = 3.0, optimal_change = 1.0;
       double low_delta = 0., high_delta = 0., low_change = 0., high_change = 0.;
       int n_iterations = 0;
       const int max_iterations = 100;
@@ -2944,6 +2957,14 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
             set_locs_rval = set_locs_extended( tweaked_orbit, epoch, obs,
                        n_obs, epoch2, rel_orbit);
             fail_on_hitting_planet = saved_fail_on_hitting_planet;
+            for( j = 0; !set_locs_rval && j < n_obs; j++)
+               {
+               double d = vect_diff2( obs[j].obj_posn, orig_obs[j].obj_posn);
+
+               d = sqrt( d) / obs[j].r;
+               if( d > 0.001)              /* tweaked orbit too different from */
+                  set_locs_rval = 1;      /* the original one; try smaller tweak */
+               }
             if( debug_level > 4)
                debug_printf( "Second set done: %d\n", set_locs_rval);
             if( set_locs_rval == INTEGRATION_TIMED_OUT)
