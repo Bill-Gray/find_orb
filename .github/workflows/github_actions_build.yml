@@ -81,7 +81,7 @@ jobs:
         git clone https://github.com/Bill-Gray/jpl_eph
         cd jpl_eph
         set CL=/I"../myincl"
-        nmake -f vc.mak jpleph.lib
+        nmake -f vc.mak jpleph64.lib
         copy jpleph64.lib ..
         copy jpleph.h ..\myincl
         cd ..
@@ -90,7 +90,7 @@ jobs:
         nmake -f dos_find.mak fo.exe cssfield.exe eph2tle.exe roottest.exe
 
         cl -W4 -Ox win_get.c urlmon.lib
-        win_get https://raw.githubusercontent.com/Bill-Gray/PDCursesMod/master/curses.h
+        win_get https://raw.githubusercontent.com/Bill-Gray/PDCursesMod/master/curses.h curses.h
         nmake -f dos_find.mak findorb.obj
 
       shell: cmd
