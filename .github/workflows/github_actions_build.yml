@@ -88,4 +88,9 @@ jobs:
 
         set CL=/I"./myincl"
         nmake -f dos_find.mak fo.exe cssfield.exe eph2tle.exe roottest.exe
+
+        cl -W4 -Ox win_get.c urlmon.lib
+        win_get https://raw.githubusercontent.com/Bill-Gray/PDCursesMod/master/curses.h
+        nmake -f dos_find.mak findorb.o
+
       shell: cmd
