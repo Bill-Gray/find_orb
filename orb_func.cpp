@@ -769,7 +769,7 @@ static void light_bending( const double *observer, double *result)
       result[i] += bending * dir[i];
 }
 
-static void light_time_lag( const double *orbit, const double *observer, double *result)
+void light_time_lag( const double *orbit, const double *observer, double *result)
 {
    const double solar_r = vector3_length( orbit);
    unsigned iter;

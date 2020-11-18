@@ -67,6 +67,8 @@ int lat_alt_to_parallax( const double lat, const double ht_in_meters,
              double *rho_cos_phi, double *rho_sin_phi, const int planet_idx);
 int write_residuals_to_file( const char *filename, const char *ast_filename,
           const int n_obs, const OBSERVE FAR *obs_data, const int format);
+void light_time_lag( const double *orbit, const double *observer,
+                                    double *result);  /* orb_func.c */
 void put_observer_data_in_text( const char FAR *mpc_code, char *buff);
 int make_pseudo_mpec( const char *mpec_filename, const char *obj_name);
                                               /* ephem0.cpp */
@@ -2213,14 +2215,11 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                     /* orbital elements),  include light-time lag:    */
          if( ephem_type == OPTION_OBSERVABLES)
             {
-            double derivs[6], dt = -r / AU_PER_DAY;
-
-            calc_derivatives( ephemeris_t, orbi, derivs, 0);
+            light_time_lag( orbi, obs_posn, orbi_after_light_lag);
             for( j = 0; j < 6; j++)
                {
-               const double diff = derivs[j] * dt;
+               const double diff = orbi_after_light_lag[j] - orbi[j];
 
-               orbi_after_light_lag[j] = orbi[j] + diff;
                if( j < 3)
                   {
                   topo[j] += diff;
