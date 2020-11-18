@@ -142,6 +142,8 @@ void restore_ra_decs_mags_times( unsigned n_obs, OBSERVE *obs,
       }
 }
 
+#include <stdint.h>
+
 /* Defining 64-bit constants portably and avoiding nuisance warnings
 is rather difficult to arrange,  but can be done. */
 
@@ -159,8 +161,6 @@ is rather difficult to arrange,  but can be done. */
 
 /* Mostly cut & pasted from http://www.pcg-random.org/download.html */
 /* Permuted Congruential Generator */
-
-#include <stdint.h>
 
 typedef struct { uint64_t state;  uint64_t inc; } pcg32_random_t;
 
