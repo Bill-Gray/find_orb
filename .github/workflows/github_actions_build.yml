@@ -91,6 +91,6 @@ jobs:
 
         cl -W4 -Ox win_get.c urlmon.lib
         win_get https://raw.githubusercontent.com/Bill-Gray/PDCursesMod/master/curses.h
-        nmake -f dos_find.mak findorb.o
+        nmake -f dos_find.mak findorb.obj
 
       shell: cmd
