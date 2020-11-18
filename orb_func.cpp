@@ -4499,6 +4499,7 @@ int metropolis_search( OBSERVE *obs, const int n_obs, double *orbit,
 void update_environ_dot_dat( void);     /* mpc_obs.cpp */
 int galactic_confusion( const double ra, const double dec);
 void pop_all_orbits( void);         /* orb_func2.cpp */
+char *find_numbered_mp_info( const int number);    /* mpc_obs.cpp */
 
 int clean_up_find_orb_memory( void)
 {
@@ -4528,6 +4529,7 @@ int clean_up_find_orb_memory( void)
    get_environment_ptr( NULL);
    pop_all_orbits( );
    galactic_confusion( -99., 0.);
+   find_numbered_mp_info( 0);
 #ifndef _WIN32
    fclose( lock_file);
    unlink( lock_filename);

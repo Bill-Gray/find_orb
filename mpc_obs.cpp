@@ -75,6 +75,7 @@ int compute_observer_vel( const double jde, const int planet_no,
              const double rho_sin_phi, const double lon, double FAR *vel);
 int get_satellite_offset( const char *iline, double *xyz);  /* mpc_obs.cpp */
 int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid);
+char *find_numbered_mp_info( const int number);             /* mpc_obs.cpp */
 static int xref_designation( char *desig);
 int debug_printf( const char *format, ...)                 /* runge.cpp */
 #ifdef __GNUC__
@@ -1181,7 +1182,7 @@ At present,  this program uses the object name or provisional designation.
 At some point,  we might show discovery date, location,  reference,
 and/or discoverer name.       */
 
-static char *find_numbered_mp_info( const int number)
+char *find_numbered_mp_info( const int number)
 {
    long loc = (number - 1) * 886 / 10;
    int i, curr_no;
