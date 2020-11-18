@@ -82,7 +82,7 @@ jobs:
         cd jpl_eph
         set CL=/I"../myincl"
         nmake -f vc.mak jpleph.lib
-        copy jpleph.lib ..\jpleph64.lib
+        copy jpleph64.lib ..
         copy jpleph.h ..\myincl
         cd ..
 
