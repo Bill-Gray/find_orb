@@ -751,6 +751,12 @@ Bla !+1274320.40   +500735.68        146       Blagoveschensk
 
 Tre !  76.9583     +08.5085           57.      Trivandrum
 
+   Steve Hutcheon supplied these locations for two stations that made other
+   19th century observations of comets.
+
+Buc !  -0.090        +51.488          10       Westmorland House, Walworth Common
+Fre !  -0.1313       +50.8429         10       Brighton
+
    Various unidentified scopes on Mt. Lemmon.  Altitude is that
    for (G96).  Lat/lon is from Bing Maps (the area is redacted
    on Google Maps,  but apparently,  nobody got round to asking
