@@ -3250,9 +3250,9 @@ static void output_angle_to_buff( char *obuff, double angle, int precision)
                   /* field size for punched-card data,  but are used in ephems */
    if( precision >= 4 && precision <= 11)    /* 'overlong' dd mm ss.ssss... */
       full_len += (size_t)( precision - 3);
-   if( precision >= 209 && precision <= 215) /* 'overlong' ddd mm ss.sss... */
+   if( precision >= 209 && precision <= 215) /* 'overlong' ddd.ddddd... */
       full_len += (size_t)( precision - 208);
-   if( precision >= 110 && precision <= 116) /* 'overlong' dd mm ss.sss... */
+   if( precision >= 110 && precision <= 116) /* 'overlong' dd.dddddd... */
       full_len += (size_t)( precision - 109);
    if( n_digits_to_show)
       {
@@ -3260,8 +3260,9 @@ static void output_angle_to_buff( char *obuff, double angle, int precision)
 
       if( precision < 307 || precision > 312)   /* omit decimal point for */
          strcat( obuff, ".");                    /* super-precise formats */
-      snprintf( format, sizeof( format), "%%0%dd", n_digits_to_show);
-      snprintf_append( obuff, full_len + 1, format, fraction);
+      assert( n_digits_to_show > 0 && n_digits_to_show < 20);
+      snprintf( format, sizeof( format), "%%0%dld", n_digits_to_show);
+      snprintf_append( obuff, full_len + 1, format, (long)fraction);
       }
    for( i = strlen( obuff); i < full_len; i++)
       obuff[i] = ' ';
