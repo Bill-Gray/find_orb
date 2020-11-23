@@ -2411,7 +2411,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                double earth_r = 0., hour_angle[3];
                char ra_buff[80], dec_buff[80];
                double phase_ang, curr_mag, air_mass = 40.;
-               bool output_ra_in_degrees = (ra_format >= 100 && ra_format < 110);
+               bool output_ra_in_degrees = (ra_format >= 100 && ra_format < 120);
                char visibility_char = ' ';
 
                solar_r = vector3_length( orbi_after_light_lag);
@@ -2561,7 +2561,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                      }
                   text_search_and_replace( ra_buff, " ", "_");
                   text_search_and_replace( dec_buff, " ", "_");
-                  snprintf_append( alt_buff, sizeof( alt_buff), " %12.8f %s %12.8f %s",
+                  snprintf_append( alt_buff, sizeof( alt_buff), " %15.11f %s %15.11f %s",
                                     ra * 15, ra_buff, dec, dec_buff);
                   }
                if( !(options & OPTION_SUPPRESS_DELTA))
