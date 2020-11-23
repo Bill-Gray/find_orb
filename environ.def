@@ -286,8 +286,8 @@ LANGUAGE=e
 
    By default,  ephems show RAs to 0.001 seconds and decs to 0.01 arcseconds.
    The following values cause ephemerides to show RAs to three places in
-   seconds,  decs to two places in arcseconds.  Format numbers 101 to 109
-   will get you get decimal degrees with one to nine places.  Format
+   seconds,  decs to two places in arcseconds.  Format numbers 101 to 116
+   will get you get decimal degrees with one to sixteen places.  Format
    numbers -1 to -9 will get you hours/minutes (for RA) or degrees/arcmin
    (for dec) with zero to eight places after the decimal.  Note that the
    higher-precision values will be almost meaningless noise.

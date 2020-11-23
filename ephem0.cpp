@@ -1902,6 +1902,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       options &= ~OPTION_SHOW_SIGMAS;
 
    sscanf( get_environment_ptr( "RA_DEC_FORMAT"), "%d,%d", &ra_format, &dec_format);
+   if( ra_format >= 100 && ra_format < 120)
+      ra_format += 100;       /* RA degrees need three places,  not two */
    if( !use_observation_times && *stepsize != 't')
       {
       step = get_step_size( stepsize, &step_units, &n_step_digits);
