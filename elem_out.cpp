@@ -833,6 +833,8 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
    for( i = 0; show_obs && i < (int)n_obs; i++)
       {
       MOTION_DETAILS m;
+      int n_digits = 3;
+      double total_resid;
 
       jd = obs[i].jd - td_minus_utc( obs[i].jd) / seconds_per_day;
       compute_observation_motion_details( obs + i, &m);
@@ -840,8 +842,15 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
                   jd, iso_time( buff, jd, 3), obs[i].mpc_code);
       fprintf( ofile, "\n                 \"RA\" : %.6f, \"Dec\": %.6f,",
                   obs[i].ra * 180. / PI, obs[i].dec * 180. / PI);
-      fprintf( ofile, "\n                 \"dRA\" : %.3f, \"dDec\": %.3f, \"dTime\": %.3f, \"cross\": %.3f,",
-         m.xresid, m.yresid, m.time_residual, m.cross_residual);
+      total_resid = sqrt( m.xresid * m.xresid + m.yresid * m.yresid);
+      while( n_digits < 9 && total_resid < .1)
+         {
+         total_resid *= 10.;
+         n_digits++;
+         }
+      fprintf( ofile, "\n                 \"dRA\" : %.*f, \"dDec\": %.*f, \"dTime\": %.3f, \"cross\": %.*f,",
+                    n_digits, m.xresid, n_digits, m.yresid, m.time_residual,
+                    n_digits, m.cross_residual);
       fprintf( ofile, "\n                 \"reference\" : \"%s\",", obs[i].reference);
       fprintf( ofile, "  \"packed\" : \"%s\",", obs[i].packed_id);
       fprintf( ofile, "\n                 \"sigma_1\" : %f,", obs[i].posn_sigma_1);
