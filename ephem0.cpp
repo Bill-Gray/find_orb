@@ -2153,7 +2153,11 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
          curr_jd = obs[i].jd;
          }
       else if( *stepsize == 't')
-         curr_jd = list_of_ephem_times[i];
+         {
+         curr_jd = list_of_ephem_times[i];    /* this time is in UTC */
+         if( *timescale)            /* we really want TT times */
+            curr_jd += td_minus_utc( curr_jd) / seconds_per_day;
+         }
       else if( *stepsize == 'a')
          {
          if( i)
