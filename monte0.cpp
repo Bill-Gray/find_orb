@@ -159,6 +159,10 @@ is rather difficult to arrange,  but can be done. */
    #endif
 #endif
 
+#ifdef __clang__
+#pragma GCC diagnostic ignored "-Wc++11-long-long"
+#endif     /* suppress nuisance warning */
+
 /* Mostly cut & pasted from http://www.pcg-random.org/download.html */
 /* Permuted Congruential Generator */
 
