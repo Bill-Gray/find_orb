@@ -4131,7 +4131,7 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
             {
             int j = i + 4;
 
-            while( buff[j] > ' ')
+            while( buff[j] > ' ' && buff[j] != ',' && buff[j] != ';')
                j++;
             buff[j] = '\0';
             memmove( buff + 1, buff + i + 2, strlen( buff + i + 1));
