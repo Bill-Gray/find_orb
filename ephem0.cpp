@@ -681,7 +681,7 @@ static int find_precovery_plates( OBSERVE *obs, const int n_obs,
 {
    FILE *ifile, *original_file = NULL;
    int current_file_number = -1;
-   double *orbi, stepsize = 1.;
+   double *orbi, stepsize = 1., max_jd_available, min_jd_available;
    obj_location_t *p1, *p2, *p3;
    int n_fields_read, n;
    const double abs_mag = calc_absolute_magnitude( obs, n_obs);
@@ -689,7 +689,7 @@ static int find_precovery_plates( OBSERVE *obs, const int n_obs,
         /* Slightly easier to work with 'bit set means included' : */
    const int inclusion = atoi( get_environment_ptr( "FIELD_INCLUSION")) ^ 3;
    const bool show_base_60 = (*get_environment_ptr( "FIELD_DEBUG") != '\0');
-   int n_groups;
+   size_t n_groups;
    field_group_t *groups;
 
    if( !ofile)
@@ -707,11 +707,11 @@ static int find_precovery_plates( OBSERVE *obs, const int n_obs,
    assert( buff);
    if( !fgets( buff, 100, ifile))
       return( -4);
-   n_groups = atoi( buff);
+   n_groups = (size_t)atoi( buff);
    assert( n_groups);
    groups = (field_group_t *)calloc( n_groups, sizeof( field_group_t));
    assert( groups);
-   if( fread( groups, sizeof( field_group_t), n_groups, ifile) != (size_t)n_groups)
+   if( fread( groups, sizeof( field_group_t), n_groups, ifile) != n_groups)
       return( -3);
    orbi = (double *)malloc( 12 * n_orbits * sizeof( double));
    memcpy( orbi, orbit,     6 * n_orbits * sizeof( double));
@@ -846,6 +846,18 @@ static int find_precovery_plates( OBSERVE *obs, const int n_obs,
             }
          }
    fclose( ifile);
+   max_jd_available = 0.;
+   min_jd_available = 3e+7;
+   for( size_t i = 0; i < n_groups; i++)
+      {
+      if( max_jd_available < groups[i].max_jd)
+         max_jd_available = groups[i].max_jd;
+      if( min_jd_available > groups[i].min_jd)
+         min_jd_available = groups[i].min_jd;
+      }
+   full_ctime( buff, min_jd_available, 0);
+   full_ctime( buff + 80, max_jd_available, 0);
+   fprintf( ofile, "Pointing data covers %s to %s\n", buff, buff + 80);
    free( buff);
    free( groups);
    if( original_file)
