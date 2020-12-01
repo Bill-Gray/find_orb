@@ -15,8 +15,13 @@ if you wanted the ephemeris to have a ten minute stepsize,  use '10m'.
    Hit '-' to reverse the sign of the step size.  Hit 'Alt-D' to get a
 default start time ("now") and geocentric observable ephemerides.
 
-   If you specify the start time and step size and then hit 'e',  you can
-enter an end time.  Find_Orb will adjust the number of steps to match.
+   If you specify the start time and step size and then hit 'e',  or
+click on the line showing the ending time,  you can enter an end time.
+Find_Orb will adjust the number of steps to match.
+
+   Hitting '0' gets you some "advanced options" of the sort many
+people won't use (galactic longitude,  heliocentric ecliptic coordinates,
+etc.),  but which can be really useful when you do need them.
 
    You can have motion details (total apparent motion in '/hr = "/min plus
 position angle),  alt/az data,  radial velocity,  and/or phase angle data
