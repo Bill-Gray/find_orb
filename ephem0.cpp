@@ -2447,26 +2447,33 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   if( j)
                      {
                      int k;
-                     double vect[3], earth_loc[3];
+                     double vect[3];
 
                      if( j == 1)    /* solar posn */
                         for( k = 0; k < 3; k++)
                            vect[k] = -obs_posn_equatorial[k];
                      else
                         {           /* we want the lunar posn */
+                        double moon_dist, earth_loc[3];
+                        const double lunar_radius = 1737.4 / AU_IN_KM;
+
                         earth_lunar_posn( ephemeris_t, earth_loc, vect);
                         for( k = 0; k < 3; k++)
-                           vect[k] -= earth_loc[k];
-                        cos_elong = dot_product( earth_loc, vect)
-                                 / (vector3_length( earth_loc) * vector3_length( vect));
+                           vect[k] -= obs_posn[k];
+                        moon_dist = vector3_length( vect);
+                        cos_elong = dot_product( obs_posn, vect)
+                                 / (vector3_length( obs_posn) * moon_dist);
                         lunar_elong = acose( -cos_elong);
                         ecliptic_to_equatorial( vect);   /* mpc_obs.cpp */
                         fraction_illum = shadow_check( earth_loc, orbi_after_light_lag,
                                     EARTH_MAJOR_AXIS_IN_AU);
-                        cos_elong = dot_product( vect, geo)
-                                 / (vector3_length( vect) * vector3_length( geo));
+                        cos_elong = dot_product( vect, topo)
+                                        / (moon_dist * vector3_length( topo));
                         dist_moon = acose( cos_elong);
-                        }
+                        if( dist_moon < lunar_radius / moon_dist)
+                           visibility_char = (vector3_length( topo) < moon_dist ?
+                                       'l' : 'L');  /* l=obj transits moon, */
+                        }                           /* L=obj behind moon   */
                      vector_to_polar( &obj_ra_dec.x, &obj_ra_dec.y, vect);
                      if( j == 1)
                         sun_ra_dec = obj_ra_dec;
@@ -2864,9 +2871,12 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
 
                if( options & OPTION_LUNAR_ELONGATION)
                   {
-                  snprintf_append( buff, sizeof( buff), " %6.1f", dist_moon * 180. / PI);
+                  const double dist_in_deg = dist_moon * 180. / PI;
+                  const char *fmt = (dist_in_deg < .9 ? " %6.2f" : " %6.1f");
+
+                  snprintf_append( buff, sizeof( buff), fmt, dist_in_deg);
                   snprintf_append( alt_buff, sizeof( alt_buff), " %10.5f",
-                                                             dist_moon * 180. / PI);
+                                                             dist_in_deg);
                   }
 
                if( options & OPTION_MOTION_OUTPUT)
