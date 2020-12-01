@@ -1966,7 +1966,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       return( -3);
    if( !abs_mag)
       abs_mag = atof( get_environment_ptr( "ABS_MAG"));
-   if( ephem_type == OPTION_OBSERVABLES && !(options & OPTION_SHOW_SIGMAS))
+   if( ephem_type != OPTION_OBSERVABLES || !(options & OPTION_SHOW_SIGMAS))
       n_objects = 1;
    orbits_at_epoch = (double *)calloc( n_objects, 8 * sizeof( double));
    memcpy( orbits_at_epoch, orbit, n_objects * 6 * sizeof( double));
@@ -2270,8 +2270,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
          radial_vel = v_dot_r / r;
          if( *stepsize == 'a')
             max_auto_step = fabs( atof( stepsize + 1)) * r / vector3_length( topo_vel);
-         if( ephem_type == OPTION_STATE_VECTOR_OUTPUT ||
-               ephem_type == OPTION_POSITION_OUTPUT)
+         if( (ephem_type == OPTION_STATE_VECTOR_OUTPUT ||
+               ephem_type == OPTION_POSITION_OUTPUT) && !obj_n)
             {
             int ecliptic_coords = 0;      /* default to equatorial J2000 */
             double posn_mult = 1., vel_mult = 1.;     /* default to AU & AU/day */
