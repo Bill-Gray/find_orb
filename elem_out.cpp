@@ -783,7 +783,7 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
       if( !get_uncertainty( "sigma_G:", buff, 0))
          fprintf( ofile, " \"G sigma\": %s,", buff);
       }
-   fprintf( ofile, "\n        \"rms_residual\": %.4f,", compute_rms( obs, n_obs));
+   fprintf( ofile, "\n        \"rms_residual\": %.7f,", compute_rms( obs, n_obs));
    weighted_rms = compute_weighted_rms( obs, n_obs, &n_used);
    fprintf( ofile, "\n        \"weighted_rms_residual\": %.4f,", weighted_rms);
    fprintf( ofile, "\n        \"n_resids\": %d,", n_used);
@@ -2310,15 +2310,19 @@ would make a dummy object 'Made-up',  at epoch 2020 Jan 13,
 position 1.2, 2.3, 3.4 (AU),  velocity -.005,-.002,.001 (AU/day),
 with an absolute mag of 17,  in the J2000 equatorial frame.
 (All heliocentric,  although a 'geo' option would be nice.)
-You can also use km and seconds as units,  by adding 'km' or 's'. */
+You can also use km and seconds as units,  by adding 'km' or 's';
+or meters with 'm';  or 'g' for geocentric.  'ep=2020.9' would
+set the coordinate plane epoch as that of 2020.9.  'UTC' would
+specify that the epoch is in UTC (some of the artsat crowd give
+epochs on that time scale).   */
 
 static double extract_state_vect_from_text( const char *text,
             double *orbit, double *solar_pressure, double *abs_mag)
 {
    char tbuff[81];
    size_t i = 0;
-   double epoch = 0.;
-   int bytes_read;
+   double epoch = 0., coord_epoch = 2000.;
+   int bytes_read, central_object = 0;
 
    while( text[i] && text[i] != ',' && i < 80)
       i++;
@@ -2346,11 +2350,20 @@ static double extract_state_vect_from_text( const char *text,
          equatorial_to_ecliptic( orbit + 3);
          text += 2;
          }
+      else if( !memcmp( text, "ep=", 3))
+         coord_epoch = atof( text + 3);
       else if( !memcmp( text, "H=", 2))
          *abs_mag = atof( text + 2);
+      else if( !memcmp( text, "UTC", 3))
+         epoch += td_minus_utc( epoch) / seconds_per_day;
       else if( !memcmp( text, "km", 2))
          for( i = 0; i < 6; i++)
             orbit[i] /= AU_IN_KM;
+      else if( *text == 'm')
+         for( i = 0; i < 6; i++)
+            orbit[i] /= AU_IN_METERS;
+      else if( *text == 'g')
+         central_object = 3;
       else if( *text == 's')
          for( i = 3; i < 6; i++)
             orbit[i] *= seconds_per_day;
@@ -2361,6 +2374,23 @@ static double extract_state_vect_from_text( const char *text,
          text++;
       if( *text == ',')
          text++;
+      }
+   if( coord_epoch != 2000.)
+      {
+      double precess_matrix[9];
+
+      setup_ecliptic_precession( precess_matrix, coord_epoch, 2000.);
+      precess_vector( precess_matrix, orbit, orbit);
+      precess_vector( precess_matrix, orbit + 3, orbit + 3);
+      }
+   if( central_object)
+      {
+      double vect[6];
+
+      compute_observer_loc( epoch, central_object, 0., 0., 0., vect);
+      compute_observer_vel( epoch, central_object, 0., 0., 0., vect + 3);
+      for( i = 0; i < 6; i++)
+         orbit[i] += vect[i];
       }
    return( epoch);
 }
