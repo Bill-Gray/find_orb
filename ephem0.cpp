@@ -3274,7 +3274,7 @@ static void output_angle_to_buff( char *obuff, double angle, int precision)
       full_len += (size_t)( precision - 109);
    if( n_digits_to_show)
       {
-      char format[7];
+      char format[8];
 
       if( precision < 307 || precision > 312)   /* omit decimal point for */
          strcat( obuff, ".");                    /* super-precise formats */
