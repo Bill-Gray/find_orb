@@ -678,11 +678,14 @@ int main( int argc, const char **argv)
                use_colors = false;
                break;
             case 'v':
-               {
-               extern const char *state_vect_text;
+               if( !*arg)
+                  use_colors = false;
+               else
+                  {
+                  extern const char *state_vect_text;
 
-               state_vect_text = arg;
-               }
+                  state_vect_text = arg;
+                  }
                break;
             case 'x':
                {
