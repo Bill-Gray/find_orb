@@ -3498,17 +3498,25 @@ methods (Gauss,  Herget) may diverge.  (Not necessarily -- in fact,
 they'll often still work with much longer arcs -- but 45 degrees means
 you can be pretty confident that a decent orbit will be found.)  A quick
 dot-product of the unit vectors,  compared to cos(45 degrees) =
-sqrt(2) / 2.,  suffices to check the arc length. */
+sqrt(2) / 2.,  suffices to check the arc length.
+
+A further condition : for really long arcs,  we sometimes run into
+problems with the older observations.  As a pragmatic workaround,  we
+limit our search to the last 40 years of observations.   */
 
 static inline void look_for_best_subarc( const OBSERVE FAR *obs,
        const int n_obs, const double max_arc_len, int *start, int *end)
 {
    double best_score = -999., score;
    const double cos_45_deg = 1.414213 / 2.;
-   int i, j;
+   const double forty_years = 20. * 365.25;
+   int i = 0, j;
 
    *start = *end = 0;
-   for( i = j = 0; i < n_obs - 1; i++)
+   while( i < n_obs && obs[n_obs - 1].jd - obs[i].jd > forty_years)
+      i++;
+   assert( i < n_obs - 1);
+   for( j = i; i < n_obs - 1; i++)
       {
       int temp_start, temp_end;
 
@@ -4352,6 +4360,71 @@ int extend_orbit_solution( OBSERVE FAR *obs, const int n_obs,
    return( n_added);
 }
 
+/* auto_reject_obs( ) counts the number of observations within three
+sigmas.  It will reject them _if_ doing so won't cut down the time span
+too much or result in tossing out too many observations.  (Without those
+restrictions,  you can "evaporate" down to two observations.)    */
+
+static int auto_reject_obs( OBSERVE *obs, int n_obs)
+{
+   double *resids = (double *)calloc( n_obs * 2, sizeof( double));
+   const double max_resid2 = 9.;    /* max = three-sigma error */
+   int i, n_found = 0, start = n_obs - 1, end = 0;
+   const double original_time_span = obs[n_obs - 1].jd - obs[0].jd;
+   double final_time_span;
+   int rval = 0;
+
+   for( i = 0; i < n_obs; i++)
+      {
+      double xresid, yresid;
+
+      get_residual_data( obs + i, &xresid, &yresid);
+      resids[  i + i  ] = xresid;
+      resids[i + i + 1] = yresid;
+      if( xresid * xresid + yresid * yresid < max_resid2)
+         {
+         end = i;
+         if( start > i)
+            start = i;
+         n_found++;
+         }
+      else
+         obs[i].flags |= OBS_TEMP_USE_FLAG;
+      }
+   final_time_span = obs[end].jd - obs[start].jd;
+   debug_printf( "Time span %f -> %f; %d obs -> %d obs\n",
+                  original_time_span, final_time_span,
+                  n_obs, n_found);
+            /* Don't reject obs if it'll cut down the time span by */
+            /* half or more,  or the number of obs by a third */
+   if( final_time_span > original_time_span * .5 && n_found > n_obs * 2 / 3)
+      for( i = 0; i < n_obs; i++)
+         {
+         int new_inclusion = ((obs[i].flags & OBS_TEMP_USE_FLAG) ? 0 : 1);
+
+         if( obs[i].is_included != new_inclusion)
+            rval++;
+         obs[i].is_included = new_inclusion;
+         }
+   for( i = 0; i < n_obs; i++)
+      obs[i].flags &= ~OBS_TEMP_USE_FLAG;
+
+   free( resids);
+   return( rval);
+}
+
+static int auto_reject_obs_within_arc( OBSERVE *obs, int n_obs)
+{
+   while( n_obs && !obs->is_included)
+      {
+      obs++;
+      n_obs--;
+      }
+   while( n_obs && !obs[n_obs - 1].is_included)
+      n_obs--;
+   return( auto_reject_obs( obs, n_obs));
+}
+
 void attempt_extensions( OBSERVE *obs, const int n_obs, double *orbit,
                                     const double epoch)
 {
@@ -4463,6 +4536,9 @@ void attempt_extensions( OBSERVE *obs, const int n_obs, double *orbit,
       obs[i].is_included = 0;
    for( i = best_end + 1; i < n_obs; i++)
       obs[i].is_included = 0;
+   if( auto_reject_obs_within_arc( obs, n_obs))
+      full_improvement( obs, n_obs, orbit, epoch, NULL,
+                           NO_ORBIT_SIGMAS_REQUESTED, epoch);
    set_locs( orbit, epoch, obs, n_obs);
 }
 

@@ -171,6 +171,11 @@ typedef uint64_t ephem_option_t;
    /* applied;  we shouldn't 'correct' a second time */
 #define OBS_ALREADY_CORRECTED_FOR_OVEROBSERVING  0x10
 
+
+   /* Following flag used temporarily within some functions to note, */
+   /* e.g.,  that a particular observation has been processed        */
+#define OBS_TEMP_USE_FLAG                        0x20
+
 extern int object_type;
 
       /* The above should be one of these three values.  Natural */
