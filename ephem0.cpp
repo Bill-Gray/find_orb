@@ -2560,7 +2560,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   strcat( fake_line, dec_buff);
                   strcat( fake_line, "        ");      /* columns 57 to 65 */
                   }
-               snprintf( alt_buff, sizeof( alt_buff), "%15.7f ", curr_jd);
+               snprintf( alt_buff, sizeof( alt_buff), "%18.10f ", curr_jd);
                if( computer_friendly)
                   strlcpy( buff, alt_buff, sizeof( buff));
                else
@@ -2572,7 +2572,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                if( !(options & OPTION_SUPPRESS_RA_DEC))
                   {
                   if( computer_friendly)
-                     snprintf_append( buff, sizeof( buff), " %12.8f %12.8f",
+                     snprintf_append( buff, sizeof( buff), " %15.11f %15.11f",
                                     ra * 15, dec);
                   else
                      {
@@ -2590,7 +2590,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                if( !(options & OPTION_SUPPRESS_DELTA))
                   {
                   alt_tptr = alt_buff + strlen( alt_buff);
-                  snprintf_append( alt_buff, sizeof( alt_buff), " %14.9f", r);
+                  snprintf_append( alt_buff, sizeof( alt_buff), " %17.12f", r);
                   if( computer_friendly)
                      strlcat( buff, alt_tptr, sizeof( buff));
                   else
@@ -2605,7 +2605,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                if( !(options & OPTION_SUPPRESS_SOLAR_R))
                   {
                   alt_tptr = alt_buff + strlen( alt_buff);
-                  snprintf_append( alt_buff, sizeof( alt_buff), " %14.9f", solar_r);
+                  snprintf_append( alt_buff, sizeof( alt_buff), " %17.12f", solar_r);
                   if( computer_friendly)
                      strlcat( buff, alt_tptr, sizeof( buff));
                   else
