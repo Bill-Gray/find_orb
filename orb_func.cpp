@@ -2694,7 +2694,7 @@ static void output_json_matrix( FILE *ofile, const char *title, const double *ma
       {
       fprintf( ofile, "   [");
       for( j = 0; j < dim; j++)
-         fprintf( ofile, "%.8g%c ", *matrix++, (j == dim - 1) ? ' ' : ',');
+         fprintf( ofile, "%.12g%c ", *matrix++, (j == dim - 1) ? ' ' : ',');
       fprintf( ofile, "]%s\n", (i == dim - 1) ? "" : ",");
       }
    fprintf( ofile, "]");
@@ -3196,7 +3196,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
       output_json_matrix( json_ofile, "covar", matrix, n_params);
       fprintf( json_ofile, ", \"state_vect\": [\n");
       for( i = 0; i < 6; i++)
-         fprintf( json_ofile, "    %.12g%s\n", orbit[i],
+         fprintf( json_ofile, "    %.18g%s\n", orbit[i],
                         (i == 5 ? " ]," : ","));
       fprintf( json_ofile, "  \"epoch\": %f\n}", epoch);
       fclose( json_ofile);
