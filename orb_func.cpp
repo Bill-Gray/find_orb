@@ -4392,7 +4392,8 @@ static int auto_reject_obs( OBSERVE *obs, int n_obs)
          obs[i].flags |= OBS_TEMP_USE_FLAG;
       }
    final_time_span = obs[end].jd - obs[start].jd;
-   debug_printf( "Time span %f -> %f; %d obs -> %d obs\n",
+   if( debug_level)
+      debug_printf( "Time span %f -> %f; %d obs -> %d obs\n",
                   original_time_span, final_time_span,
                   n_obs, n_found);
             /* Don't reject obs if it'll cut down the time span by */
