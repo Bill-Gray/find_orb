@@ -100,6 +100,8 @@ Tu1 ! -95.983429     +36.139208      201       Tulsa-1
 Tu2 ! -96.1411       +35.8311        330       Tulsa-2
 Var !   6.6814       +44.5736       1850       Vars,  southern Alps
 VMe !  27.543306     +53.904694      217       Vitaly Mechinsky
+ATA !-121.4695       +40.8178        986       Allen Telescope Array
+EKa !  10.279056     +54.35333        60       Edgar Kaiser
 
 M-M !  145111.11     +403655.78       51       M. Mollica, Salerno
 
@@ -1197,3 +1199,28 @@ K380!+034.015660   +44.726292         611.     K-380, Crimea-Nauchnij
 AT64!+034.016021   +44.726321         612.     AT-64, Crimea-Nauchnij
 
 AZT8!+034.013314   +44.727013         614.     AZT-8, Crimea-Nauchnij
+
+   Mpa = 15m radio antenna in the Canary Islands.  Position from
+   http://www.esa.int/Enabling_Support/Operations/ESA_Ground_Stations/Maspalomas_station
+Mpa !-015.633800   +27.762888         205.1    Maspalomas Station
+
+   45m geoid height added to all Ondrejov alts.  The (557) position,  from
+   Petr Pravec,  is where all observations since Nov 1993 were made.  About
+   200 comet observations submitted for (557) between August 1992 and
+   November 1993 were actually made from (On7),  an 18-cm scope on top of the
+   Solar department building,  about 12m above ground;  Petr kindly pointed
+   that one out and supplied lat/lon for it as well.  This is about a 0.5
+   km difference;  I don't think it matters for any of the observations,
+   but may be of historical interest.
+
+557 !+014.7796222  +49.9147972        575.0    Ondrejov 0.65m
+L36 !+014.78010    +49.90943          562.0    Ondrejov--BlueEye600 Telescope
+
+On1 !+014.78096    +49.91515          574.0    Ondrejov 2m
+On2 !+014.78100    +49.90921          570.0    W blue dome south of (557)
+On3 !+014.78143    +49.90917          573.0    E blue dome south of (557)
+
+On4 !+014.77999    +49.90925          563.0    Roll-off roof about 100m east of blue domes
+On5 !+014.77972    +49.90858          558.0    Ondrejov radio telescope (SW)
+On6 !+014.78264    +49.91339          559.0    Ondrejov radio telescope (NE)
+On7 !+014.7819072  +49.9090889        580.0    Ondrejov 18cm
