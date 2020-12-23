@@ -996,7 +996,9 @@ int main( const int argc, const char **argv)
       fclose( ifile);
    while( 1)
       {
-      fprintf( ofile, "Avg worst resid: %.2f km                            \n",
+      if( ofile != stdout)
+         printf( "\n");
+      fprintf( ofile, "Avg worst resid: %.2f km\n",
                                    sum_of_worst_resids / (double)tles_written);
       fprintf( ofile, "Worst residual in entire run: %.2f km on MJD %.1f\n",
                                    worst_resid_in_run, worst_mjd);
