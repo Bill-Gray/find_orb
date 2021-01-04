@@ -67,22 +67,22 @@ J053S        Jupiter LIII = S/2000 J 11 = Dia
 J054S        Jupiter LIV = S/2016 J 1
 J055S        Jupiter LV = S/2003 J 18
 J056S        Jupiter LVI = S/2011 J 2
-J057S        Jupiter LVII = S/2003 J 5
-J058S        Jupiter LVIII = S/2003 J 15
+J057S        Jupiter LVII = S/2003 J 5 = Eirene
+J058S        Jupiter LVIII = S/2003 J 15 = Philophrosyne
 J059S        Jupiter LIX = S/2017 J 1
-J060S        Jupiter LX = S/2003 J 3
-    SK03J030 Jupiter LX = S/2003 J 3
+J060S        Jupiter LX = S/2003 J 3 = Eupheme
+    SK03J030 Jupiter LX = S/2003 J 3 = Eupheme
 J061SK03J190 Jupiter LXI = S/2003 J 19
-J062SK16J020 Jupiter LXII = S/2016 J 2
+J062SK16J020 Jupiter LXII = S/2016 J 2 = Valetudo
 J063SK17J020 Jupiter LXIII = S/2017 J 2
 J064SK17J030 Jupiter LXIV = S/2017 J 3
-J065SK17J040 Jupiter LXV = S/2017 J 4
+J065SK17J040 Jupiter LXV = S/2017 J 4 = Pandia
 J066SK17J050 Jupiter LXVI = S/2017 J 5
 J067SK17J060 Jupiter LXVII = S/2017 J 6
 J068SK17J070 Jupiter LXVIII = S/2017 J 7
 J069SK17J080 Jupiter LXIX = S/2017 J 8
 J070SK17J090 Jupiter LXX  = S/2017 J 9
-J071SK18J010 Jupiter LXXI = S/2018 J 2
+J071SK18J010 Jupiter LXXI = S/2018 J 2 = Ersa
 J072SK11J010 Jupiter LXXII = S/2011 J 1
 S002S        Saturn II = Enceladus
 S003S        Saturn III = Tethys
