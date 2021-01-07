@@ -658,7 +658,8 @@ int main( int argc, const char **argv)
             case 't':
                if( argv[i][2] == 'e' || argv[i][2] == 'E')
                   {
-                  double jd = get_time_from_string( curr_jd( ), argv[i] + 3,
+                  const double jd = get_time_from_string( curr_jd( ),
+                           (argv[i][3] >= ' ' ? argv[i] + 3 : argv[i + 1]),
                            CALENDAR_JULIAN_GREGORIAN | FULL_CTIME_YMD
                            | FULL_CTIME_TWO_DIGIT_YEAR, NULL);
 
