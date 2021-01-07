@@ -39,6 +39,18 @@ have to wait for another day.       */
 #include "details.h"
 #include "afuncs.h"
 
+/* Enables some graceless hacks needed by me (Bill Gray) to deal with
+~2000 sungrazing comets.  The files lack contact data (should be me) and
+mag band data (should be V).  And some sungrazers have data from up to
+three places, but only one header.
+
+ If the following is defined,  the contact name and mag band will be in
+the ADES output,  even if absent in the input data.  And if one or more
+places lack headers,  we fill in from the first available header (the
+sungrazer spacecraft all have identical headers,  fortunately.)  */
+
+/* #define FOR_SUNGRAZER_PROJECT       1     */
+
 char *get_file_name( char *filename, const char *template_file_name);
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 char *iso_time( char *buff, const double jd, const int precision);   /* elem_out.c */
@@ -48,14 +60,19 @@ int text_search_and_replace( char FAR *str, const char *oldstr,
 
 #define PI 3.1415926535897932384626433832795028841971693993751058209749445923
 
+static const char **fallback_obs_details = NULL;
+
 static void output_names( FILE *ofile, const OBSERVE FAR *obs, const char *target)
 {
-   int i;
+   int i, n_found = 0;
    const size_t tlen = strlen( target);
    const char *tptr, *tptr2;
+   const char **obs_details = obs->obs_details;
 
-   if( obs->obs_details)
-      for( i = 0; (tptr = obs->obs_details[i]) != NULL; i++)
+   if( !obs_details)
+      obs_details = fallback_obs_details;
+   if( obs_details)
+      for( i = 0; (tptr = obs_details[i]) != NULL; i++)
          if( !strncmp( tptr, target, tlen))
             {
             tptr += tlen;
@@ -70,10 +87,17 @@ static void output_names( FILE *ofile, const OBSERVE FAR *obs, const char *targe
                tptr2 = strchr( tptr, ',');
                name_len = (tptr2 ? tptr2 - tptr : strlen( tptr));
                if( name_len)
+                  {
                   fprintf( ofile, "        <name>%.*s</name>\n", (int)name_len, tptr);
+                  n_found++;
+                  }
                tptr = tptr2;
                }
             }
+#ifdef FOR_SUNGRAZER_PROJECT
+   if( !n_found)
+      fprintf( ofile, "        <name>W. Gray</name>\n");
+#endif
 }
 
 /* Column 14 ('note 1') of punched-card astrometry contains either an
@@ -154,8 +178,8 @@ static void create_ades_file_for_one_code( FILE *ofile,
 //          fprintf( ofile, "        <prog>%c</prog>\n", progcode);
          fprintf( ofile, "        <obsTime>%s</obsTime>\n",
                   iso_time( buff, obs->jd, 3));         /* elem_out.cpp */
-         fprintf( ofile, "        <ra>%.6f</ra>\n", obs->ra * 180. / PI);
-         fprintf( ofile, "        <dec>%.6f</dec>\n", obs->dec * 180. / PI);
+         fprintf( ofile, "        <ra>%.11f</ra>\n", obs->ra * 180. / PI);
+         fprintf( ofile, "        <dec>%.11f</dec>\n", obs->dec * 180. / PI);
          fprintf( ofile, "        <rmsRA>%.4f</rmsRA>\n", obs->posn_sigma_1);
          fprintf( ofile, "        <rmsDec>%.4f</rmsDec>\n", obs->posn_sigma_2);
          fprintf( ofile, "        <rmsCorr>%.4f</rmsCorr>\n", correlation);
@@ -167,9 +191,15 @@ static void create_ades_file_for_one_code( FILE *ofile,
          fprintf( ofile, "        <astCat>%s</astCat>\n", buff);
          if( obs->obs_mag != BLANK_MAG)
             {
+            char mag_band = obs->mag_band;
+
             fprintf( ofile, "        <mag>%.*f</mag>\n",
                                     obs->mag_precision, obs->obs_mag);
-            fprintf( ofile, "        <band>%c</band>\n", obs->mag_band);
+#ifdef FOR_SUNGRAZER_PROJECT
+            if( mag_band == ' ')
+               mag_band = 'V';
+#endif
+            fprintf( ofile, "        <band>%c</band>\n", mag_band);
             }
          fprintf( ofile, "      </optical>\n");
          }
@@ -198,6 +228,11 @@ void create_ades_file( const char *filename, const OBSERVE FAR *obs,
    setbuf( ofile, NULL);
    fprintf( ofile, "<?xml version=\"1.0\" ?>\n");
    fprintf( ofile, "<ades version=\"2017\">\n");
+#ifdef FOR_SUNGRAZER_PROJECT
+   for( i = 0; i < n_obs; i++)
+      if( obs[i].obs_details)
+         fallback_obs_details = obs[i].obs_details;
+#endif
    for( i = 0; i < n_obs; i++)
       {
       char new_search[5];
