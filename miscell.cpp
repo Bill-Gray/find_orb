@@ -380,10 +380,11 @@ single dummy observation is made that reflects the object's position
 at the epoch (see above 'make_fake_astrometry()' function).  */
 
 #ifndef _WIN32
-const char *temp_obs_filename = "/tmp/temp_obs.txt";
+char tempform[] = "/tmp/temp_obs.XXXXXX";
 #else
-const char *temp_obs_filename = "temp_obs.txt";
+char tempform[] = "temp_obs.XXXXXX";
 #endif
+char *temp_obs_filename = mktemp(tempform);
 
 int reset_astrometry_filename( int *argc, const char **argv)
 {
