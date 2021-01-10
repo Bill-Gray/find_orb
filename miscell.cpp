@@ -379,12 +379,7 @@ orbital elements are _read_ (not computed) from 'mpcorb.sof',  and a
 single dummy observation is made that reflects the object's position
 at the epoch (see above 'make_fake_astrometry()' function).  */
 
-#ifndef _WIN32
-char tempform[] = "/tmp/temp_obs.XXXXXX";
-#else
-char tempform[] = "temp_obs.XXXXXX";
-#endif
-char *temp_obs_filename = mktemp(tempform);
+const char *temp_obs_filename = "temp_obs.txt";
 
 int reset_astrometry_filename( int *argc, const char **argv)
 {
@@ -409,7 +404,7 @@ int reset_astrometry_filename( int *argc, const char **argv)
          }
       if( argv[1][1] == 'f')
          {
-         FILE *ofile = fopen( temp_obs_filename, "wb");
+         FILE *ofile = fopen_ext( temp_obs_filename, "twb");
 
          assert( ofile);
          fetch_astrometry_from_mpc( ofile, obj_name);
