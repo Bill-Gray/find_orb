@@ -3501,20 +3501,23 @@ dot-product of the unit vectors,  compared to cos(45 degrees) =
 sqrt(2) / 2.,  suffices to check the arc length.
 
 A further condition : for really long arcs,  we sometimes run into
-problems with the older observations.  As a pragmatic workaround,  we
-limit our search to the last 40 years of observations.   */
+problems with the older,  pre-CCD observations.  As a pragmatic workaround,
+we exclude pre-CCD observations.  (Unless that would exclude most or all
+of our observations.  In that case,  we take a deep breath and get the
+best orbit we can get with probably raggedy data.)  */
 
 static inline void look_for_best_subarc( const OBSERVE FAR *obs,
        const int n_obs, const double max_arc_len, int *start, int *end)
 {
    double best_score = -999., score;
    const double cos_45_deg = 1.414213 / 2.;
-   const double forty_years = 20. * 365.25;
    int i = 0, j;
 
    *start = *end = 0;
-   while( i < n_obs && obs[n_obs - 1].jd - obs[i].jd > forty_years)
+   while( i < n_obs && !strchr( "CcRrSs", obs->note2))
       i++;
+   if( i > n_obs * 3 / 4)   /* most of the arc is pre-CCD;  give up */
+      i = 0;                /* and just use all the data */
    assert( i < n_obs - 1);
    for( j = i; i < n_obs - 1; i++)
       {
