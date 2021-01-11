@@ -214,6 +214,8 @@ double n_nearby_obs( const OBSERVE FAR *obs, const unsigned n_obs,
 double find_parabolic_minimum_point( const double x[3], const double y[3]);
 int orbital_monte_carlo( const double *orbit, OBSERVE *obs, const int n_obs,
          const double curr_epoch, const double epoch_shown);   /* orb_func.cpp */
+void shellsort_r( void *base, const size_t n_elements, const size_t esize,
+         int (*compare)(const void *, const void *, void *), void *context);
 
 void set_distance( OBSERVE FAR *obs, double r)
 {
@@ -3908,7 +3910,8 @@ unsigned max_n_sr_orbits;
 double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
 {
    int i;
-   int start = 0;
+   int start = 0, n_radar_obs = 0;
+   int sort_radar_last = SORT_OBS_RADAR_LAST;
    bool dawn_based_observations = false;
    double arclen;
 #ifdef CONSOLE
@@ -3993,6 +3996,12 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
       return( obs[0].jd);
       }
 
+   shellsort_r( obs, n_obs, sizeof( OBSERVE), compare_observations, &sort_radar_last);
+   while( n_obs && obs[n_obs - 1].note2 == 'R')
+      {
+      n_obs--;                   /* temporarily remove radar obs */
+      n_radar_obs++;
+      }
    while( best_score > acceptable_score_limit)
       {
       int end, n_subarc_obs, n_geocentric_obs = 0;
@@ -4166,6 +4175,12 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
    fail_on_hitting_planet = false;
    attempt_extensions( obs, n_obs, orbit, obs[start].jd);
 // available_sigmas = NO_SIGMAS_AVAILABLE;
+   if( n_radar_obs)
+      {
+      n_obs += n_radar_obs;
+      shellsort_r( obs, n_obs, sizeof( OBSERVE), compare_observations, NULL);
+      set_locs( orbit, obs[start].jd, obs, n_obs);
+      }
    integration_timeout = 0;
    if( *get_environment_ptr( "INCLUDE_ALL"))
       for( i = 0; i < n_obs; i++)
