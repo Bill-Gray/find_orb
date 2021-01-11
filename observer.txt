@@ -50,7 +50,7 @@
  Gorbovskoy                                <a href="http://www.researchgate.net/profile/E_Gorbovskoy/citations">Gorbovskoy</a>
  Grauer                                    <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0018871">Grauer</a>
  Grav                                      <a href="http://web.mac.com/tgrav/iWeb/Family/Welcome.html">Grav</a>
- Groeller                                  Gr&ouml;ller
+ Groeller                                  <a href="https://www.lpl.arizona.edu/research-scientists/hannes-gr%C3%B6ller">Gr&ouml;ller</a>
  Guido                                     <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0120361">Guido</a>
  Haleakala                                 Haleakal&#x101;
  Hammergren                                <a href="http://www.eccentrix.com/members/ssp2k/ppl/profiles/drhammer.html">Hammergren</a>
