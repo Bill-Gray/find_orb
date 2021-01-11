@@ -3311,6 +3311,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
    unsigned lines_actually_read = 0;
    unsigned n_spurious_matches = 0;
    unsigned n_sat_obs_without_offsets = 0;
+   double override_ra = 0., override_dec = 0.;
    double override_posn_sigma_1 = 0., ades_posn_sigma_1 = 0.;  /* in arcsec */
    double override_posn_sigma_2 = 0., ades_posn_sigma_2 = 0.;
    double override_posn_sigma_theta = 0., ades_posn_sigma_theta = 0.;
@@ -3388,6 +3389,13 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
          {
          const int error_code = parse_observation( rval + i, buff);
 
+         if( override_ra || override_dec)
+            {
+            rval[i].ra = override_ra * PI / 180.;
+            rval[i].dec = override_dec * PI / 180.;
+            set_up_observation( rval + i);
+            override_ra = override_dec = 0.;
+            }
          strcpy( rval[i].packed_id, original_packed_desig);
          if( error_code)
             {
@@ -3622,6 +3630,8 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                override_posn_sigma_theta = tmp.posn_sigma_theta;
                }
             }
+         else if( !memcmp( buff, "#RA/dec ", 8))
+            sscanf( buff + 8, "%lf %lf", &override_ra, &override_dec);
          else if( !memcmp( buff, "#Sigmas ", 8))
             extract_ades_sigmas( buff + 8, &ades_posn_sigma_1,
                         &ades_posn_sigma_2,
