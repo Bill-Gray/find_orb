@@ -162,7 +162,9 @@ Tar !   6.92389      +43.75222      1270       TAROT Calern Observatory
    units always makes me worry) and given to a meaningless precision of
    about 0.3 millimeters -- those sorts of mistakes usually mean bogus data
    -- but checks with people who have actually been on Mauna Kea with GPS
-   units have assuaged those worries.
+   units have assuaged those worries.  And since then,  Dave Tholen has gotten
+   a precise measurement for the 2.2-m scope by imaging navigation satellites;
+   that confirmed the following position to within about a meter.
       Lat/lon/alts in this file are supposed to be on the WGS84 ellipsoid.
    I just took the NAD83 lat/longs and ignored the difference (about two
    meters).  I increased altitudes by 26 meters,  the approximate geoid
@@ -663,11 +665,15 @@ Nar !  98.4856944    +18.589972     2559       NARIT, Chiangmai
 9998!   6.3961       +52.8119         10       Dwingeloo telescoop
 9999!   5.5151       +47.348         100       Graves
 
-   Luca Buzzi supplied coordinates for the two telescopes at (204),
-   both about 1230m above sea level (geoid height is 48 meters).
+   Luca Buzzi supplied coordinates for three telescopes at (204).  All
+   are about 1230m above sea level (geoid height is 48 meters).  (Sc2)
+   used to report (204) data,  but has been discontinued.  Luca tells me
+   (Sc3),  a smaller dome between the two,  houses a C14 that will be
+   remotely controlled in early 2021 (hasn't actually submitted any data).
 
-Sch !   8.76993      +45.86833      1278       Schiaparelli Observatory, 0.85-m scope
+204 !   8.76993      +45.86833      1278       Schiaparelli Observatory, 0.85-m scope
 Sc2 !   8.77061      +45.86845      1278       Schiaparelli Observatory, 0.60-m scope
+Sc3 !   8.77027      +45.86853      1278       Schiaparelli Observatory, C14
 
 Kwa ! 167.733333     +08.716666        5       Kwajalein Island
 G34 !  13.701403     +50.860289      490.67    Oberfrauendorf
