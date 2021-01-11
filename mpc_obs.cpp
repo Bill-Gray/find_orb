@@ -84,7 +84,6 @@ int debug_printf( const char *format, ...)                 /* runge.cpp */
 ;
 char **load_file_into_memory( const char *filename, size_t *n_lines,
                         const bool fail_if_not_found);      /* mpc_obs.cpp */
-int compare_observations( const void *a, const void *b, void *context);
 void shellsort_r( void *base, const size_t n_elements, const size_t esize,
          int (*compare)(const void *, const void *, void *), void *context);
 int string_compare_for_sort( const void *a, const void *b, void *context);

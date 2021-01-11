@@ -184,6 +184,11 @@ extern int object_type;
 #define OBJECT_TYPE_COMET        1
 #define OBJECT_TYPE_ARTSAT       2
 
+int compare_observations( const void *a, const void *b, void *context);
+
+/* 'Context' can be NULL,  or a pointer to the following integers,  with
+other sort orders (perhaps reversed,  or by residuals) possible later. */
+
 #define SORT_OBS_BY_DATE                0
 #define SORT_OBS_BY_CODE_THEN_DATE      1
 #define SORT_OBS_RADAR_LAST             2

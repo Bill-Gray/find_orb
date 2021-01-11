@@ -240,7 +240,6 @@ int orbital_monte_carlo( const double *orbit, OBSERVE *obs, const int n_obs,
          const double curr_epoch, const double epoch_shown);   /* orb_func.cpp */
 void make_config_dir_name( char *oname, const char *iname);    /* miscell.cpp */
 int reset_astrometry_filename( int *argc, const char **argv);
-int compare_observations( const void *a, const void *b, void *context);
 int set_language( const int language);                      /* elem_out.cpp */
 void shellsort_r( void *base, const size_t n_elements, const size_t esize,
          int (*compare)(const void *, const void *, void *), void *context);
@@ -5254,8 +5253,8 @@ int main( int argc, const char **argv)
             n_command_lines--;
             strcpy( message_to_user, "Removing a menu line");
             break;
-         case 'c': case 'C':
-            sort_obs_by_code ^= SORT_OBS_RADAR_LAST;
+         case 'c': case 'C':        /* temporary,  just to verify that sorting */
+            sort_obs_by_code ^= SORT_OBS_RADAR_LAST;  /* is being done correctly */
             break;
          case 'j': case 'J':
          case ALT_P: case ALT_Y:
