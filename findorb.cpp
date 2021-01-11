@@ -2754,8 +2754,7 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
             inquire( "Enter object name :", object_name, 40, COLOR_DEFAULT_INQUIRY);
             if( *object_name)
                {
-               extern const char *temp_obs_filename;        /* miscell.cpp */
-               FILE *ofile = fopen( temp_obs_filename, "wb");
+               FILE *ofile = fopen_ext( temp_obs_filename, "twb");
 
                assert( ofile);
                fetch_astrometry_from_mpc( ofile, object_name);
@@ -3250,7 +3249,7 @@ int main( int argc, const char **argv)
                    /* Start quite a bit ahead of the actual data,  just in case */
                    /* there's a #Sigma: or something in the observation header */
                    /* to which we should pay attention:                        */
-               file_offset = ids[id_number].file_offset - 4000L;
+               file_offset = ids[id_number].file_offset - 40000L;
                if( file_offset < 0L)
                   file_offset = 0L;
                fseek( ifile, file_offset, SEEK_SET);
