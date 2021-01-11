@@ -184,6 +184,10 @@ extern int object_type;
 #define OBJECT_TYPE_COMET        1
 #define OBJECT_TYPE_ARTSAT       2
 
+#define SORT_OBS_BY_DATE                0
+#define SORT_OBS_BY_CODE_THEN_DATE      1
+#define SORT_OBS_RADAR_LAST             2
+
 #ifdef SEEK_CUR
 OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                         const int n_obs);

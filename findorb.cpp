@@ -2948,7 +2948,7 @@ int main( int argc, const char **argv)
    double max_residual_for_filtering = 2.5;
    bool show_commented_elements = false;
    bool drop_single_obs = true;
-   bool sort_obs_by_code = false;
+   int sort_obs_by_code = 0;
    int n_stations_shown = 0, top_obs_shown = 0, n_obs_shown = 0;
    bool single_obs_selected = false;
    extern unsigned random_seed;
@@ -3324,10 +3324,10 @@ int main( int argc, const char **argv)
          {
          bool clock_shown = false;
          char *tptr = tbuff;
-         int i = 0;
 
          if( sort_obs_by_code)
-            shellsort_r( obs, n_obs, sizeof( OBSERVE), compare_observations, &i);
+            shellsort_r( obs, n_obs, sizeof( OBSERVE), compare_observations,
+                                                   &sort_obs_by_code);
          generate_obs_text( obs, n_obs, tbuff);
          if( make_unicode_substitutions)
             {
@@ -3445,7 +3445,8 @@ int main( int argc, const char **argv)
          debug_printf( "resid legend shown\n");
 
       if( sort_obs_by_code)
-         shellsort_r( obs, n_obs, sizeof( OBSERVE), compare_observations, &i);
+         shellsort_r( obs, n_obs, sizeof( OBSERVE), compare_observations,
+                                                     &sort_obs_by_code);
 
       top_line_residuals = line_no;
       if( c != KEY_TIMER)
@@ -5254,6 +5255,8 @@ int main( int argc, const char **argv)
             strcpy( message_to_user, "Removing a menu line");
             break;
          case 'c': case 'C':
+            sort_obs_by_code ^= SORT_OBS_RADAR_LAST;
+            break;
          case 'j': case 'J':
          case ALT_P: case ALT_Y:
          case ';': case '\'':

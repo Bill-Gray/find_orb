@@ -2767,14 +2767,32 @@ static void correct_differences( OBSERVE *obs1, const OBSERVE *obs2)
       obs1->mag_band = obs2->mag_band;
 }
 
+/* For certain forms of orbit determination,  having radar observations right
+in the middle of the data can cause trouble.  Let's say you try to apply
+the method of Gauss,  but one of your observations is a radar one.  To evade
+that issue,  we sort observations to temporarily put all the radar data at
+the end.  When we're done,  we re-sort "conventionally" (by date).  */
+
 int compare_observations( const void *a, const void *b, void *context)
 {
    const OBSERVE *obs1 = (const OBSERVE *)a;
    const OBSERVE *obs2 = (const OBSERVE *)b;
    int rval = FMEMCMP( obs1->mpc_code, obs2->mpc_code, 3);
 
-   if( context && rval)    /* non-null context -> sort by code first */
-      return( rval);
+   if( context)
+      {
+      int *sort_type = (int *)context;
+
+      if( *sort_type == SORT_OBS_BY_CODE_THEN_DATE && rval)
+         return( rval);
+      if( *sort_type == SORT_OBS_RADAR_LAST)
+         {
+         if( obs1->note2 == 'R' && obs2->note2 != 'R')
+            return( 1);
+         if( obs1->note2 != 'R' && obs2->note2 == 'R')
+            return( -1);
+         }
+      }
    if( obs1->jd < obs2->jd)
       rval = -1;
    else if( obs1->jd > obs2->jd)
