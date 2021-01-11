@@ -4599,13 +4599,14 @@ void update_environ_dot_dat( void);     /* mpc_obs.cpp */
 int galactic_confusion( const double ra, const double dec);
 void pop_all_orbits( void);         /* orb_func2.cpp */
 char *find_numbered_mp_info( const int number);    /* mpc_obs.cpp */
+#ifndef _WIN32
+int check_for_other_processes( const int locking);    /* elem_out.cpp */
+#endif
 
 int clean_up_find_orb_memory( void)
 {
+#ifdef _WIN32
    extern const char *temp_obs_filename;     /* miscell.cpp */
-#ifndef _WIN32
-   extern const char *lock_filename;      /* "/tmp/fo_lock" */
-   extern FILE *lock_file;
 #endif
 
    free_sigma_recs( );
@@ -4630,9 +4631,7 @@ int clean_up_find_orb_memory( void)
    galactic_confusion( -99., 0.);
    find_numbered_mp_info( 0);
 #ifndef _WIN32
-   fclose( lock_file);
-   unlink( lock_filename);
-   unlink( temp_obs_filename);
+   check_for_other_processes( 0);
 #else
    _unlink( temp_obs_filename);
 #endif

@@ -38,12 +38,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "showelem.h"
 
 #ifndef _WIN32
-#include <sys/file.h>
+#include <fcntl.h>
 #include <unistd.h>
 
 bool findorb_already_running = false;
-const char *lock_filename = "/tmp/fo_lock";
-FILE *lock_file;
 #endif
 
             /* Pretty much every platform I've run into supports */
@@ -3011,6 +3009,38 @@ int store_defaults( const ephem_option_t ephemeris_output_options,
    return( 0);
 }
 
+/* Modified from code at https://www.informit.com/articles/article.aspx?p=23618&seqNum=4 .
+The first instance of Find_Orb,  fo,  or fo_serve will attempt to put a lock
+on /tmp/fo_lock.  Subsequent instances will see that and fail to get a lock.
+Basically,  an interprocess mutex.     */
+
+#ifndef _WIN32
+int check_for_other_processes( const int locking)
+{
+   const char *lock_filename = "/tmp/fo_lock";
+   static int lock_fd;
+   static struct flock lock;
+   int rval;
+
+   if( locking)
+      {
+      lock_fd = open( lock_filename, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
+      lock.l_type = F_WRLCK;
+      rval = fcntl( lock_fd, F_SETLK, &lock);
+      }
+   else           /* unlocking */
+      {
+      lock.l_type = F_UNLCK;
+      fcntl( lock_fd, F_SETLK, &lock);
+      close( lock_fd);
+      if( !findorb_already_running)
+         unlink( lock_filename);
+      rval = 0;
+      }
+   return( rval);
+}
+#endif
+
 int set_language( const int language)
 {
    int i;
@@ -3056,10 +3086,7 @@ int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
    const char *albedo = get_environment_ptr( "OPTICAL_ALBEDO");
 
 #ifndef _WIN32
-   lock_file = fopen( lock_filename, "w");
-   assert( lock_file);
-   if( flock( fileno( lock_file), LOCK_EX | LOCK_NB))
-      findorb_already_running = true;
+   findorb_already_running = (check_for_other_processes( 1) != 0);
 #endif
    if( *language)
       set_language( *language);
