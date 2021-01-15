@@ -84,6 +84,20 @@
     SK03J150 J058S        Jupiter LVIII = S/2003 J 15
     SK17J010 J059S        Jupiter LIX = S/2017 J 1
 
+    SK03J030 J060S        Jupiter LX = S/2003 J 3 = Eupheme
+    SK03J190 J061S        Jupiter LXI = S/2003 J 19
+    SK16J020 J062S        Jupiter LXII = S/2016 J 2 = Valetudo
+    SK17J020 J063S        Jupiter LXIII = S/2017 J 2
+    SK17J030 J064S        Jupiter LXIV = S/2017 J 3
+    SK17J040 J065S        Jupiter LXV = S/2017 J 4 = Pandia
+    SK17J050 J066S        Jupiter LXVI = S/2017 J 5
+    SK17J060 J067S        Jupiter LXVII = S/2017 J 6
+    SK17J070 J068S        Jupiter LXVIII = S/2017 J 7
+    SK17J080 J069S        Jupiter LXIX = S/2017 J 8
+    SK17J090 J070S        Jupiter LXX  = S/2017 J 9
+    SK18J010 J071S        Jupiter LXXI = S/2018 J 2 = Ersa
+    SK11J010 J072S        Jupiter LXXII = S/2011 J 1
+
 ;   McNaught find from 26 Aug 2004:
      4H42B88 1965-058A
      4I034AB 2002-048A
