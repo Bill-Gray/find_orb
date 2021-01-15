@@ -3054,13 +3054,6 @@ int main( int argc, const char **argv)
                process_count = atoi( arg);
                }
                break;
-            case 'P':
-               {
-               extern bool suppress_private_obs;
-
-               suppress_private_obs = false;
-               }
-               break;
             case 'q':
                {
                extern bool take_first_soln;

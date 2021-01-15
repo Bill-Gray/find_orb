@@ -342,3 +342,6 @@
 2050    Find next from $
 2050    Find prev from $
 2050    Find obs from a given code
+
+2052    Some observations of this object are marked as 'private' and not
+2052    for public redistribution.  Do you want to include them?  (Y/N)
