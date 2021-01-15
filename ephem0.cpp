@@ -1818,6 +1818,65 @@ static int compare_doubles( const void *a, const void *b, void *context)
    return( rval);
 }
 
+static double normalize_vect( double *ivect)
+{
+   const double rval = vector3_length( ivect);
+
+   if( rval)
+      {
+      ivect[0] /= rval;
+      ivect[1] /= rval;
+      ivect[2] /= rval;
+      }
+   return( rval);
+}
+
+/* To give a 'generic',  non-site-specific concept of observability,  we
+try to compute an optimum part of the earth from which to observe the
+object at that time.  Arguably,  a decent candidate for such a site
+would be one where the object is twice as far above the horizon as
+the sun is below it.  In other words,  if the object is at an elongation
+of (say) 69 degrees,  we should pick a place where the sun is 23
+degrees below the horizon and the object 46 degrees above it.
+
+This will be subject to change.  I think you could argue that once the
+sun is 18 degrees below the horizon,  things don't improve much by
+putting it further below the horizon;  so at 69 degrees elongation,
+we should choose a point where the sun is 18 degrees below the horizon
+and the object 51 degrees above it,  at a lower airmass. */
+
+static void find_best_site( const double jd_utc, DPT *latlon,
+                           const double *earth_posn, const double *obj_posn)
+{
+   double sun_unit[3], obj_unit[3];
+   double xvect[3];     /* orthogonal to both of the above unit vects */
+   double tvect[3];     /* orthogonal to vector from sun,  passing through plane */
+   double elong;        /* of vector to object */
+   double angle;        /* eventual angle between sun_unit and vect to object */
+   double ovect[3];     /* vector pointing to where an observer 'ought' to be */
+   size_t i;
+
+   for( i = 0; i < 3; i++)     /* create unit vectors to object and */
+      {                        /* to the sun */
+      obj_unit[i] = obj_posn[i];
+      sun_unit[i] = -earth_posn[i];
+      }
+   normalize_vect( sun_unit);
+   normalize_vect( obj_unit);
+   elong = acose( dot_product( sun_unit, obj_unit));
+   vector_cross_product( xvect, sun_unit, obj_unit);
+   normalize_vect( xvect);
+   vector_cross_product( tvect, xvect, sun_unit);
+   angle = elong / 3. + PI / 2.;
+   for( i = 0; i < 3; i++)
+      ovect[i] = cos( angle) * sun_unit[i] + sin( angle) * tvect[i];
+            /* properly speaking,  precess ovect from J2000 to */
+            /* coords of date; gonna ignore that for the nonce */
+   latlon->x = atan2( ovect[1], ovect[0]);
+   latlon->y = asine( ovect[2]);
+   latlon->x -= green_sidereal_time( jd_utc);
+}
+
 static double *list_of_ephem_times = NULL;
 
 static int get_ephem_times_from_file( const char *filename)
@@ -1902,10 +1961,11 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    int ra_format = 3, dec_format = 2;
    char buff[440], *header = NULL, alt_buff[500];
    const bool use_observation_times = !strncmp( stepsize, "Obs", 3);
+   const bool show_geo_quantities = atoi( get_environment_ptr( "GEO_QUANTITIES"));
    double curr_jd = jd_start, real_jd_start = jd_start;
    bool reset_lat_alt = true;
 
-   if( (!rho_cos_phi && !rho_sin_phi && !use_observation_times)
+   if( (!rho_cos_phi && !rho_sin_phi && !use_observation_times && !show_geo_quantities)
                                  || ephem_type != OPTION_OBSERVABLES)
       options &= ~(OPTION_ALT_AZ_OUTPUT | OPTION_VISIBILITY | OPTION_MOON_ALT
                      | OPTION_MOON_AZ | OPTION_SUN_ALT | OPTION_SUN_AZ
@@ -2440,6 +2500,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                output_angle_to_buff( ra_buff, ra * (output_ra_in_degrees ? 15. : 1.),
                                                ra_format);
                remove_trailing_cr_lf( ra_buff);
+               if( !rho_cos_phi && !rho_sin_phi)
+                  find_best_site( utc, &latlon, obs_posn_equatorial, topo);
                for( j = 0; j < 3; j++)    /* compute alt/azzes of object (j=0), */
                   {                       /* sun (j=1), and moon (j=2)          */
                   DPT obj_ra_dec = ra_dec;
@@ -2694,7 +2756,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                                            note_text + 1);
                   }
 
-               if( rho_cos_phi || rho_sin_phi)
+//             if( rho_cos_phi || rho_sin_phi)
                   {
                   exposure_config.sky_brightness = mags_per_arcsec2;
                   if( alt_az[0].y < 0.)
