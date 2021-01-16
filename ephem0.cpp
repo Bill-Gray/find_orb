@@ -1962,6 +1962,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    char buff[440], *header = NULL, alt_buff[500];
    const bool use_observation_times = !strncmp( stepsize, "Obs", 3);
    const bool show_geo_quantities = atoi( get_environment_ptr( "GEO_QUANTITIES"));
+   const bool suppress_coloring = atoi( get_environment_ptr( "SUPPRESS_EPHEM_COLORING"));
    double curr_jd = jd_start, real_jd_start = jd_start;
    bool reset_lat_alt = true;
 
@@ -2713,7 +2714,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                            tbuff[1] = (galact_conf > 60 ? 'G' : 'g');
                         }
                      }
-                  if( computer_friendly)
+                  if( computer_friendly || suppress_coloring)
                      strcat( buff, tbuff);
                   else
                      snprintf_append( buff, sizeof( buff), "$%06lx%s", rgb, tbuff);
