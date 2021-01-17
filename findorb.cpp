@@ -2899,7 +2899,7 @@ static unsigned get_random_seed( void)
 
    zval = (unsigned long)&zval;
 #endif
-   return( (unsigned)( zval ^ (zval >> 32)));
+   return( (unsigned)( zval ^ (zval >> 31)));
 }
 
 int sanity_test_observations( const char *filename);
@@ -2952,7 +2952,7 @@ int main( int argc, const char **argv)
    bool single_obs_selected = false;
    extern unsigned random_seed;
    unsigned mouse_x = 0, mouse_y = 0, mouse_z = 0;
-   unsigned long button;
+   unsigned long button = 0;
 
    random_seed = get_random_seed( );
    if( !strcmp( argv[0], "find_orb"))
