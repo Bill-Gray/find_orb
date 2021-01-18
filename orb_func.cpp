@@ -4623,9 +4623,7 @@ int check_for_other_processes( const int locking);    /* elem_out.cpp */
 
 int clean_up_find_orb_memory( void)
 {
-#ifdef _WIN32
    extern const char *temp_obs_filename;     /* miscell.cpp */
-#endif
 
    free_sigma_recs( );
    get_observer_data( NULL, NULL, NULL, NULL, NULL);
@@ -4650,6 +4648,7 @@ int clean_up_find_orb_memory( void)
    find_numbered_mp_info( 0);
 #ifndef _WIN32
    check_for_other_processes( 0);
+   unlink( temp_obs_filename);
 #else
    _unlink( temp_obs_filename);
 #endif
