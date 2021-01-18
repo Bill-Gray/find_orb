@@ -4385,7 +4385,8 @@ restrictions,  you can "evaporate" down to two observations.)    */
 
 static int auto_reject_obs( OBSERVE *obs, int n_obs)
 {
-   double *resids = (double *)calloc( n_obs * 2, sizeof( double));
+   double *xresids = (double *)calloc( n_obs * 2, sizeof( double));
+   double *yresids = xresids + n_obs;
    const double max_resid2 = 9.;    /* max = three-sigma error */
    int i, n_found = 0, start = n_obs - 1, end = 0;
    const double original_time_span = obs[n_obs - 1].jd - obs[0].jd;
@@ -4394,12 +4395,8 @@ static int auto_reject_obs( OBSERVE *obs, int n_obs)
 
    for( i = 0; i < n_obs; i++)
       {
-      double xresid, yresid;
-
-      get_residual_data( obs + i, &xresid, &yresid);
-      resids[  i + i  ] = xresid;
-      resids[i + i + 1] = yresid;
-      if( xresid * xresid + yresid * yresid < max_resid2)
+      get_residual_data( obs + i, xresids + i, yresids + i);
+      if( xresids[i] * xresids[i] + yresids[i] * yresids[i] < max_resid2)
          {
          end = i;
          if( start > i)
@@ -4428,7 +4425,7 @@ static int auto_reject_obs( OBSERVE *obs, int n_obs)
    for( i = 0; i < n_obs; i++)
       obs[i].flags &= ~OBS_TEMP_USE_FLAG;
 
-   free( resids);
+   free( xresids);
    return( rval);
 }
 
