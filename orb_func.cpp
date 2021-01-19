@@ -771,25 +771,37 @@ static void light_bending( const double *observer, double *result)
       result[i] += bending * dir[i];
 }
 
-void light_time_lag( const double *orbit, const double *observer, double *result)
+void light_time_lag( const double jde, const double *orbit,
+                                      const double *observer, double *result)
 {
    const double solar_r = vector3_length( orbit);
-   unsigned iter;
+   double vel[3];
+   size_t i, iter;
+   static double multiplier = 1e+99;
 
+   if( multiplier > 9e+98)    /* first time through */
+      multiplier = atof( get_environment_ptr( "SSB_MULTIPLIER"));
+   if( !multiplier)
+      for( i = 0; i < 3; i++)
+         vel[i] = orbit[i + 3];
+   else
+      {
+      compute_observer_vel( jde, -1, 0., 0., 0., vel);
+      for( i = 0; i < 3; i++)
+         vel[i] = vel[i] * multiplier + orbit[i + 3];
+      }
    memcpy( result, orbit, 3 * sizeof( double));
    for( iter = 0; iter < 4; iter++)
       {
       const double r = vector3_dist( result, observer);
       const double dt = -r / AU_PER_DAY;
       const double afact = -SOLAR_GM * dt / (solar_r * solar_r * solar_r);
-      unsigned i;
 
       for( i = 0; i < 3; i++)
          {
-         result[i]     = orbit[i] + (.5 * afact * orbit[i] + orbit[i + 3]) * dt;
-         result[i + 3] = orbit[i + 3] + afact * orbit[i];
+         result[i]     = orbit[i] + (.5 * afact * orbit[i] + vel[i]) * dt;
+         result[i + 3] = vel[i] + afact * orbit[i];
          }
-//    debug_printf( "iter %d: r = %.15f\n", iter, r);
       }
    light_bending( observer, result);
 }
@@ -874,7 +886,7 @@ static int set_locs_extended( const double *orbit, const double epoch_jd,
             return( rval);
          curr_t = optr->jd;
          ldouble_to_double( temp_orbit, curr_orbit, 6);
-         light_time_lag( temp_orbit, optr->obs_posn, light_lagged_orbit);
+         light_time_lag( optr->jd, temp_orbit, optr->obs_posn, light_lagged_orbit);
          FMEMCPY( optr->obj_posn, light_lagged_orbit, 3 * sizeof( double));
          FMEMCPY( optr->obj_vel, light_lagged_orbit + 3, 3 * sizeof( double));
          j += (pass ? 1 : -1);
