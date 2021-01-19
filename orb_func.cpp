@@ -4378,34 +4378,49 @@ int extend_orbit_solution( OBSERVE FAR *obs, const int n_obs,
    return( n_added);
 }
 
-/* auto_reject_obs( ) counts the number of observations within three
-sigmas.  It will reject them _if_ doing so won't cut down the time span
-too much or result in tossing out too many observations.  (Without those
-restrictions,  you can "evaporate" down to two observations.)    */
+/* auto_reject_obs( ) looks for observations within a certain number of
+sigmas that are marked 'excluded',  _and_ those outside a (possibly
+different) range that are marked 'included'.  (The different ranges allow
+us to avoid endless recalculations as observations wobble between barely
+inside or outside a particular threshhold.)  Rejection/inclusion is
+cancelled if it would cut down the time span too much or result in
+tossing out too many observations.  (Without those restrictions,  you can
+"evaporate" down to two observations.)    */
 
-static int auto_reject_obs( OBSERVE *obs, int n_obs)
+static int auto_reject_obs( OBSERVE *obs, int n_obs,
+                 const double inner_max_resid, const double outer_max_resid)
 {
-   double *xresids = (double *)calloc( n_obs * 2, sizeof( double));
-   double *yresids = xresids + n_obs;
-   const double max_resid2 = 9.;    /* max = three-sigma error */
+   int *orig_included = (int *)calloc( n_obs, sizeof( int));
+   const double inner2 = inner_max_resid * inner_max_resid;
+   const double outer2 = outer_max_resid * outer_max_resid;
    int i, n_found = 0, start = n_obs - 1, end = 0;
    const double original_time_span = obs[n_obs - 1].jd - obs[0].jd;
    double final_time_span;
    int rval = 0;
 
    for( i = 0; i < n_obs; i++)
-      {
-      get_residual_data( obs + i, xresids + i, yresids + i);
-      if( xresids[i] * xresids[i] + yresids[i] * yresids[i] < max_resid2)
+      orig_included[i] = obs[i].is_included;
+   for( i = 0; i < n_obs; i++)
+      if( !(obs[i].flags & OBS_DONT_USE))
          {
-         end = i;
-         if( start > i)
-            start = i;
-         n_found++;
+         double xresid, yresid, r2;
+
+         get_residual_data( obs + i, &xresid, &yresid);
+         r2 = xresid * xresid + yresid * yresid;
+         if( (!obs[i].is_included && r2 < inner2) ||
+                        (obs[i].is_included && r2 > outer2))
+            {
+            rval++;
+            obs[i].is_included ^= 1;
+            }
+         if( obs[i].is_included)
+            {
+            end = i;
+            if( start > i)
+               start = i;
+            n_found++;
+            }
          }
-      else
-         obs[i].flags |= OBS_TEMP_USE_FLAG;
-      }
    final_time_span = obs[end].jd - obs[start].jd;
    if( debug_level)
       debug_printf( "Time span %f -> %f; %d obs -> %d obs\n",
@@ -4413,32 +4428,39 @@ static int auto_reject_obs( OBSERVE *obs, int n_obs)
                   n_obs, n_found);
             /* Don't reject obs if it'll cut down the time span by */
             /* half or more,  or the number of obs by a third */
-   if( final_time_span > original_time_span * .5 && n_found > n_obs * 2 / 3)
+   if( final_time_span < original_time_span * .5 || n_found < n_obs * 2 / 3)
+      {
+      rval = -1;        /* flag "failure",  restore original inclusion */
       for( i = 0; i < n_obs; i++)
-         {
-         int new_inclusion = ((obs[i].flags & OBS_TEMP_USE_FLAG) ? 0 : 1);
-
-         if( obs[i].is_included != new_inclusion)
-            rval++;
-         obs[i].is_included = new_inclusion;
-         }
-   for( i = 0; i < n_obs; i++)
-      obs[i].flags &= ~OBS_TEMP_USE_FLAG;
-
-   free( xresids);
+         obs[i].is_included = orig_included[i];
+      }
+   free( orig_included);
    return( rval);
 }
 
+/* We try rejecting outliers that are more than three sigmas from
+nominal.  99.9% of the time,  that works Just Fine,  possibly rejecting
+one or more outliers.  It may fail if most of the observations are
+outside three sigmas.  We keep trying with progressively larger
+limits.
+
+   This can help when a few observations are so horrendously off
+that they drag all other observations in the other direction to compensate.
+Eliminate those few,  do a full step,  and the remaining observations
+may look reasonable... but will then be subjected to a second,  or
+(if needed) more rounds of outlier rejection.   */
+
 static int auto_reject_obs_within_arc( OBSERVE *obs, int n_obs)
 {
-   while( n_obs && !obs->is_included)
+   int rval;
+   double reject_limit = 3.;   /* reject anything outside three sigmas */
+
+   do
       {
-      obs++;
-      n_obs--;
-      }
-   while( n_obs && !obs[n_obs - 1].is_included)
-      n_obs--;
-   return( auto_reject_obs( obs, n_obs));
+      rval = auto_reject_obs( obs, n_obs, reject_limit, reject_limit * 1.1);
+      reject_limit *= 1.5;
+      } while( rval < 0 && reject_limit < 60.);
+   return( rval);
 }
 
 void attempt_extensions( OBSERVE *obs, const int n_obs, double *orbit,
@@ -4552,7 +4574,10 @@ void attempt_extensions( OBSERVE *obs, const int n_obs, double *orbit,
       obs[i].is_included = 0;
    for( i = best_end + 1; i < n_obs; i++)
       obs[i].is_included = 0;
-   if( auto_reject_obs_within_arc( obs, n_obs))
+
+               /* Perform up to four rounds of outlier rejection */
+   for( i = 0; i < 4 && auto_reject_obs_within_arc( obs + best_start,
+                                     best_end + 1 - best_start) > 0; i++)
       full_improvement( obs, n_obs, orbit, epoch, NULL,
                            NO_ORBIT_SIGMAS_REQUESTED, epoch);
    set_locs( orbit, epoch, obs, n_obs);
