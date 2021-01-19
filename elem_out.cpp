@@ -661,6 +661,8 @@ static inline void align_packed_desig( char *obuff, const char *packed_desig)
    obuff[12] = '\0';
 }
 
+char *find_numbered_mp_info( const int number);             /* mpc_obs.cpp */
+
 static char *object_name( char *buff, const int obj_index)
 {
    if( !obj_index)
@@ -702,7 +704,28 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
    fprintf( ofile, "  ],\n");
    fprintf( ofile, "  \"objects\":\n  {\n");
    fprintf( ofile, "    \"%s\":\n", obj_name);
-   fprintf( ofile, "    {\n    \"object\": \"%s\",\n", obj_name);
+   fprintf( ofile, "    {\n      \"object\": \"%s\",\n", obj_name);
+   if( *obj_name == '(')      /* numbered obj */
+      {
+      const char *text = find_numbered_mp_info( atoi( obj_name + 1));
+
+      if( text && *text)
+         {
+         const char *fields[] = { "name", "prov_desig", "disc_date", "disc_site",
+                           "disc_ref", "discover" };
+         const int offsets[] = { 9, 29, 41, 53, 72, 78, 170 };
+
+         strcpy( buff, text);
+         for( i = 0; i < 6; i++)
+            if( buff[offsets[i]] != ' ')
+               {
+               buff[offsets[i + 1] - 1] = '\0';
+               remove_trailing_cr_lf( buff + offsets[i]);
+               fprintf( ofile, "      \"%s\": \"%s\",\n", fields[i],
+                                       buff + offsets[i]);
+               }
+         }
+      }
    fprintf( ofile, "      \"packed\": \"%s\",\n",
                   real_packed_desig( buff, packed_id));
    fprintf( ofile, "      \"created\": %.5f,\n", jd);
