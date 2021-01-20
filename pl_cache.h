@@ -24,7 +24,7 @@ int planet_posn( const int planet_no, const double jd, double *vect_2000);
 int format_jpl_ephemeris_info( char *buff);           /* pl_cache.cpp */
 int get_jpl_ephemeris_info( int *de_version, double *jd_start, double *jd_end);
 
-#define PLANET_POSN_VELOCITY_FLAG 0x8000
+#define PLANET_POSN_VELOCITY_OFFSET 1000
 
 /* Requesting planet 3 gets you the Earth-Moon barycenter.  Requesting
 planet 10 gets the vector between Earth and Moon.  Those are the values

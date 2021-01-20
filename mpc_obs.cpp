@@ -44,6 +44,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "stackall.h"
 #include "sigma.h"
 #include "date.h"
+#include "pl_cache.h"
 
 #define PI 3.1415926535897932384626433832795028841971693993751058209749445923
 #define EARTH_MAJOR_AXIS 6378140.
@@ -62,7 +63,6 @@ int lat_alt_to_parallax( const double lat, const double ht_in_meters,
 int parallax_to_lat_alt( const double rho_cos_phi, const double rho_sin_phi,
        double *lat, double *ht_in_meters, const int planet_idx); /* ephem0.c */
 void set_obs_vect( OBSERVE FAR *obs);        /* mpc_obs.h */
-int planet_posn( const int planet_no, const double jd, double *vect_2000);
 void remove_trailing_cr_lf( char *buff);            /* ephem0.cpp */
 void format_dist_in_buff( char *buff, const double dist_in_au); /* ephem0.c */
 double current_jd( void);                       /* elem_out.cpp */
@@ -87,7 +87,6 @@ char **load_file_into_memory( const char *filename, size_t *n_lines,
 void shellsort_r( void *base, const size_t n_elements, const size_t esize,
          int (*compare)(const void *, const void *, void *), void *context);
 int string_compare_for_sort( const void *a, const void *b, void *context);
-int format_jpl_ephemeris_info( char *buff);                 /* pl_cache.c */
 const char *get_find_orb_text( const int index);      /* elem_out.cpp */
 static void reduce_designation( char *desig, const char *idesig);
 int set_tholen_style_sigmas( OBSERVE *obs, const char *buff);  /* mpc_obs.c */
@@ -1451,13 +1450,14 @@ int load_environment_file( const char *filename);          /* mpc_obs.cpp */
 static int load_default_environment_file( void);           /* mpc_obs.cpp */
 void update_environ_dot_dat( void);                        /* mpc_obs.cpp */
 
-int earth_lunar_posn( const double jd, double FAR *earth_loc, double FAR *lunar_loc)
+static int earth_lunar_posn_vel( const double jd, double FAR *earth_loc,
+                             double FAR *lunar_loc, const int is_vel)
 {
    double t_earth[3], t_lunar[3];
    int i;
 
-   planet_posn( 3, jd, t_earth);
-   planet_posn( 10, jd, t_lunar);
+   planet_posn( 3 + (is_vel ? PLANET_POSN_VELOCITY_OFFSET : 0), jd, t_earth);
+   planet_posn( 10 + (is_vel ? PLANET_POSN_VELOCITY_OFFSET : 0), jd, t_lunar);
                      /* earth_loc is the E-M barycenter,  and lunar_loc */
                      /* is geocentric.  Modify earth_loc to be the earth */
                      /* geocenter loc,  and lunar_loc to be heliocentric: */
@@ -1473,6 +1473,16 @@ int earth_lunar_posn( const double jd, double FAR *earth_loc, double FAR *lunar_
          lunar_loc[i] = t_lunar[i];
       }
    return( 0);
+}
+
+int earth_lunar_posn( const double jd, double FAR *earth_loc, double FAR *lunar_loc)
+{
+   return( earth_lunar_posn_vel( jd, earth_loc, lunar_loc, 0));
+}
+
+int earth_lunar_vel( const double jd, double FAR *earth_loc, double FAR *lunar_loc)
+{
+   return( earth_lunar_posn_vel( jd, earth_loc, lunar_loc, 1));
 }
 
 /* Input time is a JD in UT.  Output offset is in equatorial    */
@@ -1535,14 +1545,14 @@ int compute_observer_vel( const double jde, const int planet_no,
                const double rho_cos_phi,
                const double rho_sin_phi, const double lon, double FAR *vel)
 {
-   double loc1[3], loc2[3];
-   const double delta_t = 10. / minutes_per_day;
    int i;
 
-   compute_observer_loc( jde + delta_t, planet_no, 0., 0., 0., loc2);
-   compute_observer_loc( jde - delta_t, planet_no, 0., 0., 0., loc1);
-   for( i = 0; i < 3; i++)
-      vel[i] = (loc2[i] - loc1[i]) / (2. * delta_t);
+   if( planet_no != 3 && planet_no != 10)
+      planet_posn( (planet_no >= 0 ? planet_no : 12) + PLANET_POSN_VELOCITY_OFFSET,
+                   jde, vel);        /* planet_no == -1 means SS Barycenter */
+   else
+      earth_lunar_vel( jde, (planet_no == 3) ? vel : NULL,
+                            (planet_no == 3) ? NULL : vel);
    if( rho_sin_phi || rho_cos_phi)
       {
       const double ut = jde - td_minus_ut( jde) / seconds_per_day;

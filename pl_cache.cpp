@@ -76,9 +76,10 @@ static int planet_posn_raw( int planet_no, const double jd,
    static const char *jpl_filename = NULL;
    static void *jpl_eph = NULL;
    const int bc405_start = 100;
-   const int calc_vel = (planet_no & PLANET_POSN_VELOCITY_FLAG) ? 1 : 0;
+   const int calc_vel = (planet_no > PLANET_POSN_VELOCITY_OFFSET - 2);
 
-   planet_no &= ~PLANET_POSN_VELOCITY_FLAG;
+   if( calc_vel)
+      planet_no -= PLANET_POSN_VELOCITY_OFFSET;
    if( !planet_no)            /* the sun */
       {
       vect_2000[0] = vect_2000[1] = vect_2000[2] = 0.;
@@ -174,8 +175,8 @@ static int planet_posn_raw( int planet_no, const double jd,
          if( debug_level > 8)
             debug_printf( "JD %f, planet %d: (%f %f %f)\n",
                      jd, planet_no, state[0], state[1], state[2]);
-         equatorial_to_ecliptic( state);
-         memcpy( vect_2000, state + calc_vel, 3 * sizeof( double));
+         memcpy( vect_2000, state + calc_vel * 3, 3 * sizeof( double));
+         equatorial_to_ecliptic( vect_2000);
          return( 0);
          }
       else
@@ -213,6 +214,16 @@ static int planet_posn_raw( int planet_no, const double jd,
       if( planet_no > 0 && planet_no <= 10)
          {
          compute_rough_planet_loc( (jd - J2000) / 36525., planet_no, vect_2000);
+         if( calc_vel)
+            {
+            const double delta_t = 10. / 1440.;    /* ten minute delta */
+            double v[3];
+            size_t i;
+
+            compute_rough_planet_loc( (jd - J2000 + delta_t) / 36525., planet_no, v);
+            for( i = 0; i < 3; i++)
+               vect_2000[i] = (v[i] - vect_2000[i]) / delta_t;
+            }
          rval = 0;
          }
       }
