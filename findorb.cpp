@@ -667,6 +667,51 @@ static void create_resid_file( const OBSERVE *obs, const int n_obs,
                     input_filename, n_obs, obs, residual_format);
 }
 
+static void set_ra_dec_format( void)
+{
+   char buff[1000];
+   const char *lines[60];
+   const char *iline = get_find_orb_text( 2054), *tptr = iline;
+   const char *ra_dec_fmt = "RA_DEC_FORMAT";
+   const char *curr_format = get_environment_ptr( ra_dec_fmt);
+   size_t len = 0, n_lines = 0;
+   int c;
+
+   while( *tptr)
+      {
+      const char *tptr2 = strchr( tptr, ':');
+
+      assert( tptr2);
+      strcpy( buff + len, "( ) ");
+      assert( n_lines < sizeof( lines) / sizeof( lines[0]));
+      lines[n_lines++] = tptr;
+      if( strlen( curr_format) == (size_t)( tptr2 - tptr) &&
+                  !memcmp( curr_format, tptr, tptr2 - tptr))
+         buff[len + 1] = '*';
+      len += 4;
+      tptr2++;
+      while( *tptr2 >= ' ')
+         buff[len++] = *tptr2++;
+      if( *tptr2)
+         buff[len++] = *tptr2++;
+      tptr = tptr2;
+      }
+   buff[len] = '\0';
+   help_file_name = "radecfmt.txt";
+   c = inquire( buff, NULL, 0, COLOR_DEFAULT_INQUIRY);
+   if( c >= KEY_F( 1) && c <= (int)KEY_F( n_lines))
+      {
+      const char *tptr2;
+
+      tptr = lines[c - KEY_F( 1)];
+      tptr2 = strchr( tptr, ':');
+      assert( tptr2);
+      memcpy( buff, tptr, tptr2 - tptr);
+      buff[tptr2 - tptr] = '\0';
+      set_environment_ptr( ra_dec_fmt, buff);
+      }
+}
+
 /* Here's a simplified example of the use of the 'ephemeris_in_a_file'
    function... nothing fancy,  but it shows how it's used.  */
 
@@ -846,6 +891,8 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             show_advanced_options = !show_advanced_options;
             break;
          case '1':
+            if( ephemeris_output_options & OPTION_SUPPRESS_RA_DEC)
+               set_ra_dec_format( );
             ephemeris_output_options ^= OPTION_SUPPRESS_RA_DEC;
             break;
          case '2':

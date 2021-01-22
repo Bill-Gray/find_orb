@@ -1,0 +1,15 @@
+   By default,  RA/decs in ephemerides are shown to 0.001 second in
+RA and 0.01 arcsec in declination.  That will usually be good enough
+for anybody.  But you can select a higher precision in this menu,
+or choose to have output in decimal degrees.  Or you can have the
+RA be in decimal hours and declination in decimal degrees;  some people
+in the radio astronomy community use this.
+
+   If you don't see the format or precision you want,  you can add
+other formats to the menu.  For this,  edit the file 'efindorb.txt'
+and look for lines starting with 2054.  You will see the entries for
+this menu,  preceded by pairs of numbers.  Those pairs of numbers
+specify the RA and dec format,  respectively.  Documentation of which
+numbers go with which format is in the file 'environ.def'; look for
+the lines concerning RA_DEC_FORMAT.  You can add or remove the 2054
+lines freely.
