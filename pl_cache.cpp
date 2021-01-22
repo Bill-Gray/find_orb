@@ -292,35 +292,36 @@ static inline int hash_function( const int planet_no, const double jd)
 /* When a node gets to 'splitting_size' values,  we compact them
 (removing unused entries),  then partition them in half.  We do
 that partitioning,  at least for the nonce,  the lazy way : we
-Shell-sort the entire array.  */
+sort the entire array.  */
+
+void shellsort_r( void *base, const size_t n_elements, const size_t elem_size,
+         int (*compare)(const void *, const void *, void *), void *context);
+
+static int compare_cached_posns( const void *a, const void *b, void *ignored_context)
+{
+   const POSN_CACHE *pa = (const POSN_CACHE *)a;
+   const POSN_CACHE *pb = (const POSN_CACHE *)b;
+   int rval;
+
+   INTENTIONALLY_UNUSED_PARAMETER( ignored_context);
+   if( pa->jd > pb->jd)
+      rval = 1;
+   else if( pa->jd < pb->jd)
+      rval = -1;
+   else
+      rval = 0;
+   return( rval);
+}
 
 static void collapse_and_partition( POSN_CACHE *ovals, const POSN_CACHE *ivals)
 {
-   int i, j, array_size, gap_size = 1;
+   int i, array_size;
 
    for( i = array_size = 0; i < node_size; i++)
       if( ivals[i].planet_no)
          ovals[array_size++] = ivals[i];
    assert( array_size == splitting_size);
-   while( gap_size < array_size)
-      gap_size = gap_size * 3 + 1;
-   while( gap_size)
-      {
-      for( i = 0; i < gap_size; i++)
-         for( j = i; j + gap_size < array_size; )
-            if( ovals[j].jd > ovals[j + gap_size].jd)
-               {
-               const POSN_CACHE temp = ovals[j];
-
-               ovals[j] = ovals[j + gap_size];
-               ovals[j + gap_size] = temp;
-               if( j >= gap_size)
-                  j -= gap_size;
-               }
-            else
-               j += gap_size;
-      gap_size /= 3;
-      }
+   shellsort_r( ovals, array_size, sizeof( POSN_CACHE), compare_cached_posns, NULL);
 }
 
 /*   The following three long ints keep track of the number of searches
