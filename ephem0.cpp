@@ -1975,8 +1975,6 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       options &= ~OPTION_SHOW_SIGMAS;
 
    sscanf( get_environment_ptr( "RA_DEC_FORMAT"), "%d,%d", &ra_format, &dec_format);
-   if( ra_format >= 100 && ra_format < 120)
-      ra_format += 100;       /* RA degrees need three places,  not two */
    if( !use_observation_times && *stepsize != 't')
       {
       step = get_step_size( stepsize, &step_units, &n_step_digits);
@@ -2488,7 +2486,6 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                double earth_r = 0., hour_angle[3];
                char ra_buff[80], dec_buff[80];
                double phase_ang, curr_mag, air_mass = 40.;
-               bool output_ra_in_degrees = (ra_format >= 100 && ra_format < 120);
                char visibility_char = ' ';
 
                solar_r = vector3_length( orbi_after_light_lag);
@@ -2498,8 +2495,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                elong = acose( cos_elong);
                if( ra < 0.) ra += 24.;
                if( ra >= 24.) ra -= 24.;
-               output_angle_to_buff( ra_buff, ra * (output_ra_in_degrees ? 15. : 1.),
-                                               ra_format);
+               output_angle_to_buff( ra_buff, ra, ra_format);
                remove_trailing_cr_lf( ra_buff);
                if( !rho_cos_phi && !rho_sin_phi)
                   find_best_site( utc, &latlon, obs_posn_equatorial, topo);
@@ -3330,11 +3326,11 @@ static void output_angle_to_buff( char *obuff, double angle, int precision)
             }
             break;
          default:                  /* try to show the angle,  but indicate */
-            fraction = 0;   /* not really necessary;  evades nuisance GCC warning */
             if( angle > -1000. && angle < 1000.)   /* the format is weird  */
                snprintf( obuff, 10, "?%.5f", angle);
             else
                strcpy( obuff, "?");
+            fraction = 0;   /* not really necessary;  evades nuisance GCC warning */
             break;
          }
                   /* Formats not used in astrometry -- they don't fit the */
