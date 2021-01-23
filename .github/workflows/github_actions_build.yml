@@ -13,22 +13,22 @@ jobs:
       run: |
         git clone https://github.com/Bill-Gray/lunar
         cd lunar
-        make liblunar.a
+        make ERRORS=Y liblunar.a
         make install
         cd ..
         git clone https://github.com/Bill-Gray/sat_code
         cd sat_code
-        make libsatell.a
+        make ERRORS=Y libsatell.a
         make install_lib
         cd ..
         git clone https://github.com/Bill-Gray/jpl_eph
         cd jpl_eph
-        make libjpl.a
+        make ERRORS=Y libjpl.a
         make install
         cd ..
-        make fo eph2tle cssfield roottest
+        make ADDED_CFLAGS=-Werror fo eph2tle cssfield roottest
         wget https://raw.githubusercontent.com/Bill-Gray/PDCursesMod/master/curses.h
-        make VT=Y findorb.o
+        make ADDED_CFLAGS=-Werror VT=Y findorb.o
 
   buildOSX:
     runs-on: macOS-latest
@@ -38,22 +38,22 @@ jobs:
       run: |
         git clone https://github.com/Bill-Gray/lunar
         cd lunar
-        make CLANG=Y liblunar.a
+        make ERRORS=Y CLANG=Y liblunar.a
         make install
         cd ..
         git clone https://github.com/Bill-Gray/sat_code
         cd sat_code
-        make CLANG=Y libsatell.a
+        make ERRORS=Y CLANG=Y libsatell.a
         make install_lib
         cd ..
         git clone https://github.com/Bill-Gray/jpl_eph
         cd jpl_eph
-        make CLANG=Y libjpl.a
+        make ERRORS=Y CLANG=Y libjpl.a
         make install
         cd ..
-        make CLANG=Y fo eph2tle cssfield roottest
+        make ADDED_CFLAGS=-Werror CLANG=Y fo eph2tle cssfield roottest
         wget https://raw.githubusercontent.com/Bill-Gray/PDCursesMod/master/curses.h
-        make CLANG=Y VT=Y findorb.o
+        make ADDED_CFLAGS=-Werror CLANG=Y VT=Y findorb.o
 
   buildWindows:
     runs-on: windows-latest

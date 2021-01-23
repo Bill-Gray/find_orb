@@ -105,7 +105,7 @@ endif
 
 all: $(FO_EXE) $(FIND_ORB_EXE) fo_serve.cgi eph2tle$(EXE)
 
-CFLAGS=-c -Wall -pedantic -Wextra -I $(INSTALL_DIR)/include
+CFLAGS=-c -Wall -pedantic -Wextra $(ADDED_CFLAGS) -I $(INSTALL_DIR)/include
 
 ifdef DEBUG
 	CFLAGS += -g -O0
