@@ -804,7 +804,7 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
       if( !get_uncertainty( "sigma_G:", buff, 0))
          fprintf( ofile, " \"G sigma\": %s,", buff);
       }
-   fprintf( ofile, "\n        \"rms_residual\": %.7f,", compute_rms( obs, n_obs));
+   fprintf( ofile, "\n        \"rms_residual\": %.5g,", compute_rms( obs, n_obs));
    weighted_rms = compute_weighted_rms( obs, n_obs, &n_used);
    fprintf( ofile, "\n        \"weighted_rms_residual\": %.4f,", weighted_rms);
    fprintf( ofile, "\n        \"n_resids\": %d,", n_used);
@@ -864,7 +864,7 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
       fprintf( ofile, "\n                 \"RA\" : %.6f, \"Dec\": %.6f,",
                   obs[i].ra * 180. / PI, obs[i].dec * 180. / PI);
       total_resid = sqrt( m.xresid * m.xresid + m.yresid * m.yresid);
-      while( n_digits < 9 && total_resid < .1)
+      while( n_digits < 12 && total_resid < .1)
          {
          total_resid *= 10.;
          n_digits++;
