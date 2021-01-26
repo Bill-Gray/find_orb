@@ -421,6 +421,7 @@ int main( const int argc, const char **argv)
    for( i = 1; i < argc; i++)
       if( !strcmp( argv[i], "-mpc"))
           mpc_code = argv[i + 1];
+   memset( &c, 0, sizeof( expcalc_config_t));
    switch( find_expcalc_config_from_mpc_code( mpc_code, ifile, &c))
       {
       case 0:
@@ -436,6 +437,7 @@ int main( const int argc, const char **argv)
       case 2:           /* got the details we wanted for the site */
          break;
       }
+   fclose( ifile);
    for( i = 1; i < argc; i++)
       if( argv[i][0] == '-' && argv[i][1])
          {
