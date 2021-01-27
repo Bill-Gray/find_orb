@@ -2350,7 +2350,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                }
             for( j = 10, tval = posn_mult; tval > 1.2; j--)
                tval /= 10.;
-            snprintf( format_text, sizeof( format_text), "%%18.%df", j + 3);
+            snprintf( format_text, sizeof( format_text), "%%21.%df", j + 6);
             for( j = 0; j < 3; j++)
                snprintf_append( buff, sizeof( buff), format_text,
                                  topo[j] * posn_mult);
@@ -2359,7 +2359,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                strcat( buff, " ");
                for( j = 12, tval = vel_mult; tval > 1.2; j--)
                   tval /= 10.;
-               snprintf( format_text, sizeof( format_text), "%%16.%df", j);
+               snprintf( format_text, sizeof( format_text), "%%21.%df", j+5);
                for( j = 0; j < 3; j++)
                   snprintf_append( buff, sizeof( buff), format_text,
                                  topo_vel[j] * vel_mult);
