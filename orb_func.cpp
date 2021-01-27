@@ -777,19 +777,11 @@ void light_time_lag( const double jde, const double *orbit,
    const double solar_r = vector3_length( orbit);
    double vel[3];
    size_t i, iter;
-   static double multiplier = 1e+99;
+   static int use_light_bending = -1;
 
-   if( multiplier > 9e+98)    /* first time through */
-      multiplier = atof( get_environment_ptr( "SSB_MULTIPLIER"));
-   if( !multiplier)
-      for( i = 0; i < 3; i++)
-         vel[i] = orbit[i + 3];
-   else
-      {
-      compute_observer_vel( jde, -1, 0., 0., 0., vel);
-      for( i = 0; i < 3; i++)
-         vel[i] = vel[i] * multiplier + orbit[i + 3];
-      }
+   compute_observer_vel( jde, -1, 0., 0., 0., vel);
+   for( i = 0; i < 3; i++)               /* 'vel' is relative to the SSB */
+      vel[i] = orbit[i + 3] - vel[i];
    memcpy( result, orbit, 3 * sizeof( double));
    for( iter = 0; iter < 4; iter++)
       {
@@ -803,7 +795,10 @@ void light_time_lag( const double jde, const double *orbit,
          result[i + 3] = vel[i] + afact * orbit[i];
          }
       }
-   light_bending( observer, result);
+   if( use_light_bending == -1)
+      use_light_bending = (*get_environment_ptr( "DISABLE_LIGHT_BENDING") == '\0');
+   if( use_light_bending)
+      light_bending( observer, result);
 }
 
 static void set_solar_r( OBSERVE FAR *ob)
