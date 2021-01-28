@@ -2618,6 +2618,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   strcat( fake_line, ra_buff);
                   strcat( fake_line, dec_buff);
                   strcat( fake_line, "        ");      /* columns 57 to 65 */
+                  fprintf( ofile, "COM RA/dec %.15f %.15f\n",
+                              ra * 15., dec);
                   }
                snprintf( alt_buff, sizeof( alt_buff), "%18.10f ", curr_jd);
                if( computer_friendly)
