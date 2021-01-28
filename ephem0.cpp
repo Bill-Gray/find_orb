@@ -1405,6 +1405,7 @@ static int create_json_ephemeris( FILE *ofile, FILE *ifile, char *header,
    text_search_and_replace( header, "helio_ecliptic", "helioLon helioLat");
    text_search_and_replace( header, "RA'/hrdec", "RAvel decvel");
    text_search_and_replace( header, "'/hr PA", "motion_rate motionPA ");
+   text_search_and_replace( header, " ExpT ", " ExpT OptExpT ");
    while( fgets_trimmed( buff, sizeof( buff), ifile))
       if( memcmp( buff, "....", 4) && *buff != '#')         /* skip irrelevant lines */
          {
@@ -1875,6 +1876,7 @@ static void find_best_site( const double jd_utc, DPT *latlon,
    latlon->x = atan2( ovect[1], ovect[0]);
    latlon->y = asine( ovect[2]);
    latlon->x -= green_sidereal_time( jd_utc);
+   latlon->x = centralize_ang( latlon->x);
 }
 
 static double *list_of_ephem_times = NULL;
@@ -2488,10 +2490,12 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                double fraction_illum = 1.;    /* i.e.,  not in earth's shadow */
                double mags_per_arcsec2 = 99.99;    /* sky brightness */
                DPT alt_az[3], sun_ra_dec;
+               DPT best_latlon, best_alt_az[3];
                double earth_r = 0., hour_angle[3];
                char ra_buff[80], dec_buff[80];
                double phase_ang, curr_mag, air_mass = 40.;
                char visibility_char = ' ';
+               BRIGHTNESS_DATA bdata;
 
                solar_r = vector3_length( orbi_after_light_lag);
                earth_r = vector3_length( obs_posn_equatorial);
@@ -2502,8 +2506,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                if( ra >= 24.) ra -= 24.;
                output_angle_to_buff( ra_buff, ra, ra_format);
                remove_trailing_cr_lf( ra_buff);
-               if( !rho_cos_phi && !rho_sin_phi)
-                  find_best_site( utc, &latlon, obs_posn_equatorial, topo);
+               find_best_site( utc, &best_latlon, obs_posn_equatorial, topo);
                for( j = 0; j < 3; j++)    /* compute alt/azzes of object (j=0), */
                   {                       /* sun (j=1), and moon (j=2)          */
                   DPT obj_ra_dec = ra_dec;
@@ -2545,7 +2548,10 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   obj_ra_dec.x = -obj_ra_dec.x;
                   full_ra_dec_to_alt_az( &obj_ra_dec, &alt_az[j], NULL, &latlon, utc,
                                               &hour_angle[j]);
+                  full_ra_dec_to_alt_az( &obj_ra_dec, &best_alt_az[j], NULL, &best_latlon, utc,
+                                              NULL);
                   alt_az[j].x = centralize_ang( alt_az[j].x + PI);
+                  best_alt_az[j].x = centralize_ang( best_alt_az[j].x + PI);
                   }
                if( is_under_horizon( alt_az[0].y * 180. / PI,
                                      alt_az[0].x * 180. / PI, &exposure_config))
@@ -2576,23 +2582,21 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   visibility_char = 'B';
                   rgb = RGB_BELOW_HORIZON;
                   }
+               bdata.ht_above_sea_in_meters = ht_in_meters;
+               bdata.temperature_in_c = 20.;      /* centigrade */
+               bdata.moon_elongation = lunar_elong;
+               bdata.relative_humidity = 20.;  /* 20% */
+               bdata.year = 2000. + (ephemeris_t - J2000) / 365.25;
+               bdata.month = bdata.year * 12. - floor( bdata.year * 12.);
+               bdata.dist_moon = dist_moon;
+               bdata.dist_sun = elong;
+               bdata.mask = 31;
                if( alt_az[0].y > 0.)
                   {
-                  BRIGHTNESS_DATA bdata;
-
-                  bdata.ht_above_sea_in_meters = ht_in_meters;
                   bdata.latitude = latlon.y;
-                  bdata.temperature_in_c = 20.;      /* centigrade */
-                  bdata.moon_elongation = lunar_elong;
-                  bdata.relative_humidity = 20.;  /* 20% */
-                  bdata.year = 2000. + (ephemeris_t - J2000) / 365.25;
-                  bdata.month = bdata.year * 12. - floor( bdata.year * 12.);
-                  bdata.dist_moon = dist_moon;
-                  bdata.dist_sun = elong;
                   bdata.zenith_angle    = PI / 2. - alt_az[0].y;
                   bdata.zenith_ang_sun  = PI / 2. - alt_az[1].y;
                   bdata.zenith_ang_moon = PI / 2. - alt_az[2].y;
-                  bdata.mask = 31;
                   set_brightness_params( &bdata);
                   compute_sky_brightness( &bdata);
                   rgb = 0;
@@ -2800,6 +2804,21 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   else
                      snprintf_append( buff, sizeof( buff),
                            (exposure_time < 999. ? " %5.1f" : " %5.0f"), exposure_time);
+
+                        /* now compute 'optimal' exposure time */
+                  bdata.ht_above_sea_in_meters = 1000.;
+                  bdata.latitude = best_latlon.y;
+                  bdata.zenith_angle    = PI / 2. - best_alt_az[0].y;
+                  bdata.zenith_ang_sun  = PI / 2. - best_alt_az[1].y;
+                  bdata.zenith_ang_moon = PI / 2. - best_alt_az[2].y;
+                  set_brightness_params( &bdata);
+                  compute_sky_brightness( &bdata);
+                  mags_per_arcsec2 = -2.5 * log10( bdata.brightness[3]) - 11.055;  /* R brightness */
+                  exposure_config.sky_brightness = mags_per_arcsec2;
+                  exposure_config.airmass = bdata.air_mass;
+                  exposure_time = exposure_from_snr_and_mag( &exposure_config,
+                                  (target_snr ? target_snr : 4.), curr_mag);
+                  snprintf_append( alt_buff, sizeof( alt_buff), " %.1f", exposure_time);
                   }
 
                *tbuff = '\0';
