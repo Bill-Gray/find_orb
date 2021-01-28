@@ -2320,6 +2320,32 @@ static int names_compare( const char *name1, const char *name2)
    return( strcmp( name1, name2));
 }
 
+#if !defined( _WIN32)
+int _memicmp( const char *s1, const char *s2, int n)
+{
+   int c1, c2;
+
+   while( n--)
+      {
+      if( (c1 = tolower( *s1++)) != (c2 = tolower( *s2++)))
+         return( c1 - c2);
+      }
+   return( 0);
+}
+
+int _stricmp( const char *s1, const char *s2)
+{
+   int c1, c2;
+
+   while( *s1 || *s2)
+      {
+      if( (c1 = tolower( *s1++)) != (c2 = tolower( *s2++)))
+         return( c1 - c2);
+      }
+   return( 0);
+}
+#endif
+
 /* You can specify a state vector on the command line (for fo and
 Find_Orb) using the -v(state vect) switch.  The state vector must
 have,  at minimum,  an epoch and six numbers (position and velocity).
@@ -2335,7 +2361,7 @@ You can also use km and seconds as units,  by adding 'km' or 's';
 or meters with 'm';  or 'g' for geocentric.  'ep=2020.9' would
 set the coordinate plane epoch as that of 2020.9.  'UTC' would
 specify that the epoch is in UTC (some of the artsat crowd give
-epochs on that time scale).   */
+epochs on that time scale).  'TDB' would specify a TDB epoch. */
 
 static double extract_state_vect_from_text( const char *text,
             double *orbit, double *solar_pressure, double *abs_mag)
@@ -2375,8 +2401,14 @@ static double extract_state_vect_from_text( const char *text,
          coord_epoch = atof( text + 3);
       else if( !memcmp( text, "H=", 2))
          *abs_mag = atof( text + 2);
-      else if( !memcmp( text, "UTC", 3))
+      else if( !_memicmp( text, "UTC", 3))
          epoch += td_minus_utc( epoch) / seconds_per_day;
+      else if( !_memicmp( text, "TDB", 3))
+         {
+         const double t_cen = (epoch - J2000) / 36525.;
+
+         epoch -= tdb_minus_tdt( t_cen) / seconds_per_day;
+         }
       else if( !memcmp( text, "km", 2))
          for( i = 0; i < 6; i++)
             orbit[i] /= AU_IN_KM;
