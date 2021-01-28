@@ -1965,6 +1965,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    const bool suppress_coloring = atoi( get_environment_ptr( "SUPPRESS_EPHEM_COLORING"));
    double curr_jd = jd_start, real_jd_start = jd_start;
    bool reset_lat_alt = true;
+   const bool fake_astrometry = ((options & 7) == OPTION_FAKE_ASTROMETRY);
 
    if( (!rho_cos_phi && !rho_sin_phi && !use_observation_times && !show_geo_quantities)
                                  || ephem_type != OPTION_OBSERVABLES)
@@ -2198,6 +2199,11 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
          fprintf( ofile, "\n%s\n", buff);
          }
       }
+   if( fake_astrometry)
+      {
+      fprintf( ofile, "# version=2017\n# observatory\n! mpcCode %.3s\n", note_text + 1);
+      fprintf( ofile, "permID|provID|trkSub|mode|stn|obsTime|ra|dec|mag|band\n");
+      }
 
    prev_r[0] = prev_r[1] = 0.;
    latlon.x = lon;
@@ -2419,14 +2425,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
          else if( ephem_type == OPTION_OBSERVABLES)
             {
             DPT ra_dec;
-            const bool fake_astrometry = ((options & 7) == OPTION_FAKE_ASTROMETRY);
             char tbuff[80], *alt_tptr;
 
-            if( fake_astrometry)
-               {
-               ra_format = 3;
-               dec_format = 2;
-               }
             ra_dec.x = atan2( topo[1], topo[0]);
             ra_dec.y = asin( topo[2] / r);
             stored_ra_decs[obj_n] = ra_dec;
@@ -2483,7 +2483,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                const double dec = ra_dec.y * 180. / PI;
                double ra = ra_dec.x * 12. / PI;
                double lunar_elong = 99., dist_moon = 99.;  /* values are ignored */
-               char fake_line[81];
+               char fake_line[181];
                double cos_elong, solar_r, elong;
                double fraction_illum = 1.;    /* i.e.,  not in earth's shadow */
                double mags_per_arcsec2 = 99.99;    /* sky brightness */
@@ -2615,16 +2615,11 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                remove_trailing_cr_lf( dec_buff);
                if( fake_astrometry)
                   {
-                  strcpy( fake_line, obs->packed_id);
-                  strcpy( fake_line + 12, "  C");
-                  full_ctime( fake_line + 15, curr_jd + 5e-7,
-                           FULL_CTIME_MICRODAYS | FULL_CTIME_YMD
-                         | FULL_CTIME_MONTHS_AS_DIGITS | FULL_CTIME_LEADING_ZEROES);
-                  strcat( fake_line, ra_buff);
-                  strcat( fake_line, dec_buff);
-                  strcat( fake_line, "         ");      /* columns 57 to 65 */
-                  fprintf( ofile, "COM RA/dec %.15f %.15f\n",
-                              ra * 15., dec);
+                  snprintf( fake_line, sizeof( fake_line),
+                           " | |EphemOb|CCD|%.3s |", note_text + 1);
+                  iso_time( fake_line + strlen( fake_line), curr_jd, 6);
+                  snprintf_append( fake_line, sizeof( fake_line),
+                           "|%18.14f|%+18.14f", ra * 15, dec);
                   }
                snprintf( alt_buff, sizeof( alt_buff), "%18.10f ", curr_jd);
                if( computer_friendly)
@@ -2753,11 +2748,9 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                if( fake_astrometry)
                   {
                   if( abs_mag && curr_mag < 99.)
-                     snprintf_append( fake_line, sizeof( fake_line), "%4.1f V", curr_mag);
+                     snprintf_append( fake_line, sizeof( fake_line), "|%4.1f|V", curr_mag);
                   else
-                     strcat( fake_line, "      ");
-                  snprintf_append( fake_line, sizeof( fake_line), " Synth%.3s",
-                                           note_text + 1);
+                     strcat( fake_line, "| |");
                   }
 
 //             if( rho_cos_phi || rho_sin_phi)
