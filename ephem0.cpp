@@ -2422,6 +2422,11 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
             const bool fake_astrometry = ((options & 7) == OPTION_FAKE_ASTROMETRY);
             char tbuff[80], *alt_tptr;
 
+            if( fake_astrometry)
+               {
+               ra_format = 3;
+               dec_format = 2;
+               }
             ra_dec.x = atan2( topo[1], topo[0]);
             ra_dec.y = asin( topo[2] / r);
             stored_ra_decs[obj_n] = ra_dec;
@@ -2617,7 +2622,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                          | FULL_CTIME_MONTHS_AS_DIGITS | FULL_CTIME_LEADING_ZEROES);
                   strcat( fake_line, ra_buff);
                   strcat( fake_line, dec_buff);
-                  strcat( fake_line, "        ");      /* columns 57 to 65 */
+                  strcat( fake_line, "         ");      /* columns 57 to 65 */
                   fprintf( ofile, "COM RA/dec %.15f %.15f\n",
                               ra * 15., dec);
                   }
