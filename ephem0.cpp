@@ -2638,7 +2638,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                if( !(options & OPTION_SUPPRESS_RA_DEC))
                   {
                   if( computer_friendly)
-                     snprintf_append( buff, sizeof( buff), " %15.11f %15.11f",
+                     snprintf_append( buff, sizeof( buff), " %19.15f %19.15f",
                                     ra * 15, dec);
                   else
                      {
