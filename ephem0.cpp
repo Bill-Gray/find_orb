@@ -1406,6 +1406,7 @@ static int create_json_ephemeris( FILE *ofile, FILE *ifile, char *header,
    text_search_and_replace( header, "RA'/hrdec", "RAvel decvel");
    text_search_and_replace( header, "'/hr PA", "motion_rate motionPA ");
    text_search_and_replace( header, " ExpT ", " ExpT OptExpT ");
+   text_search_and_replace( header, " SkyBr ", " SkyBr RGB ");
    while( fgets_trimmed( buff, sizeof( buff), ifile))
       if( memcmp( buff, "....", 4) && *buff != '#')         /* skip irrelevant lines */
          {
@@ -1461,6 +1462,8 @@ static int create_json_ephemeris( FILE *ofile, FILE *ifile, char *header,
                text_search_and_replace( out_text, "_", " ");
                }
             if( !strcmp( out_token, "SM"))
+               is_text = true;
+            if( !strcmp( out_token, "RGB"))
                is_text = true;
             remove_trailing_cr_lf( out_text);
             if( is_text)      /* Text must be enclosed in quotes for JSON */
@@ -2730,6 +2733,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                      mags_per_arcsec2 = 99.99;
                   snprintf( tbuff, sizeof( tbuff), " %5.2f", mags_per_arcsec2);
                   strcat( alt_buff, tbuff);
+                  snprintf_append( alt_buff, sizeof( alt_buff), " %06lx", rgb);
                   if( mags_per_arcsec2 > 99.9 && !computer_friendly)
                      strcpy( tbuff, " --.--");
                   strcat( buff, tbuff);
