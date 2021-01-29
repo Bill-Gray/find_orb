@@ -411,8 +411,21 @@ int main( const int argc, const char **argv)
    int i;
    const char *mpc_code = "I52";
    bool debug = false;
-   FILE *ifile = fopen( "scope.json", "rb");
+   const char *scope_json = "scope.json";
+   FILE *ifile = fopen( scope_json, "rb");
 
+   if( !ifile)       /* look for ~/.find_orb/scope.json */
+      {
+      char buff[255], *home_dir = getenv( "HOME");
+
+      if( home_dir)
+         {
+         strcpy( buff, home_dir);
+         strcat( buff, "/.find_orb/");
+         strcat( buff, scope_json);
+         ifile = fopen( buff, "rb");
+         }
+      }
    if( !ifile)
       {
       fprintf( stderr, "Couldn't open 'scope.json'\n");
