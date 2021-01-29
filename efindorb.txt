@@ -351,7 +351,7 @@
 # like to use.
 
 2054    3,2:HH MM SS.sss, dd mm ss.ss
-2054    5,4:HH MM SS.sssss, dd mm ss.ssss
+2054    6,5:HH MM SS.ssssss, dd mm ss.sssss
 2054    -5,-4:HH MM.mmmm, dd mm.mmm
 2054    -6,-5:HH MM.mmmmm, dd mm.mmmm
 2054    206,106:Decimal degrees to 10^-6 deg
