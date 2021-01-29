@@ -564,6 +564,13 @@ int main( int argc, const char **argv)
                ignore_prev_solns = 1;
                }
                break;
+            case 'j':
+               {
+               extern bool force_final_full_improvement;
+
+               force_final_full_improvement = !force_final_full_improvement;
+               }
+               break;
             case 'm':
                mpec_path = arg;
                break;

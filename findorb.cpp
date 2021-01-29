@@ -5297,6 +5297,14 @@ int main( int argc, const char **argv)
             sort_obs_by_code ^= SORT_OBS_RADAR_LAST;  /* is being done correctly */
             break;
          case 'j': case 'J':
+            {
+            extern bool force_final_full_improvement;
+
+            force_final_full_improvement = !force_final_full_improvement;
+            strcpy( message_to_user, "Final full improvement");
+            add_off_on = force_final_full_improvement;
+            }
+            break;
          case ALT_P: case ALT_Y:
          case ';': case '\'':
          default:

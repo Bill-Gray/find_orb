@@ -2451,7 +2451,7 @@ static double extract_state_vect_from_text( const char *text,
 const char *mpcorb_dot_sof_filename = "mpcorb.sof";
 const char *state_vect_text = NULL;
 int ignore_prev_solns;
-bool take_first_soln = false;
+bool take_first_soln = false, force_final_full_improvement = false;
 
 static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit,
                double *orbit_epoch, unsigned *perturbers)
@@ -2591,6 +2591,25 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
          do_full_improvement = true;
          }
       }
+   if( !got_vectors)
+      {
+      *perturbers = 0;
+      *orbit_epoch = initial_orbit( obs, n_obs, orbit);
+      if( force_final_full_improvement)
+         do_full_improvement = true;
+      }
+   else if( n_obs == 1 && !strcmp( obs->reference, "Dummy"))
+      {
+      obs->jd = *orbit_epoch + td_minus_ut( *orbit_epoch) / seconds_per_day;
+      *perturbers = 0x7fe;    /* Merc-Pluto plus moon */
+      set_locs( orbit, *orbit_epoch, obs, n_obs);
+      obs->ra = obs->computed_ra;
+      obs->dec = obs->computed_dec;
+      obs->obs_mag = abs_mag + calc_obs_magnitude( obs->solar_r,
+                 obs->r, vector3_length( obs->obs_posn), NULL);
+      obs->obs_mag = floor( obs->obs_mag * 10. + .5) * .1;
+      obs->mag_precision = 1;         /* start out assuming mag to .1 mag */
+      }
    if( do_full_improvement)
       {
       OBSERVE *saved_obs = (OBSERVE *)calloc( n_obs, sizeof( OBSERVE));
@@ -2608,7 +2627,7 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
       prev_score = evaluate_initial_orbit( obs, n_obs, orbit);
       full_improvement( obs, n_obs, orbit, *orbit_epoch, NULL,
                            ORBIT_SIGMAS_REQUESTED, *orbit_epoch);
-      if( prev_score < evaluate_initial_orbit( obs, n_obs, orbit))
+      if( prev_score < evaluate_initial_orbit( obs, n_obs, orbit) - .001)
          {
          pop_orbit( orbit_epoch, orbit);    /* we were better off with the old orbit */
          memcpy( obs, saved_obs, n_obs * sizeof( OBSERVE));
@@ -2616,23 +2635,6 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
       else        /* throw out the saved orbit;  we've got something better */
          pop_orbit( NULL, NULL);
       free( saved_obs);
-      }
-   if( !got_vectors)
-      {
-      *perturbers = 0;
-      *orbit_epoch = initial_orbit( obs, n_obs, orbit);
-      }
-   else if( n_obs == 1 && !strcmp( obs->reference, "Dummy"))
-      {
-      obs->jd = *orbit_epoch + td_minus_ut( *orbit_epoch) / seconds_per_day;
-      *perturbers = 0x7fe;    /* Merc-Pluto plus moon */
-      set_locs( orbit, *orbit_epoch, obs, n_obs);
-      obs->ra = obs->computed_ra;
-      obs->dec = obs->computed_dec;
-      obs->obs_mag = abs_mag + calc_obs_magnitude( obs->solar_r,
-                 obs->r, vector3_length( obs->obs_posn), NULL);
-      obs->obs_mag = floor( obs->obs_mag * 10. + .5) * .1;
-      obs->mag_precision = 1;         /* start out assuming mag to .1 mag */
       }
    return( got_vectors);
 }
