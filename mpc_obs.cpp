@@ -1574,10 +1574,11 @@ int compute_observer_vel( const double jde, const int planet_no,
    PS1996 and ELP82 theories,  or a JPL ephemeris.  */
 
 static double input_coordinate_epoch = 2000.;
-static double override_time = 0.;
+static double override_time = 0., override_ra = -100., override_dec = -100.;
       /* 'override_time' allows one to set the observation time with the */
-      /* #time keyword (see below).  If that's done,  the time from the  */
-      /* next observation will be ignored.  */
+      /* #time keyword (see below) or with certain keywords.  Similarly  */
+      /* for override_ra and override_dec,  primarily used for ADES  */
+      /* observations where the 80-column field lacks precision.     */
 static double observation_time_offset = 0.;
       /* 'time_offset' allows you to add,  or subtract,  a certain number */
       /* of days from the following observations.  This was added to support */
@@ -1741,6 +1742,16 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
 
       if( rval)
          return( rval);
+      if( override_ra >= 0.)
+         {
+         obs->ra = override_ra * PI / 180.;
+         override_ra = -100.;
+         }
+      if( override_dec >= -95.)
+         {
+         obs->dec = override_dec * PI / 180.;
+         override_dec = -100.;
+         }
       }
 
    obs->time_precision = time_format;
@@ -3337,7 +3348,6 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
    unsigned lines_actually_read = 0;
    unsigned n_spurious_matches = 0;
    unsigned n_sat_obs_without_offsets = 0;
-   double override_ra = 0., override_dec = 0.;
    double override_posn_sigma_1 = 0., ades_posn_sigma_1 = 0.;  /* in arcsec */
    double override_posn_sigma_2 = 0., ades_posn_sigma_2 = 0.;
    double override_posn_sigma_theta = 0., ades_posn_sigma_theta = 0.;
@@ -3416,13 +3426,6 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
          {
          const int error_code = parse_observation( rval + i, buff);
 
-         if( override_ra || override_dec)
-            {
-            rval[i].ra = override_ra * PI / 180.;
-            rval[i].dec = override_dec * PI / 180.;
-            set_up_observation( rval + i);
-            override_ra = override_dec = 0.;
-            }
          strcpy( rval[i].packed_id, original_packed_desig);
          if( error_code)
             {
@@ -3665,7 +3668,11 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                }
             }
          else if( !memcmp( buff, "#RA/dec ", 8))
-            sscanf( buff + 8, "%lf %lf", &override_ra, &override_dec);
+            {
+            if( 3 == sscanf( buff + 8, "%lf %lf %lf", &override_ra,
+                                    &override_dec, &override_time))
+               override_time += J2000;
+            }
          else if( !memcmp( buff, "#Sigmas ", 8))
             extract_ades_sigmas( buff + 8, &ades_posn_sigma_1,
                         &ades_posn_sigma_2,
