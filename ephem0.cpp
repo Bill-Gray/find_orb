@@ -1522,7 +1522,13 @@ static void make_path_available( const char *filename)
 void fix_home_dir( char *filename)
 {
    if( filename[0] == '~' && filename[1] == '/')
-      text_search_and_replace( filename, "~", getenv( "HOME"));
+      {
+      const char *home_dir = getenv( "HOME");
+      const size_t len = strlen( home_dir);
+
+      memmove( filename + len, filename + 1, strlen( filename));
+      memcpy( filename, home_dir, len);
+      }
 }
 #endif
 
