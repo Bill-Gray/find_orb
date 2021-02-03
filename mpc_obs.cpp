@@ -1740,8 +1740,6 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
                   &obs->ra_precision, &obs->ra, &obs->posn_sigma_1,
                   &obs->dec_precision, &obs->dec, &obs->posn_sigma_2);
 
-      if( rval)
-         return( rval);
       if( override_ra >= 0.)
          {
          obs->ra = override_ra * PI / 180.;
@@ -1752,6 +1750,8 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
          obs->dec = override_dec * PI / 180.;
          override_dec = -100.;
          }
+      if( rval)
+         return( rval);
       }
 
    obs->time_precision = time_format;
@@ -3645,6 +3645,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
           ades_posn_sigma_1 = ades_posn_sigma_2 = ades_posn_sigma_theta
                       = ades_mag_sigma = ades_time_sigma = 0.;
       override_time = 0.;
+      override_ra = override_dec = -100.;
       convert_com_to_pound_sign( buff);
                /* For backwards compatibility,  we'll handle both 'weight' */
                /* and 'sigma' keywords,  with the former considered to     */
@@ -5384,6 +5385,7 @@ int sanity_test_observations( const char *filename)
                   n_problems_found++;
                   }
             override_time = 0.;
+            override_ra = override_dec = -100.;
             }
       }
    fclose( ifile);
