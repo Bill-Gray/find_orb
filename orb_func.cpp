@@ -3527,7 +3527,7 @@ static inline void look_for_best_subarc( const OBSERVE FAR *obs,
       i++;
    if( i > n_obs * 3 / 4)   /* most of the arc is pre-CCD;  give up */
       i = 0;                /* and just use all the data */
-   assert( i < n_obs - 1);
+   assert( n_obs && i < n_obs - 1);
    for( j = i; i < n_obs - 1; i++)
       {
       int temp_start, temp_end;
