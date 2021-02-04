@@ -55,6 +55,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #define LOG_10 2.3025850929940456840179914546843642076011014886287729760333279009675726
 #define LIGHT_YEAR_IN_KM    (365.25 * seconds_per_day * SPEED_OF_LIGHT)
 
+int generic_message_box( const char *message, const char *box_type);
 int save_ephemeris_file( const char *filename);       /* ephem0.cpp */
 double centralize_ang( double ang);             /* elem_out.cpp */
 double vector_to_polar( double *lon, double *lat, const double *vector);
@@ -1900,7 +1901,13 @@ static int get_ephem_times_from_file( const char *filename)
 
    while( *filename == ' ')
       filename++;
-   ifile = fopen_ext( filename, "frb");
+   ifile = fopen_ext( filename, "rb");
+   if( !ifile)
+      {
+      snprintf( buff, sizeof( buff), "'%s' not found\n", filename);
+      generic_message_box( buff, "o");
+      return( 0);
+      }
    while( fgets( buff, sizeof( buff), ifile))
       n_times++;
    list_of_ephem_times = (double *)calloc( n_times, sizeof( double));
