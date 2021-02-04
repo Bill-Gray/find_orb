@@ -1043,8 +1043,19 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             ephemeris_output_options ^= OPTION_RADIAL_VEL_OUTPUT;
             break;
          case 's': case 'S': case KEY_F( 5):
+            strcpy( buff, ephemeris_step_size);
             inquire( "Enter step size in days: ",
                   ephemeris_step_size, sizeof( ephemeris_step_size), COLOR_MESSAGE_TO_USER);
+            if( !strcmp( ephemeris_step_size, "t"))
+               {
+               user_select_file( ephemeris_step_size + 2, "Select ephemeris times file", 0);
+               if( !ephemeris_step_size[2])        /* cancelled file selection */
+                  *ephemeris_step_size = '\0';
+               else
+                  ephemeris_step_size[1] = ' ';
+               }
+            if( !*ephemeris_step_size)
+               strcpy( ephemeris_step_size, buff);
             break;
          case '-':         /* reverse ephemeris direction */
             {
