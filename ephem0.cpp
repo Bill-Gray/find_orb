@@ -69,7 +69,7 @@ int lat_alt_to_parallax( const double lat, const double ht_in_meters,
 int write_residuals_to_file( const char *filename, const char *ast_filename,
           const int n_obs, const OBSERVE FAR *obs_data, const int format);
 void light_time_lag( const double jde, const double *orbit,       /* orb_func.c */
-                                      const double *observer, double *result);
+             const double *observer, double *result, const int is_heliocentric);
 void put_observer_data_in_text( const char FAR *mpc_code, char *buff);
 int make_pseudo_mpec( const char *mpec_filename, const char *obj_name);
                                               /* ephem0.cpp */
@@ -2316,7 +2316,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                     /* orbital elements),  include light-time lag:    */
          if( ephem_type == OPTION_OBSERVABLES)
             {
-            light_time_lag( ephemeris_t, orbi, obs_posn, orbi_after_light_lag);
+            light_time_lag( ephemeris_t, orbi, obs_posn, orbi_after_light_lag, 0);
             for( j = 0; j < 6; j++)
                {
                const double diff = orbi_after_light_lag[j] - orbi[j];

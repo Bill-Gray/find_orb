@@ -772,16 +772,22 @@ static void light_bending( const double *observer, double *result)
 }
 
 void light_time_lag( const double jde, const double *orbit,
-                                      const double *observer, double *result)
+             const double *observer, double *result, const int is_heliocentric)
 {
    const double solar_r = vector3_length( orbit);
    double vel[3];
    size_t i, iter;
    static int use_light_bending = -1;
 
-   compute_observer_vel( jde, -1, 0., 0., 0., vel);
-   for( i = 0; i < 3; i++)               /* 'vel' is relative to the SSB */
-      vel[i] = orbit[i + 3] - vel[i];
+   if( is_heliocentric)
+      for( i = 0; i < 3; i++)            /* 'vel' is relative to the sun */
+         vel[i] = orbit[i + 3];
+   else
+      {
+      compute_observer_vel( jde, -1, 0., 0., 0., vel);
+      for( i = 0; i < 3; i++)            /* 'vel' is relative to the SSB */
+         vel[i] = orbit[i + 3] - vel[i];
+      }
    memcpy( result, orbit, 3 * sizeof( double));
    for( iter = 0; iter < 4; iter++)
       {
@@ -881,7 +887,8 @@ static int set_locs_extended( const double *orbit, const double epoch_jd,
             return( rval);
          curr_t = optr->jd;
          ldouble_to_double( temp_orbit, curr_orbit, 6);
-         light_time_lag( optr->jd, temp_orbit, optr->obs_posn, light_lagged_orbit);
+         light_time_lag( optr->jd, temp_orbit, optr->obs_posn, light_lagged_orbit,
+                  optr->note2 == 'R');
          FMEMCPY( optr->obj_posn, light_lagged_orbit, 3 * sizeof( double));
          FMEMCPY( optr->obj_vel, light_lagged_orbit + 3, 3 * sizeof( double));
          j += (pass ? 1 : -1);
