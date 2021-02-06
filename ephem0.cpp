@@ -2635,8 +2635,11 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                remove_trailing_cr_lf( dec_buff);
                if( fake_astrometry)
                   {
+                  const char *mpc_code = (use_observation_times ?
+                                 obs[i].mpc_code : note_text + 1);
+
                   snprintf( fake_line, sizeof( fake_line),
-                           " | |EphemOb|CCD|%.3s |", note_text + 1);
+                           " | |EphemOb|CCD|%.3s |", mpc_code);
                   iso_time( fake_line + strlen( fake_line), curr_jd, 6);
                   snprintf_append( fake_line, sizeof( fake_line),
                            "|%18.14f|%+18.14f", ra * 15, dec);
