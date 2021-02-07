@@ -370,3 +370,17 @@ SNR=4
    of 10%.  Your assumed (or measured) albedo may be different,  in
    which case you should modify the following.
 OPTICAL_ALBEDO=0.10
+
+   One normally thinks of "astrometric RA/dec" as meaning "a position
+   corresponding to a precise star catalog,  such as Gaia."  The
+   determination of astrometric RA/dec as described in the USNO
+   _Astronomical Almanac_,  and as used in JPL's Horizons system,
+   corresponds to this with one minor detail: the difference between
+   the gravitational deflection of light from the object and the
+   deflection of starlight is neglected.  You still have to consider it
+   in processing observations -- the physics of how the light is
+   deflected is unchanged by human conventions -- but if you want to get
+   RA/decs in ephemerides to match Horizons to below the milliarcsecond
+   level,  set the following quantity to 1.  Leave it blank (the default),
+   and ephemeris RA/decs will match star catalogs.
+DISABLE_LIGHT_BENDING=

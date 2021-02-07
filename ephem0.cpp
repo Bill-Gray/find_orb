@@ -2316,7 +2316,12 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                     /* orbital elements),  include light-time lag:    */
          if( ephem_type == OPTION_OBSERVABLES)
             {
+            extern int use_light_bending;           /* ephem0.cpp */
+
+            if( *get_environment_ptr( "DISABLE_LIGHT_BENDING") && !fake_astrometry)
+               use_light_bending = 0;
             light_time_lag( ephemeris_t, orbi, obs_posn, orbi_after_light_lag, 0);
+            use_light_bending = 1;
             for( j = 0; j < 6; j++)
                {
                const double diff = orbi_after_light_lag[j] - orbi[j];

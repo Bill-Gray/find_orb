@@ -738,7 +738,21 @@ how much the object's light is bent and how much the light of
 background stars is bent.  So we compute phi1 = angle between
 observer,  sun,  and 'result';  and phi2 = angle between observer,
 sun,  and background stars = 180 minus elongation of the object as
-seen by 'observer'.  */
+seen by 'observer'.
+
+   There is one situation where we don't do this.  JPL's _Horizons_
+computes astrometric ephemerides with this differential light
+deflection (DLD) term neglected.  They do so because that's how the
+USNO _Astronomical Almanac_ defines an astrometric position.  If
+you want positions matching those on a CCD image,  you have to
+consider the effects of DLD.  If you want USNO AA-defined positions
+(which will match Horizons exactly),  you must disable DLD.  (Grep
+for 'use_light_bending' to see the relevant code.)
+
+   Of course,  DLD still has to be included when processing actual
+astrometric data or generating simulated observations.  Its only effect
+is on ephemerides,  and even then only if milliarcsecond agreement
+with Horizons is required.      */
 
 static void light_bending( const double *observer, double *result)
 {
@@ -771,13 +785,14 @@ static void light_bending( const double *observer, double *result)
       result[i] += bending * dir[i];
 }
 
+int use_light_bending = 1;       /* see ephem0.cpp */
+
 void light_time_lag( const double jde, const double *orbit,
              const double *observer, double *result, const int is_heliocentric)
 {
    const double solar_r = vector3_length( orbit);
    double vel[3];
    size_t i, iter;
-   static int use_light_bending = -1;
 
    if( is_heliocentric)
       for( i = 0; i < 3; i++)            /* 'vel' is relative to the sun */
@@ -801,8 +816,6 @@ void light_time_lag( const double jde, const double *orbit,
          result[i + 3] = vel[i] + afact * orbit[i];
          }
       }
-   if( use_light_bending == -1)
-      use_light_bending = (*get_environment_ptr( "DISABLE_LIGHT_BENDING") == '\0');
    if( use_light_bending)
       light_bending( observer, result);
 }
