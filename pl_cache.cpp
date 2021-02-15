@@ -621,11 +621,7 @@ int format_jpl_ephemeris_info( char *buff)
 
    get_jpl_ephemeris_info( &de_version, &jd_start, &jd_end);
    if( !de_version && !jd_start && !jd_end)
-      {
-      strcpy( buff, "\nNo JPL DE ephemeris file loaded; using (slower) PS1996 series\n");
-      strcat( buff, "See https://www.projectpluto.com/find_orb.htm#de_eph for\n");
-      strcat( buff, "info on how/why to use JPL DE ephemerides\n");
-      }
+      strcpy( buff, get_find_orb_text( 2056));
    else
       sprintf( buff,
             "\nUsing DE-%d; covers years %.1f to %.1f\n", de_version,

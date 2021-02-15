@@ -219,20 +219,6 @@
 2018    The date/time for one or more observations is in the future.
 2018    If that's not what you expected,  you should check the data.
 
-2019    The file 'elp82.dat' is missing.  Without this file,
-2019    lunar positions will be very inaccurate and orbits will
-2019    be somewhat less accurate.  Either get the file,  or (better
-2019    solution) set up JPL ephemerides.  See
-2019    https://www.projectpluto.com/find_orb.htm#de_eph
-2019    for details on how to do this.
-
-2020    The file 'ps_1996.dat' is missing.  Without this file,
-2020    planetary positions will be inaccurate and orbits will
-2020    be somewhat less accurate.  Either get the file,  or (better
-2020    solution) set up JPL ephemerides.  See
-2020    https://www.projectpluto.com/find_orb.htm#de_eph
-2020    for details on how to do this.
-
 2021    No asteroid ephemeris data is available,  so
 2021    asteroid perturbations cannot be included.  You can
 2021    fix this by downloading the necessary files.  See
@@ -274,7 +260,10 @@
 2029    You don't currently have JPL planetary ephemerides set up
 2029    for use in Find_Orb.  This will result in some loss of accuracy
 2029    and speed.  See https://www.projectpluto.com/find_orb.htm#de_eph
-2029    for further information.
+2029    for further information.\n
+2029    Hit any key to continue.  Find_Orb will still work,  though it will
+2029    be a little slower and less accurate.  You should eventually download
+2029    a JPL ephemeris file,  per the instructions at the above link.
 
 2030    Your JPL ephemeris file, %s ,
 2030    only covers the years %.1f to %.1f.  To cover your desired date
@@ -357,3 +346,8 @@
 2054    206,106:Decimal degrees to 10^-6 deg
 2054    215,115:Decimal degrees to 10^-15 deg
 2054    109,109:Decimal hours and degrees
+
+2056    \nNo JPL DE ephemeris file loaded; using (slower, less accurate)
+2056    analytic approximations for lunar and planetary positions
+2056    See https://www.projectpluto.com/find_orb.htm#de_eph for
+2056    info on how and why to use JPL DE ephemerides.\n
