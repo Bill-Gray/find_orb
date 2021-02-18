@@ -77,25 +77,27 @@ endif
 LIB_DIR=$(INSTALL_DIR)/lib
 
 ifdef W64
-	CC=x86_64-w64-mingw32-g++
-	CURSES_FLAGS=-I $(INSTALL_DIR)/include -I../PDCursesMod
-	EXE=.exe
-	CURSES_LIB=-lpdcurses
+	MINGW=x86_64-w64-mingw32-
 	LIB_DIR=$(INSTALL_DIR)/win_lib
-	LIBSADDED=-L $(LIB_DIR) -lm -lgdi32 -luser32 -mwindows -static-libgcc
-	FO_EXE=fo64.exe
-	FIND_ORB_EXE=find_o64.exe
+	BITS=64
 endif
 
 ifdef W32
-	CC=i686-w64-mingw32-g++
+	MINGW=i686-w64-mingw32-
+	LIB_DIR=$(INSTALL_DIR)/win_lib32
+	BITS=32
+endif
+
+ifdef MINGW
+	CC=$(MINGW)gcc
+	WINDRES=$(MINGW)windres
 	CURSES_FLAGS=-I $(INSTALL_DIR)/include -I../PDCursesMod
 	EXE=.exe
 	CURSES_LIB=-lpdcurses
-	LIB_DIR=$(INSTALL_DIR)/win_lib32
 	LIBSADDED=-L $(LIB_DIR) -lm -lgdi32 -luser32 -mwindows -static-libgcc
-	FO_EXE=fo32.exe
-	FIND_ORB_EXE=find_o32.exe
+	FO_EXE=fo$(BITS).exe
+	FIND_ORB_EXE=find_o$(BITS).exe
+	RES_FILENAME=find_orb.res
 endif
 
 ifndef FO_EXE
@@ -121,8 +123,8 @@ OBJS=ades_out.o b32_eph.o bc405.o bias.o collide.o conv_ele.o details.o eigen.o 
 
 LIBS=$(LIBSADDED) -llunar -ljpl -lsatell
 
-$(FIND_ORB_EXE):          findorb.o clipfunc.o $(OBJS)
-	$(CC) -o $(FIND_ORB_EXE) findorb.o clipfunc.o $(OBJS) $(LIBS) $(CURSES_LIB)
+$(FIND_ORB_EXE):          findorb.o clipfunc.o $(OBJS) $(RES_FILENAME)
+	$(CC) -o $(FIND_ORB_EXE) findorb.o clipfunc.o $(OBJS) $(LIBS) $(CURSES_LIB) $(RES_FILENAME)
 
 findorb.o:         findorb.cpp
 	$(CC) $(CFLAGS) $(CURSES_FLAGS) $<
@@ -130,8 +132,8 @@ findorb.o:         findorb.cpp
 clipfunc.o:        clipfunc.cpp
 	$(CC) $(CFLAGS) $(CURSES_FLAGS) $<
 
-$(FO_EXE):          fo.o $(OBJS)
-	$(CC) -o $(FO_EXE) fo.o $(OBJS) $(LIBS)
+$(FO_EXE):          fo.o $(OBJS) $(RES_FILENAME)
+	$(CC) -o $(FO_EXE) fo.o $(OBJS) $(LIBS) $(RES_FILENAME)
 
 eph2tle$(EXE):          eph2tle.o conv_ele.o elem2tle.o simplex.o lsquare.o
 	$(CC) -o eph2tle$(EXE) eph2tle.o conv_ele.o elem2tle.o simplex.o lsquare.o $(LIBS)
@@ -157,6 +159,12 @@ clean:
 	$(RM) $(OBJS) fo.o findorb.o fo_serve.o $(FIND_ORB_EXE) $(FO_EXE)
 	$(RM) fo_serve.cgi eph2tle.o eph2tle$(EXE) cssfield$(EXE)
 	$(RM) clipfunc.o cssfield.o neat_xvt.o neat_xvt$(EXE)
+ifdef RES_FILENAME
+	$(RM) $(RES_FILENAME)
+
+$(RES_FILENAME): find_orb.ico find_orb.rc
+	$(WINDRES) find_orb.rc -O coff -o $(RES_FILENAME)
+endif
 
 clean_temp:
 	$(RM) $(IDIR)/bc405pre.txt
