@@ -2448,7 +2448,6 @@ static double extract_state_vect_from_text( const char *text,
    return( epoch);
 }
 
-const char *mpcorb_dot_sof_filename = "mpcorb.sof";
 const char *state_vect_text = NULL;
 int ignore_prev_solns;
 bool take_first_soln = false, force_final_full_improvement = false;
@@ -2576,9 +2575,10 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
    if( !got_vectors && !ignore_prev_solns)
       {
       ELEMENTS elems;
+      const char *mpcorb_dot_sof_filename = get_environment_ptr( "MPCORB_SOF_FILENAME");
 
       got_vectors = get_orbit_from_mpcorb_sof( "orbits.sof", object_name, orbit, &elems);
-      if( !got_vectors)
+      if( !got_vectors && *mpcorb_dot_sof_filename)
          got_vectors = get_orbit_from_mpcorb_sof( mpcorb_dot_sof_filename,
                                                              object_name, orbit, &elems);
       if( got_vectors)
