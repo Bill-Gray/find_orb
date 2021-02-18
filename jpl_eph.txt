@@ -43,6 +43,10 @@ lnxm3000p3000.422
 ; ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de421/lnxp1900p2053.421
 ; (about 13 MBytes)
 lnxp1900p2053.421
+; ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de423/lnxp1900.423
+; (about 13.6 MBytes, 1900-2050)
+lnxp1900.423
+
 ; ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de423/lnxp1800p2200.423
 ; (about 37 MBytes)
 lnxp1800p2200.423
@@ -98,3 +102,16 @@ lnxm13000p17000.431
 
 ;  At least as of 2016 Oct 15,  DE-432 and later were available only in ASCII
 ;  form,  and therefore aren't listed here.
+
+; IMCCE (formerly Bureau des Longitudes) provides ephems in JPL-like format that
+; will work with this and some other software.  (Not all.  For some reason,
+; they start blocks at noon instead of midnight.  Some programs are confused
+; by this.)
+
+; https://ftp.imcce.fr/pub/ephem/planets/inpop19a/inpop19a_TDB_m100_p100_littleendian.dat
+; (17 MBytes)
+inpop19a_TDB_m100_p100_littleendian.dat
+
+; https://ftp.imcce.fr/pub/ephem/planets/inpop19a/inpop19a_TDB_m1000_p1000_littleendian.dat
+; (168 MBytes)
+inpop19a_TDB_m1000_p1000_littleendian.dat
