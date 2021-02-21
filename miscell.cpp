@@ -28,6 +28,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+const char *get_find_orb_text( const int index);
 #endif
 
 size_t strlcpy( char *dst, const char *src, size_t dsize);   /* miscell.c */
@@ -335,6 +337,10 @@ int fetch_astrometry_from_mpc( FILE *ofile, const char *desig)
             bytes_written += (int)fwrite( tbuff, 1, strlen( tbuff), ofile);
          fclose( ifile);
          }
+#ifndef _WIN32
+      else
+         generic_message_box( get_find_orb_text( 2058), "o");
+#endif
       }
    return( bytes_written);
 }

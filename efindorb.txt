@@ -351,3 +351,7 @@
 2056    analytic approximations for lunar and planetary positions
 2056    See https://www.projectpluto.com/find_orb.htm#de_eph for
 2056    info on how and why to use JPL DE ephemerides.\n
+
+2058    Couldn't run 'grab_mpc',  a small program used to grab data from
+2058    the MPC.  Get this code from https://github.com/Bill/Gray/miscell
+2058    and run 'make grab_mpc'.  Copy 'grab_mpc' into the executable path.
