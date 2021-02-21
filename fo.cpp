@@ -574,13 +574,6 @@ int main( int argc, const char **argv)
             case 'm':
                mpec_path = arg;
                break;
-            case 'M':
-               {
-               extern const char *mpcorb_dot_sof_filename;
-
-               mpcorb_dot_sof_filename = arg;
-               }
-               break;
             case 'n':
                starting_object = atoi( arg);
                break;
