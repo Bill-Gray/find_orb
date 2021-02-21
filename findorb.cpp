@@ -175,6 +175,7 @@ int find_nth_sr_orbit( double *orbit, OBSERVE FAR *obs, int n_obs,
                             const int orbit_number);       /* orb_func.cpp */
 void create_ades_file( const char *filename, const OBSERVE FAR *obs, int n_obs);
 char *fgets_trimmed( char *buff, size_t max_bytes, FILE *ifile);
+int generic_message_box( const char *message, const char *box_type);
 int debug_printf( const char *format, ...)                 /* runge.cpp */
 #ifdef __GNUC__
          __attribute__ (( format( printf, 1, 2)))
@@ -1925,7 +1926,13 @@ static void show_a_file( const char *filename)
    char search_text[100];
 
    if( !ifile)
-      ifile = fopen_ext( filename, "fclrb");
+      ifile = fopen_ext( filename, "clrb");
+   if( !ifile)
+      {
+      sprintf( buff, "Couldn't open '%s'", filename);
+      generic_message_box( buff, "o");
+      return;
+      }
    *search_text = '\0';
    while( fgets( buff, sizeof( buff), ifile))
       {
@@ -2602,7 +2609,12 @@ program. If that's unavailable,  we try 'yad' (fork of zenity with
 essentially the same options),  then 'kdialog' (used on KDE),  then
 'Xdialog'.  If all else fails, we go to the "traditional" curses
 'dialog' program.  (I may add other possibilities as I find them.
-The Curses 'dialog' is pretty bad.) */
+The Curses 'dialog' is pretty bad.)
+
+Note that a Windows version of Zenity is available,  which may come in
+handy at some point (not used yet) :
+
+https://github.com/maravento/winzenity */
 
 static int try_a_file_dialog_program( char *filename, const char *command)
 {
