@@ -51,6 +51,7 @@ int debug_printf( const char *format, ...)                 /* runge.cpp */
 extern int debug_level;
 
 int64_t planet_ns;
+static void *jpl_eph = NULL;
 
 #define J2000 2451545.0
 #define J0 (J2000 - 2000. * 365.25)
@@ -74,7 +75,6 @@ static int planet_posn_raw( int planet_no, const double jd,
    const int jpl_center = 11;         /* default to heliocentric */
    int rval = 0;
    static const char *jpl_filename = NULL;
-   static void *jpl_eph = NULL;
    const int bc405_start = 100;
    const int calc_vel = (planet_no > PLANET_POSN_VELOCITY_OFFSET - 2);
 
@@ -624,10 +624,9 @@ int format_jpl_ephemeris_info( char *buff)
       strcpy( buff, get_find_orb_text( 2056));
    else
       sprintf( buff,
-            "\nUsing DE-%d; covers years %.1f to %.1f\n", de_version,
+            "\nUsing %s; covers years %.1f to %.1f\n",
+            jpl_get_ephem_name( jpl_eph),
             (jd_start - J2000) / 365.25 + 2000.,
             (jd_end   - J2000) / 365.25 + 2000.);
-               /* Kludge to allow re-use of 'version' string */
-               /* between 'about' and 'main' dialogues:      */
    return( de_version);
 }
