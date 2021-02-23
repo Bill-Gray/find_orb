@@ -3203,7 +3203,7 @@ static inline int extract_ades_sigmas( const char *buff,
       if( buff[loc] == 'x')
          {
          *posn2 = atof( buff + loc + 1);
-         while( buff[loc] >= ' ' && buff[loc] != ',')
+         while( buff[loc] > ' ' && buff[loc] != ',')
             loc++;
          if( buff[loc] == ',')
             {
