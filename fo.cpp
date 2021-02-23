@@ -810,7 +810,7 @@ int main( int argc, const char **argv)
             extern int append_elements_to_element_file;
             extern int n_obs_actually_loaded;
             extern char orbit_summary_text[];
-            long file_offset = ids[i].file_offset - 40L;
+            long file_offset = ids[i].file_offset - 40000L;
             int element_options = ELEM_OUT_ALTERNATIVE_FORMAT;
             double epoch_shown, curr_epoch, orbit[12];
             bool have_json_ephem = false;
