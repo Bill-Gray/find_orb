@@ -1537,6 +1537,9 @@ static unsigned show_basic_info( const OBSERVE FAR *obs, const int n_obs,
    put_colored_text( buff, 0, 10, -1, COLOR_BACKGROUND);
 
    set_cmd_area( 0, 'r', 0, 1, 23);
+
+   set_cmd_area( n_commands++, '?', 0, max_column - 4, 3);
+   put_colored_text( "[?]", 0, max_column - 4, 3, COLOR_MENU);
    if( ifile)
       {
       while( fgets_trimmed( buff, sizeof( buff), ifile)
@@ -1546,20 +1549,20 @@ static unsigned show_basic_info( const OBSERVE FAR *obs, const int n_obs,
          unsigned max_column_this_line = max_column, key;
 
          if( line == 1)
-            max_column_this_line -= (max_lines_to_show > 1 ? 8 : 4);
+            max_column_this_line -= (max_lines_to_show > 1 ? 12 : 8);
          if( column + len >= max_column_this_line)
             {
             if( line == max_lines_to_show)
                {
                fclose( ifile);
-               set_cmd_area( n_commands++, KEY_ADD_MENU_LINE, 0, max_column - 4, 3);
-               put_colored_text( "[+]", 0, max_column - 4, 3, COLOR_MENU);
+               set_cmd_area( n_commands++, KEY_ADD_MENU_LINE, 0, max_column - 8, 3);
+               put_colored_text( "[+]", 0, max_column - 8, 3, COLOR_MENU);
                return( line);
                }
             if( line == 1)        /* we could subtract lines */
                {
-               set_cmd_area( n_commands++, KEY_REMOVE_MENU_LINE, 0, max_column - 8, 3);
-               put_colored_text( "[-]", 0, max_column - 8, 3, COLOR_MENU);
+               set_cmd_area( n_commands++, KEY_REMOVE_MENU_LINE, 0, max_column - 12, 3);
+               put_colored_text( "[-]", 0, max_column - 12, 3, COLOR_MENU);
                }
             column = 0;
             line++;
