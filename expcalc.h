@@ -13,6 +13,7 @@ typedef struct
    double min_dec, max_dec;                 /* degrees */
    double min_ha, max_ha;                   /* degrees */
    double min_elong, max_elong;             /* degrees */
+   double sky_brightness_at_zenith;         /* mags/arcsec^2 */
    double *horizon;                         /* degrees */
    int n_horizon_points;
 } expcalc_config_t;

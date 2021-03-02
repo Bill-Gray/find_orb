@@ -508,6 +508,20 @@ static void setup_obj_loc( obj_location_t *p, double *orbit,
       }
 }
 
+static void adjust_sky_brightness_for_light_pollution(
+               BRIGHTNESS_DATA *bdata,
+               const expcalc_config_t *exposure_config)
+{
+   double brightness =
+               exp( -0.4 * LOG_10 * (11.055 + exposure_config->sky_brightness_at_zenith));
+   size_t i;
+   const double multipliers[5] = { .01, .01, .2, 1.0, 1.0 };
+
+   brightness /= cos( bdata->zenith_angle);
+   for( i = 0; i < 5; i++)
+      bdata->brightness[i] += brightness * multipliers[i];
+}
+
 #pragma pack( 1)
 
 typedef struct
@@ -2620,6 +2634,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   bdata.zenith_ang_moon = PI / 2. - alt_az[2].y;
                   set_brightness_params( &bdata);
                   compute_sky_brightness( &bdata);
+                  adjust_sky_brightness_for_light_pollution( &bdata,
+                              &exposure_config);
                   rgb = 0;
                   for( j = 0; j < 3; j++)
                      {

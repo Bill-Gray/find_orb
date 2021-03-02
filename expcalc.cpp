@@ -289,7 +289,7 @@ int find_expcalc_config_from_mpc_code( const char *mpc_code,
          set_config_double( buff, "QE", &c->qe);
          set_config_double( buff, "ReadNoise", &c->readnoise);
          set_config_double( buff, "PixelSize", &c->pixel_size);
-         set_config_double( buff, "SkyBrightness", &c->sky_brightness);
+         set_config_double( buff, "SkyBrightness", &c->sky_brightness_at_zenith);
          set_config_double( buff, "MinAlt", &c->min_alt);
          set_config_double( buff, "MaxAlt", &c->max_alt);
          set_config_double( buff, "MinDec", &c->min_dec);
