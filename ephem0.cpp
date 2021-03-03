@@ -4080,94 +4080,89 @@ static bool got_obs_in_range( const OBSERVE *obs, int n_obs,
    return( rval);
 }
 
-/* For getting default observer/telescope details from 'details.txt' and/or
-'scopes.txt',  we look through those files for the MPC observatory code
-in question,  then look for OBS/MEA/TEL data.  In some cases,  observers or
-measurers or telescopes may change.  A comment line such as
+/* Our logic for getting observer/measurer/telescope details runs
+as follows :
+
+-- Check the details given with the observations.
+-- If that failed,  check 'progcode.txt',  then 'details.txt',
+   then 'scopes.txt'.
+-- At each point,  we keep track of what we actually found.  If we got
+   observers and measurers,  we keep going in hopes of getting the scope info.
+-- In 'details.txt',  there's allowance for the fact that observers or
+   measurers or telescopes may change.  A comment line such as
 
 COM Valid 1993 Mar 4 - 2012 Dec 25
 
 tells the program:  "Don't pay any attention to the following lines unless
-observations were made at this code during this time span." */
+observations were made at this code during this time span."  Also,  a 'details'
+line such as COM 568 & means "only use these details if it's code 568 _and_
+the program code is an ampersand."        */
 
-static int get_observer_details( const char *observation_filename,
-      const OBSERVE *obs, const int n_obs,
-      const char *mpc_code, char *observers, char *measurers, char *scope)
+static bool get_details_from_here( const char *buff, const char *mpc_code,
+                  const char *program_codes)
 {
-   FILE *ifile = fopen_ext( observation_filename, "fclrb");
-   int rval = 0, n_codes_found = 0;
+   bool rval = false;
 
-   *observers = *measurers = *scope = '\0';
-   if( ifile)
-      {
-      char buff[700];
-      bool done = false;
-
-      while( !done && fgets( buff, sizeof( buff), ifile))
-         if( !memcmp( buff, "COD ", 4))
-            {
-            bool new_code_found = false, use_lines = true;
-
-            *observers = *measurers = *scope = '\0';
-            n_codes_found++;
-            if( !memcmp( buff + 4, mpc_code, 3))
-               while( !done && fgets_trimmed( buff, sizeof( buff), ifile) && !new_code_found)
-                  {
-                  if( !memcmp( buff, "COM Valid:", 10))
-                     {
-                     char *tptr = strchr( buff, '-');
-                     double jd_start, jd_end;
-
-                     assert( tptr);
-                     *tptr = '\0';
-                     jd_start = get_time_from_string( 0., buff + 10, 0, NULL);
-                     jd_end = get_time_from_string( 0., tptr + 1, 0, NULL);
-                     assert( jd_start > 2000000. && jd_start < 3000000.);
-                     assert( jd_end > 2000000. && jd_end < 3000000.);
-                     use_lines = got_obs_in_range( obs, n_obs, jd_start, jd_end);
-                     }
-                  if( use_lines && !memcmp( buff, "OBS ", 4))
-                     tack_on_names( observers, buff + 4);
-                  if( use_lines && !memcmp( buff, "MEA ", 4))
-                     tack_on_names( measurers, buff + 4);
-                  if( use_lines && !memcmp( buff, "TEL ", 4))
-                     strcat( scope, buff + 4);
-                  if( !memcmp( buff, "COD ", 4))
-                     {
-                     if( memcmp( buff + 4, mpc_code, 3))
-                        {
-                        new_code_found = true;
-                        done = true;
-                        }
-                     else
-                        *observers = *measurers = *scope = '\0';
-                     }
-                  }
-            }
-      fclose( ifile);
-      add_final_period( observers);
-      add_final_period( measurers);
-      add_final_period( scope);
-      if( !strcmp( observers, measurers))
-         *measurers = '\0';
-      }
-
-   if( *observers)
-      rval = 1;
-   if( *measurers)
-      rval |= 2;
-   if( *scope)
-      rval |= 4;
-   if( !n_codes_found)        /* we can just ignore this file completely, */
-      rval = -1;              /* even for other observatory codes */
+   if( !memcmp( buff, "COD ", 4) && !memcmp( buff + 4, mpc_code, 3))
+       {
+       if( buff[7] < ' ' || !*program_codes)
+          rval = true;
+       else
+          rval = strchr( program_codes, buff[8]);
+       }
    return( rval);
 }
 
-static int get_observer_details_from_obs( const OBSERVE *obs,
+static int get_observer_details( const char *observation_filename,
+      const OBSERVE *obs, const int n_obs,
+      const char *mpc_code, const char *prog_codes,
+      char *observers, char *measurers, char *scope)
+{
+   FILE *ifile = fopen_ext( observation_filename, "fclrb");
+   char buff[700];
+   const bool getting_observers = (*observers == '\0');
+   const bool getting_measurers = (*measurers == '\0');
+   const bool getting_scopes = (*scope == '\0');
+
+   while( fgets_trimmed( buff, sizeof( buff), ifile))
+      if( get_details_from_here( buff, mpc_code, prog_codes))
+         {
+         bool new_code_found = false, use_lines = true;
+
+         while( fgets_trimmed( buff, sizeof( buff), ifile) && !new_code_found)
+            {
+            if( !memcmp( buff, "COM Valid:", 10))
+               {
+               char *tptr = strchr( buff, '-');
+               double jd_start, jd_end;
+
+               assert( tptr);
+               *tptr = '\0';
+               jd_start = get_time_from_string( 0., buff + 10, 0, NULL);
+               jd_end = get_time_from_string( 0., tptr + 1, 0, NULL);
+               assert( jd_start > 2000000. && jd_start < 3000000.);
+               assert( jd_end > 2000000. && jd_end < 3000000.);
+               use_lines = got_obs_in_range( obs, n_obs, jd_start, jd_end);
+               }
+            if( use_lines && !memcmp( buff, "OBS ", 4) && getting_observers)
+               tack_on_names( observers, buff + 4);
+            if( use_lines && !memcmp( buff, "MEA ", 4) && getting_measurers)
+               tack_on_names( measurers, buff + 4);
+            if( use_lines && !memcmp( buff, "TEL ", 4) && getting_scopes)
+               strcat( scope, buff + 4);
+            if( !memcmp( buff, "COD ", 4))
+               if( !get_details_from_here( buff, mpc_code, prog_codes))
+                  new_code_found = true;
+            }
+         }
+   fclose( ifile);
+   return( 0);
+}
+
+static void get_observer_details_from_obs( const OBSERVE *obs,
       size_t n_obs, const char *mpc_code, char *observers,
       char *measurers, char *scope)
 {
-   int rval = 0;
    size_t i;
    const char *tptr;
 
@@ -4186,18 +4181,6 @@ static int get_observer_details_from_obs( const OBSERVE *obs,
             }
       obs++;
       }
-   add_final_period( observers);
-   add_final_period( measurers);
-   add_final_period( scope);
-   if( *observers)
-      rval = 1;
-   if( *measurers)
-      rval |= 2;
-   if( *scope)
-      rval |= 4;
-   if( !strcmp( observers, measurers))
-      *measurers = '\0';
-   return( rval);
 }
 
 #define REPLACEMENT_COLUMN 42
@@ -4263,7 +4246,6 @@ static int write_observer_data_to_file( FILE *ofile, const char *ast_filename,
                  const int n_obs, const OBSERVE FAR *obs_data)
 {
    unsigned n_stations = 0, i, j;
-   int try_ast_file = 1, try_details_file = 1, try_scope_file = 1;
    char stations[400][5];
 
    INTENTIONALLY_UNUSED_PARAMETER( ast_filename);
@@ -4272,45 +4254,37 @@ static int write_observer_data_to_file( FILE *ofile, const char *ast_filename,
       {
       char buff[200], tbuff[100];
       char details[4][310];
-      int details_found = 0;
-      size_t loc;
+      char program_codes[30];
+      size_t loc, n_program_codes = 0;
+      const char *allowable_codes = "0123456789!\"#$%&'()*+,-./[\\]^_`{|}~";
+
+      *program_codes = '\0';
+      for( j = 0; j < (unsigned)n_obs; j++)
+         if( !strcmp( stations[i], obs_data[j].mpc_code)
+               && strchr( allowable_codes, obs_data[j].note1)
+               && !strchr( program_codes, obs_data[j].note1))
+             {
+             program_codes[n_program_codes++] = obs_data[j].note1;
+             program_codes[n_program_codes] = '\0';
+             }
 
       FSTRCPY( tbuff, stations[i]);
       put_observer_data_in_text( tbuff, buff);
       snprintf( details[0], sizeof( details[0]), "(%s) %s.", tbuff, buff);
 
-      if( try_ast_file)
-         {
-         details_found = get_observer_details_from_obs( obs_data, n_obs, tbuff,
+      get_observer_details_from_obs( obs_data, n_obs, tbuff,
                                  details[1], details[2], details[3]);
-         if( details_found == -1)       /* file wasn't found,  or it has */
-            {                           /* no observational details.  In */
-            details_found = 0;          /* either case,  ignore it for   */
-            try_ast_file = 0;           /* further MPC codes.            */
-            }
-         }
-
-      if( !details_found && try_details_file)
+      for( j = 0; j < 3; j++)
          {
-         details_found = get_observer_details( "details.txt", obs_data,
-                   n_obs, tbuff, details[1], details[2], details[3]);
-         if( details_found == -1)       /* file wasn't found,  or it has */
-            {                           /* no observational details.  In */
-            details_found = 0;          /* either case,  ignore it for   */
-            try_details_file = 0;       /* further MPC codes.            */
-            }
-         }
+         const char *filenames[3] = { "progcode.txt", "details.txt", "scopes.txt" };
 
-      if( !details_found && try_scope_file)
-         {
-         details_found = get_observer_details( "scopes.txt", obs_data,
-                   n_obs, tbuff, details[1], details[2], details[3]);
-         if( details_found == -1)       /* file wasn't found,  or it has */
-            {                           /* no observational details.  In */
-      /*    details_found = 0;   */     /* either case,  ignore it for   */
-            try_scope_file = 0;         /* further MPC codes.            */
-            }
+         get_observer_details( filenames[j], obs_data,
+                   n_obs, stations[i], program_codes, details[1], details[2], details[3]);
          }
+      for( j = 1; j <= 3; j++)
+         add_final_period( details[j]);
+      if( !strcmp( details[2], details[1]))  /* observers = measurers; */
+         details[2][0] = '\0';               /* just show observers */
 
       loc = 0;
       for( j = 0; j < 4; j++)
