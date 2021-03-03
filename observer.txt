@@ -75,6 +75,7 @@
  Kowalski                                  <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0007392">Kowalski</a>
  Kniazev                                   <a href="http://www.mathpubs.com/author/Alexei+Yu.+Kniazev">Kniazev</a>
  Kubanek                                   Kub&aacute;nek
+ Kurti                                     <a href="https://www.skaw.sk">K&uuml;rti</a>
  Kusiak                                    <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0376574">Kusiak</a>
  Kusnirak                                  <a href="http://en.wikipedia.org/wiki/Peter_Ku%C5%A1nir%C3%A1k">Ku&#353;nir&aacute;k</a>
  Langbroek                                 <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0183294">Langbroek</a>
