@@ -440,6 +440,12 @@ MEA W. M. Owen Jr.
 TEL 0.61-m f/16 reflector + CCD
 NET Tycho-2
 
+COD 675
+MEA K. Sharma, B. T. Bolin
+OBS R. S. Walters, B. T. Bolin
+COM Default details extracted from MPEC 2020-W177
+TEL 1.52-m f/8.75 Ritchey-Chretien + CCD
+
 COD 678
 COM Find_Orb default details
 CON C. W. Juels, P. O. Box 19960, Fountain Hills, AZ  85269
@@ -1094,6 +1100,9 @@ TEL 0.43-m f/6.8 astrograph + CCD + f/4.5 focal reducer
 
 COD H21
 COM Find_Orb default details
+OBS R. Holmes
+COM Default details extracted from MPEC 2020-Y141
+MEA S. Foglia, L. Buzzi, T. Linder, R. Holmes
 TEL 0.76-m f/3.0 astrograph + CCD
 
 COD H23
@@ -1157,9 +1166,10 @@ COM Find_Orb default details
 TEL 4.1-m reflector + CCD
 
 COD I41
-COM Find_Orb default details
-TEL 1.2-m f/2.44 Oschin Schmidt + CCD
-NET SDSS
+MEA B. T. Bolin, Z.-Y. Lin, F. J. Masci
+OBS B. T. Bolin, Z. T. F. Collaboration
+COM Default details extracted from MPEC 2020-W177
+TEL 1.2-m f/2.4 Schmidt
 
 COD I47
 OBS M. Masek
@@ -1244,6 +1254,11 @@ COD I81
 OBS D. Buczynski
 COM Default details extracted from MPEC 2021-B143
 TEL 0.35-m f/6.0 Schmidt-Cassegrain + CCD
+
+COD I89
+OBS A. Valvasori
+COM Default details extracted from MPEC 2020-W177
+TEL 0.32-m f/8 reflector + CCD
 
 COD I93
 MEA F. Losse
@@ -1472,6 +1487,13 @@ COD L85
 OBS M. Feraco
 COM Default details extracted from MPEC 2021-A190
 TEL 0.28-m f/6.3 Schmidt- Cassegrain + CCD
+
+COD N51
+MEA K. Sharma, B. T. Bolin
+OBS K. Sharma, H. Kumar, P. Dorjay, J. Stanzin, V. Bhalerao, G. C. Anupama
+OBS S. Barway
+COM Default details extracted from MPEC 2020-W177
+TEL 0.70-m f/6.5 Corrected Dall-Kirkham + CCD
 
 COD N88
 MEA Q.-Z. Ye
