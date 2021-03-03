@@ -1,0 +1,3345 @@
+Downloaded 2020 Feb 17 from
+
+https://minorplanetcenter.net/iau/lists/ProgramCodes.txt
+
+and converted to the 'standard' details form.
+
+Patched to remove duplicate B. Luetkenhoener/Lutkenhoner and S. Kurti
+(Find_Orb will add umlauts as necessary).
+
+COD 010 1
+OBS E. W. Elst
+
+COD 010 2
+OBS C. Pollas
+
+COD 010 3
+OBS M. Scardia
+
+COD 010 4
+OBS J.-L. Heudier
+
+COD 010 5
+OBS E. F. Helin
+
+COD 010 6
+OBS K. Tomita
+
+COD 010 7
+OBS A. Maury
+
+COD 010 8
+OBS J.-M. Petit
+
+COD 010 9
+OBS C.-I. Lagerkvist
+
+COD 010 !
+OBS W. Thuillot
+
+COD 010 "
+OBS J.-P. Rivet
+
+COD 012 1
+OBS E. W. Elst
+
+COD 012 2
+OBS T. Pauwels
+
+COD 012 3
+OBS H. Debehogne
+
+COD 012 4
+OBS J. Dommanget
+
+COD 012 5
+OBS P. De Cat
+
+COD 071 1
+OBS V. Ivanova
+
+COD 071 2
+OBS V. Radeva
+
+COD 071 3
+OBS E. W. Elst
+
+COD 071 4
+OBS V. Shkodrov
+
+COD 071 5
+OBS E. F. Helin
+
+COD 071 6
+OBS A. Kostov
+
+COD 084 1
+OBS A. V. Devyatkin
+
+COD 084 2
+OBS E. V. Khrutskaya
+
+COD 084 3
+OBS T. P. Kisseleva
+
+COD 084 4
+OBS N. M. Bronnikova
+
+COD 084 5
+OBS A. A. Berezhnoi
+
+COD 089 1
+OBS A. V. Ivantsov
+OBS G. I. Pinigin
+
+COD 089 2
+OBS O. V. Shulga
+
+COD 089 3
+OBS Y. Sybiryakova
+
+COD 089 4
+OBS L. Gudkova
+
+COD 089 5
+OBS N. V. Maigurova
+
+COD 094 1
+OBS Y. N. Krugly
+
+COD 094 2
+OBS V. Rumyantsev
+
+COD 094 3
+OBS S. Barabanov
+
+COD 094 4
+OBS T. Kryachko
+
+COD 094 5
+OBS E. Bakanas
+OBS I. Nikolenko
+OBS S. Kryuchkov
+
+COD 094 6
+OBS M. Smirnov
+
+COD 094 7
+OBS D. N. Chestnov
+
+COD 094 8
+OBS A. Novichonok
+
+COD 094 9
+OBS M. Micheli
+
+COD 095 0
+OBS N. S. Chernykh
+
+COD 095 1
+OBS Y. N. Krugly
+
+COD 095 2
+OBS V. Rumyantsev
+OBS V. V. Rumyantsev
+
+COD 095 3
+OBS S. Nazarov
+
+COD 095 4
+OBS G. Borisov
+OBS G. V. Borisov
+
+COD 095 5
+OBS A. Novichonok
+
+COD 095 6
+OBS T. Prystavski
+
+COD 095 7
+OBS D. Demyanov
+
+COD 095 8
+OBS M. Micheli
+
+COD 119 1
+OBS R. I. Kiladze
+
+COD 119 2
+OBS M. Micheli
+
+COD 119 3
+OBS Y. N. Krugly
+
+COD 121 1
+OBS Y. N. Krugly
+
+COD 121 2
+OBS V. G. Shevchenko
+
+COD 121 3
+OBS M. Micheli
+
+COD 186 1
+OBS A. Novichonok
+
+COD 186 2
+OBS M. Micheli
+
+COD 186 3
+OBS A. Zhornichenko
+
+COD 186 4
+OBS T. Prystavski
+
+COD 260 0
+OBS F. Manca
+
+COD 260 1
+OBS A. Doppler
+OBS A. Gnadig
+OBS R. Stoss
+
+COD 260 2
+OBS A. Boattini
+
+COD 260 3
+OBS V. S. Casulli
+
+COD 260 4
+OBS A. Lowe
+
+COD 260 5
+OBS E. Colombini
+OBS R. Di Luca
+
+COD 260 6
+OBS E. O. Ofek
+OBS I. Manulis
+
+COD 260 7
+OBS F. Mallia
+
+COD 260 8
+OBS D. D. Balam
+
+COD 260 9
+OBS F. Anzellini
+OBS G. Forti
+OBS R. Haver
+
+COD 260 !
+OBS J. Larsen
+
+COD 260 "
+OBS P. Kusnirak
+
+COD 260 #
+OBS E. Rhoads
+
+COD 260 $
+OBS G. V. Williams
+
+COD 260 %
+OBS S. F. Hoenig
+
+COD 260 &
+OBS R. Matson
+
+COD 260 '
+OBS M. Meyer
+
+COD 260 (
+OBS J. Bedient
+
+COD 260 )
+OBS G. Forti
+
+COD 260 *
+OBS K. Sarneczky
+
+COD 260 +
+OBS L. D. Schmadel
+
+COD 260 ,
+OBS J. Lacruz
+
+COD 260 -
+OBS G. Hahn
+
+COD 260 .
+OBS J. L. Ortiz
+
+COD 260 /
+OBS M. E. Brown
+
+COD 260 [
+OBS M. Kretlow
+
+COD 260 \
+OBS R. J. Bouma
+
+COD 260 ]
+OBS Q. Ye
+
+COD 260 ^
+OBS F. Fratev
+
+COD 260 ]
+OBS Q.-z. Ye
+
+COD 260 _
+OBS S. Foglia
+
+COD 260 `
+OBS A. Odasso
+
+COD 260 {
+OBS P. Thomas
+
+COD 260 |
+OBS N. D. Diaz
+
+COD 260 }
+OBS P. Sicoli
+
+COD 261 0
+OBS F. Manca
+
+COD 261 1
+OBS A. Doppler
+OBS A. Gnadig
+OBS R. Stoss
+
+COD 261 2
+OBS A. Boattini
+
+COD 261 3
+OBS V. S. Casulli
+
+COD 261 4
+OBS A. Lowe
+OBS G. Billings
+
+COD 261 5
+OBS E. Colombini
+OBS R. Di Luca
+
+COD 261 6
+OBS E. O. Ofek
+OBS I. Manulis
+
+COD 261 7
+OBS F. Mallia
+
+COD 261 8
+OBS D. D. Balam
+
+COD 261 9
+OBS F. Anzellini
+OBS G. Forti
+OBS R. Haver
+
+COD 261 !
+OBS J. Larsen
+
+COD 261 "
+OBS P. Kusnirak
+
+COD 261 #
+OBS E. Rhoads
+
+COD 261 $
+OBS G. V. Williams
+
+COD 261 %
+OBS S. F. Hoenig
+
+COD 261 &
+OBS R. Matson
+
+COD 261 '
+OBS M. Meyer
+
+COD 261 (
+OBS J. Bedient
+
+COD 261 )
+OBS G. Forti
+
+COD 261 *
+OBS K. Sarneczky
+
+COD 261 +
+OBS L. D. Schmadel
+
+COD 261 ,
+OBS J. Lacruz
+
+COD 261 -
+OBS G. Hahn
+
+COD 261 .
+OBS J. L. Ortiz
+
+COD 261 /
+OBS M. E. Brown
+
+COD 261 [
+OBS M. Kretlow
+
+COD 261 \
+OBS R. J. Bouma
+
+COD 261 ]
+OBS Q.-z. Ye
+
+COD 261 ^
+OBS F. Fratev
+
+COD 261 _
+OBS S. Foglia
+
+COD 261 `
+OBS A. Odasso
+
+COD 261 {
+OBS N. D. Diaz
+
+COD 261 |
+OBS P. Thomas
+
+COD 262 0
+OBS F. Manca
+
+COD 262 1
+OBS A. Doppler
+OBS A. Gnadig
+OBS R. Stoss
+
+COD 262 2
+OBS A. Boattini
+
+COD 262 3
+OBS V. S. Casulli
+
+COD 262 4
+OBS A. Lowe
+OBS G. Billings
+
+COD 262 5
+OBS E. Colombini
+OBS R. Di Luca
+
+COD 262 6
+OBS E. O. Ofek
+OBS I. Manulis
+
+COD 262 7
+OBS F. Mallia
+
+COD 262 8
+OBS D. D. Balam
+
+COD 262 9
+OBS F. Anzellini
+OBS G. Forti
+OBS R. Haver
+
+COD 262 !
+OBS J. Larsen
+
+COD 262 "
+OBS P. Kusnirak
+
+COD 262 #
+OBS E. Rhoads
+
+COD 262 $
+OBS G. V. Williams
+
+COD 262 %
+OBS S. F. Hoenig
+
+COD 262 &
+OBS R. Matson
+
+COD 262 '
+OBS M. Meyer
+
+COD 262 (
+OBS J. Bedient
+
+COD 262 )
+OBS G. Forti
+
+COD 262 *
+OBS K. Sarneczky
+
+COD 262 +
+OBS L. D. Schmadel
+
+COD 262 ,
+OBS J. Lacruz
+
+COD 262 -
+OBS G. Hahn
+
+COD 262 .
+OBS J. L. Ortiz
+
+COD 262 /
+OBS M. E. Brown
+
+COD 262 [
+OBS M. Kretlow
+
+COD 262 \
+OBS R. J. Bouma
+
+COD 262 ]
+OBS Q.-z Ye
+
+COD 262 ^
+OBS F. Fratev
+
+COD 262 _
+OBS S. Foglia
+
+COD 262 `
+OBS A. Odasso
+
+COD 266 1
+OBS M. W. Buie
+
+COD 266 2
+OBS A. H. Parker
+
+COD 266 3
+OBS J. J. Kavelaars
+OBS J. Kavelaars
+
+COD 266 4
+OBS S. B. Porter
+
+COD 267 1
+OBS M. W. Buie
+
+COD 267 2
+OBS A. H. Parker
+
+COD 267 3
+OBS J. J. Kavelaars
+OBS J. Kavelaars
+
+COD 268 1
+OBS M. W. Buie
+
+COD 268 2
+OBS A. H. Parker
+
+COD 268 3
+OBS JJ Kavelaars
+
+COD 268 4
+OBS A. Taylor
+
+COD 269 1
+OBS M. W. Buie
+
+COD 269 2
+OBS A. H. Parker
+
+COD 269 3
+OBS J. J. Kavelaars
+
+COD 290 1
+OBS M. Holman
+
+COD 290 2
+OBS W. Romanishin
+
+COD 290 3
+OBS W. H. Ryan
+
+COD 290 4
+OBS C. W. Hergenrother
+
+COD 290 5
+OBS R. P. Boyle
+
+COD 290 6
+OBS M. Trueblood
+
+COD 309 1
+OBS A. Boattini
+
+COD 309 2
+OBS B. Gladman
+
+COD 309 3
+OBS A. Delsanti
+
+COD 309 4
+OBS H. Boehnhardt
+
+COD 309 5
+OBS J.-M. Petit
+
+COD 309 6
+OBS K. Muinonen
+
+COD 309 7
+OBS S. Fornasier
+
+COD 309 8
+OBS M. Beletsky
+
+COD 309 9
+OBS S. Kozlowski
+
+COD 309 !
+OBS M. G. Parisi
+
+COD 309 "
+OBS C. Snodgrass
+
+COD 309 #
+OBS A. Iovino
+
+COD 309 $
+OBS E. Solano
+
+COD 309 %
+OBS D. Koschny
+
+COD 309 &
+OBS M. Micheli
+
+COD 309 '
+OBS M. Altmann
+
+COD 309 (
+OBS G. Barentsen
+
+COD 309 )
+OBS A. Fitzsimmons
+
+COD 309 *
+OBS M. Mahlke
+
+COD 309 +
+OBS O. Vaduvescu
+
+COD 309 ,
+OBS J. Agarwal
+
+COD 309 -
+OBS S. Deen
+
+COD 413 0
+OBS K. S. Russell
+
+COD 413 1
+OBS R. H. McNaught
+
+COD 413 2
+OBS G. J. Garradd
+
+COD 413 3
+OBS E. Bowell
+
+COD 413 4
+OBS E. F. Helin
+
+COD 413 5
+OBS R. M. West
+
+COD 413 6
+OBS S. J. Bus
+
+COD 413 7
+OBS M. Hartley
+
+COD 413 8
+OBS C.-I. Lagerkvist
+
+COD 413 9
+OBS R. D. Eberst
+
+COD 413 !
+OBS P. R. Standen
+
+COD 413 "
+OBS S. B. Tritton
+
+COD 413 #
+OBS R. D. Wolstencroft
+
+COD 413 $
+OBS A. N. Zytkow
+
+COD 413 %
+OBS J. Bedient
+
+COD 413 &
+OBS N. Phillips
+
+COD 413 '
+OBS A. Fitzsimmons
+
+COD 413 (
+OBS K. Sarneczky
+
+COD 413 )
+OBS F. Tozzi
+
+COD 413 *
+OBS M. Micheli
+
+COD 561 1
+OBS J. Kelemen
+
+COD 561 2
+OBS A. Pal
+
+COD 561 3
+OBS K. Sarneczky
+
+COD 568 0
+OBS D. Kinoshita
+OBS J. Watanabe
+OBS T. Fuse
+
+COD 568 1
+OBS D, C. Jewitt
+OBS D. Jewitt
+
+COD 568 2
+OBS D. J. Tholen
+
+COD 568 3
+OBS C. Veillet
+
+COD 568 4
+OBS G. Bernstein
+OBS R. L. Allen
+
+COD 568 5
+OBS S. S. Sheppard
+
+COD 568 6
+OBS M. Holman
+
+COD 568 7
+OBS K. J. Meech
+
+COD 568 8
+OBS S. Tegler
+OBS W. Romanishin
+
+COD 568 9
+OBS D. D. Balam
+
+COD 568 !
+OBS M. W. Buie
+
+COD 568 "
+OBS J. Pittichova
+
+COD 568 #
+OBS C. Christian
+
+COD 568 $
+OBS E. Tedesco
+
+COD 568 %
+OBS I. Halliday
+
+COD 568 &
+OBS J. Kavelaars
+
+COD 568 '
+OBS H. Spinrad
+
+COD 568 (
+OBS L. Allen
+
+COD 568 )
+OBS W. H. Ryan
+
+COD 568 *
+OBS P. Wiegert
+
+COD 568 +
+OBS A. Boattini
+
+COD 568 ,
+OBS J. Masiero
+
+COD 568 -
+OBS M. E. Brown
+OBS M. E. Schwamb
+
+COD 568 .
+OBS R. Jedicke
+
+COD 568 /
+OBS M. Yagi
+
+COD 568 [
+OBS O. Vaduvescu
+
+COD 568 \
+OBS S. Gwyn
+
+COD 568 ]
+OBS A. Doressoundiram
+OBS D. Hestroffer
+
+COD 568 ^
+OBS R. Wainscoat
+OBS R. Weryk
+
+COD 568 _
+OBS M. Micheli
+
+COD 568 `
+OBS E. Solano
+
+COD 568 {
+OBS B. Gladman
+
+COD 568 |
+OBS A. H. Parker
+
+COD 568 }
+OBS M. Willman
+
+COD 568 ~
+OBS M. Alexandersen
+
+COD 568 :
+OBS Y.-T. Chen
+
+COD 568 ;
+OBS L. Hudin
+
+COD 568 <
+OBS S. Urakawa
+
+COD 568 =
+OBS P. Veres
+
+COD 568 >
+OBS E. Schunova
+
+COD 568 ?
+OBS R. E. Pike
+
+COD 568 @
+OBS J.-M. Petit
+
+COD 568 A
+OBS M. Drahus
+
+COD 568 B
+OBS G. Hasinger
+
+COD 568 D
+OBS A. N. Heinze
+
+COD 568 E
+OBS I. Arroway
+
+COD 568 F
+OBS M.-T. Hui
+
+COD 568 G
+OBS Y. Kim
+
+COD 568 H
+OBS J. J. Kavelaars
+
+COD 568 I
+OBS F. Yoshida
+
+COD 568 J
+OBS R. Leiva
+
+COD 568 K
+OBS H. Hsieh
+
+COD 568 L
+OBS J. Kleyna
+
+COD 568 M
+OBS H.-W. Lin
+
+COD 568 N
+OBS A. Yamane
+
+COD 568 O
+OBS S. Deen
+
+COD 568 P
+OBS C. Kitada
+
+COD 658 1
+OBS D. D. Balam
+
+COD 658 2
+OBS G. C. L. Aikman
+
+COD 658 3
+OBS J. Clem
+
+COD 673 1
+OBS W. M. Owen Jr.
+
+COD 673 2
+OBS D. L. Rabinowitz
+
+COD 673 3
+OBS P. Weissman
+
+COD 673 4
+OBS M. D. Hicks
+
+COD 673 5
+OBS J. W. Young
+
+COD 673 6
+OBS J. D. Mulholland
+
+COD 673 7
+OBS J. Child
+
+COD 673 8
+OBS J. M. Bauer
+
+COD 673 9
+OBS W. Smythe
+
+COD 673 !
+OBS J. Chesley
+OBS J. Pittichova
+
+COD 673 "
+OBS H. Rhoades
+
+COD 675 0
+OBS P. Weissman
+
+COD 675 1
+OBS J. Gibson
+
+COD 675 2
+OBS E. F. Helin
+OBS K. Lawrence
+
+COD 675 3
+OBS C. S. Shoemaker
+
+COD 675 4
+OBS C. J. van Houten
+
+COD 675 5
+OBS M. Hicks
+
+COD 675 6
+OBS E. Bowell
+
+COD 675 7
+OBS C. A. Trujillo
+
+COD 675 8
+OBS B. Gladman
+
+COD 675 9
+OBS 3 + 6
+
+COD 675 !
+OBS C. T. Kowal
+
+COD 675 "
+OBS R. M. West
+
+COD 675 #
+OBS A. Maury
+
+COD 675 $
+OBS S. J. Bus
+
+COD 675 %
+OBS T. Gehrels
+
+COD 675 &
+OBS W. Sebok
+
+COD 675 '
+OBS J. H. Anderson
+
+COD 675 (
+OBS T. A. Boroson
+
+COD 675 )
+OBS R. S. Dunbar
+
+COD 675 *
+OBS R. Weinberger
+
+COD 675 +
+OBS P. Wild
+
+COD 675 ,
+OBS R. Binzel
+
+COD 675 -
+OBS J. Mueller
+
+COD 675 .
+OBS K. W. Kamper
+
+COD 675 /
+OBS D. Zelinsky
+
+COD 675 [
+OBS E. Ney
+
+COD 675 \
+OBS L. E. Cunningham
+
+COD 675 ]
+OBS T. Nomura
+
+COD 675 ^
+OBS H. G. Roe
+
+COD 675 _
+OBS M. E. Brown
+OBS M. E. Schwamb
+
+COD 675 `
+OBS L. D. Schmadel
+
+COD 675 {
+OBS J. M. Bauer
+
+COD 675 |
+OBS W. M. Owen Jr.
+
+COD 675 }
+OBS A. Waszczak
+
+COD 675 ~
+OBS J. Chesley
+OBS J. Pittichova
+
+COD 675 :
+OBS M. Micheli
+
+COD 675 ;
+OBS J.-M. Petit
+
+COD 675 <
+OBS J. Masiero
+
+COD 675 =
+OBS Q. Zhang
+
+COD 675 >
+OBS I. Wong
+
+COD 675 ?
+OBS P. D. Usher
+
+COD 675 @
+OBS B. T. Bolin
+
+COD 675 A
+OBS Q.-Z. Ye
+
+COD 688 0
+OBS G. Snyder
+
+COD 688 1
+OBS M. W. Buie
+
+COD 688 2
+OBS L. A. Marschall
+
+COD 688 3
+OBS W. Osborn
+
+COD 688 4
+OBS E. Bowell
+
+COD 688 5
+OBS L. H. Wasserman
+
+COD 688 6
+OBS B. A. Skiff
+
+COD 688 7
+OBS T. L. Farnham
+
+COD 688 8
+OBS K. Marshall
+
+COD 688 9
+OBS H. L. Giclas
+
+COD 688 !
+OBS L. Jones
+
+COD 688 "
+OBS H. G. Roe
+OBS M. Schwamb
+
+COD 688 #
+OBS M. J. Person
+
+COD 688 $
+OBS A. Thirouin
+
+COD 688 %
+OBS N. Moskovitz
+
+COD 688 &
+OBS D. Avner
+
+COD 688 '
+OBS M. Micheli
+
+COD 688 (
+OBS J. Kleyna
+
+COD 689 1
+OBS A. K. B. Monet
+
+COD 689 2
+OBS H. Harris
+OBS R. C. Stone
+
+COD 689 3
+OBS C. B. Luginbuhl
+
+COD 689 4
+OBS R. S. Harrington
+
+COD 689 5
+OBS E. Bowell
+
+COD 689 6
+OBS E. Roemer
+
+COD 689 7
+OBS D. K. Yeomans
+
+COD 689 8
+OBS J. A. DeYoung
+
+COD 689 9
+OBS S. E. Levine
+
+COD 689 !
+OBS J. A. Larsen
+
+COD 689 "
+OBS F. J. Vrba
+
+COD 695 0
+OBS M. Hicks
+
+COD 695 1
+OBS M. W. Buie
+
+COD 695 2
+OBS G. Bernstein
+OBS J. Kavelaars
+OBS R. L. Allen
+OBS T. J. Balonek
+
+COD 695 3
+OBS D. Wittman
+
+COD 695 4
+OBS T. Lauer
+
+COD 695 5
+OBS C. W. Hergenrother
+
+COD 695 6
+OBS P. Weissman
+
+COD 695 7
+OBS T. Hillwig
+OBS W. Romanishin
+
+COD 695 8
+OBS B. Gladman
+
+COD 695 9
+OBS J. W. Parker
+
+COD 695 !
+OBS D. Dinescu
+
+COD 695 "
+OBS K. J. Meech
+
+COD 695 #
+OBS M. J. S. Belton
+
+COD 695 $
+OBS J. D. Neill
+
+COD 695 %
+OBS E. Roemer
+
+COD 695 &
+OBS G. Aldering
+
+COD 695 '
+OBS D. J. Tholen
+
+COD 695 (
+OBS E. L. Wright
+
+COD 695 )
+OBS B. E. A. Mueller
+
+COD 695 *
+OBS A. Dunn
+
+COD 695 +
+OBS S. Larson
+
+COD 695 ,
+OBS D. E. Trilling
+
+COD 695 -
+OBS A. Block
+
+COD 695 .
+OBS L. H. Wasserman
+
+COD 695 /
+OBS K. A. Williams
+
+COD 695 [
+OBS A. W. Puckett
+
+COD 695 \
+OBS D. D. Balam
+
+COD 695 ]
+OBS M. Trueblood
+
+COD 695 ^
+OBS J. A. Larsen
+OBS J. V. Scotti
+OBS R. S. McMillan
+
+COD 695 _
+OBS E. Tedesco
+
+COD 695 `
+OBS M. Richmond
+
+COD 695 {
+OBS R. Gelderman
+OBS T. Vorobjov
+
+COD 695 |
+OBS S. M. Ammons
+
+COD 695 }
+OBS N. Samarahinha
+
+COD 695 ~
+OBS M. Holman
+
+COD 695 :
+OBS A. N. Heinze
+
+COD 695 ;
+OBS J. K. Rajagopal
+
+COD 695 <
+OBS J.-M. Petit
+
+COD 695 =
+OBS D. Gerdes
+
+COD 695 >
+OBS M. Micheli
+
+COD 695 ?
+OBS S. S. Sheppard
+
+COD 695 @
+OBS M.-T. Hui
+
+COD 695 A
+OBS Q.-Y. Ye
+
+COD 695 B
+OBS B. T. Bolin
+
+COD 695 C
+OBS S. Deen
+
+COD 696 0
+OBS J. C. McDowell
+
+COD 696 1
+OBS C. W. Hergenrother
+
+COD 696 2
+OBS M. J. Holman
+
+COD 696 3
+OBS A. Groot
+
+COD 696 4
+OBS O. Naranjo
+
+COD 696 5
+OBS P. J. Groot
+
+COD 696 6
+OBS L. Macri
+
+COD 696 7
+OBS T. B. Spahr
+
+COD 696 8
+OBS E. Howell
+
+COD 696 9
+OBS R. E. Schild
+
+COD 696 !
+OBS K. Sarneczky
+
+COD 696 "
+OBS K. A. Williams
+
+COD 696 #
+OBS B. Gladman
+
+COD 705 1
+OBS M. Hammergren
+
+COD 705 2
+OBS M. Holman
+
+COD 705 3
+OBS G. A. Esquerdo
+OBS J. C. Barentine
+
+COD 705 4
+OBS A. C. Becker
+
+COD 705 5
+OBS A. W. Puckett
+
+COD 705 6
+OBS T. Grav
+
+COD 705 7
+OBS K. Sarneczky
+
+COD 705 8
+OBS S. Kurti
+
+COD 705 9
+OBS K. Chiu
+
+COD 705 !
+OBS M. Micheli
+
+COD 705 "
+OBS K. Nault
+
+COD 705 #
+OBS M. Brucker
+
+COD 705 $
+OBS B. T. Bolin
+
+COD 705 %
+OBS R. Leiva
+
+COD 705 &
+OBS R. Strauss
+
+COD 807 0
+OBS D. Jewitt
+
+COD 807 1
+OBS M. W. Buie
+
+COD 807 2
+OBS J. Parker
+
+COD 807 3
+OBS Deep Lens survey
+
+COD 807 4
+OBS B. Gladman
+OBS M. Holman
+
+COD 807 5
+OBS K. J. Meech
+
+COD 807 6
+OBS T. Girard
+
+COD 807 7
+OBS W. Liller
+
+COD 807 8
+OBS G. Aldering
+
+COD 807 9
+OBS E. Bowell
+
+COD 807 !
+OBS J. C. Muzzio
+
+COD 807 "
+OBS J. Luu
+
+COD 807 #
+OBS A. Becker
+OBS D. Wittman
+
+COD 807 $
+OBS D. Rabinowitz
+
+COD 807 %
+OBS W. H. Ryan
+
+COD 807 &
+OBS L. H. Wasserman
+
+COD 807 '
+OBS B. Morelli
+OBS T. Spuck
+
+COD 807 (
+OBS J. L. Clem
+
+COD 807 )
+OBS P. Weissman
+
+COD 807 +
+OBS I. Griffin
+
+COD 807 ,
+OBS O. Vaduvescu
+
+COD 807 -
+OBS J. Kavelaars
+OBS J.-M. Petit
+
+COD 807 .
+OBS S. S. Sheppard
+
+COD 807 /
+OBS M. E. Schwamb
+
+COD 807 [
+OBS S. Benecchi
+OBS S. Kern
+
+COD 807 \
+OBS B. E. A. Mueller
+
+COD 807 ]
+OBS B. P. Schmidt
+
+COD 807 ^
+OBS M. J. Person
+
+COD 807 _
+OBS G. Tancredi
+
+COD 807 `
+OBS R. S. McMillan
+
+COD 807 {
+OBS D. M. Reichart
+OBS V. Hoette
+
+COD 807 |
+OBS R. Holmes
+
+COD 807 }
+OBS A. W. Puckett
+
+COD 807 ~
+OBS A. Lowe
+
+COD 807 :
+OBS D. Trilling
+
+COD 807 ;
+OBS J. Masiero
+
+COD 807 <
+OBS F. Valdes
+
+COD 807 =
+OBS R. Miles
+
+COD 807 >
+OBS M. Micheli
+
+COD 807 ?
+OBS J. J. Kavelaars
+
+COD 807 @
+OBS C. B. Johnson
+
+COD 807 A
+OBS K. Stanek
+
+COD 807 B
+OBS M. J. Holman
+
+COD 807 C
+OBS S. Deen
+
+COD 809 0
+OBS R. Scarpa
+
+COD 809 1
+OBS C. Cavadore
+
+COD 809 2
+OBS D. J. Tholen
+
+COD 809 3
+OBS H. Debehogne
+
+COD 809 4
+OBS E. W. Elst
+
+COD 809 5
+OBS O. Hainaut
+
+COD 809 6
+OBS B. Gladman
+
+COD 809 7
+OBS G. Masi
+
+COD 809 8
+OBS C.-I. Lagerkvist
+
+COD 809 9
+OBS A. Boattini
+OBS G. Hahn
+
+COD 809 !
+OBS H. U. Horgaard-Nielsen
+
+COD 809 "
+OBS W. Ferreri
+
+COD 809 #
+OBS R. M. West
+
+COD 809 $
+OBS H.-E. Schuster
+
+COD 809 %
+OBS W. Landgraf
+
+COD 809 &
+OBS H. Pedersen
+
+COD 809 '
+OBS G. de Sanctis
+
+COD 809 (
+OBS V. Zappala
+
+COD 809 )
+OBS G. Pizarro
+OBS O. Pizarro
+
+COD 809 *
+OBS H. Bohnhardt
+
+COD 809 +
+OBS R. Behrend
+
+COD 809 ,
+OBS O. Mousis
+OBS P. Rousselot
+
+COD 809 -
+OBS F. Hormuth
+
+COD 809 .
+OBS L. K. Kristensen
+
+COD 809 /
+OBS M. Geffert
+
+COD 809 [
+OBS H. W. Duerbeck
+
+COD 809 \
+OBS P. J. Groot
+
+COD 809 ]
+OBS K. Jager
+
+COD 809 ^
+OBS G. Hahn
+
+COD 809 _
+OBS A. Fitzsimmons
+
+COD 809 `
+OBS S. F. Hoenig
+
+COD 809 {
+OBS E. Jehin
+
+COD 809 |
+OBS O. Vaduvescu
+
+COD 809 }
+OBS P. De Pascale
+
+COD 809 ~
+OBS K. Lang
+
+COD 809 :
+OBS A. Galad
+OBS K. Hornoch
+
+COD 809 ;
+OBS S. Protopapa
+
+COD 809 <
+OBS D. Rabinowitz
+
+COD 809 =
+OBS A. Delsanti
+OBS A. Doressoundiram
+
+COD 809 >
+OBS C. Snodgrass
+
+COD 809 ?
+OBS A. C. Updike
+
+COD 809 @
+OBS K. Sarneczky
+
+COD 809 A
+OBS L. Hudin
+
+COD 809 B
+OBS M.-T. Hui
+
+COD 809 D
+OBS M. Micheli
+
+COD 809 E
+OBS M. J. Holman
+
+COD 809 F
+OBS T. L. Farnham
+
+COD 950 0
+OBS M. J. Irwin
+
+COD 950 1
+OBS M. J. Holman
+
+COD 950 2
+OBS K. Muinonen
+
+COD 950 3
+OBS A. Fitzsimmons
+
+COD 950 4
+OBS R. Casas
+
+COD 950 5
+OBS J. Virtanen
+
+COD 950 6
+OBS W. Nowotny
+
+COD 950 7
+OBS D. D. Balam
+
+COD 950 8
+OBS M. Dahlgren
+
+COD 950 9
+OBS R. Greimel
+
+COD 950 !
+OBS K. Aksnes
+
+COD 950 "
+OBS M. R. Kidger
+
+COD 950 #
+OBS A. A. Kaas
+
+COD 950 $
+OBS A. J. Castro-Tirado
+
+COD 950 %
+OBS R. Behrend
+
+COD 950 &
+OBS T. Kindt
+
+COD 950 '
+OBS T. Grav
+
+COD 950 (
+OBS O. Karlsson
+
+COD 950 )
+OBS R. Stoss
+
+COD 950 *
+OBS I. P. Williams
+
+COD 950 +
+OBS R. Duffard
+
+COD 950 ,
+OBS A. T. Hansen
+
+COD 950 -
+OBS N. McBride
+
+COD 950 .
+OBS O. Vaduvescu
+
+COD 950 /
+OBS B. Gladman
+
+COD 950 [
+OBS J.-M. Petit
+
+COD 950 \
+OBS G. Barentsen
+
+COD 950 ]
+OBS M. Micheli
+
+COD 950 ^
+OBS J. de Leon Cruz
+
+COD 950 _
+OBS I. de la Cueva
+
+COD 950 `
+OBS Q.-Z. Ye
+
+COD 950 {
+OBS M.-T. Hui
+
+COD 950 |
+OBS M. Serra-Ricart
+
+COD 950 }
+OBS K. Sarneczky
+
+COD 950 ~
+OBS G. Fedorets
+
+COD 950 :
+OBS M. Masek
+
+COD 950 ;
+OBS S. Geier
+
+COD 950 <
+OBS R. de la Fuente Marcos
+
+COD 950 =
+OBS G. Ramsay
+
+COD A84 1
+OBS H. Kirbiyik
+
+COD A84 2
+OBS I. Khamitov
+
+COD A84 3
+OBS M. Birlan
+
+COD A84 4
+OBS O. Erece
+
+COD A85 5
+OBS I. F. Bikmaev
+
+COD B35 1
+OBS U. Wolff
+
+COD B35 2
+OBS R. Hutsebaut
+
+COD B35 3
+OBS J. Sue
+
+COD B35 4
+OBS F. Hormuth
+
+COD B35 5
+OBS M. Nicholson
+
+COD B35 6
+OBS A. Lowe
+
+COD B35 7
+OBS J. Bedient
+
+COD B35 8
+OBS P. Lake
+
+COD B35 9
+OBS J. Chumack
+
+COD B35 !
+OBS R. Apitzsch
+
+COD B35 "
+OBS P. S. Hardersen
+
+COD B35 #
+OBS M. Suzuki
+
+COD B35 $
+OBS D. Wells
+
+COD B35 %
+OBS E. Guido
+
+COD B35 &
+OBS J. C. Pelle
+
+COD B35 '
+OBS R. Gagliano
+
+COD B35 (
+OBS E. Schwab
+
+COD B35 )
+OBS J. E. Danaher
+
+COD B35 *
+OBS R. Ligustri
+
+COD B35 +
+OBS N. Falla
+
+COD B35 ,
+OBS W. G. Dillon
+
+COD B35 -
+OBS D. Brandt
+
+COD B35 .
+OBS C. Jacques
+
+COD B35 /
+OBS J. Schiff
+
+COD B35 [
+OBS P. Camilleri
+
+COD C40 1
+OBS A. Ivanov
+
+COD C40 2
+OBS M. Micheli
+
+COD C65 1
+OBS S. Ribas
+
+COD C65 2
+OBS J. M. Trigo
+
+COD C65 3
+OBS M. Micheli
+
+COD D90 1
+OBS U. Wolff
+
+COD D90 2
+OBS R. Hutsebaut
+
+COD D90 3
+OBS J. Sue
+
+COD D90 4
+OBS F. Hormuth
+
+COD D90 5
+OBS M. Nicholson
+
+COD D90 6
+OBS A. Lowe
+
+COD D90 7
+OBS J. Bedient
+
+COD D90 8
+OBS P. B. Lake
+
+COD D90 9
+OBS J. Chumack
+
+COD D90 !
+OBS R. Apitzsch
+
+COD D90 "
+OBS P. S. Hardersen
+
+COD D90 #
+OBS M. Suzuki
+
+COD D90 $
+OBS D. Wells
+
+COD D90 %
+OBS E. Guido
+
+COD D90 &
+OBS J. C. Pelle
+
+COD D90 '
+OBS R. Gagliano
+
+COD D90 (
+OBS E. Schwab
+
+COD D90 )
+OBS J. E. Danaher
+
+COD D90 *
+OBS R. Ligustri
+
+COD D90 +
+OBS N. Falla
+
+COD D90 ,
+OBS W. G. Dillon
+
+COD D90 -
+OBS D. Brandt
+
+COD D90 .
+OBS C. Jacques
+
+COD D90 /
+OBS J. Schiff
+
+COD D90 [
+OBS P. Camilleri
+
+COD D90 \
+OBS B. Conklin
+
+COD D90 ]
+OBS A. Pearce
+
+COD D90 ^
+OBS E. Halberg
+
+COD D90 _
+OBS M. Nissinen
+OBS V. P. Hentunen
+
+COD D90 `
+OBS K. Hills
+
+COD D90 {
+OBS E. Bryssinck
+
+COD D90 |
+OBS H. Sato
+
+COD D90 }
+OBS S. Kurti
+
+COD E03 1
+OBS U. Wolff
+
+COD E03 2
+OBS R. Hutsebaut
+
+COD E03 3
+OBS J. Sue
+
+COD E03 4
+OBS F. Hormuth
+
+COD E03 5
+OBS M. Nicholson
+
+COD E03 6
+OBS A. Lowe
+
+COD E03 7
+OBS J. Bedient
+
+COD E03 8
+OBS P. Lake
+
+COD E03 9
+OBS J. Chumack
+
+COD E03 !
+OBS R. Apitzsch
+
+COD E03 "
+OBS P. S. Hardersen
+
+COD E03 #
+OBS M. Suzuki
+
+COD E03 $
+OBS D. Wells
+
+COD E03 %
+OBS E. Guido
+
+COD E03 &
+OBS J. C. Pelle
+
+COD E03 '
+OBS R. Gagliano
+
+COD E03 (
+OBS E. Schwab
+
+COD E03 )
+OBS J. E. Danaher
+
+COD E03 *
+OBS R. Ligustri
+
+COD E03 +
+OBS N. Falla
+
+COD E03 ,
+OBS W. G. Dillon
+
+COD E03 -
+OBS D. Brandt
+
+COD E03 .
+OBS C. Jacques
+
+COD E03 /
+OBS J. Schiff
+
+COD E03 [
+OBS P. Camilleri
+
+COD E03 \
+OBS B. Conklin
+
+COD E03 ]
+OBS A. Pearce
+
+COD E03 ^
+OBS E. Halberg
+
+COD E03 _
+OBS M. Nissinen
+OBS V. P. Hentunen
+
+COD E03 `
+OBS H. Sato
+
+COD E10 0
+OBS T. Lister
+
+COD E10 1
+OBS F. Tozzi
+
+COD E10 2
+OBS E. Guido
+OBS G. Sostero
+
+COD E10 3
+OBS P. Roche
+
+COD E10 4
+OBS R. Holmes
+
+COD E10 5
+OBS R. Miles
+
+COD E10 6
+OBS A. Fitzsimmons
+
+COD E10 7
+OBS E. Bryssinck
+
+COD E10 8
+OBS D. J. Asher
+
+COD E10 9
+OBS J. D. Armstrong
+
+COD E10 !
+OBS I. Melville
+
+COD E10 "
+OBS R. Behrend
+
+COD E10 #
+OBS J. M. R. Bergonio
+
+COD E10 $
+OBS L. Elenin
+
+COD E10 %
+OBS K. Sarneczky
+OBS A. A. Christou
+
+COD E10 '
+OBS T. Kwiatkowski
+
+COD E10 (
+OBS M. Micheli
+
+COD E10 )
+OBS A. Debackere
+
+COD E10 *
+OBS L. Kurtze
+
+COD E10 +
+OBS W. Cuppens
+
+COD E10 ,
+OBS M. Trueblood
+
+COD E26 1
+OBS U. Wolff
+
+COD E26 2
+OBS R. Hutsebaut
+
+COD E26 3
+OBS J. Sue
+
+COD E26 4
+OBS F. Hormuth
+
+COD E26 5
+OBS M. Nicholson
+
+COD E26 6
+OBS A. Lowe
+
+COD E26 7
+OBS J. Bedient
+
+COD E26 8
+OBS P. Lake
+
+COD E26 9
+OBS J. Chumack
+
+COD E26 !
+OBS R. Apitzsch
+
+COD E26 "
+OBS P. S. Hardersen
+
+COD E26 #
+OBS M. Suzuki
+
+COD E26 $
+OBS D. Wells
+
+COD E26 %
+OBS E. Guido
+
+COD E26 &
+OBS J. C. Pelle
+
+COD E26 '
+OBS R. Gagliano
+
+COD E26 (
+OBS E. Schwab
+
+COD E26 )
+OBS J. E. Danaher
+
+COD E26 *
+OBS R. Ligustri
+
+COD E26 +
+OBS N. Falla
+
+COD E26 ,
+OBS W. G. Dillon
+
+COD E26 -
+OBS D. Brandt
+
+COD E26 .
+OBS C. Jacques
+
+COD E26 /
+OBS J. Schiff
+
+COD E26 [
+OBS P. Camilleri
+
+COD E26 \
+OBS B. Conklin
+
+COD E26 ]
+OBS A. Pearce
+
+COD E26 ^
+OBS E. Halberg
+
+COD E26 _
+OBS M. Nissinen
+OBS V. P. Hentunen
+
+COD F65 1
+OBS A. Fitzsimmons
+
+COD F65 2
+OBS L. Kurtze
+
+COD F65 3
+OBS D. Bowdley
+
+COD F65 4
+OBS J. Bedient
+
+COD F65 5
+OBS D. J. Asher
+
+COD F65 6
+OBS R. Miles
+
+COD F65 7
+OBS P. Roche
+
+COD F65 8
+OBS D. J. Tholen
+
+COD F65 9
+OBS M. Micheli
+
+COD F65 !
+OBS D. Sergison
+
+COD F65 "
+OBS R. Behrend
+
+COD F65 #
+OBS I. Melville
+
+COD F65 $
+OBS E. Guido
+
+COD F65 %
+OBS T. Lister
+
+COD F65 &
+OBS A. Debackere
+
+COD F65 '
+OBS K. Roy
+
+COD F65 (
+OBS R. Holmes
+
+COD F65 )
+OBS A. A. Christou
+
+COD F65 *
+OBS P.-J. Dekelver
+
+COD F65 +
+OBS W. Cuppens
+
+COD F65 ,
+OBS J. D. Armstrong
+
+COD F65 -
+OBS K. Stanek
+
+COD F65 .
+OBS M. Trueblood
+
+COD G37 1
+OBS L. H. Wasserman
+
+COD G37 2
+OBS N. Moskovitz
+
+COD G37 3
+OBS A. Thirouin
+
+COD G37 4
+OBS S. S. Sheppard
+
+COD G37 5
+OBS M. Micheli
+
+COD G37 6
+OBS M. Devogele
+
+COD G37 7
+OBS Q.-Z. Ye
+
+COD G37 8
+OBS T. L. Farnham
+
+COD G37 9
+OBS L. M. Feaga
+
+COD G40 1
+OBS N. E. Pritchett
+
+COD G40 2
+OBS N. Paul
+
+COD G40 3
+OBS A. J. Evans
+
+COD G40 4
+OBS D. Cranford
+
+COD G40 5
+OBS S. M. Tilley
+
+COD G40 6
+OBS M. Dadighat
+
+COD G40 7
+OBS A. S. Betzler
+
+COD G40 8
+OBS B. A. Sanford
+
+COD G40 9
+OBS B. Lutkenhoner
+
+COD G40 !
+OBS M. Kumrucu-Lohmiller
+
+COD G40 "
+OBS G. Gasparovic
+
+COD G40 #
+OBS J. L. Tuten
+
+COD G40 $
+OBS R. C. Bubany
+
+COD G40 %
+OBS D. P. Dean
+
+COD G40 &
+OBS K. D. Breedlove
+
+COD G40 '
+OBS W. F. Cashwell
+
+COD G40 (
+OBS K. Dankov
+
+COD G40 )
+OBS C. H. Colvin
+
+COD G40 *
+OBS M. Suzuki
+
+COD G40 +
+OBS K. Sarneczky
+
+COD G40 ,
+OBS R. W. Anderson
+
+COD G40 -
+OBS J. Maes
+
+COD G73 1
+OBS K. Manno
+
+COD G73 2
+OBS D. Hellmann
+
+COD G83 1
+OBS E. Ryan
+
+COD G83 2
+OBS M. Micheli
+
+COD H06 0
+OBS J. Skvarc
+
+COD H06 1
+OBS U. Wolff
+
+COD H06 2
+OBS R. Hutsebaut
+
+COD H06 3
+OBS J. Sue
+
+COD H06 4
+OBS F. Hormuth
+
+COD H06 5
+OBS M. Nicholson
+
+COD H06 6
+OBS A. Lowe
+
+COD H06 7
+OBS J. Bedient
+
+COD H06 8
+OBS P. B. Lake
+
+COD H06 9
+OBS J. Chumack
+
+COD H06 !
+OBS R. Apitzsch
+
+COD H06 "
+OBS P. S. Hardersen
+
+COD H06 #
+OBS M. Suzuki
+
+COD H06 $
+OBS D. Wells
+
+COD H06 %
+OBS E. Guido
+
+COD H06 &
+OBS J. C. Pelle
+
+COD H06 '
+OBS R. Gagliano
+
+COD H06 (
+OBS E. Schwab
+
+COD H06 )
+OBS J. E. Danaher
+
+COD H06 *
+OBS R. Ligustri
+
+COD H06 +
+OBS N. Falla
+
+COD H06 ,
+OBS W. G. Dillon
+
+COD H06 -
+OBS D. Brandt
+
+COD H06 .
+OBS C. Jacques
+
+COD H06 /
+OBS J. Schiff
+
+COD H06 [
+OBS P. Camilleri
+
+COD H06 \
+OBS B. Conklin
+
+COD H06 ]
+OBS A. Pearce
+
+COD H06 ^
+OBS E. Halberg
+
+COD H06 _
+OBS M. Nissinen
+OBS V. P. Hentunen
+
+COD H06 `
+OBS E. Bryssinck
+
+COD H06 {
+OBS T. Yusa
+
+COD H06 |
+OBS H. Sato
+
+COD H06 }
+OBS M. Gerber
+
+COD H06 ~
+OBS B. Haeusler
+
+COD H06 :
+OBS S. Kurti
+
+COD H06 ;
+OBS T. Vorobjov
+
+COD H06 <
+OBS T. V. Kryachko
+
+COD H06 =
+OBS G. V. Williams
+
+COD H06 >
+OBS J. J. Gonzalez
+
+COD H06 ?
+OBS S. Kiyota
+
+COD H06 @
+OBS K. Sokolovsky
+
+COD H06 A
+OBS M. Urbanik
+
+COD H06 B
+OBS M. Henrichs
+
+COD H06 D
+OBS N. E. Pritchett
+
+COD H06 E
+OBS P. F. York
+
+COD H06 F
+OBS C. Joseph
+
+COD H06 G
+OBS P. Bacci
+
+COD H06 H
+OBS M. G. J. Breukers
+
+COD H06 I
+OBS J. Jahn
+
+COD H06 J
+OBS J. Hart
+
+COD H06 K
+OBS A. Novichonok
+OBS S. Plaksa
+
+COD H06 L
+OBS N. Paul
+
+COD H06 M
+OBS M. Masek
+
+COD H06 N
+OBS P. S. Lau
+
+COD H06 O
+OBS T. Thaluang
+
+COD H06 P
+OBS B. Dawson
+
+COD H06 Q
+OBS S. M. Tilley
+
+COD H06 R
+OBS A. J. Evans
+
+COD H06 T
+OBS R. Weir
+
+COD H06 U
+OBS J. Liu
+OBS X. Xu
+
+COD H06 V
+OBS B. Lutkenhoner
+
+COD H06 W
+OBS M. Mattiazzo
+
+COD H06 X
+OBS M. Miller
+
+COD H06 Y
+OBS D. Denisenko
+
+COD H06 Z
+OBS J.-F. Coliac
+
+COD H06 a
+OBS G. Crinklaw
+
+COD H06 b
+OBS D. P. Dean
+
+COD H06 c
+OBS D. Gardner
+
+COD H06 d
+OBS W. Clark
+
+COD H06 e
+OBS A. Valvasori
+
+COD H06 f
+OBS V. Grossi
+
+COD H06 g
+OBS R. Reed
+
+COD H06 h
+OBS D. Bamberger
+
+COD H06 i
+OBS J. Chambers
+
+COD H06 j
+OBS G. van Buitenen
+
+COD H06 k
+OBS K. Sarneczky
+
+COD H06 l
+OBS N. James
+
+COD H06 m
+OBS K. Dankov
+
+COD H06 n
+OBS D. Storey
+
+COD H06 o
+OBS T. Prystavski
+
+COD H06 p
+OBS K. Yoshimoto
+
+COD H06 q
+OBS F. D. Romanov
+
+COD H06 r
+OBS J. Zeitz
+
+COD H06 s
+OBS C. W. Hergenrother
+
+COD H06 t
+OBS G. Gasparovic
+
+COD I03 1
+OBS A. Migliorini
+OBS C. Barbieri
+OBS S. Magrin
+OBS S. Marchi
+
+COD I03 2
+OBS H. Raab
+OBS R. Stoss
+
+COD I05 1
+OBS A. Migliorini
+OBS C. Barbieri
+OBS S. Magrin
+OBS S. Marchi
+
+COD I05 2
+OBS G. Masi
+
+COD I05 3
+OBS D. Mendicini
+
+COD I11 1
+OBS J. J. Kavelaars
+OBS J.-M. Petit
+
+COD I11 2
+OBS C. A. Trujillo
+OBS S. S. Sheppard
+
+COD I11 3
+OBS J. M. Bauer
+
+COD I11 4
+OBS J. Masiero
+OBS S. Margheim
+
+COD I11 5
+OBS M. Micheli
+
+COD I89 1
+OBS E. Guido
+
+COD I89 2
+OBS E. Bryssinck
+
+COD I89 3
+OBS M. Masek
+
+COD I89 4
+OBS M. Suzuki
+
+COD I89 5
+OBS N. E. Pritchett
+
+COD I89 6
+OBS H. Sato
+
+COD I89 7
+OBS P. F. York
+
+COD I89 8
+OBS G. V. Williams
+
+COD I89 9
+OBS P. S. Lau
+
+COD I89 !
+OBS P. Palazzolo
+
+COD I89 "
+OBS C. Jacques
+
+COD I89 #
+OBS N. Paul
+
+COD I89 $
+OBS N. Falla
+
+COD I89 %
+OBS A. J. Evans
+
+COD I89 &
+OBS J. Jahn
+
+COD I89 '
+OBS S. M. Tilley
+
+COD I89 (
+OBS T. Prystavski
+
+COD I89 )
+OBS R. Weir
+
+COD I89 *
+OBS M. Urbanik
+
+COD I89 +
+OBS M. Mattiazzo
+
+COD I89 ,
+OBS D. Brandt
+
+COD I89 -
+OBS T. Yusa
+
+COD I89 .
+OBS B. Lutkenhoner
+
+COD I89 /
+OBS A. S. Betzler
+
+COD I89 [
+OBS B. Haeusler
+
+COD I89 \
+OBS L. Elenin
+
+COD I89 ]
+OBS M. Miller
+
+COD I89 ^
+OBS J.-F. Coliac
+
+COD I89 _
+OBS K. Wierzchos
+
+COD I89 `
+OBS V. Grossi
+
+COD I89 {
+OBS D. Storey
+
+COD I89 |
+OBS D. Denisenko
+
+COD I89 }
+OBS C. W. Hergenrother
+
+COD J13 1
+OBS D. Bowdley
+
+COD J13 2
+OBS R. Miles
+
+COD J13 3
+OBS G. Sostero
+
+COD J13 4
+OBS E. Guido
+
+COD J13 5
+OBS O. Vaduvescu
+
+COD J13 6
+OBS M. Altmann
+
+COD J13 7
+OBS J. L. Ortiz
+
+COD J13 8
+OBS B. T. Bolin
+
+COD K99 1
+OBS V. I. Kudak
+
+COD K99 2
+OBS M. Micheli
+
+COD L28 1
+OBS S. Schmalz
+
+COD L28 2
+OBS M. Micheli
+
+COD N50 1
+OBS M. Micheli
+
+COD N50 2
+OBS M. Safonova
+
+COD Q62 0
+OBS E. Guido
+
+COD Q62 1
+OBS H. Sato
+
+COD Q62 2
+OBS M. Urbanik
+
+COD Q62 3
+OBS R. Ligustri
+
+COD Q62 4
+OBS J. Jahn
+
+COD Q62 5
+OBS C. Jacques
+OBS E. Pimentel
+OBS J. Barros
+
+COD Q62 6
+OBS E. Bryssinck
+
+COD Q62 7
+OBS M. Nissinen
+
+COD Q62 8
+OBS N. Falla
+
+COD Q62 9
+OBS G. V. Williams
+
+COD Q62 !
+OBS P. B. Lake
+
+COD Q62 "
+OBS N. E. Pritchett
+
+COD Q62 #
+OBS K. Sokolovsky
+
+COD Q62 $
+OBS M. O'Connell
+
+COD Q62 %
+OBS M. Masek
+
+COD Q62 &
+OBS A. Novichonok
+
+COD Q62 '
+OBS T. Thaluang
+
+COD Q62 (
+OBS P. S. Lau
+
+COD Q62 )
+OBS E. Polupanov
+
+COD Q62 *
+OBS M. Rudenko
+
+COD Q62 +
+OBS P. F. York
+
+COD Q62 ,
+OBS F. Fratev
+
+COD Q62 -
+OBS P. Palazzolo
+
+COD Q62 .
+OBS R. Castillo Garcia
+
+COD Q62 /
+OBS P. Bacci
+
+COD Q62 [
+OBS M. Suzuki
+
+COD Q62 \
+OBS B. C. Dawson
+
+COD Q62 ]
+OBS A. J. Evans
+
+COD Q62 ^
+OBS J. Liu
+
+COD Q62 _
+OBS C. Wiedemair
+
+COD Q62 `
+OBS S. M. Tilley
+
+COD Q62 {
+OBS N. Paul
+
+COD Q62 |
+OBS S. Foglia
+
+COD Q62 }
+OBS S. Kurti
+
+COD Q62 ~
+OBS A. S. Betzler
+
+COD Q62 :
+OBS M.-T. Hui
+
+COD Q62 ;
+OBS M. Mattiazzo
+
+COD Q62 <
+OBS D. Storey
+
+COD Q62 =
+OBS T. Yusa
+
+COD Q62 >
+OBS M. Micheli
+
+COD Q62 ?
+OBS B. Lutkenhoner
+
+COD Q62 @
+OBS D. Brandt
+
+COD Q62 A
+OBS A. Valasori
+
+COD Q62 B
+OBS B. Haeusler
+
+COD Q62 D
+OBS I. Robbins
+
+COD Q62 E
+OBS C. Perello
+
+COD Q62 F
+OBS M. Miller
+
+COD Q62 G
+OBS W. Romanishin
+
+COD Q62 H
+OBS J.-C. Merlin
+
+COD Q62 I
+OBS R. Ferrando
+
+COD Q62 J
+OBS D. Denisenko
+
+COD Q62 K
+OBS D. P. Dean
+
+COD Q62 L
+OBS M. Taylor
+
+COD Q62 M
+OBS G. Gasparovic
+
+COD Q62 N
+OBS G. van Buitenen
+
+COD Q62 O
+OBS G. Baj
+
+COD Q62 P
+OBS W. Clark
+
+COD Q62 Q
+OBS G. Crinklaw
+
+COD Q62 R
+OBS V. Grossi
+
+COD Q62 S
+OBS R. Kneip
+
+COD Q62 T
+OBS D. Parrott
+
+COD Q62 U
+OBS R. Reed
+
+COD Q62 V
+OBS J. Chambers
+
+COD Q62 W
+OBS N. James
+
+COD Q62 X
+OBS Y.-P. Chan
+
+COD Q62 Y
+OBS P. Soper
+
+COD Q62 Z
+OBS T. Prystavski
+
+COD Q62 a
+OBS K. Yoshimoto
+
+COD Q62 b
+OBS C. W. Hergenrother
+
+COD Q62 c
+OBS A. Valvasori
+
+COD Q62 d
+OBS F. D. Romanov
+
+COD Q62 e
+OBS A. Pearce
+
+COD U69 1
+OBS E. Guido
+
+COD U69 2
+OBS A. Novichonok
+
+COD U69 3
+OBS G. V. Williams
+
+COD U69 4
+OBS E. Bryssinck
+
+COD U69 5
+OBS H. Sato
+
+COD U69 6
+OBS P. S. Lau
+
+COD U69 7
+OBS P. B. Lake
+
+COD U69 8
+OBS N. Paul
+
+COD U69 9
+OBS S. M. Tilley
+
+COD U69 !
+OBS C. Perello
+
+COD U69 "
+OBS M. Suzuki
+
+COD U69 #
+OBS B. Lutkenhoner
+
+COD U69 $
+OBS M. Urbanik
+
+COD U69 %
+OBS J. Jahn
+
+COD U69 &
+OBS M. Mattiazzo
+
+COD U69 '
+OBS A. S. Betzler
+
+COD U69 (
+OBS B. Haeusler
+
+COD U69 )
+OBS D. Brandt
+
+COD U69 *
+OBS T. Teerasak
+
+COD U69 +
+OBS M. Miller
+
+COD U69 ,
+OBS C. Jacques
+
+COD U69 -
+OBS N. Falla
+
+COD U69 .
+OBS D. Denisenko
+
+COD U69 /
+OBS R. Horn
+
+COD U69 [
+OBS M. Faison
+
+COD U69 \
+OBS A. H. Davenport
+
+COD U69 ]
+OBS G. Baj
+
+COD U69 ^
+OBS W. Romanishin
+
+COD U69 `
+OBS N. James
+
+COD U69 {
+OBS R. Ligustri
+
+COD U69 |
+OBS F. D. Romanov
+
+COD U69 }
+OBS G. van Buitenen
+
+COD U69 -
+OBS C. W. Hergenrother
+
+COD U69 :
+OBS J. Zeitz
+
+COD U69 ;
+OBS T. Prystavski
+
+COD V07 1
+OBS M. Rudenko
+
+COD V26 1
+OBS A. Mokhnatkin
+
+COD V26 2
+OBS M. Micheli
+
+COD W76 1
+OBS E. Bryssinck
+
+COD W76 2
+OBS M. Matti
+
+COD W76 3
+OBS D. Denisenko
+
+COD W76 4
+OBS M. Fiedler
+
+COD W76 5
+OBS S. Pogrebisskiy
+
+COD W76 6
+OBS H. Sato
+
+COD W76 7
+OBS N. Falla
+
+COD W76 8
+OBS G. Gasparovic
+
+COD W76 9
+OBS S. M. Tilley
+
+COD W76 !
+OBS M. Urbanik
+
+COD W76 "
+OBS M. Miller
+
+COD W76 #
+OBS M. Serra-Ricart
+
+COD W76 $
+OBS A. Belotsky
+
+COD W76 %
+OBS T. Kessler
+
+COD W84 1
+OBS D. Trilling
+
+COD W84 2
+OBS S. S. Sheppard
+
+COD W84 3
+OBS M. Micheli
+
+COD W84 4
+OBS A. N. Heinze
+
+COD W84 5
+OBS L. Allen
+
+COD W84 6
+OBS D. A. Cameron
+
+COD W84 7
+OBS D. Gerdes
+
+COD W84 8
+OBS S. Sonnett
+
+COD W84 9
+OBS D. James
+OBS J. Bauer
+
+COD W84 !
+OBS F. Valdes
+
+COD W84 "
+OBS J. Pena
+OBS J. Pena Z.
+
+COD W84 #
+OBS R. S. McMillan
+
+COD W84 $
+OBS J. B. Kalmbach
+
+COD W84 %
+OBS O. Vaduvescu
+
+COD W84 &
+OBS S. Deen
+
+COD W84 '
+OBS H.-W. Lin
+
+COD W84 (
+OBS P. H. Bernardinelli
+
+COD W84 )
+OBS W. Falla
+
+COD W84 *
+OBS L. Markwardt
+
+COD W84 +
+OBS M. T. Penny
+
+COD W88 1
+OBS A. J. Evans
+
+COD W88 2
+OBS D. G. Cranford, Jr.
+
+COD W88 3
+OBS B. Lutkenhoner
+
+COD W88 4
+OBS G. Gasparovic
+
+COD W88 5
+OBS M. Kumrucu-Lohmiller
+
+COD W88 6
+OBS J. L. Tuten
+
+COD W88 7
+OBS D. P. Dean
+
+COD W88 8
+OBS R. C. Bubany
+
+COD W88 9
+OBS K. D. Breedlove
+
+COD W88 !
+OBS W. F. Cashwell
+
+COD W88 "
+OBS K. Dankov
+
+COD W88 #
+OBS M. Suzuki
+
+COD W88 $
+OBS K. Sarneczky
+
+COD W88 %
+OBS N. Paul
+
+COD W88 &
+OBS A. Hale
+
+COD W88 '
+OBS R. W. Anderson
+
+COD W88 (
+OBS J. Maes
+
+COD Z18 1
+OBS M. Micheli
+
+COD Z18 2
+OBS M. Serra-Ricart
+
+COD Z18 3
+OBS E. Solano
+
+COD Z19 1
+OBS M. Micheli
+
+COD Z20 1
+OBS L. Palaversa
