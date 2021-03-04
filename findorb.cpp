@@ -3282,6 +3282,13 @@ int main( int argc, const char **argv)
 
             assert( ids);
             assert( n_ids);
+            strlcpy_err( tbuff, get_find_orb_text( 18), sizeof( tbuff));
+            strlcat_err( tbuff, " | ", sizeof( tbuff));
+            i = strlen( ifilename);
+            while( i && ifilename[i - 1] != '/' && ifilename[i - 1] != '\\')
+               i--;
+            strlcat_err( tbuff, ifilename + i, sizeof( tbuff));
+            PDC_set_title( tbuff);
             if( n_ids > 1)
                id_number = select_object_in_file( ids, n_ids);
             if( debug_level > 3 && id_number >= 0)
@@ -3321,6 +3328,10 @@ int main( int argc, const char **argv)
                if( obs)
                   unload_observations( obs, n_obs);
 
+               strlcpy_err( tbuff, get_find_orb_text( 18), sizeof( tbuff));
+               strlcat_err( tbuff, " | ", sizeof( tbuff));
+               strlcat_err( tbuff, ids[id_number].obj_name, sizeof( tbuff));
+               PDC_set_title( tbuff);
                obs = load_object( ifile, ids + id_number, &curr_epoch,
                                                      &epoch_shown, orbit);
                assert( obs);
