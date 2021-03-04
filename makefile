@@ -219,8 +219,8 @@ ifdef EXE
 	cp $(FIND_ORB_EXE) $(IDIR)
 	cp $(FO_EXE)       $(IDIR)
 else
-	cp $(FIND_ORB_EXE) $(HOME)/bin
-	cp $(FO_EXE)       $(HOME)/bin
+	cp $(FIND_ORB_EXE) $(INSTALL_DIR)/bin
+	cp $(FO_EXE)       $(INSTALL_DIR)/bin
 endif
 	cp command.txt details.txt dosephem.txt dos_help.txt ?findorb.txt           $(IDIR)
 	cp environ.def frame_he.txt geo_rect.txt header.htm jpl_eph.txt             $(IDIR)
@@ -235,8 +235,8 @@ ifdef EXE
 	rm -f $(IDIR)/$(FIND_ORB_EXE)
 	rm -f $(IDIR)/$(FO_EXE)
 else
-	rm -f $(HOME)/bin/$(FIND_ORB_EXE)
-	rm -f $(HOME)/bin/$(FO_EXE)
+	rm -f $(INSTALL_DIR)/bin/$(FIND_ORB_EXE)
+	rm -f $(INSTALL_DIR)/bin/$(FO_EXE)
 endif
 	rm -f $(IDIR)/*
 	rmdir $(IDIR)
