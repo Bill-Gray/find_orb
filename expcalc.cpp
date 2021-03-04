@@ -320,6 +320,7 @@ int find_expcalc_config_from_mpc_code( const char *mpc_code,
             assert( !(n_found & 1));
             c->n_horizon_points = n_found / 2;
             }
+         c->sky_brightness = c->sky_brightness_at_zenith;
          }
    return( (int)rval);
 }
@@ -381,6 +382,7 @@ const char *usage_statement =
  "   -readnoise <electrons>          # detector readout noise in electrons\n"
  "   -pixelsize <arcsec>             # assume square pixel size in arcsec\n"
  "   -skybrightness <mag/arcsec/sec> # Magnitude of square arcsec sky in one second\n"
+ "   -scope <filename>               # Reset 'scope.json' filename\n"
  "   -airmass <fraction>             # airmass of object\n"
  "   -fwhm <arcsec>                  # Full width half maximum in arcsec\n"
  "   -obstdiameter <cm>              # diameter in cm of central obstruction\n";
@@ -411,9 +413,15 @@ int main( const int argc, const char **argv)
    int i;
    const char *mpc_code = "I52";
    bool debug = false;
-   const char *scope_json = "scope.json";
-   FILE *ifile = fopen( scope_json, "rb");
+   const char *scope_json_filename = "scope.json";
+   FILE *ifile;
 
+   for( i = 1; i < argc; i++)
+      if( !strcmp( argv[i], "-mpc"))
+          mpc_code = argv[i + 1];
+      else if( !memcmp( argv[i], "-sc", 3))
+          scope_json_filename = argv[i + 1];
+   ifile = fopen( scope_json_filename, "rb");
    if( !ifile)       /* look for ~/.find_orb/scope.json */
       {
       char buff[255], *home_dir = getenv( "HOME");
@@ -422,7 +430,7 @@ int main( const int argc, const char **argv)
          {
          strcpy( buff, home_dir);
          strcat( buff, "/.find_orb/");
-         strcat( buff, scope_json);
+         strcat( buff, scope_json_filename);
          ifile = fopen( buff, "rb");
          }
       }
@@ -431,9 +439,6 @@ int main( const int argc, const char **argv)
       fprintf( stderr, "Couldn't open 'scope.json'\n");
       usage( );
       }
-   for( i = 1; i < argc; i++)
-      if( !strcmp( argv[i], "-mpc"))
-          mpc_code = argv[i + 1];
    memset( &c, 0, sizeof( expcalc_config_t));
    switch( find_expcalc_config_from_mpc_code( mpc_code, ifile, &c))
       {
@@ -463,9 +468,9 @@ int main( const int argc, const char **argv)
                debug = true;
                break;
             case 'f':
-               if( argv[i][2] == 'i')
+               if( argv[i][2] == 'i')   /* specify filter, <N|U|B|V|R|I|W> */
                   c.filter = argv[i + 1][0];
-               if( argv[i][2] == 'w')
+               else              /* full width half maximum, in arcsec */
                   c.fwhm = atof( argv[i + 1]);
                break;
             case 'o':
@@ -481,10 +486,14 @@ int main( const int argc, const char **argv)
                c.qe = atof( argv[i + 1]);
                break;
             case 'r':
-               c.aperture = atof( argv[i + 1]);
+               if( argv[i][2] == 'e')        /* read noise, in electrons */
+                  c.readnoise = atof( argv[i + 1]);
+               else              /* pinhole photometry radius in arcsec */
+                  c.aperture = atof( argv[i + 1]);
                break;
             case 's':
-               c.sky_brightness = atof( argv[i + 1]);
+               if( argv[i][2] != 'c')     /* resetting scope.json is handled above */
+                  c.sky_brightness = atof( argv[i + 1]);
                break;
             }
          }
