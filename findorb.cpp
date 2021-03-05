@@ -1669,7 +1669,11 @@ static MPC_STATION *mpc_color_codes = NULL;
    'default_color' unless it's excluded.  If it is,  the residuals
    are shown in COLOR_EXCLUDED_OBS. */
 
-static int make_unicode_substitutions = 1;
+#ifdef __APPLE__
+   static int make_unicode_substitutions = 0;
+#else
+   static int make_unicode_substitutions = 1;
+#endif
 
 static const char *legend =
 "   YYYY MM DD.DDDDD   RA (J2000)   dec      sigmas   mag     ref Obs     Xres  Yres   delta  R";
@@ -3169,7 +3173,7 @@ int main( int argc, const char **argv)
                }
                break;
             case 'u':
-               make_unicode_substitutions = 0;
+               make_unicode_substitutions ^= 1;
                break;
             case 'v':
                {
