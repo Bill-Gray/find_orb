@@ -483,6 +483,7 @@ int main( int argc, const char **argv)
    extern bool is_default_ephem;
    bool drop_single_obs = true;
    const char *ephem_option_string = NULL;
+   const char *computed_obs_filename = NULL;
 #ifdef FORKING
    int child_status;
 #endif
@@ -548,6 +549,9 @@ int main( int argc, const char **argv)
                ephem_option_string = arg;
                break;
             case 'f':                     /* obj desig specified;  fall through */
+               break;
+            case 'F':
+               computed_obs_filename = arg;
                break;
             case 'h':                     /* show planet-centric orbits */
                all_heliocentric = false;
@@ -832,6 +836,15 @@ int main( int argc, const char **argv)
                write_out_elements_to_file( orbit, curr_epoch, epoch_shown,
                      obs, n_obs_actually_loaded, orbit_constraints, element_precision,
                      0, element_options);
+               if( computed_obs_filename)
+                  {
+                  extern const char *observe_filename;
+                  const char *tptr = observe_filename;
+
+                  observe_filename = computed_obs_filename;
+                  create_obs_file_with_computed_values( obs, n_obs_actually_loaded, 0);
+                  observe_filename = tptr;
+                  }
                strcpy( tbuff, orbit_summary_text);
                if( use_colors)
                   colorize_text( tbuff);

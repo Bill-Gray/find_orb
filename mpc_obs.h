@@ -210,6 +210,8 @@ void recreate_observation_line( char *obuff,
 void put_observer_data_in_text( const char FAR *mpc_code, char *buff);
 
 void create_obs_file( const OBSERVE FAR *obs, int n_obs, const int append);
+void create_obs_file_with_computed_values( const OBSERVE FAR *obs,
+                  int n_obs, const int append);
 int find_worst_observation( const OBSERVE FAR *obs, const int n_obs);
 double calc_absolute_magnitude( OBSERVE FAR *obs, int n_obs);
 double compute_rms( const OBSERVE FAR *obs, const int n_obs);

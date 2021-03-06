@@ -126,7 +126,8 @@ size_t strlcat_err( char *dst, const char *src, size_t dsize); /* miscell.c */
 void shellsort_r( void *base, const size_t n_elements, const size_t elem_size,
          int (*compare)(const void *, const void *, void *), void *context);
 
-const char *observe_filename = "observe.txt";
+const char *default_observe_filename = "observe.txt";
+const char *observe_filename = default_observe_filename;
 const char *residual_filename = "residual.txt";
 const char *ephemeris_filename = "ephemeri.txt";
 bool is_default_ephem = true;
@@ -3999,7 +4000,12 @@ char *get_file_name( char *filename, const char *template_file_name)
 void create_obs_file( const OBSERVE FAR *obs, int n_obs, const int append)
 {
    char filename[81], curr_sigma_text[81];
-   FILE *ofile = fopen_ext( get_file_name( filename, observe_filename),
+   FILE *ofile;
+
+   if( observe_filename != default_observe_filename)
+      ofile = fopen_ext( observe_filename,  append ? "fab" : "fwb");
+   else
+      ofile = fopen_ext( get_file_name( filename, observe_filename),
                            append ? "tfcab" : "tfcwb");
 
    *curr_sigma_text = '\0';
@@ -4028,6 +4034,33 @@ void create_obs_file( const OBSERVE FAR *obs, int n_obs, const int append)
       }
    fclose( ofile);
 }
+
+/* This function creates an observation file,  but with the observed
+RA/decs and magnitudes replaced with computed ones.  Load the resulting
+file back into Find_Orb,  and you get near-zero residuals (there is
+rounding error).  Computed mags are supplied for all observations,
+and they're all V mags. */
+
+void create_obs_file_with_computed_values( const OBSERVE FAR *obs,
+                  int n_obs, const int append)
+{
+   OBSERVE *tobs = (OBSERVE *)calloc( n_obs, sizeof( OBSERVE));
+   int i;
+
+   memcpy( tobs, obs, n_obs * sizeof( OBSERVE));
+
+   for( i = 0; i < n_obs; i++)
+      {
+      tobs[i].obs_mag = tobs[i].computed_mag + mag_band_shift( tobs[i].mag_band);
+      tobs[i].ra  = tobs[i].computed_ra;
+      tobs[i].dec = tobs[i].computed_dec;
+      tobs[i].mag_precision = 2;
+      tobs[i].mag_band = 'V';
+      }
+   create_obs_file( tobs, n_obs, append);
+   free( tobs);
+}
+
 
 static void add_final_period( char *buff)
 {
