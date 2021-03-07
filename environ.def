@@ -95,6 +95,11 @@ RADAR_253=430000,17,.94,20,1e-11
    has an unofficial MPC code in 'rovers.txt' (q.v.).
 RADAR_d43=430000,17,.94,20,7e-14
 
+   The Allen Telescope Array is a radio telescope,  not radar.  I am inserting
+   bogus values here so that "visible" will mean "the object is above the
+   horizon",  rather than "the object is above the horizon and it's night".
+RADAR_ATA=0,17,.94,10,0
+
    'Settings2' gives five parameters.  The first is 1 if observation weighting
    is used and 0 if it is not.  Next,  the 'faint limit' on ephemerides (by
    default,  ephemerides are not listed if the object is fainter than mag 22).
