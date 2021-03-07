@@ -2526,6 +2526,7 @@ static int find_rgb( const unsigned irgb)
 static void PDC_set_title( const char *title)
 {
    printf( "\033\x5d\x32;%s\a", title);
+   fflush( stdout);
 }
 #endif
 
