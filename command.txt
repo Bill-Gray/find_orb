@@ -12,7 +12,7 @@ l              constr
 e              Epoch
 !              all_perts
 u              Undo
-*              SRP
+*              NonGravs
 +              HelioOnly
 -              Obs'ories
 x              ToggObs

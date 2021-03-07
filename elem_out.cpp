@@ -146,6 +146,7 @@ char default_comet_magnitude_type = 'N';
 const char *mpc_fmt_filename = "mpc_fmt.txt";
 const char *sof_filename = "sof.txt";
 const char *sofv_filename = "sofv.txt";
+int force_model = 0;
 extern int forced_central_body;
 int get_planet_posn_vel( const double jd, const int planet_no,
                      double *posn, double *vel);         /* runge.cpp */
@@ -163,6 +164,13 @@ int debug_printf( const char *format, ...)                 /* runge.cpp */
          __attribute__ (( format( printf, 1, 2)))
 #endif
 ;
+
+bool is_inverse_square_force_model( void)
+{
+   return( force_model == FORCE_MODEL_SRP
+               || force_model == FORCE_MODEL_SRP_TWO_PARAM
+               || force_model == FORCE_MODEL_SRP_THREE_PARAM);
+}
 
 char *fgets_trimmed( char *buff, size_t max_bytes, FILE *ifile)
 {
@@ -1606,7 +1614,7 @@ int write_out_elements_to_file( const double *orbit,
                if( j == n_extra_params - 1)
                   {
                   strcat( tt_ptr, " AU/day^2");
-                  if( object_type != OBJECT_TYPE_COMET)
+                  if( is_inverse_square_force_model( ))
                      strcat( tt_ptr, " [1/r^2]");
                   }
                else
@@ -2422,7 +2430,13 @@ static double extract_state_vect_from_text( const char *text,
             orbit[i] *= seconds_per_day;
       else if( *text == 'A' && text[1] >= '1' && text[1] <= '3'
                   && text[2] == '=')
-         solar_pressure[text[1] - '1'] = atof( text + 3);
+         {
+         extern int n_extra_params;
+
+         n_extra_params = text[1] - '1';
+         force_model = n_extra_params;
+         solar_pressure[n_extra_params - 1] = atof( text + 3);
+         }
       while( *text != ',' && *text)
          text++;
       if( *text == ',')
@@ -2524,6 +2538,7 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
             n_extra_params = n_read - 4;
             if( n_extra_params < 0)
                n_extra_params = 0;
+            force_model = n_extra_params;
             fgets_trimmed( buff, sizeof( buff), ifile);
             sscanf( buff, "%lf%lf%lf%lf%lf%lf",
                           orbit + 3, orbit + 4, orbit + 5,

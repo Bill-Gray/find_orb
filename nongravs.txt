@@ -1,0 +1,43 @@
+   Find_Orb supports (at present) five different non-gravitational force
+models.  More may be added later.
+
+   'Solar radiation pressure (radial, 1/r^2)' is the simplest : the model
+assumes that the object is pushed outward from the sun by a force that
+is proportional to the amount of sunlight hitting it,  i.e.,  the inverse
+square of the distance to the sun (except when in the earth's shadow).
+
+   'Solar radiation pressure (two-parameter)' adds a force in the direction
+of the object's motion around the sun,  proportional to the radial force.
+This is commonly seen with small asteroids and even more so with space
+junk.  It is a simplification of the Yarkovsky effect : if the object has
+prograde rotation,  it will absorb some sunlight,  emit it as it rotates,
+and be (very gently) accelerated.  If its rotation is retrograde,  the
+opposite will occur.  For most asteroids,  setting the constraint A1=0
+will make sense;  they will show little radial effect,  but the accumulated
+acceleration along-orbit will show up nicely.
+
+   'Solar radiation pressure (three-parameter)' adds a force in the
+out-of-plane direction,  normal to the other two forces.  This can result
+in a better fit to the data for space junk;  I've yet to see it apply to
+a natural one.  Even with space junk,  it does not really match the
+actual physics and should be used with caution.
+
+   'Comet model (A1 and A2)' applies the standard Marsden-Sekanina force
+model;  see page 3 of
+
+http://www.lpi.usra.edu/books/CometsII/7009.pdf
+
+   'Cometary Orbit Determination and Nongravitational Forces',  D. K. Yeomans,
+P. W. Chodas, G. Sitarski, S. Szutowicz, M. Krolikowska, "Comets II";  see
+'runge.cpp' in the Find_Orb source for more detail.  Also,  note that water
+ice is assumed by default,  but this can be changed by editing 'environ.dat'.
+
+   'Comet model (A1, A2, A3)' is usually only used for comets observed at
+many apparitions,  and adds an out-of-plane component to the A1/A2 model
+(almost identical to the way the three-parameter SRP model works.)
+
+   Note that the SRP and comet models are virtually identical,  except that
+for SRP,  the force is just that of sunlight and is simply expressed
+as proportional to 1/r^2.  For comets,  a rather complicated scheme is
+required to account for the rate of outgassing as a function of distance
+from the sun.

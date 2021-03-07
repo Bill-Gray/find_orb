@@ -54,15 +54,9 @@ F12    Find a circular orbit connecting the first and last positions.  Hit
 a      Toggle inclusion of up to 300 asteroids.  (See documentation for
          details,  including on how to limit/increase asteroid use.)  NOTE
          that this can slow things down a bit and appears to rarely matter.
-*      Toggle inclusion of the effects of solar radiation pressure (SRP).
-         Turn this on,  and on the next "full step",  Find_Orb will do a
-         _seven_-parameter fit,  with the area/mass ratio solved for as an
-         added variable.
-^      Toggle on comet parameters A1 and A2.  Turn this on,  and on the next
-         'full step',  Find_Orb will do an _eight_-parameter fit,  with A1
-         and A2 solved for as added variables.  Hit it again,  and A3 will be
-         included for a nine-parameter fit.  Yet again,  and you're back to
-         not using comet parameters (i.e.,  a three-way cycle).
+*      Non-grav model selection.  You can choose among various non-grav
+         models for solar radiation pressure or comet outgassing.  Click
+         on the [?] shown in the menu for details.
 
       OBSERVATION TOGGLING/WEIGHTING/SEARCHING:
 

@@ -2917,6 +2917,47 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
    return( ids);
 }
 
+static int non_grav_menu( char *message_to_user)
+{
+   char buff[300], *tptr, tbuff[7];
+   int c;
+   extern int force_model;
+
+   strcpy( buff, get_find_orb_text( 2060));
+   strlcpy_err( tbuff, "0 ( ) ", sizeof( tbuff));
+   tbuff[0] = '1' + force_model;
+   tptr = strstr( buff, tbuff);
+   assert( tptr);
+   tptr[3] = '*';
+   help_file_name = "nongravs.txt";
+   c = full_inquire( buff, NULL, 0, COLOR_MENU, -1, -1);
+   tptr[3] = ' ';
+   if( c >= KEY_F(1) && c <= KEY_F(6))
+      c += '1' - KEY_F( 1);
+   if( c >= '1' && c <= '6')
+      {
+      size_t i;
+      extern int n_extra_params;
+
+      force_model = c - '1';
+      if( force_model < 4)
+         n_extra_params = force_model;
+      else
+         n_extra_params = force_model - 2;
+      tbuff[0] = '1' + force_model;
+      tptr = strstr( buff, tbuff);
+      assert( tptr);
+      tptr += 6;
+      for( i = 0; tptr[i] >= ' '; i++)
+         message_to_user[i] = tptr[i];
+      message_to_user[i] = '\0';
+      }
+   else
+      *message_to_user = '\0';
+   return( force_model);
+}
+
+
 static void setup_elements_dialog( char *buff, const char *constraints,
                                              int element_format)
 {
@@ -4038,28 +4079,9 @@ int main( int argc, const char **argv)
             single_obs_selected = true;
             }
             break;
-         case '*':         /* toggle use of solar radiation pressure */
-            n_extra_params = (n_extra_params ? 0 : 1);
-            strcpy( message_to_user, "Solar radiation pressure is now");
-            solar_pressure[0] = solar_pressure[1] = 0.;
-            add_off_on = n_extra_params;
-            break;
+         case '*':
          case '^':
-            if( n_extra_params == 2)
-               {
-               n_extra_params = 3;
-               strcpy( message_to_user, "Three-parameter comet non-gravs");
-               }
-            else if( n_extra_params == 3)
-               {
-               n_extra_params = 0;
-               strcpy( message_to_user, "Comet non-gravs off");
-               }
-            else
-               {
-               n_extra_params = 2;
-               strcpy( message_to_user, "Two-parameter comet non-gravs");
-               }
+            non_grav_menu( message_to_user);
             solar_pressure[0] = solar_pressure[1] = solar_pressure[2] = 0.;
             break;
          case KEY_F(8):     /* show original screens */

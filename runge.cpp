@@ -415,11 +415,13 @@ Find_Orb,  but it appears to be just about unnecessary.
 requiring a normalization constant alpha.  We get that on the first call
 by setting alpha = 1,  determining what value we get for g(1),  and setting
 alpha to the inverse of that.
-*/
+
+   Also note that a simple inverse-square force is used for space junk
+and some small rocks.            */
 
 static inline double comet_g_func( const ldouble r)
 {
-   if( object_type == OBJECT_TYPE_COMET)
+   if( !is_inverse_square_force_model( ))
       {                      /* default, Marsden/Sekanina formula */
       static ldouble r0 = 2.808;         /* AU */
       static ldouble m = 2.15;
@@ -444,7 +446,7 @@ static inline double comet_g_func( const ldouble r)
       r_over_r0 = r / r0;
       return( alpha * powl( r_over_r0, -m) * powl( 1. + powl( r_over_r0, n), -k));
       }
-   else        /* just an inverse-square force,  used for 2009 BD */
+   else        /* just an inverse-square force,  used for non-comets */
       return( 1. / (r * r));
 }
 

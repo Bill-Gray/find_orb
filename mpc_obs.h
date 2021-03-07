@@ -431,3 +431,14 @@ circular orbit connecting the two resulting adjusted observations.  (Or
 some other set of four parameters.)    */
 
 // #define FIT_CIRCULAR_ORBIT          0x?4
+
+#define FORCE_MODEL_NO_NONGRAVS        0
+#define FORCE_MODEL_SRP                1
+#define FORCE_MODEL_SRP_TWO_PARAM      2
+#define FORCE_MODEL_SRP_THREE_PARAM    3
+#define FORCE_MODEL_COMET_TWO_PARAM    4
+#define FORCE_MODEL_COMET_THREE_PARAM  5
+
+extern int force_model;
+
+bool is_inverse_square_force_model( void);
