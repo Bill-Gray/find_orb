@@ -2790,7 +2790,7 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
 
       strcpy( buff, get_find_orb_text( 2031));
       for( i = n_lines - 1; i && hotkeys[n_prev]
-                                     && n_prev + 6 < (size_t)getmaxy( stdscr); i--)
+                                     && n_prev + 12 < (size_t)getmaxy( stdscr); i--)
          if( prev_files[i][0] != '#' && filename_fits_current_os( prev_files[i]))
             {
             if( !stat( prev_files[i], &file_info))
