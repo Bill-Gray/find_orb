@@ -683,13 +683,13 @@ static void set_ra_dec_format( void)
       const char *tptr2 = strchr( tptr, ':');
 
       assert( tptr2);
-      strcpy( buff + len, "( ) ");
+      snprintf( buff + len, sizeof( buff) - len, "%d ( ) ", (int)n_lines + 1);
       assert( n_lines < sizeof( lines) / sizeof( lines[0]));
       lines[n_lines++] = tptr;
       if( strlen( curr_format) == (size_t)( tptr2 - tptr) &&
                   !memcmp( curr_format, tptr, tptr2 - tptr))
-         buff[len + 1] = '*';
-      len += 4;
+         buff[len + 3] = '*';
+      len += 6;
       tptr2++;
       while( *tptr2 >= ' ')
          buff[len++] = *tptr2++;
@@ -700,6 +700,8 @@ static void set_ra_dec_format( void)
    buff[len] = '\0';
    help_file_name = "radecfmt.txt";
    c = inquire( buff, NULL, 0, COLOR_DEFAULT_INQUIRY);
+   if( c >= '1' && c < '1' + (int)n_lines)
+      c += KEY_F( 1) - '1';
    if( c >= KEY_F( 1) && c <= (int)KEY_F( n_lines))
       {
       const char *tptr2;
