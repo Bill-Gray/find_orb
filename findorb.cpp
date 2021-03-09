@@ -247,6 +247,7 @@ void shellsort_r( void *base, const size_t n_elements, const size_t esize,
 static int count_wide_chars_in_utf8_string( const char *iptr, const char *endptr);
 char **load_file_into_memory( const char *filename, size_t *n_lines,
                         const bool fail_if_not_found);      /* mpc_obs.cpp */
+double comet_g_func( const long double r);                   /* runge.cpp */
 int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
                                    const char *format, ...)
 #ifdef __GNUC__
@@ -5371,7 +5372,22 @@ int main( int argc, const char **argv)
             add_off_on = force_final_full_improvement;
             }
             break;
-         case ALT_P: case ALT_Y:
+         case ALT_P:    /* see 'environ.def' comments for COMET_CONSTRAINTS */
+            {
+            char prompt[200];
+
+            snprintf( prompt, sizeof( prompt),
+                        "Enter comet r0, m, n, k (current values are %s):",
+                        get_environment_ptr( "COMET_CONSTANTS"));
+            inquire( prompt, tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY);
+            if( *tbuff)
+               {
+               set_environment_ptr( "COMET_CONSTANTS", tbuff);
+               comet_g_func( 0.);
+               }
+            }
+            break;
+         case ALT_Y:
          case ';': case '\'':
          default:
             debug_printf( "Key %d hit\n", c);

@@ -101,6 +101,7 @@ double geo_potential_in_au( const double x, const double y, const double z,
 double shadow_check( const double *planet_loc,           /* ephem0.cpp */
                             const double *obs_posn,
                             const double planet_radius_in_au);
+double comet_g_func( const ldouble r);                   /* runge.cpp */
 
 #define N_PERTURB 19
 #define IDX_MERCURY    1
@@ -416,10 +417,15 @@ requiring a normalization constant alpha.  We get that on the first call
 by setting alpha = 1,  determining what value we get for g(1),  and setting
 alpha to the inverse of that.
 
+   Also,  there may be situations in which one wants to alter the
+COMET_CONSTANTS interactively.  A call to comet_g_func( 0.) resets alpha
+to zero,  ensuring that the next time a "real" call is made with r > 0.,
+the comet constants will be reloaded and alpha recalculated.
+
    Also note that a simple inverse-square force is used for space junk
 and some small rocks.            */
 
-static inline double comet_g_func( const ldouble r)
+double comet_g_func( const ldouble r)
 {
    if( !is_inverse_square_force_model( ))
       {                      /* default, Marsden/Sekanina formula */
@@ -430,6 +436,11 @@ static inline double comet_g_func( const ldouble r)
       static ldouble alpha = 0.;
       ldouble r_over_r0;
 
+      if( !r)                 /* resetting parameters */
+         {
+         alpha = 0.;
+         return( 0.);
+         }
       if( !alpha)
          {
          const char *comet_params = get_environment_ptr( "COMET_CONSTANTS");
