@@ -687,6 +687,7 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
                      const unsigned n_obs, const double *moids,
                      const char *body_frame_note, const bool show_obs)
 {
+   extern int n_extra_params;
    double jd = current_jd( );
    double jd_first, jd_last;
    double q_sigma = 0., weighted_rms;
@@ -803,6 +804,16 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
    if( !get_uncertainty( "sigma_Tp", buff, 0))
       fprintf( ofile, " \"Tp sigma\": %s,", buff);
    fprintf( ofile, "\n        \"Tp_iso\": \"%s\",", iso_time( buff, elem->perih_time, 3));
+   for( i = 0; i < n_extra_params; i++)
+      {
+      char tbuff[20];
+      extern double solar_pressure[];
+
+      fprintf( ofile, "\n        \"A%d\": %.9g,", i + 1, solar_pressure[i]);
+      snprintf( tbuff, sizeof( tbuff), "Sigma_A%d:", i + 1);
+      if( !get_uncertainty( tbuff, buff, 0))
+         fprintf( ofile, " \"sigma_A%d\": %s,", i + 1, buff);
+      }
    if( elem->abs_mag)
       {
       fprintf( ofile, "\n        \"H\": %6.2f,", elem->abs_mag);
