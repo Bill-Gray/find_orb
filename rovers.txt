@@ -1068,15 +1068,20 @@ OHe !+005.712389   +43.932077        780.      SATINO, Observatoire Haute-Proven
 640 !+016.467486   +50.085097         481.     Senftenberger Sternwarte
 
    Lowell Observatory scopes.  24m subtracted for geoid height.
-   The NPOI location is that at the center of the three 'arms'.
+   The NPOI location is that at the center of the three 'arms'.  Some IDs
+   made using https://lowell.edu/history/the-mars-hill-campus/ .
 Per !-111.536786   +35.097069        2178.     Perkins 1.8-m, Lowell Observatory
 Hal !-111.536335   +35.096740        2177.     Hall 1.1-m, Lowell Observatory
 699 !-111.536703   +35.095857        2177.     Lowell Observatory-LONEOS
 NPO !-111.533918   +35.095946        2180.     Navy Precision Optical Interferometer
 L?? !-111.536909   +35.099318        2182.     Unknown 250m N of Perkins 1.8-m
 c24 !-111.664018   +35.202328        2195.     Lowell Clark 24" refractor
-L?2 !-111.663985   +35.201881        2198.     Unknown 50m S of Lowell Clark refractor
+Dye !-111.663985   +35.201881        2198.     Dyer 24-inch telescope, Lowell
 L?3 !-111.665784   +35.202790        2197.     Unknown 170m WNW of Lowell Clark refractor
+PDT !-111.665954   +35.203960        2196.     Pluto discovery telescope
+L?4 !-111.666466   +35.203037        2192.     Lowell unkn 70m WNW of L?3
+L?5 !-111.667065   +35.202916        2189.     Lowell unkn 60m WSW of L?4 (small dome)
+L?6 !-111.667204   +35.202930        2189.     Lowell roll-off roof 15m W of L?5
 
    Not entirely sure which instrument at Greenwich was used for (000).
    (I would guess the transit circle early on,  and the 28" refractor later.)
