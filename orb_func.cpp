@@ -4024,7 +4024,7 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
       }
 
    shellsort_r( obs, n_obs, sizeof( OBSERVE), compare_observations, &sort_radar_last);
-   while( n_obs && obs[n_obs - 1].note2 == 'R')
+   while( n_obs && (obs[n_obs - 1].note2 == 'R' || (obs[n_obs - 1].flags & OBS_DONT_USE)))
       {
       n_obs--;                   /* temporarily remove radar obs */
       n_radar_obs++;

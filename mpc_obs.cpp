@@ -2811,6 +2811,8 @@ int compare_observations( const void *a, const void *b, void *context)
             return( 1);
          if( obs1->note2 != 'R' && obs2->note2 == 'R')
             return( -1);
+         if( (obs1->flags ^ obs2->flags) & OBS_DONT_USE)
+            return( (obs1->flags & OBS_DONT_USE) ? 1 : -1);
          }
       }
    if( obs1->jd < obs2->jd)
