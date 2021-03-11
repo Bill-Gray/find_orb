@@ -2374,13 +2374,16 @@ fo -oMade-up -v2020jan13,1.2,2.3,3.4,-.005,.002,.001,H=17,eq
 
 would make a dummy object 'Made-up',  at epoch 2020 Jan 13,
 position 1.2, 2.3, 3.4 (AU),  velocity -.005,-.002,.001 (AU/day),
-with an absolute mag of 17,  in the J2000 equatorial frame.
-(All heliocentric,  although a 'geo' option would be nice.)
-You can also use km and seconds as units,  by adding 'km' or 's';
-or meters with 'm';  or 'g' for geocentric.  'ep=2020.9' would
-set the coordinate plane epoch as that of 2020.9.  'UTC' would
-specify that the epoch is in UTC (some of the artsat crowd give
-epochs on that time scale).  'TDB' would specify a TDB epoch. */
+with an absolute mag of 17,  in heliocentric J2000 equatorial
+coordinates.  You can use km and seconds as units,  by adding
+'km' and/or 's'; or meters with 'm';  or 'g' for geocentric.
+'ep=2020.9' would set the coordinate plane epoch as that of
+2020.9.  'UTC' would specify that the epoch is in UTC (some of
+the artsat crowd give epochs on that time scale). 'TDB' would
+specify a TDB epoch.
+
+   To do : revise to allow barycentric and other-planet-centric
+(and selenocentric) vectors,  and vectors in the body plane. */
 
 static double extract_state_vect_from_text( const char *text,
             double *orbit, double *solar_pressure, double *abs_mag)
