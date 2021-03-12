@@ -226,7 +226,8 @@ endif
 	cp environ.def frame_he.txt geo_rect.txt header.htm jpl_eph.txt             $(IDIR)
 	cp link_def.json mpc_area.txt mpcorb.hdr mu1.txt nongravs.txt               $(IDIR)
 	cp observer.txt obslinks.htm ObsCodes.htm ObsCodesF.html                    $(IDIR)
-	cp obj_help.txt odd_name.txt openfile.txt previous.def radecfmt.txt         $(IDIR)
+	cp obj_help.txt odd_name.txt openfile.txt                                   $(IDIR)
+	cp previous.def progcode.txt radecfmt.txt                                   $(IDIR)
 	cp rovers.txt sat_xref.txt scope.json scopes.txt sigma.txt                  $(IDIR)
 	cp xdesig.txt bright2.pgm elem_pop.txt                                      $(IDIR)
 
