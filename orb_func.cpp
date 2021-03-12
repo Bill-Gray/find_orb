@@ -2766,7 +2766,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
 //                  { 1e-12, 1e-12, 1e-12, 1e-11, 1e-11, 1e-11,
 //                  .001, .001, .1 };
                    { 1e-4, 1e-4, 1e-5, 1e-5, 1e-3, 1e-3,
-                    .001, .001, .1 };
+                    1e-8, 1e-8, 1e-8 };
    static double delta_vals[9];
    double constraint[MAX_CONSTRAINTS];
    double sigma_squared = 0.;       /* see Danby, p. 243, (7.5.20) */
@@ -3946,7 +3946,7 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
 #endif
    const double acceptable_score_limit = 5.;
    double best_score = 1e+50;
-   double best_orbit[6];
+   double best_orbit[6], orbit_epoch;
    const int max_time = atoi( get_environment_ptr( "IOD_TIMEOUT"));
 
    for( i = 0; i < 6; i++)
@@ -4200,19 +4200,20 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
    perturbers = perturbers_automatically_found & (~AUTOMATIC_PERTURBERS);
    perturbers |= always_included_perturbers;
    fail_on_hitting_planet = false;
-   attempt_extensions( obs, n_obs, orbit, obs[start].jd);
+   orbit_epoch = obs[start].jd;
+   attempt_extensions( obs, n_obs, orbit, orbit_epoch);
 // available_sigmas = NO_SIGMAS_AVAILABLE;
    if( n_radar_obs)
       {
       n_obs += n_radar_obs;
       shellsort_r( obs, n_obs, sizeof( OBSERVE), compare_observations, NULL);
-      set_locs( orbit, obs[start].jd, obs, n_obs);
+      set_locs( orbit, orbit_epoch, obs, n_obs);
       }
    integration_timeout = 0;
    if( *get_environment_ptr( "INCLUDE_ALL"))
       for( i = 0; i < n_obs; i++)
          obs[i].is_included = 1;
-   return( obs[start].jd);    /* ...and return epoch = JD of first observation */
+   return( orbit_epoch);           /* ...and return epoch = JD of first observation */
 }
 
 double generate_mc_variant_from_covariance( double *var_orbit,
