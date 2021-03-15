@@ -108,6 +108,12 @@ OBS K. Cernis, H. Selevicius, J. Zdanavicius
 COM Default details extracted from MPEC 2021-B143
 TEL 0.35-m f/3.5 reflector + CCD
 
+COD 157
+MEA R. Haver
+OBS R. Haver, R. Gorelli
+COM Default details extracted from MPEC 2021-E19
+TEL 0.37-m f/6.70 Cassegrain + CCD
+
 COD 160
 MEA E. Prosperi
 OBS M. Jaeger, E. Prosperi, S. Prosperi
@@ -321,6 +327,11 @@ CON [marco (dot) micheli (at) esa (dot) int]
 OBS G. W. Christie
 MEA M. Micheli, G. W. Christie, K. Merz, D. Koschny
 TEL 0.40-m f/10 Schmidt-Cassegrain + CCD
+
+COD 470
+COM Default details extracted from MPEC 2019-S03
+OBS G. Masi
+TEL 0.43-m f/6.8 astrograph + CCD
 
 COD 474
 COM Find_Orb default details
@@ -1338,10 +1349,10 @@ OBS S. Sanchez, J. Nomen, M. Hurtado, J. A. Jaume, W. K. Y. Yeung, F. Serra
 OBS T. Valls, I. Mas, J. Marcus
 TEL 0.36-m f/2 reflector + CCD.
 
-COD J77 Stourton Caundle
-COM Find_Orb default details
+COD J77
 OBS R. Miles
-TEL 0.28-m f/10 Schmidt-Cassegrain + CCD
+COM Default details extracted from MPEC 2021-E19
+TEL 0.35-m f/8 Schmidt-Cassegrain + CCD
 
 COD J87 La Canada
 COM Find_Orb default details
@@ -1487,6 +1498,12 @@ COD L07
 OBS E. Guido, A. Catapano
 COM Default details extracted from MPEC 2021-B143
 TEL 0.5-m f/8 Ritchey-Chretien + CCD
+
+COD L18
+MEA A. M. Kozhukhov
+OBS O. V. Kravchenko, Y. V. Tanasiychuk
+COM Default details extracted from MPEC 2021-E14
+TEL 0.50-m f/3.8 reflector + CCD
 
 COD L27
 OBS J.-F. Soulier
@@ -1916,11 +1933,17 @@ COM Find_Orb default details
 OBS Y. JeongAhn
 TEL 1.6-m f/3.22 reflector + CCD
 
+COD W94
+MEA A. Maury, G. Attard, D. Parrott
+OBS A. Maury, G. Attard
+COM Default details extracted from MPEC 2021-E115
+
 COD W95
 MEA A. Maury, G. Attard, D. Parrott
 OBS A. Maury, G. Attard, J. Fabrega
 COM Default details extracted from MPEC 2021-E115
 TEL 0.40-m f/3.8 reflector + CCD
+
 COD X02
 MEA E. Guido
 OBS E. Guido, M. Rocchetto, E. Bryssinck, M. Fulle, G. Milani, C. Nassef
