@@ -3258,12 +3258,34 @@ bool is_topocentric_mpc_code( const char *mpc_code)
    return( planet_idx >= 0 && (rho_cos_phi != 0. || rho_sin_phi != 0.));
 }
 
+static double get_telescope_primary_diameter( const char *mpc_code)
+{
+   FILE *ifile = fopen_ext( "details.txt", "fclrb");
+   char buff[100];
+   double rval = 0.;
+   int in_code_section = 0;
+
+   while( !rval && fgets_trimmed( buff, sizeof( buff), ifile))
+      if( !memcmp( buff, "COD ", 4))
+         in_code_section = !strcmp( buff + 4, mpc_code);
+      else if( in_code_section && !memcmp( buff, "TEL ", 4))
+         rval = atof( buff + 4);
+   fclose( ifile);
+   return( rval * 100.);      /* return size in cm */
+}
+
 static void get_scope_params( const char *mpc_code, expcalc_config_t *c)
 {
    FILE *ifile = fopen_ext( "scope.json", "fclrb");
+   const double primary_diam = get_telescope_primary_diameter( mpc_code);
 
    find_expcalc_config_from_mpc_code( mpc_code, ifile, c);
    fclose( ifile);
+   if( primary_diam)
+      {
+      exposure_config.primary_diam = primary_diam;
+      exposure_config.obstruction_diam = primary_diam / 4.;
+      }
 }
 
 int ephemeris_in_a_file_from_mpc_code( const char *filename,
