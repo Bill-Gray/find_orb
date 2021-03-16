@@ -41,6 +41,11 @@ from SNR and magnitude) have the sign for B and C -- the linear
 and constant coefficients of the quadratic to be solved --
 backward;  both should be negated.  (Or A should be negated.)
 
+   Michael Richmond provides some useful background in his
+class notes at
+
+http://spiff.rit.edu/classes/ast613/lectures/signal/signal_illus.html
+
    The Lowell paper makes certain assumptions about the use
 of a near-optimal measuring aperture.  (Use too large a measuring
 aperture,  and you're gathering lots of background noise and not
