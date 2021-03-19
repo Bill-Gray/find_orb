@@ -826,7 +826,7 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
                         MOON_R * FUDGE_FACTOR };
 
    assert( fabsl( jd) < 1e+9);
-#ifndef _WIN32
+#if !defined( _WIN32) && !defined( __APPLE__)
    assert( !isnanl( ival[0]));
    assert( !isnanl( ival[1]));
    assert( !isnanl( ival[2]));
@@ -903,7 +903,7 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
       extern double solar_pressure[];
       ldouble transverse[3], dot_prod = 0.;
 
-#ifndef _WIN32
+#if !defined( _WIN32) && !defined( __APPLE__)
       assert( !isnanl( g));
 #endif
       memcpy( transverse, ival + 3, 3 * sizeof( ldouble));
