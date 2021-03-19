@@ -2799,7 +2799,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                      strcat( fake_line, "| |");
                   }
 
-//             if( rho_cos_phi || rho_sin_phi)
+               if( rho_cos_phi || rho_sin_phi)
                   {
                   exposure_config.sky_brightness = mags_per_arcsec2;
                   if( alt_az[0].y < 0.)
@@ -2841,7 +2841,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   if( exposure_time > 99999.)
                      exposure_time = 99999.;
                   snprintf_append( alt_buff, sizeof( alt_buff), " %.1f", exposure_time);
-                  if( exposure_time > 99999. && !computer_friendly)
+                  if( exposure_time > 99998. && !computer_friendly)
                      strcat( buff, " -----");
                   else
                      snprintf_append( buff, sizeof( buff),
