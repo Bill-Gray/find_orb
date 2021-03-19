@@ -1,0 +1,88 @@
+; Any line starting with ; is a comment.  Any line starting with
+; # is a directive to say "show the following explanatory text
+; if and only if the quantity in question is turned on."  Except
+; that #! means "show it only if the quantity is _off_."
+;
+; Not all ephemeris quantities have comments.  Much work to do
+; all of this...
+;
+# Type 0  (observables)
+
+#! 21
+
+   RA/decs are astrometric J2000 coordinates (corrected for light
+time lag,  but in the inertial J2000 frame,  i.e.,  not rotated
+for precession or nutation,  and differential light deflection is
+not included.)   Display can be turned on/off in the 'advanced
+options' for ephemerides.  When turning them on,  you can select
+from various format choices (base-60,  decimal, different
+precisions,  etc.)
+;
+; The following line means "show if either quantity 22 (distance
+; to object) or 23 (distance to sun) is turned on."  Which,  for
+; historical reasons,  corresponds to those bits _not_ being set.
+#! 22,23  delta and (solar) r
+
+   Distances are in kilometers for distances under one million km
+(about 0.00668 AU),  and in AUs for larger distances.
+#  3
+
+   Alt/az values are in degrees.  North=0, East=90.
+#  4,19
+
+   Radial and 'space' velocities are in km/s.  Negative radial
+velocities mean the object is approaching the observer.
+#  5
+
+   Apparent motions are given in arcminutes/hour,  or (equivalently)
+arcseconds/minute.
+# 11
+
+   The phase angle bisector gives the ecliptic lat/lon of the point
+midway between the vector from observer to target and the vector
+from sun to target.  This can be useful in analyzing light curves.
+# 14
+
+   The "SM" (Sun-Moon) flags consist of one or two letters,  extended
+from a scheme used on JPL's Horizons system.  Letters used are :
+
+      * Daytime (sun above horizon)
+      C Civil twilight (sun below horizon,  but by less than 6 degrees)
+      N Nautical twilight (-12 < sun's altitude < -6 degrees)
+      A Astronomical twilight (-18 < sun's altitude < -12 degrees)
+      m Moon is in the sky,  less than 50% illuminated
+      M Moon is in the sky,  more than 50% illuminated
+      l Object transiting in front of moon
+      L Object occulted by moon
+      a Below altitude/horizon limits set for the observing site
+      d Outside declination limits for your site/mount
+      e Outside elongation limits for your site/mount
+      h Outside hour angle limits for your site/mount
+      g Some galactic confusion
+      G Lots of galactic confusion
+      B Object is below the horizon
+
+# 29
+
+   Sky brightness is in magnitudes per square arcsecond,  computed
+using the Krisciunas & Schaefer model,
+
+http://articles.adsabs.harvard.edu/full/1990PASP..102..212S
+http://articles.adsabs.harvard.edu/full/1991PASP..103.1033K
+
+   This provides a good approximation to background brightness due
+to moonlight,  twilight,  and airglow.
+# 34
+
+   The 'galactic confusion' is computed from star counts per unit
+area from Gaia-DR2.  Values range from zero (effectively no
+confusion) to 100 (densest parts of the Milky Way,  Magellanic
+Clouds,  or globular clusters).
+
+# Type 1   (state vectors)
+# Type 2   (positions)
+# Type 3   (MPCORB output)
+# Type 4   (eight-line orbital elements)
+# Type 5   (close approach tables)
+# Type 6   (fake astrometry)
+# Type 7   (currently unused)

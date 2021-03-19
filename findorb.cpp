@@ -812,6 +812,8 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                   show_advanced_options ? '*' : ' ');
          if( show_advanced_options)
             {
+            snprintf_append( buff, sizeof( buff), "! [%c] Show explanations at end of ephems\n",
+                  (ephemeris_output_options & OPTION_EXPLANATIONS) ? '*' : ' ');
             snprintf_append( buff, sizeof( buff), "B [%c] Phase angle bisector\n",
                   (ephemeris_output_options & OPTION_PHASE_ANGLE_BISECTOR) ? '*' : ' ');
             snprintf_append( buff, sizeof( buff), "H [%c] Heliocentric ecliptic\n",
@@ -928,6 +930,9 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             break;
          case '}':
             ephemeris_output_options ^= OPTION_EXPOSURE_TIME;
+            break;
+         case '!':
+            ephemeris_output_options ^= OPTION_EXPLANATIONS;
             break;
          case 'a': case 'A':
             ephemeris_output_options ^= OPTION_ALT_AZ_OUTPUT;

@@ -223,7 +223,8 @@ else
 	cp $(FO_EXE)       $(INSTALL_DIR)/bin
 endif
 	cp command.txt details.txt dosephem.txt dos_help.txt ?findorb.txt           $(IDIR)
-	cp environ.def frame_he.txt geo_rect.txt header.htm jpl_eph.txt             $(IDIR)
+	cp environ.def eph_expl.txt frame_he.txt                                    $(IDIR)
+	cp geo_rect.txt header.htm jpl_eph.txt                                      $(IDIR)
 	cp link_def.json mpc_area.txt mpcorb.hdr mu1.txt nongravs.txt               $(IDIR)
 	cp observer.txt obslinks.htm ObsCodes.htm ObsCodesF.html                    $(IDIR)
 	cp obj_help.txt odd_name.txt openfile.txt                                   $(IDIR)

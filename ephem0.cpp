@@ -79,6 +79,7 @@ void remove_trailing_cr_lf( char *buff);      /* ephem0.cpp */
 void create_obs_file( const OBSERVE FAR *obs, int n_obs, const int append);
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 void set_environment_ptr( const char *env_ptr, const char *new_value);
+uint64_t parse_bit_string( const char *istr);                /* miscell.cpp */
 int text_search_and_replace( char FAR *str, const char *oldstr,
                                      const char *newstr);   /* ephem0.cpp */
 void format_dist_in_buff( char *buff, const double dist_in_au); /* ephem0.c */
@@ -3170,6 +3171,40 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    if( ephem_type == OPTION_OBSERVABLES && !n_lines_shown)
       fprintf( ofile, "No ephemeris output.  Object was too faint,  or in daylight,\n"
                    "or below horizon for the specified times.  Check ephem options.\n");
+   if( options & OPTION_EXPLANATIONS)
+      if( ephem_type == OPTION_OBSERVABLES)
+         {
+         FILE *ifile = fopen_ext( "eph_expl.txt", "fcrb");
+         bool showing_text = false;
+
+         if( options & (OPTION_SNR | OPTION_EXPOSURE_TIME))
+            {
+            fprintf( ofile, "Telescope primary diameter assumed to be %.1f cm\n",
+                           exposure_config.primary_diam);
+            fprintf( ofile, "Sky brightness at zenith assumed to be %.2f mag/arcsec^2\n",
+                           exposure_config.sky_brightness_at_zenith);
+            }
+         while( fgets_trimmed( buff, sizeof( buff), ifile))
+            if( *buff == '#')
+               {
+               if( !memcmp( buff, "# Type", 6))
+                  {
+                           /* haven't figured this out yet */
+                  }
+               else
+                  {
+                  const uint64_t mask =  parse_bit_string( buff + 2);   /* miscell.cpp */
+
+                  if( buff[1] == '!')
+                     showing_text = ((options & mask) != mask);
+                  else
+                     showing_text = ((options & mask) != 0);
+                  }
+               }
+            else if( *buff != ';' && showing_text)
+               fprintf( ofile, "%s\n", buff);
+         fclose( ifile);
+         }
    fclose( ofile);
    if( header && computer_friendly_ofile)
       {

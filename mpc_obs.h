@@ -153,6 +153,7 @@ typedef uint64_t ephem_option_t;
 #define OPTION_GALACTIC_CONFUSION       EPHEM_OPTION_BIT( 34)
 #define OPTION_SNR                      EPHEM_OPTION_BIT( 35)
 #define OPTION_EXPOSURE_TIME            EPHEM_OPTION_BIT( 36)
+#define OPTION_EXPLANATIONS             EPHEM_OPTION_BIT( 37)
 
 #define HELIOCENTRIC_SIGMAS_ONLY       0
 #define ORBIT_SIGMAS_REQUESTED         1
