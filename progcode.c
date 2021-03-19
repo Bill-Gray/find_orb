@@ -1,22 +1,29 @@
-/* This reads the 'program.txt' file from
+/* Utility to read the 'ProgramCodes.txt' file from
 
 https://minorplanetcenter.net/iau/lists/ProgramCodes.txt
 
-and produces a file 'progcode.txt' suitable for Find_Orb to extract
-observer info from.  Note that some editing of the input is required;
-some observers appear twice. */
+and produce a file 'progcode.txt' suitable for Find_Orb to extract
+observer info from.  Note that some editing of the input (or output)
+is required; some observers appear twice,  with modifications due to
+diacritical marks.  When doing updates,  I compare to the previous
+version to make sure such problems don't creep back in.
+
+   Compile with :
+
+gcc -Wall -pedantic -Wextra -O3 progcode.c -o progcode   */
 
 #include <stdio.h>
 #include <string.h>
 
-int main( void)
+int main( const int argc, const char **argv)
 {
-   FILE *ifile = fopen( "program.txt", "rb"), *ofile;
+   const char *filename = (argc == 1 ? "ProgramCodes.txt" : argv[1]);
+   FILE *ifile = fopen( filename, "rb"), *ofile;
    char buff[200], prev_code[5];
 
    if( !ifile)
       {
-      printf( "Couldn't open program.txt\n");
+      fprintf( stderr, "Couldn't open %s\n", filename);
       return( -1);
       }
    memset( prev_code, 0, sizeof( prev_code));

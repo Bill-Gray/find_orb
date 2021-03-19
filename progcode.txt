@@ -2,7 +2,7 @@ Downloaded 2020 Feb 17 from
 
 https://minorplanetcenter.net/iau/lists/ProgramCodes.txt
 
-and converted to the 'standard' details form.
+and converted to the 'standard' details form, using 'progcode.c' (q.v.)
 
 Patched to remove duplicate B. Luetkenhoener/Lutkenhoner and S. Kurti
 (Find_Orb will add umlauts as necessary).
