@@ -2860,6 +2860,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   exposure_config.airmass = bdata.air_mass;
                   exposure_time = exposure_from_snr_and_mag( &exposure_config,
                                   (target_snr ? target_snr : 4.), curr_mag);
+                  if( exposure_time > 99999.)
+                     exposure_time = 99999.;
                   snprintf_append( alt_buff, sizeof( alt_buff), " %.1f", exposure_time);
                   }
 
