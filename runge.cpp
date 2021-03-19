@@ -137,13 +137,13 @@ static void vector_cross_productl( ldouble *xprod, const ldouble *a, const ldoub
    xprod[2] = a[0] * b[1] - a[1] * b[0];
 }
 
-      /* The following value for various J2s come from the _Explanatory  */
-      /* Supplement_,  p 697.  They're in units of planetary radii,  and */
-      /* must be converted to AU squared. */
+      /* The following values for Earth J2, 3, 4 and solar J2 are from
+      DE-441.  They're in units of planetary radii,  and must be converted
+      to AU squared. */
 
-#define J2_IN_EARTH_UNITS (1.08263e-3)
-#define J3_IN_EARTH_UNITS (-2.54e-6)
-#define J4_IN_EARTH_UNITS (-1.61e-6)
+#define J2_IN_EARTH_UNITS (1.08262539E-03)
+#define J3_IN_EARTH_UNITS (-2.53241E-06)
+#define J4_IN_EARTH_UNITS (-1.619898E-06)
 #define EARTH_R (6378.140 / AU_IN_KM)
 #define EARTH_R2 (EARTH_R * EARTH_R)
 #define EARTH_J2 (J2_IN_EARTH_UNITS * EARTH_R2)
@@ -194,6 +194,16 @@ static void vector_cross_productl( ldouble *xprod, const ldouble *a, const ldoub
 #define MERCURY_J2   (J2_IN_MERCURY_UNITS * MERCURY_R * MERCURY_R)
 #define VENUS_J2     (J2_IN_VENUS_UNITS * VENUS_R * VENUS_R)
 #define MOON_J2      (J2_IN_MOON_UNITS * MOON_R * MOON_R)
+
+            /* From DE-441.  Theoretically speaking,  the sun's oblateness
+            could have noticeable effects for really precise observations.
+            Maybe Gaia will do the trick?  Or Solar Orbiter or BepiColombo
+            or Parker Solar Probe?        */
+#define J2_IN_SOLAR_UNITS 2.1961391516529825E-07
+#define SOLAR_R (696000.0 / AU_IN_KM)
+#define SOLAR_R2 (SOLAR_R * SOLAR_R)
+#define SOLAR_J2 (J2_IN_SOLAR_UNITS * SOLAR_R2)
+
 #endif         /* #ifdef NOT_USED_YET */
 
 /* Start considering atmospheric drag if within 500 km of earth: */
@@ -816,6 +826,14 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
                         MOON_R * FUDGE_FACTOR };
 
    assert( fabsl( jd) < 1e+9);
+#ifndef _WIN32
+   assert( !isnanl( ival[0]));
+   assert( !isnanl( ival[1]));
+   assert( !isnanl( ival[2]));
+   assert( !isnanl( ival[3]));
+   assert( !isnanl( ival[4]));
+   assert( !isnanl( ival[5]));
+#endif
    oval[0] = ival[3];
    oval[1] = ival[4];
    oval[2] = ival[5];
@@ -885,6 +903,9 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
       extern double solar_pressure[];
       ldouble transverse[3], dot_prod = 0.;
 
+#ifndef _WIN32
+      assert( !isnanl( g));
+#endif
       memcpy( transverse, ival + 3, 3 * sizeof( ldouble));
       for( i = 0; i < 3; i++)
          dot_prod += transverse[i] * ival[i];
