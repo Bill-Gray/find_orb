@@ -611,12 +611,15 @@ static int make_linkage_json( const int n_obs, const OBSERVE *obs, const ELEMENT
 
          if( desig_type == OBJ_DESIG_OTHER || desig_type == OBJ_DESIG_ARTSAT)
             {
+            const double obs_utc_jd = obs[idx[i]].jd
+                        - td_minus_utc( obs[idx[i]].jd) / seconds_per_day;
+
             strcpy( buff, obs[idx[i]].packed_id);
             text_search_and_replace( buff, " ", "");
             j++;
             fprintf( ofile, "        [\n");
             fprintf( ofile, "        \"%s\",\n", buff);
-            full_ctime( buff, obs[idx[i]].jd, FULL_CTIME_YMD | FULL_CTIME_LEADING_ZEROES
+            full_ctime( buff, obs_utc_jd, FULL_CTIME_YMD | FULL_CTIME_LEADING_ZEROES
                            | FULL_CTIME_MONTHS_AS_DIGITS
                            | FULL_CTIME_FORMAT_DAY | FULL_CTIME_5_PLACES);
             fprintf( ofile, "        \"%s\",\n", buff);
