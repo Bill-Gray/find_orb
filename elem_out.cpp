@@ -570,16 +570,21 @@ static int make_linkage_json( const int n_obs, const OBSERVE *obs, const ELEMENT
          idx[n_ids++] = i;
          }
       }
-   if( n_ids < 2 || n_ids >= MAX_LINKAGE_IDS)    /* no ID to be made */
-      return( n_ids);
+   if( n_ids < 2 || n_ids >= MAX_LINKAGE_IDS)
+      if( elem->central_obj != 3)
+         return( n_ids);                  /* no ID to be made */
    ifile = fopen_ext( "link_hdr.json", "cr");
    if( !ifile)   /* no user-modified header; fall back to default hdr */
       ifile = fopen_ext( "link_def.json", "fcr");
-   ofile = fopen_ext( "linkage.json", "fcw");
+   ofile = fopen_ext( (elem->central_obj == 3) ? "artsat.json" : "linkage.json", "fcw");
    while( fgets( buff, sizeof( buff), ifile))
       if( *buff != '#')
          fputs( buff, ofile);
    fclose( ifile);
+   if( elem->central_obj == 3)
+      fprintf( ofile, "      \"designations\": [\n"
+                      "         \"ARTSAT\"\n"
+                      "        ],\n");
    if( n_designated)
       {
       fprintf( ofile, "      \"designations\": [\n");
@@ -2176,7 +2181,7 @@ int write_out_elements_to_file( const double *orbit,
    elements_in_json_format( ofile, &elem, object_name, obs, n_obs, moids,
                                              body_frame_note, false);
    fclose( ofile);
-   make_linkage_json( n_obs, obs, &helio_elem);
+   make_linkage_json( n_obs, obs, &elem);
    free( tbuff);
    return( bad_elements);
 }
