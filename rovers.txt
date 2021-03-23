@@ -1231,3 +1231,4 @@ On6 !+014.78264    +49.91339          559.0    Ondrejov radio telescope (NE)
 On7 !+014.7819072  +49.9090889        580.0    Ondrejov 18cm
 
 McN !+149.15646    -31.27369          610.0    Rob McNaught
+Kau !+024.048722   +54.920805          67.0    Kaunas
