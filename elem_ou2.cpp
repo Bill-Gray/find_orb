@@ -57,13 +57,21 @@ int put_elements_into_sof( char *obuff, const char *templat,
       double angle_to_put = 0.;
       int integer_to_put = 0;
       const char *text_to_put = NULL;
+      bool right_justify = true;
       char tbuff[80];
 
       while( templat[i] >= ' ' && templat[i] != '|')
          i++;
 
-      if( *templat == 'N')
-         text_to_put = obs->packed_id;
+      if( *templat == 'N')       /* store name w/o leading spaces */
+         {
+         text_to_put = tbuff;
+         j = 0;
+         while( obs->packed_id[j] == ' ')
+            j++;
+         strcpy( tbuff, obs->packed_id + j);
+         right_justify = false;
+         }
       else if( *templat == 'n' && templat[1] == '_')
          {
          switch( templat[2])
@@ -178,7 +186,8 @@ int put_elements_into_sof( char *obuff, const char *templat,
                   | FULL_CTIME_11_PLACES | FULL_CTIME_MONTHS_AS_DIGITS);
          }
       if( text_to_put)
-         snprintf( obuff, i + 1, "%*s", (int)i, text_to_put);
+         snprintf( obuff, i + 1,
+                  (right_justify ? "%*s" : "%-*s"), (int)i, text_to_put);
       else if( val_to_put)
          {
          size_t j = 1;
