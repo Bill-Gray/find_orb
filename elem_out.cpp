@@ -579,7 +579,17 @@ static int make_linkage_json( const int n_obs, const OBSERVE *obs, const ELEMENT
    ofile = fopen_ext( (elem->central_obj == 3) ? "artsat.json" : "linkage.json", "fcw");
    while( fgets( buff, sizeof( buff), ifile))
       if( *buff != '#')
+         {
+         char *tptr = strstr( buff, "%t");
+         char tbuff[200];
+
+         if( tptr)
+            {
+            full_ctime( tbuff, current_jd( ), FULL_CTIME_YMD);
+            text_search_and_replace( buff, "%t", tbuff);
+            }
          fputs( buff, ofile);
+         }
    fclose( ifile);
    if( elem->central_obj == 3)
       fprintf( ofile, "      \"designations\": [\n"
@@ -633,18 +643,22 @@ static int make_linkage_json( const int n_obs, const OBSERVE *obs, const ELEMENT
    while( i < n_obs && strcmp( obs[i].reference, "NEOCP"))
       i++;
    if( i < n_obs)         /* no NEOCP observations */
-   fprintf( ofile, "      \"identification_type\": \"neocp\",\n");
-   fprintf( ofile, "      \"orbit\": {\n");
-   fprintf( ofile, "        \"arg_pericenter\": %f,\n",
-                                 centralize_ang( elem->arg_per) * 180. / PI);
-   fprintf( ofile, "        \"eccentricity\": %.8f,\n", elem->ecc);
-   fprintf( ofile, "        \"epoch\": %f,\n", elem->epoch);
-   fprintf( ofile, "        \"inclination\": %f,\n", elem->incl * 180. / PI);
-   fprintf( ofile, "        \"lon_asc_node\": %f,\n",
-                                centralize_ang( elem->asc_node) * 180. / PI);
-   fprintf( ofile, "        \"pericenter_distance\": %.8f,\n", elem->q);
-   fprintf( ofile, "        \"pericenter_time\": %f\n", elem->perih_time);
-   fprintf( ofile, "      }\n");
+   fprintf( ofile, "      \"identification_type\": \"neocp\"%s\n",
+                (elem->central_obj == 3) ? "" : ",");
+   if( elem->central_obj != 3)
+      {
+      fprintf( ofile, "      \"orbit\": {\n");
+      fprintf( ofile, "        \"arg_pericenter\": %f,\n",
+                                    centralize_ang( elem->arg_per) * 180. / PI);
+      fprintf( ofile, "        \"eccentricity\": %.8f,\n", elem->ecc);
+      fprintf( ofile, "        \"epoch\": %f,\n", elem->epoch);
+      fprintf( ofile, "        \"inclination\": %f,\n", elem->incl * 180. / PI);
+      fprintf( ofile, "        \"lon_asc_node\": %f,\n",
+                                   centralize_ang( elem->asc_node) * 180. / PI);
+      fprintf( ofile, "        \"pericenter_distance\": %.15f,\n", elem->q);
+      fprintf( ofile, "        \"pericenter_time\": %f\n", elem->perih_time);
+      fprintf( ofile, "      }\n");
+      }
    fprintf( ofile, "    }\n  }\n}\n");
    fclose( ofile);
    return( n_ids);

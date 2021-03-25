@@ -8,7 +8,7 @@
   "header": {
     "name": "J. Doe",
     "email": "john_doe@example.com",
-    "comment": "Default Find_Orb identification comment."
+    "comment": "Default Find_Orb identification comment.  Linkage written %t UTC."
   },
   "links": {
     "link_0": {
