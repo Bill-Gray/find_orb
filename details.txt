@@ -145,6 +145,11 @@ COD 170
 COM Find_Orb default details
 OBS J. Manteca
 
+COD 178
+OBS J.-G. Bosch
+COM Default details extracted from MPEC 2021-F115
+TEL 0.08-m f/6 refractor + CCD
+
 COD 185
 COM Find_Orb default details
 OBS M. Ory
@@ -1078,6 +1083,11 @@ OBS G. van Buitenen
 COM Default details extracted from MPEC 2021-B143
 TEL 0.20-m f/8 Ritchey- Chretien + CCD + f/5.4 focal reducer
 
+COD G09
+OBS J. Vincent
+COM Default details extracted from MPEC 2021-F115
+TEL 0.30-m reflector + CCD
+
 COD G11
 OBS B. Klemt
 COM Default details extracted from MPEC 2021-F20
@@ -1214,7 +1224,7 @@ TEL  + 10K CCD
 COD H01
 COM Find_Orb default details
 OBS W. H. Ryan, E. V. Ryan
-MEA W. H. Ryan.
+MEA W. H. Ryan
 TEL 2.4-m f/8.9 reflector + CCD
 
 COD H06
@@ -1643,6 +1653,11 @@ OBS J.-F. Soulier
 COM Default details extracted from MPEC 2021-B143
 TEL 0.20-m f/4 Newtonian reflector + CCD
 
+COD L29
+OBS G. Lehmann
+COM Default details extracted from MPEC 2019-P11
+TEL 0.4-m f/3.6 reflector + CCD
+
 COD L34
 OBS A. Nastasi
 COM Default details extracted from MPEC 2021-E131
@@ -1828,6 +1843,13 @@ COM Find_Orb default details
 OBS T. Lovejoy
 TEL 0.20-m f/2.1 Schmidt-Cassegrain + CCD
 
+COD R57
+COM Default details extracted from MPEC 2021-F112
+OBS A. C. Gilmore, P. M. Kilmartin
+MEA P. M. Kilmartin
+TEL 0.35-m f/11 Schmidt-Cassegrain + CCD
+AC2 alan (dot) gilmore (at) canterbury.ac (dot) nz
+
 COD T05
 COM Find_Orb default details
 OBS L. Denneau, A. Heinze, H. Weiland,  J. Tonry
@@ -1902,6 +1924,11 @@ COD U71
 OBS M. Forslund
 COM Default details extracted from MPEC 2021-B143
 TEL 0.36-m f/2.2 reflector + CCD
+
+COD U76
+OBS P. Lewin
+COM Default details extracted from MPEC 2021-F115
+TEL 0.36-m reflector + CCD
 
 COD V00
 COM Find_Orb default details
@@ -2042,6 +2069,7 @@ MEA M. Wawerzonnek
 OBS P. Breitenstein
 COM Default details extracted from MPEC 2020-Y113
 TEL 1.0-m Ritchey-Chretien + CCD
+
 COD V39
 MEA T. Lister
 OBS T. Lister, M. Hui, M. S. P. Kelley, J. Chatelain, E. Gomez
@@ -2085,6 +2113,12 @@ COM Find_Orb default details
 OBS J. E. Mazur
 NET UCAC4
 TEL 0.36-m f/6 Schmidt-Cassegrain + CCD
+
+COD W79
+OBS T. Lister, J. Chatelain, E. Gomez, S. Greenstreet, I. Kosic
+MEA T. Lister
+COM Default details extracted from MPEC 2019-P22
+TEL 0.4-m f/8.0 Schmidt-Cassegrain + CCD
 
 COD W84
 MEA S. Deen
@@ -2309,6 +2343,7 @@ COD Z92
 OBS A. R. Pratt
 COM Default details extracted from MPEC 2020-C98
 TEL 0.28-m f/10  Schmidt-Cassegrain + CCD + f/3.3 focal reducer
+
 COD Z99
 OBS A. Mickleburgh
 COM Default details extracted from MPEC 2021-B143
