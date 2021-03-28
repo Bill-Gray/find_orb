@@ -3385,6 +3385,11 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
    object_type = OBJECT_TYPE_ASTEROID;
    is_interstellar = 0;
    n_rovers = 0;
+   if( rovers)
+      {
+      free( rovers);
+      rovers = NULL;
+      }
    if( !obs_details)
       obs_details = init_observation_details( );
    ades_context = init_ades2mpc( );
