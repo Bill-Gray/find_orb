@@ -122,15 +122,19 @@ OBJS=ades_out.o b32_eph.o bc405.o bias.o collide.o conv_ele.o details.o eigen.o 
 	runge.o shellsor.o sigma.o simplex.o sm_vsop.o sr.o stackall.o
 
 LIBS=$(LIBSADDED) -llunar -ljpl -lsatell
+FIND_ORB_OBJS = clipfunc.o getstrex.o
 
-$(FIND_ORB_EXE):          findorb.o clipfunc.o $(OBJS) $(RES_FILENAME)
-	$(CC) -o $(FIND_ORB_EXE) findorb.o clipfunc.o $(OBJS) $(LIBS) $(CURSES_LIB) $(RES_FILENAME)
+$(FIND_ORB_EXE):          findorb.o $(FIND_ORB_OBJS) $(OBJS) $(RES_FILENAME)
+	$(CC) -o $(FIND_ORB_EXE) findorb.o $(FIND_ORB_OBJS) $(OBJS) $(LIBS) $(CURSES_LIB) $(RES_FILENAME)
 
 findorb.o:         findorb.cpp
 	$(CC) $(CFLAGS) $(CURSES_FLAGS) $<
 
 clipfunc.o:        clipfunc.cpp
 	$(CC) $(CFLAGS) $(CURSES_FLAGS) $<
+
+getstrex.o:        getstrex.c
+	$(CC) $(CFLAGS) $(CURSES_FLAGS) -DPDC_WIDE -DPDC_FORCE_UTF8 -DPDC_NCMOUSE $<
 
 $(FO_EXE):          fo.o $(OBJS) $(RES_FILENAME)
 	$(CC) -o $(FO_EXE) fo.o $(OBJS) $(LIBS) $(RES_FILENAME)

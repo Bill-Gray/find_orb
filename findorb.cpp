@@ -247,6 +247,17 @@ void shellsort_r( void *base, const size_t n_elements, const size_t esize,
 static int count_wide_chars_in_utf8_string( const char *iptr, const char *endptr);
 char **load_file_into_memory( const char *filename, size_t *n_lines,
                         const bool fail_if_not_found);      /* mpc_obs.cpp */
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* #ifdef __cplusplus */
+
+int getnstr_ex( char *str, int *loc, int maxlen, const int size);  /* getstrex.c */
+
+#ifdef __cplusplus
+}
+#endif  /* #ifdef __cplusplus */
+
 double comet_g_func( const long double r);                   /* runge.cpp */
 int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
                                    const char *format, ...)
@@ -441,12 +452,17 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
          }
       if( buff)         /* we're asking for text from the user */
          {
+         int loc = 0;
+
          memset( tbuff, ' ', real_width);
          put_colored_text( tbuff, line, col, real_width, color);
-         move( line, col + side_borders);
-         echo( );
-         rval = getnstr( buff, max_len);
-         noecho( );
+         *buff = '\0';
+         do
+            {
+            move( line, col + side_borders);
+            rval = getnstr_ex( buff, &loc, max_len, 20);
+            }
+            while( rval > 0 && rval != 27);
          }
       else        /* we just want the user to pick a line */
          {
