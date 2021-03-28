@@ -379,7 +379,7 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
       int *buffered_screen;
 
       for( i = 0; prompt[i]; i++)
-         if( prompt[i] == '\n')
+         if( prompt[i] == '\n' || !prompt[i + 1])
             {
             int new_size = count_wide_chars_in_utf8_string(
                         prompt + line_start, prompt + i);
@@ -392,9 +392,6 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
             if( prompt[i + 1])   /* ignore trailing '\n's */
                n_lines++;
             }
-      i = count_wide_chars_in_utf8_string( prompt + line_start, prompt + i);
-      if( box_size < i)
-         box_size = i;
       if( box_size > getmaxx( stdscr) - 2)
          box_size = getmaxx( stdscr) - 2;
 
