@@ -2698,6 +2698,8 @@ static int user_select_file( char *filename, const char *title, const int flags)
 
          /* dialog and Xdialog take the same options : */
    endwin( );
+   sprintf( strchr( cmd, '~'), "~ %d %d",
+                          getmaxy( stdscr) - 15, getmaxx( stdscr) - 3);
    rval = try_a_file_dialog_program( filename, cmd + 1);
    refresh( );
    if( !rval)
