@@ -1,0 +1,15 @@
+You can enter almost any 'standard' MPC designation or name,  including
+packed variants.  For example,  any of
+
+Apophis
+99942
+2004 MN4
+K04M04N
+
+would get astrometry for (99942) Apophis = 2004 MN4.  Similarly,
+any of the following three entries would get astrometry for
+P/2005 L4 = 286P Christensen.
+
+P/2005 L4
+286P
+PK05L040

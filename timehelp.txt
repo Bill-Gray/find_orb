@@ -1,0 +1,139 @@
+   You can enter dates/times in a wide variety of ways.
+Essentially, if a human can understand the input,  the
+program probably will, too.  If you're a frequent Find_Orb
+user, though,  it may help to glance through the following;
+there are some tricks/shortcuts you may find helpful.
+
+   Examples of the most basic ways of entering time are as follows:
+
+   YOUR INPUT             PROGRAM INTERPRETATION
+------------------------  ----------------------
+1997-May-6 12:30:23.3348   ( 6 MAY 1997 12:30:23.3348)
+1997May-6                  ( 6 MAY 1997 00:00:00)
+6 May                      ( 6 May of the current year)
+12:30:23.3348              ( 12:30:23.3348 on the current date)
+12:30                      ( 12:30 on the current date)
+
+   You can separate the day/month/year with -, /, space,  or periods.
+You could also use '5' instead of 'May' (though this can result in the
+problems, since "5/6" can mean May 6 or 5 June;  see details below. It's
+therefore recommended that you use month names.)  The program will
+figure out where something like "1997may6" ought to have spaces.  (Case
+is always ignored.)
+
+   In addition to the time formats listed above,  entries such as the
+following are accepted.  These either make it simpler to enter certain
+times,  or allow for different common methods (Julian Day entry,  decimal
+days or years,  offsetting by a particular time interval,  and so on.)
+
+   YOUR INPUT             PROGRAM INTERPRETATION
+------------------------  ----------------------
+19970506 12:30:23.3348     ( 6 MAY 1997 12:30:23.3348)
+970506 12:30:23.3348       (same as above)
+6/18/2004                  (18 Jun 2004 00:00:00)
+6.18.2004                  (same as above)
+3:14.159                   (reset time to 3:14.159,  leave date alone)
+13:                        (reset time to 13:00:00, leave date alone)
+11/2 (or 11/f or 11 FE)    (11 Feb 00:00:00,  no change of year)
+11 2 (or 11/2 or 11-2)     (same as above)
+11.25 2                    (Same as above,  but 6:00:00)
+11.25 2 -10m               (10 Feb  5:50:00,  ten minutes prior to above)
++6d                        (advance six days from current time)
+-13.4h                     (subtract 13.4 hours from current time)
+-14h +36m                  (subtract 14 hours, then add 36 minutes)
+Ap                         (April of current year)
+Fri                        (Friday closest to current time)
+Fri+2w (or fr+14d)         (Two weeks from the nearest Friday)
+7.125                      (7th of current month at 3:00)
+7 :                        (7th of current month, leave time unchanged)
+:43:18 (or :43.3)          (43 minutes 18 seconds, hour unchanged)
+JD 2451545.                ( 1 JAN 2000 12:00 )
+j2451545                   (same as above)
+2451545                    (same as above)
+mjd 51000                  (MJD 51000 = JD 2451000.5 = 6 Jul 2008 0:00:00)
+2008-03-14T15:26:53.5      (FITS-style time: 2008 Mar 14, 15:26:53.5)
+2008/50 (or 50-2008)       (50th day of 2008: 2008 Feb 19)
+50 2008 3:14:15.9          (same as above, but sets time to 3:14:15.9)
+50.75 2008                 (50th day of 2008,  18:00)
+050.75                     (50th day of current year,  18:00)
+2008 o (or Octob 2008)     ( 1 OCT 2008 00:00:00)
+y1952.34                   (decimal year: about a third of the way into 1952)
+1952.34                    (same as above)
+
+   Essentially,  one can enter calendar-style dates; some special date
+formats;  a day-of-year;  and one can add/subtract offsets from the time.
+
+   Calendar-style input:  (This is all most people will need or want to
+know!) You can enter a day, month, and year (or just a day and month),
+optionally followed by a time of day.  The program will usually figure
+out more unusual inputs,  because it can see that (for example) 1997 must
+be a year, not a month or a day; or that "mar" must be a month, not a day
+or year. With '5-1997-15',  for example, the input numbers can be in any
+order, and the program will still recognize that this must mean 1997 May
+15. A year after 31 AD, a month name,  and a day can be entered in any
+order, and the program will be able to sort things out. But when given
+inputs such as '3/4/5',  year/month/day is assumed.
+
+   Month names are interpreted "logically".  For example, at least in English,
+'f' is unambiguously February (no other month starts with F) and will be
+recognized as such,  but 'ju' could be either June or July. In such cases,
+the program will choose the first possible month,  so 'j'=January,
+'JU'=June, 'Jul'=July. 'Febru' or 'f' or 'FEB' or 'february' would all be
+understood to mean February.
+
+   If a time (hours:minutes or hours:minutes:seconds) follows a date,  it's
+used;  otherwise,  0:00 is assumed.  If just a ':' follows a date,  the time
+is left unchanged.  The day can include a decimal portion (as some of the
+above examples do).
+
+  You can enter just a month name (as shown above) or just a number.  The
+interpretation of that number will be:
+
+One or two digits:   Reset day and decimal part of day of month
+Three digits:        Reset day of year
+Four or five digits: Reset year
+Six-digit number:    YYMMDD.  If the year is less than 40,  it's assumed to
+                     be a 21th-century year (2000 is added).  Otherwise,
+                     it's assumed to be a 20th-century year (1900 is added).
+Seven digits:        Julian Day
+Eight-digit number:  YYYYMMDD
+
+   So one can just enter '3',  for example,  to reset to the third of the
+current month;  or '2005' to get 1 January 2005;  or '2451545' to get JD
+2451545 = 1.5 January 2000.  If a year entered in this manner has a decimal
+part,  you'll get that fractional part of a year added. But if you want to
+set the year -23300 or 130000,  you'll need to use 'y-23300' or 'y130000';
+for a JD before 1000000 or after 9999999,  you'd need to use 'j' or 'jd'
+followed by the JD. Decimal parts of a day can be added,  so that
+'030913.75' is equivalent to '030913 18:' is equivalent to '2003 Sep 13
+18:00:00'.
+
+   To get the output you want,  you may need to add leading zeroes. If
+you wanted the fiftieth day of the current year,  for example,  you'd
+use '050',  because '50' would get you the fiftieth day of the current
+month (i.e.,  most of the way into the next month). '0050' would get you
+the year 50, '00501007' Oct 7 of that year,  and so on.
+
+   As shown above,  three digits (optionally followed by a decimal
+portion) will be interpreted as setting that day of the year.  Also, if
+you enter two numbers,  both greater than 31, the program assumes they
+are the year and day of the year (thus the "2008/50" and "50 2008"
+examples above).  The program assumes that the larger number is the year.
+
+   A '+' or '-' followed by a number will add/subtract that number of days
+to the current time.  One can add a letter specifying time units: 'd' (day),
+'h' (hour), 'm' (minute), 's' (seconds), 'w' (weeks), 'l' (lunations), 'y'
+(years), 'c' (centuries).  Some examples are shown above.
+
+   This can be useful in dealing with time zones.  For example,  if your
+default time zone is UT,  but you want to enter an Eastern US (UT-5) time,
+you can just add '-5h' to it.
+
+   You can add more than one offset;  for example,  Fri+2w -5h  would mean
+"two weeks from the nearest Friday, midnight Eastern US time."
+
+   Some other forms will be interpreted,  but if there's ambiguity,
+you may not get what you wanted.
+
+   To be added:  it would be nice if one could add 'UT' or 'EST' or 'LST'
+or 'UTC-8' or similar time zone abbreviations to any of the above entries.

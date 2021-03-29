@@ -377,6 +377,8 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
       int real_width, line = line0, col = col0;
       char tbuff[200];
       int *buffered_screen;
+      int x, y, z;
+      unsigned long button;
 
       for( i = 0; prompt[i]; i++)
          if( prompt[i] == '\n' || !prompt[i + 1])
@@ -452,12 +454,39 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
          int loc = 0;
 
          memset( tbuff, ' ', real_width);
-         put_colored_text( tbuff, line, col, real_width, color);
          *buff = '\0';
          do
             {
+            put_colored_text( tbuff, line + 1, col, real_width, color);
+            put_colored_text( "[OK]",
+                 line + 1, col + side_borders, 4, color | A_REVERSE);
+            put_colored_text( "[Cancel]",
+                 line + 1, col + real_width - side_borders - 8, 8, color | A_REVERSE);
+            put_colored_text( tbuff, line, col, real_width, color);
             move( line, col + side_borders);
             rval = getnstr_ex( buff, &loc, max_len, 20);
+            if( rval == KEY_MOUSE)
+               {
+               get_mouse_data( &x, &y, &z, &button);
+               x -= col;
+               if( y == line - n_lines && x >= real_width - 4 && x < real_width - 1)
+                  rval = KEY_F( 1);
+               if( y == line + 1 && x >= side_borders && x < real_width - 1)
+                  {
+                  if( x < side_borders + 4)
+                     rval = 0;         /* OK clicked */
+                  else if( x >= real_width - 8 - side_borders)
+                     rval = 27;        /* Cancel clicked */
+                  }
+               }
+            if( rval == KEY_F( 1) && help_file_name)
+               {
+               int *buffered_screen_2 = store_curr_screen( );
+
+               show_a_file( help_file_name);
+               restore_screen( buffered_screen_2);
+               free( buffered_screen_2);
+               }
             }
             while( rval > 0 && rval != 27);
          }
@@ -485,8 +514,7 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
                     /* on the second line,  etc.                    */
             if( rval == KEY_MOUSE)
                {
-               int x, y, z, curr_line, pass;
-               unsigned long button;
+               int curr_line, pass;
 
                get_mouse_data( &x, &y, &z, &button);
                curr_line = y;
@@ -963,6 +991,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             ephemeris_output_options ^= OPTION_SHOW_SIGMAS;
             break;
          case 'e': case 'E': case KEY_F( 2):
+            help_file_name = "timehelp.txt";
             inquire( "Enter end of ephemeris (YYYY MM DD, or JD, or 'now'):",
                      buff, sizeof( buff), COLOR_MESSAGE_TO_USER);
             format_start = extract_date( buff, &jd_end);
@@ -1090,6 +1119,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             }
             break;
          case 't': case 'T': case KEY_F( 1): case KEY_F( 3):
+            help_file_name = "timehelp.txt";
             inquire( "Enter start of ephemeris (YYYY MM DD, or JD, or 'now'):",
                   ephemeris_start, sizeof( ephemeris_start), COLOR_MESSAGE_TO_USER);
             break;
@@ -2851,6 +2881,7 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
             {
             char object_name[80];
 
+            help_file_name = "obj_name.txt";
             inquire( "Enter object name :", object_name, 40, COLOR_DEFAULT_INQUIRY);
             if( *object_name)
                {
@@ -4163,6 +4194,7 @@ int main( int argc, const char **argv)
             {
             double new_jd = epoch_shown;
 
+            help_file_name = "timehelp.txt";
             inquire( "Enter new epoch,  as YYYY MM DD, or JD,  or 'now':",
                              tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY);
             if( !tbuff[1] && strchr( "sme", tbuff[0]))
