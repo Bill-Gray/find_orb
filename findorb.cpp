@@ -458,20 +458,22 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
          do
             {
             put_colored_text( tbuff, line + 1, col, real_width, color);
+            put_colored_text( tbuff, line + 2, col, real_width, color);
             put_colored_text( "[OK]",
-                 line + 1, col + side_borders, 4, color | A_REVERSE);
+                 line + 2, col + side_borders, 4, color | A_REVERSE);
             put_colored_text( "[Cancel]",
-                 line + 1, col + real_width - side_borders - 8, 8, color | A_REVERSE);
+                 line + 2, col + real_width - side_borders - 8, 8, color | A_REVERSE);
             put_colored_text( tbuff, line, col, real_width, color);
             move( line, col + side_borders);
-            rval = getnstr_ex( buff, &loc, max_len, 20);
+            attrset( COLOR_PAIR( COLOR_BACKGROUND));
+            rval = getnstr_ex( buff, &loc, max_len, box_size);
             if( rval == KEY_MOUSE)
                {
                get_mouse_data( &x, &y, &z, &button);
                x -= col;
                if( y == line - n_lines && x >= real_width - 4 && x < real_width - 1)
                   rval = KEY_F( 1);
-               if( y == line + 1 && x >= side_borders && x < real_width - 1)
+               if( y == line + 2 && x >= side_borders && x < real_width - 1)
                   {
                   if( x < side_borders + 4)
                      rval = 0;         /* OK clicked */
