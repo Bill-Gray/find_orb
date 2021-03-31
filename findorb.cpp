@@ -994,30 +994,32 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             break;
          case 'e': case 'E': case KEY_F( 2):
             help_file_name = "timehelp.txt";
-            inquire( "Enter end of ephemeris (YYYY MM DD, or JD, or 'now'):",
-                     buff, sizeof( buff), COLOR_MESSAGE_TO_USER);
-            format_start = extract_date( buff, &jd_end);
-            if( format_start == 1 || format_start == 2)
+            if( !inquire( "Enter end of ephemeris (YYYY MM DD, or JD, or 'now'):",
+                     buff, sizeof( buff), COLOR_MESSAGE_TO_USER))
                {
-               n_ephemeris_steps = (int)ceil( (jd_end - jd_start) / step);
-               if( n_ephemeris_steps < 0)
+               format_start = extract_date( buff, &jd_end);
+               if( format_start == 1 || format_start == 2)
                   {
-                  n_ephemeris_steps = 1 - n_ephemeris_steps;
-                  if( *ephemeris_step_size == '-')   /* eliminate neg sign */
-                     memmove( ephemeris_step_size, ephemeris_step_size + 1,
-                                          strlen( ephemeris_step_size));
-                  else
-                     {                            /* insert neg sign */
-                     memmove( ephemeris_step_size + 1, ephemeris_step_size,
-                                          strlen( ephemeris_step_size) + 1);
-                     *ephemeris_step_size = '-';
+                  n_ephemeris_steps = (int)ceil( (jd_end - jd_start) / step);
+                  if( n_ephemeris_steps < 0)
+                     {
+                     n_ephemeris_steps = 1 - n_ephemeris_steps;
+                     if( *ephemeris_step_size == '-')   /* eliminate neg sign */
+                        memmove( ephemeris_step_size, ephemeris_step_size + 1,
+                                             strlen( ephemeris_step_size));
+                     else
+                        {                            /* insert neg sign */
+                        memmove( ephemeris_step_size + 1, ephemeris_step_size,
+                                             strlen( ephemeris_step_size) + 1);
+                        *ephemeris_step_size = '-';
+                        }
                      }
                   }
                }
             break;
          case 'f': case 'F':
-            inquire( "Mag limit for ephemerides: ", buff, sizeof( buff), COLOR_MESSAGE_TO_USER);
-            if( atof( buff))
+            if( !inquire( "Mag limit for ephemerides: ", buff, sizeof( buff),
+                     COLOR_MESSAGE_TO_USER) && atof( buff))
                ephemeris_mag_limit = atof( buff);
             break;
          case 'g': case 'G':
@@ -1033,13 +1035,15 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             ephemeris_output_options ^= OPTION_LUNAR_ELONGATION;
             break;
          case 'l': case 'L':
-            inquire( "Enter MPC code: ", buff, sizeof( buff), COLOR_MESSAGE_TO_USER);
-            if( strlen( buff) < 50 || !memcmp( buff, "Ast", 3))
-               strcpy( mpc_code, buff);
-            else if( !get_observer_data( buff, buff, NULL, NULL, NULL))
+            if( !inquire( "Enter MPC code: ", buff, sizeof( buff), COLOR_MESSAGE_TO_USER))
                {
-               buff[3] = '\0';
-               strcpy( mpc_code, buff);
+               if( strlen( buff) < 50 || !memcmp( buff, "Ast", 3))
+                  strcpy( mpc_code, buff);
+               else if( !get_observer_data( buff, buff, NULL, NULL, NULL))
+                  {
+                  buff[3] = '\0';
+                  strcpy( mpc_code, buff);
+                  }
                }
             break;
          case '@':        /* toggle comet-related options */
@@ -1082,8 +1086,8 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             }
             break;
          case 'n': case 'N': case KEY_F( 4):
-            inquire( "Number of steps:", buff, sizeof( buff), COLOR_MESSAGE_TO_USER);
-            if( atoi( buff) > 0)
+            if( !inquire( "Number of steps:", buff, sizeof( buff), COLOR_MESSAGE_TO_USER)
+                             && atoi( buff) > 0)
                n_ephemeris_steps = atoi( buff);
             break;
          case 'o': case 'O':
@@ -1097,18 +1101,20 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             break;
          case 's': case 'S': case KEY_F( 5):
             strcpy( buff, ephemeris_step_size);
-            inquire( "Enter step size in days: ",
-                  ephemeris_step_size, sizeof( ephemeris_step_size), COLOR_MESSAGE_TO_USER);
-            if( !strcmp( ephemeris_step_size, "t"))
+            if( !inquire( "Enter step size in days: ",
+                                      buff, sizeof( buff), COLOR_MESSAGE_TO_USER))
                {
-               user_select_file( ephemeris_step_size + 2, "Select ephemeris times file", 0);
-               if( !ephemeris_step_size[2])        /* cancelled file selection */
-                  *ephemeris_step_size = '\0';
-               else
-                  ephemeris_step_size[1] = ' ';
+               if( !strcmp( buff, "t"))
+                  {
+                  user_select_file( buff + 2, "Select ephemeris times file", 0);
+                  if( !buff[2])        /* cancelled file selection */
+                     *buff = '\0';
+                  else
+                     buff[1] = ' ';
+                  }
+               if( *buff)
+                  strcpy( ephemeris_step_size, buff);
                }
-            if( !*ephemeris_step_size)
-               strcpy( ephemeris_step_size, buff);
             break;
          case '-':         /* reverse ephemeris direction */
             {
@@ -1122,8 +1128,10 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             break;
          case 't': case 'T': case KEY_F( 1): case KEY_F( 3):
             help_file_name = "timehelp.txt";
-            inquire( "Enter start of ephemeris (YYYY MM DD, or JD, or 'now'):",
-                  ephemeris_start, sizeof( ephemeris_start), COLOR_MESSAGE_TO_USER);
+            strlcpy_err( buff, ephemeris_start, sizeof( ephemeris_start));
+            if( !inquire( "Enter start of ephemeris (YYYY MM DD, or JD, or 'now'):",
+                         buff, sizeof( ephemeris_start), COLOR_MESSAGE_TO_USER))
+               strlcpy_err( ephemeris_start, buff, sizeof( ephemeris_start));
             break;
          case ALT_T:
             strcpy( ephemeris_start, "+0");
@@ -2884,8 +2892,8 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
             char object_name[80];
 
             help_file_name = "obj_name.txt";
-            inquire( "Enter object name :", object_name, 40, COLOR_DEFAULT_INQUIRY);
-            if( *object_name)
+            if( !inquire( "Enter object name :", object_name, 40, COLOR_DEFAULT_INQUIRY)
+                     && *object_name)
                {
                FILE *ofile = fopen_ext( temp_obs_filename, "twb");
 
@@ -4197,9 +4205,10 @@ int main( int argc, const char **argv)
             double new_jd = epoch_shown;
 
             help_file_name = "timehelp.txt";
-            inquire( "Enter new epoch,  as YYYY MM DD, or JD,  or 'now':",
-                             tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY);
-            if( !tbuff[1] && strchr( "sme", tbuff[0]))
+            if( inquire( "Enter new epoch,  as YYYY MM DD, or JD,  or 'now':",
+                             tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY))
+               *tbuff = '\0';       /* cancelled entry */
+            else if( !tbuff[1] && strchr( "sme", tbuff[0]))
                {
                int first, last;
 
@@ -4245,15 +4254,17 @@ int main( int argc, const char **argv)
 
                set_statistical_ranging( c == CTRL( 'A'));
                c = '|';
-               inquire( "Gaussian noise level (arcsec): ",
-                             tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY);
-               noise_in_arcseconds = atof( tbuff);
-               if( noise_in_arcseconds)
+               if( !inquire( "Gaussian noise level (arcsec): ",
+                             tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY))
                   {
-                  max_monte_rms =
-                           sqrt( noise_in_arcseconds * noise_in_arcseconds
-                                        + rms * rms);
-                  c = AUTO_REPEATING;
+                  noise_in_arcseconds = atof( tbuff);
+                  if( noise_in_arcseconds)
+                     {
+                     max_monte_rms =
+                              sqrt( noise_in_arcseconds * noise_in_arcseconds
+                                           + rms * rms);
+                     c = AUTO_REPEATING;
+                     }
                   }
                }
             if( c == AUTO_REPEATING)
@@ -4361,10 +4372,9 @@ int main( int argc, const char **argv)
 
             perturbers = 0;
             push_orbit( curr_epoch, orbit);
-            if( c == 'G')
+            if( c == 'G' && ! inquire( "Initial Gauss rho: ", tbuff,
+                       sizeof( tbuff), COLOR_DEFAULT_INQUIRY))
                {
-               inquire( "Initial Gauss rho: ", tbuff, sizeof( tbuff),
-                            COLOR_DEFAULT_INQUIRY);
                orbit[0] = atof( tbuff);
                gauss_soln = -1;
                }
@@ -4464,11 +4474,14 @@ int main( int argc, const char **argv)
             break;
          case 'l': case 'L':
             if( !*orbit_constraints)
-               inquire(
+               {
+               if( inquire(
    "Enter limits on the orbit (e.g.,  'e=0' or 'q=2.3' or 'q=.7,P=1.4').\n"
    "Constraints can be placed on e, q, Q, P, a, n, O, o, or i.",
                      orbit_constraints, sizeof( orbit_constraints),
-                     COLOR_DEFAULT_INQUIRY);
+                     COLOR_DEFAULT_INQUIRY))
+                  *orbit_constraints = '\0';    /* cancelled constraints */
+               }
             else
                {
                *orbit_constraints = '\0';
@@ -4511,9 +4524,8 @@ int main( int argc, const char **argv)
             sprintf( message_to_user, "%d digits\n", element_precision);
             break;
          case CTRL( 'P'):
-            inquire( "Blunder probability: ", tbuff, sizeof( tbuff),
-                            COLOR_DEFAULT_INQUIRY);
-            if( *tbuff)
+            if( !inquire( "Blunder probability: ", tbuff, sizeof( tbuff),
+                            COLOR_DEFAULT_INQUIRY) && *tbuff)
                {
                extern double probability_of_blunder;
 
@@ -4525,10 +4537,9 @@ int main( int argc, const char **argv)
             extern double **eigenvects;
             static double total_sigma = 0.;
 
-            if( eigenvects)
+            if( eigenvects && !inquire( "Enter sigma: ", tbuff,
+                        sizeof( tbuff), COLOR_DEFAULT_INQUIRY))
                {
-               inquire( "Enter sigma: ", tbuff, sizeof( tbuff),
-                            COLOR_DEFAULT_INQUIRY);
                if( *tbuff == '0')
                   total_sigma = 0.;
                else
@@ -4558,15 +4569,13 @@ int main( int argc, const char **argv)
             }
             break;
          case CTRL( 'D'):
-            inquire( "Number SR orbits: ", tbuff, sizeof( tbuff),
-                            COLOR_DEFAULT_INQUIRY);
-            if( *tbuff)
+            if( !inquire( "Number SR orbits: ", tbuff, sizeof( tbuff),
+                            COLOR_DEFAULT_INQUIRY) && atoi( tbuff))
                {
-               unsigned max_orbits = atoi( tbuff);
-               double *orbits;
+               const unsigned max_orbits = atoi( tbuff);
+               double *orbits = (double *)calloc( max_orbits, 7 * sizeof( double));
                int n_found;
 
-               orbits = (double *)calloc( max_orbits, 7 * sizeof( double));
                for( i = 0; i < n_obs - 1 && !obs[i].is_included; i++)
                   ;
                n_found = get_sr_orbits( orbits, obs + i, n_obs - i, 0, max_orbits, 3., 1.);
@@ -4601,16 +4610,16 @@ int main( int argc, const char **argv)
             extern double sr_min_r, sr_max_r;
             extern int using_sr;
 
-            inquire( "Enter SR R1, R2: ", tbuff, sizeof( tbuff),
-                            COLOR_DEFAULT_INQUIRY);
-            if( sscanf( tbuff, "%lf %lf %lf", &sr_min_r, &sr_max_r, &max_monte_rms) == 3)
+            if( !inquire( "Enter SR R1, R2: ", tbuff, sizeof( tbuff),
+                            COLOR_DEFAULT_INQUIRY) &&
+                   3 == sscanf( tbuff, "%lf %lf %lf", &sr_min_r, &sr_max_r, &max_monte_rms))
                using_sr = 1;
             }
             break;
          case 'r': case 'R':
-            inquire( "Enter new R1, R2: ", tbuff, sizeof( tbuff),
-                            COLOR_DEFAULT_INQUIRY);
-            if( sscanf( tbuff, "%lf%n", &r1, &i) == 1)
+            if( !inquire( "Enter new R1, R2: ", tbuff, sizeof( tbuff),
+                            COLOR_DEFAULT_INQUIRY)
+                   && sscanf( tbuff, "%lf%n", &r1, &i) == 1)
                {
                int j;
 
@@ -4653,9 +4662,8 @@ int main( int argc, const char **argv)
             break;
          case 's': case 'S':     /* save orbital elements to a file */
             {
-            inquire( "Enter filename for saving elements: ",
-                                tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY);
-            if( *tbuff)
+            if( !inquire( "Enter filename for saving elements: ", tbuff,
+                              sizeof( tbuff), COLOR_DEFAULT_INQUIRY) && *tbuff)
                {
                FILE *ofile;
                char filename[80];
@@ -4715,10 +4723,8 @@ int main( int argc, const char **argv)
             {
             double vaisala_dist;
 
-            inquire( "Enter peri/apohelion distance: ", tbuff, sizeof( tbuff),
-                                    COLOR_DEFAULT_INQUIRY);
-            vaisala_dist = atof( tbuff);
-            if( vaisala_dist)
+            if( !inquire( "Enter peri/apohelion distance: ", tbuff, sizeof( tbuff),
+                        COLOR_DEFAULT_INQUIRY) && (vaisala_dist = atof( tbuff)) != 0.)
                {
                curr_epoch = obs->jd;
                find_vaisala_orbit( orbit, obs, obs + n_obs - 1, vaisala_dist);
@@ -4861,40 +4867,39 @@ int main( int argc, const char **argv)
             }
             break;
          case ALT_D:
-            {
-            char *equals_ptr;
-
-            inquire( "Debug level: ",
-                                tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY);
-            equals_ptr = strchr( tbuff, '=');
-            if( !equals_ptr)
-               debug_level = atoi( tbuff);
-            else
+            if( !inquire( "Debug level: ",
+                                tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY))
                {
-               *equals_ptr = '\0';
-               set_environment_ptr( tbuff, equals_ptr + 1);
+               char *equals_ptr = strchr( tbuff, '=');
+
+               if( !equals_ptr)
+                  debug_level = atoi( tbuff);
+               else
+                  {
+                  *equals_ptr = '\0';
+                  set_environment_ptr( tbuff, equals_ptr + 1);
+                  }
                }
-            }
             break;
          case ALT_J:
-            {
-            extern double j2_multiplier;
-
-            inquire( "J2 multiplier: ",
-                                tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY);
-            if( *tbuff != 'r')
-               j2_multiplier = atof( tbuff);
-            else
+            if( !inquire( "J2 multiplier: ",
+                                tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY))
                {
-               unsigned j;
+               extern double j2_multiplier;
 
-               for( i = j = 0; i < n_obs; i++)
-                  if( obs[i].note2 == 'R')
-                     obs[j++] = obs[i];
-               n_obs = j;
-               update_element_display = 1;
+               if( *tbuff != 'r')
+                  j2_multiplier = atof( tbuff);
+               else
+                  {
+                  unsigned j;
+
+                  for( i = j = 0; i < n_obs; i++)
+                     if( obs[i].note2 == 'R')
+                        obs[j++] = obs[i];
+                  n_obs = j;
+                  update_element_display = 1;
+                  }
                }
-            }
             break;
          case ALT_S:
             {
@@ -4911,59 +4916,59 @@ int main( int argc, const char **argv)
 
             snprintf( tbuff, sizeof( tbuff), "Integration tolerance: (currently %.4g)",
                                  integration_tolerance);
-            inquire( tbuff, tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY);
-            if( atof( tbuff) != 0.)
+            if( !inquire( tbuff, tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY)
+                                 && atof( tbuff) > 0.)
                integration_tolerance = atof( tbuff);
             }
             break;
          case '%':
-            {
-            int n_selected = 0;
-            double new_sig;
-            bool is_mul = false;
-
-            inquire( "Uncertainty of selected observation(s), in arcsec: ",
-                                tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY);
-            if( *tbuff == 't' || *tbuff == 'm')
-               new_sig = atof( tbuff + 1);
-            else if( *tbuff == '*')
+            if( !inquire( "Uncertainty of selected observation(s), in arcsec: ",
+                                tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY))
                {
-               is_mul = true;
-               new_sig = atof( tbuff + 1);
-               }
-            else
-               new_sig = atof( tbuff);
-            for( i = 0; new_sig > 0. && i < n_obs; i++)
-               if( obs[i].flags & OBS_IS_SELECTED)
+               int n_selected = 0;
+               double new_sig;
+               bool is_mul = false;
+
+               if( *tbuff == 't' || *tbuff == 'm')
+                  new_sig = atof( tbuff + 1);
+               else if( *tbuff == '*')
                   {
-                  n_selected++;
-                  switch( *tbuff)
-                     {
-                     case 'm':
-                        obs[i].mag_sigma = new_sig;
-                        snprintf( message_to_user, sizeof( message_to_user),
-                               "Magnitude sigma reset to %.3e", new_sig);
-                        break;
-                     case 't':
-                        obs[i].time_sigma = new_sig / seconds_per_day;
-                        snprintf( message_to_user, sizeof( message_to_user),
-                               "Time sigma reset to %.3e seconds", new_sig);
-                        break;
-                     default:
-                        if( is_mul)
-                           {
-                           obs[i].posn_sigma_1 *= new_sig;
-                           obs[i].posn_sigma_2 *= new_sig;
-                           }
-                        else
-                           set_tholen_style_sigmas( obs + i, tbuff);
-                        strcpy( message_to_user, "Positional uncertainty reset");
-                        break;
-                     }
+                  is_mul = true;
+                  new_sig = atof( tbuff + 1);
                   }
-            snprintf_append( message_to_user, sizeof( message_to_user),
-                     " for %d observations", n_selected);
-            }
+               else
+                  new_sig = atof( tbuff);
+               for( i = 0; new_sig > 0. && i < n_obs; i++)
+                  if( obs[i].flags & OBS_IS_SELECTED)
+                     {
+                     n_selected++;
+                     switch( *tbuff)
+                        {
+                        case 'm':
+                           obs[i].mag_sigma = new_sig;
+                           snprintf( message_to_user, sizeof( message_to_user),
+                                  "Magnitude sigma reset to %.3e", new_sig);
+                           break;
+                        case 't':
+                           obs[i].time_sigma = new_sig / seconds_per_day;
+                           snprintf( message_to_user, sizeof( message_to_user),
+                                  "Time sigma reset to %.3e seconds", new_sig);
+                           break;
+                        default:
+                           if( is_mul)
+                              {
+                              obs[i].posn_sigma_1 *= new_sig;
+                              obs[i].posn_sigma_2 *= new_sig;
+                              }
+                           else
+                              set_tholen_style_sigmas( obs + i, tbuff);
+                           strcpy( message_to_user, "Positional uncertainty reset");
+                           break;
+                        }
+                     }
+               snprintf_append( message_to_user, sizeof( message_to_user),
+                        " for %d observations", n_selected);
+               }
             break;
          case '"':
             debug_mouse_messages ^= 1;
@@ -4984,9 +4989,9 @@ int main( int argc, const char **argv)
             strcpy( message_to_user, "Full arc set");
             break;
          case ')':
-            inquire( "Enter name of file to be displayed: ",
-                               tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY);
-            show_a_file( tbuff);
+            if( !inquire( "Enter name of file to be displayed: ",
+                               tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY))
+               show_a_file( tbuff);
             break;
          case '`':
             {
@@ -5093,25 +5098,24 @@ int main( int argc, const char **argv)
             break;
 #endif
          case '{':
-            {
-            double rms;
-
-            inquire( "Cutoff in sigmas:",
-                               tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY);
-            rms = atof( tbuff);
-            if( rms > 0.)
+            if( !inquire( "Cutoff in sigmas:",
+                               tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY))
                {
-               const int n_changed = filter_obs( obs, n_obs, rms);
+               const double rms = atof( tbuff);
 
-               if( !n_changed)
-                  strcpy( message_to_user, "No filtering done");
-               else if( n_changed == -1)
-                  strcpy( message_to_user, "Filtering FAILED");
-               else
-                  sprintf( message_to_user, "Rejections at %.3f sigmas; %d changes",
-                           rms, n_changed);
+               if( rms > 0.)
+                  {
+                  const int n_changed = filter_obs( obs, n_obs, rms);
+
+                  if( !n_changed)
+                     strcpy( message_to_user, "No filtering done");
+                  else if( n_changed == -1)
+                     strcpy( message_to_user, "Filtering FAILED");
+                  else
+                     sprintf( message_to_user, "Rejections at %.3f sigmas; %d changes",
+                              rms, n_changed);
+                  }
                }
-            }
             break;
          case '}':
             {
@@ -5171,9 +5175,8 @@ int main( int argc, const char **argv)
                }
             break;
          case KEY_F(17):    /* shift-f5 */
-            inquire( "Enter element filename: ",
-                               tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY);
-            if( *tbuff)
+            if( !inquire( "Enter element filename: ", tbuff, sizeof( tbuff),
+                                COLOR_DEFAULT_INQUIRY) && *tbuff)
                {
                const double rval = get_elements( tbuff, orbit);
 
@@ -5215,32 +5218,34 @@ int main( int argc, const char **argv)
                            euler_function( obs, obs + n_obs - 1));
             break;
          case KEY_F(20):    /* shift-f8 */
-            inquire( "MPC code for which to search: ",
-                               tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY);
-            if( strlen( tbuff) == 3)
+            if( !inquire( "MPC code for which to search: ",
+                               tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY))
                {
-               curr_obs = (curr_obs + 1) % n_obs;
-               for( i = 0; i < n_obs && strcmp( tbuff,
-                         obs[curr_obs].mpc_code); i++)
+               if( strlen( tbuff) == 3)
+                  {
                   curr_obs = (curr_obs + 1) % n_obs;
-               }
-            else if( !strcmp( tbuff, "r"))
-               {
-               curr_obs = (curr_obs + 1) % n_obs;
-               for( i = 0; i < n_obs && obs[curr_obs].note2 != 'R'; i++)
+                  for( i = 0; i < n_obs && strcmp( tbuff,
+                            obs[curr_obs].mpc_code); i++)
+                     curr_obs = (curr_obs + 1) % n_obs;
+                  }
+               else if( !strcmp( tbuff, "r"))
+                  {
                   curr_obs = (curr_obs + 1) % n_obs;
-               }
-            else
-               {
-               const double jd = get_time_from_string( obs[curr_obs].jd,
-                              tbuff, 0, NULL);
+                  for( i = 0; i < n_obs && obs[curr_obs].note2 != 'R'; i++)
+                     curr_obs = (curr_obs + 1) % n_obs;
+                  }
+               else
+                  {
+                  const double jd = get_time_from_string( obs[curr_obs].jd,
+                                 tbuff, 0, NULL);
 
-               if( jd)
-                  for( curr_obs = 0; curr_obs < n_obs &&
-                         obs[curr_obs].jd < jd; curr_obs++)
-                     ;
+                  if( jd)
+                     for( curr_obs = 0; curr_obs < n_obs &&
+                            obs[curr_obs].jd < jd; curr_obs++)
+                        ;
+                  }
+               single_obs_selected = true;
                }
-            single_obs_selected = true;
             break;
          case KEY_F(19):    /* shift-f7 */
             element_format ^= ELEM_OUT_ALTERNATIVE_FORMAT;
@@ -5285,15 +5290,12 @@ int main( int argc, const char **argv)
                         curr_epoch, epoch_shown);
             break;
          case ALT_M:
-            {
-            inquire( "Number Metropolis steps: ",
-                               tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY);
-            if( (i = atoi( tbuff)) > 0)
+            if( !inquire( "Number Metropolis steps: ", tbuff, sizeof( tbuff),
+                        COLOR_DEFAULT_INQUIRY) && (i = atoi( tbuff)) > 0)
                {
                metropolis_search( obs, n_obs, orbit, curr_epoch, i, 1.);
                update_element_display = 1;
                }
-            }
             break;
          case CTRL( 'B'):
             show_commented_elements = !show_commented_elements;
@@ -5384,10 +5386,12 @@ int main( int argc, const char **argv)
             residual_format ^= RESIDUAL_FORMAT_SHOW_DESIGS;
             break;
          case ALT_R:
-            inquire( get_find_orb_text( 2038),
-                               tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY);
-            set_environment_ptr( "REFERENCE", tbuff);
-            update_element_display = 1;
+            if( !inquire( get_find_orb_text( 2038),
+                               tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY))
+               {
+               set_environment_ptr( "REFERENCE", tbuff);
+               update_element_display = 1;
+               }
             break;
          case 'k':
             write_environment_pointers( );
@@ -5433,8 +5437,7 @@ int main( int argc, const char **argv)
             snprintf( prompt, sizeof( prompt),
                         "Enter comet r0, m, n, k (current values are %s):",
                         get_environment_ptr( "COMET_CONSTANTS"));
-            inquire( prompt, tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY);
-            if( *tbuff)
+            if( !inquire( prompt, tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY) && *tbuff)
                {
                set_environment_ptr( "COMET_CONSTANTS", tbuff);
                comet_g_func( 0.);
