@@ -372,7 +372,7 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
 
    while( rval < 0)
       {
-      int i, j, n_lines = 1, line_start = 0, box_size = 0;
+      int i, j, n_lines = 1, line_start = 0, box_size = (buff ? 14 : 0);
       const int side_borders = 1;   /* leave a blank on either side */
       int real_width, line = line0, col = col0;
       char tbuff[200];
