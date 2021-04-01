@@ -3394,7 +3394,7 @@ int main( int argc, const char **argv)
             assert( n_ids);
             strlcpy_err( tbuff, get_find_orb_text( 18), sizeof( tbuff));
             strlcat_err( tbuff, " | ", sizeof( tbuff));
-            i = strlen( ifilename);
+            i = (int)strlen( ifilename);
             while( i && ifilename[i - 1] != '/' && ifilename[i - 1] != '\\')
                i--;
             strlcat_err( tbuff, ifilename + i, sizeof( tbuff));
