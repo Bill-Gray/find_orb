@@ -3301,7 +3301,18 @@ int main( int argc, const char **argv)
                return( -1);
             }
          }
-      else     /* argument does not start with '-' */
+   sscanf( get_environment_ptr( "CONSOLE_OPTS"), "%s %d %d %u",
+               mpc_code, &observation_display, &residual_format, &list_codes);
+   text_search_and_replace( mpc_code, "_", " ");
+
+   residual_format |= RESIDUAL_FORMAT_80_COL;      /* force 80-column mode */
+
+   get_defaults( &ephemeris_output_options, &element_format,
+         &element_precision, &max_residual_for_filtering,
+         &noise_in_arcseconds);
+
+   for( i = 1; i < argc; i++)
+      if( argv[i][0] != '-')
          {
          const char *tptr = strchr( argv[i], '=');
 
@@ -3316,16 +3327,6 @@ int main( int argc, const char **argv)
          else if( !*ifilename)
             strcpy( ifilename, argv[i]);
          }
-   sscanf( get_environment_ptr( "CONSOLE_OPTS"), "%s %d %d %u",
-               mpc_code, &observation_display, &residual_format, &list_codes);
-   text_search_and_replace( mpc_code, "_", " ");
-
-   residual_format |= RESIDUAL_FORMAT_80_COL;      /* force 80-column mode */
-
-
-   get_defaults( &ephemeris_output_options, &element_format,
-         &element_precision, &max_residual_for_filtering,
-         &noise_in_arcseconds);
 
    strlcpy_err( ephemeris_start, get_environment_ptr( "EPHEM_START"),
                   sizeof( ephemeris_start));
