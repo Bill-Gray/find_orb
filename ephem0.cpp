@@ -3311,17 +3311,32 @@ static double get_telescope_primary_diameter( const char *mpc_code)
    return( rval * 100.);      /* return size in cm */
 }
 
+/* By default,  all data about the telescope comes from 'scope.json'
+or the replacement specified via SCOPE_JSON_FILE.  If details for
+the site aren't provided in the JSON data,  we dig through 'details.txt'
+to get a telescope diameter.  */
+
 static void get_scope_params( const char *mpc_code, expcalc_config_t *c)
 {
-   FILE *ifile = fopen_ext( "scope.json", "fclrb");
-   const double primary_diam = get_telescope_primary_diameter( mpc_code);
+   FILE *ifile;
+   int scope_details;
+   const char *scope_json_file = get_environment_ptr( "SCOPE_JSON_FILE");
 
-   find_expcalc_config_from_mpc_code( mpc_code, ifile, c);
+   if( *scope_json_file)
+      ifile = fopen_ext( scope_json_file, "frb");
+   else
+      ifile = fopen_ext( "scope.json", "fclrb");
+   scope_details = find_expcalc_config_from_mpc_code( mpc_code, ifile, c);
    fclose( ifile);
-   if( primary_diam)
-      {
-      exposure_config.primary_diam = primary_diam;
-      exposure_config.obstruction_diam = primary_diam / 4.;
+   if( scope_details == 1)    /* only default details were found; */
+      {                       /* see if 'details.txt' can help    */
+      const double primary_diam = get_telescope_primary_diameter( mpc_code);
+
+      if( primary_diam)
+         {
+         exposure_config.primary_diam = primary_diam;
+         exposure_config.obstruction_diam = primary_diam / 4.;
+         }
       }
 }
 
