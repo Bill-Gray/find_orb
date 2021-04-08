@@ -3319,17 +3319,24 @@ to get a telescope diameter.  */
 static void get_scope_params( const char *mpc_code, expcalc_config_t *c)
 {
    FILE *ifile;
-   int scope_details;
+   int scope_details = EXPCALC_NO_CONFIG_FOUND;
    const char *scope_json_file = get_environment_ptr( "SCOPE_JSON_FILE");
 
    if( *scope_json_file)
+      {
       ifile = fopen_ext( scope_json_file, "frb");
-   else
+      scope_details = find_expcalc_config_from_mpc_code( mpc_code, ifile, c);
+      fclose( ifile);
+      }
+   if( scope_details == EXPCALC_NO_CONFIG_FOUND)
+      {
       ifile = fopen_ext( "scope.json", "fclrb");
-   scope_details = find_expcalc_config_from_mpc_code( mpc_code, ifile, c);
-   fclose( ifile);
-   if( scope_details == 1)    /* only default details were found; */
-      {                       /* see if 'details.txt' can help    */
+      scope_details = find_expcalc_config_from_mpc_code( mpc_code, ifile, c);
+      fclose( ifile);
+      }
+   assert( scope_details != EXPCALC_NO_CONFIG_FOUND);
+   if( scope_details == EXPCALC_GEOCENTRIC_CONFIG)    /* only default */
+      {           /* details were found; see if 'details.txt' can help */
       const double primary_diam = get_telescope_primary_diameter( mpc_code);
 
       if( primary_diam)

@@ -29,3 +29,9 @@ int find_expcalc_config_from_mpc_code( const char *mpc_code,
 void free_expcalc_config_t( expcalc_config_t *c);
 int is_under_horizon( const double alt, const double az,
                               const expcalc_config_t *c);
+
+      /* find_expcalc_config_from_mpc_code( ) will return one
+         of the following three values.         */
+#define EXPCALC_NO_CONFIG_FOUND             -1
+#define EXPCALC_GEOCENTRIC_CONFIG            0
+#define EXPCALC_SITE_SPECIFIC_CONFIG         1

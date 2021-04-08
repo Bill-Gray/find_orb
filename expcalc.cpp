@@ -266,19 +266,28 @@ static void set_config_double( const char *buff, const char *config_var,
 
 #define IS_POWER_OF_TWO( n)    (((n) & ((n)-1)) == 0)
 
+#define EXPCALC_NO_CONFIG_FOUND             -1
+#define EXPCALC_GEOCENTRIC_CONFIG            0
+#define EXPCALC_SITE_SPECIFIC_CONFIG         1
+
 int find_expcalc_config_from_mpc_code( const char *mpc_code,
              FILE *ifile, expcalc_config_t *c)
 {
-   int rval = 0;
+   int rval = EXPCALC_NO_CONFIG_FOUND;
    char buff[200];
    const char *tptr;
    bool getting_data = false;
 
    c->airmass = 1.5;
    while( fgets( buff, sizeof( buff), ifile))
-      if( get_config( buff, "500") || get_config( buff, mpc_code))
+      if( get_config( buff, "500"))
          {
-         rval++;
+         rval = EXPCALC_GEOCENTRIC_CONFIG;
+         getting_data = true;
+         }
+      else if( get_config( buff, mpc_code))
+         {
+         rval = EXPCALC_SITE_SPECIFIC_CONFIG;
          getting_data = true;
          }
       else if( strchr( buff, '}'))
@@ -327,7 +336,7 @@ int find_expcalc_config_from_mpc_code( const char *mpc_code,
             }
          c->sky_brightness = c->sky_brightness_at_zenith;
          }
-   return( (int)rval);
+   return( rval);
 }
 
 void free_expcalc_config_t( expcalc_config_t *c)
