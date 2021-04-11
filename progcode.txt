@@ -1,4 +1,4 @@
-Downloaded 2020 Feb 17 from
+Downloaded 2020 Apr 06 from
 
 https://minorplanetcenter.net/iau/lists/ProgramCodes.txt
 
@@ -884,6 +884,24 @@ OBS S. Deen
 
 COD 568 P
 OBS C. Kitada
+
+COD 568 Q
+OBS J. N. Purdum
+
+COD 568 R
+OBS E. J. Ashton
+
+COD 568 S
+OBS C. Hersman
+
+COD 568 T
+OBS H. Hoekstra
+
+COD 568 U
+OBS K. Ly
+
+COD 568 V
+OBS H. B. Yuan
 
 COD 658 1
 OBS D. D. Balam
