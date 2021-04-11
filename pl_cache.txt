@@ -23,38 +23,17 @@ positions from the hash table.  I think that was because the hash table
 was usually tens or hundreds of MBytes in extent;  there was a lot of
 thrashing around in memory going on.
 
-   Also,  I had problems with the hash table getting filled.  The way I
-got around this was to make a "reasonable" table,  and if it got more than
-80% full,  I freed the memory,  allocated a table twice as big,  and
-started filling that.  Not really a bad method,  but I wanted something
-with better performance.
+   I did not really need anything very sophisticated.  The functions
+required were "store this planet's position at this time" and "retrieve
+that planet's position at that time".  No deletions,  in-order
+traversals,  etc.  A good bit of dead space would be acceptable.
 
-   After making little progress for some time,  I read about the hash-tree
-("H-tree") scheme used in the ext3 file system for Linux :
-
-http://static.usenix.org/publications/library/proceedings/als01/full_papers/phillips/phillips_html/index.html
-
-   This is essentially a B+ tree,  with some interesting modifications. B+
-trees tend to be horrendously complicated.  H-trees make some simplifying
-assumptions:  there will always be only two levels in the tree,  for example,
-and keys are hashed so that the insertion order will appear to be essentially
-random.  In my case,  things could be further simplified.  I eventually
-realized that I only needed a root node with leaf nodes directly under it.  I
-didn't have to worry about doing deletions, nor storing the tree on disk.  I
-didn't have to be especially concerned about removing "dead space" from the
-tree;  it wouldn't get all that huge anyway.  Nor did I need to do in-order
-traversal.  (H-trees give that up because the keys are hashed.  For some
-purposes,  that would be a big deal... but it's not a problem for the Linux
-file system,  nor for storing planetary positions.)  In fact,  the only
-operations needed were to add a planetary position for a given date,  and to
-retrieve that position later.
-
-   What I ended up with was this.  Planetary positions would be stored
-in "nodes" of maybe a few hundred or a few thousand positions each (I'm
-still tweaking this "node_size" parameter to see what works best).  For
-each node,  there would be a minimum JD.  For example,  by the time we
-have enough positions cached to require three nodes,  the data might be
-separated as follows:
+   What I ended up with was a tree with one root node and a theoretically
+infinite number of leaves.  Planetary positions are stored in "leaf nodes"
+of maybe a few hundred or a few thousand positions each. Each leaf node
+contains the positions for a particular date range.  For example, by the
+time we have enough positions cached to require three leaf nodes,  the data
+might be separated as follows:
 
 First node has a minimum JD of -infinity;
 Second node has a minimum JD of 2448345.349;
@@ -68,25 +47,27 @@ way to +inf, would go into the third node.
 
    As new positions are computed,  they go into these nodes.  (We start out
 with a single,  empty node with minimum JD -inf,  and implicit max JD of
-+inf.)  If a node gets to being 80% full,  it's split in half.  To do that,
-it's sorted by JD;  we look at the JD of the middle entry of the result,
-allocate a new node,  and split the entries between the old and new nodes.
++inf.)  If a node gets to being 80% full,  it's split in half (I will
+explain shortly why we don't wait until it's completely full).  To split
+it,  we sort the entries by JD;  we look at the JD of the middle entry of
+the result, allocate a new node,  and split the entries between the old
+and new nodes.
 
-   (Again,  all of this is pretty much standard B+ tree procedure.  The
-main thing I took from the H-tree paper was the insight that going with
-a fixed tree size really simplifies matters greatly.  In this case,  all
-we have is one "root" index node,  with "leaf" nodes directly below it.)
+   (These bits are all pretty much standard B+ tree procedure. However,
+having only one "root" index node with "leaves" directly below it really
+simplifies thing tremendously.)
 
    It helps greatly that access is almost uniformly sequential;  i.e.,  we're
 either integrating forward in time or backward in time,  accessing lots of
 positions along the way.  So about 99% of the time,  we can just look within
-whichever node was last accessed.
+whichever node was last accessed.  (Even when we don't,  binary searching
+within the root node is fast.)
 
    A further wrinkle,  which I cannot believe is original to me,  but which
 I've not seen discussed elsewhere,  lies in how items are stored within a
 node.  Obviously,  once you have several hundred or thousand positions stored
 within a node,  you don't want to have to say (to use the above example):
-"We're trying to get a position for Jupiter for JD 24500000;  that's between
+"We're trying to get a position for Jupiter for JD 2450000.0;  that's between
 JD 2448345.349 and less than 2451545.018,  so we know we should look in the
 second node,  but there are a few thousand items currently in that node;
 let's look at every single one of those few thousand,  trying to find
@@ -94,15 +75,17 @@ the one we want."
 
    To get around this,  the items within a node are stored using a hash
 table scheme.  JD=2450000.5 and planet_number = 5 are hashed,  and we look
-at that point within the node,  doing a quadratic search.  (Again,  this
-is all bog-standard hash table usage.)  In practice,  the nodes are usually
-about half full,  so we don't have to do much searching.
+at that point within the node,  doing a quadratic search.  (This is all
+bog-standard hash table usage.)  In practice,  the nodes are usually about
+half full,  so we don't have to do much searching.
 
-   The chief drawback to this would be that in-order tree traversal is more
-difficult.  Deletions would be harder,  too.  However,  insertion and finding
-become _much_ quicker.  We're doing both of those in quantity,  and exactly
-zero deletions or in-order traversals.  So (for this particular application)
-hash-tabling the nodes is the way to go.
+   As hash tables fill,  collisions are more frequent,  which is why we
+split nodes when they're 80% full.
+
+   Note that deletions and in-order traversals would be hard to do.  But
+we aren't doing them.  Insertion and finding are really,  really fast,  and
+that's what we're doing here.  The method is very specific to the job
+at hand.
 
    Yet another small wrinkle:  when a node is to be split,  we first check
 its neighbors (or neighbor singular,  if it's the first or last node).  If
