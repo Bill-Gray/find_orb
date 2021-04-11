@@ -466,16 +466,18 @@ H01 !-1071121.6      +335905.4      3227       Magdalena Ridge Observatory, Soco
 291 !-111.599905     +31.961669     2045.      LPL/Spacewatch II
 
    Other scopes measured while looking at Kitt Peak in Google Earth.
+   https://www.noao.edu/kpno/usrhnbk/mtn.gif used to ID most telescopes.
    30m substracted to get ellipsoidal altitudes.
 
 May !-111.599895     +31.964027     2051.      Mayall telescope,  Kitt Peak
-1.3 !-111.598406     +31.959634     2042.      1.3-m telescope, Kitt Peak
+1.3 !-111.598406     +31.959634     2042.      1.3-m RCT telescope, Kitt Peak
 2.1 !-111.598296     +31.958175     2055.      2.1-m telescope, Kitt Peak
 WIY !-111.600586     +31.958052     2057.      WIYN telescope, Kitt Peak
 Bur !-111.599203     +31.960597     2060.      Burrell Schmidt, Kitt Peak
 Unk1!-111.598157     +31.960070     2042.      Near visitor center, Kitt Peak
-Unk2!-111.599620     +31.958041     2060.      Unkn 2.1-m 90 meters east of WIYN
-WIY2!-111.600237     +31.958013     2058.      WIYN 0.9-m, Kitt Peak
+WIY2!-111.599620     +31.958041     2060.      WIYN 0.9-m, Kitt Peak
+Unk2!-111.600237     +31.958013     2058.      Sm dome between WIYN domes,  Kitt Peak
+Unk3!-111.602183     +31.958133     2058.      Roll-off roof W of WIYN,  Kitt Peak
 
    From http://kp12m.as.arizona.edu/12m_docs/12_meter_description.htm .
    Again,  I subtracted 30 meters for geoid height.  The odd mismatch in
