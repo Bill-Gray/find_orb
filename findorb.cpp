@@ -288,9 +288,6 @@ static int curses_kbhit( )
    int c;
 
    nodelay( stdscr, TRUE);
-#ifndef _WIN32
-   usleep( 100000);        /* .1 second */
-#endif
    c = getch( );
    nodelay( stdscr, FALSE);
    if( c != ERR)     /* no key waiting */
