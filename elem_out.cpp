@@ -1181,14 +1181,19 @@ static int add_sof_to_file( const char *filename,
 {
    char templat[MAX_SOF_LEN], obuff[MAX_SOF_LEN];
    char output_filename[100];
+   const char *obj_name = obs->packed_id;
    FILE *fp;
    int rval = -1, forking;
 
-   fp = fopen_ext( filename, "ca+b");
+   while( *obj_name == ' ')
+      obj_name++;
+   fp = fopen_ext( filename, "cr+b");
    get_file_name( output_filename, filename);
    forking = strcmp( output_filename, filename);
    if( fp)
       {
+      bool got_it = false;
+
       fseek( fp, 0L, SEEK_SET);
       if( !fgets( templat, sizeof( templat), fp))
          {
@@ -1198,10 +1203,17 @@ static int add_sof_to_file( const char *filename,
       if( forking)
          {
          fclose( fp);
-         fp = fopen_ext( output_filename, "ca+b");
+         fp = fopen_ext( output_filename, "cr+b");
          assert( fp);
          }
-      fseek( fp, 0L, SEEK_END);
+      fseek( fp, 0L, SEEK_SET);
+      while( !got_it && fgets( obuff, sizeof( obuff), fp))
+         if( !memcmp( obuff, obj_name, strlen( obj_name)) &&
+                     obuff[strlen( obj_name)] == ' ')
+            {
+            got_it = true;
+            fseek( fp, -(long)strlen( obuff), SEEK_CUR);
+            }
       rval = put_elements_into_sof( obuff, templat, elem, n_obs, obs);
       fwrite( obuff, strlen( obuff), 1, fp);
       fclose( fp);
