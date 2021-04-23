@@ -5309,19 +5309,37 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff)
       {
       const char **lines = obs[first].obs_details;
 
+      n_lines = 0;
       if( lines)
-         for( i = 0; lines[i]; i++)
+         while( lines[n_lines])
             {
-            strcpy( tptr, lines[i]);
+            strcpy( tptr, lines[n_lines]);
             strcat( tptr, "\n");
             tptr += strlen( tptr);
+            n_lines++;
             }
       else
          {
-         strcpy( tptr, get_find_orb_text( 2026));
-         i = 1;            /* "No obs header" message */
+         FILE *ifile = fopen_ext( "details.txt", "fcrb");
+
+         while( fgets( tptr, 100, ifile))
+            if( !memcmp( tptr, "COD ", 4) && !memcmp( tptr + 4, obs[first].mpc_code, 3))
+               {
+               while( fgets( tptr, 100, ifile) && memcmp( tptr, "COD", 3) && n_lines < 8)
+                  if( *tptr >= ' ')
+                     {
+                     tptr += strlen( tptr);
+                     n_lines++;
+                     }
+               }
+         *tptr = '\0';
+         fclose( ifile);
          }
-      n_lines = (int)i;
+      if( !n_lines)
+         {
+         strcpy( tptr, get_find_orb_text( 2026));
+         n_lines = 1;            /* "No obs header" message */
+         }
       }
    else        /* "standard",  computed details */
       {
