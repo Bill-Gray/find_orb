@@ -1401,6 +1401,7 @@ N_MOIDS_TO_SHOW = 8 at present (we only show planetary MOIDs.) */
 
 double comet_total_magnitude = 0.;          /* a.k.a. "M1" */
 double comet_nuclear_magnitude = 0.;        /* a.k.a. "M2" */
+bool saving_elements_for_reuse = false;
 
 #define ELEMENT_FRAME_DEFAULT                   0
 #define ELEMENT_FRAME_J2000_ECLIPTIC            1
@@ -1564,6 +1565,8 @@ int write_out_elements_to_file( const double *orbit,
 
    add_sof_to_file( (n_extra_params >= 2 ? "cmt_sof.txt" : sof_filename),
                     &elem, n_obs, obs);            /* elem_ou2.cpp */
+   if( saving_elements_for_reuse)
+      add_sof_to_file( "orbits.sof", &elem, n_obs, obs);
 /* if( showing_sigmas == COVARIANCE_AVAILABLE)
 */    {
       ELEMENTS elem2 = elem;
@@ -2290,10 +2293,12 @@ void set_solutions_found( OBJECT_INFO *ids, const int n_ids)
 ELEMENTS.COMET,  Find_Orb can sometimes flounder about a bit in its
 efforts to determine an orbit. */
 
-int extract_sof_data( ELEMENTS *elem, const char *buff, const char *header);
+int extract_sof_data_ex( ELEMENTS *elem, const char *buff, const char *header,
+                        double *extra_info);
 
 static int get_orbit_from_mpcorb_sof( const char *filename,
-                 const char *object_name, double *orbit, ELEMENTS *elems)
+                 const char *object_name, double *orbit, ELEMENTS *elems,
+                 const double full_arc_len, double *max_resid)
 
 {
    FILE *ifile = fopen_ext( filename, "crb");
@@ -2322,30 +2327,36 @@ static int get_orbit_from_mpcorb_sof( const char *filename,
       while( !got_vectors && fgets_trimmed( buff, sizeof( buff), ifile))
          if( !memcmp( tname, buff, 12))
             {
-            extract_sof_data( elems, buff, header);
+            double extra_info[10];
+
+            extract_sof_data_ex( elems, buff, header, extra_info);
             if( elems->epoch < 2400000.)
                printf( "JD %f\n", elems->epoch);
             assert( elems->epoch > 2400000.);
-            derive_quantities( elems, get_planet_mass( elems->central_obj));
-            comet_posn_and_vel( elems, elems->epoch, orbit, orbit + 3);
-            if( elems->central_obj == 3)
+            if( extra_info[1] - extra_info[0] > full_arc_len / 2.)
                {
-               equatorial_to_ecliptic( orbit);
-               equatorial_to_ecliptic( orbit + 3);
-               }
-            if( elems->central_obj)
-               {
-               double planet_state[6];
-               int i;
+               derive_quantities( elems, get_planet_mass( elems->central_obj));
+               comet_posn_and_vel( elems, elems->epoch, orbit, orbit + 3);
+               if( elems->central_obj == 3)
+                  {
+                  equatorial_to_ecliptic( orbit);
+                  equatorial_to_ecliptic( orbit + 3);
+                  }
+               if( elems->central_obj)
+                  {
+                  double planet_state[6];
+                  int i;
 
-               get_planet_posn_vel( elems->epoch, elems->central_obj,
-                                       planet_state, planet_state + 3);
-               for( i = 0; i < 6; i++)
-                  orbit[i] += planet_state[i];
+                  get_planet_posn_vel( elems->epoch, elems->central_obj,
+                                          planet_state, planet_state + 3);
+                  for( i = 0; i < 6; i++)
+                     orbit[i] += planet_state[i];
+                  }
+               got_vectors = 1;
+               if( elems->ecc == 1.)     /* indicate parabolic-constraint orbit */
+                  got_vectors = 2;
+               *max_resid = extra_info[3];
                }
-            got_vectors = 1;
-            if( elems->ecc == 1.)     /* indicate parabolic-constraint orbit */
-               got_vectors = 2;
             }
       fclose( ifile);
       }
@@ -2639,17 +2650,21 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
       {
       ELEMENTS elems;
       const char *mpcorb_dot_sof_filename = get_environment_ptr( "MPCORB_SOF_FILENAME");
+      const double full_arc_len = obs[n_obs - 1].jd - obs[0].jd;
+      double rms_resid;
 
-      got_vectors = get_orbit_from_mpcorb_sof( "orbits.sof", object_name, orbit, &elems);
+      got_vectors = get_orbit_from_mpcorb_sof( "orbits.sof", obs->packed_id,
+                                          orbit, &elems, full_arc_len, &rms_resid);
       if( !got_vectors && *mpcorb_dot_sof_filename)
          got_vectors = get_orbit_from_mpcorb_sof( mpcorb_dot_sof_filename,
-                                                             object_name, orbit, &elems);
+                             object_name, orbit, &elems, full_arc_len, &rms_resid);
       if( got_vectors)
          {
          *orbit_epoch = elems.epoch;
          if( got_vectors == 1)
             *perturbers = 0x7fe;    /* Merc-Pluto plus moon */
          set_locs( orbit, *orbit_epoch, obs, n_obs);
+         filter_obs( obs, n_obs, rms_resid * 3., 1);
          abs_mag = elems.abs_mag;
          do_full_improvement = true;
          }
@@ -2798,7 +2813,6 @@ static int obj_desig_to_perturber( const char *packed_desig)
          object_mass = get_planet_mass( rval) / SOLAR_GM;
          debug_printf( "Excluded: %d (%x)\n", rval, excluded_perturbers);
          }
-// debug_printf( "Packed desig: '%s'\n", packed_desig);
    return( rval);
 }
 
