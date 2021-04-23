@@ -345,7 +345,9 @@ MPC_STATION *find_mpc_color_codes( const int n_obs, const OBSERVE FAR *obs,
                    const int max_n_colors);           /* elem_out.cpp */
 
 int filter_obs( OBSERVE FAR *obs, const int n_obs,           /* orb_fun2.cpp */
-                  const double max_residual_in_sigmas);
+                  const double max_residual_in_sigmas, const int filter_type);
+   /* Currently,  filter_type = 0 -> in sigmas; = 1 => in arcsec */
+
 
     /* Functions used to store and restore orbits for the 'undo' function. */
     /* Orbits are stored on a stack and can be retrieved from it.          */

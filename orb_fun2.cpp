@@ -179,7 +179,7 @@ int superplex_method( OBSERVE FAR *obs, int n_obs, double *orbit, const char *co
  /* of 'flipped' observations.                                        */
 
 int filter_obs( OBSERVE FAR *obs, const int n_obs,
-                  const double max_residual_in_sigmas)
+                  const double max_residual, const int filter_type)
 {
    int i, pass, n_active = 0, rval = 0;
 
@@ -190,9 +190,16 @@ int filter_obs( OBSERVE FAR *obs, const int n_obs,
       for( i = 0; i < n_obs; i++)
          if( get_residual_data( obs + i, &dx, &dy))
             {
-            const int is_okay = (dx * dx + dy * dy
-                        < max_residual_in_sigmas * max_residual_in_sigmas);
+            int is_okay;
 
+            if( filter_type)    /* actually filtering by arcseconds */
+               {
+               dx = (obs[i].ra - obs[i].computed_ra) * cos( obs[i].dec);
+               dy = obs[i].dec - obs[i].computed_dec;
+               dx *= 3600 * (180. / PI);
+               dy *= 3600 * (180. / PI);
+               }
+            is_okay = (dx * dx + dy * dy < max_residual * max_residual);
             if( !pass && is_okay)
                {
                n_active++;

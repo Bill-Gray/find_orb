@@ -5138,13 +5138,15 @@ int main( int argc, const char **argv)
 #endif
          case '{':
             if( !inquire( "Cutoff in sigmas:",
-                               tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY))
+                               tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY)
+                    && atof( tbuff))
                {
                const double rms = atof( tbuff);
+               const int is_in_arcsec = (tbuff[strlen( tbuff) - 1] == '"');
 
                if( rms > 0.)
                   {
-                  const int n_changed = filter_obs( obs, n_obs, rms);
+                  const int n_changed = filter_obs( obs, n_obs, rms, is_in_arcsec);
 
                   if( !n_changed)
                      strcpy( message_to_user, "No filtering done");
