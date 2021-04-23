@@ -335,6 +335,31 @@ static int *store_curr_screen( void)
    return( rval);
 }
 
+#ifndef __PDCURSES__
+/* Some ncurses platforms are squirrelly about how they handle
+mouse movements.  Console commands have to be issued to turn
+the mouse on or off.  */
+
+#define VT_IGNORE_ALL_MOUSE      "\033[?1003l\n"
+#define VT_RECEIVE_ALL_MOUSE     "\033[?1003h\n"
+#endif
+
+static int full_endwin( void)
+{
+#ifndef __PDCURSES__
+   printf( VT_IGNORE_ALL_MOUSE);
+#endif
+   return( endwin( ));
+}
+
+static int restart_curses( void)
+{
+#ifndef __PDCURSES__
+   printf( VT_RECEIVE_ALL_MOUSE);
+#endif
+   return( refresh( ));
+}
+
 static void restore_screen( const int *screen)
 {
    const int xsize = getmaxx( stdscr), ysize = getmaxy( stdscr);
@@ -467,15 +492,18 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
             if( rval == KEY_MOUSE)
                {
                get_mouse_data( &x, &y, &z, &button);
-               x -= col;
-               if( y == line - n_lines && x >= real_width - 4 && x < real_width - 1)
-                  rval = KEY_F( 1);
-               if( y == line + 2 && x >= side_borders && x < real_width - 1)
+               if( button & BUTTON1_CLICKED)
                   {
-                  if( x < side_borders + 4)
-                     rval = 0;         /* OK clicked */
-                  else if( x >= real_width - 8 - side_borders)
-                     rval = 27;        /* Cancel clicked */
+                  x -= col;
+                  if( y == line - n_lines && x >= real_width - 4 && x < real_width - 1)
+                     rval = KEY_F( 1);
+                  if( y == line + 2 && x >= side_borders && x < real_width - 1)
+                     {
+                     if( x < side_borders + 4)
+                        rval = 0;         /* OK clicked */
+                     else if( x >= real_width - 8 - side_borders)
+                        rval = 27;        /* Cancel clicked */
+                     }
                   }
                }
             if( rval == KEY_F( 1) && help_file_name)
@@ -496,10 +524,6 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
          bool show_help = false;
 
          curs_set( 0);        /* turn cursor off */
-         mousemask( default_mouse_events | REPORT_MOUSE_POSITION, NULL);
-#ifndef PDCURSES
-         printf("\033[?1003h");   /* ] used in ncurses with xterm-like */
-#endif                         /* terms to enable mouse move events */
          do
             {
             rval = extended_getch( );
@@ -562,10 +586,6 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
                }
             }
             while( rval == KEY_MOUSE);
-#ifndef PDCURSES
-         printf("\033[?1003l");   /* ] used in ncurses with xterm-like */
-#endif
-         mousemask( default_mouse_events, NULL);
          curs_set( 1);        /* turn cursor back on */
          if( rval == '?' && help_file_name)
             show_help = true;
@@ -1385,44 +1405,49 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
          put_colored_text( "Open...", n_lines + 1, x0 + 12, 7, COLOR_HIGHLIT_BUTTON);
          put_colored_text( "HELP", n_lines + 1, x0 + 20, 4, COLOR_HIGHLIT_BUTTON);
          flushinp( );
-         c = extended_getch( );
-         err_message = 0;
-         if( c == KEY_MOUSE)
+         do
             {
-            int x, y, z;
-            unsigned long button;
-
-            get_mouse_data( &x, &y, &z, &button);
-            if( button & BUTTON4_PRESSED)   /* actually 'wheel up' */
-               c = KEY_UP;
-            else if( button5_pressed)   /* actually 'wheel down' */
-               c = KEY_DOWN;
-            else if( !y && x >= xmax - 4 && x < xmax - 1)
-               c = '?';                 /* clicked on [?] at upper right */
-            else if( y < n_lines)
-               choice = curr_page + y + (x / column_width) * n_lines;
-            else if( y == n_lines + 1 && x >= x0 - 12 && x < x0 + 19)
-               c = ALT_F;           /* clicked on 'Open...' */
-            else if( y == n_lines + 1 || y == n_lines)
-               c = '?';
-            else if( y == n_lines + 2 && x >= x0)
+            c = extended_getch( );
+            err_message = 0;
+            if( c == KEY_MOUSE)
                {
-               const int dx = x - x0;
+               int x, y, z;
+               unsigned long button;
 
-               if( dx >= 20)
-                  c = 27;          /* quit */
-               else if( dx >= 15)
-                  c = KEY_NPAGE;   /* 'next page' */
-               else if( dx >= 10)
-                  c = KEY_PPAGE;   /* 'prev page' */
-               else if( dx >= 6)
-                  c = KEY_END;     /* end of list */
-               else
-                  c = KEY_HOME;    /* start of list */
+               get_mouse_data( &x, &y, &z, &button);
+               if( button & REPORT_MOUSE_POSITION)
+                  c = 0;
+               else if( button & BUTTON4_PRESSED)   /* actually 'wheel up' */
+                  c = KEY_UP;
+               else if( button5_pressed)   /* actually 'wheel down' */
+                  c = KEY_DOWN;
+               else if( !y && x >= xmax - 4 && x < xmax - 1)
+                  c = '?';                 /* clicked on [?] at upper right */
+               else if( y < n_lines)
+                  choice = curr_page + y + (x / column_width) * n_lines;
+               else if( y == n_lines + 1 && x >= x0 - 12 && x < x0 + 19)
+                  c = ALT_F;           /* clicked on 'Open...' */
+               else if( y == n_lines + 1 || y == n_lines)
+                  c = '?';
+               else if( y == n_lines + 2 && x >= x0)
+                  {
+                  const int dx = x - x0;
+
+                  if( dx >= 20)
+                     c = 27;          /* quit */
+                  else if( dx >= 15)
+                     c = KEY_NPAGE;   /* 'next page' */
+                  else if( dx >= 10)
+                     c = KEY_PPAGE;   /* 'prev page' */
+                  else if( dx >= 6)
+                     c = KEY_END;     /* end of list */
+                  else
+                     c = KEY_HOME;    /* start of list */
+                  }
+               if( button & BUTTON1_DOUBLE_CLICKED)
+                  rval = choice;
                }
-            if( button & BUTTON1_DOUBLE_CLICKED)
-               rval = choice;
-            }
+            } while( !c);
                      /* if a letter/number is hit,  look for an obj that */
                      /* starts with that letter/number: */
          if( (c >= ' ' && c <= 'z' && c != '?') || c == 8)
@@ -2120,40 +2145,47 @@ static void show_a_file( const char *filename)
       *err_text = '\0';
       msg_num = 0;
       flushinp( );
-      c = extended_getch( );
-      if( c == KEY_MOUSE)
+      do
          {
-         int x, y, z;
-         unsigned long button;
-
-         get_mouse_data( &x, &y, &z, &button);
-         if( button & BUTTON4_PRESSED)   /* actually 'wheel up' */
-            c = KEY_UP;
-         else if( button5_pressed)       /* actually 'wheel down' */
-            c = KEY_DOWN;
-         else
-          if( y == i)
+         c = extended_getch( );
+         if( c == KEY_MOUSE)
             {
-            if( x >= 25 && x <= 28)       /* "Quit" */
-               c = 27;
-            else if( x >= 30 && x <= 35)  /* "pgDown" */
-               c = KEY_NPAGE;
-            else if( x >= 37 && x <= 39)  /* "End" */
-               c = KEY_END;
-            else if( x >= 41 && x <= 44)  /* "pgUp" */
-               c = KEY_PPAGE;
-            else if( x >= 46 && x <= 48)  /* "Top" */
-               c = KEY_HOME;
-            else if( x >= 50 && x <= 53)  /* "Save" */
-               c = ALT_S;
-            else if( x >= 55 && x <= 58)  /* "Copy" */
-               c = ALT_C;
+            int x, y, z;
+            unsigned long button;
+
+            get_mouse_data( &x, &y, &z, &button);
+            if( button & BUTTON4_PRESSED)   /* actually 'wheel up' */
+               c = KEY_UP;
+            else if( button5_pressed)       /* actually 'wheel down' */
+               c = KEY_DOWN;
+            else if( button & BUTTON1_CLICKED)
+               {
+               if( y == i)
+                  {
+                  if( x >= 25 && x <= 28)       /* "Quit" */
+                     c = 27;
+                  else if( x >= 30 && x <= 35)  /* "pgDown" */
+                     c = KEY_NPAGE;
+                  else if( x >= 37 && x <= 39)  /* "End" */
+                     c = KEY_END;
+                  else if( x >= 41 && x <= 44)  /* "pgUp" */
+                     c = KEY_PPAGE;
+                  else if( x >= 46 && x <= 48)  /* "Top" */
+                     c = KEY_HOME;
+                  else if( x >= 50 && x <= 53)  /* "Save" */
+                     c = ALT_S;
+                  else if( x >= 55 && x <= 58)  /* "Copy" */
+                     c = ALT_C;
+                  }
+               else if( x == getmaxx( stdscr) - 1)  /* clicked scroll bar */
+                  line_no = y * n_lines / n_lines_to_show;
+               else
+                  line_no = y + top_line;
+               }
+            else
+               c = 0;         /* ignorable mouse event */
             }
-         else if( x == getmaxx( stdscr) - 1)  /* clicked scroll bar */
-            line_no = y * n_lines / n_lines_to_show;
-         else
-            line_no = y + top_line;
-         }
+         } while( !c);
 #ifdef ALT_0
       if( c >= ALT_0 && c <= ALT_9)
          line_no = (n_lines - 1) * (c - ALT_0 + 1) / 11;
@@ -2626,6 +2658,8 @@ static inline int initialize_curses( const int argc, const char **argv)
    PDC_set_blink( TRUE);
    PDC_set_title( get_find_orb_text( 18));
                               /* "Find_Orb -- Orbit Determination" */
+#else
+   printf( VT_RECEIVE_ALL_MOUSE);
 #endif
    start_color( );
    char_to_search_for = (COLORS > 8 ? 'c' : '8');
@@ -2643,7 +2677,7 @@ static inline int initialize_curses( const int argc, const char **argv)
    if( debug_level > 2)
       debug_printf( "(3)\n");
    keypad( stdscr, 1);
-   mousemask( default_mouse_events, NULL);
+   mousemask( default_mouse_events | REPORT_MOUSE_POSITION, NULL);
    return( 0);
 }
 
@@ -2734,11 +2768,11 @@ static int user_select_file( char *filename, const char *title, const int flags)
       return( 0);
 
          /* dialog and Xdialog take the same options : */
-   endwin( );
+   full_endwin( );
    sprintf( strchr( cmd, '~'), "~ %d %d",
                           getmaxy( stdscr) - 15, getmaxx( stdscr) - 3);
    rval = try_a_file_dialog_program( filename, cmd + 1);
-   refresh( );
+   restart_curses( );
    if( !rval)
       return( 0);
 
@@ -3707,27 +3741,34 @@ int main( int argc, const char **argv)
             }
       if( c != AUTO_REPEATING)
          {
-         const time_t t0 = time( NULL);
+         int loop = 20;
 
          c = 0;
-         while( !c && curses_kbhit( ) == ERR)
+         while( !c)
             {
-            napms( 50);
-            if( t0 != time( NULL))  /* wait one second for a key hit */
-               c = KEY_TIMER;
-            }
-         if( !c)
-            {
-            c = extended_getch( );
-            if( c == KEY_MOUSE)
-               get_mouse_data( (int *)&mouse_x, (int *)&mouse_y, (int *)&mouse_z, &button);
+            if( curses_kbhit( ) != ERR)
+               {
+               c = extended_getch( );
+               if( c == KEY_MOUSE)
+                  get_mouse_data( (int *)&mouse_x, (int *)&mouse_y, (int *)&mouse_z, &button);
+               }
+            else
+               {
+               if( !loop--)            /* timed out */
+                  c = KEY_TIMER;
+               else
+                  napms( 50);
+               }
+            if( c == KEY_MOUSE && (button & REPORT_MOUSE_POSITION))
+               c = 0;      /* suppress mouse moves */
             }
          auto_repeat_full_improvement = 0;
          }
+
       if( c != KEY_TIMER)
          *message_to_user = '\0';
 
-      if( c == KEY_MOUSE)
+      if( c == KEY_MOUSE && !(button & REPORT_MOUSE_POSITION))
          {
          int dir = 1;
          const unsigned station_start_line = getmaxy( stdscr) - n_stations_shown;
@@ -3776,9 +3817,9 @@ int main( int argc, const char **argv)
                   }
                }
          if( button & BUTTON4_PRESSED)   /* actually 'wheel up' */
-            top_obs_shown--;
+            top_obs_shown -= ((button & BUTTON_CTRL) ? 5 : 1);
          else if( button5_pressed)   /* actually 'wheel down' */
-            top_obs_shown++;
+            top_obs_shown += ((button & BUTTON_CTRL) ? 5 : 1);
          else if( mouse_y >= station_start_line)
             {
             int c1;
@@ -4145,9 +4186,9 @@ int main( int argc, const char **argv)
             solar_pressure[0] = solar_pressure[1] = solar_pressure[2] = 0.;
             break;
          case KEY_F(8):     /* show original screens */
-            endwin( );
+            full_endwin( );
             extended_getch( );
-            refresh( );
+            restart_curses( );
             break;
          case 'a': case 'A':
             perturbers ^= (7 << 20);
@@ -5454,7 +5495,7 @@ int main( int argc, const char **argv)
    attrset( COLOR_PAIR( COLOR_BACKGROUND));
    show_final_line( n_obs, curr_obs, COLOR_BACKGROUND);
 Shutdown_program:
-   endwin( );
+   full_endwin( );                 /* terminals to end mouse movement */
 #ifdef __PDCURSES__
    delscreen( SP);
 #endif
