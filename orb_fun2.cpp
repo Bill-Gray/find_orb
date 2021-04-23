@@ -678,13 +678,12 @@ If,  between those points,  we find a minimum "score" (sum of the squares
 of the residuals,  unweighted),  we do a parabolic search for the real
 minimum.  We may find multiple minima.  We take the lowest of them.  */
 
-#define N_DIVS 300
-
 double improve_along_lov( double *orbit, const double epoch, const double *lov,
           const unsigned n_params, unsigned n_obs, OBSERVE *obs)
 {
    unsigned i, j;
-   double x[N_DIVS], score[N_DIVS];
+   unsigned n_divs = atoi( get_environment_ptr( "IMPROVE_ALONG_LOV_DIVS"));
+   double *x, *score;
    double *xyz, *slopes;
    const double delta = 0.0001;
    double rval, lowest_score;
@@ -700,8 +699,8 @@ double improve_along_lov( double *orbit, const double epoch, const double *lov,
       return( 0.);
 
    xyz = (double *)calloc( n_obs * 6, sizeof( double));
-   assert( xyz);
    slopes = xyz + n_obs * 3;
+   assert( xyz);
    for( i = 0; i < n_obs; i++)
       for( j = 0; j < 3; j++)
          xyz[i * 3 + j] = obs[i].obj_posn[j] - obs[i].obs_posn[j];
@@ -713,11 +712,23 @@ double improve_along_lov( double *orbit, const double epoch, const double *lov,
          slopes[i * 3 + j] = obs[i].obj_posn[j] - obs[i].obs_posn[j];
    for( i = 0; i < n_obs * 3; i++)
       slopes[i] = (slopes[i] - xyz[i]) / delta;
+   if( !n_divs)
+      n_divs = 10000;
+   x = (double *)calloc( n_divs * 2, sizeof( double));
+   assert( x);
+   score = x + n_divs;
    for( i = 0; i < n_obs; i++)
       if( obs[i].is_included)
          {
+         double sigma = hypot( obs[i].posn_sigma_1, obs[i].posn_sigma_2)
+                                 * 180. * 3600. / PI;
+
          rotate_obs_vect( obs + i, xyz + i * 3);
          rotate_obs_vect( obs + i, slopes + i * 3);
+         xyz[i * 3] /= sigma;
+         xyz[i * 3 + 1] /= sigma;
+         slopes[i * 3] /= sigma;
+         slopes[i * 3 + 1] /= sigma;
          }
       else
          {
@@ -726,9 +737,9 @@ double improve_along_lov( double *orbit, const double epoch, const double *lov,
          xyz[i * 3 + 2] = 1.;
          }
 
-   for( i = 0; i < N_DIVS; i++)
+   for( i = 0; i < n_divs; i++)
       {
-      x[i] = inverf( 2. * ((double)i + .5) / (double)N_DIVS - 1.);
+      x[i] = inverf( 2. * ((double)i + .5) / (double)n_divs - 1.);
       x[i] *= 3.;
       score[i] = search_score( xyz, slopes, n_obs, x[i]);
       }
@@ -738,15 +749,15 @@ double improve_along_lov( double *orbit, const double epoch, const double *lov,
       x[0] += x[0] - x[1];
       score[0] = search_score( xyz, slopes, n_obs, x[0]);
       }
-   while( score[N_DIVS - 1] < score[N_DIVS - 2] && score[N_DIVS - 1] < score[N_DIVS - 3]
+   while( score[n_divs - 1] < score[n_divs - 2] && score[n_divs - 1] < score[n_divs - 3]
                      && i++ < 20)
       {
-      x[N_DIVS - 1] += x[N_DIVS - 1] - x[N_DIVS - 2];
-      score[N_DIVS - 1] = search_score( xyz, slopes, n_obs, x[N_DIVS - 1]);
+      x[n_divs - 1] += x[n_divs - 1] - x[n_divs - 2];
+      score[n_divs - 1] = search_score( xyz, slopes, n_obs, x[n_divs - 1]);
       }
    rval = 0.;
    lowest_score = 1e+200;
-   for( i = 0; i < N_DIVS - 2; i++)
+   for( i = 0; i < n_divs - 2; i++)
       if( score[i + 1] < score[i] && score[i + 1] < score[i + 2])
          {
          double new_x;
@@ -763,6 +774,7 @@ double improve_along_lov( double *orbit, const double epoch, const double *lov,
       orbit[i] += (rval - delta) * lov[i];
    set_locs( orbit, epoch, obs, n_obs);
    free( xyz);
+   free( x);
    return( rval);
 }
 
