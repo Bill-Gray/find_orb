@@ -160,8 +160,11 @@ BC405_ASTEROIDS=300
    replicating the results of other programs;  if an integrator always
    uses Ceres,  Pallas,  and Vesta (a common choice),  you would set
    ASTEROID_PERT_LIST=1,2,4.  To replicate JPL's "Big-16" scheme,  you
-   would use ASTEROID_PERT_LIST=1,2,4,10,3,6,7,15,16,29,52,65,87,88,511,704
-   (the order doesn't matter.)
+   would use ASTEROID_PERT_LIST=1,2,3,4,6,7,10,15,16,29,52,65,87,88,511,704
+   for DE-43x.  As of DE-44x,  Horizons has swapped some perturbers :
+   ASTEROID_PERT_LIST=1,2,3,4,10,15,16,31,48,52,65,87,88,451,511,704
+   (the order doesn't matter.)  See
+   ftp://ssd.jpl.nasa.gov/pub/xfr/gm_Horizons.pck.
 ASTEROID_PERT_LIST=
 
    By default,  geoocentric elements are referred to the J2000 _equator_.
