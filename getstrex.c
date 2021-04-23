@@ -26,6 +26,12 @@ int getn_wstr_ex( wint_t *wstr, int *loc, const int maxlen, const int size);
 #define _ESCAPE    0x1B
 #define _TAB       0x09
 
+/* At least for the nonce,  the cursor will be 'normal' in overwrite mode
+and 'very visible' in insert mode.     */
+
+#define CURSOR_INSERT      2
+#define CURSOR_OVERWRITE   1
+
 /* "Extended" wgetn_wstr(),  for both ncurses and PDCurses.  You can
 supply an initial string,  location within that string,  and the maximum
 number of columns to be consumed on-screen (the text will be clipped
@@ -47,13 +53,14 @@ reposition the cursor using the mouse.
 
    -- Currently in wide-char form only.  That's the only one I actually use.
 
-To do : return when Shift-Tab,  etc. are hit;  fullwidth/combining characters. */
+To do : return when Shift-Tab,  etc. are hit;  fullwidth/combining characters;
+perhaps allow text to be marked by click-drag.    */
 
 static bool _insert_mode = false;
 
 int wgetn_wstr_ex(WINDOW *win, wint_t *wstr, int *loc, const int maxlen, const int size)
 {
-    int i, x, y, offset = 0;
+    int i, x, y, offset = 0, initial_cursor_state;
     int rval = -1;
 #ifdef __PDCURSES__
     const bool oldcbreak = SP->cbreak; /* remember states */
@@ -69,6 +76,7 @@ int wgetn_wstr_ex(WINDOW *win, wint_t *wstr, int *loc, const int maxlen, const i
     x = getcurx( win);
     y = getcury( win);
 
+    initial_cursor_state = curs_set( _insert_mode ? CURSOR_INSERT : CURSOR_OVERWRITE);
     noecho( );              /* we do echo ourselves */
     cbreak();               /* ensure each key is returned immediately */
     nodelay( win, FALSE) ;  /* don't return -1 */
@@ -81,8 +89,12 @@ int wgetn_wstr_ex(WINDOW *win, wint_t *wstr, int *loc, const int maxlen, const i
         move( y, x);
         while( len < maxlen && wstr[len])
             len++;
+        assert( len != maxlen);
         if( len == maxlen)
-            return( -1);
+        {
+            rval = -1;
+            break;
+        }
         if( *loc < offset)
             offset = *loc;
         else if( offset < *loc - size + 1)
@@ -129,6 +141,7 @@ int wgetn_wstr_ex(WINDOW *win, wint_t *wstr, int *loc, const int maxlen, const i
 
             case KEY_IC:
                _insert_mode = !_insert_mode;
+               curs_set( _insert_mode ? CURSOR_INSERT : CURSOR_OVERWRITE);
                break;
 
             case KEY_HOME:
@@ -215,6 +228,7 @@ int wgetn_wstr_ex(WINDOW *win, wint_t *wstr, int *loc, const int maxlen, const i
     SP->echo = oldecho;
     win->_nodelay = oldnodelay;
 #endif
+    curs_set( initial_cursor_state);
     return rval;
 }
 
