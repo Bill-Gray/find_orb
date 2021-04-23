@@ -1234,3 +1234,21 @@ On7 !+014.7819072  +49.9090889        580.0    Ondrejov 18cm
 
 McN !+149.15646    -31.27369          610.0    Rob McNaught
 Kau !+024.048722   +54.920805          67.0    Kaunas
+
+   The MPC position for Skalnate Pleso is about 600 meters east of the
+one given at https://www.ta3.sk/l3.php?p3=mph (and confirmed on G__gle
+Maps).
+
+056 !+020.23412    +49.18935         1828.0    Skalnate Pleso
+
+   https://www.klet.org/en/telescopes says that Klet Observatory has two
+scopes : a 1.06-m f/3 KLENOT scope and a 0.57-m f/5.2 reflector.  Two
+domes show up in G__gle Maps,  but I don't actually know which dome is
+which.  For the nonce,  I have put (246) KLENOT in the dome that is
+~20m northeast of the dome I have labelled as (046).  Both points are
+about 270 m north-northwest of the location given by MPC,  so even if
+I do have them backwards,  it's an improvement over the current situation.
+47m added for geoid height.
+
+046 !+014.28448    +48.86376         1107.     Klet Observatory, Ceske Budejovice
+246 !+014.28469    +48.86390         1107.     Klet Observatory-KLENOT
