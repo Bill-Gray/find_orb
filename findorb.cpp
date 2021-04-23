@@ -3319,6 +3319,13 @@ int main( int argc, const char **argv)
                state_vect_text = arg;
                }
                break;
+            case 'x':
+               {
+               extern bool saving_elements_for_reuse;
+
+               saving_elements_for_reuse = true;
+               }
+               break;
             case 'z':
                {
                extern const char *alt_config_directory;
