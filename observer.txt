@@ -141,12 +141,13 @@
  Skvarc                                    <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0089818">Skvar&#269;</a>
  Sonnett                                   <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0008796">Sonnett</a>
  Sostero                                   <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0009878">Sostero</a>
+ Stecklum                                  <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0069295">Stecklum</a>
  Stoss                                     <a href="http://www.starkenburg-sternwarte.de/asteroiden/namen/7689.htm">Stoss</a>
  Tancredi                                  <a href="http://www.anii.org.uy/cvuy/SNI2008/Ciencias%20Naturales%20y%20Exactas/Ciencias%20F%C3%ADsicas/Gonzalo%20TANCREDI%20Machado.pdf">Tancredi</a>
  Testa                                     <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0011667">Testa</a>
  Tholen                                    <a href="http://www.ifa.hawaii.edu/faculty/tholen/">Tholen</a>
- Ticha, J                                  Tich&aacute;, J
- Ticha, M                                  Tich&#253;, M
+ Ticha, J                                  <a href="https://www.klet.org/en/klenot-staff-members">Tich&aacute;, J</a>
+ Tichy, M                                  <a href="https://www.klet.org/en/klenot-staff-members">Tich&#253;, M</a>
  Tlatov                                    <a href="http://www.iau.org/administration/membership/individual/674/">Tlatov</a>
  Thuillot                                  <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0018568">Thuillot</a>
  Tombaugh                                  <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?ID=a0001604">Tombaugh</a>
