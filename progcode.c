@@ -10,7 +10,22 @@ version to make sure such problems don't creep back in.
 
    Compile with :
 
-gcc -Wall -pedantic -Wextra -O3 progcode.c -o progcode   */
+gcc -Wall -pedantic -Wextra -O3 progcode.c -o progcode
+
+   Extension of the table provided at the above URL.  Some inference
+is involved here,  and I'm not totally certain of the extended part.
+
+10 !       20 +      30 `     40 ?      50 I      60 S
+11 "       21 ,      31 {     41 @      51 J      61 T
+12 #       22 -      32 |     42 A      52 K      62 U
+13 $       23 .      33 }     43 B      53 L      63 V
+14 %       24 /      34 ~     44 C      54 M
+15 &       25 [      35 :     45 D      55 N
+16 '       26 \      36 ;     46 E      56 O
+17 (       27 ]      37 <     47 F      57 P
+18 )       28 ^      38 =     48 G      58 Q
+19 *       29 _      39 >     49 H      59 R
+*/
 
 #include <stdio.h>
 #include <string.h>
