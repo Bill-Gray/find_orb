@@ -1252,3 +1252,53 @@ I do have them backwards,  it's an improvement over the current situation.
 
 046 !+014.28448    +48.86376         1107.     Klet Observatory, Ceske Budejovice
 246 !+014.28469    +48.86390         1107.     Klet Observatory-KLENOT
+
+   (907) Melbourne reported three positions of C/1917 F1 in 1917,  and
+then four more of 2P/Encke in 1918,  and then they gave up.  The following
+position for (907) Melbourne Observatory is for the _current_ location
+of the main dome at Melbourne Observatory,  about 210m north of the
+location given by MPC.  This is a reconstruction of the original
+observatory,  but I can't tell from on-line sources if it's in the
+same place.  However,  the MPC coordinates are given to 0.00001 Earth
+radius = 63m precision.  So I am at least not adding error by using
+the following G__gle Earth coordinates.  5m added for geoid height.
+
+970 !+144.97551    -37.82966           42.     Melbourne
+
+   Further scopes near SkyMapper,  identified using site maps at
+https://rsaa.anu.edu.au/observers/travel-siding-spring-observatory
+27m added for geoid height.
+
+   Note that (Q57) is unidentified at that map.
+https://kmtnet.kasi.re.kr/kmtnet-eng/sites-data-process/ gives
+a position matching the MPC's.  Both are about 80m west of the position
+shown on the map at the KMTNet site... which lands nicely on the
+only unidentified dome from the SSO map.
+
+SkM !+149.06143    -31.27207         1190.     SkyMapper, Siding Spring
+Hun !+149.061534   -31.271770        1171.     Huntsman, Siding Spring
+AN24!+149.061678   -31.271589        1172.     Australian National Univ 24-inch, Siding Spring
+AN23!+149.062396   -31.271647        1171.     Australian National Univ 2.3-m, Siding Spring
+AN16!+149.062227   -31.272120        1183.     Australian National Univ 16-inch, Siding Spring
+AN40!+149.062103   -31.271163        1180.     Australian National Univ 40-inch, Siding Spring
+Q57 !+149.062545   -31.271108        1167.     Korea Microlensing Telescope Network-SSO
+
+Upp5!+149.064160   -31.273225        1151.     Uppsala 0.5-m, Siding Spring
+ROTS!+149.064252   -31.273447        1148.     UNSW ROTSE Telescope, Siding Spring
+UNSW!+149.064297   -31.273297        1149.     0.5-m UNSW Automated Patrol Telescope
+UKSc!+149.071132   -31.272289        1142.     1.2-m UK Schmidt, Siding Spring
+AAO !+149.067264   -31.275358        1161.     3.9-m Anglo-Australian Telescope, Siding Spring
+
+   Should check in with Las Cumbres folks to disambiguate the following :
+
+Faul!+149.070794   -31.272822        1146.     Faulkes Telescope South?
+FauA!+149.070736   -31.272999        1145.     Dome ~15m S of (Faul)
+FauB!+149.070621   -31.272919        1145.     Dome ~15m WSW of (Faul)
+
+   The aforementioned Web site also has a link to an excellent site
+map for Mount Stromlo.  These were all destroyed in the 2003 bushfires.
+Geoid height is 20m.  Highlights :
+
+St74!+149.008898   -35.319125         786.     74-in reflector, Mt Stromlo
+St26!+149.009794   -35.318523         787.     26-in Yale-Columbia refractor, Mt Stromlo
+St50!+149.007461   -35.320406         786.     50-in reflector, Mt Stromlo
