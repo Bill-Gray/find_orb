@@ -1263,7 +1263,7 @@ same place.  However,  the MPC coordinates are given to 0.00001 Earth
 radius = 63m precision.  So I am at least not adding error by using
 the following G__gle Earth coordinates.  5m added for geoid height.
 
-970 !+144.97551    -37.82966           42.     Melbourne
+907 !+144.97551    -37.82966           42.     Melbourne
 
    Further scopes near SkyMapper,  identified using site maps at
 https://rsaa.anu.edu.au/observers/travel-siding-spring-observatory
