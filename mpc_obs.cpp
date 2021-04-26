@@ -75,6 +75,7 @@ int compute_observer_vel( const double jde, const int planet_no,
              const double rho_sin_phi, const double lon, double FAR *vel);
 int get_satellite_offset( const char *iline, double *xyz);  /* mpc_obs.cpp */
 int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid);
+bool nighttime_only( const char *mpc_code);                 /* mpc_obs.cpp */
 char *find_numbered_mp_info( const int number);             /* mpc_obs.cpp */
 static int xref_designation( char *desig);
 int debug_printf( const char *format, ...)                 /* runge.cpp */
@@ -3309,6 +3310,11 @@ static void reset_object_type( const OBSERVE *obs, const int n_obs)
       }
 }
 
+bool nighttime_only( const char *mpc_code)
+{
+   return( strstr( get_environment_ptr( "DAYTIME_OBS_OK1"), mpc_code) == NULL);
+}
+
 /* Uncertainties on time,  magnitude,  and the error ellipse all will have
 default values.  If ADES or Tholen or .rwo uncertainties have been set,  or
 uncertainties in columns 57-65,  we use them.  (Such uncertainties apply to
@@ -3796,7 +3802,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
             if( !get_obs_alt_azzes( rval + i, &sun_alt_az, &obj_alt_az)
                      && sun_alt_az.x > -90.)
                {                          /* I.e., not flagged as meaningless */
-               if( sun_alt_az.y > 0.)
+               if( sun_alt_az.y > 0. && nighttime_only( rval[i].mpc_code))
                   {
                   n_in_sunlight++;
                   rval[i].is_included = 0;

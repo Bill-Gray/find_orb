@@ -396,3 +396,10 @@ DISABLE_LIGHT_BENDING=
    Normally,  site information comes from 'scope.json' (q.v.).  Some may
    wish to override that choice by specifying a full file name here.
 SCOPE_JSON_FILE=
+
+   The following observers are actually radiotelescope receivers (for
+   artsat tracking).  Unlike optical observers,  they can work in the
+   daytime;  observations made in daylight won't get warnings,  and
+   ephemerides won't be suppressed when the sky gets bright.  Unlike
+   Goldstone or Arecibo,  they don't transmit.
+DAYTIME_OBS_OK1=ScT ATA 256 EKa
