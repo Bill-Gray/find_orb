@@ -75,6 +75,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name);
                                               /* ephem0.cpp */
 int earth_lunar_posn( const double jd, double FAR *earth_loc,
                                        double FAR *lunar_loc);
+bool nighttime_only( const char *mpc_code);                 /* mpc_obs.cpp */
 void remove_trailing_cr_lf( char *buff);      /* ephem0.cpp */
 void create_obs_file( const OBSERVE FAR *obs, int n_obs, const int append);
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
@@ -1964,6 +1965,8 @@ static int get_ephem_times_from_file( const char *filename)
 
 double ephemeris_mag_limit = 22.;
 
+static const char *mpc_code_for_ephems = "";
+
 int ephemeris_in_a_file( const char *filename, const double *orbit,
          OBSERVE *obs, const int n_obs,
          const int planet_no,
@@ -3123,8 +3126,9 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   if( show_this_line)
                      {
                      show_this_line = (visibility_char == ' ');
-                     if( !show_radar_data && alt_az[1].y > 0.)
-                        show_this_line = false;  /* optical data must be taken at night */
+                     if( !show_radar_data)
+                        if( nighttime_only( mpc_code_for_ephems) && alt_az[1].y > 0.)
+                           show_this_line = false;  /* optical data must be taken at night */
                      }
 
                if( fake_astrometry)
@@ -3373,10 +3377,12 @@ int ephemeris_in_a_file_from_mpc_code( const char *filename,
       real_number_of_steps = get_ephem_times_from_file( stepsize + 1);
    else
       real_number_of_steps = n_steps;
+   mpc_code_for_ephems = mpc_code;
    rval = ephemeris_in_a_file( filename, orbit, obs, n_obs, planet_no,
                epoch_jd, jd_start, stepsize, lon, rho_cos_phi, rho_sin_phi,
                real_number_of_steps,
                note_text, options, n_objects);
+   mpc_code_for_ephems = "";
    free_expcalc_config_t( &exposure_config);
    return( rval);
 }
