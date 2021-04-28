@@ -228,15 +228,22 @@ Daw !   0.0000       0.00000   +0.00000    @10 Dawn spacecraft
    https://www.giss.nasa.gov/tools/mars24/ .  Note that it gives remarks
    about significant disagreements in positions between sources.
 Spi ! 175.47848      -14.571892        0   @4  Spirit
-Opp ! 354.47413      -01.9483          0   @4  Opportunity
+Opp ! 354.47417      -01.9483          0   @4  Opportunity
 MSL ! 137.441635     -04.589465        0   @4  MSL (Curiosity)
 InS ! 135.623447     +04.502384        0   @4  Mars InSight
 Pho ! 234.24845      +68.21878         0   @4  Phoenix lander, Mars
 Pat ! 326.74576      +19.09985         0   @4  Mars Pathfinder
 Vk1 ! 312.04863      +22.2715          0   @4  Viking 1
 Vk2 ! 134.2803       +47.6698          0   @4  Viking 2
-Be2 ! 269.5          +11.6             0   @4  Beagle 2
+Be2 !  90.43         +11.53            0   @4  Beagle 2
 ExM ! 353.79         -02.07            0   @4  ExoMars Schiaparelli
+Per !  77.45088572   +18.44462715      0   @4  Perseverance, Mars
+Ti1 ! 110.318        +24.748           0   @4  Tianwen-1 lander, Mars
+ExM ! 335.45         +18.20            0   @4  ExoMars 2022
+MPL ! 195.3          -76.1             0   @4  Mars Polar Lander
+Ma6 !  19.42         -23.9             0   @4  Mars 6 site
+Ma3 ! 202.           -45.              0   @4  Mars 3 site
+Ma2 !  47.           -45.              0   @4  Mars 2 site
 
    Shortly after the Chelyabinsk meteor impacted,  I computed a (_very) rough
    orbit based on the object coming in ten km above Chelyabinsk at 17.3 km/s
@@ -467,7 +474,7 @@ H01 !-1071121.6      +335905.4      3227       Magdalena Ridge Observatory, Soco
 
    Other scopes measured while looking at Kitt Peak in Google Earth.
    https://www.noao.edu/kpno/usrhnbk/mtn.gif used to ID most telescopes.
-   30m substracted to get ellipsoidal altitudes.
+   30m subtracted to get ellipsoidal altitudes.
 
 May !-111.599895     +31.964027     2051.      Mayall telescope,  Kitt Peak
 1.3 !-111.598406     +31.959634     2042.      1.3-m RCT telescope, Kitt Peak
