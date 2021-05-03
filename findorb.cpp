@@ -598,6 +598,7 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
       restore_screen( buffered_screen);
       free( buffered_screen);
       flushinp( );
+      refresh( );
       }
    help_file_name = NULL;
    return( rval);
@@ -3930,8 +3931,6 @@ int main( int argc, const char **argv)
                         {                 /* right or middle button click/release */
                         char *search_code = obs[new_curr].mpc_code;
 
-                        show_observations( obs, top_obs_shown, top_line_residuals,
-                                 residual_format, n_obs_shown);
                         strlcpy_err( tbuff, get_find_orb_text( 2022), sizeof( tbuff));
                         text_search_and_replace( tbuff, "$", search_code);
                         i = full_inquire( tbuff, NULL, 0, COLOR_MENU, mouse_y, mouse_x);
