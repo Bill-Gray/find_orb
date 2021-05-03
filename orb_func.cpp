@@ -2462,8 +2462,6 @@ static int evaluate_limited_orbit( const double *orbit,
    return( rval);
 }
 
-#define MAX_N_PARAMS 9
-
 double **eigenvects;
 void jacobi_eigenvalues( double *a, const int size, double *eigenvals,
                         double *eigenvects);       /* eigen.cpp */
@@ -2759,15 +2757,16 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
    double constraint_slope[MAX_CONSTRAINTS][MAX_N_PARAMS];
    double element_slopes[MAX_N_PARAMS][MONTE_N_ENTRIES];
    double elements_in_array[MONTE_N_ENTRIES];
-   double differences[10];
+   double differences[MAX_N_PARAMS];
    double original_orbit[6], original_params[MAX_N_NONGRAV_PARAMS];
    double central_obj_state[6], tvect[6];
-   const double default_delta_vals[9] =
+   const double default_delta_vals[MAX_N_PARAMS] =
 //                  { 1e-12, 1e-12, 1e-12, 1e-11, 1e-11, 1e-11,
 //                  .001, .001, .1 };
                    { 1e-4, 1e-4, 1e-5, 1e-5, 1e-3, 1e-3,
+                    1e-8, 1e-8, 1e-8,
                     1e-8, 1e-8, 1e-8 };
-   static double delta_vals[9];
+   static double delta_vals[MAX_N_PARAMS];
    double constraint[MAX_CONSTRAINTS];
    double sigma_squared = 0.;       /* see Danby, p. 243, (7.5.20) */
    double scale_factor = 1.;
@@ -3193,7 +3192,8 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
       FILE *json_ofile = fopen_ext( get_file_name( tbuff, "covar.json"), "tfcwb");
       double *matrix = lsquare_covariance_matrix( lsquare);
       double *wtw = lsquare_wtw_matrix( lsquare);
-      double eigenvals[10], eigenvectors[100], element_sigmas[MONTE_N_ENTRIES];
+      double eigenvals[MAX_N_PARAMS], eigenvectors[MAX_N_PARAMS * MAX_N_PARAMS];
+      double element_sigmas[MONTE_N_ENTRIES];
       int pass;
       const int max_obs_in_covariance_file = 2000;
 

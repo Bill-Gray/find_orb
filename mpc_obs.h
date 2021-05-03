@@ -82,9 +82,14 @@ RADAR_INFO
 int compute_radar_info( const OBSERVE *obs, RADAR_INFO *rinfo);
 
 /* So far,  there can be zero,  one,  two,  or three nongravitational
-parameters in Find_Orb.  This may get bumped up at some point. */
+parameters in Find_Orb.  I have some force models in mind that will
+require four.  Six will,  I think,  be more than enough (though easy
+enough to increase if I'm wrong).  Six nongravs, plus a 'traditional'
+state vector,  means a possible total of twelve parameters for an
+orbit;  i.e.,  we could have a 12x12 covariance matrix. */
 
-#define MAX_N_NONGRAV_PARAMS 3
+#define MAX_N_NONGRAV_PARAMS 6
+#define MAX_N_PARAMS 12
 
 typedef uint64_t ephem_option_t;
 
