@@ -4189,7 +4189,9 @@ int main( int argc, const char **argv)
          case '*':
          case '^':
             non_grav_menu( message_to_user);
-            solar_pressure[0] = solar_pressure[1] = solar_pressure[2] = 0.;
+            if( *message_to_user)      /* new force model selected */
+               for( i = 0; i < MAX_N_NONGRAV_PARAMS; i++)
+                  solar_pressure[i] = 0.;
             break;
          case KEY_F(8):     /* show original screens */
             full_endwin( );
