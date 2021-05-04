@@ -3378,7 +3378,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
             strcpy( title_text, (asteroid_mass ? "Sigma_mass" : "Sigma_AMR"));
          else
             {           /* comet A1, A2, maybe A3 included */
-            assert( n_params == 8 || n_params == 9);
+            assert( n_params >= 8);
             sprintf( title_text, "Sigma_A%d", i - 5);
             }
          fprintf( ofile, "\n%s: %s", title_text, tbuff);
