@@ -188,15 +188,16 @@
 2007    'environ.dat' and look for the MAX_OBSERVATION_SPAN line.
 
 2008    Not all satellite observations were read correctly.
-2008    This shouldn't happen.  Please send your observation
-2008    file to [email]rojectpluto.com so it can be fixed.
+2008    See https://www.projectpluto.com/sc_obs.htm for info on
+2008    how to fix this,  or contact [email]rojectpluto.com.
+2008    (In the latter case,  be sure to send the observation file.)
 
 2009    %u observations were duplicates.  They have been removed.
 
 2010    %u satellite observations had incorrect offset data.  The file
 2010    'debug.txt' may have further information.  These observations
-2010    have been excluded.
-
+2010    have been excluded.  See https://www.projectpluto.com/sc_obs.htm
+2010    for more information.
 
 2011    %u observations were incorrectly formatted.  These observations
 2011    will be ignored.
@@ -213,6 +214,7 @@
 
 2017    %u observations are from spacecraft,  but aren't marked
 2017    as such and lack the 'second line' offset data.  See\n
+2017    https://www.projectpluto.com/sc_obs.htm
 2017    https://www.minorplanetcenter.net/iau/info/SatelliteObs.html
 2017    \nfor info on how to handle spacecraft-based observations.
 
@@ -323,7 +325,7 @@
 2043    %d 'line 2' radar observations didn't have a 'line 1' match.\n
 2044    %d satellite observations lacked spacecraft locations.\n
 2045    %d satellite observations lacked RA/decs.\n
-2046    See https://www.projectpluto.com/mismatch.htm for more info.\n
+2046    See https://www.projectpluto.com/sc_obs.htm for more info.\n
 
 2050    [ ] Show one MPC code
 2050    [ ] Show some MPC codes
