@@ -3,7 +3,7 @@
 # if an MPC code is within that rectangle,  we can ID it.
 # Every now and then,  an MPC code is added for which no
 # rectangle exists;  I then have to add a rectangle or two.
-# 2017 January 5 version.
+# 2021 May 6 version.
    6.61665  32.28687   2.38989  37.29359  Algeria
  303.64175 -38.50229 302.15234 -35.24411  Argentina
  300.93768 -34.54863 301.45872 -34.35379  Argentina
@@ -520,3 +520,4 @@
  353.4      49.8     357.38     51.27     UK/England
   33.0      56.0      87.0      80.0      Russia
   85.3      50.07     89.7      56.0      Russia
+ 282.60     39.71    282.24265  39.44     US/Maryland
