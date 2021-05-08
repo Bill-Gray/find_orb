@@ -338,15 +338,16 @@ static int *store_curr_screen( void)
 #ifndef __PDCURSES__
 /* Some ncurses platforms are squirrelly about how they handle
 mouse movements.  Console commands have to be issued to turn
-the mouse on or off.  */
+the mouse on or off.  This is still getting some testing,  and
+is commented out by default. */
 
-#define VT_IGNORE_ALL_MOUSE      "\033[?1003l\n"
-#define VT_RECEIVE_ALL_MOUSE     "\033[?1003h\n"
+// #define VT_IGNORE_ALL_MOUSE      "\033[?1003l\n"
+// #define VT_RECEIVE_ALL_MOUSE     "\033[?1003h\n"
 #endif
 
 static int full_endwin( void)
 {
-#ifndef __PDCURSES__
+#ifdef VT_IGNORE_ALL_MOUSE
    printf( VT_IGNORE_ALL_MOUSE);
 #endif
    return( endwin( ));
@@ -354,7 +355,7 @@ static int full_endwin( void)
 
 static int restart_curses( void)
 {
-#ifndef __PDCURSES__
+#ifdef VT_RECEIVE_ALL_MOUSE
    printf( VT_RECEIVE_ALL_MOUSE);
 #endif
    return( refresh( ));
@@ -2659,7 +2660,8 @@ static inline int initialize_curses( const int argc, const char **argv)
    PDC_set_blink( TRUE);
    PDC_set_title( get_find_orb_text( 18));
                               /* "Find_Orb -- Orbit Determination" */
-#else
+#endif
+#ifdef VT_RECEIVE_ALL_MOUSE
    printf( VT_RECEIVE_ALL_MOUSE);
 #endif
    start_color( );
