@@ -245,6 +245,10 @@ Ma6 !  19.42         -23.9             0   @4  Mars 6 site
 Ma3 ! 202.           -45.              0   @4  Mars 3 site
 Ma2 !  47.           -45.              0   @4  Mars 2 site
 
+   In some cases,  viewpoints from the Moon may be useful.
+Ch4 ! 177.589        -45.457           0   @10 Chang'e 4 lander
+Ch3 ! -19.5116       +44.1214          0   @10 Chang'e 3 lander
+
    Shortly after the Chelyabinsk meteor impacted,  I computed a (_very) rough
    orbit based on the object coming in ten km above Chelyabinsk at 17.3 km/s
    from azimuth 97,  alt +18.  The following 'Che' code helped :
@@ -1282,7 +1286,7 @@ a position matching the MPC's.  Both are about 80m west of the position
 shown on the map at the KMTNet site... which lands nicely on the
 only unidentified dome from the SSO map.
 
-SkM !+149.06143    -31.27207         1190.     SkyMapper, Siding Spring
+Q55 !+149.06143    -31.27207         1190.     SkyMapper, Siding Spring
 Hun !+149.061534   -31.271770        1171.     Huntsman, Siding Spring
 AN24!+149.061678   -31.271589        1172.     Australian National Univ 24-inch, Siding Spring
 AN23!+149.062396   -31.271647        1171.     Australian National Univ 2.3-m, Siding Spring
