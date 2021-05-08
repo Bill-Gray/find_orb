@@ -92,6 +92,8 @@ int detect_perturbers( const double jd, const double * __restrict xyz,
                        double *accel);          /* bc405.cpp */
 int find_relative_orbit( const double jd, const double *ivect,
                ELEMENTS *elements, const int ref_planet);     /* runge.cpp */
+static void compute_ref_state( ELEMENTS *ref_orbit, double *ref_state,
+                                          const double jd);
 int parallax_to_lat_alt( const double rho_cos_phi, const double rho_sin_phi,
        double *lat, double *ht_in_meters, const int planet_idx); /* ephem0.c */
 void calc_approx_planet_orientation( const int planet,        /* runge.cpp */
@@ -798,6 +800,31 @@ static ldouble compute_accel_multiplier( double fraction)
    return( rval);
 }
 
+/* THIS HAS NOTHING TO DO WITH LIGHT-TIME LAG.
+
+Sometimes,  comet non-gravs are modelled as having a 'lagged' effect :
+the magnitude of the non-gravs is determined not by the _current_
+distance from the sun,  but the distance some number of days ago.
+The idea is that it may take a while for the comet to heat up and
+for real non-gravs to kick in.  Given a 'current' state vector and
+jd,  this computes a two-body approximate distance from the sun as
+of the time jd - lag.        */
+
+static double lagged_dist( const ldouble *state_vect, const ldouble jd,
+                             const ldouble lag)
+{
+   double svect[6], outvect[9], rval;
+   size_t i;
+   ELEMENTS elem;
+
+   for( i = 0; i < 6; i++)
+      svect[i] = (double)state_vect[i];
+   find_relative_orbit( (double)jd, svect, &elem, 0);
+   compute_ref_state( &elem, outvect, (double)( jd - lag));
+   rval = vector3_length( outvect);
+   return( rval);
+}
+
 #define FUDGE_FACTOR .9
 
 int planet_hit = -1;
@@ -897,10 +924,11 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
             oval[i] += asteroid_accel[i];
          }
 
-   if( n_extra_params == 2 || n_extra_params == 3)
+   if( n_extra_params >= 2 && n_extra_params <= 4)
       {                  /* Marsden & Sekanina comet formula */
-      const ldouble g = comet_g_func( r) * fraction_illum;
       extern double solar_pressure[];
+      const ldouble lag = (n_extra_params == 4 ? solar_pressure[3] : 0.);
+      const ldouble g = comet_g_func( lagged_dist( ival, jd, lag)) * fraction_illum;
       ldouble transverse[3], dot_prod = 0.;
 
 #if !defined( _WIN32) && !defined( __APPLE__)
@@ -915,7 +943,7 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
       for( i = 0; i < 3; i++)
          oval[i + 3] += g * (solar_pressure[0] * ival[i] / r
                      + solar_pressure[1] * transverse[i] / dot_prod);
-      if( n_extra_params == 3)
+      if( n_extra_params >= 3)
          {
          ldouble out_of_plane[3];
 

@@ -440,12 +440,24 @@ some other set of four parameters.)    */
 
 // #define FIT_CIRCULAR_ORBIT          0x?4
 
+/* For the following constants,  bits 0-3 give the number of 'additional'
+non-grav parameters,  and bit 4 indicates if the force is an inverse
+square one. Higher bits can distinguish,  for example,  SRP from
+Yarkovsky with A2 (both inverse-square and both one added parameter). */
+
 #define FORCE_MODEL_NO_NONGRAVS        0
-#define FORCE_MODEL_SRP                1
-#define FORCE_MODEL_SRP_TWO_PARAM      2
-#define FORCE_MODEL_SRP_THREE_PARAM    3
-#define FORCE_MODEL_COMET_TWO_PARAM    4
-#define FORCE_MODEL_COMET_THREE_PARAM  5
+#define FORCE_MODEL_SRP                0x11
+#define FORCE_MODEL_SRP_TWO_PARAM      0x12
+#define FORCE_MODEL_SRP_THREE_PARAM    0x13
+#define FORCE_MODEL_COMET_TWO_PARAM    0x02
+#define FORCE_MODEL_COMET_THREE_PARAM  0x03
+#define FORCE_MODEL_COMET_FOUR_PARAM   0x04
+
+/* Not used yet : for some rocks,  Yarkovsky can be modelled as an
+A2 (along-orbit) inverse square force.  This is currently handled by
+selecting a two-parameter SRP model and constraining A1=0.   */
+
+#define FORCE_MODEL_YARKO_A2           0x111
 
 extern int force_model;
 

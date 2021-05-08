@@ -364,4 +364,5 @@
 2060    4 ( ) Solar radiation pressure (three-parameter)
 2060    5 ( ) Comet model (A1 and A2)
 2060    6 ( ) Comet model (A1, A2, A3)
+2060    7 ( ) Comet model (A1, A2, A3, DT)
 2060    Cancel

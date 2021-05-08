@@ -167,9 +167,7 @@ int debug_printf( const char *format, ...)                 /* runge.cpp */
 
 bool is_inverse_square_force_model( void)
 {
-   return( force_model == FORCE_MODEL_SRP
-               || force_model == FORCE_MODEL_SRP_TWO_PARAM
-               || force_model == FORCE_MODEL_SRP_THREE_PARAM);
+   return( (force_model & 0x10) != 0);
 }
 
 char *fgets_trimmed( char *buff, size_t max_bytes, FILE *ifile)
@@ -1565,7 +1563,7 @@ int write_out_elements_to_file( const double *orbit,
 
    add_sof_to_file( (n_extra_params >= 2 ? "cmt_sof.txt" : sof_filename),
                     &elem, n_obs, obs);            /* elem_ou2.cpp */
-   if( saving_elements_for_reuse)
+   if( saving_elements_for_reuse && available_sigmas == COVARIANCE_AVAILABLE)
       add_sof_to_file( "orbits.sof", &elem, n_obs, obs);
 /* if( showing_sigmas == COVARIANCE_AVAILABLE)
 */    {
@@ -1639,9 +1637,9 @@ int write_out_elements_to_file( const double *orbit,
                text_search_and_replace( buff, "TT", sigma_buff);
                }
 
-         if( n_extra_params == 2 || n_extra_params == 3)
+         if( n_extra_params >= 2 && n_extra_params <= 4)
             {
-            char tbuff0[40], sig_name[20];
+            char tbuff0[80], sig_name[20];
             int j = 0;
 
             if( !strcmp( constraints, "A=0") || !strcmp( constraints, "A1=0"))
@@ -1658,14 +1656,19 @@ int write_out_elements_to_file( const double *orbit,
                   if( !get_uncertainty( sig_name, sigma_buff + 4, false))
                      strcat( tbuff0, sigma_buff);
 /*             snprintf_append( tt_ptr, 180, "A%d: %s", j + 1, tbuff0); */
-               snprintf_append( buff, sizeof( buff), "A%d: %s", j + 1, tbuff0);
-               if( j == n_extra_params - 1)
-                  {
-                  strcat( tt_ptr, " AU/day^2");
-                  if( is_inverse_square_force_model( ))
-                     strcat( tt_ptr, " [1/r^2]");
-                  }
+               if( j == 3)
+                  snprintf_append( buff, sizeof( buff), "DT: %s", tbuff0);
                else
+                  {
+                  snprintf_append( buff, sizeof( buff), "A%d: %s", j + 1, tbuff0);
+                  if( j == n_extra_params - 1 || j == 2)
+                     {
+                     strcat( tt_ptr, " AU/day^2");
+                     if( is_inverse_square_force_model( ))
+                        strcat( tt_ptr, " [1/r^2]");
+                     }
+                  }
+               if( j < n_extra_params - 1)
                   strcat( tt_ptr, (strlen( tt_ptr) > 50) ? "\n" : "   ");
                }
             }
@@ -2493,7 +2496,7 @@ static double extract_state_vect_from_text( const char *text,
          extern int n_extra_params;
 
          n_extra_params = text[1] - '1';
-         force_model = n_extra_params;
+         force_model = (n_extra_params | 0x10);   /* assume inverse square for the nonce */
          solar_pressure[n_extra_params - 1] = atof( text + 3);
          }
       while( *text != ',' && *text)
@@ -2595,9 +2598,10 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
                           solar_pressure + 2);
             assert( n_read >= 3 && n_read < 8);
             n_extra_params = n_read - 4;
-            if( n_extra_params < 0)
-               n_extra_params = 0;
-            force_model = n_extra_params;
+            if( n_extra_params <= 0)
+               n_extra_params = force_model = 0;
+            else
+               force_model = (n_extra_params | 0x10);  /* assume inv square for the nonce */
             fgets_trimmed( buff, sizeof( buff), ifile);
             sscanf( buff, "%lf%lf%lf%lf%lf%lf",
                           orbit + 3, orbit + 4, orbit + 5,

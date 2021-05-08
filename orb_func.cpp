@@ -2798,7 +2798,12 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
    else if( limited_orbit && !strncmp( limited_orbit, "np=", 3))
       n_params = atoi( limited_orbit + 3);
    else
+      {
       n_params = 6 + n_extra_params;
+      if( n_extra_params == 4 && !solar_pressure[0] && !solar_pressure[1]
+                && !solar_pressure[2]) /* don't try to solve for DT if we */
+         n_params--;                  /* don't have approx A1, A2, A3 yet */
+      }
    if( !obs)
       {
       if( eigenvects)

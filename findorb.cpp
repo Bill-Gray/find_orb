@@ -3017,30 +3017,33 @@ static int non_grav_menu( char *message_to_user)
 {
    char buff[300], *tptr, tbuff[7];
    int c;
+   size_t i;
    extern int force_model;
+   static int models[] = { FORCE_MODEL_NO_NONGRAVS, FORCE_MODEL_SRP,
+            FORCE_MODEL_SRP_TWO_PARAM, FORCE_MODEL_SRP_THREE_PARAM,
+            FORCE_MODEL_COMET_TWO_PARAM, FORCE_MODEL_COMET_THREE_PARAM,
+            FORCE_MODEL_COMET_FOUR_PARAM };
 
    strcpy( buff, get_find_orb_text( 2060));
    strlcpy_err( tbuff, "0 ( ) ", sizeof( tbuff));
-   tbuff[0] = '1' + force_model;
+   for( i = 0; i < sizeof( models) / sizeof( models[0]); i++)
+      if( force_model == models[i])
+         tbuff[0] = '1' + i;
    tptr = strstr( buff, tbuff);
    assert( tptr);
    tptr[3] = '*';
    help_file_name = "nongravs.txt";
    c = full_inquire( buff, NULL, 0, COLOR_MENU, -1, -1);
    tptr[3] = ' ';
-   if( c >= KEY_F(1) && c <= KEY_F(6))
+   if( c >= KEY_F(1) && c <= KEY_F(7))
       c += '1' - KEY_F( 1);
-   if( c >= '1' && c <= '6')
+   if( c >= '1' && c <= '7')
       {
-      size_t i;
       extern int n_extra_params;
 
-      force_model = c - '1';
-      if( force_model < 4)
-         n_extra_params = force_model;
-      else
-         n_extra_params = force_model - 2;
-      tbuff[0] = '1' + force_model;
+      force_model = models[c - '1'];
+      n_extra_params = (force_model & 0xf);
+      tbuff[0] = c;
       tptr = strstr( buff, tbuff);
       assert( tptr);
       tptr += 6;
@@ -3052,7 +3055,6 @@ static int non_grav_menu( char *message_to_user)
       *message_to_user = '\0';
    return( force_model);
 }
-
 
 static void setup_elements_dialog( char *buff, const char *constraints,
                                              int element_format)
