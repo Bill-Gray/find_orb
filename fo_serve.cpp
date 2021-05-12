@@ -399,9 +399,10 @@ int main( const int argc, const char **argv)
    unsigned n_orbits_in_ephem = 1;
 
    ifile = fopen( temp_obs_filename, "rb");
+   fprintf( lock_file, "'%s' %sopened\n", temp_obs_filename, ifile ? "" : "not ");
    obs = load_object( ifile, ids, &curr_epoch, &epoch_shown, orbit);
    fclose( ifile);
-
+   fprintf( lock_file, "%d obs %sloaded\n", n_obs, (obs ? "" : "not "));
    if( available_sigmas == COVARIANCE_AVAILABLE)
       {
       extern unsigned perturbers;
@@ -414,6 +415,7 @@ int main( const int argc, const char **argv)
       full_improvement( obs, n_obs, orbit, curr_epoch, "",
                     sigma_type, epoch_shown);
       }
+   fprintf( lock_file, "avail sigmas %d\n", available_sigmas);
 
    if( n_obs_actually_loaded > 1 && curr_epoch > 0.)
       {
@@ -449,6 +451,7 @@ int main( const int argc, const char **argv)
          snprintf( ephemeris_step_size, sizeof( ephemeris_step_size),
                   "%.6fd", (jd_end - jd_start) / (double)n_ephem_steps);
       }
+   fprintf( lock_file, "ready for ephem\n");
    if( ephemeris_in_a_file_from_mpc_code( ephemeris_filename,
                orbits_to_use, obs, n_obs_actually_loaded,
                curr_epoch, jd_start, ephemeris_step_size,
@@ -459,14 +462,18 @@ int main( const int argc, const char **argv)
       printf( "Ephem generation failed\n");
       return( 0);
       }
+   fprintf( lock_file, "Ephem generated\n");
    write_residuals_to_file( residual_filename, temp_obs_filename,
                   n_obs_actually_loaded, obs, residual_format);
+   fprintf( lock_file, "Resids written\n");
 
    strlcpy( mpec_name, get_environment_ptr( "MPEC_NAME"), sizeof( mpec_name));
    if( !*mpec_name)
       strcpy( mpec_name, "mpec.htm");
    make_pseudo_mpec( mpec_name, ids[0].obj_name);
+   fprintf( lock_file, "pseudo-MPEC made\n");
    unload_observations( obs, n_obs);
+   fprintf( lock_file, "Obs unloaded\n");
    if( !file_no)
       {
       printf( "Content-type: text/html\n\n");
@@ -490,6 +497,8 @@ int main( const int argc, const char **argv)
          set_environment_ptr( "MPEC_NAME", mpec_name);
          }
       }
+   fprintf( lock_file, "Cleaning memory\n");
    clean_up_find_orb_memory( );
+   fprintf( lock_file, "Done!\n");
    return( 0);
 }
