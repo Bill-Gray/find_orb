@@ -4225,7 +4225,7 @@ static bool get_details_from_here( const char *buff, const char *mpc_code,
 
    if( !memcmp( buff, "COD ", 4) && !memcmp( buff + 4, mpc_code, 3))
        {
-       if( buff[7] < ' ' || !*program_codes)
+       if( buff[7] < ' ')
           rval = true;
        else
           rval = strchr( program_codes, buff[8]);
