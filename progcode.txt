@@ -1,4 +1,4 @@
-Downloaded 2020 Apr 06 from
+Downloaded 2021 May 11 from
 
 https://minorplanetcenter.net/iau/lists/ProgramCodes.txt
 
@@ -278,9 +278,6 @@ OBS M. Kretlow
 
 COD 260 \
 OBS R. J. Bouma
-
-COD 260 ]
-OBS Q. Ye
 
 COD 260 ^
 OBS F. Fratev
@@ -712,8 +709,7 @@ OBS J. Watanabe
 OBS T. Fuse
 
 COD 568 1
-OBS D, C. Jewitt
-OBS D. Jewitt
+OBS D. C. Jewitt
 
 COD 568 2
 OBS D. J. Tholen
