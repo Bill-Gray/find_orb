@@ -2476,6 +2476,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                {
                double dist, posn_ang;
                int int_pa;
+               const double sigma_multiplier =
+                     atof( get_environment_ptr( "SIGMA_MULTIPLIER"));
 
                if( n_objects == 2)
                   calc_dist_and_posn_ang( (const double *)&stored_ra_decs[0],
@@ -2515,6 +2517,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                      fclose( offset_ofile);
                   }
                tbuff[0] = ' ';
+               if( sigma_multiplier)
+                  dist *= sigma_multiplier;
                int_pa = put_ephemeris_posn_angle_sigma( tbuff + 1, dist, posn_ang, false);
                strcat( buff, tbuff);
                snprintf_append( alt_buff, sizeof( alt_buff), " %8.3f %3d",

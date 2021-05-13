@@ -403,3 +403,10 @@ SCOPE_JSON_FILE=
    ephemerides won't be suppressed when the sky gets bright.  Unlike
    Goldstone or Arecibo,  they don't transmit.
 DAYTIME_OBS_OK1=ScT ATA 256 EKa
+
+   By default,  ephemeris uncertainties are shown as one-sigma differences
+   from the nominal.  Some sources show three-sigma differences (for which
+   you would set SIGMA_MULTIPLIER,  below,  to 3) or three-sigma "full
+   width" uncertainties,  i.e.,  "you'd have to scan the following length
+   to get from -3 to +3 sigmas".  For that,  you'd set SIGMA_MULTIPLIER=6.
+SIGMA_MULTIPLIER=1
