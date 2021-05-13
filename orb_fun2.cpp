@@ -756,6 +756,7 @@ double improve_along_lov( double *orbit, const double epoch, const double *lov,
       x[0] += x[0] - x[1];
       score[0] = search_score( xyz, slopes, n_obs, x[0]);
       }
+   i = 0;
    while( score[n_divs - 1] < score[n_divs - 2] && score[n_divs - 1] < score[n_divs - 3]
                      && i++ < 20)
       {
@@ -768,7 +769,7 @@ double improve_along_lov( double *orbit, const double epoch, const double *lov,
       if( score[i + 1] < score[i] && score[i + 1] < score[i + 2])
          {
          double new_x;
-         double new_score = find_score_minimum( xyz, slopes, n_obs,
+         const double new_score = find_score_minimum( xyz, slopes, n_obs,
                                        x + i, score + i, &new_x);
 
          if( lowest_score > new_score)
