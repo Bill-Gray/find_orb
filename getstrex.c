@@ -1,5 +1,4 @@
 #define NCURSES_WIDECHAR 1
-
 #include <curses.h>
 #include <wchar.h>
 #include <assert.h>
@@ -189,6 +188,24 @@ int wgetn_wstr_ex(WINDOW *win, wint_t *wstr, int *loc, const int maxlen, const i
                break;
 
             case _DWCHAR:       /* CTRL-W -- Delete word */
+               {
+               int i = 0;
+
+               while( *loc && wstr[*loc - 1] == ' ')
+                  (*loc)--;     /* back up over spaces,  if any */
+               while( *loc && wstr[*loc - 1] != ' ')
+                  (*loc)--;     /* back up to start of actual word */
+               while( *loc && wstr[*loc - 1] == ' ')
+                  {
+                  (*loc)--;     /* back up over preceding spaces,  if any */
+                  i++;
+                  }
+               while( *loc + i < len && wstr[*loc + i] != ' ')
+                  i++;        /* count characters in the word */
+               len -= i;
+               memmove( wstr + *loc, wstr + *loc + i,
+                                 (len + 1 - *loc) * sizeof( wint_t));
+               }
                break;
 
             case '\n':
