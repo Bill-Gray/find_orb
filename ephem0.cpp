@@ -1722,7 +1722,8 @@ int galactic_confusion( const double ra, const double dec)
    static int xsize, ysize;
    static unsigned char **buff = NULL;
    static void *stack = NULL;
-   int i, x, y;
+   int i, ix, iy;
+   double x, y;
 
    if( ra == -99.)       /* flag for "we're done here;  free everything up" */
       {
@@ -1767,19 +1768,23 @@ int galactic_confusion( const double ra, const double dec)
             }
       }
    assert( xsize);
-   x = (int)( (360. - ra) * (double)xsize / 360.) % xsize;
-   y = (int)( (90. - dec) * (double)ysize / 180.);
+   x = fmod( (720. - ra) * (double)xsize / 360., xsize);
+   ix = (int)x;
+   y = (90. - dec) * (double)ysize / 180.;
+   iy = (int)y;
    assert( y >= 0 && y <= ysize);
-   if( !buff[y])
-      {
-      size_t bytes_read;
+   for( i = iy - 1; i < iy + 2; i++)
+      if( i >= 0 && i < ysize && !buff[i])
+         {
+         size_t bytes_read;
 
-      buff[y] = (unsigned char *)stack_alloc( stack, xsize * sizeof( char));
-      fseek( image_file, y * xsize + hdr_offset, SEEK_SET);
-      bytes_read = fread( buff[y], 1, xsize, image_file);
-      assert( bytes_read == (size_t)xsize);
-      }
-   return( buff[y][x]);
+         buff[i] = (unsigned char *)stack_alloc( stack, (xsize + 1) * sizeof( char));
+         fseek( image_file, i * xsize + hdr_offset, SEEK_SET);
+         bytes_read = fread( buff[i], 1, xsize, image_file);
+         buff[i][xsize] = buff[i][0];   /* simplifies interpolation at lon=360 */
+         assert( bytes_read == (size_t)xsize);
+         }
+   return( buff[iy][ix]);
 }
 
 static double round_to( const double x, const double step)
