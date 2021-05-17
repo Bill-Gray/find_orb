@@ -44,6 +44,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "mpc_func.h"
 #include "vislimit.h"
 #include "brentmin.h"
+#include "stackall.h"
 #include "expcalc.h"
 #include "rgb_defs.h"
 
@@ -1707,7 +1708,7 @@ confusion'. See bright.cpp in my 'star_cats' repository for the code that
 created this.  The image is in the .pgm (Portable GrayMap) format,
 basically an array of byte values.  We convert RA/dec to a pixel
 location,  and read that pixel value.  Some logic is added to save
-the FILE* and cache a few bytes.
+the FILE* and cache lines.
 
 'bright2.pgm' has a one-degree resolution (and is therefore 360x180)
 and is distributed by default with Find_Orb.  'bright.pgm' has ten times
@@ -1717,17 +1718,21 @@ We look for the latter;  if it fails,  we try the former. */
 int galactic_confusion( const double ra, const double dec)
 {
    static FILE *image_file;
-   static long buff_offset, hdr_offset;
+   static long hdr_offset;
    static int xsize, ysize;
-   static unsigned char buff[32];
+   static unsigned char **buff = NULL;
+   static void *stack = NULL;
    int i, x, y;
-   long loc;
 
    if( ra == -99.)       /* flag for "we're done here;  free everything up" */
       {
       if( image_file)
          fclose( image_file);
+      if( stack)
+         destroy_stack( stack);
       image_file = NULL;
+      stack = NULL;
+      buff = NULL;
       xsize = 0;
       return( 0);
       }
@@ -1747,33 +1752,34 @@ int galactic_confusion( const double ra, const double dec)
       {
       char tbuff[40];
 
-      if( fgets( tbuff, sizeof( buff), image_file))
-         if( fgets( tbuff, sizeof( buff), image_file))
+      if( fgets( tbuff, sizeof( tbuff), image_file))
+         if( fgets( tbuff, sizeof( tbuff), image_file))
             {
             sscanf( tbuff, "%d %d", &xsize, &ysize);
             if( !fgets( tbuff, sizeof( buff), image_file))
                return( 0);   /* line w/max pixel value */
             assert( atoi( tbuff) == 255);
+            assert( !stack);
+            assert( !buff);
             hdr_offset = ftell( image_file);
-            buff_offset = -99;
+            stack = create_stack( 2000);
+            buff = (unsigned char **)stack_calloc( stack, ysize * sizeof( char *));
             }
       }
    assert( xsize);
    x = (int)( (360. - ra) * (double)xsize / 360.) % xsize;
    y = (int)( (90. - dec) * (double)ysize / 180.);
-   loc = x + y * xsize;
-   if( loc < buff_offset || loc >= buff_offset + (long)sizeof( buff))
+   assert( y >= 0 && y <= ysize);
+   if( !buff[y])
       {
       size_t bytes_read;
 
-      buff_offset = loc - sizeof( buff) / 2;
-      if( buff_offset < 0)
-         buff_offset = 0;
-      fseek( image_file, buff_offset + hdr_offset, SEEK_SET);
-      bytes_read = fread( buff, 1, sizeof( buff), image_file);
-      assert( bytes_read >= sizeof( buff) / 2);
+      buff[y] = (unsigned char *)stack_alloc( stack, xsize * sizeof( char));
+      fseek( image_file, y * xsize + hdr_offset, SEEK_SET);
+      bytes_read = fread( buff[y], 1, xsize, image_file);
+      assert( bytes_read == (size_t)xsize);
       }
-   return( buff[loc - buff_offset]);
+   return( buff[y][x]);
 }
 
 static double round_to( const double x, const double step)
