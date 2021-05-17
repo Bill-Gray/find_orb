@@ -226,7 +226,8 @@ Daw !   0.0000       0.00000   +0.00000    @10 Dawn spacecraft
    Spirit and Opportunity,  and wanted to compute ephems from the rovers.
    Updated 2020 Mar 12 using data from the Mars24 clock program,
    https://www.giss.nasa.gov/tools/mars24/ .  Note that it gives remarks
-   about significant disagreements in positions between sources.
+   about significant disagreements in positions between sources.  East
+   longitudes are positive,  as on Earth.
 Spi ! 175.47848      -14.571892        0   @4  Spirit
 Opp ! 354.47417      -01.9483          0   @4  Opportunity
 MSL ! 137.441635     -04.589465        0   @4  MSL (Curiosity)
@@ -244,6 +245,7 @@ MPL ! 195.3          -76.1             0   @4  Mars Polar Lander
 Ma6 !  19.42         -23.9             0   @4  Mars 6 site
 Ma3 ! 202.           -45.              0   @4  Mars 3 site
 Ma2 !  47.           -45.              0   @4  Mars 2 site
+Zhu ! 109.9          +25.1             0   @4  Zhurong landing site
 
    In some cases,  viewpoints from the Moon may be useful.
 Ch4 ! 177.589        -45.457           0   @10 Chang'e 4 lander
