@@ -3346,10 +3346,6 @@ int main( int argc, const char **argv)
 
    residual_format |= RESIDUAL_FORMAT_80_COL;      /* force 80-column mode */
 
-   get_defaults( &ephemeris_output_options, &element_format,
-         &element_precision, &max_residual_for_filtering,
-         &noise_in_arcseconds);
-
    for( i = 1; i < argc; i++)
       if( argv[i][0] != '-')
          {
@@ -3366,6 +3362,10 @@ int main( int argc, const char **argv)
          else if( !*ifilename)
             strcpy( ifilename, argv[i]);
          }
+
+   get_defaults( &ephemeris_output_options, &element_format,
+         &element_precision, &max_residual_for_filtering,
+         &noise_in_arcseconds);
 
    strlcpy_err( ephemeris_start, get_environment_ptr( "EPHEM_START"),
                   sizeof( ephemeris_start));
