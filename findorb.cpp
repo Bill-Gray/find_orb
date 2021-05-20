@@ -17,19 +17,15 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301, USA.    */
 
-#ifdef _WIN32
-#include <windows.h>
-#else
-#include <unistd.h>
-#endif
-
+#define _XOPEN_SOURCE_EXTENDED   1
 #define PDC_NCMOUSE
 #define PDC_FORCE_UTF8
 #define PDC_WIDE
 
-#ifdef __APPLE__
-   #define _XOPEN_SOURCE_EXTENDED
-   /* https://stackoverflow.com/questions/48042203/curses-library-doesnt-support-wide-char-on-os-x-high-sierra */
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <unistd.h>
 #endif
 
 #if defined( _WIN32)
