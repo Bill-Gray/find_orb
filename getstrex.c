@@ -1,4 +1,10 @@
+#define _XOPEN_SOURCE_EXTENDED 1
+#define PDC_WIDE
+#define PDC_FORCE_UTF8
+#define PDC_NCMOUSE
 #define NCURSES_WIDECHAR 1
+#define HAVE_NCURSESW
+
 #include <curses.h>
 #include <wchar.h>
 #include <assert.h>
