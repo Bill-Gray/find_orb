@@ -4518,9 +4518,10 @@ void attempt_extensions( OBSERVE *obs, const int n_obs, double *orbit,
    get_first_and_last_included_obs( obs, n_obs, &best_start, &best_end);
    do
       {
-//    debug_printf( "Orbit: %f %f %f %f %f %f\n",
-//          orbit[0], orbit[1], orbit[2],
-//          orbit[3], orbit[4], orbit[5]);
+      if( debug_level)
+         debug_printf( "Extending orbit: %f %f %f %f %f %f\n",
+               orbit[0], orbit[1], orbit[2],
+               orbit[3], orbit[4], orbit[5]);
       set_locs( orbit, epoch, obs, n_obs);
       if( !extend_orbit_solution( obs, n_obs, residual_limit, arc_limit_in_days))
          done = true;
@@ -4533,8 +4534,6 @@ void attempt_extensions( OBSERVE *obs, const int n_obs, double *orbit,
          if( debug_level)
             debug_printf( "   Try extend %d to %d (%f day arc)\n",
                      start, end, obs[end].jd - obs[start].jd);
-//                printf( "   Try extend %d to %d (%f day arc)\n",
-//                   start, end, obs[end].jd - obs[start].jd);
          if( obs[end].jd - obs[start].jd > 10.)
             perturbers |= (1 << 5);       /* add Jupiter for >10-day arc */
          if( obs[end].jd - obs[start].jd > 40.)
@@ -4549,21 +4548,31 @@ void attempt_extensions( OBSERVE *obs, const int n_obs, double *orbit,
          for( i = 0; i < 5 && !result; i++)
             {
             perturbers |= (perturbers_automatically_found & (~AUTOMATIC_PERTURBERS));
-//          printf( "i = %d;  %d obs;  rms %f\n", i, n_obs,
-//                       compute_rms( obs, n_obs));
+            if( debug_level)
+               debug_printf( "i = %d;  %d obs;  rms %f\n", i, n_obs,
+                         compute_rms( obs, n_obs));
             if( available_sigmas == COVARIANCE_AVAILABLE)
                {
+               double lov_sigmas;
+
+               if( debug_level > 2)
+                  debug_printf( "  Got a covariance,  setting %d obs\n", n_obs);
                set_locs( orbit, epoch, obs, n_obs);
-               improve_along_lov( orbit, epoch, eigenvects[0],
+               if( debug_level > 2)
+                  debug_printf( "  Seeking minimum along LOV\n");
+               lov_sigmas = improve_along_lov( orbit, epoch, eigenvects[0],
                                             n_extra_params + 6, n_obs, obs);
+               if( debug_level > 2)
+                  debug_printf( "  Minimum at %f sigmas\n", lov_sigmas);
                }
             if( full_improvement( obs, n_obs, orbit, epoch, NULL,
                            NO_ORBIT_SIGMAS_REQUESTED, epoch))
                result = -1;   /* full improvement failed */
             else
                {
-//             printf( "fully improved : rms %f\n",
-//                       compute_rms( obs, n_obs));
+               if( debug_level > 2)
+                  debug_printf( "fully improved : rms %f\n",
+                               compute_rms( obs, n_obs));
                score[i] = evaluate_initial_orbit( obs, n_obs, orbit);
                if( i && score[i - 1] < score[i] + .1)      /* no real improvement... */
                   result = 1;                               /* we must have converged */
