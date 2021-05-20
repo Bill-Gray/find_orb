@@ -586,6 +586,10 @@ static int make_linkage_json( const int n_obs, const OBSERVE *obs, const ELEMENT
             full_ctime( tbuff, current_jd( ), FULL_CTIME_YMD);
             text_search_and_replace( buff, "%t", tbuff);
             }
+         if( elem->central_obj == 3)
+            text_search_and_replace( buff, "\"comment\": \"",
+                     "\"comment\": \"Identified as artsat. ");
+
          fputs( buff, ofile);
          }
    fclose( ifile);
