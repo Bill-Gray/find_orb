@@ -778,7 +778,7 @@ static void set_ra_dec_format( void)
    function... nothing fancy,  but it shows how it's used.  */
 
 static char mpc_code[80];
-static char ephemeris_start[80], ephemeris_step_size[80];
+static char ephemeris_start[80], ephemeris_step_size[300];
 static int n_ephemeris_steps;
 static ephem_option_t ephemeris_output_options;
 
@@ -837,7 +837,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
       snprintf_append( buff, sizeof( buff), "T  Ephem start: %s\n", ephemeris_start);
       snprintf_append( buff, sizeof( buff), "N  Number steps: %d\n",
                                         n_ephemeris_steps);
-      snprintf_append( buff, sizeof( buff) , "S  Step size: %s\n", ephemeris_step_size);
+      snprintf_append( buff, sizeof( buff) , "S  Step size: %.60s\n", ephemeris_step_size);
       snprintf_append( buff, sizeof( buff), "L  Location: (%s) ", mpc_code);
       put_observer_data_in_text( mpc_code, buff + strlen( buff));
       strcat( buff, "\n");
