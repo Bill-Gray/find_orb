@@ -3024,7 +3024,7 @@ static int non_grav_menu( char *message_to_user)
    strlcpy_err( tbuff, "0 ( ) ", sizeof( tbuff));
    for( i = 0; i < sizeof( models) / sizeof( models[0]); i++)
       if( force_model == models[i])
-         tbuff[0] = '1' + i;
+         tbuff[0] = (char)( '1' + i);
    tptr = strstr( buff, tbuff);
    assert( tptr);
    tptr[3] = '*';
