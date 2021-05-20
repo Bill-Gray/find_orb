@@ -134,7 +134,7 @@ clipfunc.o:        clipfunc.cpp
 	$(CC) $(CFLAGS) $(CURSES_FLAGS) $<
 
 getstrex.o:        getstrex.c
-	$(CC) $(CFLAGS) $(CURSES_FLAGS) -DPDC_WIDE -DPDC_FORCE_UTF8 -DPDC_NCMOUSE $<
+	$(CC) $(CFLAGS) $(CURSES_FLAGS) $<
 
 $(FO_EXE):          fo.o $(OBJS) $(RES_FILENAME)
 	$(CC) -o $(FO_EXE) fo.o $(OBJS) $(LIBS) $(RES_FILENAME)
