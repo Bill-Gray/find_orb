@@ -4008,7 +4008,6 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
       n_sr_orbits = get_sr_orbits( sr_orbits, obs, n_obs, 0, max_n_sr_orbits, .5, 0.);
    else
       n_sr_orbits = 0;     /* don't bother with SR for long time spans */
-   writing_sr_elems = true;
    i = 0;
    while( (unsigned)i < n_sr_orbits && sr_orbits[i * 7 + 6] < .7)
       i++;
@@ -4023,6 +4022,7 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
          i++;
       n_sr_orbits = i;        /* cut orbits down to the "reasonable" ones */
       }
+   writing_sr_elems = true;
    if( n_sr_orbits > 10)   /* got at least ten "reasonable" SR orbits; */
       {               /* accept the SR solution */
       const double epoch_shown = find_epoch_shown( obs, n_obs);
