@@ -24,6 +24,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include <errno.h>
 #include "mpc_func.h"
 
+#include <iostream>
+#include <filesystem>
+#include <string>
+namespace fs = std::filesystem;
+
 #ifndef _WIN32
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -84,6 +89,53 @@ const char *write_bit_string( char *ibuff, const uint64_t bits);
 
 int use_config_directory = false;
 const char *alt_config_directory;
+
+// HACK: create the default config directory from a central copy
+// Going forward it'd be good to reqork Find_Orb to search for data in
+// default directories if local copies don't exist
+#include "prefix.h"
+void ensure_config_directory_exists()
+{
+   if (!use_config_directory)
+      return;
+
+   // The c_str() magic in the next line allows conda-build's prefix
+   // replacer to work as expected.
+   // See https://github.com/conda/conda-build/issues/1674 for details.
+   std::string prefix = std::string(PREFIX).c_str();
+
+   if (prefix == "~") {
+      // backwards compatibility; do nothing.
+      return;
+   }
+   auto src = fs::path(prefix) / "share" / "findorb" / "data";
+   
+   const char *home = getenv("HOME");
+   if (home == NULL) {
+      // home unknown; give up
+      return;
+   }
+   auto dest = fs::path(home) / ".find_orb";
+   if (fs::exists(dest)) {
+      // dir exists; nothing to do
+      return;
+   }
+
+   // copy from $PREFIX/share/findorb/data to ~/.find_orb
+//   fs::copy(src, dest, fs::copy_options::recursive);
+   fs::copy(src, dest);
+
+   // symlink the ephemerides files, if they exist
+//   auto path = fs::path(prefix) / "share" / "findorb" / "jpl_eph";
+   std::string path = prefix + "/share/findorb/jpl_eph";
+   if (fs::exists(path)) {
+      for (const auto & entry : fs::directory_iterator(path))
+      {
+         auto lnk = dest / entry.path().filename();
+         fs::create_symlink(entry, lnk);
+      }
+   }
+}
 
 /* Users may specify files such as ~/this/that.txt on non-Windows boxes.
 The following function replaces ~ with the home directory. */
