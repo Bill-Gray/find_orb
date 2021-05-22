@@ -23,7 +23,11 @@
 # As CXX is an implicit variable, a simple CXX?=g++ doesn't work.
 # We have to use this trick from https://stackoverflow.com/a/42958970
 ifeq ($(origin CXX),default)
-	CXX=g++
+	ifdef CLANG
+		CXX=clang++
+	else
+		CXX=g++
+	endif
 endif
 LIBSADDED=-L $(INSTALL_DIR)/lib -lm
 EXE=
@@ -33,10 +37,6 @@ ifeq ($(OS),Windows_NT)
     detected_OS := Windows
 else
     detected_OS := $(shell sh -c 'uname 2>/dev/null || echo Unknown')
-endif
-
-ifdef CLANG
-	CXX=clang
 endif
 
 # I'm using 'mkdir -p' to avoid error messages if the directory exists.
@@ -155,7 +155,7 @@ define DEPENDABLE_VAR
 .PHONY: phony
 $1: phony
 	@if [ "$$$$(cat $1 2>&1)"x != '$($1)'x ]; then \
-		echo -n '$($1)' > $1 ; \
+		/bin/echo -n '$($1)' > $1 ; \
 	fi
 
 endef

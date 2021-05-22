@@ -24,10 +24,23 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include <errno.h>
 #include "mpc_func.h"
 
-#include <iostream>
-#include <filesystem>
 #include <string>
+
+// From https://github.com/gulrak/filesystem#using-it-as-single-file-header
+#ifdef __APPLE__
+#include <Availability.h> // for deployment target to support pre-catalina targets without std::fs 
+#endif
+#if ((defined(_MSVC_LANG) && _MSVC_LANG >= 201703L) || (defined(__cplusplus) && __cplusplus >= 201703L)) && defined(__has_include)
+#if __has_include(<filesystem>) && (!defined(__MAC_OS_X_VERSION_MIN_REQUIRED) || __MAC_OS_X_VERSION_MIN_REQUIRED >= 101500)
+#define GHC_USE_STD_FS
+#include <filesystem>
 namespace fs = std::filesystem;
+#endif
+#endif
+#ifndef GHC_USE_STD_FS
+#include <ghc/filesystem.hpp>
+namespace fs = ghc::filesystem;
+#endif
 
 #ifndef _WIN32
 #include <sys/stat.h>
