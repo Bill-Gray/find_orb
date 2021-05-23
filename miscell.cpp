@@ -26,7 +26,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 
 #include <string>
 
-// From https://github.com/gulrak/filesystem#using-it-as-single-file-header
+#ifdef CONFIG_DIR_AUTOCOPY
+
+/* Support older (pre-10.15 Catalina) versions of macOS via cpp-filesystem
+   shim. From https://github.com/gulrak/filesystem#using-it-as-single-file-header
+*/
 #ifdef __APPLE__
 #include <Availability.h> // for deployment target to support pre-catalina targets without std::fs 
 #endif
@@ -40,6 +44,8 @@ namespace fs = std::filesystem;
 #ifndef GHC_USE_STD_FS
 #include <ghc/filesystem.hpp>
 namespace fs = ghc::filesystem;
+#endif
+
 #endif
 
 #ifndef _WIN32
@@ -103,6 +109,15 @@ const char *write_bit_string( char *ibuff, const uint64_t bits);
 int use_config_directory = false;
 const char *alt_config_directory;
 
+#ifndef CONFIG_DIR_AUTOCOPY
+
+// make this an empty function if not building for conda
+void ensure_config_directory_exists()
+{
+}
+
+#else
+
 // HACK: create the default config directory from a central copy
 // Going forward it'd be good to reqork Find_Orb to search for data in
 // default directories if local copies don't exist
@@ -121,7 +136,6 @@ void ensure_config_directory_exists()
       // backwards compatibility; do nothing.
       return;
    }
-   auto src = fs::path(prefix) / "share" / "findorb" / "data";
    
    const char *home = getenv("HOME");
    if (home == NULL) {
@@ -130,17 +144,17 @@ void ensure_config_directory_exists()
    }
    auto dest = fs::path(home) / ".find_orb";
    if (fs::exists(dest)) {
-      // dir exists; nothing to do
+      // ~/.find_orb already exists; nothing to do
       return;
    }
 
    // copy from $PREFIX/share/findorb/data to ~/.find_orb
-//   fs::copy(src, dest, fs::copy_options::recursive);
-   fs::copy(src, dest);
+   auto src = fs::path(prefix) / "share" / "findorb" / "data";
+   fs::copy(src, dest, fs::copy_options::recursive);
 
-   // symlink the ephemerides files, if they exist
-//   auto path = fs::path(prefix) / "share" / "findorb" / "jpl_eph";
-   std::string path = prefix + "/share/findorb/jpl_eph";
+   // symlink the ephemerides files from system-wide
+   // location, if there are any
+   auto path = fs::path(prefix) / "share" / "findorb" / "jpl_eph";
    if (fs::exists(path)) {
       for (const auto & entry : fs::directory_iterator(path))
       {
@@ -149,6 +163,7 @@ void ensure_config_directory_exists()
       }
    }
 }
+#endif
 
 /* Users may specify files such as ~/this/that.txt on non-Windows boxes.
 The following function replaces ~ with the home directory. */

@@ -63,6 +63,12 @@ ifdef GLOBAL
 else
 	INSTALL_DIR=$(PREFIX)
 endif
+ifneq ($(PREFIX),~)
+	# enable the automatic setup of ~/.find_orb dir from
+	# $PREFIX/share/openorb.  This at the moment requires C++17 features
+	# and works on Linux and macOS
+	CXXFLAGS+=-DCONFIG_DIR_AUTOCOPY=1 -std=c++17
+endif
 
 ifdef X
 	CURSES_FLAGS=-DXCURSES -I../PDCursesMod
@@ -107,14 +113,7 @@ endif
 
 all: $(FO_EXE) $(FIND_ORB_EXE) fo_serve.cgi eph2tle$(EXE)
 
-CXXFLAGS+=-c -std=c++17 -Wall -pedantic -Wextra $(ADDED_CXXFLAGS) -I $(INSTALL_DIR)/include
-
-# If building within a conda environment, add that environment's
-# .../include and .../lib directories
-##ifdef CONDA_PREFIX
-##	CXXFLAGS += -I $(CONDA_PREFIX)/include
-##	LIBSADDED += -L $(CONDA_PREFIX)/lib
-##endif
+CXXFLAGS+=-c -Wall -pedantic -Wextra $(ADDED_CXXFLAGS) -I $(INSTALL_DIR)/include
 
 ifdef DEBUG
 	CXXFLAGS += -g -O0
