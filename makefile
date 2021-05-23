@@ -20,7 +20,6 @@
 # orbital elements,  covariance matrices,  etc.  'clean' removes these _and_
 # the more usual object and executable files.
 
-CURSES_LIB=-lncursesw
 CC=g++
 LIBSADDED=-L $(INSTALL_DIR)/lib -lm
 EXE=
@@ -30,10 +29,6 @@ ifeq ($(OS),Windows_NT)
     detected_OS := Windows
 else
     detected_OS := $(shell sh -c 'uname 2>/dev/null || echo Unknown')
-endif
-
-ifeq ($(detected_OS),Darwin)  # Mac OS X uses 'ncurses', not 'ncursesw'
-	CURSES_LIB=-lncurses
 endif
 
 ifdef CLANG
@@ -123,6 +118,18 @@ OBJS=ades_out.o b32_eph.o bc405.o bias.o collide.o conv_ele.o details.o eigen.o 
 
 LIBS=$(LIBSADDED) -llunar -ljpl -lsatell
 FIND_ORB_OBJS = clipfunc.o getstrex.o
+
+# If no Curses library has been specified,  we use ncursesw if it's
+# available.  Otherwise,  we use the ncurses lib and hope it actually
+# supports wide characters (Unicode).
+
+ifeq ($(CURSES_LIB),)
+	ifeq ($(shell gcc -lncursesw 2>&1 > /dev/null | grep find),)
+		CURSES_LIB=-lncursesw
+	else
+		CURSES_LIB=-lncurses
+	endif
+endif
 
 $(FIND_ORB_EXE):          findorb.o $(FIND_ORB_OBJS) $(OBJS) $(RES_FILENAME)
 	$(CC) -o $(FIND_ORB_EXE) findorb.o $(FIND_ORB_OBJS) $(OBJS) $(LIBS) $(CURSES_LIB) $(RES_FILENAME)
