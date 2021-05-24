@@ -1591,7 +1591,7 @@ FILE *open_json_file( char *filename, const char *env_ptr, const char *default_n
    if( !*env_ptr)
       {
       get_file_name( filename, default_name);
-      strcpy( full_permits, "fc");
+      strcpy( full_permits, "tfc");
       }
    else
       {
