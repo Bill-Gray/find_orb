@@ -123,7 +123,7 @@ size_t strlcat_err( char *dst, const char *src, size_t dsize); /* miscell.c */
 
 int debug_printf( const char *format, ...)
 {
-   FILE *ofile = fopen_ext( "debug.txt", "ca");
+   FILE *ofile = fopen_ext( "debug.txt", "tca");
 
    if( ofile)
       {
