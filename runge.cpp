@@ -67,7 +67,7 @@ double j2_multiplier = 1.;
 extern unsigned perturbers;
 
 extern int debug_level;
-int debug_printf( const char *format, ...)                 /* runge.cpp */
+int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
 #ifdef __GNUC__
          __attribute__ (( format( printf, 1, 2)))
 #endif

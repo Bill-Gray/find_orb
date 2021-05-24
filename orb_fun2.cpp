@@ -53,7 +53,7 @@ int simplex_step( double **vects, double *fvals,
 
 extern int available_sigmas;
 extern int debug_level;
-int debug_printf( const char *format, ...)                 /* runge.cpp */
+int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
 #ifdef __GNUC__
          __attribute__ (( format( printf, 1, 2)))
 #endif

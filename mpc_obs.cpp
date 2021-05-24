@@ -78,7 +78,7 @@ int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid);
 bool nighttime_only( const char *mpc_code);                 /* mpc_obs.cpp */
 char *find_numbered_mp_info( const int number);             /* mpc_obs.cpp */
 static int xref_designation( char *desig);
-int debug_printf( const char *format, ...)                 /* runge.cpp */
+int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
 #ifdef __GNUC__
          __attribute__ (( format( printf, 1, 2)))
 #endif

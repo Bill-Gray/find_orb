@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "monte0.h"
 
 double gaussian_random( void);                           /* monte0.c */
-int debug_printf( const char *format, ...)                 /* runge.cpp */
+int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
 #ifdef __GNUC__
          __attribute__ (( format( printf, 1, 2)))
 #endif

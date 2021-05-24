@@ -55,7 +55,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name);
 int reset_dialog_language( CDialog *dlg, const int dlg_number);  /* elem_out.cpp */
 int lat_alt_to_parallax( const double lat, const double ht_in_meters,
             double *rho_cos_phi, double *rho_sin_phi, const int planet_idx);
-int debug_printf( const char *format, ...)                 /* runge.cpp */
+int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
 #ifdef __GNUC__
          __attribute__ (( format( printf, 1, 2)))
 #endif

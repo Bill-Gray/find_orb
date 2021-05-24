@@ -159,7 +159,7 @@ int put_elements_into_sof( char *obuff, const char *templat,
 uint64_t parse_bit_string( const char *istr);                /* miscell.cpp */
 const char *write_bit_string( char *ibuff, const uint64_t bits);
 
-int debug_printf( const char *format, ...)                 /* runge.cpp */
+int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
 #ifdef __GNUC__
          __attribute__ (( format( printf, 1, 2)))
 #endif

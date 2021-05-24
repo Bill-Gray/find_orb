@@ -172,7 +172,7 @@ int find_nth_sr_orbit( double *orbit, OBSERVE FAR *obs, int n_obs,
 void create_ades_file( const char *filename, const OBSERVE FAR *obs, int n_obs);
 char *fgets_trimmed( char *buff, size_t max_bytes, FILE *ifile);
 int generic_message_box( const char *message, const char *box_type);
-int debug_printf( const char *format, ...)                 /* runge.cpp */
+int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
 #ifdef __GNUC__
          __attribute__ (( format( printf, 1, 2)))
 #endif

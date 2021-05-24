@@ -40,7 +40,7 @@ the new code and (b) because the algorithm _is_ of some interest. */
 #define GAUSS_K .01720209895
 #define SOLAR_GM (GAUSS_K * GAUSS_K)
 
-int debug_printf( const char *format, ...)                 /* runge.cpp */
+int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
 #ifdef __GNUC__
          __attribute__ (( format( printf, 1, 2)))
 #endif

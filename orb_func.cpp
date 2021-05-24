@@ -138,7 +138,7 @@ static bool fail_on_hitting_planet = false;
 
 double gaussian_random( void);                           /* monte0.c */
 int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid);
-int debug_printf( const char *format, ...)                 /* runge.cpp */
+int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
 #ifdef __GNUC__
          __attribute__ (( format( printf, 1, 2)))
 #endif

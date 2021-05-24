@@ -41,7 +41,7 @@ SIGMA_RECORD
 static int n_sigma_recs;
 static SIGMA_RECORD *sigma_recs;
 
-int debug_printf( const char *format, ...)                 /* runge.cpp */
+int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
 #ifdef __GNUC__
          __attribute__ (( format( printf, 1, 2)))
 #endif

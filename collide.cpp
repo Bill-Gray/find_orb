@@ -37,7 +37,7 @@ double find_collision_time( ELEMENTS *elem, double *latlon, const int is_impact)
 double find_lat_lon_alt( const double ut, const double *ivect,
                   const int planet_no, double *lat_lon, const bool geometric);
 
-int debug_printf( const char *format, ...)                 /* runge.cpp */
+int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
 #ifdef __GNUC__
          __attribute__ (( format( printf, 1, 2)))
 #endif

@@ -85,7 +85,7 @@ uint64_t parse_bit_string( const char *istr);                /* miscell.cpp */
 int text_search_and_replace( char FAR *str, const char *oldstr,
                                      const char *newstr);   /* ephem0.cpp */
 void format_dist_in_buff( char *buff, const double dist_in_au); /* ephem0.c */
-int debug_printf( const char *format, ...)                 /* runge.cpp */
+int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
 #ifdef __GNUC__
          __attribute__ (( format( printf, 1, 2)))
 #endif

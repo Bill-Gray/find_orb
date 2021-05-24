@@ -43,7 +43,7 @@ int snprintf( char *string, const size_t max_len, const char *format, ...);
 #endif
 const char *get_find_orb_text( const int index);          /* elem_out.cpp */
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
-int debug_printf( const char *format, ...)                 /* runge.cpp */
+int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
 #ifdef __GNUC__
          __attribute__ (( format( printf, 1, 2)))
 #endif

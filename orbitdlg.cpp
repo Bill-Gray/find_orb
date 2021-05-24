@@ -92,7 +92,7 @@ int text_search_and_replace( char FAR *str, const char *oldstr,
                                      const char *newstr);   /* ephem0.cpp */
 double convenient_gauss( const OBSERVE FAR *obs, int n_obs, double *orbit,
                   const double mu, const int desired_soln); /* gauss.cpp */
-int debug_printf( const char *format, ...)                 /* runge.cpp */
+int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
 #ifdef __GNUC__
          __attribute__ (( format( printf, 1, 2)))
 #endif
