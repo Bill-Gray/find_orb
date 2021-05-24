@@ -744,19 +744,18 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
 
       if( text && *text)
          {
-         const char *fields[] = { "name", "prov_desig", "disc_date", "disc_site",
+         for( i = 5; i >= 0; i--)
+            {
+            const char *fields[] = { "name", "prov_desig", "disc_date", "disc_site",
                            "disc_ref", "discover" };
-         const int offsets[] = { 9, 29, 41, 53, 72, 78, 170 };
+            const int offsets[] = { 9, 29, 41, 53, 72, 78 };
+            char *tptr = (char *)find_nth_utf8_char( text, offsets[i]);
 
-         strcpy( buff, text);
-         for( i = 0; i < 6; i++)
-            if( buff[offsets[i]] != ' ')
-               {
-               buff[offsets[i + 1] - 1] = '\0';
-               remove_trailing_cr_lf( buff + offsets[i]);
-               fprintf( ofile, "      \"%s\": \"%s\",\n", fields[i],
-                                       buff + offsets[i]);
-               }
+            remove_trailing_cr_lf( tptr);
+            if( *tptr && *tptr != ' ')
+               fprintf( ofile, "      \"%s\": \"%s\",\n", fields[i], tptr);
+            *tptr = '\0';
+            }
          }
       }
    fprintf( ofile, "      \"packed\": \"%s\",\n",
