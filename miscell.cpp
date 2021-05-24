@@ -123,7 +123,7 @@ void make_config_dir_name( char *oname, const char *iname)
 #else
    if( home_ptr)
       {
-      strcpy( oname, getenv( "HOME"));
+      strcpy( oname, home_ptr);
       strcat( oname, "/.find_orb/");
       }
    else
