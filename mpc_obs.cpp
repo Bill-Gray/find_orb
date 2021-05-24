@@ -3377,6 +3377,10 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
    int spacecraft_offset_reference = 399;    /* default is geocenter */
    static int suppress_private_obs = -1;
 
+#ifdef CONSOLE
+   move_add_nstr( 1, 2, "Loading observations", -1);
+   refresh_console( );
+#endif
    *desig_from_neocp = '\0';
    strcpy( mpc_code_from_neocp, "500");   /* default is geocenter */
    neocp_file_type = NEOCP_FILE_TYPE_UNKNOWN;
@@ -3912,6 +3916,11 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
             }
       reset_object_type( rval, n_obs_actually_loaded);
       }
+#ifdef CONSOLE
+   snprintf( buff, sizeof( buff), "%d observations actually loaded", n_obs_actually_loaded);
+   move_add_nstr( 1, 2, buff, -1);
+   refresh_console( );
+#endif
    return( rval);
 }
 
