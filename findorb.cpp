@@ -153,6 +153,7 @@ devoted to station data.   */
 #define RESIDUAL_FORMAT_SHOW_DELTAS              0x1000
 #define RESIDUAL_FORMAT_SHOW_DESIGS              0x2000
 
+void ensure_config_directory_exists(); /* miscell.c */
 size_t strlcat_err( char *dst, const char *src, size_t dsize); /* miscell.c */
 size_t strlcpy_err( char *dst, const char *src, size_t dsize); /* miscell.c */
 static int user_select_file( char *filename, const char *title, const int flags);
@@ -3174,6 +3175,7 @@ int main( int argc, const char **argv)
       use_config_directory = true;
    else
       use_config_directory = false;
+   ensure_config_directory_exists();
    if( !setlocale( LC_ALL, "C.UTF-8"))
       setlocale( LC_ALL, "en_US.utf8");
    *ifilename = '\0';

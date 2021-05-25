@@ -60,6 +60,7 @@ for Windows and other non-*nix systems. */
 
 extern int debug_level;
 
+void ensure_config_directory_exists(); /* miscell.c */
 size_t strlcpy_err( char *dst, const char *src, size_t dsize); /* miscell.c */
 size_t strlcat_err( char *dst, const char *src, size_t dsize); /* miscell.c */
 
@@ -492,6 +493,7 @@ int main( int argc, const char **argv)
       use_config_directory = true;
    else
       use_config_directory = false;
+   ensure_config_directory_exists();
    *mpc_code = '\0';
    if( reset_astrometry_filename( &argc, argv))
       drop_single_obs = false;
