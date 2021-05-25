@@ -4515,7 +4515,7 @@ void update_environ_dot_dat( void)
 
       if( !text)
          text = load_file_into_memory( "environ.def", NULL, true);
-      ofile = fopen_ext( environ_dot_dat, "fcwb");
+      ofile = fopen_ext( environ_dot_dat, "tfcwb");
       assert( ofile);
       for( i = 0; text[i]; i++)
          {
