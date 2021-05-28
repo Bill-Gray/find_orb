@@ -84,7 +84,8 @@ fwhm / sigma = 2 * sqrt( 2 * ln(2)) = 2.354820045030949 */
 static double fraction_inside( const expcalc_config_t *c)
 {
    const double full_widths_per_sigma = 2.354820045030949;
-   const double r_scaled = full_widths_per_sigma * c->aperture / c->fwhm;
+   const double real_fwhm = c->fwhm * c->airmass;
+   const double r_scaled = full_widths_per_sigma * c->aperture / real_fwhm;
 
    return( 1. - exp( -r_scaled * r_scaled / 2.));
 }
