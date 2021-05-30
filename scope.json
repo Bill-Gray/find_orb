@@ -6,7 +6,10 @@
      "3":   "   Site details default to (500),  with specifics being",
      "4":   "overridden on a site-by-site basis.  Report your site",
      "5":   "info to pluto (at) projectpluto (.) com to be added to",
-     "6":   "this file.  2020 Nov 09 version."
+     "6":   "this file.  2021 May 29 version.",
+     "7":   "See 'site_310.txt' for an alternative,  simpler way to",
+     "8":  "describe site parameters (and comments that may help in",
+     "9":   "understanding this file)."
   },
   "500":
   {
@@ -140,6 +143,10 @@
     "Comment1": "MPC test code.  Let's use it as a test code here,  with",
     "Comment2": "a very unusual horizon profile.  Horizon profile format",
     "Comment3": "documented at https://www.projectpluto.com/findhist.htm#horizon",
+    "Comment4": "and in site_310.txt.",
+    "Primary": 40,
+    "Obstruction": 10,
+    "PixelSize": 2.0,
     "Horizon":
      [
      355, 10,
@@ -152,10 +159,10 @@
      180, 15,
      175, 40,
      200, 30,
-     190, 4,
      230, 0,
      240, 15,
-     300, 20
+     300, 20,
+     355, 10
      ],
      "SkyBrightness": 18.5
   }

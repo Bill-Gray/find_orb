@@ -3340,8 +3340,17 @@ static void get_scope_params( const char *mpc_code, expcalc_config_t *c)
    FILE *ifile;
    int scope_details = EXPCALC_NO_CONFIG_FOUND;
    const char *scope_json_file = get_environment_ptr( "SCOPE_JSON_FILE");
+   char filename[20];
 
-   if( *scope_json_file)
+   snprintf( filename, sizeof( filename), "site_%.3s.txt", mpc_code);
+   ifile = fopen_ext( filename, "clrb");
+   if( ifile)
+      {
+      scope_details = find_expcalc_config_from_mpc_code( mpc_code, ifile, c);
+      printf( "Searched '%s' : %d\n", filename, scope_details);
+      fclose( ifile);
+      }
+   if( scope_details == EXPCALC_NO_CONFIG_FOUND && *scope_json_file)
       {
       ifile = fopen_ext( scope_json_file, "frb");
       scope_details = find_expcalc_config_from_mpc_code( mpc_code, ifile, c);

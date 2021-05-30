@@ -1,0 +1,135 @@
+# Site description for (310) MPC Test Code.
+# This is just for illustrative purposes,  with a made-up telescope and
+# abnormally complex irregular horizon.  Take this file and copy it to
+# site_(your MPC code).txt,  and edit the parameters to fit what you
+# have.  Comments can be added freely,  starting with '#'.
+
+# Sites can also be described in 'scope.json'.  However,  a 'site_###.txt'
+# file will be easier to read (JSON is intended for machine consumption,
+# not human).  The following may help in puzzling out the JSON,  though
+# (the keywords,  except for irregular horizons,  are the same.)  The
+# data for this site is duplicated in 'scope.json',  simply for explanatory
+# use.
+
+# First,  you do have to specify your MPC code.
+
+Site: 310
+
+# Next,  parameters describing your telescope.  These are used to compute
+# estimated exposure times and/or SNR levels in ephemerides.  The key ones
+# to set involve filtering and scope size,  but the others can matter to
+# a lesser degree.  You probably need not get nit-pickingly precise here.
+# Exposure calculations tend to be a rough guideline anyway.
+
+# Filter can be N (none), U, B, V, R, I, W.
+
+Filter: N
+
+# Primary diameter and central obstruction diameter are in cm.  I see a
+# dome on G__gle Maps at the position given for (310),  right on MPC
+# headquarters,  http://maps.google.com/maps?q=42.381468,-71.128360 .
+# But I don't know what scope,  if any,  dwells inside.  Let's give
+# 'em a 16-inch = 40-cm scope,  for demonstration purposes.
+
+Primary: 40
+Obstruction: 10
+
+# Aperture, FWHM,  and PixelSize are in arcseconds.  Again,  no need
+# to be all that precise here.
+
+Aperture: 6
+FWHM: 3
+PixelSize: 2
+
+# QE = quantum efficiency.  ReadNoise is in counts per pixel.
+
+QE: 0.9
+ReadNoise: 8
+
+# SkyBrightness is the brightness of the sky at zenith on your best
+# night.  It's basically an estimate of light pollution.  When Find_Orb
+# computes sky brightness,  it will add this to light contribution from
+# the sun,  moon,  airglow,  and (at some point,  haven't done these
+# bits yet) zodiacal light and galactic background.  MPC is in the middle
+# of Cambridge,  Massachusetts;  I assume their night sky is bright enough
+# to read by.  But I'll set a darker,  during-power-outage level here.
+
+SkyBrightness: 18.5
+
+# By default,  we assume you can see from the horizon at 0 degrees
+# right up to the zenith.  Alt/az scopes often have a bit of area
+# near the zenith they can't see ("Dobson's Hole").  These,  and the
+# following parameters,  are used in ephemerides to determine visibility;
+# if you have 'suppress unobservables' ticked and the object would be
+# outside these ranges,  ephemeris data won't be shown for that time.
+# If you don't have that option checked,  the 'visibility indicator'
+# (if checked) will warn you that the object isn't actually visible.
+# You can also describe an irregular horizon,  as a series of alt/az
+# points;  see below for that capability.  The limits can be combined
+# to say "I can't see below this alt,  above this alt,  _and_ I can't
+# see below the irregular horizon."
+
+MinAlt: 0.0
+MaxAlt: 90.0
+
+# Equatorial scopes often can't quite slew to the poles due to an
+# obstruction.  Some equatorials have a minimum or maximum hour angle,
+# either due to mechanical obstructions or cables wrapping.  Default
+# is to assume no such limits.  (Of course,  your horizon may impose
+# such limits,  and unless you're at the equator,  it does.)
+
+MinDec: -90.0
+MaxDec: 90.0
+MinHA: -180.0
+MaxHA: 180.0
+
+# Limits on elongation are somewhat rarer.  Hubble,  for example,  can't
+# get closer than about 45 degrees to the sun.  WISE is always looking
+# at close to 90 degrees from the sun.  SOHO's C3 camera can see quite
+# close to the sun (MinElong = about 1 degree),  but can't look far
+# from it (MaxElong = 9 degrees,  roughly.)
+
+MinElong: 0.0
+MaxElong: 180.0
+
+# One can set up an irregular horizon,  instead of or in addition to the
+# MinAlt/MaxAlt values given above.  To do so,  you give a series of points
+# around the horizon as azimuth/altitude points.  Find_Orb will connect the
+# points in the order they're given;  anything within the designated area
+# will be considered as "under the horizon".  The last point is connected
+# back to the first point.  Find_Orb connects "the short way";  if your points
+# were 230 degrees apart clockwise,  it would go 150 degrees counterclockwise.
+# To get around that,  just go in two (clockwise) steps of 115 degrees each.
+
+# In this contrived example,  the horizon profile starts slightly west of
+# north, works its way around the eastern horizon,  actually backs up a
+# little in the south to let you peek a little under a tree,  and then goes
+# around the west.  The last point at (300, 20) is connected back to the
+# first one at (355, 10).  ASCII art representation follows.
+#
+#                                      9.
+#40-                                   \ \
+#    _ 2--------3._                     | 'a.
+#20-/              \_   _/5    ___----7-8    \_     c-----.
+#  1<-start & end    '4'  6---'                \_  /       '----d-------___e
+#0-                                              'b
+#   | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | |
+#   0  20  40  60  80  100 120 140 160 180 200 220 240 260 280 300 320 340 360
+
+Horizon start
+Point: 355, 10   # Start point (1 in above diagram)
+Point: 15, 25
+Point: 60, 25    # point 3 in above diagram
+Point: 90, 10
+Point: 110, 20
+Point: 110, 5    # 6
+Point: 170, 15
+Point: 180, 15
+Point: 175, 40   # 9
+Point: 200, 30
+# Drop down into valley
+Point: 230, 0    # b
+Point: 240, 15
+Point: 300, 20
+Point: 355, 10   # e,  identical to start
+Horizon end

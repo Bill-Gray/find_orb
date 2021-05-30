@@ -240,19 +240,32 @@ double exposure_from_snr_and_mag( const expcalc_config_t *c,
    return( internal_exposure_from_snr_and_mag( &e, c, snr, mag));
 }
 
+/* See 'scope.json' and 'site_310.txt' for two different ways of storing
+site data.  The former is preferred by CSS for automated processing;
+'site_(mpc code).txt' files are a lot easier for humans to edit.  Both
+let you do the same things. */
+
 static const char *get_config( const char *buff, const char *config_var)
 {
-   char search_str[40];
+   const size_t len = strlen( config_var);
 
-   snprintf( search_str, sizeof( search_str), "\"%s\":", config_var);
-   buff = strstr( buff, search_str);
-   if( buff)
+   if( !memcmp( buff, config_var, len) && buff[len] == ':'
+                     && buff[len + 1] == ' ')
+      buff += len + 2;
+   else                                /* look for JSON version */
       {
-      buff += strlen( search_str);
-      while( *buff == ' ')
-         buff++;
-      if( *buff == '"')
-         buff++;
+      char search_str[40];
+
+      snprintf( search_str, sizeof( search_str), "\"%s\":", config_var);
+      buff = strstr( buff, search_str);
+      if( buff)
+         {
+         buff += strlen( search_str);
+         while( *buff == ' ')
+            buff++;
+         if( *buff == '"')
+            buff++;
+         }
       }
    return( buff);
 }
@@ -291,6 +304,11 @@ int find_expcalc_config_from_mpc_code( const char *mpc_code,
          rval = EXPCALC_SITE_SPECIFIC_CONFIG;
          getting_data = true;
          }
+      else if( !memcmp( buff, "Site: ", 6) && !memcmp( buff + 6, mpc_code, 3))
+         {              /* 'site_(code).txt' format */
+         rval = EXPCALC_SITE_SPECIFIC_CONFIG;
+         getting_data = true;
+         }
       else if( strchr( buff, '}'))
          getting_data = false;
       else if( getting_data)
@@ -313,7 +331,7 @@ int find_expcalc_config_from_mpc_code( const char *mpc_code,
          set_config_double( buff, "MaxHA", &c->max_ha);
          set_config_double( buff, "MinElong", &c->min_elong);
          set_config_double( buff, "MaxElong", &c->max_elong);
-         if( strstr( buff, "\"Horizon\""))
+         if( strstr( buff, "\"Horizon\""))      /* JSON-style horizon */
             {
             int i, n_found = 0;
 
@@ -334,6 +352,24 @@ int find_expcalc_config_from_mpc_code( const char *mpc_code,
             assert( n_found > 2);
             assert( !(n_found & 1));
             c->n_horizon_points = n_found / 2;
+            }
+         if( !memcmp( buff, "Horizon start", 13))     /* text-file horizon */
+            {                                        /* see 'site_310.txt' */
+            int n_read, n_found = 0;                 /* for explanation    */
+
+            while( fgets( buff, sizeof( buff), ifile) &&
+                              memcmp( buff, "Horizon", 7))
+               if( !memcmp( buff, "Point: ", 7))
+                  {
+                  n_found++;
+                  if( IS_POWER_OF_TWO( n_found))
+                     c->horizon = (double *)realloc( c->horizon, n_found * 4 * sizeof( double));
+                  n_read = sscanf( buff + 7, "%lf, %lf",
+                        c->horizon + n_found * 2, c->horizon + n_found * 2 + 1);
+                  assert( n_read == 2);
+                  }
+            assert( n_found > 1);
+            c->n_horizon_points = n_found;
             }
          c->sky_brightness = c->sky_brightness_at_zenith;
          }
