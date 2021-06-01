@@ -4631,8 +4631,13 @@ void attempt_extensions( OBSERVE *obs, const int n_obs, double *orbit,
                /* Perform up to four rounds of outlier rejection */
    for( i = 0; i < 4 && auto_reject_obs_within_arc( obs + best_start,
                                      best_end + 1 - best_start) > 0; i++)
-      full_improvement( obs, n_obs, orbit, epoch, NULL,
+      {
+      if( available_sigmas == COVARIANCE_AVAILABLE)
+         full_improvement( obs, n_obs, orbit, epoch, NULL,
                            NO_ORBIT_SIGMAS_REQUESTED, epoch);
+      else
+         adjust_herget_results( obs, n_obs, orbit);
+      }
    set_locs( orbit, epoch, obs, n_obs);
 }
 
