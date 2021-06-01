@@ -74,7 +74,7 @@ extern const char *sof_filename, *sofv_filename;
 
 char *get_file_name( char *filename, const char *template_file_name);
 int sanity_test_observations( const char *filename);
-int debug_printf( const char *format, ...)                 /* runge.cpp */
+int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
 #ifdef __GNUC__
          __attribute__ (( format( printf, 1, 2)))
 #endif
@@ -700,6 +700,13 @@ int main( int argc, const char **argv)
 
                use_config_directory = true;
                alt_config_directory = arg;
+               }
+               break;
+            case 'X':
+               {
+               extern bool saving_elements_for_reuse;
+
+               saving_elements_for_reuse = true;
                }
                break;
             case 'z':
