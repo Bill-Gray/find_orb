@@ -2671,10 +2671,13 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
          *orbit_epoch = elems.epoch;
          if( got_vectors == 1)
             *perturbers = 0x7fe;    /* Merc-Pluto plus moon */
-         set_locs( orbit, *orbit_epoch, obs, n_obs);
-         filter_obs( obs, n_obs, rms_resid * 3., 1);
+         if( n_obs > 1)
+            {
+            set_locs( orbit, *orbit_epoch, obs, n_obs);
+            filter_obs( obs, n_obs, rms_resid * 3., 1);
+            do_full_improvement = true;
+            }
          abs_mag = elems.abs_mag;
-         do_full_improvement = true;
          }
       }
    if( !got_vectors)
