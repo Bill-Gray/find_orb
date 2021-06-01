@@ -2292,6 +2292,27 @@ void set_solutions_found( OBJECT_INFO *ids, const int n_ids)
    free( ilines);
 }
 
+void compute_two_body_position( ELEMENTS *elems, double *orbit)
+{
+   derive_quantities( elems, get_planet_mass( elems->central_obj));
+   comet_posn_and_vel( elems, elems->epoch, orbit, orbit + 3);
+   if( elems->central_obj == 3)
+      {
+      equatorial_to_ecliptic( orbit);
+      equatorial_to_ecliptic( orbit + 3);
+      }
+   if( elems->central_obj)
+      {
+      double planet_state[6];
+      int i;
+
+      get_planet_posn_vel( elems->epoch, elems->central_obj,
+                              planet_state, planet_state + 3);
+      for( i = 0; i < 6; i++)
+         orbit[i] += planet_state[i];
+      }
+}
+
 /* Can get some comet elements from
 
    http://ssd.jpl.nasa.gov/dat/ELEMENTS.COMET
@@ -2342,23 +2363,7 @@ static int get_orbit_from_mpcorb_sof( const char *filename,
             assert( elems->epoch > 2400000.);
             if( extra_info[1] - extra_info[0] > full_arc_len / 2.)
                {
-               derive_quantities( elems, get_planet_mass( elems->central_obj));
-               comet_posn_and_vel( elems, elems->epoch, orbit, orbit + 3);
-               if( elems->central_obj == 3)
-                  {
-                  equatorial_to_ecliptic( orbit);
-                  equatorial_to_ecliptic( orbit + 3);
-                  }
-               if( elems->central_obj)
-                  {
-                  double planet_state[6];
-                  int i;
-
-                  get_planet_posn_vel( elems->epoch, elems->central_obj,
-                                          planet_state, planet_state + 3);
-                  for( i = 0; i < 6; i++)
-                     orbit[i] += planet_state[i];
-                  }
+               compute_two_body_position( elems, orbit);
                got_vectors = 1;
                if( elems->ecc == 1.)     /* indicate parabolic-constraint orbit */
                   got_vectors = 2;
