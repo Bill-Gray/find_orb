@@ -84,6 +84,7 @@ int store_defaults( const ephem_option_t ephemeris_output_options,
 int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
          int *element_precision, double *max_residual_for_filtering,
          double *noise_in_arcseconds);                /* elem_out.cpp */
+int64_t nanoseconds_since_1970( void);                      /* mpc_obs.c */
 static int elements_in_mpcorb_format( char *buff, const char *packed_desig,
                 const char *full_desig, const ELEMENTS *elem,
                 const OBSERVE FAR *obs, const int n_obs);   /* orb_func.c */
@@ -2695,10 +2696,11 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
       obs->obs_mag = floor( obs->obs_mag * 10. + .5) * .1;
       obs->mag_precision = 1;         /* start out assuming mag to .1 mag */
       }
-   if( do_full_improvement)
+   if( do_full_improvement || available_sigmas == NO_SIGMAS_AVAILABLE)
       {
       OBSERVE *saved_obs = (OBSERVE *)calloc( n_obs, sizeof( OBSERVE));
       double prev_score;
+      int pass;
 
       if( !*get_environment_ptr( "KEEP_PREVIOUS_EPOCH"))
          {
@@ -2708,17 +2710,28 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
          *orbit_epoch = new_epoch;
          }
       memcpy( saved_obs, obs, n_obs * sizeof( OBSERVE));
-      push_orbit( *orbit_epoch, orbit);
       prev_score = evaluate_initial_orbit( obs, n_obs, orbit);
-      full_improvement( obs, n_obs, orbit, *orbit_epoch, NULL,
-                           ORBIT_SIGMAS_REQUESTED, *orbit_epoch);
-      if( prev_score < evaluate_initial_orbit( obs, n_obs, orbit) - .001)
+      for( pass = 0; pass < 2; pass++)
          {
-         pop_orbit( orbit_epoch, orbit);    /* we were better off with the old orbit */
-         memcpy( obs, saved_obs, n_obs * sizeof( OBSERVE));
+         const int64_t t0 = nanoseconds_since_1970( );
+         const int64_t QUARTER_SECOND = 250000000;
+
+         push_orbit( *orbit_epoch, orbit);
+         for( i = 0; i < 4 && (nanoseconds_since_1970( ) - t0) < QUARTER_SECOND; i++)
+            full_improvement( obs, n_obs, orbit, *orbit_epoch,
+                           (pass ? "e=1" : NULL),
+                           ORBIT_SIGMAS_REQUESTED, *orbit_epoch);
+         if( prev_score < evaluate_initial_orbit( obs, n_obs, orbit) - .001)
+            {
+            pop_orbit( orbit_epoch, orbit);    /* we were better off with the old orbit */
+            memcpy( obs, saved_obs, n_obs * sizeof( OBSERVE));
+            }
+         else        /* throw out the saved orbit;  we've got something better */
+            {
+            pass = 100;
+            pop_orbit( NULL, NULL);
+            }
          }
-      else        /* throw out the saved orbit;  we've got something better */
-         pop_orbit( NULL, NULL);
       free( saved_obs);
       }
    return( got_vectors);
