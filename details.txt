@@ -212,14 +212,15 @@ TEL 0.60-m f/4.64 Newtonian + CCD
 TEL 0.84-m f/3.5 reflector + CCD
 
 COD 212
-COM Find_Orb default details
+COM Default details extracted from MPEC 2021-L04
 OBS I. Almendros
+TEL 0.30-m f/10 Schmidt-Cassegrain
 
 COD 213
-COM Find_Orb default details
+COM Default details extracted from MPEC 2021-L04
 OBS R. Naves
 MEA M. Campas
-TEL 0.30-m f/5.5 Schmidt-Cassegrain + CCD
+TEL 0.30-m f/9 reflector + CCD
 
 COD 215
 COM Find_Orb default details
@@ -732,6 +733,12 @@ NET GSC-ACT
 BND R
 TEL 0.46m f/4.5 Newtonian + CCD
 
+COD 750
+OBS N. Moritz
+MEA W. Childs
+COM Default details extracted from MPEC 2021-L04
+TEL 0.6-m f/5 Newtonian reflector + CCD
+
 COD 761
 COM Find_Orb default details
 CON Richard Kowalski
@@ -1127,6 +1134,12 @@ COM Find_Orb default details
 OBS H. B. Zhao, B. Li, G. Zhaori, R. Q. Hong, L. F. Hu
 MEA H. B. Zhao, B. Li. H. Lu, G. Zhaori
 TEL 1.04-m f/1.8 Schmidt + CCD
+
+COD D35
+OBS C.-S. Lin, Z.-Y. Lin
+COM Default details extracted from MPEC 2021-L04
+MEA Z.-Y. Lin
+TEL 0.4-m f/8.4 Ritchey-Chretien + CCD
 
 COD D88
 OBS Y. Sugiyama
@@ -1665,6 +1678,11 @@ OBS A. San Segundo
 COM Default details extracted from MPEC 2021-E131
 TEL 0.30-m f/4 reflector + CCD
 
+COD J36
+OBS F. Gomez
+COM Default details extracted from MPEC 2021-L04
+TEL 0.25-m f/10 Schmidt-Cassegrain + CCD.
+
 COD J38
 OBS F. Garcia
 COM Default details extracted from MPEC 2021-B143
@@ -1679,6 +1697,17 @@ COM Find_Orb default details
 OBS C. Rinner
 MEA C. Rinner,  M. Ory
 TEL 0.5-m f/3 reflector + CCD
+
+COD J47
+OBS G. Muler
+COM Default details extracted from MPEC 2021-L04
+TEL 0.30-m f/6 reflector + CCD
+
+COD J57
+OBS A. Fornas
+COM Default details extracted from MPEC 2021-J104
+MEA E. Arce, V. Mas, G. Fornas
+TEL 0.43-m f/6.8 reflector + CCD
 
 COD J59
 OBS J. Temprano
@@ -1917,6 +1946,11 @@ OBS E. Guido, A. Catapano
 COM Default details extracted from MPEC 2021-B143
 TEL 0.5-m f/8 Ritchey-Chretien + CCD
 
+COD L09
+COM Default details extracted from MPEC 2021-L04
+OBS A. Hale
+TEL 0.40-m f/10 Schmidt-Cassegrain + CCD
+
 COD L18
 MEA A. M. Kozhukhov
 OBS O. V. Kravchenko, Y. V. Tanasiychuk
@@ -2066,6 +2100,12 @@ COD N82
 OBS L. Elenin
 COM Default details extracted from MPEC 2021-E129
 TEL 0.4-m f/1.25 reflector + CCD
+
+COD N86
+COM Default details extracted from MPEC 2021-L04
+OBS Observers X. Gao, Q.-Z. Ye
+MEA Q.-Z. Ye
+TEL 0.28-m f/2.2 Schmidt.
 
 COD N88
 MEA Q.-Z. Ye
@@ -2251,7 +2291,7 @@ COM Find_Orb default details
 CON D. J. Tholen, Institute for Astronomy, 2680 Woodlawn Drive, Honolulu, HI 96822
 CON [tholen (at) ifa (dot) hawaii (dot) edu]
 OBS D. Fohring, D. Hung, Y. Ramanjooloo, Z. Claytor, D. J. Tholen
-TEL 2.24-m University of Hawaii reflector
+TEL 2.24-m f/10.1 University of Hawaii reflector
 COM Valid: 2016-2018 mar 1
 NET Gaia-DR1
 COM Valid: 2018 mar 1-2100
@@ -2420,6 +2460,11 @@ COM Valid: 2019 Oct 1 - 2100
 OBS K. W. Wierzchos
 COM Valid: 1900-2100
 TEL 1.55-m reflector + CCD
+
+COD V11
+COM Default details extracted from MPEC 2020-L04
+OBS D. Rankin
+TEL 0.20-m reflector + CCD
 
 COD V16
 OBS D. Crowson
