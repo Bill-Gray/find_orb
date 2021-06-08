@@ -775,6 +775,8 @@ static void set_ra_dec_format( void)
       }
 }
 
+#define EARTH_MAJOR_AXIS  6378.14
+
 /* Here's a simplified example of the use of the 'ephemeris_in_a_file'
    function... nothing fancy,  but it shows how it's used.  */
 
@@ -796,7 +798,10 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
       {
       int format_start;
       unsigned i, n_lines;
+      int vect_frame = -1;
+      double vect_dist_units = 0., vect_time_units = 0.;
       const int ephem_type = (int)(ephemeris_output_options & 7);
+      bool reset_vect_units = false;
       extern double ephemeris_mag_limit;
       const bool is_topocentric =
                is_topocentric_mpc_code( mpc_code);
@@ -842,6 +847,44 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
       snprintf_append( buff, sizeof( buff), "L  Location: (%s) ", mpc_code);
       put_observer_data_in_text( mpc_code, buff + strlen( buff));
       strcat( buff, "\n");
+      if( ephem_type == OPTION_STATE_VECTOR_OUTPUT
+                   || ephem_type == OPTION_POSITION_OUTPUT)
+         {
+         const char *vect_opts = get_environment_ptr( "VECTOR_OPTS");
+         const char *otext;
+
+         sscanf( vect_opts, "%d,%lf,%lf", &vect_frame, &vect_dist_units, &vect_time_units);
+         snprintf_append( buff, sizeof( buff), "F  %s\n",
+                     vect_frame ? "Ecliptic J2000" : "Equatorial J2000");
+         if( vect_dist_units == 1.)
+            otext = "AU";
+         else if( fabs( vect_dist_units - AU_IN_KM) < 1.)  /* allow for roundoff */
+            {
+            otext = "km";
+            vect_dist_units = AU_IN_KM;
+            }
+         else
+            {
+            otext = "Earth radii";
+            vect_dist_units = AU_IN_KM / EARTH_MAJOR_AXIS;
+            }
+         snprintf_append( buff, sizeof( buff), "D  Distances in %s\n", otext);
+         if( ephem_type == OPTION_STATE_VECTOR_OUTPUT)
+            {
+            if( vect_time_units == 1.)
+               otext = "days";
+            else if( vect_time_units == 24.)
+               otext = "hours";
+            else if( vect_time_units == 1440.)
+               otext = "minutes";
+            else
+               {
+               vect_time_units = 86400.;
+               otext = "seconds";
+               }
+            snprintf_append( buff, sizeof( buff), "U  Time units %s\n", otext);
+            }
+         }
       if( ephem_type == OPTION_OBSERVABLES)    /* for other tables,        */
          {                          /* these options are irrelevant:       */
          snprintf_append( buff, sizeof( buff), "Z [%c] Motion info\n",
@@ -1006,7 +1049,18 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                ephemeris_output_options++;
             break;
          case 'd': case 'D':
-            ephemeris_output_options ^= OPTION_SHOW_SIGMAS;
+            if( vect_frame  > -1)
+               {
+               if( vect_dist_units == 1.)
+                  vect_dist_units = AU_IN_KM;
+               else if( vect_dist_units == AU_IN_KM)
+                  vect_dist_units = AU_IN_KM / EARTH_MAJOR_AXIS;
+               else
+                  vect_dist_units = 1.;
+               reset_vect_units = true;
+               }
+            else
+               ephemeris_output_options ^= OPTION_SHOW_SIGMAS;
             break;
          case 'e': case 'E': case KEY_F( 2):
             help_file_name = "timehelp.txt";
@@ -1034,7 +1088,12 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                }
             break;
          case 'f': case 'F':
-            if( !inquire( "Mag limit for ephemerides: ", buff, sizeof( buff),
+            if( vect_frame > -1)
+               {
+               vect_frame ^= 1;
+               reset_vect_units = true;
+               }
+            else if( !inquire( "Mag limit for ephemerides: ", buff, sizeof( buff),
                      COLOR_MESSAGE_TO_USER) && atof( buff))
                ephemeris_mag_limit = atof( buff);
             break;
@@ -1153,7 +1212,20 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             strcpy( ephemeris_start, "+0");
             break;
          case 'u': case 'U':
-            ephemeris_output_options ^= OPTION_SUPPRESS_UNOBSERVABLE;
+            if( vect_time_units)
+               {
+               if( vect_time_units == 1.)
+                  vect_time_units = 24.;
+               else if( vect_time_units == 24.)
+                  vect_time_units = 24. * 60.;
+               else if( vect_time_units == 24. * 60.)
+                  vect_time_units = 24. * 60. * 60.;
+               else
+                  vect_time_units = 1;
+               reset_vect_units = true;
+               }
+            else
+               ephemeris_output_options ^= OPTION_SUPPRESS_UNOBSERVABLE;
             break;
          case 'v': case 'V':
             ephemeris_output_options ^= OPTION_VISIBILITY;
@@ -1185,6 +1257,12 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
          default:
             show_a_file( "dosephem.txt");
             break;
+         }
+      if( reset_vect_units)
+         {
+         snprintf( buff, sizeof( buff), "%d,%f,%f", vect_frame,
+                     vect_dist_units, vect_time_units);
+         set_environment_ptr( "VECTOR_OPTS", buff);
          }
       }
 
