@@ -24,11 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "afuncs.h"
 #include "lunar.h"
 
-
 #define PI 3.141592653589793238462643383279502884197169399375
-#define EARTH_MAJOR_AXIS 6378140.
-#define EARTH_MINOR_AXIS 6356755.
-#define EARTH_AXIS_RATIO (EARTH_MINOR_AXIS / EARTH_MAJOR_AXIS)
 
 int parallax_to_lat_alt( const double rho_cos_phi, const double rho_sin_phi,
        double *lat, double *ht_in_meters, const int planet_idx); /* ephem0.c */
@@ -69,8 +65,8 @@ double find_lat_lon_alt( const double ut, const double *ivect,
    if( geometric)
       {
       const double planet_radius_in_meters =
-
                planet_radius_in_au * AU_IN_METERS;
+
       lat_lon[1] = atan( rho_sin_phi / rho_cos_phi);
       alt_in_meters = vector3_length( loc) * planet_radius_in_meters;
       }
