@@ -2962,6 +2962,8 @@ double calc_obs_magnitude( const double obj_sun,
    return( rval);
 }
 
+int generic_message_box( const char *message, const char *box_type);
+
 /* The following function,  as the comment indicates,  assumes that
 a "no band" case (obs->mag_band == ' ') must be an R mag.  That's
 probably the best guess for most modern CCD observations.  MPC
@@ -3017,9 +3019,23 @@ double mag_band_shift( const char mag_band)
          -0.28, 0.23, 0.39, 0.37, 0.36, 0.16,     /* grizyw */
          0.28 };                                  /* G */
    const char *tptr = strchr( bands, mag_band);
+   static bool unknown_band_warning_shown = false;
 
    if( tptr)
       rval = offsets[tptr - bands];
+   else if( !strchr( "VNT", mag_band)
+            && !unknown_band_warning_shown)    /* show warning only once */
+      {
+      char buff[200];
+
+      unknown_band_warning_shown = true;
+      snprintf( buff, sizeof( buff),
+                "Band '%c' is unknown to Find_Orb.  Photometry in this\n"
+                "band will be unadjusted.  If this really is a legitimate\n"
+                "photometric band,  please contact Project Pluto.",  mag_band);
+      if( *get_environment_ptr( "BAND_WARNING"))
+         generic_message_box( buff, "o");
+      }
    return( rval);
 }
 
