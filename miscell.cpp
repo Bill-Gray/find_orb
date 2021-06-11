@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <stdarg.h>
 #include <assert.h>
 #include <errno.h>
 #include "mpc_func.h"
@@ -32,7 +33,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    shim. From https://github.com/gulrak/filesystem#using-it-as-single-file-header
 */
 #ifdef __APPLE__
-#include <Availability.h> // for deployment target to support pre-catalina targets without std::fs 
+#include <Availability.h> // for deployment target to support pre-catalina targets without std::fs
 #endif
 #if ((defined(_MSVC_LANG) && _MSVC_LANG >= 201703L) || (defined(__cplusplus) && __cplusplus >= 201703L)) && defined(__has_include)
 #if __has_include(<filesystem>) && (!defined(__MAC_OS_X_VERSION_MIN_REQUIRED) || __MAC_OS_X_VERSION_MIN_REQUIRED >= 101500)
@@ -67,6 +68,13 @@ int snprintf( char *string, const size_t max_len, const char *format, ...);
 #endif
 
 int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
+                                   const char *format, ...)
+#ifdef __GNUC__
+         __attribute__ (( format( printf, 3, 4)))
+#endif
+;
+
+int snprintf_err( char *string, const size_t max_len,      /* miscell.cpp */
                                    const char *format, ...)
 #ifdef __GNUC__
          __attribute__ (( format( printf, 3, 4)))
@@ -136,7 +144,7 @@ void ensure_config_directory_exists()
       // backwards compatibility; do nothing.
       return;
    }
-   
+
    const char *home = getenv("HOME");
    if (home == NULL) {
       // home unknown; give up
@@ -402,11 +410,11 @@ int fetch_astrometry_from_mpc( FILE *ofile, const char *desig)
       for( i = 0; desig[i]; i++)
          j = j * 314159u + (unsigned)desig[i];
 #ifdef _WIN32
-      snprintf( filename, sizeof( filename),      "temp%02u.ast", j % 100);
+      snprintf_err( filename, sizeof( filename),      "temp%02u.ast", j % 100);
 #else
-      snprintf( filename, sizeof( filename), "/tmp/temp%02u.ast", j % 100);
+      snprintf_err( filename, sizeof( filename), "/tmp/temp%02u.ast", j % 100);
 #endif
-      snprintf( tbuff, sizeof( tbuff), "%s %s %s", grab_program,
+      snprintf_err( tbuff, sizeof( tbuff), "%s %s %s", grab_program,
                                                 filename, desig);
       if( !system( tbuff))
          {
@@ -684,6 +692,32 @@ size_t strlcat_err( char *dst, const char *src, size_t dsize)
       {
       fprintf( stderr, "strlcat overflow: dsize = %ld, rval %ld, '%s'\n",
                      (long)dsize, (long)rval, src);
+      exit( -1);
+      }
+   return( rval);
+}
+
+/* 'Traditional' snprintf() silently truncates the output if it would
+go past max_len bytes.  snprintf_err() is in all respects identical to
+snprintf(),  except that truncation is considered to be an error and
+the program will abort.    */
+
+int snprintf_err( char *string, const size_t max_len,      /* miscell.cpp */
+                                   const char *format, ...)
+{
+   va_list argptr;
+   int rval;
+
+   va_start( argptr, format);
+#if _MSC_VER <= 1100
+   rval = vsprintf( string, format, argptr);
+#else
+   rval = vsnprintf( string, max_len, format, argptr);
+#endif
+   va_end( argptr);
+   if( (size_t)rval >= max_len || rval < 0)
+      {
+      fprintf( stderr, "snprintf_err : %d/%ld bytes\n", rval, (long)max_len);
       exit( -1);
       }
    return( rval);
