@@ -1976,7 +1976,7 @@ static int get_ephem_times_from_file( const char *filename)
 
 double ephemeris_mag_limit = 22.;
 
-static const char *mpc_code_for_ephems = "";
+const char *mpc_code_for_ephems = "";
 
 int ephemeris_in_a_file( const char *filename, const double *orbit,
          OBSERVE *obs, const int n_obs,
@@ -2012,7 +2012,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
    const bool show_geo_quantities = atoi( get_environment_ptr( "GEO_QUANTITIES"));
    const bool suppress_coloring = atoi( get_environment_ptr( "SUPPRESS_EPHEM_COLORING"));
    double curr_jd = jd_start, real_jd_start = jd_start;
-   bool reset_lat_alt = true;
+   bool reset_lat_alt = (planet_no >= 0);
    const bool fake_astrometry = ((options & 7) == OPTION_FAKE_ASTROMETRY);
 
    if( (!rho_cos_phi && !rho_sin_phi && !use_observation_times && !show_geo_quantities)
@@ -2070,7 +2070,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       fclose( ofile);
       return( rval);
       }
-   if( planet_no < 0)      /* bad observatory code or satellite */
+   if( planet_no && planet_no != -2)      /* bad observatory code */
       return( -3);
    if( !abs_mag)
       abs_mag = atof( get_environment_ptr( "ABS_MAG"));
@@ -2273,7 +2273,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
             get_observer_data( obs[i].mpc_code, buff, &lon,
                                              &rho_cos_phi, &rho_sin_phi);
             latlon.x = lon;
-            reset_lat_alt = true;
+            reset_lat_alt = (planet_no >= 0);
             }
          curr_jd = obs[i].jd;
          }

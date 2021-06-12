@@ -104,6 +104,8 @@ int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
          __attribute__ (( format( printf, 3, 4)))
 #endif
 ;
+int compute_canned_object_state_vect( double *loc, const char *mpc_code,
+                     const double jd);                 /* elem_out.cpp */
 char *mpc_station_name( char *station_data);       /* mpc_obs.cpp */
 int get_object_name( char *obuff, const char *packed_desig);   /* mpc_obs.c */
 void compute_error_ellipse_adjusted_for_motion( double *sigma1, double *sigma2,
@@ -1515,11 +1517,27 @@ static inline int compute_topocentric_offset( const double ut,
    return( 0);
 }
 
+static int get_canned_object_posn_vel( double *posn, double *vel, const double jde)
+{
+   extern const char *mpc_code_for_ephems;
+   double state_vect[6];
+   const int rval = compute_canned_object_state_vect( state_vect,
+                                    mpc_code_for_ephems, jde);
+
+   if( posn)
+      memcpy( posn, state_vect, 3 * sizeof( double));
+   if( vel)
+      memcpy( vel, state_vect + 3, 3 * sizeof( double));
+   return( rval);
+}
 
 int compute_observer_loc( const double jde, const int planet_no,
                const double rho_cos_phi,
                const double rho_sin_phi, const double lon, double FAR *offset)
 {
+
+   if( planet_no == -2)
+      return( get_canned_object_posn_vel( offset, NULL, jde));
    if( planet_no != 3 && planet_no != 10)
       planet_posn( planet_no >= 0 ? planet_no : 12, jde, offset);
                /* planet_no == -1 means SS Barycenter */
@@ -1548,6 +1566,8 @@ int compute_observer_vel( const double jde, const int planet_no,
 {
    int i;
 
+   if( planet_no == -2)    /* spacecraft-based observation */
+      return( get_canned_object_posn_vel( NULL, vel, jde));
    if( planet_no != 3 && planet_no != 10)
       planet_posn( (planet_no >= 0 ? planet_no : 12) + PLANET_POSN_VELOCITY_OFFSET,
                    jde, vel);        /* planet_no == -1 means SS Barycenter */

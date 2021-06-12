@@ -139,6 +139,8 @@ FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 static int names_compare( const char *name1, const char *name2);
 static int get_uncertainty( const char *key, char *obuff, const bool in_km);
 char *iso_time( char *buff, const double jd, const int precision); /* elem_out.cpp */
+int compute_canned_object_state_vect( double *loc, const char *mpc_code,
+                     const double jd);                /* elem_out.cpp */
 char *real_packed_desig( char *obuff, const char *packed_id);  /* ephem0.cpp */
 extern int debug_level;
 double asteroid_magnitude_slope_param = .15;
@@ -149,6 +151,7 @@ const char *sof_filename = "sof.txt";
 const char *sofv_filename = "sofv.txt";
 int force_model = 0;
 extern int forced_central_body;
+double extract_yyyymmdd_to_jd( const char *buff);        /* sof.cpp */
 int get_planet_posn_vel( const double jd, const int planet_no,
                      double *posn, double *vel);         /* runge.cpp */
 void compute_variant_orbit( double *variant, const double *ref_orbit,
@@ -2373,6 +2376,66 @@ static int get_orbit_from_mpcorb_sof( const char *filename,
       fclose( ifile);
       }
    return( got_vectors);
+}
+
+int compute_canned_object_state_vect( double *loc, const char *mpc_code,
+                     const double jd)
+{
+   char buff[300], header[300], *tptr;
+   FILE *ifile;
+   size_t tp_offset;
+   double prev_jd_read = -1e+99;   /* 'infinitely long ago' */
+   int rval = -2;
+
+   snprintf( buff, sizeof( buff), "eph_%s.txt", mpc_code);
+   ifile = fopen_ext( buff, "fcrb");
+   if( !ifile)
+      debug_printf( "File '%s' not found\n", buff);
+   assert( ifile);
+   if( !fgets_trimmed( header, sizeof( header), ifile))
+      {
+      fprintf( stderr, "Error in %s header\n", buff);
+      exit( -1);
+      }
+   tptr = strstr( header, "|Te");
+   assert( tptr);
+   tp_offset = tptr - header + 1;
+   while( rval && fgets( buff, sizeof( buff), ifile))
+      {
+      const double curr_jd_read = extract_yyyymmdd_to_jd( buff + tp_offset);
+
+      debug_printf( "curr_jd_read = %f (%.13s)\n",
+                     curr_jd_read, buff + tp_offset);
+      if( curr_jd_read > jd)
+         {
+         rval = 0;
+         if( jd < (curr_jd_read + prev_jd_read) / 2.)
+            {            /* should have used previous line */
+            fseek( ifile, -2 * (long)strlen( buff), SEEK_CUR);
+            if( !fgets( buff, sizeof( buff), ifile))
+               exit( -1);
+            }
+         }
+      else if( curr_jd_read > 0.)
+         rval = -1;
+      prev_jd_read = curr_jd_read;
+      }
+   if( rval == -1)      /* read to end of file,  extrapolating */
+      rval = 0;
+   if( !rval)
+      {
+      ELEMENTS elems;
+
+      memset( &elems, 0, sizeof( ELEMENTS));
+      extract_sof_data_ex( &elems, buff, header, NULL);
+      if( elems.epoch < 2400000.)
+         debug_printf( "JD %f\n", elems.epoch);
+      assert( elems.epoch > 2400000.);
+      compute_two_body_state_vect( &elems, loc, jd);
+      debug_printf( "Epoch %f, JD %f\n", elems.epoch, jd);
+      }
+   fclose( ifile);
+   return( rval);
 }
 
 /* The following ensures that names starting with the same international
