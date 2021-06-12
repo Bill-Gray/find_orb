@@ -2404,8 +2404,6 @@ int compute_canned_object_state_vect( double *loc, const char *mpc_code,
       {
       const double curr_jd_read = extract_yyyymmdd_to_jd( buff + tp_offset);
 
-      debug_printf( "curr_jd_read = %f (%.13s)\n",
-                     curr_jd_read, buff + tp_offset);
       if( curr_jd_read > jd)
          {
          rval = 0;
@@ -2432,7 +2430,6 @@ int compute_canned_object_state_vect( double *loc, const char *mpc_code,
          debug_printf( "JD %f\n", elems.epoch);
       assert( elems.epoch > 2400000.);
       compute_two_body_state_vect( &elems, loc, jd);
-      debug_printf( "Epoch %f, JD %f\n", elems.epoch, jd);
       }
    fclose( ifile);
    return( rval);
@@ -3070,24 +3067,54 @@ Denneau et. al., 'The Pan-STARRS Moving Object Process System'
 2017 Jul 11:  David Tholen found V-G=0.28 (private communication at
 present,  will give a "proper" reference once it's published...
 also provides V-G as quadratic functions of V-I or V-R,  which
-should be handy in other contexts) */
+should be handy in other contexts)
+
+2021 Jun 12: Rob Seaman passed along a private communication
+from Larry Denneau giving the shifts for the c and o bands used
+by ATLAS :  "We start with
+
+    (c-o) = -0.19 + 0.72 * (B-V)
+    (V-c) = -0.17 * (c-o) + 0.08 (c-o)^2
+
+Using B-V = 0.8, we get (c-o) = 0.386, therefore
+
+  (V-c) = -0.05, or V = c - 0.05,  and V = o + 0.336"
+
+Rob also directed me to table 6 from
+https://iopscience.iop.org/article/10.3847/1538-3881/aac37d/pdf
+which added J, L, H, K, Y, o, c.
+
+Note that along with the magnitude band shift,  the mag sigma
+ought to be adjusted,  with some quantity added in quadrature.
+I _think_ that quantity would be small for transforming,  say,
+R to V,  but would be large for transforming a "less V-like"
+band (such as the IR bands JHK) to V.     */
+
+typedef struct
+{
+   char band;
+   double v_mag_correction;
+} band_shift_t;
 
 double mag_band_shift( const char mag_band)
 {
-   double rval = 0.;
-   const char *bands = "R BIUCgrizywG";
-   const double offsets[] = { .43, .43,
-                     /* R and 'no band' are treated alike */
-         -.77, .82, -1.16, .4,    /* B, I, U, C */
-         -0.28, 0.23, 0.39, 0.37, 0.36, 0.16,     /* grizyw */
-         0.28 };                                  /* G */
-   const char *tptr = strchr( bands, mag_band);
+   size_t i;
    static bool unknown_band_warning_shown = false;
+   static const band_shift_t bands[] = {
+              {'R', 0.43 },       {' ', 0.43 },    {'B', -0.77 },
+              {'I', 0.82 },       {'U', -1.16 },   {'C', 0.4 },
+              {'g', -0.28 },      {'r', 0.23 },    {'i', 0.39 },
+              {'z', 0.37, },      {'y', 0.36 },    {'w', 0.16 },
+              {'G', 0.28 },       {'J', 1.2 },     {'L', 0.2 },
+              {'H', 1.4 },        {'K', 1.7 },     {'Y', 0.7 },
+              {'o', 0.336 },      {'c', -0.05 },   {'\0', 0. } };
 
-   if( tptr)
-      rval = offsets[tptr - bands];
-   else if( !strchr( "VNT", mag_band)
-            && !unknown_band_warning_shown)    /* show warning only once */
+   if( strchr( "VNT", mag_band))
+      return( 0.);
+   for( i = 0; bands[i].band; i++)
+      if( mag_band == bands[i].band)
+         return( bands[i].v_mag_correction);
+   if( !unknown_band_warning_shown)    /* show warning only once */
       {
       char buff[200];
 
@@ -3098,8 +3125,10 @@ double mag_band_shift( const char mag_band)
                 "photometric band,  please contact Project Pluto.",  mag_band);
       if( *get_environment_ptr( "BAND_WARNING"))
          generic_message_box( buff, "o");
+      else
+         debug_printf( "%s", buff);
       }
-   return( rval);
+   return( 0.);
 }
 
 double calc_absolute_magnitude( OBSERVE FAR *obs, int n_obs)
