@@ -1256,11 +1256,7 @@ a master list of artsats available at
 http://planet4589.org/space/log/satcat.txt
 
    The following code can turn,  for example,  '1966-092A' into
-'1966-092A = NORAD 02501 = Molniya-1'.
-
-within 'all_tle.txt' or similar file.
-(Thus far,  only 'all_tle.txt' is searched.) The following will append
-that designation if it's found. */
+'1966-092A = NORAD 02501 = Molniya-1'.       */
 
 static bool try_artsat_xdesig( char *name)
 {
