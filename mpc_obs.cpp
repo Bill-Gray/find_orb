@@ -1267,19 +1267,24 @@ static bool try_artsat_xdesig( char *name)
       {
       char tbuff[250];
       size_t slen;
+      size_t max_out = 80;    /* max len of 'name' will be 80 bytes */
 
       while( *name == ' ')    /* skip leading spaces */
+         {
          name++;
+         max_out--;
+         }
       remove_trailing_cr_lf( name);
       slen = strlen( name);
-      while( !found_a_match && fgets( tbuff, sizeof( tbuff), ifile))
-         if( !memcmp( tbuff + 8, name, slen) && tbuff[slen + 8] == ' ')
-            {
-            found_a_match = true;
-            snprintf_append( name, 50, " = NORAD %.5s = %.31s",
+      if( max_out > slen)
+         while( !found_a_match && fgets( tbuff, sizeof( tbuff), ifile))
+            if( !memcmp( tbuff + 8, name, slen) && tbuff[slen + 8] == ' ')
+               {
+               found_a_match = true;
+               snprintf_append( name, max_out - slen, " = NORAD %.5s = %.31s",
                         tbuff + 2, tbuff + 23);
-            remove_trailing_cr_lf( name);
-            }
+               remove_trailing_cr_lf( name);
+               }
       fclose( ifile);
       }
    return( found_a_match);
