@@ -180,7 +180,6 @@ int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
 ;
 int fetch_astrometry_from_mpc( FILE *ofile, const char *desig);
 static void get_mouse_data( int *mouse_x, int *mouse_y, int *mouse_z, unsigned long *button);
-int get_object_name( char *obuff, const char *packed_desig);   /* mpc_obs.c */
 int make_pseudo_mpec( const char *mpec_filename, const char *obj_name);
                                               /* ephem0.cpp */
 int store_defaults( const ephem_option_t ephemeris_output_options,
