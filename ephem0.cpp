@@ -2070,7 +2070,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       fclose( ofile);
       return( rval);
       }
-   if( planet_no && planet_no != -2)      /* bad observatory code */
+   if( planet_no < 0 && planet_no != -2)      /* bad observatory code */
       return( -3);
    if( !abs_mag)
       abs_mag = atof( get_environment_ptr( "ABS_MAG"));
