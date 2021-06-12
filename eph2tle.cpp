@@ -65,6 +65,7 @@ doing a sufficiently exhaustive search in such cases. */
 #include <string.h>
 #include <assert.h>
 #include <math.h>
+#include <ctype.h>
 #include <time.h>
 #include "watdefs.h"
 #include "date.h"
@@ -703,9 +704,15 @@ int main( const int argc, const char **argv)
                if( atoi( tptr) > 1900 && tptr[4] == '-' &&
                      atoi( tptr + 5) > 0)
                   {
+                  memset( tle.intl_desig, 0, sizeof( tle.intl_desig));
                   memcpy( tle.intl_desig, tptr + 2, 2);    /* get year */
                   memcpy( tle.intl_desig + 2, tptr + 5, 4); /* launch # */
-                  tle.intl_desig[6] = '\0';
+                  if( isalpha( tptr[9]))    /* two- or three-letter suffix */
+                     {
+                     tle.intl_desig[6] = tptr[9];
+                     if( isalpha( tptr[10]))    /* three-letter suffix */
+                        tle.intl_desig[7] = tptr[10];
+                     }
                   }
          if( intl_desig == default_intl_desig)
             reset_desigs_by_name( obj_name, &tle);
