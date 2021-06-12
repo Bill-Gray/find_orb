@@ -827,6 +827,11 @@ static double lagged_dist( const ldouble *state_vect, const ldouble jd,
 
 #define FUDGE_FACTOR .9
 
+static ldouble planet_radius( const int idx)
+{
+   return( planet_radius_in_meters( idx) * FUDGE_FACTOR / AU_IN_METERS);
+}
+
 int planet_hit = -1;
 
 int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
@@ -844,13 +849,6 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
             10000., 0.00075, 0.00412, 0.00618,   /* sun, mer, ven, ear */
             0.00386, 0.32229, 0.36466, 0.34606,  /* mar, jup, sat, ura */
             0.57928, 0.02208 };                  /* nep, plu */
-   static const ldouble planet_radius[11] = {
-                        SUN_R * FUDGE_FACTOR, MERCURY_R * FUDGE_FACTOR,
-                        VENUS_R * FUDGE_FACTOR, EARTH_R * FUDGE_FACTOR,
-                        MARS_R * FUDGE_FACTOR, JUPITER_R * FUDGE_FACTOR,
-                        SATURN_R * FUDGE_FACTOR, URANUS_R * FUDGE_FACTOR,
-                        NEPTUNE_R * FUDGE_FACTOR, PLUTO_R * FUDGE_FACTOR,
-                        MOON_R * FUDGE_FACTOR };
 
    assert( fabsl( jd) < 1e+9);
 #if !defined( _WIN32) && !defined( __APPLE__)
@@ -884,9 +882,9 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
 
       solar_accel -= solar_pressure[0] * fraction_illum;
       }
-   if( r < planet_radius[0])     /* special fudge to keep acceleration from reaching */
+   if( r < planet_radius( 0))     /* special fudge to keep acceleration from reaching */
       {                          /* infinity inside the sun;  see above notes        */
-      accel_multiplier = compute_accel_multiplier( r / planet_radius[0]);
+      accel_multiplier = compute_accel_multiplier( r / planet_radius( 0));
       planet_hit = 0;
       if( debug_level)
          debug_printf( "Inside the sun: %f km\n", (double)r * AU_IN_KM);
@@ -1045,9 +1043,9 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
                   mass_to_use = MASS_SATURN_SYSTEM;
                }
 
-            if( r < planet_radius[i])
+            if( r < planet_radius( i))
                {
-               accel_multiplier = compute_accel_multiplier( r / planet_radius[i]);
+               accel_multiplier = compute_accel_multiplier( r / planet_radius( i));
                planet_hit = i;
                if( accel_multiplier == 0.)
                   {
