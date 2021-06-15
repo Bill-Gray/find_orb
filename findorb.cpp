@@ -2940,6 +2940,18 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
       prev_files = load_file_into_memory( "previous.def", &n_lines, true);
    assert( prev_files);
    *err_buff = '\0';
+   if( *ifilename == '@')     /* can use '@' followed by end of filename */
+      {                      /* if that file is a recently accessed one */
+      size_t len, len1 = strlen( ifilename) - 1;
+
+      for( i = n_lines - 1; i; i--)
+         if( (len = strlen( prev_files[i])) >= len1 &&
+                        !strcmp( prev_files[i] + len - len1, ifilename + 1))
+            {
+            strcpy( ifilename, prev_files[i]);
+            break;
+            }
+      }
    if( !*ifilename)
       {
       const size_t buffsize = 8000;
