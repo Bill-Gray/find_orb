@@ -105,6 +105,7 @@ is 'true' is for console Find_Orb in Linux,  and even there,  you
 can turn it back to 'false'.
 */
 
+int get_temp_dir( char *name, const size_t max_len);      /* miscell.cpp */
 int fetch_astrometry_from_mpc( FILE *ofile, const char *desig);
 int generic_message_box( const char *message, const char *box_type);
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
@@ -220,6 +221,27 @@ void make_config_dir_name( char *oname, const char *iname)
 #endif
 }
 
+const char *output_directory = NULL;
+
+int get_temp_dir( char *name, const size_t max_len)
+{
+   static int process_id = 0;
+
+   if( output_directory)
+      strlcpy_err( name, output_directory, max_len);
+   else
+      {
+      const bool first_time = (process_id == 0);
+
+      if( first_time)
+         process_id = getpid( );
+      snprintf_err( name, max_len, "/tmp/find_orb%d", process_id);
+      if( first_time)
+         mkdir( name, 0777);
+      }
+   return( process_id);
+}
+
 /* We use a lock file to determine if Find_Orb is already running,  and
 therefore putting some temporary files (ephemerides,  elements,  etc.)
 into the config directory ~/.find_orb.   If that's happening,  we ought
@@ -228,8 +250,6 @@ to put our temporary files elsewhere,  in a directories of the form
 
    We can also deliberately put output files to a desired 'output_directory',
 via command-line options.    */
-
-const char *output_directory = NULL;
 
 FILE *fopen_ext( const char *filename, const char *permits)
 {
@@ -265,17 +285,8 @@ FILE *fopen_ext( const char *filename, const char *permits)
    if( is_temporary)
       {
       char tname[255];
-      static int process_id = 0;
-      const bool first_time = (process_id == 0);
 
-      if( first_time)
-         process_id = getpid( );
-      if( output_directory)
-         strcpy( tname, output_directory);
-      else
-         snprintf( tname, sizeof( tname), "/tmp/find_orb%d", process_id);
-      if( first_time)
-         mkdir( tname, 0777);
+      get_temp_dir( tname, sizeof( tname));
       snprintf_append( tname, sizeof( tname), "/%s",  filename);
       rval = fopen( tname, permits);
       }
