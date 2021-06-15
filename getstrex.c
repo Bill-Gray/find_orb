@@ -8,7 +8,12 @@
 #include <curses.h>
 #include <wchar.h>
 #include <assert.h>
-#include <unistd.h>
+#ifdef _WIN32
+   #include <stdbool.h>
+   #include <stdlib.h>
+#else
+   #include <unistd.h>
+#endif
 #include <string.h>
 
 #ifdef __cplusplus
@@ -267,12 +272,12 @@ int wgetnstr_ex(WINDOW *win, char *str, int *loc, int maxlen, const int size)
         maxlen = MAXLINE;
 
     memset( &ps, 0, sizeof( ps));
-    if( (ssize_t)mbsrtowcs( wstr, &strptr, maxlen, &ps) < 0)
+    if( mbsrtowcs( wstr, &strptr, maxlen, &ps) == (size_t)-1)
         return( -1);
 
     rval = wgetn_wstr_ex(win, (wint_t *)wstr, loc, maxlen, size);
     memset( &ps, 0, sizeof( ps));
-    if( (ssize_t)wcsrtombs(str, &wptr, maxlen, &ps) < 0)
+    if( wcsrtombs(str, &wptr, maxlen, &ps) == (size_t)-1)
         return( -1);
     return( rval);
 }
