@@ -105,7 +105,9 @@ is 'true' is for console Find_Orb in Linux,  and even there,  you
 can turn it back to 'false'.
 */
 
+#ifndef _WIN32
 int get_temp_dir( char *name, const size_t max_len);      /* miscell.cpp */
+#endif
 int fetch_astrometry_from_mpc( FILE *ofile, const char *desig);
 int generic_message_box( const char *message, const char *box_type);
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
@@ -223,6 +225,7 @@ void make_config_dir_name( char *oname, const char *iname)
 
 const char *output_directory = NULL;
 
+#ifndef _WIN32
 int get_temp_dir( char *name, const size_t max_len)
 {
    static int process_id = 0;
@@ -241,6 +244,7 @@ int get_temp_dir( char *name, const size_t max_len)
       }
    return( process_id);
 }
+#endif
 
 /* We use a lock file to determine if Find_Orb is already running,  and
 therefore putting some temporary files (ephemerides,  elements,  etc.)
