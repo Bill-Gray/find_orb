@@ -210,7 +210,7 @@ clean:
 	$(RM) $(OBJS) fo.o findorb.o fo_serve.o $(FIND_ORB_EXE) $(FO_EXE)
 	$(RM) fo_serve.cgi eph2tle.o eph2tle$(EXE) cssfield$(EXE)
 	$(RM) $(FIND_ORB_OBJS) cssfield.o neat_xvt.o neat_xvt$(EXE)
-	$(RM) prefix.h
+	$(RM) prefix.h PREFIX
 ifdef RES_FILENAME
 	$(RM) $(RES_FILENAME)
 
