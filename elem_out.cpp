@@ -3305,7 +3305,7 @@ int check_for_other_processes( const int locking)
       close( lock_fd);
       if( !findorb_already_running)
          unlink( lock_filename);
-      rval = 0;
+      rval = findorb_already_running;
       }
    return( rval);
 }

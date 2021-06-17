@@ -4699,6 +4699,7 @@ void pop_all_orbits( void);         /* orb_func2.cpp */
 char *find_numbered_mp_info( const int number);    /* mpc_obs.cpp */
 #ifndef _WIN32
 int check_for_other_processes( const int locking);    /* elem_out.cpp */
+int get_temp_dir( char *name, const size_t max_len);   /* miscell.cpp */
 #endif
 
 int clean_up_find_orb_memory( void)
@@ -4727,7 +4728,15 @@ int clean_up_find_orb_memory( void)
    galactic_confusion( -99., 0.);
    find_numbered_mp_info( 0);
 #ifndef _WIN32
-   check_for_other_processes( 0);
+   if( check_for_other_processes( 0))
+      {
+      char cmd[100];
+
+      strcpy( cmd, "rm -r ");
+      get_temp_dir( cmd + 6, sizeof( cmd) - 6);
+      if( !memcmp( cmd + 6, "/tmp/", 5))
+         debug_printf( "Result %d\n", system( cmd));
+      }
    unlink( temp_obs_filename);
 #else
    _unlink( temp_obs_filename);
