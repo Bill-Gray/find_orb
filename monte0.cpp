@@ -442,7 +442,7 @@ double dump_monte_data_to_file( FILE *ofile, const double *sigmas,
       const double runoff = runoff_coeff *
              (sigmas[0] * ecc + 15. * days_per_year * sigmas[MONTE_INV_A] * semimajor_axis) / per_yrs;
 #endif
-      const double uparam_const = 1.49;  /* =ln(648000/9) */
+      const double uparam_const = 1.49;    /*    = ln( 648000) / 9 */
 
       uparam = log( runoff) / uparam_const + 1.;
 
@@ -459,7 +459,10 @@ double dump_monte_data_to_file( FILE *ofile, const double *sigmas,
          put_double_in_buff( tbuff, sigma_P_in_days / 365.25);
          fprintf( ofile, "sigma_Py: %s years\n", tbuff);
          }
-      fprintf( ofile, "U=%.1f\n", uparam);
+      if( uparam < 99.9 && uparam > -8.0)
+         fprintf( ofile, "U=%.1f\n", uparam);
+      else
+         uparam = 97.;     /* 'bogus' U */
       }
    available_sigmas = MONTE_CARLO_SIGMAS_AVAILABLE;
    return( uparam);
