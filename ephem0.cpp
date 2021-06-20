@@ -2817,7 +2817,9 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   if( mags_per_arcsec2 > 99.9)
                      mags_per_arcsec2 = 99.99;
                   snprintf( tbuff, sizeof( tbuff), " %5.2f", mags_per_arcsec2);
-                  strcat( alt_buff, tbuff);
+                  strlcat_err( alt_buff,
+                           (mags_per_arcsec2 > 99.9) ? " null" : tbuff,
+                            sizeof( alt_buff));
                   snprintf_append( alt_buff, sizeof( alt_buff), " %06lx", rgb);
                   if( mags_per_arcsec2 > 99.9 && !computer_friendly)
                      strcpy( tbuff, " --.--");
@@ -2860,7 +2862,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   if( exposure_config.airmass > 1e+9)
                      {
                      strcat( buff, (computer_friendly ? " 99999" : " --.--"));
-                     strcat( alt_buff, " 99999");
+                     strcat( alt_buff, "  null");
                      }
                   else
                      {
@@ -2881,14 +2883,15 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   double exposure_time;
 
                   if( exposure_config.airmass > 1e+9)
-                     exposure_time = 99999.;
+                     exposure_time = 99999.9;
                   else
                      exposure_time = exposure_from_snr_and_mag( &exposure_config,
                                   (target_snr ? target_snr : 4.), curr_mag);
                   if( exposure_time > 99999.)
-                     exposure_time = 99999.;
-                  snprintf_append( alt_buff, sizeof( alt_buff), " %.1f", exposure_time);
-                  if( exposure_time > 99998. && !computer_friendly)
+                     strlcat_err( alt_buff, " null", sizeof( alt_buff));
+                  else
+                     snprintf_append( alt_buff, sizeof( alt_buff), " %.1f", exposure_time);
+                  if( exposure_time > 99999. && !computer_friendly)
                      strcat( buff, " -----");
                   else
                      snprintf_append( buff, sizeof( buff),
@@ -2908,8 +2911,9 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   exposure_time = exposure_from_snr_and_mag( &exposure_config,
                                   (target_snr ? target_snr : 4.), curr_mag);
                   if( exposure_time > 99999.)
-                     exposure_time = 99999.;
-                  snprintf_append( alt_buff, sizeof( alt_buff), " %.1f", exposure_time);
+                     strlcat_err( alt_buff, " null", sizeof( alt_buff));
+                  else
+                     snprintf_append( alt_buff, sizeof( alt_buff), " %.1f", exposure_time);
                   }
 
                *tbuff = '\0';
