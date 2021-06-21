@@ -1634,6 +1634,11 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
             case 'o': case 'O':
                rval = -3;
                break;
+            case KEY_F(8):     /* show original screens */
+               full_endwin( );
+               extended_getch( );
+               restart_curses( );
+               break;
             case KEY_MOUSE:      /* already handled above */
                break;
 #ifdef KEY_RESIZE
