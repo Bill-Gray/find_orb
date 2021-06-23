@@ -1634,11 +1634,13 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
             case 'o': case 'O':
                rval = -3;
                break;
+#ifndef _WIN32
             case KEY_F(8):     /* show original screens */
                full_endwin( );
                extended_getch( );
                restart_curses( );
                break;
+#endif
             case KEY_MOUSE:      /* already handled above */
                break;
 #ifdef KEY_RESIZE
@@ -4289,11 +4291,13 @@ int main( int argc, const char **argv)
                for( i = 0; i < MAX_N_NONGRAV_PARAMS; i++)
                   solar_pressure[i] = 0.;
             break;
+#ifndef _WIN32
          case KEY_F(8):     /* show original screens */
             full_endwin( );
             extended_getch( );
             restart_curses( );
             break;
+#endif
          case 'a': case 'A':
             perturbers ^= (7 << 20);
             strcpy( message_to_user, "Asteroids toggled");
