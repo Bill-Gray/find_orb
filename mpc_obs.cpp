@@ -4680,13 +4680,8 @@ static void reference_to_text( char *obuff, const char *reference,
       sprintf( obuff, "DASO %d", atoi( reference + 1));
    else if( *reference == '~' || *reference == '#')   /* MPS or MPC number, */
       {                 /* packed as four "mutant hex" (base 62) digits */
-      unsigned i, number = 0;
+      const unsigned number = get_mutant_hex_value( reference + 1, 4);
 
-      for( i = 1; i < 5; i++)
-         {
-         number *= 62;
-         number += mutant_hex_char_to_int( reference[i]);
-         }
       sprintf( obuff, "MP%c %u", ((*reference == '~') ? 'S' : 'C'),
                         number + ((*reference == '~') ? 260000 : 110000));
       }
