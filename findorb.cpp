@@ -3330,6 +3330,13 @@ int main( int argc, const char **argv)
                ignore_prev_solns = 1;
                }
                break;
+            case 'j':
+               {
+               extern bool force_final_full_improvement;
+
+               force_final_full_improvement = true;
+               }
+               break;
             case 'l':
                {
                extern char findorb_language;
@@ -5570,15 +5577,6 @@ int main( int argc, const char **argv)
          case 'c': case 'C':        /* temporary,  just to verify that sorting */
             sort_obs_by_code ^= SORT_OBS_RADAR_LAST;  /* is being done correctly */
             break;
-         case 'j': case 'J':
-            {
-            extern bool force_final_full_improvement;
-
-            force_final_full_improvement = !force_final_full_improvement;
-            strcpy( message_to_user, "Final full improvement");
-            add_off_on = force_final_full_improvement;
-            }
-            break;
          case ALT_P:    /* see 'environ.def' comments for COMET_CONSTRAINTS */
             {
             char prompt[200];
@@ -5593,6 +5591,7 @@ int main( int argc, const char **argv)
                }
             }
             break;
+         case 'j': case 'J':
          case ALT_Y:
          case ';': case '\'':
          default:
