@@ -1711,7 +1711,7 @@ double geo_potential_in_au( const double x, const double y, const double z,
    rval *= earth_gm_aud / EARTH_R;
    if( derivs)
       {
-      const double r_cyl = sqrt( x * x + y * y);
+      const double r_cyl = hypot( x, y);
       const double r = sqrt( x * x + y * y + z * z);
       const double sin_lon = y / r_cyl;
       const double cos_lon = x / r_cyl;

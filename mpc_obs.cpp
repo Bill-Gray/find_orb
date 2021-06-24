@@ -4577,7 +4577,7 @@ static inline void compute_relative_velocity_vectors( const OBSERVE FAR *obs,
       }
    ecliptic_to_equatorial( j2000_vel);
    ecliptic_to_equatorial( matrix);
-   length = sqrt( matrix[0] * matrix[0] + matrix[1] * matrix[1]);
+   length = hypot( matrix[0], matrix[1]);
    matrix[3] =  matrix[1] / length;
    matrix[4] = -matrix[0] / length;
    matrix[5] = 0.;
@@ -4716,8 +4716,7 @@ int compute_observation_motion_details( const OBSERVE FAR *obs,
          m->position_angle_of_motion =
                   180. + (180. / PI) * atan2( -m->ra_motion, -m->dec_motion);
       }
-   m->total_motion = sqrt( m->ra_motion * m->ra_motion
-                                        + m->dec_motion * m->dec_motion);
+   m->total_motion = hypot( m->ra_motion, m->dec_motion);
    m->xresid = (obs->ra - obs->computed_ra) * cos( obs->dec);
    m->yresid = obs->dec - obs->computed_dec;
                /* cvt xresid, yresid from radians to arcseconds: */

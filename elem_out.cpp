@@ -909,7 +909,7 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
                   jd, iso_time( buff, jd, 3), obs[i].mpc_code);
       fprintf( ofile, "\n                 \"RA\" : %.6f, \"Dec\": %.6f,",
                   obs[i].ra * 180. / PI, obs[i].dec * 180. / PI);
-      total_resid = sqrt( m.xresid * m.xresid + m.yresid * m.yresid);
+      total_resid = hypot( m.xresid, m.yresid);
       while( n_digits < 12 && total_resid < .1)
          {
          total_resid *= 10.;
@@ -1131,7 +1131,7 @@ static void ecliptic_to_planetary_plane( const int planet_no,
          /* Our "X-axis" is perpendicular to "Z",  but in the plane */
          /* of the J2000 equator,  corresponding to the ascending node  */
          /* of the planet's equator relative to the J2000 equator:      */
-   tval = sqrt( xform[2][0] * xform[2][0] + xform[2][1] * xform[2][1]);
+   tval = hypot( xform[2][0], xform[2][1]);
    xform[0][0] = -xform[2][1] / tval;
    xform[0][1] =  xform[2][0] / tval;
    xform[0][2] = 0.;

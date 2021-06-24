@@ -3943,8 +3943,7 @@ void format_observation( const OBSERVE FAR *obs, char *text,
       if( resid_format & RESIDUAL_FORMAT_MAG_RESIDS)
          {
          put_mag_resid( yresid, obs->obs_mag, obs->computed_mag, obs->mag_band);
-         put_residual_into_text( xresid, sqrt( m.xresid * m.xresid
-                                             + m.yresid * m.yresid), resid_format);
+         put_residual_into_text( xresid, hypot( m.xresid, m.yresid), resid_format);
          xresid[5] = ' ';        /* replace the '+' with a ' ' */
          }
       memcpy( text, xresid, 6);

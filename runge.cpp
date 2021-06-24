@@ -1092,8 +1092,8 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
                   extern double solar_pressure[];
                   const double SRP1AU = 2.3e-7;   /* kg*AU^3 / (m^2*d^2) */
                   const double amr_drag = solar_pressure[0] * SOLAR_GM / SRP1AU;
-                  const double rho_cos_phi = sqrt( delta_planet[0] * delta_planet[0]
-                              + delta_planet[1] * delta_planet[1]) / EARTH_R;
+                  const double rho_cos_phi =
+                          hypot( delta_planet[0], delta_planet[1]) / EARTH_R;
                   const double rho_sin_phi = delta_planet[2] / EARTH_R;
                   double ht_in_meters, rho;
                   const double meters_per_km = 1000.;

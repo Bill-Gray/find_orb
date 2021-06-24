@@ -968,7 +968,7 @@ double observation_rms( const OBSERVE FAR *obs)
    const double d_dec = obs->computed_dec - obs->dec;
    const double d_ra  = (obs->computed_ra  - obs->ra) * cos( obs->computed_dec);
 
-   return( sqrt( d_dec * d_dec + d_ra * d_ra) * 3600. * 180. / PI);
+   return( hypot( d_dec, d_ra) * 3600. * 180. / PI);
 }
 
 /* 2010 Nov 4:  revised so that RMS residuals are computed as
@@ -3896,7 +3896,7 @@ static void generate_bogus_orbit_for_single_obs( OBSERVE FAR *obs, double *orbit
    obs->r = dist_to_target;
    for( i = 0; i < 3; i++)
       orbit[i] = obs->obs_posn[i] + obs->vect[i] * dist_to_target;
-   z = sqrt( orbit[0] * orbit[0] + orbit[1] * orbit[1]);
+   z = hypot( orbit[0], orbit[1]);
    orbit[3] = -orbit[1] * scale / z;
    orbit[4] =  orbit[0] * scale / z;
    orbit[5] = 0.;
@@ -4297,7 +4297,7 @@ static double total_residual_err( const OBSERVE *obs)
    double xresid, yresid;
 
    get_residual_data( obs, &xresid, &yresid);
-   return( sqrt( xresid * xresid + yresid * yresid));
+   return( hypot( xresid, yresid));
 }
 
 /* extend_orbit_solution( ) is used if you have a solution covering part of
