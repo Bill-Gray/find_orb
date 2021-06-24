@@ -923,9 +923,7 @@ static int set_locs_extended( const double *orbit, const double epoch_jd,
             /* times. */
    for( i = 0; i < n_obs; i++)
       {
-      double loc[3], ra, dec, temp, r = 0.;
-      const double sin_obliq_2000 = 0.397777155931913701597179975942380896684;
-      const double cos_obliq_2000 = 0.917482062069181825744000384639406458043;
+      double loc[3], ra, dec, r = 0.;
       int j;
 
       for( j = 0; j < 3; j++)
@@ -935,9 +933,7 @@ static int set_locs_extended( const double *orbit, const double epoch_jd,
          }
       r = sqrt( r);
       obs[i].r = r;
-      temp = loc[1] * cos_obliq_2000 - loc[2] * sin_obliq_2000;
-      loc[2] = loc[2] * cos_obliq_2000 + loc[1] * sin_obliq_2000;
-      loc[1] = temp;
+      ecliptic_to_equatorial( loc);
       ra = atan2( loc[1], loc[0]);
       if( r > 100000. || r <= 0.)
          debug_printf( "???? bad r: %f %f %f: %s\n",
@@ -3204,9 +3200,9 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
 
       assert( matrix);
       setvbuf( ofile, NULL, _IONBF, 0);
-      fprintf( ofile, "Orbit: %.7f %.7f %.7f %.7f %.7f %.7f\nepoch JD %.5f\n",
+      fprintf( ofile, "Orbit: %.7f %.7f %.7f %.7f %.7f %.7f\nepoch JD %.5f (%.5f)\n",
                orbit[0], orbit[1], orbit[2],
-               orbit[3], orbit[4], orbit[5], epoch2);
+               orbit[3], orbit[4], orbit[5], epoch2, epoch);
       jacobi_eigenvalues( wtw, n_params, eigenvals, eigenvectors);
 
       fprintf( ofile, "Eigenvalues computed: sigma_squared = %g\n", sigma_squared);
