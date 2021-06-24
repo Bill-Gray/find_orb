@@ -1182,7 +1182,7 @@ existing file,  one in which the first line is the header.      */
 
 static int add_sof_to_file( const char *filename,
              const ELEMENTS *elem,
-             const int n_obs, const OBSERVE *obs)
+             const int n_obs, const OBSERVE *obs, const char *fallback_filename)
 {
    char templat[MAX_SOF_LEN], obuff[MAX_SOF_LEN];
    char output_filename[100];
@@ -1195,6 +1195,15 @@ static int add_sof_to_file( const char *filename,
    fp = fopen_ext( filename, "cr+b");
    get_file_name( output_filename, filename);
    forking = strcmp( output_filename, filename);
+   if( !fp && fallback_filename && !forking)
+      {
+      fp = fopen_ext( fallback_filename, "fcr+b");
+      if( !fgets( templat, sizeof( templat), fp))
+         assert( 1);          /* should never happen */
+      fclose( fp);
+      fp = fopen_ext( filename, "fcw+b");
+      fputs( templat, fp);
+      }
    if( fp)
       {
       bool got_it = false;
@@ -1569,9 +1578,9 @@ int write_out_elements_to_file( const double *orbit,
       }
 
    add_sof_to_file( (n_extra_params >= 2 ? "cmt_sof.txt" : sof_filename),
-                    &elem, n_obs, obs);            /* elem_ou2.cpp */
+                    &elem, n_obs, obs, NULL);      /* elem_ou2.cpp */
    if( saving_elements_for_reuse && available_sigmas == COVARIANCE_AVAILABLE)
-      add_sof_to_file( "orbits.sof", &elem, n_obs, obs);
+      add_sof_to_file( "orbits.sof", &elem, n_obs, obs, "orbitdef.sof");
 /* if( showing_sigmas == COVARIANCE_AVAILABLE)
 */    {
       ELEMENTS elem2 = elem;
@@ -1584,7 +1593,7 @@ int write_out_elements_to_file( const double *orbit,
          }
       else        /* insert dummy elements */
          elem2.q = elem2.ecc = elem2.incl = elem2.arg_per = elem2.asc_node = 0.;
-      add_sof_to_file( sofv_filename, &elem2, n_obs, obs);     /* elem_ou2.cpp */
+      add_sof_to_file( sofv_filename, &elem2, n_obs, obs, NULL); /* elem_ou2.cpp */
       }
    helio_elem = elem;            /* Heliocentric J2000 ecliptic elems */
    helio_elem.central_obj = 0;
