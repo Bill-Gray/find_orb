@@ -1685,7 +1685,15 @@ int write_out_elements_to_file( const double *orbit,
                      }
                   }
                if( j < n_extra_params - 1)
-                  strcat( tt_ptr, (strlen( tt_ptr) > 50) ? "\n" : "   ");
+                  {
+                  if( strlen( tt_ptr) > 50)
+                     {
+                     strcat( tt_ptr, "\n");
+                     tt_ptr += strlen( tt_ptr);
+                     }
+                  else
+                     strcat( tt_ptr, "   ");
+                  }
                }
             }
          assert( strlen( buff) < sizeof( buff) - 1);
