@@ -5442,8 +5442,9 @@ int main( int argc, const char **argv)
             full_improvement( NULL, 0, NULL, 0., NULL, 0, 0.);
             break;
          case ALT_E:
-            sprintf( message_to_user,  "Curr_epoch %f; epoch_shown %f\n",
-                        curr_epoch, epoch_shown);
+            full_ctime( tbuff, curr_epoch, FULL_CTIME_YMD | FULL_CTIME_MILLIDAYS);
+            snprintf( message_to_user, sizeof( message_to_user),
+                        "Curr epoch %.40s = %.3f ", tbuff, curr_epoch);
             break;
          case ALT_M:
             if( !inquire( "Number Metropolis steps: ", tbuff, sizeof( tbuff),
