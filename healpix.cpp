@@ -155,14 +155,14 @@ unsigned xy_to_healpix( const double x, const double y, const unsigned N)
 only version used in Find_Orb.  For Gaia-DR1,  I ran into the need to handle
 the 'nested' HEALPix scheme,  which looks more like this :
 
-                                    2f 2d 27 25
-                                    2e 2c 26 24 8e
-                                    2b 29 23 21 8b 89
-                                    2a 28 22 20 8a 88 82
-                        1f 1d 17 15 7f 7d 77 75 bf bd b7 b5
-i=0 1  2  3  4  5  6    1e 1c 16 14 7e 7c 76 74 be bc b6 b4
-                        1b 19 13 11 7b 79 73 71 bb b9 b3 b1
-                        1a 18 12 10 7a 78 72 70 ba b8 b2 b0
+                                    3f 3d 37 35
+                                    3e 3c 36 34 4e
+                                    3b 39 33 31 4b 49
+                                    3a 38 32 30 4a 48 42
+                        2f 2d 27 25 7f 7d 77 75 bf bd b7 b5
+i=0 1  2  3  4  5  6    2e 2c 26 24 7e 7c 76 74 be bc b6 b4
+                        2b 29 23 21 7b 79 73 71 bb b9 b3 b1
+                        2a 28 22 20 7a 78 72 70 ba b8 b2 b0
             1f 1d 17 15 6f 6d 67 65 af ad a7 a5
             1e 1c 16 14 6e 6c 66 64 ae ac a6 a4
             1b 19 13 11 6b 69 63 61 ab a9 a3 a1      -2     (i, j) rotated to keep cell
