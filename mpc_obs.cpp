@@ -3600,6 +3600,10 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                   SET_SIGMA( posn_sigma_1, ades_posn_sigma_1, override_posn_sigma_1);
                   SET_SIGMA( posn_sigma_2, ades_posn_sigma_2, override_posn_sigma_2);
                   SET_SIGMA( posn_sigma_theta, ades_posn_sigma_theta, override_posn_sigma_theta);
+                           /* Sigmas from ADES or Dave Tholen apply to only */
+                           /* one observation.  Zero 'em out after that use : */
+                  ades_posn_sigma_1 = ades_posn_sigma_2 = ades_mag_sigma = 0.;
+                  ades_posn_sigma_theta = ades_time_sigma = 0.;
 
                   if( sscanf( rval[i].columns_57_to_65, "%lf %lf%n",
                               &ra_sigma, &dec_sigma, &bytes_read) >= 2
@@ -3678,10 +3682,6 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                }
             }
          }
-                           /* See above : sigmas from ADES or Dave Tholen are used once. */
-      if( is_in_range( jd))          /*  If we've just got an observation,  zero 'em out */
-          ades_posn_sigma_1 = ades_posn_sigma_2 = ades_posn_sigma_theta
-                      = ades_mag_sigma = ades_time_sigma = 0.;
       override_time = 0.;
       override_ra = override_dec = -100.;
       convert_com_to_pound_sign( buff);
