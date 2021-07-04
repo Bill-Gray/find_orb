@@ -245,7 +245,10 @@ MPL ! 195.3          -76.1             0   @4  Mars Polar Lander
 Ma6 !  19.42         -23.9             0   @4  Mars 6 site
 Ma3 ! 202.           -45.              0   @4  Mars 3 site
 Ma2 !  47.           -45.              0   @4  Mars 2 site
-Zhu ! 109.9          +25.1             0   @4  Zhurong landing site
+
+   Following position, measured from an HiRISE image,  is from
+   https://space.stackexchange.com/questions/53586/whats-the-exact-location-lat-lon-of-zhurong
+Zhu ! 109.9249       +25.0644          0   @4  Zhurong landing site
 
    In some cases,  viewpoints from the Moon may be useful.
 Ch4 ! 177.589        -45.457           0   @10 Chang'e 4 lander
@@ -1315,3 +1318,8 @@ Geoid height is 20m.  Highlights :
 St74!+149.008898   -35.319125         786.     74-in reflector, Mt Stromlo
 St26!+149.009794   -35.318523         787.     26-in Yale-Columbia refractor, Mt Stromlo
 St50!+149.007461   -35.320406         786.     50-in reflector, Mt Stromlo
+
+   Identified from image at
+   https://www.esa.int/Safety_Security/Planetary_Defence/New_ESA_telescope_in_South_America_to_search_for_asteroids
+
+ET2 !-070.73904    -29.25522                   ESA Test-Bed Telescope 2, La Silla
