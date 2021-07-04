@@ -32,6 +32,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "afuncs.h"
 #include "lunar.h"
 #include "monte0.h"
+#include "pl_cache.h"
 
 #ifndef _MSC_VER
          /* All non-Microsoft builds are for the console */
@@ -264,15 +265,29 @@ double euler_function( const OBSERVE FAR *obs1, const OBSERVE FAR *obs2)
    return( rval);
 }
 
-double find_r_given_solar_r( const OBSERVE FAR *obs, const double solar_r)
+double find_r_given_planet_r( const OBSERVE FAR *obs, const double solar_r,
+                        const int planet_idx)
 {
+   double posn[3];
    double r_dot_v = 0., r_dot_r = 0., b, c, discr, rval = -1.;
    int i;
 
+   if( planet_idx)
+      {
+      double planet_vect[3];
+
+      planet_posn( (planet_idx == 3) ? PLANET_POSN_EARTH : planet_idx,
+                          obs->jd, planet_vect);
+      for( i = 0; i < 3; i++)
+         posn[i] = obs->obs_posn[i] - planet_vect[i];
+      }
+   else
+      for( i = 0; i < 3; i++)
+         posn[i] = obs->obs_posn[i];
    for( i = 0; i < 3; i++)
       {
-      r_dot_r += obs->obs_posn[i] * obs->obs_posn[i];
-      r_dot_v += obs->obs_posn[i] * obs->vect[i];
+      r_dot_r += posn[i] * posn[i];
+      r_dot_v += posn[i] * obs->vect[i];
       }
    b = 2. * r_dot_v;
    c = r_dot_r - solar_r * solar_r;
@@ -280,6 +295,11 @@ double find_r_given_solar_r( const OBSERVE FAR *obs, const double solar_r)
    if( discr > 0.)
       rval = (-b + sqrt( discr)) / 2.;
    return( rval);
+}
+
+double find_r_given_solar_r( const OBSERVE FAR *obs, const double solar_r)
+{
+   return( find_r_given_planet_r( obs, solar_r, 0));
 }
 
 static double get_euler_value( const OBSERVE FAR *obs1, OBSERVE FAR *obs2,
@@ -303,7 +323,6 @@ dy2 / dx2 = z2 = a * dx2 + b
 
    We then solve the resulting quadratic,  going for the positive sign
 if dir != 0.   */
-
 
 static double find_quadratic_zero( const double *x, const double *y,
                const int dir)
@@ -1179,6 +1198,8 @@ static int find_transfer_orbit( double *orbit, OBSERVE FAR *obs1,
    return( XFER_OK);
 }
 
+int vaisala_center_object = 0;
+
 static int find_parameterized_orbit( double *orbit, const double *params,
                 OBSERVE obs1, OBSERVE obs2, const unsigned parameter_type,
                 const int already_have_approximate_orbit)
@@ -1219,8 +1240,8 @@ static int find_parameterized_orbit( double *orbit, const double *params,
       case FIT_VAISALA:
       case FIT_VAISALA_FULL:
          obs1.solar_r *= 1. + params[0] * 100.;
-         obs1.r = find_r_given_solar_r( &obs1, obs1.solar_r);
-         obs2.r = find_r_given_solar_r( &obs2, obs1.solar_r);
+         obs1.r = find_r_given_planet_r( &obs1, obs1.solar_r, vaisala_center_object);
+         obs2.r = find_r_given_planet_r( &obs2, obs1.solar_r, vaisala_center_object);
          break;
       default:
          break;
