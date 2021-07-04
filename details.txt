@@ -132,6 +132,11 @@ OBS A. Coffano, W. Marinello, M. Micheli, G. Pizzetti, A. Soffiantini
 COM Default details extracted from MPEC 2021-B143
 TEL 0.40-m f/5.9 reflector + CCD
 
+COD 145
+OBS T. Alderweireldt
+COM Default details extracted from MPEC 2021-N06
+TEL 0.35-m f/5.5 reflector + CCD
+
 COD 151
 COM Find_Orb default details
 OBS M. Griesser
@@ -999,6 +1004,11 @@ OBS J. Linder
 COM Default details extracted from MPEC 2021-A190
 TEL 0.20-m f/5.8 Schmidt-Cassegrain + CCD
 
+COD B54
+OBS J. Bel
+COM Default details extracted from MPEC 2021-N06
+TEL 0.30-m f/10.28 Schmidt-Cassegrain + CCD
+
 COD B56
 OBS J. Lopesino
 COM Default details extracted from MPEC 2021-B143
@@ -1022,6 +1032,11 @@ COD B75
 OBS M. Martignoni
 COM Default details extracted from MPEC 2021-A190
 TEL 0.25-m f/10 Schmidt-Cassegrain + CCD
+
+COD B92
+OBS M. Audejean
+COM Default details extracted from MPEC 2021-N06
+TEL 0.32-m f/6 Newtonian reflector + CCD
 
 COD B96
 OBS E. Bryssinck
@@ -1929,6 +1944,11 @@ OBS K. Korlevic, D. Pujagic, V. Dobos
 COM Default details extracted from MPEC 2021-C313
 TEL 1.0-m f/2.9 reflector + CCD
 
+COD L02
+OBS N. Sioulas
+COM Default details extracted from MPEC 2021-N06
+TEL 0.25-m f/4.7 reflector + CCD
+
 COD L04
 OBS L. Hudin
 COM Default details extracted from MPEC 2021-A190
@@ -1956,6 +1976,11 @@ MEA A. M. Kozhukhov
 OBS O. V. Kravchenko, Y. V. Tanasiychuk
 COM Default details extracted from MPEC 2021-E14
 TEL 0.50-m f/3.8 reflector + CCD
+
+COD L22
+OBS C. Vintdevara, A. Dumitriu
+COM Default details extracted from MPEC 2021-N06
+TEL 0.2-m f/4 Newtonian reflector + CCD
 
 COD L27
 OBS J.-F. Soulier
@@ -2133,6 +2158,11 @@ COD P93
 COM Find_Orb default details
 OBS S. Okumura, T. Fujiwara
 TEL 1.0-m f/3.0 reflector + CCD
+
+COD Q02
+OBS Y. Yamaguchi
+COM Default details extracted from MPEC 2021-N06
+TEL 0.08-m f/5.5 refractor
 
 COD Q11
 MEA H. Sato
@@ -2515,6 +2545,11 @@ COD W46
 OBS J. Haidet
 COM Default details extracted from MPEC 2021-B143
 TEL 0.36-m f/6.3 Ritchey-Chretien + CCD
+
+COD W53
+OBS R. Jennings
+COM Default details extracted from MPEC 2021-N06
+TEL 0.20-m f/3.9 reflector + CCD
 
 COD W62
 OBS J. Maikner
