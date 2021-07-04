@@ -4874,17 +4874,26 @@ int main( int argc, const char **argv)
                strcpy( message_to_user, "No more orbits to undo!");
             break;
          case 'V':         /* apply Vaisala method, without linearizing */
-            {
-            double vaisala_dist;
-
             if( !inquire( "Enter peri/apohelion distance: ", tbuff, sizeof( tbuff),
-                        COLOR_DEFAULT_INQUIRY) && (vaisala_dist = atof( tbuff)) != 0.)
+                        COLOR_DEFAULT_INQUIRY))
                {
-               curr_epoch = obs->jd;
-               find_vaisala_orbit( orbit, obs, obs + n_obs - 1, vaisala_dist);
-               update_element_display = 1;
+               double vaisala_dist;
+               extern int vaisala_center_object;
+
+               if( *tbuff == 'e')
+                  vaisala_center_object = 3;
+               vaisala_dist = atof( tbuff + (vaisala_center_object != 0));
+               if( vaisala_dist > 300.)   /* larger distances are assumed */
+                  vaisala_dist /= AU_IN_KM;        /* to be in kilometers */
+               if( vaisala_dist)
+                  {
+                  curr_epoch = obs->jd;
+                  find_vaisala_orbit( orbit, obs, obs + n_obs - 1, vaisala_dist);
+                  update_element_display = 1;
+                  set_locs( orbit, curr_epoch, obs, n_obs);
+                  }
+               vaisala_center_object = 0;
                }
-            }
             break;
          case 'v':         /* apply Vaisala method */
             extended_orbit_fit( orbit, obs, n_obs, FIT_VAISALA_FULL, curr_epoch);
