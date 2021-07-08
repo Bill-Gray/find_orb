@@ -3929,10 +3929,16 @@ int main( int argc, const char **argv)
                      }
                   }
                }
-         if( button & BUTTON4_PRESSED)   /* actually 'wheel up' */
-            top_obs_shown -= ((button & BUTTON_CTRL) ? 5 : 1);
-         else if( button5_pressed)   /* actually 'wheel down' */
-            top_obs_shown += ((button & BUTTON_CTRL) ? 5 : 1);
+         if( (button & BUTTON4_PRESSED) || button5_pressed)  /* 'wheel up'/'dn' */
+            {
+            int delta = ((button & BUTTON_CTRL) ? 5 : 1);
+
+            if( !button5_pressed)         /* 'wheel down' */
+               delta = -delta;
+            top_obs_shown += delta;
+            if( single_obs_selected)
+               curr_obs += delta;
+            }
          else if( mouse_y >= station_start_line)
             {
             int c1;
