@@ -26,6 +26,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "comets.h"
 #include "afuncs.h"
 #include "mpc_obs.h"
+#include "date.h"
 
 #define PI 3.1415926535897932384626433832795028841971693993751058209749445923078
 #define GAUSS_K .01720209895
@@ -39,6 +40,7 @@ double improve_along_lov( double *orbit, const double epoch, const double *lov,
           const unsigned n_params, unsigned n_obs, OBSERVE *obs);
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 int adjust_herget_results( OBSERVE FAR *obs, int n_obs, double *orbit);
+double current_jd( void);                       /* elem_out.cpp */
 double evaluate_for_simplex_method( const OBSERVE FAR *obs,
                     const int n_obs, const double *orbit,
                     const int planet_orbiting,
@@ -50,6 +52,8 @@ int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid);
 int simplex_step( double **vects, double *fvals,
          double (*f)( void *context, const double *vect),
                void *context, const int n);        /* simplex.c */
+int apply_excluded_observations_file( OBSERVE *obs, const int n_obs);
+int write_excluded_observations_file( const OBSERVE *obs, int n_obs);
 
 extern int available_sigmas;
 extern int debug_level;
@@ -188,7 +192,8 @@ int filter_obs( OBSERVE FAR *obs, const int n_obs,
       double dx, dy;
 
       for( i = 0; i < n_obs; i++)
-         if( get_residual_data( obs + i, &dx, &dy))
+         if( get_residual_data( obs + i, &dx, &dy)
+                            && !(obs[i].flags & OBS_DONT_USE))
             {
             int is_okay;
 
@@ -808,4 +813,73 @@ double generate_mc_variant_from_covariance( double *var_orbit,
       rval += g_rand * g_rand;
       }
    return( rval);
+}
+
+int text_search_and_replace( char FAR *str, const char *oldstr,
+                                     const char *newstr);   /* ephem0.cpp */
+
+int write_excluded_observations_file( const OBSERVE *obs, int n_obs)
+{
+   char filename[90];
+   FILE *ofile;
+   int n_excluded = 0;
+
+   snprintf( filename, sizeof( filename), "excl_%s.txt", obs->packed_id);
+   text_search_and_replace( filename, " ", "");
+   ofile = fopen_ext( filename, "fcwb");
+   while( n_obs--)
+      {
+      if( !obs->is_included)
+         {
+         if( !n_excluded)
+            {
+            char time_buff[80];
+
+            full_ctime( time_buff, current_jd( ), FULL_CTIME_YMD);
+            fprintf( ofile, "# Banned obs file written %s\n", time_buff);
+            }
+         n_excluded++;
+         fprintf( ofile, "%s %.6f %010.6f %+010.6f\n",
+                     obs->mpc_code, obs->jd - 2400000.5,
+                     obs->ra * 180. / PI, obs->dec * 180. / PI);
+         }
+      obs++;
+      }
+   fclose( ofile);
+   return( n_excluded);
+}
+
+int apply_excluded_observations_file( OBSERVE *obs, const int n_obs)
+{
+   char filename[90], buff[90];
+   FILE *ifile;
+   int n_excluded = 0, i;
+
+   snprintf( filename, sizeof( filename), "excl_%s.txt", obs->packed_id);
+   text_search_and_replace( filename, " ", "");
+   ifile = fopen_ext( filename, "crb");
+   if( ifile)
+      {
+      while( fgets( buff, sizeof( buff), ifile))
+         if( *buff != '#')
+            {
+            const double jd = 2400000.5 + atof( buff + 4);
+            const double ra = atof( buff + 17) * PI / 180.;
+            const double dec = atof( buff + 28) * PI / 180.;
+            const double date_tolerance = 1e-6;
+            const double ang_tolerance = 2e-6 * (PI / 180.);
+
+            for( i = 0; i < n_obs; i++)
+               if( fabs( obs[i].jd - jd) < date_tolerance
+                     && fabs( obs[i].ra - ra) < ang_tolerance
+                     && fabs( obs[i].dec - dec) < ang_tolerance)
+                  {
+                  obs[i].flags |= OBS_DONT_USE;
+                  obs[i].is_included = 0;
+                  n_excluded++;
+                  }
+            }
+      fclose( ifile);
+      }
+   return( n_excluded);
 }

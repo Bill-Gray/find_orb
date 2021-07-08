@@ -173,6 +173,7 @@ int find_nth_sr_orbit( double *orbit, OBSERVE FAR *obs, int n_obs,
 void create_ades_file( const char *filename, const OBSERVE FAR *obs, int n_obs);
 char *fgets_trimmed( char *buff, size_t max_bytes, FILE *ifile);
 int generic_message_box( const char *message, const char *box_type);
+int write_excluded_observations_file( const OBSERVE *obs, int n_obs);
 int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
 #ifdef __GNUC__
          __attribute__ (( format( printf, 1, 2)))
@@ -5607,8 +5608,12 @@ int main( int argc, const char **argv)
                }
             }
             break;
-         case 'j': case 'J':
          case ALT_Y:
+            snprintf( message_to_user, sizeof( message_to_user),
+                     "Exclusion file of %d obs written",
+                                     write_excluded_observations_file( obs, n_obs));
+            break;
+         case 'j': case 'J':
          case ';': case '\'':
          default:
             debug_printf( "Key %d hit\n", c);

@@ -53,6 +53,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #define EARTH_MINOR_AXIS_IN_AU (EARTH_MINOR_AXIS / AU_IN_METERS)
 #define J2000 2451545.
 
+int apply_excluded_observations_file( OBSERVE *obs, const int n_obs);
 void set_up_observation( OBSERVE FAR *obs);                 /* mpc_obs.c */
 static double observation_jd( const char *buff);
 double centralize_ang( double ang);             /* elem_out.cpp */
@@ -3936,6 +3937,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                }
             }
       reset_object_type( rval, n_obs_actually_loaded);
+      apply_excluded_observations_file( rval, n_obs_actually_loaded);
       }
 #ifdef CONSOLE
    snprintf( buff, sizeof( buff), "%d observations actually loaded", n_obs_actually_loaded);
