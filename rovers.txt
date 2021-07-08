@@ -1070,8 +1070,29 @@ OHe !+005.712389   +43.932077        780.      SATINO, Observatoire Haute-Proven
    with a base altitude 83m ASL,  plus 47m for geoid height.
    Jan Manek points out a map and description at :
    https://archive.org/details/deshartwelliano00smytgoog/page/n124/mode/2up
+   Peter has overlaid the map on G__gle Earth to get
+   https://birtwhistle.org.uk/MPCCode997Hartwell.htm ,  from which the
+   following coordinates were obtained :
 997 !-000.846278   +51.805000         133.     Hartwell
 997e!-000.846194   +51.805000         135.     Hartwell equatorial
+
+   Peter also provides images and background for several observatories at
+   https://birtwhistle.org.uk/SiteMap.htm (45m added for geoid heights)
+
+576 !+000.374425   +50.995594         118.     Burwash
+984 !-002.739722   +50.922992         101.     Eastfield
+986 !+000.639444   +51.408888         115.     Ascot
+993 !+002.505833   +51.047117         136.     Woolston
+
+   Peter's page at https://birtwhistle.org.uk/HistoryMillHill.htm
+   provides enough identification for these (998) scopes.  The MPC
+   position appears to be for the Radcliffe dome.
+
+998a!-000.242431   +51.613321         130.     Mill Hill, Radcliffe
+998b!-000.242226   +51.613365         126.     Mill Hill, 24" Ritchey-Chretien
+998c!-000.242320   +51.613224         122.     Mill Hill, western of 3 sm domes
+998d!-000.242243   +51.613224         122.     Mill Hill, middle of 3 sm domes
+998e!-000.242165   +51.613227         122.     Mill Hill, eastern of 3 sm domes
 
    Jan also writes : "(640) Seftenberg has a completely wrong longitude (offset
    > ~200 km).  It was active ~1845-1858,  founded by British astronomer
