@@ -157,6 +157,7 @@ int get_planet_posn_vel( const double jd, const int planet_no,
 void compute_variant_orbit( double *variant, const double *ref_orbit,
                      const double n_sigmas);       /* orb_func.cpp */
 void make_config_dir_name( char *oname, const char *iname);  /* miscell.cpp */
+int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid);
 int put_elements_into_sof( char *obuff, const char *templat,
          const ELEMENTS *elem,
          const int n_obs, const OBSERVE *obs);                /* elem_ou2.cpp */
@@ -901,7 +902,7 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
       {
       MOTION_DETAILS m;
       int n_digits = 3;
-      double total_resid;
+      double total_resid, normalized_xresid, normalized_yresid;
 
       jd = obs[i].jd - td_minus_utc( obs[i].jd) / seconds_per_day;
       compute_observation_motion_details( obs + i, &m);
@@ -922,6 +923,11 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
       fprintf( ofile, "  \"packed\" : \"%s\",", obs[i].packed_id);
       fprintf( ofile, "\n                 \"sigma_1\" : %f,", obs[i].posn_sigma_1);
       fprintf( ofile, "\n                 \"sigma_2\" : %f,", obs[i].posn_sigma_2);
+      get_residual_data( obs + i, &normalized_xresid, &normalized_yresid);
+      fprintf( ofile, "\n                 \"normalized_resid_1\" : %f,",
+                                                normalized_xresid);
+      fprintf( ofile, "\n                 \"normalized_resid_2\" : %f,",
+                                                normalized_yresid);
       fprintf( ofile, "\n                 \"posn_sigma_theta\" : %f,",
                                                       obs[i].posn_sigma_theta * 180. / PI);
       fprintf( ofile, "\n                 \"RAMotion\" : %.4f,", m.ra_motion);
