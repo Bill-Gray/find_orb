@@ -3122,7 +3122,7 @@ static int non_grav_menu( char *message_to_user)
    strlcpy_err( tbuff, "0 ( ) ", sizeof( tbuff));
    for( i = 0; i < sizeof( models) / sizeof( models[0]); i++)
       if( force_model == models[i])
-         tbuff[0] = (char)( '1' + i);
+         tbuff[0] = (char)( '0' + i);
    tptr = strstr( buff, tbuff);
    assert( tptr);
    tptr[3] = '*';
@@ -3130,12 +3130,12 @@ static int non_grav_menu( char *message_to_user)
    c = full_inquire( buff, NULL, 0, COLOR_MENU, -1, -1);
    tptr[3] = ' ';
    if( c >= KEY_F(1) && c <= KEY_F(7))
-      c += '1' - KEY_F( 1);
-   if( c >= '1' && c <= '7')
+      c += '0' - KEY_F( 1);
+   if( c >= '0' && c <= '6')
       {
       extern int n_extra_params;
 
-      force_model = models[c - '1'];
+      force_model = models[c - '0'];
       n_extra_params = (force_model & 0xf);
       tbuff[0] = c;
       tptr = strstr( buff, tbuff);
