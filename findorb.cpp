@@ -350,6 +350,7 @@ static int full_endwin( void)
    return( endwin( ));
 }
 
+#ifndef _WIN32
 static int restart_curses( void)
 {
 #ifdef VT_RECEIVE_ALL_MOUSE
@@ -357,6 +358,7 @@ static int restart_curses( void)
 #endif
    return( refresh( ));
 }
+#endif
 
 static void restore_screen( const int *screen)
 {
@@ -2821,9 +2823,7 @@ static int user_select_file( char *filename, const char *title, const int flags)
    if( !x_is_running)
       {
       inquire( "Enter filename: ", filename, 80, COLOR_DEFAULT_INQUIRY);
-#ifndef _WIN32
       fix_home_dir( filename);
-#endif
       return( 0);
       }
    strcpy( cmd, "zenity --file-selection");
