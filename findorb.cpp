@@ -3249,11 +3249,11 @@ int main( int argc, const char **argv)
    int c = 1, element_precision,  add_off_on = -1;
    bool get_new_object = true, get_new_file = true;
    unsigned top_line_basic_info_perturbers;
-   unsigned top_line_orbital_elements;
+   unsigned top_line_orbital_elements = 0;
    unsigned top_line_residuals;
    bool is_monte_orbit = false;
    unsigned list_codes = SHOW_MPC_CODES_NORMAL;
-   int i, quit = 0, n_obs = 0;
+   int i, quit = 0, n_obs = 0, clock_line = 0;
    int observation_display = 0;
    OBSERVE FAR *obs = NULL;
    int curr_obs = 0;
@@ -3669,11 +3669,11 @@ int main( int argc, const char **argv)
       if( debug_level)
          refresh( );
       line_no = n_command_lines + 1;
-      if( observation_display & DISPLAY_OBSERVATION_DETAILS)
+      if( c != KEY_TIMER && (observation_display & DISPLAY_OBSERVATION_DETAILS))
          {
-         bool clock_shown = false;
          char *tptr = tbuff;
 
+         clock_line = 0;
          if( sort_obs_by_code)
             shellsort_r( obs, n_obs, sizeof( OBSERVE), compare_observations,
                                                    &sort_obs_by_code);
@@ -3698,21 +3698,22 @@ int main( int argc, const char **argv)
             tptr += i + 1;
             while( *tptr == 10 || *tptr == 13)
                tptr++;
-            if( i < 72 && !clock_shown)
-               {
-               time_t t0 = time( NULL);
-               char tbuf[40];
-
-               strcpy( tbuf, ctime( &t0) + 11);
-               tbuf[9] = '\0';
-               put_colored_text( tbuf, line_no - 1, 72, -1, COLOR_OBS_INFO);
-               clock_shown = true;
-               }
+            if( i < 72 && !clock_line)
+               clock_line = line_no - 1;
             }
          if( debug_level)
             refresh( );
+         top_line_orbital_elements = line_no;
          }
-      top_line_orbital_elements = line_no;
+      if( clock_line)
+         {
+         const time_t t0 = time( NULL);
+         char tbuf[18];
+
+         strlcpy_err( tbuf, ctime( &t0) + 11, sizeof( tbuf));
+         tbuf[9] = '\0';
+         put_colored_text( tbuf, clock_line, 72, -1, COLOR_OBS_INFO);
+         }
       if( c != KEY_TIMER && (observation_display & DISPLAY_ORBITAL_ELEMENTS))
          {
          FILE *ifile;
