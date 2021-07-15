@@ -1675,16 +1675,19 @@ typedef struct
    } command_area_t;
 
 static command_area_t command_areas[MAX_CMD_AREAS];
+static unsigned n_command_areas;
 
-static void set_cmd_area( const unsigned cmd_number, const unsigned key,
+static void add_cmd_area( const unsigned key,
               const unsigned line, const unsigned col1, const unsigned len)
 {
-   command_area_t *tptr = command_areas + cmd_number;
+   command_area_t *tptr = command_areas + n_command_areas;
 
+   assert( n_command_areas < MAX_CMD_AREAS);
    tptr->key = key;
    tptr->line = line;
    tptr->col1 = col1;
    tptr->col2 = col1 + len;
+   n_command_areas++;
 }
 
 static unsigned show_basic_info( const OBSERVE FAR *obs, const int n_obs,
@@ -1692,7 +1695,7 @@ static unsigned show_basic_info( const OBSERVE FAR *obs, const int n_obs,
 {
    char buff[80];
    double r1, r2;
-   unsigned line = 1, column = 24, n_commands = 1;
+   unsigned line = 1, column = 24;
    unsigned max_column = (unsigned)getmaxx( stdscr);
    FILE *ifile = fopen_ext( "command.txt", "fcrb");
 
@@ -1705,9 +1708,9 @@ static unsigned show_basic_info( const OBSERVE FAR *obs, const int n_obs,
    format_dist_in_buff( buff + 5, r2);
    put_colored_text( buff, 0, 10, -1, COLOR_BACKGROUND);
 
-   set_cmd_area( 0, 'r', 0, 1, 23);
-
-   set_cmd_area( n_commands++, '?', 0, max_column - 4, 3);
+   n_command_areas = 0;
+   add_cmd_area( 'r', 0, 1, 23);
+   add_cmd_area( '?', 0, max_column - 4, 3);
    put_colored_text( "[?]", 0, max_column - 4, 3, COLOR_MENU);
    if( ifile)
       {
@@ -1724,13 +1727,13 @@ static unsigned show_basic_info( const OBSERVE FAR *obs, const int n_obs,
             if( line == max_lines_to_show)
                {
                fclose( ifile);
-               set_cmd_area( n_commands++, KEY_ADD_MENU_LINE, 0, max_column - 8, 3);
+               add_cmd_area( KEY_ADD_MENU_LINE, 0, max_column - 8, 3);
                put_colored_text( "[+]", 0, max_column - 8, 3, COLOR_MENU);
                return( line);
                }
             if( line == 1)        /* we could subtract lines */
                {
-               set_cmd_area( n_commands++, KEY_REMOVE_MENU_LINE, 0, max_column - 12, 3);
+               add_cmd_area( KEY_REMOVE_MENU_LINE, 0, max_column - 12, 3);
                put_colored_text( "[-]", 0, max_column - 12, 3, COLOR_MENU);
                }
             column = 0;
@@ -1745,7 +1748,7 @@ static unsigned show_basic_info( const OBSERVE FAR *obs, const int n_obs,
             key = buff[5] - 'A';
          else
             key = buff[0];
-         set_cmd_area( n_commands++, key, line - 1, column, len);
+         add_cmd_area( key, line - 1, column, len);
          put_colored_text( buff + 15, line - 1, column, len, COLOR_MENU);
          column += len + 1;
          }
@@ -1753,7 +1756,7 @@ static unsigned show_basic_info( const OBSERVE FAR *obs, const int n_obs,
       }
    if( line != 1)
       max_column -= 4;
-   command_areas[n_commands].key = 0;
+   command_areas[n_command_areas].key = 0;
    return( line);
 }
 
