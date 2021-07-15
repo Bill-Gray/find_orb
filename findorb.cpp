@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #define PDC_NCMOUSE
 #define PDC_FORCE_UTF8
 #define PDC_WIDE
+#define MOUSE_MOVEMENT_EVENTS_ENABLED
 
 #ifdef _WIN32
 #include <windows.h>
@@ -338,8 +339,10 @@ mouse movements.  Console commands have to be issued to turn
 the mouse on or off.  This is still getting some testing,  and
 is commented out by default. */
 
-// #define VT_IGNORE_ALL_MOUSE      "\033[?1003l\n"
-// #define VT_RECEIVE_ALL_MOUSE     "\033[?1003h\n"
+#ifdef MOUSE_MOVEMENT_EVENTS_ENABLED
+   #define VT_IGNORE_ALL_MOUSE      "\033[?1003l\n"
+   #define VT_RECEIVE_ALL_MOUSE     "\033[?1003h\n"
+#endif
 #endif
 
 static int full_endwin( void)
@@ -2771,7 +2774,11 @@ static inline int initialize_curses( const int argc, const char **argv)
    if( debug_level > 2)
       debug_printf( "(3)\n");
    keypad( stdscr, 1);
+#ifdef MOUSE_MOVEMENT_EVENTS_ENABLED
    mousemask( default_mouse_events | REPORT_MOUSE_POSITION, NULL);
+#else
+   mousemask( default_mouse_events, NULL);
+#endif
    return( 0);
 }
 
@@ -3891,9 +3898,7 @@ int main( int argc, const char **argv)
          auto_repeat_full_improvement = 0;
          }
 
-      if( c != KEY_TIMER)
-         *message_to_user = '\0';
-
+      *message_to_user = '\0';
       if( c == KEY_MOUSE && !(button & REPORT_MOUSE_POSITION))
          {
          for( i = 0; command_areas[i].key; i++)
