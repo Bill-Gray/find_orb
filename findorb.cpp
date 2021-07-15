@@ -3887,6 +3887,15 @@ int main( int argc, const char **argv)
 
       if( c == KEY_MOUSE && !(button & REPORT_MOUSE_POSITION))
          {
+         for( i = 0; command_areas[i].key; i++)
+            if( mouse_y == command_areas[i].line &&
+                          mouse_x >= command_areas[i].col1 &&
+                          mouse_x < command_areas[i].col2)
+               c = command_areas[i].key;
+         }
+
+      if( c == KEY_MOUSE && !(button & REPORT_MOUSE_POSITION))
+         {
          int dir = 1;
          const unsigned station_start_line = getmaxy( stdscr) - n_stations_shown;
          wchar_t text[100], *search_ptr;
@@ -4107,15 +4116,6 @@ int main( int argc, const char **argv)
          else if( mouse_y > top_line_basic_info_perturbers + n_command_lines
                && mouse_y < top_line_orbital_elements)   /* in obs details area: */
             c = ALT_Q;         /* toggle display header/'traditional' data */
-         else if( mouse_y >= top_line_basic_info_perturbers &&
-                  mouse_y < top_line_basic_info_perturbers + n_command_lines)
-            {
-            for( i = 0; command_areas[i].key; i++)
-               if( mouse_y == command_areas[i].line &&
-                          mouse_x >= command_areas[i].col1 &&
-                          mouse_x < command_areas[i].col2)
-                  c = command_areas[i].key;
-            }
          else if( (observation_display & DISPLAY_ORBITAL_ELEMENTS)
                   && c == KEY_MOUSE
                   && mouse_y >= top_line_orbital_elements)
