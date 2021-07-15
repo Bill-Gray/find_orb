@@ -1682,7 +1682,7 @@ static void add_cmd_area( const unsigned key,
 {
    command_area_t *tptr = command_areas + n_command_areas;
 
-   assert( n_command_areas < MAX_CMD_AREAS);
+   assert( n_command_areas + 1 < MAX_CMD_AREAS);
    tptr->key = key;
    tptr->line = line;
    tptr->col1 = col1;
@@ -3253,7 +3253,7 @@ int main( int argc, const char **argv)
    double epoch_shown, curr_epoch, orbit[6];
    double r1 = 1., r2 = 1.;
    char message_to_user[180];
-   int update_element_display = 1, gauss_soln = 0;
+   int update_element_display = 1, gauss_soln = 0, residual_line = 0;
    int residual_format = RESIDUAL_FORMAT_80_COL, bad_elements = 0;
    int element_format = 0, debug_mouse_messages = 0, prev_getch = 0;
    int auto_repeat_full_improvement = 0, n_ids = 0, planet_orbiting = 0;
@@ -3654,8 +3654,11 @@ int main( int argc, const char **argv)
          debug_printf( "elements written\n");
       update_element_display = 0;
       top_line_basic_info_perturbers = line_no;
-      n_command_lines = show_basic_info( obs, n_obs, n_command_lines);
-      show_perturbers( n_command_lines);
+      if( c != KEY_TIMER)
+         {
+         n_command_lines = show_basic_info( obs, n_obs, n_command_lines);
+         show_perturbers( n_command_lines);
+         }
       if( debug_level)
          refresh( );
       line_no = n_command_lines + 1;
@@ -3703,7 +3706,7 @@ int main( int argc, const char **argv)
             refresh( );
          }
       top_line_orbital_elements = line_no;
-      if( observation_display & DISPLAY_ORBITAL_ELEMENTS)
+      if( c != KEY_TIMER && (observation_display & DISPLAY_ORBITAL_ELEMENTS))
          {
          FILE *ifile;
 
@@ -3774,7 +3777,9 @@ int main( int argc, const char **argv)
             }
          if( debug_level)
             refresh( );
+         residual_line = line_no;
          }
+      line_no = residual_line;
       if(  c != KEY_TIMER)
          show_residual_legend( line_no, residual_format);
       line_no++;
