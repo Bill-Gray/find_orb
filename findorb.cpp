@@ -105,7 +105,7 @@ extern unsigned perturbers;
 
 #define KEY_TIMER              31001
 #define AUTO_REPEATING         31002
-#define KEY_ALREADY_HANDLED    31003
+#define MOUSE_CLICK_ON_TIME_LEGEND  31003
 #define KEY_ADD_MENU_LINE      31004
 #define KEY_REMOVE_MENU_LINE   31005
 
@@ -2094,6 +2094,7 @@ static void show_residual_legend( const int line_no, const int residual_format)
    add_cmd_area( ALT_K, line_no, 44, 8);  /* 'sigmas' toggles sigma display */
    add_cmd_area( '&', line_no, 21, 17);  /* 'ra dec' toggles forced punch card fmt */
    add_cmd_area( 9, line_no, 65, 3);  /* 'Obs' sorts obs by code,  not date */
+   add_cmd_area( MOUSE_CLICK_ON_TIME_LEGEND, line_no, 5, 12);
 }
 
 static int find_rgb( const unsigned irgb);
@@ -3904,11 +3905,11 @@ int main( int argc, const char **argv)
          int dir = 1;
          const unsigned station_start_line = getmaxy( stdscr) - n_stations_shown;
          wchar_t text[100], *search_ptr;
-         const wchar_t *search_strings[] = { L"YY MM DD.DDD", L"Peri",
+         const wchar_t *search_strings[] = { L"Peri",
                   L"Epoch", L"(J2000 ecliptic)",
                   L"(J2000 equator)", L"(body frame)",
                   L"Sigma", NULL };
-         const int search_char[] = { KEY_ALREADY_HANDLED, '+', 'e',
+         const int search_char[] = { '+', 'e',
                   ALT_N, ALT_N, ALT_N, '%' };
 
          dir = (( button & button1_events) ? 1 : -1);
@@ -3927,24 +3928,7 @@ int main( int argc, const char **argv)
                const unsigned loc = mouse_x - (unsigned)( search_ptr - text);
 
                if( loc < (unsigned)wcslen( search_strings[i]))
-                  {
                   c = search_char[i];
-                  if( !i)     /* clicked on YY MM DD.DDD */
-                     {
-                     static const double time_diffs[] = { 3650., 365., 180., 90., 30.,
-                                    0., 10., 1., .3, 0.1, 0.01, 0.001 };
-                     const double curr_jd = obs[curr_obs].jd;
-                     const double step = time_diffs[loc];
-
-                     if( dir == 1)
-                        while( curr_obs < n_obs - 1 && obs[curr_obs].jd < curr_jd + step)
-                           curr_obs++;
-                     else
-                        while( curr_obs > 0 && obs[curr_obs].jd > curr_jd - step)
-                           curr_obs--;
-                     single_obs_selected = true;
-                     }
-                  }
                }
          if( (button & BUTTON4_PRESSED) || button5_pressed)  /* 'wheel up'/'dn' */
             {
@@ -5180,7 +5164,23 @@ int main( int argc, const char **argv)
                strcpy( message_to_user, "Using total mags for comets");
             }
          case KEY_MOUSE:   /* already handled above */
-         case KEY_ALREADY_HANDLED:
+            break;
+         case MOUSE_CLICK_ON_TIME_LEGEND:
+            {       /* clicked on YY MM DD.DDD */
+            static const double time_diffs[] = { 3650., 365., 180., 90., 30.,
+                           0., 10., 1., .3, 0.1, 0.01, 0.001 };
+            const double curr_jd = obs[curr_obs].jd;
+            const double step = time_diffs[mouse_x - 5];
+            const int dir = (( button & button1_events) ? 1 : -1);
+
+            if( dir == 1)
+               while( curr_obs < n_obs - 1 && obs[curr_obs].jd < curr_jd + step)
+                  curr_obs++;
+            else
+               while( curr_obs > 0 && obs[curr_obs].jd > curr_jd - step)
+                  curr_obs--;
+            single_obs_selected = true;
+            }
             break;
          case 27:
          case 'q': case 'Q':
@@ -5541,6 +5541,8 @@ int main( int argc, const char **argv)
             extern int sigmas_in_columns_57_to_65;
 
             sigmas_in_columns_57_to_65 ^= 1;
+            strcpy( message_to_user, "Sigma display");
+            add_off_on = sigmas_in_columns_57_to_65;
             }
             break;
          case ALT_Q:
@@ -5561,6 +5563,8 @@ int main( int argc, const char **argv)
             break;
          case 9:
             sort_obs_by_code = !sort_obs_by_code;
+            strcpy( message_to_user, sort_obs_by_code ?
+                     "Obs sorted by MPC code" : "Obs sorted by date");
             break;
          case ALT_A:
             residual_format ^= RESIDUAL_FORMAT_SHOW_DESIGS;
