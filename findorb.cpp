@@ -1688,6 +1688,7 @@ static void add_cmd_area( const unsigned key,
    tptr->col1 = col1;
    tptr->col2 = col1 + len;
    n_command_areas++;
+   tptr[1].key = 0;        /* move the null terminator ahead */
 }
 
 static unsigned show_basic_info( const OBSERVE FAR *obs, const int n_obs,
@@ -1756,7 +1757,6 @@ static unsigned show_basic_info( const OBSERVE FAR *obs, const int n_obs,
       }
    if( line != 1)
       max_column -= 4;
-   command_areas[n_command_areas].key = 0;
    return( line);
 }
 
@@ -1814,17 +1814,15 @@ void show_perturbers( const unsigned line)
       int color = COLOR_BACKGROUND;
       const int shift_amt = (i == 10 ? 20 : i + 1);
       char buff[20];
+      char perturber_letter = (i == 10 ? 'a' : '0' + (i + 1) % 10);
 
       strcpy( buff, "(o)");
       if( (perturbers >> shift_amt) & 1)
          color = COLOR_HIGHLIT_BUTTON;
       else
-         {
-         buff[1] = (char)( '0' + (i + 1) % 10);
-         if( i == 10)
-            buff[1] = 'a';
-         }
+         buff[1] = perturber_letter;
       put_colored_text( buff, line, i * 7, 3, color);
+      add_cmd_area( perturber_letter, line, i * 7, 6);
       strcpy( buff, get_find_orb_text( 99108 + i));
       strcpy( (char *)find_nth_utf8_char( buff, 3), " ");
       put_colored_text( buff, line, i * 7 + 3, (int)strlen( buff),
@@ -4090,16 +4088,6 @@ int main( int argc, const char **argv)
                   curr_obs = new_curr;
                   }
                }
-            }
-         else if( n_command_lines &&
-                          mouse_y == top_line_basic_info_perturbers + n_command_lines)
-            {                      /* clicked on a perturber 'radio button' */
-            if( mouse_x / 7 == 9)
-               c = '0';
-            else if( mouse_x / 7 == 10)
-               c = 'a';
-            else
-               c = '1' + (mouse_x / 7);
             }
          else if( mouse_y > top_line_basic_info_perturbers + n_command_lines
                && mouse_y < top_line_orbital_elements)   /* in obs details area: */
