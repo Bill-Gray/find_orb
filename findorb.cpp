@@ -3248,7 +3248,6 @@ int main( int argc, const char **argv)
    unsigned n_command_lines = 1;
    int c = 1, element_precision,  add_off_on = -1;
    bool get_new_object = true, get_new_file = true;
-   unsigned top_line_basic_info_perturbers;
    unsigned top_line_orbital_elements = 0;
    unsigned top_line_residuals;
    bool is_monte_orbit = false;
@@ -3660,7 +3659,6 @@ int main( int argc, const char **argv)
       if( debug_level > 2)
          debug_printf( "elements written\n");
       update_element_display = 0;
-      top_line_basic_info_perturbers = line_no;
       if( c != KEY_TIMER)
          {
          n_command_lines = show_basic_info( obs, n_obs, n_command_lines);
@@ -4100,7 +4098,7 @@ int main( int argc, const char **argv)
                   }
                }
             }
-         else if( mouse_y > top_line_basic_info_perturbers + n_command_lines
+         else if( mouse_y > n_command_lines
                && mouse_y < top_line_orbital_elements)   /* in obs details area: */
             c = ALT_Q;         /* toggle display header/'traditional' data */
          else if( (observation_display & DISPLAY_ORBITAL_ELEMENTS)
