@@ -2089,6 +2089,11 @@ static void show_residual_legend( const int line_no, const int residual_format)
                   : "      Tres  Cres  total Mres");
 
    put_colored_text( buff, line_no, 0, -1, COLOR_RESIDUAL_LEGEND);
+   add_cmd_area( 't', line_no, 73, 10);  /* click on 'Xres  Yres' resets resid format */
+   add_cmd_area( '=', line_no, 85, 7);   /* click on ' delta ' toggles mag resids */
+   add_cmd_area( ALT_K, line_no, 44, 8);  /* 'sigmas' toggles sigma display */
+   add_cmd_area( '&', line_no, 21, 17);  /* 'ra dec' toggles forced punch card fmt */
+   add_cmd_area( 9, line_no, 65, 3);  /* 'Obs' sorts obs by code,  not date */
 }
 
 static int find_rgb( const unsigned irgb);
@@ -3902,10 +3907,9 @@ int main( int argc, const char **argv)
          const wchar_t *search_strings[] = { L"YY MM DD.DDD", L"Peri",
                   L"Epoch", L"(J2000 ecliptic)",
                   L"(J2000 equator)", L"(body frame)",
-                  L"sigmas",
-                  L"Xres  Yres", L"Tres  Cres", L" delta ", L"Sigma", NULL };
+                  L"Sigma", NULL };
          const int search_char[] = { KEY_ALREADY_HANDLED, '+', 'e',
-                  ALT_N, ALT_N, ALT_N, ALT_K, 't', 't', '=', '%' };
+                  ALT_N, ALT_N, ALT_N, '%' };
 
          dir = (( button & button1_events) ? 1 : -1);
          if( debug_mouse_messages)
