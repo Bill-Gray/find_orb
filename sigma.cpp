@@ -56,6 +56,7 @@ static int parse_sigma_record( SIGMA_RECORD *w, const char *buff)
       {
       int i;
 
+      memset( w, 0, sizeof( SIGMA_RECORD));
       memcpy( w->mpc_code, buff + 1, 3);
       w->mpc_code[3] = '\0';
       w->program_code = buff[5];
@@ -80,7 +81,8 @@ static int parse_sigma_record( SIGMA_RECORD *w, const char *buff)
             else
                w->jd1 = jd;
             }
-      w->posn_sigma = atof( buff + 40);
+      if( buff[41] != ' ')
+         w->posn_sigma = atof( buff + 40);
       if( buff[48] != ' ')
          w->mag_sigma = atof( buff + 45);
       else                       /* indicate 'no mag sigma set' */
