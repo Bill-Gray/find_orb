@@ -16,10 +16,8 @@ u              Undo
 +              HelioOnly
 -              Obs'ories
 x              ToggObs
-k              ResidFmt
 =              MagResids
 w              Worst
-^              CometParams
 #              Simplex
 /              Superplex
 :              Linearize
@@ -75,3 +73,51 @@ c 18 ffffff 000000         MPC code 5 : white on black
 8 17 00ffff 000000         MPC code 4 : cyan on black
 8 18 00ff00 000000         MPC code 5 : green on black
 
+End colors
+
+Start hints
+
+q              Quit Find_Orb
+o              Open a file of astrometry
+n              Select a different object from the file
+F16 (shift-F4) Add astrometry for a different object
+m              Generate ephemerides
+f              Do a full least-squares improvement of the orbit
+h              Compute an orbit using the method of Herget
+v              Compute an orbit using the method of Vaisala
+d              Show a table of astrometric residuals
+g              Compute an orbit using the method of Gauss
+l              Enter or remove constraints on orbital parameters
+e              Change the epoch of the elements
+!              Turn all perturbers on/off
+u              Undo (go back to previous orbit)
+*              Select a non-gravitational force model
++              Select an orbit type (heliocentric,  geocentric,  etc.)
+-              Change the number of observatories shown at bottom
+x              Toggle currently selected observation(s) on/off
+=              Toggle display of magnitude residuals
+w              Show included observation with the worst residuals
+#              Apply the 'simplex' orbit improvement method
+/              Apply the 'superplex' orbit improvement method
+:              Linearize the orbit
+|              Compute Monte Carlo variant orbits
+[              Show the covariance and some debugging data
+`              Toggle comet mags between nuclear M(N) and total M(T)
+)              Select a file and show it on-screen
+0              Toggle lunar perturbations
+1              Toggle perturbations from Mercury
+2              Toggle perturbations from Venus
+3              Toggle perturbations from Earth
+4              Toggle perturbations from Mars
+5              Toggle perturbations from Jupiter
+6              Toggle perturbations from Saturn
+7              Toggle perturbations from Uranus
+8              Toggle perturbations from Neptune
+9              Toggle perturbations from Pluto
+a              Toggle perturbations from asteroids
+t              Toggle residuals from 'normal' to along-track/cross-track
+Alt-K          Toggle display of sigmas
+U+9            Toggle sort obs by date vs. sort by MPC code
+U+31004        Add a line of menu options
+U+31005        Remove last line of menu options
+?              Get help

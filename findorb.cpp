@@ -1702,6 +1702,23 @@ static void add_cmd_area( const unsigned key,
    tptr[1].key = 0;        /* move the null terminator ahead */
 }
 
+static int get_character_code( const char *buff)
+{
+   int rval;
+
+   if( !memcmp( buff, "Alt-", 4))
+      rval = ALT_0 + buff[4] - '0';
+   else if( *buff == 'F')
+      rval = KEY_F( atoi( buff + 1));
+   else if( *buff == 'U' && buff[1] == '+')
+      rval = atoi( buff + 2);
+   else if( !memcmp( buff, "Ctrl-", 5))
+      rval = buff[5] - 64;
+   else
+      rval = *buff;
+   return( rval);
+}
+
 static unsigned show_basic_info( const OBSERVE FAR *obs, const int n_obs,
                                           const unsigned max_lines_to_show)
 {
@@ -1752,14 +1769,7 @@ static unsigned show_basic_info( const OBSERVE FAR *obs, const int n_obs,
             line++;
             put_colored_text( "", line - 1, column, -1, COLOR_BACKGROUND);
             }
-         if( *buff == 'F' && buff[1] != ' ')
-            key = KEY_F( atoi( buff + 1));
-         else if (!memcmp( buff, "Alt-", 4))
-            key = ALT_A + buff[4] - 'A';
-         else if (!memcmp( buff, "Ctrl-", 5))
-            key = buff[5] - 'A';
-         else
-            key = buff[0];
+         key = get_character_code( buff);
          add_cmd_area( key, line - 1, column, len);
          put_colored_text( buff + 15, line - 1, column, len, COLOR_MENU);
          column += len + 1;
@@ -2768,7 +2778,7 @@ static inline int initialize_curses( const int argc, const char **argv)
 #endif
    start_color( );
    char_to_search_for = (COLORS > 8 ? 'c' : '8');
-   while( fgets( buff, sizeof( buff), ifile))
+   while( fgets( buff, sizeof( buff), ifile) && memcmp( buff, "End c", 5))
       if( *buff == char_to_search_for)
          {
          int idx;
@@ -3218,17 +3228,60 @@ static void setup_elements_dialog( char *buff, const char *constraints,
    fclose( ifile);
 }
 
-static int find_command_area( const unsigned mouse_x, const unsigned mouse_y)
+static int find_command_area( const unsigned mouse_x, const unsigned mouse_y,
+                              size_t *index)
 {
    size_t i;
    int rval = KEY_MOUSE;
 
+   if( index)
+      *index = (size_t)( -1);
    for( i = 0; command_areas[i].key; i++)
       if( mouse_y == command_areas[i].line &&
                     mouse_x >= command_areas[i].col1 &&
                     mouse_x < command_areas[i].col2)
+         {
          rval = command_areas[i].key;
+         if( index)
+            *index = i;
+         }
    return( rval);
+}
+
+static void show_hint( const unsigned mouse_x, const unsigned mouse_y)
+{
+   size_t index;
+   const int cmd = find_command_area( mouse_x, mouse_y, &index);
+
+   if( cmd != KEY_MOUSE)
+      {
+      char buff[100];
+      FILE *ifile = fopen_ext( "command.txt", "fcrb");
+
+      while( fgets_trimmed( buff, sizeof( buff), ifile)
+                  && memcmp( buff, "Start h", 7))
+         ;   /* just skip lines until we get to the section we want */
+      while( fgets_trimmed( buff, sizeof( buff), ifile))
+         if( get_character_code( buff) == cmd)
+            {
+            chtype prev_scr[100];
+            unsigned i, len = command_areas[index].col2 - command_areas[index].col1;
+            int pass;
+
+            mvinchnstr( command_areas[index].line, command_areas[index].col1,
+                      prev_scr, len);
+            for( pass = 0; pass < 2; pass++)
+               {
+               for( i = 0; i < len; i++)
+                  prev_scr[i] ^= A_REVERSE;
+               mvaddchnstr( command_areas[index].line, command_areas[index].col1,
+                             prev_scr, len);
+               if( !pass)
+                  full_inquire( buff + 15, NULL, HINT_TEXT, COLOR_MENU, mouse_y, mouse_x);
+               }
+            }
+      fclose( ifile);
+      }
 }
 
    /* On any platform with ASLR,  the address of 'zval' will be
@@ -3902,16 +3955,18 @@ int main( int argc, const char **argv)
                   }
                napms( 50);
                n_iterations++;
+               if( n_iterations == 20)    /* after a second of no activity, */
+                  show_hint( mouse_x, mouse_y);    /* show a hint */
                }
             if( c == KEY_MOUSE && (button & REPORT_MOUSE_POSITION))
-               c = 0;      /* suppress mouse moves */
+               c = n_iterations = 0;      /* suppress mouse moves */
             }
          auto_repeat_full_improvement = 0;
          }
 
       *message_to_user = '\0';
       if( c == KEY_MOUSE && !(button & REPORT_MOUSE_POSITION))
-         c = find_command_area( mouse_x, mouse_y);
+         c = find_command_area( mouse_x, mouse_y, NULL);
 
       if( c == KEY_MOUSE && !(button & REPORT_MOUSE_POSITION))
          {
