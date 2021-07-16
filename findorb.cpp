@@ -4005,12 +4005,19 @@ int main( int argc, const char **argv)
          if( (button & BUTTON4_PRESSED) || button5_pressed)  /* 'wheel up'/'dn' */
             {
             int delta = ((button & BUTTON_CTRL) ? 5 : 1);
+            int n_selected = 0;
 
             if( !button5_pressed)         /* 'wheel down' */
                delta = -delta;
             top_obs_shown += delta;
-            if( single_obs_selected)
+            for( i = 0; i < n_obs; i++)
+               if( obs[i].flags & OBS_IS_SELECTED)
+                  n_selected++;
+            if( n_selected == 1)
+               {
                curr_obs += delta;
+               single_obs_selected = true;
+               }
             }
          else if( mouse_y >= station_start_line)
             {
