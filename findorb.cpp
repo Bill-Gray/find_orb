@@ -436,7 +436,11 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
          else
             line++;
          if( col + real_width >= getmaxx( stdscr))
+            {
             col -= real_width;
+            if( col < 1)
+               col = 1;
+            }
          else
             col++;
          }
