@@ -1343,4 +1343,6 @@ St50!+149.007461   -35.320406         786.     50-in reflector, Mt Stromlo
    Identified from image at
    https://www.esa.int/Safety_Security/Planetary_Defence/New_ESA_telescope_in_South_America_to_search_for_asteroids
 
-ET2 !-070.73904    -29.25522                   ESA Test-Bed Telescope 2, La Silla
+ET2 !-070.73904    -29.25522         2359.     ESA Test-Bed Telescope 2, La Silla
+
+SSA !+114.0899     -21.8957            40.     Space Surveillance Telescope, Exmouth
