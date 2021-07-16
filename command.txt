@@ -77,6 +77,7 @@ End colors
 
 Start hints
 
+r              Enter dist to object at start and end of arc
 q              Quit Find_Orb
 o              Open a file of astrometry
 n              Select a different object from the file
@@ -121,3 +122,5 @@ U+9            Toggle sort obs by date vs. sort by MPC code
 U+31004        Add a line of menu options
 U+31005        Remove last line of menu options
 ?              Get help
+%              Set uncertainties for the selected observation(s)
+&              Toggle use of punched-card RA/dec format

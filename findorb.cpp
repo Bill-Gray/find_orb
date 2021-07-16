@@ -279,6 +279,7 @@ extern double maximum_jd, minimum_jd;        /* orb_func.cpp */
 #define COLOR_DEFAULT_INQUIRY      12
 #define COLOR_ATTENTION            13
 #define COLOR_MPC_CODES            14
+#define COLOR_HINT_TEXT            18
 
 static int curses_kbhit( )
 {
@@ -1742,7 +1743,7 @@ static unsigned show_basic_info( const OBSERVE FAR *obs, const int n_obs,
    put_colored_text( buff, 0, 10, -1, COLOR_BACKGROUND);
 
    n_command_areas = 0;
-   add_cmd_area( 'r', 0, 1, 23);
+   add_cmd_area( 'r', 0, 0, 23);
    add_cmd_area( '?', 0, max_column - 4, 3);
    put_colored_text( "[?]", 0, max_column - 4, 3, COLOR_MENU);
    if( ifile)
@@ -3355,7 +3356,7 @@ int main( int argc, const char **argv)
    int n_stations_shown = 0, top_obs_shown = 0, n_obs_shown = 0;
    bool single_obs_selected = false;
    extern unsigned random_seed;
-   unsigned mouse_x = 0, mouse_y = 0, mouse_z = 0;
+   unsigned mouse_x = (unsigned)-1, mouse_y = 0, mouse_z = 0;
    unsigned long button = 0;
 
    random_seed = get_random_seed( );
@@ -3762,10 +3763,14 @@ int main( int argc, const char **argv)
          while( *tptr)
             {
             size_t i;
+            char *tptr2;
 
             for( i = 0; (unsigned char)tptr[i] >= ' '; i++)
                ;
             tptr[i] = '\0';
+            tptr2 = strstr( tptr, "Sigma");
+            if( tptr2)
+               add_cmd_area( '%', line_no, tptr2 - tptr, 5);
             put_colored_text( tptr, line_no++, 0, -1, COLOR_OBS_INFO);
             tptr += i + 1;
             while( *tptr == 10 || *tptr == 13)
@@ -3809,6 +3814,10 @@ int main( int argc, const char **argv)
 
                   if( !memcmp( tbuff, "IMPACT", 6))
                      elem_color = COLOR_ATTENTION + A_BLINK;
+                  if( !memcmp( tbuff, "Epoch", 5))
+                     add_cmd_area( 'e', line_no + iline, 0, 5);
+                  if( !memcmp( tbuff + 3, "Peri", 4))
+                     add_cmd_area( '+', line_no + iline, 3, 7);
                   if( make_unicode_substitutions)
                      {
                      text_search_and_replace( tbuff, " +/- ", " \xc2\xb1 ");
