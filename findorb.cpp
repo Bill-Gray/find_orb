@@ -3976,32 +3976,11 @@ int main( int argc, const char **argv)
          {
          int dir = 1;
          const unsigned station_start_line = getmaxy( stdscr) - n_stations_shown;
-         wchar_t text[100], *search_ptr;
-         const wchar_t *search_strings[] = { L"Peri",
-                  L"Epoch", L"(J2000 ecliptic)",
-                  L"(J2000 equator)", L"(body frame)",
-                  L"Sigma", NULL };
-         const int search_char[] = { '+', 'e',
-                  ALT_N, ALT_N, ALT_N, '%' };
 
          dir = (( button & button1_events) ? 1 : -1);
          if( debug_mouse_messages)
             sprintf( message_to_user, "x=%d y=%d z=%d button=%lx",
                               mouse_x, mouse_y, mouse_z, button);
-         for( i = 0; i < 99 && i < getmaxx( stdscr); i++)
-            {
-            move( mouse_y, i);
-            text[i] = (wchar_t)( inch( ) & A_CHARTEXT);
-            }
-         text[i] = '\0';
-         for( i = 0; search_strings[i]; i++)
-            if( (search_ptr = wcsstr( text, search_strings[i])) != NULL)
-               {
-               const unsigned loc = mouse_x - (unsigned)( search_ptr - text);
-
-               if( loc < (unsigned)wcslen( search_strings[i]))
-                  c = search_char[i];
-               }
          if( (button & BUTTON4_PRESSED) || button5_pressed)  /* 'wheel up'/'dn' */
             {
             int delta = ((button & BUTTON_CTRL) ? 5 : 1);
