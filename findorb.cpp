@@ -104,7 +104,6 @@ int debug_level = 0;
 
 extern unsigned perturbers;
 
-#define KEY_TIMER              31001
 #define AUTO_REPEATING         31002
 #define MOUSE_CLICK_ON_TIME_LEGEND  31003
 #define KEY_ADD_MENU_LINE      31004
@@ -3510,8 +3509,7 @@ int main( int argc, const char **argv)
       extern double solar_pressure[];
       extern int n_extra_params;
 
-      if( c != KEY_TIMER)
-         prev_getch = c;
+      prev_getch = c;
       while( get_new_file || get_new_object)
          {
          while( get_new_file)
@@ -3659,15 +3657,12 @@ int main( int argc, const char **argv)
       if( debug_level > 2)
          debug_printf( "elements written\n");
       update_element_display = 0;
-      if( c != KEY_TIMER)
-         {
-         n_command_lines = show_basic_info( obs, n_obs, n_command_lines);
-         show_perturbers( n_command_lines);
-         }
+      n_command_lines = show_basic_info( obs, n_obs, n_command_lines);
+      show_perturbers( n_command_lines);
       if( debug_level)
          refresh( );
       line_no = n_command_lines + 1;
-      if( c != KEY_TIMER && (observation_display & DISPLAY_OBSERVATION_DETAILS))
+      if(  observation_display & DISPLAY_OBSERVATION_DETAILS)
          {
          char *tptr = tbuff;
 
@@ -3703,16 +3698,7 @@ int main( int argc, const char **argv)
             refresh( );
          top_line_orbital_elements = line_no;
          }
-      if( clock_line)
-         {
-         const time_t t0 = time( NULL);
-         char tbuf[18];
-
-         strlcpy_err( tbuf, ctime( &t0) + 11, sizeof( tbuf));
-         tbuf[9] = '\0';
-         put_colored_text( tbuf, clock_line, 72, -1, COLOR_OBS_INFO);
-         }
-      if( c != KEY_TIMER && (observation_display & DISPLAY_ORBITAL_ELEMENTS))
+      if( observation_display & DISPLAY_ORBITAL_ELEMENTS)
          {
          FILE *ifile;
 
@@ -3786,8 +3772,7 @@ int main( int argc, const char **argv)
          residual_line = line_no;
          }
       line_no = residual_line;
-      if(  c != KEY_TIMER)
-         show_residual_legend( line_no, residual_format);
+      show_residual_legend( line_no, residual_format);
       line_no++;
       if( debug_level)
          refresh( );
@@ -3799,7 +3784,7 @@ int main( int argc, const char **argv)
                                                      &sort_obs_by_code);
 
       top_line_residuals = line_no;
-      if( c != KEY_TIMER)
+/*    if( c != KEY_TIMER) */
          {
          const int n_mpc_codes = find_mpc_color( mpc_color_codes, NULL);
          int lines_available;
@@ -3847,8 +3832,7 @@ int main( int argc, const char **argv)
          debug_printf( "resids shown\n");
       if( debug_level)
          refresh( );
-      if( c != KEY_TIMER)
-         show_final_line( n_obs, curr_obs, COLOR_FINAL_LINE);
+      show_final_line( n_obs, curr_obs, COLOR_FINAL_LINE);
       if( sort_obs_by_code)
          shellsort_r( obs, n_obs, sizeof( OBSERVE), compare_observations, NULL);
       if( debug_level)
@@ -3873,7 +3857,7 @@ int main( int argc, const char **argv)
             }
       if( c != AUTO_REPEATING)
          {
-         int loop = 20;
+         int n_iterations = 0;
 
          c = 0;
          while( !c)
@@ -3886,10 +3870,16 @@ int main( int argc, const char **argv)
                }
             else
                {
-               if( !loop--)            /* timed out */
-                  c = KEY_TIMER;
-               else
-                  napms( 50);
+               if( (n_iterations % 20 == 0) && clock_line)
+                  {                          /* update clock once a second */
+                  const time_t t0 = time( NULL);
+
+                  strlcpy_err( tbuff, ctime( &t0) + 11, sizeof( tbuff));
+                  tbuff[9] = '\0';
+                  put_colored_text( tbuff, clock_line, 72, 9, COLOR_OBS_INFO);
+                  }
+               napms( 50);
+               n_iterations++;
                }
             if( c == KEY_MOUSE && (button & REPORT_MOUSE_POSITION))
                c = 0;      /* suppress mouse moves */
@@ -5261,8 +5251,6 @@ int main( int argc, const char **argv)
                }
             inquire( tbuff, NULL, 0, COLOR_DEFAULT_INQUIRY);
             }
-            break;
-         case KEY_TIMER:
             break;
 #ifdef KEY_RESIZE
          case KEY_RESIZE:
