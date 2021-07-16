@@ -382,6 +382,8 @@ static bool curses_running = false;
 static const char *help_file_name = NULL;
 static bool mpc_code_select = false;
 
+#define HINT_TEXT -1
+
 static int full_inquire( const char *prompt, char *buff, const int max_len,
                      const int color, const int line0, const int col0)
 {
@@ -526,7 +528,13 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
          bool show_help = false;
 
          curs_set( 0);        /* turn cursor off */
-         do
+         if( max_len == HINT_TEXT)  /* with hint text,  we quit as soon as anything happens */
+            {
+            while( curses_kbhit( ) == ERR)
+               napms( 50);
+            rval = '?';
+            }
+         else do
             {
             rval = extended_getch( );
             if( rval == KEY_RESIZE)
@@ -599,7 +607,8 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
          }
       restore_screen( buffered_screen);
       free( buffered_screen);
-      flushinp( );
+      if( max_len != HINT_TEXT)
+         flushinp( );
       refresh( );
       }
    help_file_name = NULL;
@@ -3209,6 +3218,19 @@ static void setup_elements_dialog( char *buff, const char *constraints,
    fclose( ifile);
 }
 
+static int find_command_area( const unsigned mouse_x, const unsigned mouse_y)
+{
+   size_t i;
+   int rval = KEY_MOUSE;
+
+   for( i = 0; command_areas[i].key; i++)
+      if( mouse_y == command_areas[i].line &&
+                    mouse_x >= command_areas[i].col1 &&
+                    mouse_x < command_areas[i].col2)
+         rval = command_areas[i].key;
+   return( rval);
+}
+
    /* On any platform with ASLR,  the address of 'zval' will be
    cyptographically selected at startup time.  (Or at least,  some
    bits of it will be.)  It should be more than random enough for
@@ -3889,13 +3911,7 @@ int main( int argc, const char **argv)
 
       *message_to_user = '\0';
       if( c == KEY_MOUSE && !(button & REPORT_MOUSE_POSITION))
-         {
-         for( i = 0; command_areas[i].key; i++)
-            if( mouse_y == command_areas[i].line &&
-                          mouse_x >= command_areas[i].col1 &&
-                          mouse_x < command_areas[i].col2)
-               c = command_areas[i].key;
-         }
+         c = find_command_area( mouse_x, mouse_y);
 
       if( c == KEY_MOUSE && !(button & REPORT_MOUSE_POSITION))
          {
