@@ -4806,7 +4806,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
                   ;        /* search for matching $ */
                if( i < 20 && tptr[i] == '$')
                   {
-                  char search_str[80], replace_str[180];
+                  char search_str[80], replace_str[240];
 
                   memcpy( search_str, tptr, i);
                   search_str[i] = '\0';
