@@ -540,16 +540,20 @@ static void setup_obj_loc( obj_location_t *p, double *orbit,
       }
 }
 
-static void adjust_sky_brightness_for_light_pollution(
-               BRIGHTNESS_DATA *bdata,
-               const expcalc_config_t *exposure_config)
+/* Here,  we take the computed sky brightness from the Schaefer-Krisciunas
+model and add in the contribution from another source,  such as light
+pollution and/or galactic background.  For both of those,  I don't really
+have a good concept of the adjustment for each band;  the 'multipliers'
+are somewhat ad hoc.          */
+
+static void adjust_sky_brightness_for_added_light_source(
+               BRIGHTNESS_DATA *bdata, const double mags_per_arcsec_squared)
 {
-   double brightness =
-               exp( -0.4 * LOG_10 * (11.055 + exposure_config->sky_brightness_at_zenith));
+   const double brightness =
+               exp( -0.4 * LOG_10 * (11.055 + mags_per_arcsec_squared));
    size_t i;
    const double multipliers[5] = { .01, .01, .2, 1.0, 1.0 };
 
-   brightness /= cos( bdata->zenith_angle);
    for( i = 0; i < 5; i++)
       bdata->brightness[i] += brightness * multipliers[i];
 }
@@ -2676,14 +2680,19 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                bdata.mask = 31;
                if( alt_az[0].y > 0.)
                   {
+                  double light_pollution_mags_per_arcsec_squared =
+                                exposure_config.sky_brightness_at_zenith;
+
                   bdata.latitude = latlon.y;
                   bdata.zenith_angle    = PI / 2. - alt_az[0].y;
                   bdata.zenith_ang_sun  = PI / 2. - alt_az[1].y;
                   bdata.zenith_ang_moon = PI / 2. - alt_az[2].y;
                   set_brightness_params( &bdata);
                   compute_sky_brightness( &bdata);
-                  adjust_sky_brightness_for_light_pollution( &bdata,
-                              &exposure_config);
+                  light_pollution_mags_per_arcsec_squared +=
+                               2.5 * log10( sin( alt_az[0].y));
+                  adjust_sky_brightness_for_added_light_source( &bdata,
+                                 light_pollution_mags_per_arcsec_squared);
                   rgb = 0;
                   for( j = 0; j < 3; j++)
                      {
