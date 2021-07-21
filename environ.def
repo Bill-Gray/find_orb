@@ -410,3 +410,15 @@ DAYTIME_OBS_OK1=ScT ATA 256 EKa
    width" uncertainties,  i.e.,  "you'd have to scan the following length
    to get from -3 to +3 sigmas".  For that,  you'd set SIGMA_MULTIPLIER=6.
 SIGMA_MULTIPLIER=1
+
+   For some purposes,  it can help to add the light contribution from the
+   galactic background when computing sky brightness.  (See
+   https://www.projectpluto.com/gal_conf.htm for a discussion of how Find_Orb
+   computes galactic confusion from Gaia-DR2.)  We're still trying to figure
+   out just how much it matters and in what way;  it's not "smeared out" the
+   way moonlight,  twilight,  sky glow,  and zodiacal light are.  If the
+   following value is non-zero,  then at maximum galactic background levels,
+   that many magnitudes per arcsecond are added to the V band background,
+   and exposure durations will be correspondingly longer.  GALACTIC_ADDENDUM=18
+   seems to work fairly well,  but again,  tweaking will be required.
+GALACTIC_ADDENDUM=

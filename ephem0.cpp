@@ -2682,6 +2682,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   {
                   double light_pollution_mags_per_arcsec_squared =
                                 exposure_config.sky_brightness_at_zenith;
+                  double galactic_confusion_addendum =
+                           atof( get_environment_ptr( "GALACTIC_ADDENDUM"));
 
                   bdata.latitude = latlon.y;
                   bdata.zenith_angle    = PI / 2. - alt_az[0].y;
@@ -2693,6 +2695,15 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                                2.5 * log10( sin( alt_az[0].y));
                   adjust_sky_brightness_for_added_light_source( &bdata,
                                  light_pollution_mags_per_arcsec_squared);
+                  if( galactic_confusion_addendum)
+                     {
+                     int galact_conf = galactic_confusion( ra * 15, dec);
+
+                     if( galact_conf)
+                        adjust_sky_brightness_for_added_light_source( &bdata,
+                                  galactic_confusion_addendum -
+                                  2.5 * log10( (double)galact_conf / 255.));
+                     }
                   rgb = 0;
                   for( j = 0; j < 3; j++)
                      {
