@@ -5684,7 +5684,8 @@ int main( int argc, const char **argv)
          default:
             debug_printf( "Key %d hit\n", c);
             show_a_file( "dos_help.txt");
-            sprintf( message_to_user, "Key %d ($%x, o%o) hit", c, c, c);
+            sprintf( message_to_user, "Key %d ($%x, o%o) '%s' hit",
+                               c, c, c, keyname( c));
             break;
          }
       }
