@@ -648,16 +648,19 @@ static int make_linkage_json( const int n_obs, const OBSERVE *obs, const ELEMENT
             fprintf( ofile, "        ]%s\n", (j == n_ids - n_designated ? "" : ","));
             }
          }
-      fprintf( ofile, "      ],\n");
+      fprintf( ofile, "      ]");
       }
    i = 0;
    while( i < n_obs && strcmp( obs[i].reference, "NEOCP"))
       i++;
    if( i < n_obs)         /* no NEOCP observations */
-   fprintf( ofile, "      \"identification_type\": \"neocp\"%s\n",
-                (elem->central_obj == 3) ? "" : ",");
+      {
+      fprintf( ofile, ",\n");
+      fprintf( ofile, "      \"identification_type\": \"neocp\"");
+      }
    if( elem->central_obj != 3)
       {
+      fprintf( ofile, ",\n");
       fprintf( ofile, "      \"orbit\": {\n");
       fprintf( ofile, "        \"arg_pericenter\": %f,\n",
                                     centralize_ang( elem->arg_per) * 180. / PI);
@@ -668,9 +671,9 @@ static int make_linkage_json( const int n_obs, const OBSERVE *obs, const ELEMENT
                                    centralize_ang( elem->asc_node) * 180. / PI);
       fprintf( ofile, "        \"pericenter_distance\": %.15f,\n", elem->q);
       fprintf( ofile, "        \"pericenter_time\": %f\n", elem->perih_time);
-      fprintf( ofile, "      }\n");
+      fprintf( ofile, "      }");
       }
-   fprintf( ofile, "    }\n  }\n}\n");
+   fprintf( ofile, "\n    }\n  }\n}\n");
    fclose( ofile);
    return( n_ids);
 }
