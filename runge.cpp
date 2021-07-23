@@ -90,6 +90,8 @@ int find_best_fit_planet( const double jd, const double *ivect,
                                  double *rel_vect);      /* runge.cpp */
 int detect_perturbers( const double jd, const double * __restrict xyz,
                        double *accel);          /* bc405.cpp */
+void find_relative_state_vect( const double jd, const double *ivect,
+               double *ovect, const int ref_planet);        /* runge.cpp */
 int find_relative_orbit( const double jd, const double *ivect,
                ELEMENTS *elements, const int ref_planet);     /* runge.cpp */
 static void compute_ref_state( ELEMENTS *ref_orbit, double *ref_state,
@@ -1247,24 +1249,30 @@ int get_planet_posn_vel( const double jd, const int planet_no,
    return( 0);
 }
 
+void find_relative_state_vect( const double jd, const double *ivect,
+               double *ovect, const int ref_planet)
+{
+   assert( ref_planet >= 0);
+   memcpy( ovect, ivect, 6 * sizeof( double));
+   if( ref_planet)
+      {
+      double planet_state[6];
+      size_t i;
+
+      get_planet_posn_vel( jd, ref_planet, planet_state, planet_state + 3);
+      for( i = 0; i < 6; i++)
+         ovect[i] -= planet_state[i];
+      }
+}
+
 int find_relative_orbit( const double jd, const double *ivect,
                ELEMENTS *elements, const int ref_planet)
 {
    double local_rel_vect[6];
 
    assert( ref_planet >= 0);
-   memcpy( local_rel_vect, ivect, 6 * sizeof( double));
-   if( ref_planet)
-      {
-      double planet_state[6];
-      int i;
-
-      get_planet_posn_vel( jd, ref_planet, planet_state, planet_state + 3);
-      for( i = 0; i < 6; i++)
-         local_rel_vect[i] -= planet_state[i];
-      }
-// if( rel_vect)
-//    memcpy( rel_vect, local_rel_vect, 6 * sizeof( double));
+   assert( elements);
+   find_relative_state_vect( jd, ivect, local_rel_vect, ref_planet);
    if( elements)
       {
       elements->gm = SOLAR_GM * planetary_system_mass( ref_planet);
