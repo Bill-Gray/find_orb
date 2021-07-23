@@ -60,7 +60,7 @@ bool findorb_already_running = false;
 #define JD_TO_YEAR(jd)  (2000. + ((jd)-J2000) / 365.25)
 #define YEAR_TO_JD( year) (J2000 + (year - 2000.) * 365.25)
 
-
+extern int available_sigmas;
 extern double optical_albedo;
 
 #ifdef _MSC_VER   /* MSVC/C++ lacks snprintf.  See 'ephem0.cpp' for details. */
@@ -102,6 +102,8 @@ double calc_obs_magnitude( const double obj_sun,
           const double obj_earth, const double earth_sun, double *phase_ang);
 int find_best_fit_planet( const double jd, const double *ivect,
                                  double *rel_vect);         /* runge.cpp */
+void find_relative_state_vect( const double jd, const double *ivect,
+               double *ovect, const int ref_planet);        /* runge.cpp */
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 void remove_trailing_cr_lf( char *buff);      /* ephem0.cpp */
 int write_tle_from_vector( char *buff, const double *state_vect,
@@ -163,6 +165,8 @@ int put_elements_into_sof( char *obuff, const char *templat,
          const int n_obs, const OBSERVE *obs);                /* elem_ou2.cpp */
 uint64_t parse_bit_string( const char *istr);                /* miscell.cpp */
 const char *write_bit_string( char *ibuff, const uint64_t bits);
+double generate_mc_variant_from_covariance( double *var_orbit,
+                                    const double *orbit);    /* orb_func.c */
 
 int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
 #ifdef __GNUC__
@@ -711,10 +715,47 @@ static char *object_name( char *buff, const int obj_index)
    return( buff);
 }
 
+double vect3_squared( const double *v)
+{
+   return( v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+}
+
+int geo_score( const double *orbit, const double epoch)
+{
+   extern unsigned n_sr_orbits;
+   unsigned i, n_geo, n_orbits;
+   const double gm = get_planet_mass( 3);
+
+   if( available_sigmas == COVARIANCE_AVAILABLE)
+      n_orbits = 100;
+   else if( available_sigmas == SR_SIGMAS_AVAILABLE)
+      n_orbits = n_sr_orbits;
+   else
+      return( -1);
+   for( i = n_geo = 0; i < n_orbits; i++)
+      {
+      double variant_orbit[6], earth_centric_orbit[6], r, vel_squared;
+      extern double *sr_orbits;
+
+      if( available_sigmas == COVARIANCE_AVAILABLE)
+         generate_mc_variant_from_covariance( variant_orbit, orbit);
+
+      else if( available_sigmas == SR_SIGMAS_AVAILABLE)
+         memcpy( variant_orbit, sr_orbits + 6 * i, 6 * sizeof( double));
+      find_relative_state_vect( epoch, variant_orbit, earth_centric_orbit, 3);
+      r = vector3_length( earth_centric_orbit);
+      vel_squared = vect3_squared( earth_centric_orbit + 3);
+      if( vel_squared < gm / r)
+         n_geo++;
+      }
+   return( n_geo * 100 / n_orbits);
+}
+
 static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
                      const char *obj_name, const OBSERVE *obs,
                      const unsigned n_obs, const double *moids,
-                     const char *body_frame_note, const bool show_obs)
+                     const char *body_frame_note, const bool show_obs,
+                     const int geocentric_score)
 {
    extern int n_extra_params;
    double jd = current_jd( );
@@ -863,6 +904,8 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
 
       fprintf( ofile, "\n        \"p_NEO\": %.4f,", neo_score * 100.);
       }
+   if( geocentric_score > 0)
+      fprintf( ofile, "\n        \"geo_score\": %d,", geocentric_score);
 /* if( moids[1])        */
       {
       char tbuff[80];
@@ -1046,8 +1089,6 @@ static int show_reference( char *buff)
       }
    return( rval);
 }
-
-extern int available_sigmas;
 
 int compute_available_sigmas_hash( const OBSERVE FAR *obs, const int n_obs,
          const double epoch, const unsigned perturbers, const int central_obj);
@@ -1458,6 +1499,7 @@ int write_out_elements_to_file( const double *orbit,
    const char *monte_carlo_permits;
    const bool rms_ok = (compute_rms( obs, n_obs) < max_monte_rms);
    extern int available_sigmas;
+   int geocentric_score = -1;
    const char *body_frame_note = NULL;
    bool body_frame_note_shown = false;
    int showing_sigmas = available_sigmas;
@@ -1946,6 +1988,10 @@ int write_out_elements_to_file( const double *orbit,
          fprintf( ofile, "# MOIDs: Ju%10.6f Sa%10.6f Ur%10.6f Ne%10.6f\n",
                   moids[5], moids[6], moids[7], moids[8]);
          }
+
+      geocentric_score = geo_score( orbit, curr_epoch);
+      if( geocentric_score > 0)
+         fprintf( ofile, "# GEO score %d\n", geocentric_score);
       }
    if( monte_carlo)
       {
@@ -2238,13 +2284,13 @@ int write_out_elements_to_file( const double *orbit,
                      "wb");
    assert( ofile);
    elements_in_json_format( ofile, &elem, object_name, obs, n_obs, moids,
-                                             body_frame_note, true);
+                                             body_frame_note, true, geocentric_score);
    fclose( ofile);
    ofile = open_json_file( tbuff, "JSON_SHORT_ELEMENTS", "elem_short.json", obs->packed_id,
                      "wb");
    assert( ofile);
    elements_in_json_format( ofile, &elem, object_name, obs, n_obs, moids,
-                                             body_frame_note, false);
+                                             body_frame_note, false, geocentric_score);
    fclose( ofile);
    make_linkage_json( n_obs, obs, &elem);
    free( tbuff);
