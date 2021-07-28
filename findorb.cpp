@@ -340,8 +340,8 @@ the mouse on or off.  This is still getting some testing,  and
 is commented out by default. */
 
 #ifdef MOUSE_MOVEMENT_EVENTS_ENABLED
-   #define VT_IGNORE_ALL_MOUSE      "\033[?1003l\n"
-   #define VT_RECEIVE_ALL_MOUSE     "\033[?1003h\n"
+   #define VT_IGNORE_ALL_MOUSE      "\033\133?1003l\n"
+   #define VT_RECEIVE_ALL_MOUSE     "\033\133?1003h\n"
 #endif
 #endif
 
@@ -3954,7 +3954,7 @@ int main( int argc, const char **argv)
             }
       if( c != AUTO_REPEATING)
          {
-         int n_iterations = 0;
+         int n_ticks_elapsed = 0, n_ticks_mouse_stationary = 0;
 
          c = 0;
          while( !c)
@@ -3967,7 +3967,7 @@ int main( int argc, const char **argv)
                }
             else
                {
-               if( (n_iterations % 20 == 0) && clock_line)
+               if( (n_ticks_elapsed % 20 == 0) && clock_line)
                   {                          /* update clock once a second */
                   const time_t t0 = time( NULL);
 
@@ -3975,13 +3975,14 @@ int main( int argc, const char **argv)
                   tbuff[9] = '\0';
                   put_colored_text( tbuff, clock_line, 72, 9, COLOR_OBS_INFO);
                   }
-               napms( 50);
-               n_iterations++;
-               if( n_iterations == 20)    /* after a second of no activity, */
+               napms( 50);      /* a 'tick' is 50 milliseconds long */
+               n_ticks_elapsed++;
+               n_ticks_mouse_stationary++;
+               if( n_ticks_mouse_stationary == 20)    /* after a second of no activity, */
                   show_hint( mouse_x, mouse_y);    /* show a hint */
                }
             if( c == KEY_MOUSE && (button & REPORT_MOUSE_POSITION))
-               c = n_iterations = 0;      /* suppress mouse moves */
+               c = n_ticks_mouse_stationary = 0;      /* suppress mouse moves */
             }
          auto_repeat_full_improvement = 0;
          }
