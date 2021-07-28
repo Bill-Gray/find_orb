@@ -2898,8 +2898,17 @@ static int user_select_file( char *filename, const char *title, const int flags)
    if( !rval)
       return( 0);
 
-   assert( 1);
-   return( -1);
+            /* We have none of the 'usual' file dialogues available
+            to us.  So we'll just ask outright for the file name : */
+   if( !inquire( "Enter file name :", filename, 100, COLOR_DEFAULT_INQUIRY)
+                     && *filename)
+      {
+      if( *filename == '~')
+         text_search_and_replace( filename, "~", getenv( "HOME"));
+      return( 0);
+      }
+   else
+      return( -1);
 }
 #endif
 
