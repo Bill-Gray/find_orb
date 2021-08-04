@@ -1,11 +1,21 @@
 #define _XOPEN_SOURCE_EXTENDED 1
-#define PDC_WIDE
-#define PDC_FORCE_UTF8
-#define PDC_NCMOUSE
-#define NCURSES_WIDECHAR 1
-#define HAVE_NCURSESW
 
-#include <curses.h>
+#if defined( VT) || defined( XCURSES) || defined( _WIN32)
+   #define PDC_WIDE
+   #define PDC_FORCE_UTF8
+   #define PDC_NCMOUSE
+   #include <curses.h>
+#else
+   #define NCURSES_WIDECHAR 1
+   #define HAVE_NCURSESW
+
+   #if defined(__has_include) && __has_include( <ncursesw/cursesw.h>)
+      #include <ncursesw/cursesw.h>
+   #else
+      #include <curses.h>
+   #endif
+#endif
+
 #include <wchar.h>
 #include <assert.h>
 #ifdef _WIN32
