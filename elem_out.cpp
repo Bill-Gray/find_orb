@@ -441,7 +441,8 @@ static void packed_desig_minus_spaces( char *obuff, const char *ibuff)
 double current_jd( void)
 {
    static const double jan_1970 = 2440587.5;
-   const double jd = jan_1970 + (double)time( NULL) / seconds_per_day;
+   const double jd = jan_1970 +
+                  (double)nanoseconds_since_1970( ) * 1e-9 / seconds_per_day;
 
    return( jd);
 }
