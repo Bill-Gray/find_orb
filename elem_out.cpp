@@ -729,7 +729,10 @@ int geo_score( const double *orbit, const double epoch)
    extern unsigned n_sr_orbits;
    unsigned i, n_geo, n_orbits;
    const double gm = get_planet_mass( 3);
+   extern int n_extra_params;
 
+   if( n_extra_params)     /* don't bother with a geo score for objects */
+      return( -1);         /* so well-determined that we have non-gravs */
    if( available_sigmas == COVARIANCE_AVAILABLE)
       n_orbits = 100;
    else if( available_sigmas == SR_SIGMAS_AVAILABLE)
