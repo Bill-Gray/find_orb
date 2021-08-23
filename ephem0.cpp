@@ -2610,11 +2610,19 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                         {           /* we want the lunar posn */
                         double moon_dist, earth_loc[3];
                         const double lunar_radius = 1737.4 / AU_IN_KM;
+#ifdef SHOW_LUNAR_OFFSETS
+                        double moon_lon, moon_lat, obs_lon, obs_lat;
+                        char date_buff[80];
+#endif
 
                         earth_lunar_posn( ephemeris_t, earth_loc, vect);
                         for( k = 0; k < 3; k++)
                            vect[k] -= obs_posn[k];
                         moon_dist = vector3_length( vect);
+#ifdef SHOW_LUNAR_OFFSETS
+                        moon_lon = atan2( vect[1], vect[0]);
+                        moon_lat = asine( vect[2] / moon_dist);
+#endif
                         cos_elong = dot_product( obs_posn, vect)
                                  / (vector3_length( obs_posn) * moon_dist);
                         lunar_elong = acose( -cos_elong);
@@ -2624,6 +2632,20 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                         cos_elong = dot_product( vect, topo)
                                         / (moon_dist * vector3_length( topo));
                         dist_moon = acose( cos_elong);
+#ifdef SHOW_LUNAR_OFFSETS
+                        obs_lon = atan2( topo_ecliptic[1], topo_ecliptic[0]);
+                        obs_lat = asine( topo_ecliptic[2] / vector3_length( topo_ecliptic));
+                        while( obs_lon - moon_lon > PI)
+                           obs_lon -= PI + PI;
+                        while( obs_lon - moon_lon < -PI)
+                           obs_lon += PI + PI;
+                        full_ctime( date_buff, curr_jd, 0);
+                        debug_printf( "%s %8.3f %7.3f %8.3f %7.3f %7.3f %7.3f\n", date_buff,
+                              obs_lon * 180. / PI, obs_lat * 180. / PI,
+                              moon_lon * 180. / PI, moon_lat * 180. / PI,
+                              (obs_lon - moon_lon) * 180. / PI,
+                              (obs_lat - moon_lat) * 180. / PI);
+#endif
                         if( dist_moon < lunar_radius / moon_dist)
                            visibility_char = (vector3_length( topo) < moon_dist ?
                                        'l' : 'L');  /* l=obj transits moon, */
