@@ -2468,12 +2468,36 @@ static void get_mouse_data( int *mouse_x, int *mouse_y,
                             int *mouse_z, unsigned long *button)
 {
    MEVENT mouse_event;
+   int i;
 
    getmouse( &mouse_event);
    *mouse_x = mouse_event.x;
    *mouse_y = mouse_event.y;
    *mouse_z = mouse_event.z;
    *button  = mouse_event.bstate;
+         /* Mouse events are sometimes 'lost' in some terminals.  If we get
+         a button release and,  based on past history,  thought the button
+         should have already been released,  we turn it into a click.  This
+         is an imperfect workaround. */
+   for( i = 0; i < 3; i++)
+      {
+      static int old_buttons_pressed = 0;
+      static const int releases[3] = { BUTTON1_RELEASED, BUTTON2_RELEASED, BUTTON3_RELEASED };
+      static const int presses[3] = { BUTTON1_PRESSED, BUTTON2_PRESSED, BUTTON3_PRESSED };
+      static const int clicks[3] = { BUTTON1_CLICKED, BUTTON2_CLICKED, BUTTON3_CLICKED };
+      static const int button_up[3] = {
+                  BUTTON1_RELEASED | BUTTON1_CLICKED | BUTTON1_DOUBLE_CLICKED,
+                  BUTTON2_RELEASED | BUTTON2_CLICKED | BUTTON2_DOUBLE_CLICKED,
+                  BUTTON3_RELEASED | BUTTON3_CLICKED | BUTTON3_DOUBLE_CLICKED };
+      const int mask = 1 << i;
+
+      if( (*button & releases[i]) && !(old_buttons_pressed & mask))
+         *button ^= releases[i] | clicks[i];    /* turn a release into a click */
+      if( *button & button_up[i])
+         old_buttons_pressed &= ~mask;
+      else if( *button & presses[i])
+         old_buttons_pressed |= mask;
+      }
 }
 
 static void put_colored_text( const char *text, const int line_no,
