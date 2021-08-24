@@ -9,7 +9,8 @@
    #define NCURSES_WIDECHAR 1
    #define HAVE_NCURSESW
 
-   #if defined(__has_include) && __has_include( <ncursesw/cursesw.h>)
+   #if defined( __cplusplus) && defined(__has_include) \
+                                    && __has_include( <ncursesw/cursesw.h>)
       #include <ncursesw/cursesw.h>
    #else
       #include <curses.h>
