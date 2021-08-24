@@ -39,6 +39,12 @@ else
     detected_OS := $(shell sh -c 'uname 2>/dev/null || echo Unknown')
 endif
 
+ifeq ($(detected_OS),Linux)
+    CP = cp -u
+else
+    CP = cp
+endif
+
 # I'm using 'mkdir -p' to avoid error messages if the directory exists.
 # It may fail on very old systems,  and will probably fail on non-POSIX
 # systems.  If so,  change to '-mkdir' and ignore errors.
@@ -268,21 +274,21 @@ clean_temp:
 install:
 	$(MKDIR) $(IDIR)
 ifdef EXE
-	cp $(FIND_ORB_EXE) $(IDIR)
-	cp $(FO_EXE)       $(IDIR)
+	$(CP) $(FIND_ORB_EXE) $(IDIR)
+	$(CP) $(FO_EXE)       $(IDIR)
 else
-	cp $(FIND_ORB_EXE) $(INSTALL_DIR)/bin
-	cp $(FO_EXE)       $(INSTALL_DIR)/bin
+	$(CP) $(FIND_ORB_EXE) $(INSTALL_DIR)/bin
+	$(CP) $(FO_EXE)       $(INSTALL_DIR)/bin
 endif
-	cp command.txt details.txt dosephem.txt dos_help.txt ?findorb.txt           $(IDIR)
-	cp environ.def eph_expl.txt frame_he.txt                                    $(IDIR)
-	cp geo_rect.txt header.htm jpl_eph.txt                                      $(IDIR)
-	cp link_def.json mpc_area.txt mpcorb.hdr mu1.txt nongravs.txt               $(IDIR)
-	cp observer.txt obslinks.htm ObsCodes.htm ObsCodesF.html                    $(IDIR)
-	cp obj_help.txt obj_name.txt odd_name.txt openfile.txt                      $(IDIR)
-	cp orbitdef.sof previous.def progcode.txt radecfmt.txt                      $(IDIR)
-	cp rovers.txt sat_xref.txt scope.json scopes.txt sigma.txt site_310.txt     $(IDIR)
-	cp timehelp.txt xdesig.txt bright.pgm bright2.pgm elem_pop.txt              $(IDIR)
+	$(CP) command.txt details.txt dosephem.txt dos_help.txt ?findorb.txt           $(IDIR)
+	$(CP) environ.def eph_expl.txt frame_he.txt                                    $(IDIR)
+	$(CP) geo_rect.txt header.htm jpl_eph.txt                                      $(IDIR)
+	$(CP) link_def.json mpc_area.txt mpcorb.hdr mu1.txt nongravs.txt               $(IDIR)
+	$(CP) observer.txt obslinks.htm ObsCodes.htm ObsCodesF.html                    $(IDIR)
+	$(CP) obj_help.txt obj_name.txt odd_name.txt openfile.txt                      $(IDIR)
+	$(CP) orbitdef.sof previous.def progcode.txt radecfmt.txt                      $(IDIR)
+	$(CP) rovers.txt sat_xref.txt scope.json scopes.txt sigma.txt site_310.txt     $(IDIR)
+	$(CP) timehelp.txt xdesig.txt bright.pgm bright2.pgm elem_pop.txt              $(IDIR)
 
 uninstall:
 ifdef EXE
