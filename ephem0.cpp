@@ -3708,39 +3708,34 @@ static void put_mag_resid( char *output_text, const double obs_mag,
       strcpy( output_text, "------ ");
 }
 
-/* Output is a number in three bytes,  such as '3.1', ' 31', '314', ' 3k',
-'31k', '.3M',  etc. */
+/* Output is a number in four bytes,  such as '3.14', '31.4', '3141', '3.1k',
+' 31k', '314k', '3.1M',  etc. */
 
-static void show_number_in_three_bytes( char *buff, double ival)
+static void show_number_in_four_bytes( char *buff, double ival)
 {
-   if( ival < 999)
-      snprintf( buff, 4, (ival < 9.9 ? "%3.1f" : "%3.0f"), ival);
+   assert( ival >= 0.);
+   if( ival < 9999.)
+      {
+      const char *format = "%4.2f";
+
+      if( ival > 999.)
+         format = "%4.0f";
+      else if( ival > 99.)
+         format = "%4.1f";
+      snprintf( buff, 5, format, ival);
+      }
    else
       {
-      int i, digit;
+      int i;
 
       ival /= 1000.;
-      for( i = 0; ival > 99. && si_prefixes[i]; i++)
+      for( i = 0; ival > 999. && si_prefixes[i]; i++)
          ival /= 1000.;
-      digit = (int)( ival * 10);
       if( !si_prefixes[i])
          strcpy( buff, "!!!");
       else
-         {
-         if( digit < 10)
-            {
-            *buff++ = '.';
-            *buff++ = '0' + digit;
-            }
-         else
-            {
-            digit /= 10;
-            *buff++ = '0' + digit / 10;
-            *buff++ = '0' + digit % 10;
-            }
-         *buff++ = si_prefixes[i];
-         *buff++ = '\0';
-         }
+         snprintf( buff, 5, (ival > 9.9 ? "%3.0f%c" : "%3.1f%c"),
+                        ival, si_prefixes[i]);
       }
 }
 
@@ -3748,9 +3743,7 @@ static void show_resid_in_sigmas( char *buff, const double sigmas)
 {
    *buff++ = ' ';
    *buff++ = (sigmas > 0. ? '+' : '-');
-   show_number_in_three_bytes( buff, fabs( sigmas));
-   buff[3] = ' ';
-   buff[4] = '\0';
+   show_number_in_four_bytes( buff, fabs( sigmas));
 }
 
 /* format_observation( ) takes an observation and produces text for it,
