@@ -330,6 +330,7 @@ int clean_up_find_orb_memory( void);         /* orb_func.cpp */
 #define RESIDUAL_FORMAT_OVERPRECISE        0x80
 #define RESIDUAL_FORMAT_COMPUTER_FRIENDLY  0x100
 #define RESIDUAL_FORMAT_EXTRA              0x200
+#define RESIDUAL_FORMAT_NORMALIZED         0x400
 
 int write_residuals_to_file( const char *filename, const char *ast_filename,
         const int n_obs, const OBSERVE FAR *obs_data, const int resid_format);

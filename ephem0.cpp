@@ -3907,6 +3907,14 @@ void format_observation( const OBSERVE FAR *obs, char *text,
             strcpy( yresid, " HUGE ");
          }
       }
+   else if( resid_format & RESIDUAL_FORMAT_NORMALIZED)
+      {
+      double xresid1, yresid1;
+
+      get_residual_data( obs, &xresid1, &yresid1);
+      show_resid_in_sigmas( xresid, xresid1);
+      show_resid_in_sigmas( yresid, yresid1);
+      }
    else if( resid_format & RESIDUAL_FORMAT_TIME_RESIDS)
       {
       const double abs_time_resid = fabs( m.time_residual);

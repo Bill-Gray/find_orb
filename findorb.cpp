@@ -740,6 +740,7 @@ static void create_resid_file( const OBSERVE *obs, const int n_obs,
    extern const char *residual_filename;
 
    residual_format &= (RESIDUAL_FORMAT_TIME_RESIDS | RESIDUAL_FORMAT_MAG_RESIDS
+               | RESIDUAL_FORMAT_NORMALIZED
                | RESIDUAL_FORMAT_PRECISE | RESIDUAL_FORMAT_OVERPRECISE);
    residual_format |= RESIDUAL_FORMAT_SHORT;
    write_residuals_to_file( get_file_name( buff, residual_filename),
@@ -2092,14 +2093,20 @@ static void show_residual_legend( const int line_no, const int residual_format)
    char buff[290];
 
    strcpy( buff, legend);
-   if( residual_format & RESIDUAL_FORMAT_TIME_RESIDS)
+   if( residual_format & (RESIDUAL_FORMAT_TIME_RESIDS | RESIDUAL_FORMAT_NORMALIZED))
       {         /* residuals in time & cross-time, not RA and dec */
       char *text_loc;
 
       while( (text_loc = strstr( buff, "Xres")) != NULL)
-         *text_loc = 'T';
+         if( residual_format & RESIDUAL_FORMAT_TIME_RESIDS)
+            *text_loc = 'T';
+         else
+            memcpy( text_loc, "Res1", 4);
       while( (text_loc = strstr( buff, "Yres")) != NULL)
-         *text_loc = 'C';
+         if( residual_format & RESIDUAL_FORMAT_TIME_RESIDS)
+            *text_loc = 'C';
+         else
+            memcpy( text_loc, "Res2", 4);
       }
    if( residual_format & RESIDUAL_FORMAT_MAG_RESIDS)
       text_search_and_replace( buff, "delta  R", "delta mresid");
@@ -4943,10 +4950,18 @@ int main( int argc, const char **argv)
                }
             }
             break;
-         case 't': case 'T':
+         case 't':
             residual_format ^= RESIDUAL_FORMAT_TIME_RESIDS;
             if( residual_format & RESIDUAL_FORMAT_TIME_RESIDS)
                strcpy( message_to_user, "Showing time/cross-track residuals");
+            else
+               strcpy( message_to_user, "Showing RA/dec residuals");
+            break;
+         case 'T':
+            residual_format ^= RESIDUAL_FORMAT_NORMALIZED;
+            residual_format &= ~RESIDUAL_FORMAT_TIME_RESIDS;
+            if( residual_format & RESIDUAL_FORMAT_NORMALIZED)
+               strcpy( message_to_user, "Showing normalized residuals");
             else
                strcpy( message_to_user, "Showing RA/dec residuals");
             break;
