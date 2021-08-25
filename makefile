@@ -286,7 +286,7 @@ endif
 	$(CP) link_def.json mpc_area.txt mpcorb.hdr mu1.txt nongravs.txt               $(IDIR)
 	$(CP) observer.txt obslinks.htm ObsCodes.htm ObsCodesF.html                    $(IDIR)
 	$(CP) obj_help.txt obj_name.txt odd_name.txt openfile.txt                      $(IDIR)
-	$(CP) orbitdef.sof previous.def progcode.txt radecfmt.txt                      $(IDIR)
+	$(CP) orbitdef.sof previous.def progcode.txt radecfmt.txt residfmt.txt         $(IDIR)
 	$(CP) rovers.txt sat_xref.txt scope.json scopes.txt sigma.txt site_310.txt     $(IDIR)
 	$(CP) timehelp.txt xdesig.txt bright.pgm bright2.pgm elem_pop.txt              $(IDIR)
 

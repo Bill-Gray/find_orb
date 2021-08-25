@@ -366,3 +366,8 @@
 2060    5 ( ) Comet model (A1, A2, A3)
 2060    6 ( ) Comet model (A1, A2, A3, DT)
 2060    Cancel
+
+2062    0 ( ) Resids in RA/dec arcsec
+2062    1 ( ) Resids in along-track sec/cross-track arcsec
+2062    2 ( ) Normalized residuals in sigmas
+2062    Cancel

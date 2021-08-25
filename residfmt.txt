@@ -1,0 +1,22 @@
+   By default,  residuals are shown in a very 'traditional' way : in
+arcseconds in RA and dec.  There are cases where one might want the
+residuals shown in two other ways.
+
+   The 'along-track in seconds,  cross-track in arcseconds' format is
+mostly useful for fast-moving objects,  where the residual in the
+direction of motion can show the effects of timing error.  If an object
+is moving at,  say,  15" per second,  and your timing is bad by a third
+of a second, you will get a 5" error in the direction of motion,  even
+if your astrometry was perfect.  (Such errors can happen even if your
+timing is near-perfect, due to difficulties in measuring trailed
+objects.)  Residuals shown in this manner can confirm that the data in
+such cases are "probably good",  but poorly defined in the direction
+of the object motion.
+
+   Find_Orb treats such cases by recognizing that the uncertainty ellipse
+for a particular observation will be 'stretched' in the direction of
+apparent motion.  The observation will then have a residual in the
+direction of motion and another in the direction perpendicular to the
+motion (the "cross-track") direction.  You can have these residuals
+shown in normalized form,  in sigmas.  It is the sum of the squares of
+these normalized residuals that Find_Orb attempts to minimize.

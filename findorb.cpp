@@ -3227,6 +3227,52 @@ static int non_grav_menu( char *message_to_user)
    return( force_model);
 }
 
+static int resid_format_menu( char *message_to_user, int resid_format)
+{
+   char buff[300], *tptr, tbuff[7];
+   int c;
+   size_t i;
+
+   strcpy( buff, get_find_orb_text( 2062));
+   strlcpy_err( tbuff, "0 ( ) ", sizeof( tbuff));
+   if( resid_format & RESIDUAL_FORMAT_NORMALIZED)
+      *tbuff = '2';
+   else if( resid_format & RESIDUAL_FORMAT_TIME_RESIDS)
+      *tbuff = '1';
+   tptr = strstr( buff, tbuff);
+   assert( tptr);
+   tptr[3] = '*';
+   help_file_name = "residfmt.txt";
+   c = full_inquire( buff, NULL, 0, COLOR_MENU, -1, -1);
+   tptr[3] = ' ';
+   if( c >= KEY_F(1) && c <= KEY_F(3))
+      c += '0' - KEY_F( 1);
+   if( c >= '0' && c <= '2')
+      {
+      resid_format &= ~(RESIDUAL_FORMAT_TIME_RESIDS | RESIDUAL_FORMAT_NORMALIZED);
+      switch( c)
+         {
+         case '0':
+            break;
+         case '1':
+            resid_format |= RESIDUAL_FORMAT_TIME_RESIDS;
+            break;
+         case '2':
+            resid_format |= RESIDUAL_FORMAT_NORMALIZED;
+            break;
+         }
+      tbuff[0] = c;
+      tptr = strstr( buff, tbuff);
+      assert( tptr);
+      tptr += 6;
+      for( i = 0; tptr[i] >= ' '; i++)
+         message_to_user[i] = tptr[i];
+      message_to_user[i] = '\0';
+      }
+   else
+      *message_to_user = '\0';
+   return( resid_format);
+}
 static void setup_elements_dialog( char *buff, const char *constraints,
                                              int element_format)
 {
@@ -4954,23 +5000,10 @@ int main( int argc, const char **argv)
                }
             }
             break;
-         case 't':
-            residual_format &= ~RESIDUAL_FORMAT_NORMALIZED;
-            residual_format ^= RESIDUAL_FORMAT_TIME_RESIDS;
-            if( residual_format & RESIDUAL_FORMAT_TIME_RESIDS)
-               strcpy( message_to_user, "Showing time/cross-track residuals");
-            else
-               strcpy( message_to_user, "Showing RA/dec residuals");
-            update_element_display = 1;
-            break;
-         case 'T':
-            residual_format ^= RESIDUAL_FORMAT_NORMALIZED;
-            residual_format &= ~RESIDUAL_FORMAT_TIME_RESIDS;
-            if( residual_format & RESIDUAL_FORMAT_NORMALIZED)
-               strcpy( message_to_user, "Showing normalized residuals");
-            else
-               strcpy( message_to_user, "Showing RA/dec residuals");
-            update_element_display = 1;
+         case 't': case 'T':
+            residual_format = resid_format_menu( message_to_user, residual_format);
+            if( *message_to_user)
+               update_element_display = 1;
             break;
          case 127:           /* backspace takes on different values */
          case 263:           /* on PDCurses,  ncurses,  etc.        */
