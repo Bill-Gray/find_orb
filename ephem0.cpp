@@ -209,7 +209,7 @@ static int _sn_append( const bool no_truncation, char *string,
                      (long)ilen, (long)rval, (long)max_len, string);
          exit( -1);
          }
-   return( rval + ilen);
+   return( rval + (int)ilen);
 }
 
 int snprintf_append_trunc( char *string, const size_t max_len,      /* ephem0.cpp */

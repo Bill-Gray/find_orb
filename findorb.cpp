@@ -3860,7 +3860,7 @@ int main( int argc, const char **argv)
             tptr[i] = '\0';
             tptr2 = strstr( tptr, "Sigma");
             if( tptr2)
-               add_cmd_area( '%', line_no, tptr2 - tptr, 5);
+               add_cmd_area( '%', line_no, (unsigned)( tptr2 - tptr), 5);
             put_colored_text( tptr, line_no++, 0, -1, COLOR_OBS_INFO);
             tptr += i + 1;
             while( *tptr == 10 || *tptr == 13)
