@@ -1080,6 +1080,8 @@ static int find_transfer_orbit( double *orbit, OBSERVE FAR *obs1,
    assert( fabs( obs2->jd) < 1e+9);
    assert( fabs( jd1) < 1e+9);
    assert( fabs( jd2) < 1e+9);
+   assert( obs1 != obs2);
+   assert( obs1->jd != obs2->jd);
    if( obs1->r > max_reasonable_dist || obs2->r > max_reasonable_dist)
       {
       debug_printf( "Bad xfer: %f %f\n", obs1->r, obs2->r);
@@ -1117,6 +1119,7 @@ static int find_transfer_orbit( double *orbit, OBSERVE FAR *obs1,
          for( i = 0; i < 3; i++)
             orbit[i] = obs->obj_posn[i];
          reset_auto_perturbers( jd, orbit);
+         assert( orbit[0] || orbit[1] || orbit[2]);
          calc_derivatives( jd, orbit, (pass ? deriv2 : deriv), -1);
          perturbers = saved_perturbers;
          }
@@ -1948,6 +1951,22 @@ int adjust_herget_results( OBSERVE FAR *obs, int n_obs, double *orbit)
    return( rval);
 }
 
+static double max_herget_span( const double r1, const double r2)
+{
+   double rval = 100.;           /* default value */
+   const double r = (r1 < r2 ? r1 : r2);
+
+   if( r > 0.)
+      {
+      const double max_speed = (r > 1. ? 30. : 70.);
+      const double empirical_fudge_factor = 4.5;
+
+      rval = r * AU_IN_KM / (max_speed * seconds_per_day);
+      rval *= empirical_fudge_factor;
+      }
+   return( rval);
+}
+
 int herget_method( OBSERVE FAR *obs, int n_obs, double r1, double r2,
          double *orbit, double *d_r1, double *d_r2, const char *limited_orbit)
 {
@@ -1955,7 +1974,7 @@ int herget_method( OBSERVE FAR *obs, int n_obs, double r1, double r2,
    double delta, a = 0., b = 0., c = 0., e = 0., f = 0., determ;
    int i, n_real_obs;
    const int using_pseudo_vaisala = (r1 < 0.);
-   double orbit2[6];
+   double orbit2[6], end_jd;
    double orbit_offset[6], *constraint = NULL;
    int planet_orbiting = 0, n_constraints = 0;
    char tstr[80];
@@ -1973,9 +1992,13 @@ int herget_method( OBSERVE FAR *obs, int n_obs, double r1, double r2,
       }
 
    temp_obs1 = obs[0];
-            /* Look "ahead" up to 100 days: */
-   for( i = n_obs - 1; i > 0 && obs[i].jd - obs[0].jd > 100.; i--)
-      ;
+   end_jd = obs[0].jd + max_herget_span( r1, r2);
+            /* Look "ahead" up to maximum span : days: */
+   i = n_obs - 1;
+   while( i > 0 && obs[i].jd > end_jd)
+      i--;
+   if( !i)
+      return( -1);
    temp_obs2 = obs[i];
    uncertainty_parameter = 99.;
    if( using_pseudo_vaisala)
