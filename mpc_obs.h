@@ -283,6 +283,7 @@ int extend_orbit_solution( OBSERVE FAR *obs, const int n_obs,
             const double limit, const double time_limit);
 int clean_up_find_orb_memory( void);         /* orb_func.cpp */
 
+#define ELEM_OUT_NORMALIZED_MEAN_RESID 16
 #define ELEM_OUT_PRECISE_MEAN_RESIDS   8
 #define ELEM_OUT_ALTERNATIVE_FORMAT    4
 #define ELEM_OUT_NO_COMMENT_DATA       2

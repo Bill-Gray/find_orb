@@ -3769,6 +3769,10 @@ int main( int argc, const char **argv)
          element_format |= ELEM_OUT_PRECISE_MEAN_RESIDS;
       else
          element_format &= ~ELEM_OUT_PRECISE_MEAN_RESIDS;
+      if( residual_format & RESIDUAL_FORMAT_NORMALIZED)
+         element_format |= ELEM_OUT_NORMALIZED_MEAN_RESID;
+      else
+         element_format &= ~ELEM_OUT_NORMALIZED_MEAN_RESID;
       if( update_element_display)
          bad_elements = write_out_elements_to_file( orbit, curr_epoch, epoch_shown,
              obs, n_obs, orbit_constraints, element_precision,
@@ -4951,11 +4955,13 @@ int main( int argc, const char **argv)
             }
             break;
          case 't':
+            residual_format &= ~RESIDUAL_FORMAT_NORMALIZED;
             residual_format ^= RESIDUAL_FORMAT_TIME_RESIDS;
             if( residual_format & RESIDUAL_FORMAT_TIME_RESIDS)
                strcpy( message_to_user, "Showing time/cross-track residuals");
             else
                strcpy( message_to_user, "Showing RA/dec residuals");
+            update_element_display = 1;
             break;
          case 'T':
             residual_format ^= RESIDUAL_FORMAT_NORMALIZED;
@@ -4964,6 +4970,7 @@ int main( int argc, const char **argv)
                strcpy( message_to_user, "Showing normalized residuals");
             else
                strcpy( message_to_user, "Showing RA/dec residuals");
+            update_element_display = 1;
             break;
          case 127:           /* backspace takes on different values */
          case 263:           /* on PDCurses,  ncurses,  etc.        */
