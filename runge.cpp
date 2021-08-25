@@ -854,6 +854,14 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
 
    assert( fabsl( jd) < 1e+9);
 #if !defined( _WIN32) && !defined( __APPLE__)
+   for( i = 0; i < 6; i++)
+      if( isnanl( ival[i]))
+         {
+         debug_printf( "Bad derivs; jd %Lf; ref %d\n", jd, reference_planet);
+         debug_printf( "%Lf %Lf %Lf\n", ival[0], ival[1], ival[2]);
+         debug_printf( "%Lf %Lf %Lf\n", ival[3], ival[4], ival[5]);
+         assert( 0);
+         }
    assert( !isnanl( ival[0]));
    assert( !isnanl( ival[1]));
    assert( !isnanl( ival[2]));
