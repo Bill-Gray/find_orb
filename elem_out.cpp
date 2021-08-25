@@ -2985,6 +2985,24 @@ static int obj_desig_to_perturber( const char *packed_desig)
    return( rval);
 }
 
+double get_max_included_resid( const OBSERVE *obs, int n_obs)
+{
+   double rval = 0.;
+
+   while( n_obs--)
+      {
+      if( obs->is_included)
+         {
+         const double resid = observation_rms( obs);
+
+         if( rval < resid)
+            rval = resid;
+         }
+      obs++;
+      }
+   return( rval);
+}
+
 OBSERVE FAR *load_object( FILE *ifile, OBJECT_INFO *id,
                        double *curr_epoch, double *epoch_shown, double *orbit)
 {
@@ -3024,8 +3042,6 @@ OBSERVE FAR *load_object( FILE *ifile, OBJECT_INFO *id,
    return( obs);
 }
 
-double observation_rms( const OBSERVE FAR *obs);            /* elem_out.cpp */
-
 int store_solution( const OBSERVE *obs, const int n_obs, const double *orbit,
        const double orbit_epoch, const int perturbers)
 {
@@ -3034,8 +3050,7 @@ int store_solution( const OBSERVE *obs, const int n_obs, const double *orbit,
    if( ofile)
       {
       char buff[80];
-      int i, j, k;
-      double max_resid_included_obs = 0.;
+      int i, j;
 
       get_object_name( buff, obs->packed_id);
       fprintf( ofile, "%10.1f %s\n", orbit_epoch, buff);
@@ -3055,16 +3070,10 @@ int store_solution( const OBSERVE *obs, const int n_obs, const double *orbit,
             }
          }
       get_first_and_last_included_obs( obs, n_obs, &i, &j);
-      for( k = i; k <= j; k++)
-         {
-         const double resid = observation_rms( obs + k);
-
-         if( obs[k].is_included && max_resid_included_obs < resid)
-            max_resid_included_obs = resid;
-         }
       fprintf( ofile, "\n%21.16f%21.16f%21.16f %.3f %.5f %.5f\n",
               orbit[3] * 1000., orbit[4] * 1000., orbit[5] * 1000.,
-              max_resid_included_obs + .001, obs[i].jd, obs[j].jd);
+              get_max_included_resid( obs, n_obs) + 0.001,
+              obs[i].jd, obs[j].jd);
       fclose( ofile);
       }
    return( ofile ? 0 : -1);
