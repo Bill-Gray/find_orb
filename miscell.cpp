@@ -419,6 +419,7 @@ int fetch_astrometry_from_mpc( FILE *ofile, const char *desig)
    if( !bytes_written && *grab_program)
       {                 /* no NEOCP data;  maybe MPC has astrometry */
       unsigned j = 0;
+      int err_code;
       size_t i;
       char filename[40];
 
@@ -431,7 +432,8 @@ int fetch_astrometry_from_mpc( FILE *ofile, const char *desig)
 #endif
       snprintf_err( tbuff, sizeof( tbuff), "%s %s %s", grab_program,
                                                 filename, desig);
-      if( !system( tbuff))
+      err_code = system( tbuff);
+      if( !err_code)
          {
          FILE *ifile = fopen( filename, "rb");
 
@@ -442,7 +444,11 @@ int fetch_astrometry_from_mpc( FILE *ofile, const char *desig)
          }
 #ifndef _WIN32
       else
+         {
+         fprintf( stderr, "grab_mpc error code %d (%x) %s\n", err_code, err_code,
+                     strerror( err_code));
          generic_message_box( get_find_orb_text( 2058), "o");
+         }
 #endif
       }
    return( bytes_written);
@@ -595,8 +601,13 @@ const char *write_bit_string( char *ibuff, const uint64_t bits)
 }
 
 /* strlcat() and strlcpy() appear in some BSDs,  but I don't think they
-appear anyplace else (though in my opinion,  they should).   The following
-is from http://www.openbsd.org/cgi-bin/cvsweb/src/lib/libc/string/ . */
+appear anyplace else (though in my opinion,  they should).  In my
+humble opinion,  they should only be used when truncation may
+legitimately happen.  If what you really want is buffer overflow
+detection,  use strlcat_err() or strlcpy_err(),  shown below.
+
+The following is from
+http://www.openbsd.org/cgi-bin/cvsweb/src/lib/libc/string/ . */
 
 /* $OpenBSD: strlcpy.c,v 1.16 2019/01/25 00:19:25 millert Exp $   */
 
