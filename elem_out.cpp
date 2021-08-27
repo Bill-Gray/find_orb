@@ -73,10 +73,18 @@ int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
          __attribute__ (( format( printf, 3, 4)))
 #endif
 ;
+
+int snprintf_err( char *string, const size_t max_len,      /* miscell.cpp */
+                                   const char *format, ...)
+#ifdef __GNUC__
+         __attribute__ (( format( printf, 3, 4)))
+#endif
+;
 #ifdef NOT_CURRENTLY_IN_USE
 #define ssnprintf_append( obuff, ...) snprintf_append( obuff, sizeof( obuff), __VA_ARGS__)
 #define ssnprintf( obuff, ...) snprintf( obuff, sizeof( obuff), __VA_ARGS__)
 #endif
+size_t strlcat_err( char *dst, const char *src, size_t dsize); /* miscell.c */
 int store_defaults( const ephem_option_t ephemeris_output_options,
          const int element_format, const int element_precision,
          const double max_residual_for_filtering,
@@ -402,7 +410,7 @@ static void observation_summary_data( char *obuff, const OBSERVE FAR *obs,
       const double rms = (options & ELEM_OUT_NORMALIZED_MEAN_RESID) ?
                   compute_weighted_rms( obs, n_obs, NULL) :
                   compute_rms( obs, n_obs);
-      char rms_buff[14];
+      char rms_buff[24];
       const char *rms_format = "%.2f";
 
       strcat( obuff, " ");
@@ -411,9 +419,9 @@ static void observation_summary_data( char *obuff, const OBSERVE FAR *obs,
       obuff += strlen( obuff);
       if( options & ELEM_OUT_PRECISE_MEAN_RESIDS)
          rms_format = (rms > 0.003 ? "%.3f" : "%.1e");
-      sprintf( rms_buff, rms_format, rms);
+      snprintf_err( rms_buff, sizeof( rms_buff), rms_format, rms);
       if( options & ELEM_OUT_NORMALIZED_MEAN_RESID)
-         strcat( rms_buff, " sigmas");
+         strlcat_err( rms_buff, " sigmas", sizeof( rms_buff));
       else
          text_search_and_replace( rms_buff, ".", "\".");
       sprintf( obuff, get_find_orb_text( 17), rms_buff);
