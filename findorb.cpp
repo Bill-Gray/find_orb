@@ -5118,14 +5118,23 @@ int main( int argc, const char **argv)
 #endif
          case 'w': case 'W':
             {
-            double worst_rms = 0., rms;
-            const double top_rms = (prev_getch == 'w' ?
-                     compute_rms( obs + curr_obs, 1) : 1e+20);
+            double worst_rms = 0., rms, top_rms = 1e+20;
+
+            if( prev_getch == 'w')
+               {
+               if( residual_format & RESIDUAL_FORMAT_NORMALIZED)
+                  top_rms = compute_weighted_rms( obs + curr_obs, 1, NULL);
+               else
+                  top_rms = compute_rms( obs + curr_obs, 1);
+               }
 
             for( i = 0; i < n_obs; i++)
                 if( obs[i].is_included)
                    {
-                   rms = compute_rms( obs + i, 1);
+                   if( residual_format & RESIDUAL_FORMAT_NORMALIZED)
+                      rms = compute_weighted_rms( obs + i, 1, NULL);
+                   else
+                      rms = compute_rms( obs + i, 1);
                    if( rms > worst_rms && rms < top_rms)
                       {
                       worst_rms = rms;
