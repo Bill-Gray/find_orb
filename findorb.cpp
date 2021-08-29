@@ -5428,26 +5428,34 @@ int main( int argc, const char **argv)
             break;
 #endif
          case '{':
-            if( !inquire( "Cutoff in sigmas:",
-                               tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY)
+            {
+            const int using_normalized_resids =
+                     (residual_format & RESIDUAL_FORMAT_NORMALIZED);
+            const char *prompt = (using_normalized_resids ?
+                     "Enter cutoff in sigmas :" : "Enter cutoff in arcseconds :");
+
+            if( !inquire( prompt, tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY)
                     && atof( tbuff))
                {
-               const double rms = atof( tbuff);
-               const int is_in_arcsec = (tbuff[strlen( tbuff) - 1] == '"');
+               const double cutoff = atof( tbuff);
 
-               if( rms > 0.)
+               if( cutoff > 0.)
                   {
-                  const int n_changed = filter_obs( obs, n_obs, rms, is_in_arcsec);
+                  const int n_changed = filter_obs( obs, n_obs, cutoff,
+                                    !using_normalized_resids);
 
                   if( !n_changed)
                      strcpy( message_to_user, "No filtering done");
                   else if( n_changed == -1)
                      strcpy( message_to_user, "Filtering FAILED");
                   else
-                     sprintf( message_to_user, "Rejections at %.3f sigmas; %d changes",
-                              rms, n_changed);
+                     snprintf( message_to_user, sizeof( message_to_user),
+                                "Rejections at %.3f %s; %d changes", cutoff,
+                                 (using_normalized_resids ? "sigmas" : "arcsecs"),
+                                 n_changed);
                   }
                }
+            }
             break;
          case '}':
             {
