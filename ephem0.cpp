@@ -47,6 +47,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "stackall.h"
 #include "expcalc.h"
 #include "rgb_defs.h"
+#include "stringex.h"
 
 #define J2000 2451545.0
 #define JD_TO_YEAR(jd)  (2000. + ((jd)-J2000) / 365.25)
@@ -103,12 +104,6 @@ double shadow_check( const double *planet_loc,           /* ephem0.cpp */
                             const double planet_radius_in_au);
 int get_object_name( char *obuff, const char *packed_desig);   /* mpc_obs.c */
 int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid);
-int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
-                                   const char *format, ...)
-#ifdef __GNUC__
-         __attribute__ (( format( printf, 3, 4)))
-#endif
-;
 int setup_planet_elem( ELEMENTS *elem, const int planet_idx,
                                           const double t_cen);   /* moid4.c */
 char *mpc_station_name( char *station_data);       /* mpc_obs.cpp */
@@ -122,10 +117,6 @@ static void put_residual_into_text( char *text, const double resid,
                                  const int resid_format);    /* ephem0.cpp */
 FILE *open_json_file( char *filename, const char *env_ptr, const char *default_name,
                   const char *packed_desig, const char *permits); /* ephem0.cpp */
-size_t strlcat( char *dst, const char *src, size_t dsize);     /* miscell.cpp */
-size_t strlcpy( char *dst, const char *src, size_t dsize);     /* miscell.cpp */
-size_t strlcpy_err( char *dst, const char *src, size_t dsize); /* miscell.c */
-size_t strlcat_err( char *dst, const char *src, size_t dsize); /* miscell.c */
 void shellsort_r( void *base, const size_t n_elements, const size_t elem_size,
          int (*compare)(const void *, const void *, void *), void *context);
 
@@ -173,11 +164,6 @@ int parallax_to_lat_alt( const double rho_cos_phi, const double rho_sin_phi,
 }
 
 #include <stdarg.h>
-#if defined(_MSC_VER) && _MSC_VER < 1900
-                      /* For older MSVCs,  we have to supply our own  */
-                      /* snprintf().  See snprintf.cpp for details.  */
-int snprintf( char *string, const size_t max_len, const char *format, ...);
-#endif
 
 /* I find myself frequently snprintf()-ing at the end of a string,  with
 something like snprintf( str + strlen( str), sizeof( str) - strlen(str), ...).
@@ -719,7 +705,7 @@ static void extract_field( field_location_t *field, const char *buff,
    field->height = groups->height;
    field->width  = groups->width;
    field->file_number = groups->file_number;
-   strcpy( field->obscode, groups->obscode);
+   strlcpy_error( field->obscode, groups->obscode);
 }
 
 
@@ -1490,12 +1476,12 @@ static int create_json_ephemeris( FILE *ofile, FILE *ifile, char *header,
             assert( hlen < 18);
             assert( blen < 25);
             if( hptr == header)     /* first token -> date/time */
-               strcpy( out_token, "JD");
+               strlcpy_error( out_token, "JD");
             else
                {
                if( hptr == header + 5)   /* second token -> ISO date */
                   {
-                  strcpy( out_token, "ISO_time");
+                  strlcpy_error( out_token, "ISO_time");
                   is_text = true;
                   }
                else
@@ -1614,8 +1600,8 @@ FILE *open_json_file( char *filename, const char *env_ptr, const char *default_n
    char tbuff[100], full_permits[20];
 
 #ifdef _WIN32
-   strcpy( tbuff, "WIN_");
-   strcat( tbuff, env_ptr);
+   strlcpy_error( tbuff, "WIN_");
+   strlcat_error( tbuff, env_ptr);
    env_ptr = get_environment_ptr( tbuff);
 #else
    env_ptr = get_environment_ptr( env_ptr);
@@ -1623,7 +1609,7 @@ FILE *open_json_file( char *filename, const char *env_ptr, const char *default_n
    if( !*env_ptr)
       {
       get_file_name( filename, default_name);
-      strcpy( full_permits, "tfc");
+      strlcpy_error( full_permits, "tfc");
       }
    else
       {
@@ -1631,7 +1617,7 @@ FILE *open_json_file( char *filename, const char *env_ptr, const char *default_n
 
       strcpy( filename, env_ptr);
       if( combine_all_observations && *combine_all_observations)
-         strcpy( tbuff, combine_all_observations);
+         strlcpy_error( tbuff, combine_all_observations);
       else
          real_packed_desig( tbuff, packed_desig);
       text_search_and_replace( filename, "%p", tbuff);
@@ -1641,10 +1627,10 @@ FILE *open_json_file( char *filename, const char *env_ptr, const char *default_n
 #ifndef _WIN32
       fix_home_dir( filename);
 #endif
-      strcpy( full_permits, "f");
+      strlcpy_error( full_permits, "f");
       make_path_available( filename);
       }
-   strlcat( full_permits, permits, sizeof( full_permits));
+   strlcat_error( full_permits, permits);
    return( fopen_ext( filename, full_permits));
 }
 
@@ -1663,7 +1649,7 @@ static int combine_json_elems_and_ephems( const char *packed_desig, FILE *ephem_
          in_observations = true;
       if( in_observations && !strncmp( buff, "      }", 7))
          {
-         strcpy( buff, "      },\n");   /* JSON needs comma for 'continuation' */
+         strlcpy_error( buff, "      },\n");   /* JSON needs comma for 'continuation' */
          obs_end_found = true;
          }
       fwrite( buff, strlen( buff), 1, ofile);
@@ -2161,7 +2147,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       remove_trailing_cr_lf( added_prec_text_dec);
       memset( added_prec_text_ra,  '-', strlen( added_prec_text_ra));
       memset( added_prec_text_dec, '-', strlen( added_prec_text_dec));
-      strcpy( hr_min_text, pre_texts[hh_mm]);
+      strlcpy_error( hr_min_text, pre_texts[hh_mm]);
       if( n_step_digits)
          {
          strcat( hr_min_text, ".");
@@ -2248,7 +2234,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
 
          header = (char *)malloc( 1024);
          assert( header);
-         strcpy( header, buff);
+         strlcpy_err( header, buff, 1024);
          computer_friendly_ofile = fopen_ext( cf_filename, is_default_ephem ? "tfcw+" : "fw+");
          assert( computer_friendly_ofile);
          }
@@ -2355,7 +2341,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                 /* we need the observer position in equatorial coords too: */
       memcpy( obs_posn_equatorial, obs_posn, 3 * sizeof( double));
       ecliptic_to_equatorial( obs_posn_equatorial);
-      strcpy( buff, "Nothing to see here... move along... uninteresting... who cares?...");
+      strlcpy_error( buff, "Nothing to see here... move along... uninteresting... who cares?...");
       for( obj_n = 0; obj_n < n_objects; obj_n++)
          {
          double *orbi = orbits_at_epoch + obj_n * 6;
@@ -2536,8 +2522,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                      char date_buff[80];
                      static bool path_already_made = false;
 
-                     strcpy( tbuff, offset_dir);
-                     strcat( tbuff, "/");
+                     strlcpy_error( tbuff, offset_dir);
+                     strlcat_error( tbuff, "/");
                      if( !path_already_made)
                         make_path_available( tbuff);
                      path_already_made = true;
@@ -2545,8 +2531,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                            FULL_CTIME_FORMAT_HH_MM | FULL_CTIME_YMD
                          | FULL_CTIME_MONTHS_AS_DIGITS | FULL_CTIME_NO_SPACES
                          | FULL_CTIME_NO_COLONS | FULL_CTIME_LEADING_ZEROES);
-                     strcat( tbuff, date_buff);
-                     strcat( tbuff, ".off");
+                     strlcat_error( tbuff, date_buff);
+                     strlcat_error( tbuff, ".off");
                      offset_ofile = fopen( tbuff, "wb");
                      assert( offset_ofile);
                      full_ctime( date_buff, curr_jd,
@@ -2563,7 +2549,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                if( sigma_multiplier)
                   dist *= sigma_multiplier;
                int_pa = put_ephemeris_posn_angle_sigma( tbuff + 1, dist, posn_ang, false);
-               strcat( buff, tbuff);
+               strlcat_error( buff, tbuff);
                snprintf_append( alt_buff, sizeof( alt_buff), " %8.3f %3d",
                                     dist * 3600. * 180. / PI, int_pa);
                }
@@ -2771,11 +2757,11 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                                     ra * 15, dec);
                   else
                      {
-                     strcat( buff, " ");
-                     strcat( buff, ra_buff);
-                     strcat( buff, "   ");
-                     strcat( buff, dec_buff);
-                     strcat( buff, " ");
+                     strlcat_error( buff, " ");
+                     strlcat_error( buff, ra_buff);
+                     strlcat_error( buff, "   ");
+                     strlcat_error( buff, dec_buff);
+                     strlcat_error( buff, " ");
                      }
                   text_search_and_replace( ra_buff, " ", "_");
                   text_search_and_replace( dec_buff, " ", "_");
@@ -2787,7 +2773,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   alt_tptr = alt_buff + strlen( alt_buff);
                   snprintf_append( alt_buff, sizeof( alt_buff), " %17.12f", r);
                   if( computer_friendly)
-                     strlcat( buff, alt_tptr, sizeof( buff));
+                     strlcat_error( buff, alt_tptr);
                   else
                      {
                        /* the radar folks prefer the distance to be always in */
@@ -2802,7 +2788,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   alt_tptr = alt_buff + strlen( alt_buff);
                   snprintf_append( alt_buff, sizeof( alt_buff), " %17.12f", solar_r);
                   if( computer_friendly)
-                     strlcat( buff, alt_tptr, sizeof( buff));
+                     strlcat_error( buff, alt_tptr);
                   else
                      format_dist_in_buff( buff + strlen( buff), solar_r);
                   }
@@ -2847,25 +2833,24 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                         }
                      }
                   if( computer_friendly || suppress_coloring)
-                     strcat( buff, tbuff);
+                     strlcat_error( buff, tbuff);
                   else
                      snprintf_append( buff, sizeof( buff), "$%06lx%s", rgb, tbuff);
                   if( tbuff[1] == ' ' && tbuff[2] == ' ')
                      tbuff[1] = '-';
-                  strcat( alt_buff, tbuff);
+                  strlcat_error( alt_buff, tbuff);
                   }
                if( options & OPTION_SKY_BRIGHTNESS)
                   {
                   if( mags_per_arcsec2 > 99.9)
                      mags_per_arcsec2 = 99.99;
                   snprintf( tbuff, sizeof( tbuff), " %5.2f", mags_per_arcsec2);
-                  strlcat_err( alt_buff,
-                           (mags_per_arcsec2 > 99.9) ? " null" : tbuff,
-                            sizeof( alt_buff));
+                  strlcat_error( alt_buff,
+                           (mags_per_arcsec2 > 99.9) ? " null" : tbuff);
                   snprintf_append( alt_buff, sizeof( alt_buff), " %06lx", rgb);
                   if( mags_per_arcsec2 > 99.9 && !computer_friendly)
-                     strcpy( tbuff, " --.--");
-                  strcat( buff, tbuff);
+                     strlcpy_error( tbuff, " --.--");
+                  strlcat_error( buff, tbuff);
                   }
 
                curr_mag = abs_mag + calc_obs_magnitude(
@@ -2887,7 +2872,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   if( abs_mag && curr_mag < 99.)
                      snprintf_append( fake_line, sizeof( fake_line), "|%4.1f|V", curr_mag);
                   else
-                     strcat( fake_line, "| |");
+                     strlcat_error( fake_line, "| |");
                   }
 
                if( rho_cos_phi || rho_sin_phi)
@@ -2903,8 +2888,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   {
                   if( exposure_config.airmass > 1e+9)
                      {
-                     strcat( buff, (computer_friendly ? " 99999" : " --.--"));
-                     strcat( alt_buff, "  null");
+                     strlcat_error( buff, (computer_friendly ? " 99999" : " --.--"));
+                     strlcat_error( alt_buff, "  null");
                      }
                   else
                      {
@@ -2914,8 +2899,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                      const char *fmt = (snr > 99. ? " %5.0f" : " %5.2f");
 
                      snprintf( tbuff, sizeof( tbuff), fmt, snr);
-                     strcat( buff, tbuff);
-                     strcat( alt_buff, tbuff);
+                     strlcat_error( buff, tbuff);
+                     strlcat_error( alt_buff, tbuff);
                      }
                   }
 
@@ -2930,11 +2915,11 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                      exposure_time = exposure_from_snr_and_mag( &exposure_config,
                                   (target_snr ? target_snr : 4.), curr_mag);
                   if( exposure_time > 99999.)
-                     strlcat_err( alt_buff, " null", sizeof( alt_buff));
+                     strlcat_error( alt_buff, " null");
                   else
                      snprintf_append( alt_buff, sizeof( alt_buff), " %.1f", exposure_time);
                   if( exposure_time > 99999. && !computer_friendly)
-                     strcat( buff, " -----");
+                     strlcat_error( buff, " -----");
                   else
                      snprintf_append( buff, sizeof( buff),
                            (exposure_time < 999. ? " %5.1f" : " %5.0f"), exposure_time);
@@ -2953,7 +2938,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   exposure_time = exposure_from_snr_and_mag( &exposure_config,
                                   (target_snr ? target_snr : 4.), curr_mag);
                   if( exposure_time > 99999.)
-                     strlcat_err( alt_buff, " null", sizeof( alt_buff));
+                     strlcat_error( alt_buff, " null");
                   else
                      snprintf_append( alt_buff, sizeof( alt_buff), " %.1f", exposure_time);
                   }
@@ -3052,8 +3037,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                                     dist * 180. / PI - 90.);
                   }
 
-               strcat( buff, tbuff);
-               strcat( alt_buff, tbuff);
+               strlcat_error( buff, tbuff);
+               strlcat_error( alt_buff, tbuff);
                if( abs_mag)           /* don't show a mag if you dunno how bright */
                   {                   /* the object really is! */
                   const bool two_place_mags =
@@ -3066,7 +3051,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                      snprintf_append( buff, sizeof( buff), fmt, curr_mag + .005);
                      }
                   else if( fraction_illum == 0.)
-                     strcat( buff, " Sha ");
+                     strlcat_error( buff, " Sha ");
                   else if( curr_mag < 99 && curr_mag > -9.9)
                      snprintf_append( buff, sizeof( buff), " %4.1f", curr_mag + .05);
                   else
@@ -3101,7 +3086,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                   char *alt_tptr = alt_buff + strlen( alt_buff);
 
                   compute_observation_motion_details( &temp_obs, &m);
-                  strcat( buff, " ");
+                  strlcat_error( buff, " ");
                   if( options & OPTION_SEPARATE_MOTIONS)
                      {
                      format_motion( end_ptr + 1, m.ra_motion);
@@ -3155,9 +3140,9 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                      snprintf_append( alt_buff, sizeof( alt_buff), " %8.4f", az);
                      }
                   if( !computer_friendly)
-                     strcat( buff, tbuff);
+                     strlcat_error( buff, tbuff);
                   else
-                     strcat( buff, alt_tptr);
+                     strlcat_error( buff, alt_tptr);
                   }
                if( options & OPTION_RADIAL_VEL_OUTPUT)
                   {
@@ -3172,7 +3157,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                if( show_radar_data)
                   {
                   if( alt_az[0].y < 0.)
-                     strcpy( tbuff, "  n/a");
+                     strlcpy_error( tbuff, "  n/a");
                   else
                      {
                      const double radar_albedo = 0.1;
@@ -3182,8 +3167,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                      *tbuff = ' ';
                      show_packed_with_si_prefixes( tbuff + 1, snr);
                      }
-                  strcat( alt_buff, tbuff);
-                  strcat( buff, tbuff);
+                  strlcat_error( alt_buff, tbuff);
+                  strlcat_error( buff, tbuff);
                   }
                if( options & OPTION_GROUND_TRACK)
                   {
@@ -3197,8 +3182,8 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                         lat_lon[1] * 180. / PI,
                         alt_in_meters / meters_per_km);
                   tbuff[30] = '\0';
-                  strcat( alt_buff, tbuff);
-                  strcat( buff, tbuff);
+                  strlcat_error( alt_buff, tbuff);
+                  strlcat_error( buff, tbuff);
                   }
 
                if( options & OPTION_SPACE_VEL_OUTPUT)
@@ -3208,7 +3193,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                              vector3_length( topo_vel) * AU_IN_KM / seconds_per_day;
 
                   format_velocity_in_buff( tbuff, total_vel);
-                  strcat( buff, tbuff);
+                  strlcat_error( buff, tbuff);
                   snprintf_append( alt_buff, sizeof( alt_buff),  " %11.6f", total_vel);
                   }
                if( options & OPTION_SUPPRESS_UNOBSERVABLE)
@@ -3221,11 +3206,11 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                      }
 
                if( fake_astrometry)
-                  strcpy( buff, fake_line);
+                  strlcpy_error( buff, fake_line);
                if( !show_this_line)
                   {
                   if( last_line_shown)
-                     strcpy( buff, "................");
+                     strlcpy_error( buff, "................");
                   else
                      *buff = '\0';
                   *alt_buff = '\0';
@@ -3234,7 +3219,7 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                }
             }
          else        /* shouldn't happen */
-            strcpy( buff, "DANGER!\n");
+            strlcpy_error( buff, "DANGER!\n");
          if( !obj_n && (options & OPTION_MOIDS) && show_this_line)
             for( j = 1; j <= 8; j++)
                {
@@ -3308,9 +3293,9 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
       fprintf( ofile, "{\n  \"ephemeris\":\n  {\n");
       fprintf( ofile, "    \"obscode\": \"%.3s\",\n", note_text + 1);
       if( combine_all_observations && *combine_all_observations)
-         strcpy( buff, combine_all_observations);
+         strlcpy_error( buff, combine_all_observations);
       else
-         strcpy( buff, obs->packed_id);
+         strlcpy_error( buff, obs->packed_id);
       text_search_and_replace( buff, " ", "");
       fprintf( ofile, "    \"packed\": \"%s\",\n", buff);
       fprintf( ofile, "    \"count\": %d,\n", n_lines_shown);
@@ -3463,7 +3448,7 @@ int ephemeris_in_a_file_from_mpc_code( const char *filename,
                                            &rho_cos_phi, &rho_sin_phi);
 
    assert( strlen( mpc_code) >= 3);
-   strlcpy_err( ephem_mpc_code, mpc_code, sizeof( ephem_mpc_code));
+   strlcpy_error( ephem_mpc_code, mpc_code);
    snprintf( note_text, sizeof( note_text),
                     "(%s) %s", mpc_code, mpc_station_name( buff));
    get_object_name( buff, obs->packed_id);
@@ -3575,7 +3560,7 @@ static void output_angle_to_buff( char *obuff, double angle, int precision)
             if( angle > -1000. && angle < 1000.)   /* the format is weird  */
                snprintf( obuff, 10, "?%.5f", angle);
             else
-               strcpy( obuff, "?");
+               strlcpy_error( obuff, "?");
             fraction = 0;   /* not really necessary;  evades nuisance GCC warning */
             break;
          }
@@ -3594,7 +3579,7 @@ static void output_angle_to_buff( char *obuff, double angle, int precision)
       if( precision < 307 || precision > 312)   /* omit decimal point for */
          strcat( obuff, ".");                    /* super-precise formats */
       assert( n_digits_to_show > 0 && n_digits_to_show < 20);
-      snprintf( format, sizeof( format), "%%0%dld", n_digits_to_show);
+      snprintf_err( format, sizeof( format), "%%0%dld", n_digits_to_show);
       snprintf_append( obuff, full_len + 1, format, (long)fraction);
       }
    for( i = strlen( obuff); i < full_len; i++)
@@ -3639,21 +3624,21 @@ static void put_residual_into_text( char *text, const double resid,
    if( resid_format & RESIDUAL_FORMAT_COMPUTER_FRIENDLY)
       {                   /* resids in arcseconds at all times,  with */
       if( resid > -9.9999 && resid < 9.9999)
-         snprintf( text, 11, " %+8.6f", resid);    /* some added precision */
+         snprintf_err( text, 11, " %+8.6f", resid);    /* some added precision */
       return;
       }
    if( zval > 999. * 3600.)      /* >999 degrees: error must have occurred */
-      strcpy( text, " Err!");
+      strlcpy_err( text, " Err!", 6);
    else if( zval > 59940.0)             /* >999': show integer degrees */
-      snprintf( text, 6, "%4.0fd", zval / 3600.);
+      snprintf_err( text, 6, "%4.0fd", zval / 3600.);
    else if( zval > 9999.9)              /* 999' > x > 9999": show ###' arcmin */
-      snprintf( text, 6, "%4.0f'", zval / 60.);
+      snprintf_err( text, 6, "%4.0f'", zval / 60.);
    else if( zval > 99.9)
-      snprintf( text, 6, "%5.0f", zval);
+      snprintf_err( text, 6, "%5.0f", zval);
    else if( zval > .99 && zval < 9.99 && precise)
-      snprintf( text, 6, "%5.2f", zval);
+      snprintf_err( text, 6, "%5.2f", zval);
    else if( zval > .99)
-      snprintf( text, 6, "%5.1f", zval);
+      snprintf_err( text, 6, "%5.1f", zval);
    else if( (resid_format & RESIDUAL_FORMAT_OVERPRECISE) && zval < .00999)
       {          /* 'high-precision' residuals */
       unsigned i;
@@ -3661,12 +3646,12 @@ static void put_residual_into_text( char *text, const double resid,
 
       for( i = 0; zval < 0.99 && i < 9; i++)
          zval *= 1000.;
-      snprintf( text, 6, (zval < 9.9 ? "%4.1f%c" : "%4.0f%c"),
+      snprintf_err( text, 6, (zval < 9.9 ? "%4.1f%c" : "%4.0f%c"),
                      zval, lower_si_prefixes[i]);
       }
    else
       {
-      snprintf( text, 6, (precise ? "%5.3f" : "%5.2f"), zval);
+      snprintf_err( text, 6, (precise ? "%5.3f" : "%5.2f"), zval);
       text[precise ? 0 : 1] = ' ';
       }
    if( !atof( text))
@@ -3684,7 +3669,7 @@ static void show_dd_hh_mm_ss_point_sss( char *text,
    const int64_t ms_per_hour = 60 * ms_per_minute;
    const int64_t ms_per_day = 24 * ms_per_hour;
 
-   snprintf( text, 15, "%02u %02u:%02u:%02u%03u",
+   snprintf_err( text, 15, "%02u %02u:%02u:%02u%03u",
             (unsigned)( milliseconds / ms_per_day),
             (unsigned)( milliseconds / ms_per_hour) % 24,
             (unsigned)( milliseconds / ms_per_minute) % 60,
@@ -3701,7 +3686,7 @@ static void put_mag_resid( char *output_text, const double obs_mag,
    INTENTIONALLY_UNUSED_PARAMETER( mag_band);
 
    if( obs_mag < BLANK_MAG && computed_mag)
-      snprintf( output_text, 8, "%6.2f ",
+      snprintf_err( output_text, 8, "%6.2f ",
                obs_mag - computed_mag);
 //             obs_mag - computed_mag - mag_band_shift( mag_band);
    else
@@ -3722,7 +3707,7 @@ static void show_number_in_four_bytes( char *buff, double ival)
          format = "%4.0f";
       else if( ival > 9.9)
          format = "%4.1f";
-      snprintf( buff, 5, format, ival);
+      snprintf_err( buff, 5, format, ival);
       }
    else
       {
@@ -3734,7 +3719,7 @@ static void show_number_in_four_bytes( char *buff, double ival)
       if( !si_prefixes[i])
          strcpy( buff, "!!!");
       else
-         snprintf( buff, 5, (ival > 9.9 ? "%3.0f%c" : "%3.1f%c"),
+         snprintf_err( buff, 5, (ival > 9.9 ? "%3.0f%c" : "%3.1f%c"),
                         ival, si_prefixes[i]);
       }
 }
@@ -4209,7 +4194,7 @@ void create_obs_file( const OBSERVE FAR *obs, int n_obs, const int append)
       if( obs->note2 != 'R' && strcmp( curr_sigma_text, obuff))
          {
          fprintf( ofile, "%s\n", obuff);
-         strcpy( curr_sigma_text, obuff);
+         strlcpy_error( curr_sigma_text, obuff);
          }
       recreate_observation_line( obuff, obs);
       fprintf( ofile, "%s\n", obuff);
@@ -4486,9 +4471,9 @@ static int write_observer_data_to_file( FILE *ofile, const char *ast_filename,
              program_codes[n_program_codes] = '\0';
              }
 
-      FSTRCPY( tbuff, stations[i]);
+      strlcpy_error( tbuff, stations[i]);
       put_observer_data_in_text( tbuff, buff);
-      snprintf( details[0], sizeof( details[0]), "(%s) %s.", tbuff, buff);
+      snprintf_err( details[0], sizeof( details[0]), "(%s) %s.", tbuff, buff);
 
       get_observer_details_from_obs( obs_data, n_obs, tbuff,
                                  details[1], details[2], details[3]);
@@ -4511,15 +4496,15 @@ static int write_observer_data_to_file( FILE *ofile, const char *ast_filename,
             char inserted_text[15], *outtext = details[j];
 
             if( j == 3)                      /* telescope */
-               strcpy( inserted_text, " ");
+               strlcpy_error( inserted_text, " ");
             else if( j == 0)                 /* observatory name/location */
                *inserted_text = '\0';
             else              /* j=1: observer(s); j=2: measurer(s) */
                {
-               strcpy( inserted_text, (j == 2) ? " Measurer" : "  Observer");
+               strlcpy_error( inserted_text, (j == 2) ? " Measurer" : "  Observer");
                if( strchr( outtext, ','))
-                  strcat( inserted_text, "s");
-               strcat( inserted_text, " ");
+                  strlcat_error( inserted_text, "s");
+               strlcat_error( inserted_text, " ");
                }
             memmove( outtext + strlen( inserted_text), outtext,
                               strlen( outtext) + 1);
@@ -4836,9 +4821,9 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
                   *buff = '\0';
                else
                   {
-                  strcpy( buff, "<p> <b>");
-                  strcat( buff, mpec_error_message);
-                  strcat( buff, "</b> </p>");
+                  strlcpy_error( buff, "<p> <b>");
+                  strlcat_error( buff, mpec_error_message);
+                  strlcat_error( buff, "</b> </p>");
                   }
                }
             while( (tptr = strchr( buff, '$')) != NULL)
@@ -4865,7 +4850,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
                         }
                      else if( !strcmp( search_str, "$Name"))
                         {
-                        strcpy( replace_str, obj_name);
+                        strlcpy_error( replace_str, obj_name);
                         got_it = 1;
                         }
                      else if( !strcmp( search_str, "$SV"))   /* state vect */
@@ -4906,7 +4891,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
                            replace_str[i] = '\0';
                            got_it = 1;
                            }
-                     strcat( search_str, "$");
+                     strlcat_error( search_str, "$");
                      if( got_it)
                         text_search_and_replace( buff, search_str, replace_str);
                      }
@@ -4951,7 +4936,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
                const bool redacted = line_must_be_redacted( buff,
                                              orbit_is_heliocentric);
 
-               strcpy( mpc_code, buff + 77);
+               strlcpy_error( mpc_code, buff + 77);
                buff[77] = '\0';
                if( buff[14] != 's' && buff[14] != 'v' && buff[14] != 'r')
                   total_lines++;
@@ -4973,9 +4958,9 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
                         {
                         char tbuff[180], *zptr;
 
-                        strcpy( tbuff, "</code><a href='https://www.projectpluto.com/redacted.htm'>");
-                        strcat( tbuff, terms[i]);
-                        strcat( tbuff, "</a><code class=\"neocp\">");
+                        strlcpy_error( tbuff, "</code><a href='https://www.projectpluto.com/redacted.htm'>");
+                        strlcat_error( tbuff, terms[i]);
+                        strlcat_error( tbuff, "</a><code class=\"neocp\">");
                         zptr = tptr + 2 + x[i];
                         memcpy( zptr, terms[i], strlen( terms[i]));
                         text_search_and_replace( tptr, terms[i], tbuff);
@@ -5230,7 +5215,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
                fprintf( ofile, " <a href=\"#stn_%s\">%s</a>", tbuff, tbuff);
 
                tptr[23] = '\0';        /* ...and finally,  the residuals */
-               strcpy( tbuff, tptr + 10);
+               strlcpy_error( tbuff, tptr + 10);
                text_search_and_replace( tbuff, "u", "&#xb5;");
                fprintf( ofile, "%s   ", tbuff);
                }
