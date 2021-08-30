@@ -23,11 +23,18 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include <stdarg.h>
 #include <assert.h>
 #include <errno.h>
+#include "stringex.h"
 #include "mpc_func.h"
 
-#include <string>
+int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
+#ifdef __GNUC__
+         __attribute__ (( format( printf, 1, 2)))
+#endif
+;
+
 
 #ifdef CONFIG_DIR_AUTOCOPY
+#include <string>
 
 /* Support older (pre-10.15 Catalina) versions of macOS via cpp-filesystem
    shim. From https://github.com/gulrak/filesystem#using-it-as-single-file-header
@@ -56,30 +63,6 @@ namespace fs = ghc::filesystem;
 
 const char *get_find_orb_text( const int index);
 #endif
-
-size_t strlcpy( char *dst, const char *src, size_t dsize);   /* miscell.c */
-size_t strlcat( char *dst, const char *src, size_t dsize);   /* miscell.c */
-size_t strlcpy_err( char *dst, const char *src, size_t dsize); /* miscell.c */
-size_t strlcat_err( char *dst, const char *src, size_t dsize); /* miscell.c */
-
-   /* MSVC/C++ lacks snprintf.  See 'ephem0.cpp' for details. */
-#if defined(_MSC_VER) && _MSC_VER < 1900
-int snprintf( char *string, const size_t max_len, const char *format, ...);
-#endif
-
-int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
-                                   const char *format, ...)
-#ifdef __GNUC__
-         __attribute__ (( format( printf, 3, 4)))
-#endif
-;
-
-int snprintf_err( char *string, const size_t max_len,      /* miscell.cpp */
-                                   const char *format, ...)
-#ifdef __GNUC__
-         __attribute__ (( format( printf, 3, 4)))
-#endif
-;
 
 /* This function allows one to put the following options in front of
 the 'permits' string :
@@ -718,6 +701,7 @@ size_t strlcat_err( char *dst, const char *src, size_t dsize)
       {
       fprintf( stderr, "strlcat overflow: dsize = %ld, rval %ld, '%s'\n",
                      (long)dsize, (long)rval, src);
+      assert( 0);
       exit( -1);
       }
    return( rval);
@@ -744,6 +728,9 @@ int snprintf_err( char *string, const size_t max_len,      /* miscell.cpp */
    if( (size_t)rval >= max_len || rval < 0)
       {
       fprintf( stderr, "snprintf_err : %d/%ld bytes\n", rval, (long)max_len);
+      debug_printf( "%d/%ld bytes : '%s'\n", rval, (long)max_len, string);
+      debug_printf( "Format string '%s'\n", format);
+      assert( 0);
       exit( -1);
       }
    return( rval);
