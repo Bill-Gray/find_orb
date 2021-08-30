@@ -652,7 +652,11 @@ int integrate_orbitl( long double *orbit, const long double t0, const long doubl
          {
          debug_printf( "Unreasonable %d at %.5g (%.5f to %.5f)\n",
                   rval, (double)(t - t0), (double)t0, (double)t1);
-         debug_printf( "Stepsize %g\n", (double)stepsize);
+         debug_printf( "Stepsize %g; JD %f\n", (double)stepsize, (double)t);
+         debug_printf( "   Posn: %f %f %f\n",
+                            (double)orbit[0], (double)orbit[1], (double)orbit[2]);
+         debug_printf( "   Vel:  %f %f %f\n",
+                            (double)orbit[3], (double)orbit[4], (double)orbit[5]);
          }
       else if( integration_timeout && !(n_steps % 100))
          if( clock( ) > integration_timeout)
