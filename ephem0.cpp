@@ -3718,9 +3718,9 @@ static void show_number_in_four_bytes( char *buff, double ival)
       {
       const char *format = "%4.2f";
 
-      if( ival > 999.)
+      if( ival > 99.9)
          format = "%4.0f";
-      else if( ival > 99.)
+      else if( ival > 9.9)
          format = "%4.1f";
       snprintf( buff, 5, format, ival);
       }
