@@ -99,6 +99,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "date.h"
 #include "monte0.h"
 #include "expcalc.h"
+#include "stringex.h"
 
 int debug_level = 0;
 
@@ -154,8 +155,6 @@ devoted to station data.   */
 #define RESIDUAL_FORMAT_SHOW_DESIGS              0x2000
 
 void ensure_config_directory_exists(); /* miscell.c */
-size_t strlcat_err( char *dst, const char *src, size_t dsize); /* miscell.c */
-size_t strlcpy_err( char *dst, const char *src, size_t dsize); /* miscell.c */
 static int user_select_file( char *filename, const char *title, const int flags);
 double get_planet_mass( const int planet_idx);                /* orb_func.c */
 int simplex_method( OBSERVE FAR *obs, int n_obs, double *orbit,
@@ -216,9 +215,6 @@ int find_parabolic_orbit( OBSERVE FAR *obs, const int n_obs,
 int format_jpl_ephemeris_info( char *buff);
 double improve_along_lov( double *orbit, const double epoch, const double *lov,
           const unsigned n_params, unsigned n_obs, OBSERVE *obs);
-#ifdef _MSC_VER   /* MSVC/C++ lacks snprintf.  See 'ephem0.cpp' for details. */
-int snprintf( char *string, const size_t max_len, const char *format, ...);
-#endif
 bool is_topocentric_mpc_code( const char *mpc_code);
 int64_t nanoseconds_since_1970( void);                      /* mpc_obs.c */
 int metropolis_search( OBSERVE *obs, const int n_obs, double *orbit,
@@ -256,12 +252,6 @@ int getnstr_ex( char *str, int *loc, int maxlen, const int size);  /* getstrex.c
 #endif  /* #ifdef __cplusplus */
 
 double comet_g_func( const long double r);                   /* runge.cpp */
-int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
-                                   const char *format, ...)
-#ifdef __GNUC__
-         __attribute__ (( format( printf, 3, 4)))
-#endif
-;
 
 extern double maximum_jd, minimum_jd;        /* orb_func.cpp */
 
@@ -4893,18 +4883,6 @@ int main( int argc, const char **argv)
                free( orbits);
                }
             break;
-#ifdef __PDCURSES__
-         case CTRL( 'E'):
-            {
-            FILE *ifile =
-                 fopen_ext( get_file_name( tbuff, elements_filename), "tfcrb");
-
-            while( fgets( tbuff, sizeof( tbuff), ifile))
-               printf( "%s", tbuff);
-            fclose( ifile);
-            }
-         break;
-#endif
          case CTRL( 'R'):
             {
             extern double sr_min_r, sr_max_r;
@@ -5780,6 +5758,15 @@ int main( int argc, const char **argv)
                }
             }
             break;
+         case CTRL( 'X'):
+            {
+            extern bool saving_elements_for_reuse;
+
+            saving_elements_for_reuse ^= 1;
+            strlcpy_error( message_to_user, "Saving elements for re-use is");
+            add_off_on = saving_elements_for_reuse;
+            }
+            break;
          case ALT_Y:
             snprintf( message_to_user, sizeof( message_to_user),
                      "Exclusion file of %d obs written",
@@ -5787,6 +5774,23 @@ int main( int argc, const char **argv)
             break;
          case 'j': case 'J':
          case ';': case '\'':
+         case CTRL( 'E'): case CTRL( 'J'): case CTRL( 'L'):
+         case CTRL( 'N'): case CTRL( 'O'): case CTRL( 'T'):
+         case CTRL( 'V'): case CTRL( 'W'): case CTRL( 'Y'):
+         case CTRL( '_'): case CTRL( ']'):
+         case CTL_UP: case CTL_LEFT: case CTL_DN: case CTL_RIGHT:
+         case KEY_F( 13):        /* shift-f1 */
+         case KEY_F( 14):        /* shift-f2 */
+         case KEY_F( 15):        /* shift-f3 */
+         case KEY_F( 24):        /* shift-f12 */
+         case KEY_DC:            /* delete key */
+         case CTL_DEL:
+         case ALT_DEL:
+         case KEY_B2:            /* central key on numeric keypad */
+         case KEY_ENTER:         /* on numeric keypad */
+#ifdef __PDCURSES__
+         case PADPLUS: case PADMINUS: case PADSLASH:
+#endif
          default:
             debug_printf( "Key %d hit\n", c);
             show_a_file( "dos_help.txt");
