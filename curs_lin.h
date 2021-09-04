@@ -107,6 +107,9 @@ something I've just not figured out yet.      */
 #define ALT_UP        0x234
 #define ALT_DN        0x20b
 
+#define ALT_DEL       0x205
+#define ALT_INS       0x21a
+
 #define CTL_PAD2     0x020d
 #define CTL_PAD3     0x0226
 #define CTL_PAD4     0x0221
