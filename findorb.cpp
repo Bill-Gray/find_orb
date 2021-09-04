@@ -5778,7 +5778,12 @@ int main( int argc, const char **argv)
          case CTRL( 'N'): case CTRL( 'O'): case CTRL( 'T'):
          case CTRL( 'V'): case CTRL( 'W'): case CTRL( 'Y'):
          case CTRL( '_'): case CTRL( ']'):
-         case CTL_UP: case CTL_LEFT: case CTL_DN: case CTL_RIGHT:
+         case CTL_UP: case CTL_LEFT: case CTL_RIGHT:
+#ifdef CTL_DOWN        /* PDCurses uses this #define */
+         case CTL_DOWN:
+#else                  /* ncurses uses this #define */
+         case CTL_DN:
+#endif
          case KEY_F( 13):        /* shift-f1 */
          case KEY_F( 14):        /* shift-f2 */
          case KEY_F( 15):        /* shift-f3 */
