@@ -45,6 +45,7 @@ backward;  both should be negated.  (Or A should be negated.)
 class notes at
 
 http://spiff.rit.edu/classes/ast613/lectures/signal/signal_illus.html
+https://www.noao.edu/kpno/manuals/dim/#ccdtime
 
    The Lowell paper makes certain assumptions about the use
 of a near-optimal measuring aperture.  (Use too large a measuring
