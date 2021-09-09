@@ -5382,6 +5382,7 @@ int main( int argc, const char **argv)
                         "%d pairs of %d colors\n", COLOR_PAIRS, COLORS);
             if( can_change_color( ))
                strcat( tbuff, "Colors are changeable\n");
+            snprintf_append( tbuff, sizeof( tbuff), "2021 Sep 08 version\n");
             format_jpl_ephemeris_info( tbuff + strlen( tbuff) - 1);
             load_earth_orientation_params( NULL, eop_range);
             if( eop_range[0])
