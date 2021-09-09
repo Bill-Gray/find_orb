@@ -2309,9 +2309,13 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
          }
       else
          {
-         curr_jd = jd_start + (double)i * step;
          if( options & OPTION_ROUND_TO_NEAREST_STEP)
-            curr_jd = round_to( curr_jd - .5, step) + .5;
+            {
+            curr_jd = round_to( jd_start - .5, step) + .5;
+            curr_jd = round_to( curr_jd + i * step - .5, step) + .5;
+            }
+         else
+            curr_jd = jd_start + (double)i * step;
          }
       if( reset_lat_alt)
          parallax_to_lat_alt(
