@@ -4357,6 +4357,7 @@ int main( int argc, const char **argv)
             break;
          case KEY_F(1):      /* turn on/off all obs prior to curr one */
          case ALT_U:         /* Used because F1 doesn't work in X     */
+         case CTRL( 'W'):    /* Used because Alt-U doesn't work on Macs */
             obs[curr_obs].is_included ^= 1;
             for( i = 0; i < curr_obs; i++)
                obs[i].is_included = obs[curr_obs].is_included;
@@ -5777,7 +5778,7 @@ int main( int argc, const char **argv)
          case ';': case '\'':
          case CTRL( 'E'): case CTRL( 'J'): case CTRL( 'L'):
          case CTRL( 'N'): case CTRL( 'O'): case CTRL( 'T'):
-         case CTRL( 'V'): case CTRL( 'W'):
+         case CTRL( 'V'):
          case CTRL( '_'): case CTRL( ']'):
          case ALT_Y:
          case CTL_UP: case CTL_LEFT: case CTL_RIGHT:
