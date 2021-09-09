@@ -463,6 +463,32 @@ int simplex_search( tle_t *tle, const double *starting_params,
    return( 0);
 }
 
+#ifndef PATH_MAX
+   #define PATH_MAX 256
+#endif
+
+static FILE *fopen_from_findorb_dir( const char *filename, const char *permits)
+{
+   const char *path = getenv( "HOME");
+   FILE *rval = NULL;
+
+   if( path)
+      {
+      char fullname[PATH_MAX];
+
+      assert( strlen( path) + strlen( filename) + 12 < PATH_MAX);
+      strcpy( fullname, path);
+      strcat( fullname, "/.find_orb/");
+      strcat( fullname, filename);
+      rval = fopen( fullname, permits);
+      if( !rval)
+         fprintf( stderr, "Couldn't open '%s'\n", fullname);
+      }
+   if( !rval)
+      rval = fopen( filename, permits);
+   return( rval);
+}
+
 /* Certain objects have names (preliminary designations from surveys),  but
 no NORAD or international designation.  The following ensures they get one,
 which won't (we lightheartedly hope) conflict with other designations.  The
@@ -474,7 +500,7 @@ tracking community already has designations for that.
 
 static void reset_desigs_by_name( const char *obj_name, tle_t *tle)
 {
-   FILE *ifile = fopen( "sat_xref.txt", "rb");
+   FILE *ifile = fopen_from_findorb_dir( "sat_xref.txt", "rb");
    char buff[100];
 
    assert( ifile);
@@ -505,7 +531,7 @@ I'm not using the 'revolution number at epoch' field at present.  */
 
 int main( const int argc, const char **argv)
 {
-   FILE *ifile = fopen( "eph2tle.txt", "rb");
+   FILE *ifile = fopen_from_findorb_dir( "eph2tle.txt", "rb");
    FILE *ofile = stdout;
    int i, j, count = 0, output_freq = 10, line = 0;
    int tles_written = 0;
