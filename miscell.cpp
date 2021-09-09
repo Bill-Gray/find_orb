@@ -16,6 +16,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301, USA. */
 
 #include <stdio.h>
+#include <ctype.h>
 #include <string.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -404,8 +405,15 @@ int fetch_astrometry_from_mpc( FILE *ofile, const char *desig)
       unsigned j = 0;
       int err_code;
       size_t i;
-      char filename[40];
+      char filename[40], temp_desig[10];
 
+      if( isalpha( desig[0]) && isdigit( desig[1]) && isdigit( desig[2])
+                             && isdigit( desig[3]) && isdigit( desig[4]) && !desig[5])
+         {
+         snprintf_err( temp_desig, sizeof( temp_desig), "%d%s",
+                  mutant_hex_char_to_int( *desig), desig + 1);
+         desig = temp_desig;     /* unpacks G3141 -> 163141,  etc. */
+         }
       for( i = 0; desig[i]; i++)
          j = j * 314159u + (unsigned)desig[i];
 #ifdef _WIN32
