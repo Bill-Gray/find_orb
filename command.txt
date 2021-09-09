@@ -24,6 +24,10 @@ w              Worst
 |              MonteCarlo
 [              CovarData
 `              CmtMags
+Ctrl-W         ToggUp
+F2             ToggDn
+Ctrl-Y         BanObs
+Ctrl-X         SaveOrbs
 )              ReadFile
 End
    Color assignments (foreground,  then background,  in hex form)
@@ -124,3 +128,7 @@ U+31005        Remove last line of menu options
 ?              Get help
 %              Set uncertainties for the selected observation(s)
 &              Toggle use of punched-card RA/dec format
+Ctrl-W         Toggle observations above the currently selected one
+F2             Toggle observations below the currently selected one
+Ctrl-X         Save orbits for re-use
+Ctrl-Y         Write excluded observations to be 'banned'
