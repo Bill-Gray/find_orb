@@ -5768,7 +5768,7 @@ int main( int argc, const char **argv)
             add_off_on = saving_elements_for_reuse;
             }
             break;
-         case ALT_Y:
+         case CTRL( 'Y'):
             snprintf( message_to_user, sizeof( message_to_user),
                      "Exclusion file of %d obs written",
                                      write_excluded_observations_file( obs, n_obs));
@@ -5777,8 +5777,9 @@ int main( int argc, const char **argv)
          case ';': case '\'':
          case CTRL( 'E'): case CTRL( 'J'): case CTRL( 'L'):
          case CTRL( 'N'): case CTRL( 'O'): case CTRL( 'T'):
-         case CTRL( 'V'): case CTRL( 'W'): case CTRL( 'Y'):
+         case CTRL( 'V'): case CTRL( 'W'):
          case CTRL( '_'): case CTRL( ']'):
+         case ALT_Y:
          case CTL_UP: case CTL_LEFT: case CTL_RIGHT:
 #ifdef CTL_DOWN        /* PDCurses uses this #define */
          case CTL_DOWN:
