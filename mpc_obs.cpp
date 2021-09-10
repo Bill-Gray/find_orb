@@ -3363,6 +3363,7 @@ double maximum_observation_span = 200.;
 int sanity_check_observations = 1;
 bool use_sigmas = true;
 extern int is_interstellar;
+static double _overall_obj_alt_limit, _overall_sun_alt_limit;
 
 OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                            const int n_obs)
@@ -3736,6 +3737,10 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
             }
          else if( !memcmp( buff, "#suppress_obs", 13))
             including_obs = false;
+         else if( !memcmp( buff, "#sun_alt_limit ", 15))
+            _overall_sun_alt_limit = atof( buff + 15);
+         else if( !memcmp( buff, "#obj_alt_limit ", 15))
+            _overall_obj_alt_limit = atof( buff + 15);
          else if( !memcmp( buff, "#include_obs", 12))
             including_obs = true;
          else if( !memcmp( buff, "#toffset", 7))
@@ -3828,14 +3833,15 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
             if( !get_obs_alt_azzes( rval + i, &sun_alt_az, &obj_alt_az)
                      && sun_alt_az.x > -90.)
                {                          /* I.e., not flagged as meaningless */
-               if( sun_alt_az.y > 0. && nighttime_only( rval[i].mpc_code))
+               if( sun_alt_az.y > _overall_sun_alt_limit
+                                     && nighttime_only( rval[i].mpc_code))
                   {
                   n_in_sunlight++;
                   rval[i].is_included = 0;
                   rval[i].flags |= OBS_DONT_USE;
                   comment_observation( rval + i, "Daylit");
                   }
-               if( obj_alt_az.y < 0.)
+               if( obj_alt_az.y < _overall_obj_alt_limit)
                   {
                   n_below_horizon++;
                   rval[i].is_included = 0;
