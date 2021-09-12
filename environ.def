@@ -422,3 +422,12 @@ SIGMA_MULTIPLIER=1
    and exposure durations will be correspondingly longer.  GALACTIC_ADDENDUM=18
    seems to work fairly well,  but again,  tweaking will be required.
 GALACTIC_ADDENDUM=
+
+   Rarely,  you will encounter astrometry with no photometry.  By default,
+   that results in no H (absolute mag) parameter being computed or shown.
+   Set,  for example,  DEFAULT_V_MAG=21,  and in such cases,  Find_Orb will
+   assume the object was observed at Vmag = 21 and compute H accordingly.
+   This is a convenience for some automated uses where you really want
+   _some_ H given to indicate,  at the very least,  "it's really big" vs.
+   "it's really small".  Obviously,  if possible,  supply photometry.
+DEFAULT_V_MAG=

@@ -3229,7 +3229,7 @@ double mag_band_shift( const char mag_band)
    return( 0.);
 }
 
-double calc_absolute_magnitude( OBSERVE FAR *obs, int n_obs)
+double calc_absolute_magnitude( OBSERVE FAR *obs, const int n_obs)
 {
    int obs_no;
    double n_mags = 0.;
@@ -3262,9 +3262,31 @@ double calc_absolute_magnitude( OBSERVE FAR *obs, int n_obs)
          }
       obs++;
       }
+   obs -= n_obs;
    if( n_mags)
       rval /= n_mags;
-   obs -= n_obs;
+   else
+      {
+      const double default_v_mag = atof( get_environment_ptr( "DEFAULT_V_MAG"));
+
+      if( default_v_mag)   /* see 'environ.def' for an explanation of this */
+         {
+         OBSERVE *temp_obs = (OBSERVE *)calloc( n_obs, sizeof( OBSERVE));
+
+         for( obs_no = 0; obs_no < n_obs; obs_no++)
+            {
+            temp_obs[obs_no] = obs[obs_no];
+            temp_obs[obs_no].obs_mag = default_v_mag;
+            temp_obs[obs_no].mag_band = 'V';
+            temp_obs[obs_no].mag_sigma = 5.;
+            }
+         rval = calc_absolute_magnitude( temp_obs, n_obs);
+         for( obs_no = 0; obs_no < n_obs; obs_no++)
+            obs[obs_no].computed_mag = temp_obs[obs_no].computed_mag;
+         free( temp_obs);
+         return( rval);
+         }
+      }
    for( obs_no = 0; obs_no < n_obs; obs_no++, obs++)
       if( n_mags)
          obs->computed_mag += rval;
