@@ -161,7 +161,6 @@ typedef uint64_t ephem_option_t;
 #define OPTION_EXPOSURE_TIME            EPHEM_OPTION_BIT( 36)
 #define OPTION_EXPLANATIONS             EPHEM_OPTION_BIT( 37)
 
-#define HELIOCENTRIC_SIGMAS_ONLY       0
 #define ORBIT_SIGMAS_REQUESTED         1
 #define NO_ORBIT_SIGMAS_REQUESTED    (-1)
 
