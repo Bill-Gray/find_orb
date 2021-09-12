@@ -43,7 +43,7 @@ const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 void set_environment_ptr( const char *env_ptr, const char *new_value);
 char *get_file_name( char *filename, const char *template_file_name);
 int sanity_test_observations( const char *filename);
-int debug_printf( const char *format, ...)                 /* runge.cpp */
+int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
 #ifdef __GNUC__
          __attribute__ (( format( printf, 1, 2)))
 #endif
@@ -149,6 +149,7 @@ int main( const int argc, const char **argv)
    FILE *lock_file = fopen( "lock.txt", "w");
    extern const char *combine_all_observations;
    extern const char *temp_obs_filename;     /* miscell.cpp */
+   extern int forced_central_body;
    double jd_start = 0., jd_end = 0., user_selected_epoch = 0.;
    const double min_jd = 2378527.5;    /* 1800 feb 1 */
    const double max_jd = 2488083.5;    /* 2099 dec 1 */
@@ -363,15 +364,7 @@ int main( const int argc, const char **argv)
       return( 0);
       }
    ephemeris_mag_limit = mag_limit;
-   if( center_object == -2)
-      element_format &= ~ELEM_OUT_HELIOCENTRIC_ONLY;
-   else
-      {
-      extern int forced_central_body;
-
-      forced_central_body = center_object;
-      element_format |= ELEM_OUT_HELIOCENTRIC_ONLY;
-      }
+   forced_central_body = center_object;
 
    load_up_sigma_records( "sigma.txt");
    fprintf( lock_file, "Default uncertainties table read\n");
@@ -406,14 +399,12 @@ int main( const int argc, const char **argv)
    if( available_sigmas == COVARIANCE_AVAILABLE)
       {
       extern unsigned perturbers;
-      const int sigma_type = ((element_format & ELEM_OUT_HELIOCENTRIC_ONLY) ?
-                           HELIOCENTRIC_SIGMAS_ONLY : ORBIT_SIGMAS_REQUESTED);
 
       perturbers = 0x7fe;     /* all planets plus the moon */
       if( user_selected_epoch)
          epoch_shown = user_selected_epoch;
       full_improvement( obs, n_obs, orbit, curr_epoch, "",
-                    sigma_type, epoch_shown);
+                    ORBIT_SIGMAS_REQUESTED, epoch_shown);
       }
    fprintf( lock_file, "avail sigmas %d\n", available_sigmas);
 

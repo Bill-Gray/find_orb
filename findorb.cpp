@@ -1777,32 +1777,35 @@ static unsigned show_basic_info( const OBSERVE FAR *obs, const int n_obs,
    return( line);
 }
 
-int select_central_object( int *element_format, char *buff,
-                                          const bool dialog_text_only)
+static int select_central_object( char *buff, const bool dialog_text_only)
 {
    extern int forced_central_body;
    int i, c;
    const char *hotkeys = "AB0123456789L", *tptr;
 
    *buff = '\0';
-   strcpy( buff, "A  Automatic\n");
-   if( !(*element_format & ELEM_OUT_HELIOCENTRIC_ONLY))
-      buff[1] = '*';
-   for( i = -1; i <= 10; i++)
+   for( i = -2; i <= 10; i++)
       {
-      bool is_selected = (i == forced_central_body
-               && (*element_format & ELEM_OUT_HELIOCENTRIC_ONLY));
+      bool is_selected = (i == forced_central_body);
 
       sprintf( buff + strlen( buff), "%c%c ",
                hotkeys[i + 2], is_selected ? '*' : ' ');
-      if( i == -1)
-         strcat( buff, "Barycentric\n");
-      else if( !i)
-         strcat( buff, "Heliocentric\n");
-      else
+      switch( i)
          {
-         strcat( buff, get_find_orb_text( 99108 + i - 1));
-         strcat( buff, "\n");
+         case -2:
+            strcat( buff, "Automatic\n");
+            break;
+         case -1:
+            strcat( buff, "Barycentric\n");
+            break;
+         case 0:
+            strcat( buff, "Heliocentric\n");
+            break;
+         default:
+            {
+            strcat( buff, get_find_orb_text( 99108 + i - 1));
+            strcat( buff, "\n");
+            }
          }
       }
    if( dialog_text_only)
@@ -1810,13 +1813,8 @@ int select_central_object( int *element_format, char *buff,
    c = inquire( buff, NULL, 0, COLOR_DEFAULT_INQUIRY);
    if( c && (tptr = strchr( hotkeys, toupper( c))) != NULL)
       c = KEY_F( 1) + (int)( tptr - hotkeys);
-   if( c == KEY_F( 1))
-      *element_format &= ~ELEM_OUT_HELIOCENTRIC_ONLY;
-   else if( c >= KEY_F( 2) && c <= KEY_F( 13))
-      {
+   if( c >= KEY_F( 1) && c <= KEY_F( 13))
       forced_central_body = c - KEY_F( 3);
-      *element_format |= ELEM_OUT_HELIOCENTRIC_ONLY;
-      }
    return( forced_central_body);
 }
 
@@ -3263,8 +3261,8 @@ static int resid_format_menu( char *message_to_user, int resid_format)
       *message_to_user = '\0';
    return( resid_format);
 }
-static void setup_elements_dialog( char *buff, const char *constraints,
-                                             int element_format)
+
+static void setup_elements_dialog( char *buff, const char *constraints)
 {
    int pass;
    char tbuff[300], *tptr;
@@ -3280,7 +3278,7 @@ static void setup_elements_dialog( char *buff, const char *constraints,
    for( pass = 0; pass < 2; pass++)
       {
       if( pass)
-         select_central_object( &element_format, tbuff, true);
+         select_central_object( tbuff, true);
       else
          element_frame_dialog_text( tbuff);
       tptr = strchr( tbuff, '*');
@@ -4249,7 +4247,7 @@ int main( int argc, const char **argv)
             if( button & (BUTTON2_RELEASED | BUTTON2_CLICKED
                         | BUTTON3_RELEASED | BUTTON3_CLICKED))
                {                 /* right or middle button click/release */
-               setup_elements_dialog( tbuff, orbit_constraints, element_format);
+               setup_elements_dialog( tbuff, orbit_constraints);
                help_file_name = "elem_pop.txt";
                i = full_inquire( tbuff, NULL, 0,
                                COLOR_MENU, mouse_y, mouse_x);
@@ -4587,8 +4585,7 @@ int main( int argc, const char **argv)
 
                   if( i == 1 && c != AUTO_REPEATING &&
                               (element_format & ELEM_OUT_ALTERNATIVE_FORMAT))
-                     sigma_type = ((element_format & ELEM_OUT_HELIOCENTRIC_ONLY) ?
-                           HELIOCENTRIC_SIGMAS_ONLY : ORBIT_SIGMAS_REQUESTED);
+                     sigma_type = ORBIT_SIGMAS_REQUESTED;
                   err = full_improvement( obs, n_obs, orbit, mid_epoch,
                               orbit_constraints, sigma_type, epoch_shown);
                   }
@@ -5329,7 +5326,7 @@ int main( int argc, const char **argv)
             add_off_on = (residual_format & RESIDUAL_FORMAT_MAG_RESIDS);
             break;
          case '+':
-            select_central_object( &element_format, tbuff, false);
+            select_central_object( tbuff, false);
             update_element_display = 1;
             break;
          case '[':

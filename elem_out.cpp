@@ -1548,7 +1548,7 @@ int write_out_elements_to_file( const double *orbit,
    integrate_orbit( orbit2, curr_epoch, epoch_shown);
    memcpy( helio_ecliptic_j2000_vect, orbit2, 6 * sizeof( double));
    helio_ecliptic_j2000_vect[6] = epoch_shown;
-   if( options & ELEM_OUT_HELIOCENTRIC_ONLY)
+   if( forced_central_body != ORBIT_CENTER_AUTO)
       {
       planet_orbiting = forced_central_body;
       get_relative_vector( epoch_shown, orbit2, rel_orbit, planet_orbiting);

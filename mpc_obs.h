@@ -90,6 +90,7 @@ orbit;  i.e.,  we could have a 12x12 covariance matrix. */
 
 #define MAX_N_NONGRAV_PARAMS 6
 #define MAX_N_PARAMS 12
+#define ORBIT_CENTER_AUTO  -2
 
 typedef uint64_t ephem_option_t;
 
@@ -287,7 +288,7 @@ int clean_up_find_orb_memory( void);         /* orb_func.cpp */
 #define ELEM_OUT_PRECISE_MEAN_RESIDS   8
 #define ELEM_OUT_ALTERNATIVE_FORMAT    4
 #define ELEM_OUT_NO_COMMENT_DATA       2
-#define ELEM_OUT_HELIOCENTRIC_ONLY     1
+/* #define ELEM_OUT_HELIOCENTRIC_ONLY     1     Now obsolete */
 
 #define NO_SIGMAS_AVAILABLE            0
 #define COVARIANCE_AVAILABLE           1

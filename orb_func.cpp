@@ -2926,10 +2926,11 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
       return( -4);
       }
 
-   if( sigmas_requested != HELIOCENTRIC_SIGMAS_ONLY)
+   if( planet_orbiting == ORBIT_CENTER_AUTO)    /* select 'best' orbit center */
       planet_orbiting = find_best_fit_planet( epoch2, orbit2, tvect);
    else
       get_relative_vector( epoch2, orbit2, tvect, planet_orbiting);
+   assert( planet_orbiting >= -1);
    for( i = 0; i < 6; i++)
       {
       central_obj_state[i] = orbit2[i] - tvect[i];

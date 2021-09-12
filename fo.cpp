@@ -829,7 +829,7 @@ int main( int argc, const char **argv)
             bool have_json_ephem = false;
 
             if( all_heliocentric)
-               element_options |= ELEM_OUT_HELIOCENTRIC_ONLY;
+               forced_central_body = ORBIT_CENTER_AUTO;
                 /* Start a bit ahead of the actual data,  just in case */
                 /* there's a #Sigma: or similar command in there: */
             if( file_offset < 0L)
