@@ -832,6 +832,9 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
                   real_packed_desig( buff, packed_id));
    fprintf( ofile, "      \"created\": %.5f,\n", jd);
    fprintf( ofile, "      \"created iso\": \"%s\",\n", iso_time( buff, jd, 0));
+   find_orb_version_jd( &jd);
+   fprintf( ofile, "      \"Find_Orb_version\": %.5f,\n", jd);
+   fprintf( ofile, "      \"Find_Orb_version_iso\": \"%s\",\n", iso_time( buff, jd, 0));
    fprintf( ofile, "      \"elements\":\n      {\n");
    fprintf( ofile, "        \"central body\": \"%s\",\n", object_name( buff, elem->central_obj));
    strcpy( buff, body_frame_note + 1);
@@ -2050,7 +2053,7 @@ int write_out_elements_to_file( const double *orbit,
       make_date_range_text( buff, obs[0].jd, obs[n_obs - 1].jd);
       fprintf( ofile, "# Full range of obs: %s (%d observations)\n",
                               buff, n_obs);
-      fprintf( ofile, "# Find_Orb ver: %s %s\n", __DATE__, __TIME__);
+      fprintf( ofile, "# Find_Orb ver: %s\n", find_orb_version_jd( NULL));
       fprintf( ofile, "# Perturbers: %08lx ", (unsigned long)perturbers);
       if( !perturbers)
          fprintf( ofile, "(unperturbed orbit)");
