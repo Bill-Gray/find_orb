@@ -50,6 +50,10 @@ int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
 ;
 extern int debug_level;
 
+#if defined( __GNUC__) && defined( __TIMESTAMP__)
+   const char *timestamp_pl_cache_cpp = __TIMESTAMP__;
+#endif
+
 int64_t planet_ns;
 static void *jpl_eph = NULL;
 
