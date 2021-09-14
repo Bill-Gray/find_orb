@@ -3770,10 +3770,11 @@ void format_observation( const OBSERVE FAR *obs, char *text,
          {
          case 2:        /* CYYMMDD:HHMMSSsss:  formats 20-23 */
          case 3:        /* CYYMMDD.ddddddddd:  formats 30-39 */
+         case 5:        /* CYYMMDD:HHMM:       format 50 */
             snprintf( text, 6, "%c%02u%02u",     /* show century letter, 2digit yr, mo */
                      (char)( 'A' + year / 100 - 10), (unsigned)( year % 100),
                      (unsigned)month);
-            if( base_time_format == 2)
+            if( base_time_format != 3)
                {
                show_dd_hh_mm_ss_point_sss( text + 5, day, n_time_digits);
                text[7] = ':';
@@ -3786,6 +3787,8 @@ void format_observation( const OBSERVE FAR *obs, char *text,
                text[16] = text[18];
                text[17] = text[19];
                text[18] = '\0';
+               if( base_time_format == 5)    /* lop off the seconds */
+                  text[12] = text[13] = ' ';
                }
             else
                snprintf( text + 5, 13, "%012.9f", day);

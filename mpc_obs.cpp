@@ -1789,6 +1789,8 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
       obs->time_sigma = pow( .1, (double)( time_format % 10));
       if( time_format / 10 == 2)    /* CYYMMDD HH:MM:SS.ss.. formats */
          obs->time_sigma /= seconds_per_day;
+      if( time_format / 10 == 5)    /* CYYMMDD HH:MM.mmm... formats */
+         obs->time_sigma /= minutes_per_day;
       }
 
    obs->mag_precision = 2;         /* start out assuming mag to .01 mag */
