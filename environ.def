@@ -106,15 +106,14 @@ RADAR_ATA=0,17,.94,10,0
    The third value defaults to zero;  if it's non-zero,  the positional sigmas
    for observations are shown in the (normally blank) columns 57-65 of MPC
    reports.  The fourth number indicates a central object for orbital
-   elements,  if one isn't allowing automatic selection of elements.  By default,
-   the central object is 3,  i.e.,  the earth.
+   elements.  The default -2 means "pick a central object automatically".
       The final number is 1 if FCCT14 astrometric debiasing is applied,  and 0
    if it is not. FCCT14 removes (most of) the star catalog position/proper
    motion biases,  using tables from Farnocchia,  Chesley,  Chamberlin,
    Tholen, _Icarus_ 245 (2015) 94-111,
    http://adsabs.harvard.edu/abs/2015Icar..245...94F  .  See
    https://www.projectpluto.com/bias.htm for more information.
-SETTINGS2=1 22.00 0 3 0
+SETTINGS2=1 22.00 0 -2 0
 
    Note the comments in the above paragraph about FCCT14 debiasing.  By
    default,  Find_Orb looks for the 'bias.dat' file to be in the same
