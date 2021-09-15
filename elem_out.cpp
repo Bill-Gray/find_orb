@@ -53,10 +53,6 @@ bool findorb_already_running = false;
    #endif
 #endif
 
-#if defined( __GNUC__) && defined( __TIMESTAMP__)
-   const char *timestamp_elem_out_cpp = __TIMESTAMP__;
-#endif
-
 #define J2000 2451545.
 #define PI 3.1415926535897932384626433832795028841971693993751058209749445923
 #define GAUSS_K .01720209895

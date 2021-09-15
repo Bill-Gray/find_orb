@@ -53,10 +53,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #define EARTH_MINOR_AXIS_IN_AU (EARTH_MINOR_AXIS / AU_IN_METERS)
 #define J2000 2451545.
 
-#if defined( __GNUC__) && defined( __TIMESTAMP__)
-   const char *timestamp_mpc_obs_cpp = __TIMESTAMP__;
-#endif
-
 int apply_excluded_observations_file( OBSERVE *obs, const int n_obs);
 void set_up_observation( OBSERVE FAR *obs);                 /* mpc_obs.c */
 static double observation_jd( const char *buff);

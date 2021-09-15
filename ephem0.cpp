@@ -57,10 +57,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #define LOG_10 2.3025850929940456840179914546843642076011014886287729760333279009675726
 #define LIGHT_YEAR_IN_KM    (365.25 * seconds_per_day * SPEED_OF_LIGHT)
 
-#if defined( __GNUC__) && defined( __TIMESTAMP__)
-   const char *timestamp_ephem0_cpp = __TIMESTAMP__;
-#endif
-
 int generic_message_box( const char *message, const char *box_type);
 int save_ephemeris_file( const char *filename);       /* ephem0.cpp */
 double centralize_ang( double ang);             /* elem_out.cpp */

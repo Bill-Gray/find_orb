@@ -29,10 +29,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include <unistd.h>
 #endif
 
-#if defined( __GNUC__) && defined( __TIMESTAMP__)
-   const char *timestamp_main = __TIMESTAMP__;
-#endif
-
 #if defined( _WIN32)
    #ifdef MOUSE_MOVED
       #undef MOUSE_MOVED
@@ -5386,12 +5382,8 @@ int main( int argc, const char **argv)
                         "%d pairs of %d colors\n", COLOR_PAIRS, COLORS);
             if( can_change_color( ))
                strcat( tbuff, "Colors are changeable\n");
-#if defined( __GNUC__) && defined( __TIMESTAMP__)
             snprintf_append( tbuff, sizeof( tbuff), "Find_Orb version %s\n",
                              find_orb_version_jd( NULL));
-#else
-            snprintf_append( tbuff, sizeof( tbuff), "2021 Sep 13 version\n");
-#endif
             format_jpl_ephemeris_info( tbuff + strlen( tbuff) - 1);
             load_earth_orientation_params( NULL, eop_range);
             if( eop_range[0])

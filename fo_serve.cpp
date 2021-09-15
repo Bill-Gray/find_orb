@@ -61,10 +61,6 @@ void refresh_console( void);                    /* fo_serve.cpp */
 void move_add_nstr( const int col, const int row, const char *msg,
                      const int n_bytes);        /* fo_serve.cpp */
 
-#if defined( __GNUC__) && defined( __TIMESTAMP__)
-   const char *timestamp_main = __TIMESTAMP__;
-#endif
-
 /* In the server flavor of Find_Orb,  warning messages such as "3
 observations were made in daylight" or "couldn't find thus-and-such file"
 are stored/added to the 'mpec_error_message' text.  This is then shown

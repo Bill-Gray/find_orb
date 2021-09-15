@@ -43,10 +43,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    #include <unistd.h>
 #endif
 
-#if defined( __GNUC__) && defined( __TIMESTAMP__)
-   const char *timestamp_orb_func_cpp = __TIMESTAMP__;
-#endif
-
 #ifdef CONSOLE
       /* In the console version of Find_Orb,  the following two functions */
       /* get remapped to Curses functions.  In the non-interactive one,   */

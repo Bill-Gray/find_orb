@@ -58,10 +58,6 @@ for Windows and other non-*nix systems. */
 #include "date.h"
 #include "monte0.h"
 
-#if defined( __GNUC__) && defined( __TIMESTAMP__)
-   const char *timestamp_main = __TIMESTAMP__;
-#endif
-
 extern int debug_level;
 
 void ensure_config_directory_exists(); /* miscell.c */

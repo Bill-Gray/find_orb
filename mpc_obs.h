@@ -465,6 +465,4 @@ extern int force_model;
 
 bool is_inverse_square_force_model( void);
 
-#if defined( __GNUC__) && defined( __TIMESTAMP__)
-   const char *find_orb_version_jd( double *jd);
-#endif
+const char *find_orb_version_jd( double *jd);

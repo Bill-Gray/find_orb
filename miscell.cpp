@@ -744,56 +744,9 @@ int snprintf_err( char *string, const size_t max_len,      /* miscell.cpp */
    return( rval);
 }
 
-#if defined( __GNUC__) && defined( __TIMESTAMP__)
-
-#include "watdefs.h"
-#include "date.h"
-#include "mpc_obs.h"
-
-/* A bit of a hack to get a date/time of the current version.  __TIMESTAMP__
-gives a date/time for the last update of the source file.  We look at the
-time stamps of a few crucial files that tend to get updated a lot.  The
-most recent one gives us our version time.
-
-The timestamp is oddly arranged,  so some memcpy() shuffling is required
-to get it into a form where get_time_from_string() can parse it. */
-
 const char *find_orb_version_jd( double *jd)
 {
-   extern const char *timestamp_main;
-   extern const char *timestamp_elem_out_cpp;
-   extern const char *timestamp_ephem0_cpp;
-   extern const char *timestamp_mpc_obs_cpp;
-   extern const char *timestamp_orb_func_cpp;
-   extern const char *timestamp_pl_cache_cpp;
-   const char *timestamps[] = { __TIMESTAMP__,
-            timestamp_main,
-            timestamp_elem_out_cpp,
-            timestamp_ephem0_cpp,
-            timestamp_mpc_obs_cpp,
-            timestamp_orb_func_cpp,
-            timestamp_pl_cache_cpp };
-   size_t i, newest_idx = (size_t)-1;
-   double most_recent_jd = 0;
-
-   for( i = 0; i < sizeof( timestamps) / sizeof( timestamps[0]); i++)
-      if( timestamps[i])
-         {
-         char buff[21];
-         double jd;
-
-         memcpy( buff, timestamps[i] + 20, 4);
-         memcpy( buff + 4, timestamps[i] + 3, 16);
-         buff[20] = '\0';
-         jd = get_time_from_string( 0., buff, 0, NULL);
-         if( most_recent_jd < jd)
-            {
-            most_recent_jd = jd;
-            newest_idx = i;
-            }
-         }
     if( jd)
-      *jd = most_recent_jd;
-    return( timestamps[newest_idx]);
+      *jd = 2459472.5;
+    return( "2021 Sep 15");
 }
-#endif         /* #if defined( __GNUC__) && defined( __TIMESTAMP__) */
