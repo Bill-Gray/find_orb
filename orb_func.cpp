@@ -1966,8 +1966,8 @@ static double max_herget_span( const double r1, const double r2)
 
    if( r > 0.)
       {
-      const double max_speed = (r > 1. ? 30. : 70.);
-      const double empirical_fudge_factor = 4.5;
+      const double max_speed = (r > 1. ? 30. : 70.);  /* km/s */
+      const double empirical_fudge_factor = 20.;
 
       rval = r * AU_IN_KM / (max_speed * seconds_per_day);
       rval *= empirical_fudge_factor;
@@ -3010,6 +3010,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
          double original_solar_pressure[MAX_N_NONGRAV_PARAMS];
          double *slope_ptr;
          double rel_orbit[6];
+         bool trouble_happened = false;
 
                   /* for asteroid mass computations,  on first pass, */
                   /* try to set a "reasonable" delta :   */
@@ -3062,6 +3063,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
                {                    /* with a smaller tweak */
                delta_val /= 2.;
                delta_vals[i] /= 2.;
+               trouble_happened = true;
                }
             }
             while( set_locs_rval);
@@ -3156,6 +3158,8 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
          worst_error_in_sigmas += 1e-10;        /* ensure _some change; */
                            /* evades divide-by-zero/range errors below */
          if( worst_error_in_sigmas > min_change && worst_error_in_sigmas < max_change)
+            keep_iterating = false;
+         if( trouble_happened && worst_error_in_sigmas < max_change)
             keep_iterating = false;
          if( worst_error_in_sigmas <= optimal_change)
             {
