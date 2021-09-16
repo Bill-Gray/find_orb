@@ -1426,6 +1426,9 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
             {
             char desig[181];
             int color = COLOR_BACKGROUND;
+            const bool in_last_column = (i >= n_lines * (n_cols - 1));
+            const int this_column_width = (in_last_column ?
+                    xmax - (n_cols - 1) * column_width + 1 : column_width);
 
             if( i + curr_page < n_ids)
                {
@@ -1450,20 +1453,19 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
                else
                   if( ids[i + curr_page].solution_exists)
                      color = COLOR_OBS_INFO;
-               if( column_width > 40)
+               if( this_column_width > 40)
                   {
                   strcat( desig, " ");
                   object_comment_text( desig + strlen( desig), ids + i + curr_page);
                   }
-               desig[column_width - 1] = ' ';
-               desig[column_width] = '\0';    /* trim to fit available space */
+               desig[this_column_width - 1] = ' ';
+               desig[this_column_width] = '\0';    /* trim to fit available space */
                }
             else                        /* just want to erase space: */
                *desig = '\0';
-            sprintf( buff, "%-*s", column_width, desig);
+            sprintf( buff, "%-*s", this_column_width, desig);
             put_colored_text( buff, i % n_lines,
-                   (i / n_lines) * column_width,
-                   (n_cols == 1 ? -1 : column_width), color);
+                   (i / n_lines) * column_width, this_column_width, color);
             }
 
               /* "Use arrow keys to select object", etc. */
