@@ -1705,7 +1705,12 @@ static int get_character_code( const char *buff)
    int rval;
 
    if( !memcmp( buff, "Alt-", 4))
-      rval = ALT_0 + buff[4] - '0';
+      {
+      if( buff[4] >= 'A' && buff[4] <= 'Z')
+         rval = ALT_A + buff[4] - 'A';
+      else
+         rval = ALT_0 + buff[4] - '0';
+      }
    else if( *buff == 'F')
       rval = KEY_F( atoi( buff + 1));
    else if( *buff == 'U' && buff[1] == '+')
@@ -2114,7 +2119,7 @@ static void show_residual_legend( const int line_no, const int residual_format)
    add_cmd_area( '=', line_no, 85, 7);   /* click on ' delta ' toggles mag resids */
    add_cmd_area( ALT_K, line_no, 44, 8);  /* 'sigmas' toggles sigma display */
    add_cmd_area( '&', line_no, 21, 17);  /* 'ra dec' toggles forced punch card fmt */
-   add_cmd_area( 9, line_no, 65, 3);  /* 'Obs' sorts obs by code,  not date */
+   add_cmd_area( ALT_X, line_no, 65, 3);  /* Show list of MPC codes */
    add_cmd_area( MOUSE_CLICK_ON_TIME_LEGEND, line_no, 5, 12);
 }
 

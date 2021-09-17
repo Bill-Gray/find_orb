@@ -122,6 +122,7 @@ w              Show included observation with the worst residuals
 a              Toggle perturbations from asteroids
 t              Toggle residuals from 'normal' to along-track/cross-track
 Alt-K          Toggle display of sigmas
+Alt-X          Find next obs with a desired MPC code
 U+9            Toggle sort obs by date vs. sort by MPC code
 U+31004        Add a line of menu options
 U+31005        Remove last line of menu options
