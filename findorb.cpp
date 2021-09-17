@@ -106,7 +106,6 @@ int debug_level = 0;
 extern unsigned perturbers;
 
 #define AUTO_REPEATING         31002
-#define MOUSE_CLICK_ON_TIME_LEGEND  31003
 #define KEY_ADD_MENU_LINE      31004
 #define KEY_REMOVE_MENU_LINE   31005
 
@@ -2120,7 +2119,7 @@ static void show_residual_legend( const int line_no, const int residual_format)
    add_cmd_area( ALT_K, line_no, 44, 8);  /* 'sigmas' toggles sigma display */
    add_cmd_area( '&', line_no, 21, 17);  /* 'ra dec' toggles forced punch card fmt */
    add_cmd_area( ALT_X, line_no, 65, 3);  /* Show list of MPC codes */
-   add_cmd_area( MOUSE_CLICK_ON_TIME_LEGEND, line_no, 5, 12);
+   add_cmd_area( 'b', line_no, 5, 12);    /* Toggle time format _or_ scan obs for time */
 }
 
 static int find_rgb( const unsigned irgb);
@@ -3668,7 +3667,7 @@ int main( int argc, const char **argv)
    *message_to_user = '\0';
    while( !quit)
       {
-      int line_no = 0;
+      int line_no = 0, mouse_wheel_motion;
       extern double solar_pressure[];
       extern int n_extra_params;
 
@@ -4065,33 +4064,37 @@ int main( int argc, const char **argv)
          auto_repeat_full_improvement = 0;
          }
 
+      if( (button & BUTTON4_PRESSED) || button5_pressed)  /* 'wheel up'/'dn' */
+         {
+         mouse_wheel_motion = ((button & BUTTON_CTRL) ? 5 : 1);
+         if( !button5_pressed)         /* 'wheel down' */
+            mouse_wheel_motion = -mouse_wheel_motion;
+         }
+      else
+         mouse_wheel_motion = 0;
+
       *message_to_user = '\0';
       if( c == KEY_MOUSE && !(button & REPORT_MOUSE_POSITION))
          c = find_command_area( mouse_x, mouse_y, NULL);
 
       if( c == KEY_MOUSE && !(button & REPORT_MOUSE_POSITION))
          {
-         int dir = 1;
          const unsigned station_start_line = getmaxy( stdscr) - n_stations_shown;
 
-         dir = (( button & button1_events) ? 1 : -1);
          if( debug_mouse_messages)
             sprintf( message_to_user, "x=%d y=%d z=%d button=%lx",
                               mouse_x, mouse_y, mouse_z, button);
-         if( (button & BUTTON4_PRESSED) || button5_pressed)  /* 'wheel up'/'dn' */
+         if( mouse_wheel_motion)
             {
-            int delta = ((button & BUTTON_CTRL) ? 5 : 1);
             int n_selected = 0;
 
-            if( !button5_pressed)         /* 'wheel down' */
-               delta = -delta;
-            top_obs_shown += delta;
+            top_obs_shown += mouse_wheel_motion;
             for( i = 0; i < n_obs; i++)
                if( obs[i].flags & OBS_IS_SELECTED)
                   n_selected++;
             if( n_selected == 1)
                {
-               curr_obs += delta;
+               curr_obs += mouse_wheel_motion;
                single_obs_selected = true;
                }
             }
@@ -4132,7 +4135,8 @@ int main( int argc, const char **argv)
 
             if( mouse_x == max_x - 1)    /* clicked on 'scroll bar' right of obs */
                {
-               dir = 0;
+               int dir = 0;
+
                if( mouse_y == top_line_residuals)
                   dir = -1;        /* similar to mouse wheel up */
                else if( mouse_y == top_line_residuals + n_obs_shown - 1)
@@ -4453,13 +4457,6 @@ int main( int argc, const char **argv)
             perturbers ^= (7 << 20);
             strcpy( message_to_user, "Asteroids toggled");
             add_off_on = (perturbers >> 20) & 1;
-            break;
-         case 'b': case 'B':
-            residual_format ^= RESIDUAL_FORMAT_HMS;
-            strcpy( message_to_user,
-                 (residual_format & RESIDUAL_FORMAT_HMS) ?
-                 "Showing observation times as HH:MM:SS" :
-                 "Showing observation times as decimal days");
             break;
          case '!':
             perturbers = ((perturbers == 0x3fe) ? 0 : 0x3fe);
@@ -5305,22 +5302,33 @@ int main( int argc, const char **argv)
             }
          case KEY_MOUSE:   /* already handled above */
             break;
-         case MOUSE_CLICK_ON_TIME_LEGEND:
-            {       /* clicked on YY MM DD.DDD */
-            static const double time_diffs[] = { 3650., 365., 180., 90., 30.,
-                           0., 10., 1., .3, 0.1, 0.01, 0.001 };
-            const double curr_jd = obs[curr_obs].jd;
-            const double step = time_diffs[mouse_x - 5];
-            const int dir = (( button & button1_events) ? 1 : -1);
+         case 'b':
+            if( mouse_wheel_motion)
+               {       /* clicked on YY MM DD.DDD */
+               static const double time_diffs[] = { 3650., 365., 180., 90., 30.,
+                              0., 10., 1., .3, 0.1, 0.01, 0.001 };
+               const double step = time_diffs[mouse_x - 5];
+               const double target_jd = obs[curr_obs].jd
+                               + (double)mouse_wheel_motion * step;
 
-            if( dir == 1)
-               while( curr_obs < n_obs - 1 && obs[curr_obs].jd < curr_jd + step)
-                  curr_obs++;
+               if( mouse_wheel_motion > 0)
+
+                  while( curr_obs < n_obs - 1 && obs[curr_obs].jd < target_jd)
+                     curr_obs++;
+               else
+                  while( curr_obs > 0 && obs[curr_obs].jd > target_jd)
+                     curr_obs--;
+               single_obs_selected = true;
+               strcpy( message_to_user, "Stepped through observations");
+               }
             else
-               while( curr_obs > 0 && obs[curr_obs].jd > curr_jd - step)
-                  curr_obs--;
-            single_obs_selected = true;
-            }
+               {
+               residual_format ^= RESIDUAL_FORMAT_HMS;
+               strcpy( message_to_user,
+                    (residual_format & RESIDUAL_FORMAT_HMS) ?
+                    "Showing observation times as HH:MM:SS" :
+                    "Showing observation times as decimal days");
+               }
             break;
          case 27:
          case 'q': case 'Q':
