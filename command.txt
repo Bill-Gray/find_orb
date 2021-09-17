@@ -81,6 +81,7 @@ End colors
 
 Start hints
 
+b              Toggle time format
 r              Enter dist to object at start and end of arc
 q              Quit Find_Orb
 o              Open a file of astrometry
@@ -120,8 +121,8 @@ w              Show included observation with the worst residuals
 8              Toggle perturbations from Neptune
 9              Toggle perturbations from Pluto
 a              Toggle perturbations from asteroids
-t              Toggle residuals from 'normal' to along-track/cross-track
-Alt-K          Toggle display of sigmas
+t              Select how residuals are shown
+Alt-K          Toggle display of uncertainties
 Alt-X          Find next obs with a desired MPC code
 U+9            Toggle sort obs by date vs. sort by MPC code
 U+31004        Add a line of menu options
