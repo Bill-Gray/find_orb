@@ -150,7 +150,6 @@ devoted to station data.   */
 
 #define PI 3.1415926535897932384626433832795028841971693993751058209749445923
 
-#define RESIDUAL_FORMAT_SHOW_DELTAS              0x1000
 #define RESIDUAL_FORMAT_SHOW_DESIGS              0x2000
 
 void ensure_config_directory_exists(); /* miscell.c */
@@ -5349,11 +5348,6 @@ int main( int argc, const char **argv)
          case '[':
             show_a_file( get_file_name( tbuff, "covar.txt"));
             break;
-         case ']':
-            residual_format ^= RESIDUAL_FORMAT_SHOW_DELTAS;
-            strcpy( message_to_user, "Delta display turned");
-            add_off_on = (residual_format & RESIDUAL_FORMAT_SHOW_DELTAS);
-            break;
          case '-':
             {
             static const char *messages[3] = {
@@ -5790,7 +5784,7 @@ int main( int argc, const char **argv)
                                      write_excluded_observations_file( obs, n_obs));
             break;
          case 'j': case 'J':
-         case ';': case '\'':
+         case ';': case '\'': case ']':
          case CTRL( 'E'): case CTRL( 'J'): case CTRL( 'L'):
          case CTRL( 'N'): case CTRL( 'O'): case CTRL( 'T'):
          case CTRL( 'V'):
