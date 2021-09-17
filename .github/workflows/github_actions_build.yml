@@ -26,9 +26,9 @@ jobs:
         make ERRORS=Y libjpl.a
         make install
         cd ..
-        make ADDED_CFLAGS=-Werror fo eph2tle cssfield roottest
+        make fo eph2tle cssfield roottest
         wget https://raw.githubusercontent.com/Bill-Gray/PDCursesMod/master/curses.h
-        make ADDED_CFLAGS=-Werror VT=Y findorb.o
+        make VT=Y findorb.o
 
   buildOSX:
     runs-on: macOS-latest
@@ -51,9 +51,9 @@ jobs:
         make ERRORS=Y CLANG=Y libjpl.a
         make install
         cd ..
-        make ADDED_CFLAGS=-Werror CLANG=Y fo eph2tle cssfield roottest
+        make CLANG=Y fo eph2tle cssfield roottest
         wget https://raw.githubusercontent.com/Bill-Gray/PDCursesMod/master/curses.h
-        make ADDED_CFLAGS=-Werror CLANG=Y VT=Y findorb.o
+        make CLANG=Y VT=Y findorb.o
 
   buildWindows:
     runs-on: windows-latest
