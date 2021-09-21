@@ -225,16 +225,19 @@ $(RES_FILENAME): find_orb.ico find_orb.rc
 endif
 
 clean_temp:
+	$(RM) $(IDIR)/artsat.json
 	$(RM) $(IDIR)/bc405pre.txt
 	$(RM) $(IDIR)/cmt_sof.txt
 	$(RM) $(IDIR)/combined.json
 	$(RM) $(IDIR)/covar.txt
 	$(RM) $(IDIR)/covar.json
 	$(RM) $(IDIR)/covar?.txt
+	$(RM) $(IDIR)/covar?.json
 	$(RM) $(IDIR)/debug.txt
 	$(RM) $(IDIR)/dummy.txt
 	$(RM) $(IDIR)/elem_?.json
 	$(RM) $(IDIR)/eleme?.txt
+	$(RM) $(IDIR)/eleme?.json
 	$(RM) $(IDIR)/elements.txt
 	$(RM) $(IDIR)/elements.json
 	$(RM) $(IDIR)/elem_short.json
