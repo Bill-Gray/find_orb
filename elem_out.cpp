@@ -3220,6 +3220,7 @@ double calc_absolute_magnitude( OBSERVE FAR *obs, const int n_obs)
    int obs_no;
    double n_mags = 0.;
    double rval = 0.;
+   bool blank_mags_found = false;
 
    for( obs_no = 0; obs_no < n_obs; obs_no++)
       {
@@ -3232,10 +3233,17 @@ double calc_absolute_magnitude( OBSERVE FAR *obs, const int n_obs)
          if( object_type == OBJECT_TYPE_COMET
                          && obs->mag_band != default_comet_magnitude_type)
             use_obs = false;
-         if( obs->obs_mag == BLANK_MAG || !obs->is_included)
-            use_obs = false;
-         obs->computed_mag = calc_obs_magnitude(
-               obs->solar_r, obs->r, earth_sun, NULL) - mag_band_shift( obs->mag_band);
+         else if( obs->is_included)
+            {
+            if( obs->obs_mag == BLANK_MAG)
+               {
+               use_obs = false;
+               blank_mags_found = true;
+               }
+            else
+               obs->computed_mag = calc_obs_magnitude( obs->solar_r,
+                   obs->r, earth_sun, NULL) - mag_band_shift( obs->mag_band);
+            }
          if( use_obs)
             {
             rval += (obs->obs_mag - obs->computed_mag) / obs->mag_sigma;
@@ -3247,7 +3255,7 @@ double calc_absolute_magnitude( OBSERVE FAR *obs, const int n_obs)
    obs -= n_obs;
    if( n_mags)
       rval /= n_mags;
-   else
+   else if( blank_mags_found)
       {
       const double default_v_mag = atof( get_environment_ptr( "DEFAULT_V_MAG"));
 
