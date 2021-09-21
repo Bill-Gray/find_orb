@@ -3125,7 +3125,15 @@ double calc_obs_magnitude( const double obj_sun,
 
 int generic_message_box( const char *message, const char *box_type);
 
-/* The following function,  as the comment indicates,  assumes that
+/* Almost all mag band shifts,  as of 2021 Sep 19,  come from
+
+https://minorplanetcenter.net/iau/info/BandConversion.txt
+
+Previous versions drew from a variety of sources;  see old versions
+for comments (many of which would probably apply here as well,  but
+the MPC table lacks references.)
+
+The following function,  as the comment indicates,  assumes that
 a "no band" case (obs->mag_band == ' ') must be an R mag.  That's
 probably the best guess for most modern CCD observations.  MPC
 assumes a B (photographic) magnitude,  which is probably the best
@@ -3143,47 +3151,16 @@ an 'r' magnitude,  no matter what filter you had.  Problems are cases
 where the photometry was done with a different catalog than the astrometry;
 or the catalog had multiple magnitude bands (Ax.0,  B1.0);  or tricky
 things were done to "adjust" the magnitudes to a different band,  using
-either 2MASS colors to estimate a color correction or just ass uming
+either 2MASS colors to estimate a color correction or just assuming
 an average color correction.
 
 'C' ('clear',  'unfiltered') magnitudes are something of a problem.
 They never really should have existed.  As described above,  the key
 thing isn't what filter you use (though that's a nice thing to
 know);  it's what sort of reference photometry you used.  At
-present,   I'm treating 'C' magnitudes as close enough to 'R' or
-'blank'.  (I perhaps should treat them as 'probably wrong' and give
-them minimal or no weight in the computation of H values.)
-
-Estimates for the mag band shifts in R, B, I, and U are from a post by
-Petr Pravec,  https://groups.io/g/mpml/message/24598
-in turn derived from data in Shevchenko and Lupishko, Solar System
-Research 32, 220-232, 1998 :
-
-http://www.asu.cas.cz/~ppravec/ShevchenkoandLupishko1998.pdf
-
-grizyw (Sloan magnitudes) come from table 1, p. 360, 2013 April,
-Publications of the Astro Soc of Pacific, 2013 PASP, 125:357-395,
-Denneau et. al., 'The Pan-STARRS Moving Object Process System'
-
-2017 Jul 11:  David Tholen found V-G=0.28 (private communication at
-present,  will give a "proper" reference once it's published...
-also provides V-G as quadratic functions of V-I or V-R,  which
-should be handy in other contexts)
-
-2021 Jun 12: Rob Seaman passed along a private communication
-from Larry Denneau giving the shifts for the c and o bands used
-by ATLAS :  "We start with
-
-    (c-o) = -0.19 + 0.72 * (B-V)
-    (V-c) = -0.17 * (c-o) + 0.08 (c-o)^2
-
-Using B-V = 0.8, we get (c-o) = 0.386, therefore
-
-  (V-c) = -0.05, or V = c - 0.05,  and V = o + 0.336"
-
-Rob also directed me to table 6 from
-https://iopscience.iop.org/article/10.3847/1538-3881/aac37d/pdf
-which added J, L, H, K, Y, o, c.
+present,  'C' magnitudes are treated as close enough to 'R',  per
+MPC practice.  (I perhaps should treat them as 'probably wrong' and
+give them minimal or no weight in the computation of H values.)
 
 Note that along with the magnitude band shift,  the mag sigma
 ought to be adjusted,  with some quantity added in quadrature.
@@ -3202,13 +3179,14 @@ double mag_band_shift( const char mag_band)
    size_t i;
    static bool unknown_band_warning_shown = false;
    static const band_shift_t bands[] = {
-              {'R', 0.43 },       {' ', 0.43 },    {'B', -0.77 },
-              {'I', 0.82 },       {'U', -1.16 },   {'C', 0.4 },
-              {'g', -0.28 },      {'r', 0.23 },    {'i', 0.39 },
-              {'z', 0.37, },      {'y', 0.36 },    {'w', 0.16 },
-              {'G', 0.28 },       {'J', 1.2 },     {'L', 0.2 },
-              {'H', 1.4 },        {'K', 1.7 },     {'Y', 0.7 },
-              {'o', 0.336 },      {'c', -0.05 },   {'\0', 0. } };
+             {' ', 0.43},   {'B', -0.8 },   {'c', -0.05 },
+             {'C', 0.4 },   {'g', -0.35 },  {'G', 0.28 },
+             {'H', 1.4 },   {'i', 0.32 },   {'I', 0.8 },
+             {'J', 1.2 },   {'K', 1.7 },    {'L', 0.2 },
+             {'o', 0.33 },  {'r', 0.14 },   {'R', 0.4 },
+             {'U', -1.3 },  {'v', 0},       {'W', 0.4 },
+             {'w', -0.13 }, {'y', 0.32 },   {'Y', 0.7 },
+             {'z', 0.26, },    {'\0', 0. } };
 
    if( strchr( "VNT", mag_band))
       return( 0.);
