@@ -3111,9 +3111,14 @@ double calc_obs_magnitude( const double obj_sun,
       {
       double phi1, phi2, log_tan_half_phase;
 
-      log_tan_half_phase = log( sin( ph_ang / 2.) / cos( ph_ang / 2.));
-      phi1 = exp( -3.33 * exp( log_tan_half_phase * 0.63));
-      phi2 = exp( -1.87 * exp( log_tan_half_phase * 1.22));
+      if( ph_ang < 1e-10)   /* "close enough" to zero */
+         phi1 = phi2 = 1.;
+      else
+         {
+         log_tan_half_phase = log( sin( ph_ang / 2.) / cos( ph_ang / 2.));
+         phi1 = exp( -3.33 * exp( log_tan_half_phase * 0.63));
+         phi2 = exp( -1.87 * exp( log_tan_half_phase * 1.22));
+         }
       rval = 5. * log( obj_sun) - 2.5 *
                   log( (1. - asteroid_magnitude_slope_param) * phi1
                 + asteroid_magnitude_slope_param * phi2);
@@ -3222,23 +3227,19 @@ double calc_absolute_magnitude( OBSERVE FAR *obs, const int n_obs)
       if( obs->r && obs->solar_r)
          {
          const double earth_sun = vector3_length( obs->obs_posn);
+         bool use_obs = true;
 
-         if( earth_sun)
+         if( object_type == OBJECT_TYPE_COMET
+                         && obs->mag_band != default_comet_magnitude_type)
+            use_obs = false;
+         if( obs->obs_mag == BLANK_MAG || !obs->is_included)
+            use_obs = false;
+         obs->computed_mag = calc_obs_magnitude(
+               obs->solar_r, obs->r, earth_sun, NULL) - mag_band_shift( obs->mag_band);
+         if( use_obs)
             {
-            bool use_obs = true;
-
-            if( object_type == OBJECT_TYPE_COMET
-                            && obs->mag_band != default_comet_magnitude_type)
-               use_obs = false;
-            if( obs->obs_mag == BLANK_MAG || !obs->is_included)
-               use_obs = false;
-            obs->computed_mag = calc_obs_magnitude(
-                  obs->solar_r, obs->r, earth_sun, NULL) - mag_band_shift( obs->mag_band);
-            if( use_obs)
-               {
-               rval += (obs->obs_mag - obs->computed_mag) / obs->mag_sigma;
-               n_mags += 1. / obs->mag_sigma;
-               }
+            rval += (obs->obs_mag - obs->computed_mag) / obs->mag_sigma;
+            n_mags += 1. / obs->mag_sigma;
             }
          }
       obs++;
