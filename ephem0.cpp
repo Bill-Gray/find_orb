@@ -2577,7 +2577,10 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                solar_r = vector3_length( orbi_after_light_lag);
                earth_r = vector3_length( obs_posn_equatorial);
                cos_elong = r * r + earth_r * earth_r - solar_r * solar_r;
-               cos_elong /= 2. * earth_r * r;
+               if( earth_r)
+                  cos_elong /= 2. * earth_r * r;
+               else                    /* heliocentric viewpoint;  elong is  */
+                  cos_elong = -1.;     /* undefined; just set it to 180 deg */
                elong = acose( cos_elong);
                if( ra < 0.) ra += 24.;
                if( ra >= 24.) ra -= 24.;
