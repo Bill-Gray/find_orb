@@ -4083,7 +4083,7 @@ int main( int argc, const char **argv)
          if( debug_mouse_messages)
             sprintf( message_to_user, "x=%d y=%d z=%d button=%lx",
                               mouse_x, mouse_y, mouse_z, button);
-         if( mouse_wheel_motion)
+         if( mouse_wheel_motion && mouse_y < station_start_line)
             {
             int n_selected = 0;
 
@@ -4111,7 +4111,10 @@ int main( int argc, const char **argv)
             *tptr = '*';
             text_search_and_replace( tbuff, "$", search_code);
             help_file_name = "mpc_area.txt";
-            c1 = full_inquire( tbuff, NULL, 0, COLOR_MENU, mouse_y, mouse_x);
+            if( mouse_wheel_motion)
+               c1 = (mouse_wheel_motion > 0 ? KEY_F( 4) : KEY_F( 5));
+            else
+               c1 = full_inquire( tbuff, NULL, 0, COLOR_MENU, mouse_y, mouse_x);
             if( c1 >= KEY_F(1) && c1 <= KEY_F(3))
                list_codes = c1 - KEY_F(1);
             else if( c1 == KEY_F(4) || c1 == KEY_F(5))
