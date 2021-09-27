@@ -1533,6 +1533,84 @@ static int get_canned_object_posn_vel( double *posn, double *vel, const double j
    return( rval);
 }
 
+/* To compute the location for L4 or L5,  we take the state vector and
+compute the cross-product of position and velocity to get a vector
+normal to the plane.  We then rotate both position and velocity
+around that by +/- 60 degrees,  depending on whether we're at L4
+or L5. */
+
+static void _rotate_state_vector( double *state_vect, const double angle)
+{
+   double normal[3], orthog[6];
+   size_t i;
+   const double cos_ang = cos( angle), sin_ang = sin( angle);
+
+   vector_cross_product( normal, state_vect, state_vect + 3);
+   normalize_vect3( normal);
+   vector_cross_product( orthog, state_vect, normal);
+   vector_cross_product( orthog + 3, state_vect + 3, normal);
+   for( i = 0; i < 6; i++)
+      state_vect[i] = cos_ang * state_vect[i] + sin_ang * orthog[i];
+}
+
+/* See remarks in 'rovers.txt' about how L1-5 are computed. */
+
+static int _compute_lagrange_point( double *vect, const int point_number,
+                      const double jde, const bool get_vel)
+{
+   static double state[6], cached_jde;
+   static double multiplier;
+   static int cached_point_number;
+   int i;
+
+   if( cached_point_number != point_number || cached_jde != jde)
+      {
+      int obj1 = (point_number / 10000) % 1000;
+      int obj2 = (point_number / 10) % 1000;
+      const int lpoint = point_number % 10;
+      double state1[6], state2[6];
+
+      if( cached_point_number != point_number
+                     && lpoint >= 1 && lpoint <= 3)  /* collinear cases */
+         {
+         char buff[30];
+         const char *multipliers;
+
+         snprintf( buff, sizeof( buff), "LAGRANGE_%03d%03d", obj1, obj2);
+         multipliers = get_environment_ptr( buff);
+         if( *multipliers)
+            multiplier = atof( multipliers + (lpoint - 1) * 10);
+         }
+      if( obj1 == 3 && obj2 == 10)     /* Earth-Moon case */
+         {
+         obj1 = PLANET_POSN_EARTH;     /* see 'pl_cache.h' */
+         obj2 = PLANET_POSN_MOON;
+         }
+      planet_posn( obj1, jde, state1);
+      planet_posn( obj1 + PLANET_POSN_VELOCITY_OFFSET, jde, state1 + 3);
+      planet_posn( obj2, jde, state2);
+      planet_posn( obj2 + PLANET_POSN_VELOCITY_OFFSET, jde, state2 + 3);
+      for( i = 0; i < 6; i++)    /* make state2 = vector from primary to secondary */
+         state2[i] -= state1[i];
+      if( lpoint >= 1 && lpoint <= 3)     /* collinear cases */
+         {
+         for( i = 0; i < 6; i++)
+            state[i] = state1[i] + multiplier * state2[i];
+         }
+      else                        /* L4, L5 : equilateral triangle cases */
+         {
+         _rotate_state_vector( state2, (lpoint == 5 ? PI / 3. : -PI / 3.));
+         for( i = 0; i < 6; i++)
+            state[i] = state1[i] + state2[i];
+         }
+      cached_point_number = point_number;
+      cached_jde = jde;
+      }
+   for( i = 0; i < 3; i++)
+      vect[i] = state[i + (get_vel ? 3 : 0)];
+   return( 0);
+}
+
 int compute_observer_loc( const double jde, const int planet_no,
                const double rho_cos_phi,
                const double rho_sin_phi, const double lon, double FAR *offset)
@@ -1540,7 +1618,10 @@ int compute_observer_loc( const double jde, const int planet_no,
 
    if( planet_no == -2)
       return( get_canned_object_posn_vel( offset, NULL, jde));
-   if( planet_no != 3 && planet_no != 10)
+
+   if( planet_no > 90000000)
+      _compute_lagrange_point( offset, planet_no, jde, false);
+   else if( planet_no != 3 && planet_no != 10)
       planet_posn( planet_no >= 0 ? planet_no : 12, jde, offset);
                /* planet_no == -1 means SS Barycenter */
    else
@@ -1570,7 +1651,9 @@ int compute_observer_vel( const double jde, const int planet_no,
 
    if( planet_no == -2)    /* spacecraft-based observation */
       return( get_canned_object_posn_vel( NULL, vel, jde));
-   if( planet_no != 3 && planet_no != 10)
+   if( planet_no > 90000000)
+      _compute_lagrange_point( vel, planet_no, jde, true);
+   else if( planet_no != 3 && planet_no != 10)
       planet_posn( (planet_no >= 0 ? planet_no : 12) + PLANET_POSN_VELOCITY_OFFSET,
                    jde, vel);        /* planet_no == -1 means SS Barycenter */
    else

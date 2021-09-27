@@ -430,3 +430,12 @@ GALACTIC_ADDENDUM=
    _some_ H given to indicate,  at the very least,  "it's really big" vs.
    "it's really small".  Obviously,  if possible,  supply photometry.
 DEFAULT_V_MAG=
+
+   The entries below tell us that,  for example,  the Earth-Moon L1 point
+   is 84.8477% of the way to the moon from earth,  and so on for L2 and L3,
+   with similar L1/2/3 distances for the Sun-Earth and Sun-Jupiter collinear
+   Lagrange points.  These values can be computed -- see /junk/lagrange.c --
+   but it's simpler just to store these precomputed values.
+LAGRANGE_003010=0.848477, 1.168561, -0.992924
+LAGRANGE_000003=0.989989, 1.010078, -0.999998
+LAGRANGE_000005=0.933299, 1.069807, -0.999443

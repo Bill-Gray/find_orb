@@ -135,6 +135,15 @@ Ura !   0.0000       0.00000   +0.00000    @7  Uranus
 Nep !   0.0000       0.00000   +0.00000    @8  Neptune
 Plu !   0.0000       0.00000   +0.00000    @9  Pluto
 Lun !   0.0000       0.00000   +0.00000    @10 Luna
+
+   Lagrange points are approximate (but good approximation) fictions.
+   L1, L2,  and L3 are assumed to lie in straight lines with both bodies
+   at fractions based on the relative masses of the objects. L4 and L5
+   are at equilateral triangle points. Perturbations are ignored.  I
+   don't expect observations to be made from these points;  this is
+   really so you can compute ephemerides from these locations.  See
+   'environ.dat' for info on how to set up L points for other systems.
+
 SE1 !   0.0000       0.00000   +0.00 @90000031 Sun-Earth L1
 SE2 !   0.0000       0.00000   +0.00 @90000032 Sun-Earth L2
 SE3 !   0.0000       0.00000   +0.00 @90000033 Sun-Earth L3
@@ -145,7 +154,11 @@ EM2 !   0.0000       0.00000   +0.00 @90030102 Earth-Moon L2
 EM3 !   0.0000       0.00000   +0.00 @90030103 Earth-Moon L3
 EM4 !   0.0000       0.00000   +0.00 @90030104 Earth-Moon L4
 EM5 !   0.0000       0.00000   +0.00 @90030105 Earth-Moon L5
-
+SJ1 !   0.0000       0.00000   +0.00 @90000051 Sun-Jupiter L1
+SJ2 !   0.0000       0.00000   +0.00 @90000052 Sun-Jupiter L2
+SJ3 !   0.0000       0.00000   +0.00 @90000053 Sun-Jupiter L3
+SJ4 !   0.0000       0.00000   +0.00 @90000054 Sun-Jupiter L4
+SJ5 !   0.0000       0.00000   +0.00 @90000055 Sun-Jupiter L5
 
 MEx !   0.0000       0.00000   +0.00000    @4  Mars Express
 LCO ! 311.75834      -84.56139        10   @10 LCROSS impact site
