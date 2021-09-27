@@ -196,12 +196,12 @@ static int planet_posn_raw( int planet_no, const double jd,
          error_message_shown = true;
          if( jpl_eph)
             {
-            int unused_de_version;
             double jd_start, jd_end;
             char *buff = (char *)malloc( 10000);
 
             assert( buff);
-            get_jpl_ephemeris_info( &unused_de_version, &jd_start, &jd_end);
+            debug_printf( "Failure on planet %d, JD %f\n", planet_no, jd);
+            get_jpl_ephemeris_info( NULL, &jd_start, &jd_end);
             snprintf( buff, 10000, get_find_orb_text( 2030), jpl_filename,
                         JD_TO_YEAR( jd_start),
                         JD_TO_YEAR( jd_end));
@@ -463,13 +463,16 @@ int planet_posn( const int planet_no, const double jd, double *vect_2000)
       return( 0);
       }
 
-   if( planet_no == PLANET_POSN_EARTH || planet_no == PLANET_POSN_MOON)
+   if( (planet_no % PLANET_POSN_VELOCITY_OFFSET) == PLANET_POSN_EARTH
+             || (planet_no % PLANET_POSN_VELOCITY_OFFSET) == PLANET_POSN_MOON)
       {
       double moon_loc[3];
+      const int vel_offset = (planet_no > PLANET_POSN_VELOCITY_OFFSET ?
+                  PLANET_POSN_VELOCITY_OFFSET : 0);
 
-      rval = planet_posn( 3, jd, vect_2000);   /* first,  get Earth-Moon */
+      rval = planet_posn( 3 + vel_offset, jd, vect_2000);   /* first,  get Earth-Moon */
       if( !rval)                               /* barycenter posn,  then */
-         rval = planet_posn( 10, jd, moon_loc);    /* lunar offset vect  */
+         rval = planet_posn( 10 + vel_offset, jd, moon_loc);    /* lunar offset vect  */
       if( !rval)
          {
          unsigned i;
@@ -606,7 +609,8 @@ int get_jpl_ephemeris_info( int *de_version, double *jd_start, double *jd_end)
 
    planet_posn_raw( 3, J2000, vect_2000);
    planet_posn_raw( 0, 0., vect_2000);
-   *de_version = (int)vect_2000[0];
+   if( de_version)
+      *de_version = (int)vect_2000[0];
    if( jd_start)
       *jd_start = (int)vect_2000[1];
    if( jd_end)
