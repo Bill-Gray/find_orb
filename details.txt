@@ -1124,6 +1124,11 @@ OBS A. Mantero
 COM Default details extracted from MPEC 2021-E131
 TEL 0.25-m f/4.0 reflector + CCD
 
+COD C82
+COM Default details extracted from MPEC 2021-R151
+OBS N. Ruocco
+TEL 0.35-m f/6.3 Schmidt-Cassegrain + CCD
+
 COD C86
 OBS J. Gaitan
 COM Default details extracted from MPEC 2020-C98
@@ -1310,6 +1315,11 @@ COD G11
 OBS B. Klemt
 COM Default details extracted from MPEC 2021-F20
 TEL 0.31-m f/5.7 Ritchey-Chretien + CCD
+
+COD G15
+COM Default details extracted from MPEC 2021-R52
+OBS A. De Pieri
+TEL 0.25-m f/6.7 Schmidt-Cassegrain + CCD
 
 COD G17
 OBS L. Grazzini
@@ -2313,6 +2323,11 @@ MEA P. M. Kilmartin
 TEL 0.35-m f/11 Schmidt-Cassegrain + CCD
 AC2 alan (dot) gilmore (at) canterbury.ac (dot) nz
 
+COD R65
+COM Default details extracted from MPEC 2021-S94
+OBS R. B. Glassey
+Tel 0.4-m f/8.0 Schmidt-Cassegrain + CCD
+
 COD T04
 OBS T. Santana-Ros, M. Micheli, L. Conversi
 COM Default details extracted from MPEC 2021-P122
@@ -2832,6 +2847,11 @@ MEA A. Sofia, A.  Silvia
 OBS A. Acosta
 COM Default details extracted from MPEC 2020-C98
 TEL 0.25-m Schmidt-Cassegrain + CCD
+
+COD Z41
+COM Default details extracted from MPEC 2021-S43
+OBS F. Calvo
+TEL 0.16-m f/3.3 reflector + CCD
 
 COD Z45
 OBS F. Jackson
