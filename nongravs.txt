@@ -1,4 +1,4 @@
-   Find_Orb supports (at present) five different non-gravitational force
+   Find_Orb supports (at present) six different non-gravitational force
 models.  More may be added later.
 
    'Solar radiation pressure (radial, 1/r^2)' is the simplest : the model
@@ -40,4 +40,12 @@ many apparitions,  and adds an out-of-plane component to the A1/A2 model
 for SRP,  the force is just that of sunlight and is simply expressed
 as proportional to 1/r^2.  For comets,  a rather complicated scheme is
 required to account for the rate of outgassing as a function of distance
-from the sun.
+from the sun,  as described at the above reference.
+
+   On occasion,  we get comets where the activity lags the comet's position
+by days or weeks or months.  It takes the comet a while to warm up in
+the sun to get to the point where it's really pushed around,  and then
+it will take it a while before it cools back down.  Such cases can be
+modelled with the A1, A2, A3, DT model : the 'DT' corresponds to a time
+lag in days.  It takes at least a few oppositions to get enough data
+to determine this value reliably.
