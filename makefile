@@ -284,7 +284,7 @@ else
 	$(CP) $(FO_EXE)       $(INSTALL_DIR)/bin
 endif
 	$(CP) command.txt details.txt dosephem.txt dos_help.txt ?findorb.txt           $(IDIR)
-	$(CP) environ.def eph2tle.txt eph_expl.txt frame_he.txt                        $(IDIR)
+	$(CP) environ.def eph2tle.txt eph_expl.txt eph_type.txt frame_he.txt           $(IDIR)
 	$(CP) geo_rect.txt header.htm jpl_eph.txt                                      $(IDIR)
 	$(CP) link_def.json mpc_area.txt mpcorb.hdr mu1.txt nongravs.txt               $(IDIR)
 	$(CP) observer.txt obslinks.htm ObsCodes.htm ObsCodesF.html                    $(IDIR)

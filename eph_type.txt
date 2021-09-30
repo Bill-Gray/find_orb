@@ -1,0 +1,45 @@
+   Find_Orb can generate (at present) seven different types of ephemerides.
+
+   About 90% of users will probably never generate anything except the
+default 'Observables' ephemerides.  With these,  you can tabulate the RA/dec,
+alt/az,  magnitude,  distance,  etc. for the target at desired times.
+
+   In some cases,  it's useful to get ephemerides of state vectors.  These
+will be relative to your 'location' : set it to 500,  and you get geocentric
+state vectors;  set it to Sun for heliocentric,  or SSB for solar system
+barycentric,  and so on.  If you've selected state vectors,  some options
+specific to state vectors will be shown : you'll have a choice of distance
+units (km, AU,  earth radii) and time units (seconds,  minutes,  hours,
+days),  and can toggle between ecliptic or equatorial state vectors.
+
+   Cartesian coordinates are effectively the same,  except that you get
+x, y, and z,  with the velocity components omitted.
+
+   The MPCORB option gets you orbital elements in the format used by MPC.
+Unfortunately,  this is limited to elliptical heliocentric orbits,  and
+they can't be very close to parabolic.
+
+   The 'eight-line' option is considerably more flexible,  and provides
+hyperbolic and non-heliocentric elements.  It's great for human readers,
+though not at all good for automated use.  (I may add SOF output to give
+a solution that is both human- and computer-friendly and that works with
+all orbit types,  but getting other software to use SOF remains a problem.)
+
+   If you select 'close approaches',  only the start and end times really
+matter;  Find_Orb will look for instances between those times when the
+distance from your 'location' to the target was a minimum.  Since the
+'location' can be,  for example,  (Jup) or (Ven) or (Lun),  you can get
+minima from those objects.  It's recommended that you not set your
+location to be topocentric for this case.  If the object is not moving
+more than about 0.5 km/s radially,  the earth's rotation will dominate
+and you'll get a minimum once a day.
+
+   On rare occasion,  it has been useful to be able to generate simulated
+astrometry for an object.  The simulated observations are in ADES PSV
+format,  and can be fed back into Find_Orb or any software that can
+process ADES PSV data (which is probably more limiting than any of
+us would really like.)
+
+   Pro tip : while in the 'make ephemeris' dialog,  just hit (for
+example) the two keys C 1 to switch to state vectors,  C 0 for
+observables,  etc.  You need not touch the mouse.

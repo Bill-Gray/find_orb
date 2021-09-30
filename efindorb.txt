@@ -371,3 +371,12 @@
 2062    1 ( ) Resids in along-track sec/cross-track arcsec
 2062    2 ( ) Normalized residuals in sigmas
 2062    Cancel
+
+2064    0 ( ) Observables
+2064    1 ( ) State vectors
+2064    2 ( ) Cartesian coord positions
+2064    3 ( ) MPCORB output
+2064    4 ( ) 8-line elements
+2064    5 ( ) Close approaches
+2064    6 ( ) Fake astrometry
+2064    Cancel

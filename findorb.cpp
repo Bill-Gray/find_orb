@@ -810,19 +810,9 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
       const int ephem_type = (int)(ephemeris_output_options & 7);
       bool reset_vect_units = false;
       extern double ephemeris_mag_limit;
+      const char *tptr;
       const bool is_topocentric =
                is_topocentric_mpc_code( mpc_code);
-
-      const char *ephem_type_strings[] = {
-               "Observables",
-               "State vectors",
-               "Cartesian coord positions",
-               "MPCORB output",
-               "8-line elements",
-               "Close approaches",
-               "Fake astrometry",
-               "Unused",
-               NULL };
 
       jd_start = 0.;
       format_start = extract_date( ephemeris_start, &jd_start);
@@ -976,7 +966,24 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             if( n_lines + 4 == (unsigned)LINES)
                buff[i + 1] = '\0';
             }
-      snprintf_append( buff, sizeof( buff), "C  %s\n", ephem_type_strings[ephem_type]);
+      tptr = get_find_orb_text( 2064);
+      i = ephem_type;
+      while( i && *tptr)
+         if( *tptr++ == '\n')
+            i--;
+      if( *tptr == '0' + ephem_type)
+         {
+         tptr += 6;
+         i = 0;
+         while( tptr[i] >= ' ')
+            i++;
+         }
+      else
+         {
+         tptr = (char *)"Unknown";
+         i = 7;
+         }
+      snprintf_append( buff, sizeof( buff), "C  %.*s\n", i, tptr);
       snprintf_append( buff, sizeof( buff), "M  Make ephemeris\n");
       snprintf_append( buff, sizeof( buff), "Q  Return to main display");
       n_lines += 4;
@@ -1050,10 +1057,26 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             ephemeris_output_options ^= OPTION_PHASE_ANGLE_BISECTOR;
             break;
          case 'c': case 'C':
-            if( ephem_type == OPTION_CLOSE_APPROACHES)  /* end of cycle: */
-               ephemeris_output_options -= OPTION_CLOSE_APPROACHES;
-            else                    /* not at end: move forward */
-               ephemeris_output_options++;
+            {
+            char tbuff[6], *line_ptr;
+
+            snprintf_err( tbuff, sizeof( tbuff), "%d ( )", ephem_type);
+            strcpy( buff, get_find_orb_text( 2064));
+            line_ptr = strstr( buff, tbuff);
+            if( line_ptr)
+               line_ptr[3] = '*';
+            help_file_name = "eph_type.txt";
+            c = inquire( buff, NULL, 0, COLOR_DEFAULT_INQUIRY);
+            if( c >= KEY_F( 1))
+               i = c - KEY_F( 1);
+            else if( c >= '0' && c < '8')
+               i = c - '0';
+            if( i < 7)
+               {
+               ephemeris_output_options &= ~7;
+               ephemeris_output_options |= i;
+               }
+            }
             break;
          case 'd': case 'D':
             if( vect_frame  > -1)
