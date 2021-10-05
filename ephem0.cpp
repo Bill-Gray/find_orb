@@ -1942,7 +1942,6 @@ static int get_ephem_times_from_file( const char *filename)
    FILE *ifile;
    char buff[80];
    int n_times = 0, byte_offset = 0;
-   double jd;
    int sort_order = 0, time_system = 0;
 
    while( *filename == ' ')
@@ -1960,28 +1959,33 @@ static int get_ephem_times_from_file( const char *filename)
    fseek( ifile, 0L, SEEK_SET);
    n_times = 0;
    while( fgets_trimmed( buff, sizeof( buff), ifile))
-      if( (jd = get_time_from_string( 0., buff + byte_offset, FULL_CTIME_YMD, NULL)) > 1.)
+      if( *buff != '#')
          {
-         if( time_system)   /* Input times are in TD;  cvt to UTC */
-            jd -= td_minus_utc( jd) / seconds_per_day;
-         list_of_ephem_times[n_times++] = jd;
-         }
-      else if( !memcmp( buff, "OPTION ", 7))
-         switch( buff[7])
+         double jd = get_time_from_string( 0., buff + byte_offset, FULL_CTIME_YMD, NULL);
+
+         if( jd > 1.)
             {
-            case 'T':         /* as in TD : convert times to UTC */
-               time_system = 1;
-               break;
-            case 'A':         /* as in Ascending */
-               sort_order = 1;
-               break;
-            case 'D':         /* as in Descending */
-               sort_order = -1;
-               break;
-            case 'C':         /* as in (starting) Column */
-               byte_offset = atoi( buff + 8) - 1;
-               break;
+            if( time_system)   /* Input times are in TD;  cvt to UTC */
+               jd -= td_minus_utc( jd) / seconds_per_day;
+            list_of_ephem_times[n_times++] = jd;
             }
+         else if( !memcmp( buff, "OPTION ", 7))
+            switch( buff[7])
+               {
+               case 'T':         /* as in TD : convert times to UTC */
+                  time_system = 1;
+                  break;
+               case 'A':         /* as in Ascending */
+                  sort_order = 1;
+                  break;
+               case 'D':         /* as in Descending */
+                  sort_order = -1;
+                  break;
+               case 'C':         /* as in (starting) Column */
+                  byte_offset = atoi( buff + 8) - 1;
+                  break;
+               }
+         }
    if( sort_order)
       shellsort_r( list_of_ephem_times, n_times, sizeof( double),
                      compare_doubles, &sort_order);
