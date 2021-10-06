@@ -3288,7 +3288,7 @@ double calc_absolute_magnitude( OBSERVE FAR *obs, const int n_obs)
             temp_obs[obs_no].obs_mag = default_v_mag;
             temp_obs[obs_no].mag_band = 'V';
             temp_obs[obs_no].mag_sigma = 5.;
-            if( object_type == OBJECT_TYPE_COMET
+            if( object_type == OBJECT_TYPE_COMET)
                temp_obs[obs_no].mag_band = default_comet_magnitude_type;
             }
          rval = calc_absolute_magnitude( temp_obs, n_obs);
