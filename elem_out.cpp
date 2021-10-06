@@ -3215,12 +3215,11 @@ double mag_band_shift( const char mag_band)
    return( 0.);
 }
 
-double calc_absolute_magnitude( OBSERVE FAR *obs, const int n_obs)
+static double _calc_absolute_magnitude_internal( OBSERVE FAR *obs, int n_obs)
 {
    int obs_no;
    double n_mags = 0.;
    double rval = 0.;
-   bool blank_mags_found = false;
 
    for( obs_no = 0; obs_no < n_obs; obs_no++)
       {
@@ -3228,60 +3227,77 @@ double calc_absolute_magnitude( OBSERVE FAR *obs, const int n_obs)
       if( obs->r && obs->solar_r)
          {
          const double earth_sun = vector3_length( obs->obs_posn);
-         bool use_obs = true;
 
-         if( object_type == OBJECT_TYPE_COMET
-                         && obs->mag_band != default_comet_magnitude_type)
-            use_obs = false;
-         else if( obs->is_included)
+         if( earth_sun)
             {
-            if( obs->obs_mag == BLANK_MAG)
-               {
+            bool use_obs = true;
+
+            if( object_type == OBJECT_TYPE_COMET
+                            && obs->mag_band != default_comet_magnitude_type)
                use_obs = false;
-               blank_mags_found = true;
+            if( obs->obs_mag == BLANK_MAG || !obs->is_included)
+               use_obs = false;
+            obs->computed_mag = calc_obs_magnitude(
+                  obs->solar_r, obs->r, earth_sun, NULL) - mag_band_shift( obs->mag_band);
+            if( use_obs)
+               {
+               rval += (obs->obs_mag - obs->computed_mag) / obs->mag_sigma;
+               n_mags += 1. / obs->mag_sigma;
                }
-            else
-               obs->computed_mag = calc_obs_magnitude( obs->solar_r,
-                   obs->r, earth_sun, NULL) - mag_band_shift( obs->mag_band);
-            }
-         if( use_obs)
-            {
-            rval += (obs->obs_mag - obs->computed_mag) / obs->mag_sigma;
-            n_mags += 1. / obs->mag_sigma;
             }
          }
       obs++;
       }
-   obs -= n_obs;
    if( n_mags)
       rval /= n_mags;
-   else if( blank_mags_found)
-      {
-      const double default_v_mag = atof( get_environment_ptr( "DEFAULT_V_MAG"));
-
-      if( default_v_mag)   /* see 'environ.def' for an explanation of this */
-         {
-         OBSERVE *temp_obs = (OBSERVE *)calloc( n_obs, sizeof( OBSERVE));
-
-         for( obs_no = 0; obs_no < n_obs; obs_no++)
-            {
-            temp_obs[obs_no] = obs[obs_no];
-            temp_obs[obs_no].obs_mag = default_v_mag;
-            temp_obs[obs_no].mag_band = 'V';
-            temp_obs[obs_no].mag_sigma = 5.;
-            }
-         rval = calc_absolute_magnitude( temp_obs, n_obs);
-         for( obs_no = 0; obs_no < n_obs; obs_no++)
-            obs[obs_no].computed_mag = temp_obs[obs_no].computed_mag;
-         free( temp_obs);
-         return( rval);
-         }
-      }
+   obs -= n_obs;
    for( obs_no = 0; obs_no < n_obs; obs_no++, obs++)
       if( n_mags)
          obs->computed_mag += rval;
       else
          obs->computed_mag = 0.;
+   return( rval);
+}
+
+/* Computing an absolute magnitude using the above function may fail,
+simply because none of the included observations has a magnitude given.
+If so,  we try again with all observations temporarily turned on.
+
+_That_ may fail because _none_ of the observations has a magnitude.
+If so,  and if the DEFAULT_V_MAG is set,  we try again with all
+observations temporarily set to that magnitude.  */
+
+double calc_absolute_magnitude( OBSERVE FAR *obs, const int n_obs)
+{
+   double rval = _calc_absolute_magnitude_internal( obs, n_obs);
+
+   if( !rval)        /* no mag computed;  try first w/all obs on */
+      {
+      const double default_v_mag = atof( get_environment_ptr( "DEFAULT_V_MAG"));
+      OBSERVE *temp_obs = (OBSERVE *)calloc( n_obs, sizeof( OBSERVE));
+      int obs_no;
+
+      memcpy( temp_obs, obs, n_obs * sizeof( OBSERVE));
+      for( obs_no = 0; obs_no < n_obs; obs_no++)
+         temp_obs[obs_no].is_included = 1;
+      rval = _calc_absolute_magnitude_internal( temp_obs, n_obs);
+      if( !rval && default_v_mag)   /* see 'environ.def' for an explanation of this */
+         {
+         for( obs_no = 0; obs_no < n_obs; obs_no++)
+            {
+            temp_obs[obs_no].obs_mag = default_v_mag;
+            temp_obs[obs_no].mag_band = 'V';
+            temp_obs[obs_no].mag_sigma = 5.;
+            if( object_type == OBJECT_TYPE_COMET
+               temp_obs[obs_no].mag_band = default_comet_magnitude_type;
+            }
+         rval = calc_absolute_magnitude( temp_obs, n_obs);
+         }
+      if( rval)
+         for( obs_no = 0; obs_no < n_obs; obs_no++)
+            obs[obs_no].computed_mag = temp_obs[obs_no].computed_mag;
+      free( temp_obs);
+      }
    return( rval);
 }
 
