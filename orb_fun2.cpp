@@ -90,7 +90,6 @@ static double simplex_scoring( void *icontext, const double *ivect)
       }
    rval = evaluate_for_simplex_method( context->obs, context->n_obs,
                         context->orbit, 0, context->constraints);
-// printf( "Radii %f, %f: score %f\n", ivect[0], ivect[1], rval);
    return( rval);
 }
 
@@ -117,10 +116,7 @@ int simplex_method( OBSERVE FAR *obs, int n_obs, double *orbit,
    if( !max_iter)
       max_iter = 70;
    for( iter = 0; iter < max_iter; iter++)
-      {
-//    printf( "Iter %d\n", iter);
       simplex_step( rptr, scores, simplex_scoring, &context, context.n_params);
-      }
    memcpy( orbit, context.orbit, 6 * sizeof( double));
    available_sigmas = NO_SIGMAS_AVAILABLE;
    return( iter);
@@ -166,10 +162,7 @@ int superplex_method( OBSERVE FAR *obs, int n_obs, double *orbit, const char *co
    if( !max_iter)
       max_iter = 70;
    for( iter = 0; iter < max_iter; iter++)
-      {
-//    printf( "Iter %d\n", iter);
       simplex_step( rptr, scores, simplex_scoring, &context, context.n_params);
-      }
    memcpy( orbit, context.orbit, 6 * sizeof( double));
    available_sigmas = NO_SIGMAS_AVAILABLE;
    return( iter);
@@ -378,7 +371,6 @@ int link_arcs( OBSERVE *obs, int n_obs, const double r1, const double r2)
       theta[i] = atan2( y, x);
       sin_theta = sin( theta[i]);
       cos_theta = cos( theta[i]);
-//    r[i] = obs[i].solar_r;
       r[i] = vector3_length( loc);
       fit_p += sin_theta;
       fit_q += cos_theta;
@@ -443,8 +435,6 @@ static int set_up_circular_orbit( OBSERVE FAR *obs1, OBSERVE FAR *obs2,
    angle = 2. * asin( vector3_length( delta) * .5 / solar_r);
    *dt = angle * (*t0);
    *t0 *= 2. * PI;
-// debug_printf( "Solar_r %f, dt = %f, t0 = %f\n",
-//          solar_r, *dt, *t0);
    if( orbit)
       {
       double xprod[30], scale, vel[30];
@@ -504,8 +494,6 @@ int find_circular_orbits( OBSERVE FAR *obs1, OBSERVE FAR *obs2,
                types[n_solutions] = soln_type;
                radii[n_solutions++] =
                      (r1 * delta_3 - r3 * delta_1) / (delta_3 - delta_1);
-//             debug_printf( "Soln %d: type %d, r=%f\n",
-//                n_solutions, soln_type, radii[n_solutions - 1]);
                }
             if( delta_1 > dt + t0_1)
                bug_out = 1;

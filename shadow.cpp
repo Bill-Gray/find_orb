@@ -107,7 +107,7 @@ intensity (0 if no disk visible,  1 if r=R.  I0 = TI(1) / 2pi.)     */
 #include <math.h>
 
 #define NECKEL_LABS_COEFFS
-// #define YOULES_COEFFS
+/* #define YOULES_COEFFS   */
 
 static double total_intensity( const double r)
 {
@@ -141,7 +141,7 @@ static double total_intensity( const double r)
       mu = 0.;
    for( i = 0; i < sizeof( coeffs) / sizeof( coeffs[0]); i++, power *= mu)
       rval += coeffs[i] * power / (double)( i + 2);
-// return( r * r);               /* for a uniformly intense solar disc */
+/* return( r * r);                  for a uniformly intense solar disc */
    return( (I0 - rval) / I0);
 }
 

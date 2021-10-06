@@ -314,8 +314,6 @@ static inline double knuth_upper_root_bound( const double *poly,
    double rval = 0.;
    int i;
 
-//    printf( "Degree %d: Bounds: Cauchy %lf, mine %lf\n", poly_degree,
-//             cauchy_bound, knuth_bound);
    for( i = 0; i < poly_degree; i++)
       {
       const double new_ratio =
@@ -403,15 +401,14 @@ int find_real_polynomial_roots( const double *poly, int poly_degree,
          else
             x2 = bound;
          y2 = evaluate_poly( poly, poly_degree, x2);
-//       printf( "Range %lf %lf (%lf %lf)\n", x1, x2, y1, y2);
+/*       printf( "Range %lf %lf (%lf %lf)\n", x1, x2, y1, y2);    */
                /* Make sure there is root searching to do (i.e.,  there is */
                /* a range to search and a sign change within that range): */
          if( y1 * y2 <= 0.)
-//       if( x2 != x1 && y1 * y2 <= 0.)
             {
             real_roots[n_roots_found++] = find_poly_root_between( poly,
                                   poly_degree, x1, y1, x2, y2);
-//          printf( "Root = %lf\n", real_roots[n_roots_found - 1]);
+/*          printf( "Root = %lf\n", real_roots[n_roots_found - 1]);  */
             }
          if( i != n_minmax - 1)
             {

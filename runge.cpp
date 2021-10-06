@@ -23,10 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include <stdarg.h>
 #include <math.h>
 #include <assert.h>
-#ifndef __GNUC__
-// #include <conio.h>
-// #include <io.h>
-#else
+#ifdef __GNUC__
 #include <unistd.h>
 #endif
 #include "watdefs.h"
@@ -213,7 +210,7 @@ static void vector_cross_productl( ldouble *xprod, const ldouble *a, const ldoub
 /* Start considering atmospheric drag if within 500 km of earth: */
 
 #define ATMOSPHERIC_LIMIT (EARTH_R + 500. / AU_IN_KM)
-// #define ATMOSPHERIC_LIMIT 0
+/* #define ATMOSPHERIC_LIMIT 0      */
 
 /*  Jupiter field is now from doi:10.1038/nature25776, "Measurement of
 Jupiter's asymmetric gravity field".   Saturn,  Uranus, and Neptune
@@ -276,9 +273,9 @@ static double jn_potential( const double *loc, const double j3,
    const double mu2 = mu * mu;
    const double p3 = mu * (2.5 * mu2 - 1.5);
    const double p4 = (35. * mu2 * mu2 - 30. * mu2 + 3.) / 8.;
-// const double p2 = 1.5 * mu2 - .5;     /* Danby, p. 115 */
+/* const double p2 = 1.5 * mu2 - .5;        Danby, p. 115 */
 
-//    return( (j2 * p2 + j3 * p3 / r + j4 * p4 / r2) / (r * r2));
+/*    return( (j2 * p2 + j3 * p3 / r + j4 * p4 / r2) / (r * r2));  */
       return( (          j3 * p3 / r + j4 * p4 / r2) / (r * r2));
 }
 
@@ -575,14 +572,11 @@ extern const double planet_mass[N_PERTURB + 1] = { 1.,             /*  0 */
 static ldouble planetary_system_mass( const int planet_no)
 {
    ldouble rval;
-// const int bc405_start = 100;
 
    if( planet_no == 5)
       rval = MASS_JUPITER_SYSTEM;
    else if( planet_no == 6)
       rval = MASS_SATURN_SYSTEM;
-// else if( planet_no == bc405_start)     /* Ceres: special fixed mass  */
-//    rval = 4.76e-10;                    /* used for Dawn computations */
    else
       rval = planet_mass[planet_no];
    return( rval);
@@ -1117,8 +1111,6 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
 
                   parallax_to_lat_alt( rho_cos_phi, rho_sin_phi, NULL,
                                     &ht_in_meters, i);
-//                debug_printf( "Parallax: %f %f; ht in meters %f\n",
-//                               rho_cos_phi,  rho_sin_phi, ht_in_meters);
                   rho = atmospheric_density( ht_in_meters / meters_per_km);
                   earth_lunar_posn( jd + dt, earth_loc, NULL);
                   for( j = 0; j < 3; j++)
@@ -1144,8 +1136,6 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
                   accel_coeff = rho * Cd * speed * amr_drag / 2.;
                   for( j = 0; j < 3; j++)
                      drag[j] = vel[j] * accel_coeff;
-//                debug_printf( "Height %7.2f km; speed %7.1f m/s; accel %6.1f m/s^2\n",
-//                            ht_in_meters / meters_per_km, speed, vector3_length( drag));
                   for( j = 0; j < 3; j++)
                      oval[j + 3] += drag[j] * seconds_per_day * seconds_per_day / AU_IN_METERS;
                   }
@@ -1166,7 +1156,7 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
                best_fit_planet_dist = r;
                }
 
-//          if( accel_multiplier)
+/*          if( accel_multiplier)  */
                {
                const ldouble accel_factor =
                                -SOLAR_GM * mass_to_use / (r * r * r);

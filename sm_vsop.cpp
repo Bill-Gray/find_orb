@@ -66,7 +66,7 @@ int compute_rough_planet_loc( const double t_cen, const int planet_idx,
                                           double *vect);    /* sm_vsop.c */
 int check_for_perturbers( const double t_cen, const double *vect); /* sm_vsop*/
 
-// #define LONG_EARTH_SERIES  1
+/* #define LONG_EARTH_SERIES  1  */
 
 #define SMALL_VSOP_TERM struct small_vsop_term
 
@@ -598,7 +598,6 @@ int check_for_perturbers( const double t_cen, const double *vect)
                r2 > MARS_INNER_LIMIT * MARS_INNER_LIMIT)
          planet_to_check = 4;
 
-// printf( "r2 = %lf, planet_to_check = %d\n", r2, planet_to_check);
    for( axis = 3; planet_to_check && axis > 0; axis--)
       {
       double delta = -vect[axis - 1];
@@ -618,8 +617,7 @@ int check_for_perturbers( const double t_cen, const double *vect)
       for( i = n_terms[planet_to_check] - 1; i; i--, vptr++)
          if( vptr->axis == axis)
             delta += vptr->amplitude * cos( vptr->phase + vptr->freq * t_cen);
-//    printf( "Axis %d, delta %lf, range %lf\n", axis, delta, ranges[planet_to_check]);
-//                   /* Is the difference delta within limits? */
+                     /* Is the difference delta within limits? */
       if( delta > ranges[planet_to_check] || delta < -ranges[planet_to_check])
          planet_to_check = 0;
       }

@@ -20,7 +20,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301, USA.    */
 
-// #define TIMING_ON         1
+/* #define TIMING_ON  */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -328,7 +328,7 @@ static void collapse_and_partition( POSN_CACHE *ovals, const POSN_CACHE *ivals)
 and probes done,  and the "worst-case" maximum number of probes required,
 just to check that the hash function is truly random enough.      */
 
-// #define TEST_PLANET_CACHING_HASH_FUNCTION
+/* #define TEST_PLANET_CACHING_HASH_FUNCTION */
 
 #ifdef TEST_PLANET_CACHING_HASH_FUNCTION
 long total_n_searches = 0, total_n_probes = 0, max_probes_required = 0;

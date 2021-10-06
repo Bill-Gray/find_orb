@@ -392,7 +392,6 @@ double maximum_jd = 4277757.5;    /* 1 Jan +7000 */
 char *runtime_message;
 int show_runtime_messages = 1;
 
-// static int reference_planet = 0;
 static unsigned perturbers_automatically_found;
 extern unsigned always_included_perturbers;
 
@@ -514,7 +513,6 @@ int integrate_orbitl( long double *orbit, const long double t0, const long doubl
          extern int best_fit_planet, n_posns_cached;
          extern int64_t planet_ns;
          extern double best_fit_planet_dist;
-// #define TEST_PLANET_CACHING_HASH_FUNCTION
 #ifdef TEST_PLANET_CACHING_HASH_FUNCTION
          extern long total_n_searches, total_n_probes, max_probes_required;
 #endif
@@ -618,9 +616,6 @@ int integrate_orbitl( long double *orbit, const long double t0, const long doubl
                }
             if( !stepsize)
                exit( -6);
-//          if( err >= integration_tolerance && fabs( stepsize) < min_stepsize)
-//             debug_printf( "Err %f x tolerance; stepsize %f seconds\n",
-//                         err / integration_tolerance, delta_t * seconds_per_day);
             if( err < integration_tolerance || fixed_stepsize > 0.
                         || fabs( stepsize) < min_stepsize)  /* it's good! */
                {
@@ -1129,8 +1124,6 @@ static int find_transfer_orbit( double *orbit, OBSERVE FAR *obs1,
          }
       for( i = 0; i < 3; i++)
          orbit[3 + i] -= delta_t * (deriv[i + 3] / 3 + deriv2[i + 3] / 6.);
-//       orbit[3 + i] -= deriv[i + 3] * delta_t / 2.
-//                 + (deriv2[i + 3] - deriv[i + 3]) * delta_t / 6.;
       }
    for( i = 0; i < 3; i++)
       orbit[i] = obs1->obj_posn[i];
@@ -1333,8 +1326,6 @@ int extended_orbit_fit( double *orbit, OBSERVE *obs, int n_obs,
          params[i] = -delta_val;
       rval = find_parameterized_orbit( orbit, params, obs1, obs2,
                      fit_type, 0);
-//    if( rval)
-//       printf( "Iter %d, rval %d\n", i, rval);
       set_locs_extended( orbit, obs1.jd, obs, n_obs, epoch, orbit_at_epoch);
       for( j = 0; j < n_obs; j++)
          if( obs[j].is_included)
@@ -1342,7 +1333,6 @@ int extended_orbit_fit( double *orbit, OBSERVE *obs, int n_obs,
             double dx, dy;
 
             get_residual_data( obs + j, &dx, &dy);
-//          printf( "Resids: obs %d, param %d, %f %f\n", j, i, dx, dy);
             if( i == -1)
                {
                resids[j + j] = dx;
@@ -1371,8 +1361,6 @@ int extended_orbit_fit( double *orbit, OBSERVE *obs, int n_obs,
 
    free( resids);
    lsquare_solve( lsquare, params);
-// for( i = 0; i < n_params; i++)
-//    printf( "Param %d: %.9f\n", i, params[i]);
    lsquare_free( lsquare);
    if( fit_type == FIT_CLASSIC_HERGET || fit_type == FIT_HERGET_FULL)
       {
@@ -1513,8 +1501,6 @@ int search_for_trial_orbit( double *orbit, OBSERVE FAR *obs, int n_obs,
       rms[0] = rms[1];
       rms[1] = rms[2];
       rms[2] = compute_weighted_rms( obs, n_obs, NULL);
-//    debug_printf( "r1 %f, ang_param %f: %f\n",
-//                r1, ang_param, rms[2]);
       if( !i || best_rms_found > rms[2])
          {
          best_rms_found = rms[2];
@@ -1776,22 +1762,15 @@ int get_sr_orbits( double *orbits, OBSERVE FAR *obs,
    double *tptr = orbits;
 
    INTENTIONALLY_UNUSED_PARAMETER( noise_in_sigmas);
-// perturbers = AUTOMATIC_PERTURBERS;
    for( i = 0; i < max_orbits && clock( ) < end_clock; i++)
       {
-//    double *stored_ra_decs_mags_times =
-//                 add_gaussian_noise_to_obs( n_obs, obs, noise_in_sigmas);
-
       if( !find_nth_sr_orbit( tptr, obs, n_obs, i + starting_orbit)
                    && (n_obs == 2 || !adjust_herget_results( obs, n_obs, tptr)))
          {
-//       tptr[6] = compute_rms( obs, n_obs);
          tptr[6] = evaluate_initial_orbit( obs, n_obs, tptr);
          rval++;
          tptr += 7;
          }
-//    restore_ra_decs_mags_times( n_obs, obs, stored_ra_decs_mags_times);
-//    free( stored_ra_decs_mags_times);
       }
    qsort( orbits, rval, 7 * sizeof( double), sr_orbit_compare);
    if( writing_sr_elems)
@@ -2296,7 +2275,7 @@ void improve_parabolic( OBSERVE FAR *obs, int n_obs, double *orbit,
    set_locs( orbit, epoch, obs, n_obs);
 }
 
-#endif        // #ifdef OBSOLETE
+#endif        /* #ifdef OBSOLETE */
 
 void compute_variant_orbit( double *variant, const double *ref_orbit,
                      const double n_sigmas)
@@ -2501,7 +2480,6 @@ static int evaluate_limited_orbit( const double *orbit,
          }
       for( i = 0; i < rval; i++)
          constraints[i] *= 1e+5;
-//       constraints[i] *= 1e+10;
       }
    return( rval);
 }
@@ -2805,8 +2783,6 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
    double original_orbit[6], original_params[MAX_N_NONGRAV_PARAMS];
    double central_obj_state[6], tvect[6];
    const double default_delta_vals[MAX_N_PARAMS] =
-//                  { 1e-12, 1e-12, 1e-12, 1e-11, 1e-11, 1e-11,
-//                  .001, .001, .1 };
                    { 1e-4, 1e-4, 1e-5, 1e-5, 1e-3, 1e-3,
                     1e-8, 1e-8, 1e-8,
                     1e-8, 1e-8, 1e-8 };
@@ -2909,7 +2885,6 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
       sigmas_requested = ORBIT_SIGMAS_REQUESTED;
       if( !limited_orbit)
          epoch2 = find_epoch_shown( obs, n_obs);
-//       epoch2 = (obs[0].jd + obs[n_obs - 1].jd) / 2.;
       }
 
    sprintf( tstr, "fi/setting locs: %f  ", JD_TO_YEAR( epoch));
@@ -3130,7 +3105,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
 
                slope_ptr[0] -= xresidual;
                slope_ptr[n_params] -= yresidual;
-//             if( obs[j].note2 != 'R')
+/*             if( obs[j].note2 != 'R')   */
                   {
                   const double error_squared = slope_ptr[0] * slope_ptr[0]
                            + slope_ptr[n_params] * slope_ptr[n_params];
@@ -3471,8 +3446,6 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
          }
    if( debug_level > 1)
       debug_printf( "lsquare computed\n");
-// if( scale_factor != 1.)
-//    debug_printf( "rescale: %g\n", scale_factor);
    memcpy( orbit2, orbit, 6 * sizeof( double));
    for( i = 0; i < n_params && !err_code; i++)
       {
@@ -3705,9 +3678,6 @@ static double adjustment_for_orbit_likelihood( const double semimajor_axis,
                + (double)( tptr2[0] - tptr1[0]) * ybin
                + (double)( tptr2[1] + tptr1[0] - tptr1[1] - tptr2[0])
                               * xbin * ybin;
-//    debug_printf( "xbin %f, ybin %f: %f\n",
-//             xbin + (double)ixbin,
-//             ybin + (double)iybin, rval);
       if( q < 1.2)
          rval *= (q - 1.1) / 10.;
       }
@@ -4261,13 +4231,11 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
       memcpy( orbit, best_orbit, 6 * sizeof( double));
       }
 
-// set_locs( orbit, obs[start].jd, obs, n_obs);
    perturbers = perturbers_automatically_found & (~AUTOMATIC_PERTURBERS);
    perturbers |= always_included_perturbers;
    fail_on_hitting_planet = false;
    orbit_epoch = obs[start].jd;
    attempt_extensions( obs, n_obs, orbit, orbit_epoch);
-// available_sigmas = NO_SIGMAS_AVAILABLE;
    if( n_radar_obs)
       {
       n_obs += n_radar_obs;
@@ -4466,8 +4434,6 @@ int extend_orbit_solution( OBSERVE FAR *obs, const int n_obs,
    exclude_unusable_observations( obs, n_obs);
    if( initial_count == count_observations_used( obs, n_obs))
       n_added = 0;
-// if( n_added)
-//    available_sigmas = NO_SIGMAS_AVAILABLE;
    return( n_added);
 }
 
@@ -4710,7 +4676,6 @@ int metropolis_search( OBSERVE *obs, const int n_obs, double *orbit,
 
       memcpy( new_orbit, orbit, 9 * sizeof( double));
       for( i = 0; i < 6 + n_extra_params; i++)
-//    for( i = 0; i < 1; i++)
          {
          const double n_sigmas = scale * gaussian_random( );
 
