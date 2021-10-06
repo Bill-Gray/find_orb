@@ -587,6 +587,7 @@ int main( const int argc, const char **argv)
                   strcpy( obj_name, argv[i] + 2);
                else if( i < argc - 1)
                   strcpy( obj_name, argv[i + 1]);
+               printf( "Object name reset to '%s'\n", obj_name);
                break;
             case 'e':
                fitted |= FIT_EPOCH;
@@ -701,7 +702,7 @@ int main( const int argc, const char **argv)
          ref_frame = 0;
          }
       mjdt = tdt - 2400000.5;
-      if( tptr)
+      if( tptr && !*obj_name)
          strcpy( obj_name, tptr + 18);
       fprintf( ofile, "# Ephem range: %f %f %f\n",
             mjdt, mjdt + step * (double)total_lines, step * (double)output_freq);
@@ -711,7 +712,7 @@ int main( const int argc, const char **argv)
             writing_data = true;
          if( writing_data && *buff != '#')
             fprintf( ofile, "# %s\n", buff);
-         if( !memcmp( buff, "Orbital elements: ", 18))
+         if( !memcmp( buff, "Orbital elements: ", 18) && !*obj_name)
             strcpy( obj_name, buff + 19);
          if( !memcmp( buff, "Ephemeris", 9))
             printf( "%s\n", buff);
