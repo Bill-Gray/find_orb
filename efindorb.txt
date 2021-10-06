@@ -380,3 +380,6 @@
 2064    5 ( ) Close approaches
 2064    6 ( ) Fake astrometry
 2064    Cancel
+
+2066    '%s' is %d bytes long.  Packed designations must be less
+2066    than twelve bytes long.  Try again with a shorter designation.

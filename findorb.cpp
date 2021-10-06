@@ -3500,6 +3500,13 @@ int main( int argc, const char **argv)
                extern const char *combine_all_observations;
 
                combine_all_observations = arg;
+               if( strlen( arg) > 12)
+                  {           /* warn that packed desig is overlong */
+                  snprintf( tbuff, sizeof( tbuff), get_find_orb_text( 2066),
+                        arg, (int)strlen( arg));
+                  inquire( tbuff, NULL, 30, COLOR_DEFAULT_INQUIRY);
+                  return( -1);
+                  }
                }
                break;
             case 'd':
