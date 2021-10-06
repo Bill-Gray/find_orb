@@ -1,4 +1,4 @@
-   Version date: 2019 Oct 08
+   Version date: 2021 Oct 05
 
    The parameters shown in this software are basically the same as those
 shown in the Windows software,  as described at
@@ -195,7 +195,7 @@ z      Integrate current orbit forward,  then back,  a certain number of
 "      Shows details of Curses mouse commands (these differ from one platform
          to the next,  and I needed a way to puzzle them out),  and info on
          the DE file currently in use.
-.      Show flavor of Curses and DE version in use.
+.      Show flavor of Curses,  DE and Find_Orb version info in use.
 ,      Show 'debug.txt' (log of debug messages).
 \      Shift all observations from a given observatory by a given time offset.
          Used when I was trying to puzzle out some timing errors from a
@@ -205,19 +205,27 @@ Shift-F6   Reset atmospheric drag (doesn't work yet)
 
 Mouse actions:
 
+   Move cursor over an item and you will (usually) get a "tool tip"
+   Click on [?] at upper right of screen/within dialog boxes to get info
+      on that screen or dialog box
    Click on any of the "menu" items on the top line to get that action
+      (click [+] or [-] to get more/fewer menu times)
    Click on the R1, R2 display to be prompted to enter a new R1 and R2
    Click on a planet abbreviation to toggle its use as a perturber
    Click on an observation to select it;  double-click it to toggle it
-   Click on the "residual legend" to cycle the residual format
-   Click on the epoch to enter a new epoch.
-   Click on the list of observatories to toggle that list.  The observatory
-      for the current observation will always be listed.
+   Click on "Xres Yres" to get residual display options
+   Click on the epoch to enter a new epoch
+   Click on a line in the list of observatories to get options to search
+      for observations from that code,  or to modify how many obscodes
+      are shown in that list
+   Move mouse over an obscode in the list and scroll with the mouse wheel
+      to find previous/next observation from that obscode
    Click on scroll bar at right edge (in 'help',  or in ephemerides,  or
       next to the observations in the main screen) to... well... scroll.
-   Turning a mouse wheel may scroll within the list of residuals or within
-      the file you're looking at (depends on the platform;  mouse support
-      is a little sketchy in some flavors of Curses.)
+   Move mouse over the 'YYYY MM DD.DDDDD' in the residual legend and scroll
+      the mouse wheel to move up/down by a year,  day,  0.001 day,  etc.
+      Amount will depend on which letter the mouse is over.
+   Move mouse within the residuals section and scroll up/down.
 
 The following table was shamelessly copied from:
 
