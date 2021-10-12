@@ -3946,7 +3946,7 @@ int main( int argc, const char **argv)
                      if( atof( tptr + 11) < .01)
                         put_colored_text( tptr, line_no + iline,
                               count_wide_chars_in_utf8_string( tbuff, tptr),
-                              20, COLOR_ATTENTION + A_BLINK);
+                              20, COLOR_ATTENTION);
                   iline++;
                   }
                else

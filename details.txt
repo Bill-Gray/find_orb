@@ -596,6 +596,12 @@ TEL 0.07-m f/2.8 refractor + CCD
 NET GSC-ACT
 ACK MPC_HJ0110_OBS_050629_061012_A.txt
 
+COD 679
+COM Default details extracted from MPEC 2021-T85
+OBS J. S. Silva-Cabrera
+MEA M. Micheli
+TEL 0.84-m reflector + CCD
+
 COD 691
 COM Find_Orb default details
 OBS J. V. Scotti
@@ -1972,6 +1978,7 @@ TEL 0.40-m f/3.8 Newtonian + CCD
 
 COD K99
 COM Default details from private communication
+OBS V. Kudak, V. Perig
 TEL 0.40-m telescope + CCD
 
 COD L01
@@ -2006,6 +2013,13 @@ COD L09
 COM Default details extracted from MPEC 2021-L04
 OBS A. Hale
 TEL 0.40-m f/10 Schmidt-Cassegrain + CCD
+
+COD L10
+COM Default details from private communication
+TEL 1.2-m reflector + CMO
+OBS A. Liakos
+MEA M. Micheli
+NET Gaia-DR2
 
 COD L18
 MEA A. M. Kozhukhov
@@ -2808,6 +2822,12 @@ TEL 0.4-m f/2.5 reflector + CCD
 COD Z23
 COM Find_Orb default details
 TEL 2.56-m f/11 reflector + CCD
+
+COD Z24
+COM Default details extracted from MPEC 2021-T54
+OBS T. Santana-Ros, L. Conversi, M. Micheli
+MEA M. Micheli
+TEL 1.0-m f/8 Ritchey-Chretien + CCD
 
 COD Z30
 OBS D. Storey
