@@ -2820,6 +2820,7 @@ static inline int initialize_curses( const int argc, const char **argv)
    curses_running = true;
    if( debug_level > 2)
       debug_printf( "(2), ");
+   start_color( );
 #ifdef __PDCURSES__
    PDC_set_blink( TRUE);
    PDC_set_title( get_find_orb_text( 18));
@@ -2828,7 +2829,6 @@ static inline int initialize_curses( const int argc, const char **argv)
 #ifdef VT_RECEIVE_ALL_MOUSE
    printf( VT_RECEIVE_ALL_MOUSE);
 #endif
-   start_color( );
    char_to_search_for = (COLORS > 8 ? 'c' : '8');
    while( fgets( buff, sizeof( buff), ifile) && memcmp( buff, "End c", 5))
       if( *buff == char_to_search_for)
