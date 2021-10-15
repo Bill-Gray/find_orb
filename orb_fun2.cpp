@@ -17,6 +17,10 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301, USA.    */
 
+#ifndef _WIN32
+   #include <unistd.h>
+#endif
+
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
@@ -282,6 +286,7 @@ void pop_all_orbits( void)
 }
 
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
+void make_config_dir_name( char *oname, const char *iname);  /* miscell.cpp */
 void set_distance( OBSERVE FAR *obs, double r);             /* orb_func.c */
 
 /* The linear regression fit here is used to determine a perihelion distance
@@ -834,6 +839,17 @@ int write_excluded_observations_file( const OBSERVE *obs, int n_obs)
       obs++;
       }
    fclose( ofile);
+   if( n_excluded == 0)
+      {
+      char fullname[255];
+
+      make_config_dir_name( fullname, filename);
+#ifndef _WIN32
+      unlink( fullname);
+#else
+      _unlink( fullname);
+#endif
+      }
    return( n_excluded);
 }
 
