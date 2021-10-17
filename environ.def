@@ -64,7 +64,7 @@ TIME_RANGE=-1000,3000
    "unredacted" form.  (Contact me if you're willing to be added to this
    list.)  An asterisk indicates that observations of geocentric objects
    should remain redacted.
-GREENLIT=033 291 568 691 703 718 970 C95 G58 G96 H01 H41 H43 H45 I41 I52
+GREENLIT=033 291 568 595 691 703 718 970 C95 G58 G96 H01 H41 H43 H45 I41 I52
 GREENLIT2=I81 I93 J69 J95 K80 T05* T08* V03 V06 V11 Y00 Z37 Z48 Z80
 
    We default to assuming that no object will have an observed arc greater
