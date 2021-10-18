@@ -1370,3 +1370,8 @@ St50!+149.007461   -35.320406         786.     50-in reflector, Mt Stromlo
 ET2 !-070.73904    -29.25522         2359.     ESA Test-Bed Telescope 2, La Silla
 
 SSA !+114.0899     -21.8957            40.     Space Surveillance Telescope, Exmouth
+SOR !-106.463864   +34.9642312       1892.     Starfire Optical Range,  Albuqueque
+
+   Private communication from Francois Kugel,  2021 Oct 18 : N 43 59' 59.26",
+   E 05 38' 48.96", alt 626m ASL.  51m added for geoid height.
+A77 !+005.64693    +43.99972          677.     Observatoire Chante-Perdrix, Dauban
