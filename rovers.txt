@@ -1374,4 +1374,13 @@ SOR !-106.463864   +34.9642312       1892.     Starfire Optical Range,  Albuqueq
 
    Private communication from Francois Kugel,  2021 Oct 18 : N 43 59' 59.26",
    E 05 38' 48.96", alt 626m ASL.  51m added for geoid height.
-A77 !+005.64693    +43.99972          677.     Observatoire Chante-Perdrix, Dauban
+A77 !+005.64693    +43.99979          677.     Observatoire Chante-Perdrix, Dauban
+
+   Identification of Apache Point telescopes,  from
+   https://www.apo.nmsu.edu/Site/usersguide/Facility.html .  Altitude from
+   https://www.apo.nmsu.edu/ ;  says it's already ellipsoidal.
+
+705a!-105.82044    +32.78035         2788.      Apache Point, 3.5-m
+705b!-105.82028    +32.78004         2788.      New Mexico State Univ. 1.0-m,  Apache Point
+705c!-105.82018    +32.77979         2788.      ARCSAT 0.5-m, Apache Point
+705d!-105.82033    +32.77959         2788.      Sloan Digital Sky Survey 2.5-m
