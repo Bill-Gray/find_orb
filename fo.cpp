@@ -738,8 +738,7 @@ int main( int argc, const char **argv)
          }
       }
 
-   if( all_heliocentric)
-      forced_central_body = 0;
+   forced_central_body = (all_heliocentric ? 0 : ORBIT_CENTER_AUTO);
    if( ephem_option_string)
       ephemeris_output_options = parse_bit_string( ephem_option_string);
 
@@ -828,8 +827,6 @@ int main( int argc, const char **argv)
             double epoch_shown, curr_epoch, orbit[12];
             bool have_json_ephem = false;
 
-            if( all_heliocentric)
-               forced_central_body = ORBIT_CENTER_AUTO;
                 /* Start a bit ahead of the actual data,  just in case */
                 /* there's a #Sigma: or similar command in there: */
             if( file_offset < 0L)
