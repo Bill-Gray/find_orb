@@ -2878,9 +2878,13 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
 
          push_orbit( *orbit_epoch, orbit);
          for( i = 0; i < 4 && (nanoseconds_since_1970( ) - t0) < QUARTER_SECOND; i++)
+            {
+            if( i)
+               filter_obs( obs, n_obs, 3., 0);
             full_improvement( obs, n_obs, orbit, *orbit_epoch,
                            (pass ? "e=1" : NULL),
                            ORBIT_SIGMAS_REQUESTED, *orbit_epoch);
+            }
          if( prev_score < evaluate_initial_orbit( obs, n_obs, orbit) - .001)
             {
             pop_orbit( orbit_epoch, orbit);    /* we were better off with the old orbit */
