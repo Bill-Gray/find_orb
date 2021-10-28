@@ -473,68 +473,38 @@ in 'rovers.txt'.)    */
 
 static void *obs_details;
 
-static double get_lat_lon( const char *ibuff, char *compass)
-{
-   double deg = 0., min = 0., sec = 0.;
-
-   *compass = '\0';
-   if( sscanf( ibuff, "%lf %lf %lf %c", &deg, &min, &sec, compass) != 4)
-      *compass = '!';         /* didn't get all the fields */
-   deg += min / 60. + sec / 3600.;
-   return( deg);
-}
-
 static inline int get_lat_lon_from_header( double *lat,
             double *lon, double *alt, const char *mpc_code,
             const char **name_from_header)
 {
    const char **lines = get_code_details( obs_details, mpc_code);
    size_t i;
-   int rval = 0;
+   int rval = -1;
 
    *name_from_header = NULL;
-   for( i = 0; !rval && lines && lines[i]; i++)
-      if( !memcmp( lines[i], "COM Long.", 9))
+   for( i = 0; rval && lines && lines[i]; i++)
+      {
+      static bool warning_shown = false;
+      mpc_code_t cinfo;
+
+      rval = get_xxx_location_info( &cinfo, lines[i]);
+      if( rval == -2 && !warning_shown)      /* malformed position line */
          {
-         char compass;
-         const char *tptr = strstr( lines[i], "Lat.");
-         static bool warning_shown = false;
-         bool show_warning = false;
+         char tbuff[200];
 
-         *lon = get_lat_lon( lines[i] + 9, &compass);
-         if( *lon > 180.)
-            *lon -= 360.;
-         if( compass == 'W')
-            *lon *= -1.;
-         else
-            show_warning = (compass != 'E');
-         if( tptr)
-            {
-            *lat = get_lat_lon( tptr + 4, &compass);
-            if( compass == 'S')
-               *lat = -*lat;
-            else
-               show_warning = (compass != 'N');
-            }
-         else
-            show_warning = true;
-         tptr = strstr( lines[i], "Alt.");
-         if( tptr)
-            *alt = atof( tptr + 4);
-         else
-            show_warning = true;
-         rval = 1;
-         if( show_warning && !warning_shown)
-            {
-            char tbuff[200];
-
-            warning_shown = true;      /* just do this once */
-            snprintf( tbuff, sizeof( tbuff),            /* see efindorb.txt */
+         warning_shown = true;      /* just do this once */
+         snprintf( tbuff, sizeof( tbuff),            /* see efindorb.txt */
                   get_find_orb_text( 2000), mpc_code);
-            generic_message_box( tbuff, "o");
-            }
+         generic_message_box( tbuff, "o");
          }
-   if( rval && strlen( lines[0]) > 8)
+      else if( !rval)
+         {
+         *lat = cinfo.lat * 180. / PI;
+         *lon = cinfo.lon * 180. / PI;
+         *alt = cinfo.alt;
+         }
+      }
+   if( !rval && strlen( lines[0]) > 8)
       *name_from_header = lines[0] + 8;
                /* if observatory name is specified in header,  e.g., */
                /* COD Bow Generic Observatory,  Bowdoinham */
@@ -789,7 +759,7 @@ int get_observer_data( const char FAR *mpc_code, char *buff,
       }
 
 
-   if( get_lat_lon_from_header( &lat0, &lon0, &alt0, mpc_code,
+   if( !get_lat_lon_from_header( &lat0, &lon0, &alt0, mpc_code,
                                              &override_observatory_name))
       if( !override_observatory_name)
          override_observatory_name = "Temporary MPC code";
