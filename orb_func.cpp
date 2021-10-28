@@ -4259,15 +4259,20 @@ int orbital_monte_carlo( const double *orbit, OBSERVE *obs, const int n_obs,
    extern int append_elements_to_element_file;
    extern const char *elements_filename;
    const char *saved_name = elements_filename;
+   const char *vects_filename = get_environment_ptr( "VARIANT_VECT_FILE");
+   FILE *ofile = (*vects_filename ? fopen( vects_filename, "wb") : NULL);
 
    assert( sr_orbits);
    n_sr_orbits = max_n_sr_orbits;
    available_sigmas = NO_SIGMAS_AVAILABLE;
    elements_filename = "sr_elems.txt";
+   if( ofile)
+      fprintf( ofile, "Epoch JD %f TDT\n", epoch_shown);
    for( i = 0; i < n_sr_orbits; i++)
       {
       double *torbit = sr_orbits + i * 6;
       const double sig_squared = generate_mc_variant_from_covariance( torbit, orbit);
+      const char *format_str = "%+17.6f %+17.6f %+17.6f %+14.12f %+14.12f %+14.12f\n";
 
       if( i < 1000)
          {
@@ -4281,9 +4286,19 @@ int orbital_monte_carlo( const double *orbit, OBSERVE *obs, const int n_obs,
          }
       integrate_orbit( torbit, curr_epoch, epoch_shown);
       write_out_elements_to_file( torbit, epoch_shown, epoch_shown,
-           obs, n_obs, "", 6, 1, ELEM_OUT_ALTERNATIVE_FORMAT);
+           obs, n_obs, "", 6, 1, ELEM_OUT_ALTERNATIVE_FORMAT | ELEM_OUT_NO_COMMENT_DATA);
       append_elements_to_element_file = 1;
+      if( ofile)
+         fprintf( ofile, format_str,
+               torbit[0] * AU_IN_KM,
+               torbit[1] * AU_IN_KM,
+               torbit[2] * AU_IN_KM,
+               torbit[3] * AU_IN_KM / seconds_per_day,
+               torbit[4] * AU_IN_KM / seconds_per_day,
+               torbit[5] * AU_IN_KM / seconds_per_day);
       }
+   if( ofile)
+      fclose( ofile);
    set_locs( orbit, curr_epoch, obs, n_obs);
    compute_sr_sigmas( sr_orbits, n_sr_orbits, curr_epoch, epoch_shown);
    available_sigmas_hash = compute_available_sigmas_hash( obs, n_obs,
