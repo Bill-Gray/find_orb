@@ -1378,9 +1378,19 @@ A77 !+005.64693    +43.99979          677.     Observatoire Chante-Perdrix, Daub
 
    Identification of Apache Point telescopes,  from
    https://www.apo.nmsu.edu/Site/usersguide/Facility.html .  Altitude from
-   https://www.apo.nmsu.edu/ ;  says it's already ellipsoidal.
+   https://www.apo.nmsu.edu/ ;  says it's already ellipsoidal.  The MPC
+   positions for (705) and (645) both land on the 3.5-m dome,  about 85m
+   north of the SDSS 2.5-m dome.
 
-705a!-105.82044    +32.78035         2788.      Apache Point, 3.5-m
-705b!-105.82028    +32.78004         2788.      New Mexico State Univ. 1.0-m,  Apache Point
-705c!-105.82018    +32.77979         2788.      ARCSAT 0.5-m, Apache Point
-705d!-105.82033    +32.77959         2788.      Sloan Digital Sky Survey 2.5-m
+705a!-105.82044    +32.78035         2788.     Apache Point, 3.5-m
+705b!-105.82028    +32.78004         2788.     New Mexico State Univ. 1.0-m,  Apache Point
+705c!-105.82018    +32.77979         2788.     ARCSAT 0.5-m, Apache Point
+705d!-105.82033    +32.77959         2788.     Sloan Digital Sky Survey 2.5-m
+
+   Palomar telescopes identified via the site map at
+   http://ftp.astro.caltech.edu/palomar/observer/observertravel.html .  (I41),
+   (261),  and (644) all refer to the 48" Samuel Oschin telescope.  (675) is
+   the location of the decommissioned 18" telescope.  -32m correction for geoid.
+
+P5m !-116.86503    +33.35627         1662.     Palomar 5m
+60P !-116.85972    +33.34835         1648.     Palomar 1.5m
