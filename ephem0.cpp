@@ -2620,15 +2620,22 @@ int ephemeris_in_a_file( const char *filename, const double *orbit,
                         moon_lon = atan2( vect[1], vect[0]);
                         moon_lat = asine( vect[2] / moon_dist);
 #endif
-                        cos_elong = dot_product( obs_posn, vect)
+                        if( moon_dist)
+                           cos_elong = dot_product( obs_posn, vect)
                                  / (vector3_length( obs_posn) * moon_dist);
+                        else     /* lunicentric ephems;  'lunar elong' is undefined */
+                           cos_elong = -1.;
                         lunar_elong = acose( -cos_elong);
                         ecliptic_to_equatorial( vect);   /* mpc_obs.cpp */
                         fraction_illum = shadow_check( earth_loc, orbi_after_light_lag,
                                     EARTH_MAJOR_AXIS_IN_AU);
-                        cos_elong = dot_product( vect, topo)
+                        if( moon_dist)
+                           cos_elong = dot_product( vect, topo)
                                         / (moon_dist * vector3_length( topo));
+                        else
+                           cos_elong = 1.;
                         dist_moon = acose( cos_elong);
+
 #ifdef SHOW_LUNAR_OFFSETS
                         obs_lon = atan2( topo_ecliptic[1], topo_ecliptic[0]);
                         obs_lat = asine( topo_ecliptic[2] / vector3_length( topo_ecliptic));
