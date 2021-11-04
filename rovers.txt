@@ -1394,3 +1394,6 @@ A77 !+005.64693    +43.99979          677.     Observatoire Chante-Perdrix, Daub
 
 P5m !-116.86503    +33.35627         1662.     Palomar 5m
 60P !-116.85972    +33.34835         1648.     Palomar 1.5m
+
+   Coords from Andrea Mattei.
+L78 !+014.780211   +40.6826087        134.     San Marco Observatory, Salerno
