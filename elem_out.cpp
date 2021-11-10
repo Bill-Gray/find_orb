@@ -60,6 +60,7 @@ bool findorb_already_running = false;
 #define JD_TO_YEAR(jd)  (2000. + ((jd)-J2000) / 365.25)
 #define YEAR_TO_JD( year) (J2000 + (year - 2000.) * 365.25)
 
+static const char *_extras_filename = "hints.txt";
 extern int available_sigmas;
 extern double optical_albedo;
 
@@ -1342,6 +1343,75 @@ void get_periapsis_loc( double *ecliptic_lon, double *ecliptic_lat,
    *ecliptic_lat = asin( sin( elem->incl) * sin( elem->arg_per));
 }
 
+static void _store_extra_orbit_info( const char *packed_id,
+               const unsigned perturbers, const int n_extra_params,
+               const double *solar_pressure, const char *constraints)
+{
+   extern int force_model;
+   size_t n_lines;
+   char **lines = load_file_into_memory( _extras_filename, &n_lines, true);
+   FILE *ofile;
+   char buff[200];
+   int i;
+
+   assert( strlen( packed_id) == 12);
+   assert( (force_model && n_extra_params) || (!force_model && !n_extra_params));
+   ofile = fopen_ext( _extras_filename, "fcw");
+   for( i = 0; i < (int)n_lines; i++)
+      if( memcmp( lines[i], packed_id, 12))
+         fprintf( ofile, "%s\n", lines[i]);
+   free( lines);
+   strcpy( buff, packed_id);
+   if( perturbers & ~0x7ff)
+      snprintf_append( buff, sizeof( buff), " p=%x", perturbers);
+   if( force_model)
+      snprintf_append( buff, sizeof( buff), " model=%x", force_model);
+   for( i = 0; i < n_extra_params; i++)
+      snprintf_append( buff, sizeof( buff), " A%d=%e", i + 1, solar_pressure[i]);
+   if( *constraints)
+      snprintf_append( buff, sizeof( buff), " Constraint=%s", constraints);
+   fprintf( ofile, "%s\n", buff);
+   fclose( ofile);
+}
+
+static void _get_extra_orbit_info( const char *packed_id,
+                unsigned *perturbers, int *n_extra_params,
+                double *solar_pressure, char *constraints)
+{
+   extern int force_model;
+   size_t n_lines;
+   char **lines = load_file_into_memory( _extras_filename, &n_lines, true);
+   int i, j;
+
+   assert( strlen( packed_id) == 12);
+   for( i = 0; i < (int)n_lines; i++)
+      if( !memcmp( lines[i], packed_id, 12))
+         {
+         const char *tptr;
+
+         if( (tptr = strstr( lines[i], " p=")) != NULL)
+            sscanf( tptr + 3, "%x", perturbers);
+         if( (tptr = strstr( lines[i], " model=")) != NULL)
+            sscanf( tptr + 7, "%x", (unsigned *)&force_model);
+         for( j = 0; j < 5; j++)
+            {
+            char tbuff[6];
+
+            snprintf( tbuff, sizeof( tbuff), " A%d=", j + 1);
+            if( (tptr = strstr( lines[i], tbuff)) != NULL)
+               {
+               sscanf( tptr + 4, "%lf", solar_pressure + j);
+               *n_extra_params = j + 1;
+               }
+            }
+         if( (tptr = strstr( lines[i], " Constraint=")) != NULL)
+            if( constraints)
+               sscanf( tptr + 12, "%s", constraints);
+         break;
+         }
+   free( lines);
+}
+
 /* From an e-mail from Alan Harris:
 
    "...the formula for encounter velocity (in FORTRAN), for a circular planet
@@ -1651,7 +1721,14 @@ int write_out_elements_to_file( const double *orbit,
    add_sof_to_file( (n_extra_params >= 2 ? "cmt_sof.txt" : sof_filename),
                     &elem, n_obs, obs, NULL);      /* elem_ou2.cpp */
    if( saving_elements_for_reuse && available_sigmas == COVARIANCE_AVAILABLE)
+      {
+      extern double solar_pressure[];
+
       add_sof_to_file( "orbits.sof", &elem, n_obs, obs, "orbitdef.sof");
+      if( (perturbers & ~0x7ff) || n_extra_params > 1 || *constraints)
+         _store_extra_orbit_info( obs->packed_id, perturbers, n_extra_params,
+                     solar_pressure, constraints);
+      }
 /* if( showing_sigmas == COVARIANCE_AVAILABLE)
 */    {
       ELEMENTS elem2 = elem;
@@ -2828,6 +2905,8 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
          *orbit_epoch = elems.epoch;
          if( got_vectors == 1)
             *perturbers = 0x7fe;    /* Merc-Pluto plus moon */
+         _get_extra_orbit_info( obs->packed_id, perturbers, &n_extra_params,
+                     solar_pressure, NULL);
          if( n_obs > 1)
             {
             set_locs( orbit, *orbit_epoch, obs, n_obs);

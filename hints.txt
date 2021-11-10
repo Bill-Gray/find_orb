@@ -1,0 +1,9 @@
+# This contains 'hints' for orbital solutions of certain oddball objects.
+# For example,  2006 DE160 had a close encounter with Ceres;  fail to include
+# asteroid perturbations,  and you won't get a good orbit.  1998 SD9 shows
+# signs of the Yarkovsky effect;  fail to account for that,  and you will
+# again see large residuals.
+     K06DG0E p=7007fe
+08013J90K00A p=7001fe
+50278        p=7001fe
+     J98S09D model=12 A1=0 A2=-2.720848e-13 Constraint=A1=0

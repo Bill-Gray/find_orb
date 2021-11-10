@@ -292,6 +292,7 @@ endif
 	$(CP) orbitdef.sof previous.def progcode.txt radecfmt.txt residfmt.txt         $(IDIR)
 	$(CP) rovers.txt sat_xref.txt scope.json scopes.txt sigma.txt site_310.txt     $(IDIR)
 	$(CP) timehelp.txt xdesig.txt bright.pgm bright2.pgm elem_pop.txt              $(IDIR)
+	$(CP) -n hints.txt                                                             $(IDIR)
 
 uninstall:
 ifdef EXE
