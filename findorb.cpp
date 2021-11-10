@@ -4140,11 +4140,13 @@ int main( int argc, const char **argv)
                 tptr = strstr( tptr, "[ ]") + 1;
             *tptr = '*';
             text_search_and_replace( tbuff, "$", search_code);
-            help_file_name = "mpc_area.txt";
             if( mouse_wheel_motion)
                c1 = (mouse_wheel_motion > 0 ? KEY_F( 4) : KEY_F( 5));
             else
+               {
+               help_file_name = "mpc_area.txt";
                c1 = full_inquire( tbuff, NULL, 0, COLOR_MENU, mouse_y, mouse_x);
+               }
             if( c1 >= KEY_F(1) && c1 <= KEY_F(3))
                list_codes = c1 - KEY_F(1);
             else if( c1 == KEY_F(4) || c1 == KEY_F(5))
