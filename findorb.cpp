@@ -5039,9 +5039,10 @@ int main( int argc, const char **argv)
                {
                double vaisala_dist;
                extern int vaisala_center_object;
+               const char *centers = "mveMjsunpl", *tptr = strchr( centers, *tbuff);
 
-               if( *tbuff == 'e')
-                  vaisala_center_object = 3;
+               if( tptr)
+                  vaisala_center_object = (int)( tptr - centers) + 1;
                vaisala_dist = atof( tbuff + (vaisala_center_object != 0));
                if( vaisala_dist > 300.)   /* larger distances are assumed */
                   vaisala_dist /= AU_IN_KM;        /* to be in kilometers */
