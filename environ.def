@@ -439,3 +439,20 @@ DEFAULT_V_MAG=
 LAGRANGE_003010=0.848477, 1.168561, -0.992924
 LAGRANGE_000003=0.989989, 1.010078, -0.999998
 LAGRANGE_000005=0.933299, 1.069807, -0.999443
+
+   The 'elements.txt' file created by Find_Orb has some 'comment' data not
+   shown by default.  You can toggle to it by clicking on the orbital elements
+   shown on-screen,  and some people just look at the 'elements.txt' file
+   directly.  By default,  a _lot_ of comments are shown.  However,  you can
+   change the following line to (for example) COMMENT_SHUTOFF=State Tis to
+   shut off the state vector and Tisserand output.  Setting it to
+   COMMENT_SHUTOFF=TLE State MOID Twrit ObsRange Ver Per DE Tis Vinf Sco Pse
+   will shut off TLEs (shown only for geocentric objects),  state vectors,
+   MOIDs for eight planets,  the time the elements were written,  data about
+   the time span/number of observations,  Find_Orb version info,  perturber
+   data,  JPL DE version info,  Tisserand data,  Vinf relative to Earth,
+   "score" (a quantity describing Find_Orb's confidence in the orbit,  based
+   on residuals and the likelihood of the elements),  and data used for
+   making pseudo-MPECs.
+COMMENT_SHUTOFF=
+

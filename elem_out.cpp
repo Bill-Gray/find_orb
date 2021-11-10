@@ -1412,6 +1412,13 @@ static void _get_extra_orbit_info( const char *packed_id,
    free( lines);
 }
 
+/* see 'environ.def' for an explanation of how/why this works. */
+
+static bool _include_comment( const char *keyval)
+{
+   return( !strstr( get_environment_ptr( "COMMENT_SHUTOFF"), keyval));
+}
+
 /* From an e-mail from Alan Harris:
 
    "...the formula for encounter velocity (in FORTRAN), for a circular planet
@@ -2047,7 +2054,7 @@ int write_out_elements_to_file( const double *orbit,
       }
    observation_summary_data( tbuff, obs, n_obs, options);
    fprintf( ofile, "%s\n", tbuff);
-   if( elem.central_obj == 3 && elem.ecc < .99)
+   if( elem.central_obj == 3 && elem.ecc < .99 && _include_comment( "TLE"))
       {
       write_tle_from_vector( tbuff, rel_orbit, elem.epoch, NULL, NULL);
       tbuff[69] = tbuff[140] = '\0';
@@ -2067,21 +2074,24 @@ int write_out_elements_to_file( const double *orbit,
          ecliptic_to_equatorial( rel_orbit);
          ecliptic_to_equatorial( rel_orbit + 3);
          }
-      fprintf( ofile, "# State vector (heliocentric %s J2000):\n",
-               is_ecliptic ? "ecliptic" : "equatorial");
-      fprintf( ofile, "# %+17.12f%+17.12f%+17.12f AU\n",
-               orb[0], orb[1], orb[2]);
-      fprintf( ofile, "# %+17.12f%+17.12f%+17.12f mAU/day\n",
-               orb[3] * 1000., orb[4] * 1000., orb[5] * 1000.);
-      if( planet_orbiting)
+      if( _include_comment( "State"))
          {
-         fprintf( ofile, "# State vector relative to central body:\n");
-         fprintf( ofile, "# %17.12f%17.12f%17.12f AU\n",
-               rel_orbit[0], rel_orbit[1], rel_orbit[2]);
-         fprintf( ofile, "# %17.12f%17.12f%17.12f mAU/day\n",
-               rel_orbit[3] * 1000., rel_orbit[4] * 1000., rel_orbit[5] * 1000.);
+         fprintf( ofile, "# State vector (heliocentric %s J2000):\n",
+                  is_ecliptic ? "ecliptic" : "equatorial");
+         fprintf( ofile, "# %+17.12f%+17.12f%+17.12f AU\n",
+                  orb[0], orb[1], orb[2]);
+         fprintf( ofile, "# %+17.12f%+17.12f%+17.12f mAU/day\n",
+                  orb[3] * 1000., orb[4] * 1000., orb[5] * 1000.);
+         if( planet_orbiting)
+            {
+            fprintf( ofile, "# State vector relative to central body:\n");
+            fprintf( ofile, "# %17.12f%17.12f%17.12f AU\n",
+                  rel_orbit[0], rel_orbit[1], rel_orbit[2]);
+            fprintf( ofile, "# %17.12f%17.12f%17.12f mAU/day\n",
+                  rel_orbit[3] * 1000., rel_orbit[4] * 1000., rel_orbit[5] * 1000.);
+            }
          }
-      else   /* for heliocentric orbits,  show MOIDs: */
+      if( !planet_orbiting && _include_comment( "MOID"))
          {
          fprintf( ofile, "# MOIDs: Me%10.6f Ve%10.6f Ea%10.6f Ma%10.6f\n",
                   moids[1], moids[2], moids[3], moids[4]);
@@ -2122,28 +2132,37 @@ int write_out_elements_to_file( const double *orbit,
       int jpl_de_version;
 
       full_ctime( buff, jd, CALENDAR_JULIAN_GREGORIAN);
-      fprintf( ofile, "# Elements written: %s (JD %f)\n", buff, jd);
+      if( _include_comment( "Twrit"))
+         fprintf( ofile, "# Elements written: %s (JD %f)\n", buff, jd);
       make_date_range_text( buff, obs[0].jd, obs[n_obs - 1].jd);
-      fprintf( ofile, "# Full range of obs: %s (%d observations)\n",
+      if( _include_comment( "ObsRange"))
+         fprintf( ofile, "# Full range of obs: %s (%d observations)\n",
                               buff, n_obs);
-      fprintf( ofile, "# Find_Orb ver: %s\n", find_orb_version_jd( NULL));
-      fprintf( ofile, "# Perturbers: %08lx ", (unsigned long)perturbers);
-      if( !perturbers)
-         fprintf( ofile, "(unperturbed orbit)");
-      else if( (perturbers & 0x3fe) == 0x3fe)
-         fprintf( ofile, (perturbers & 0x400) ? "(Merc-Pluto plus Luna)" :
-               "(Merc-Pluto, Earth & moon combined)");
-      else if( perturbers == 0x408)
-         fprintf( ofile, "(Sun/Earth/Moon)");
+      if( _include_comment( "Ver"))
+         fprintf( ofile, "# Find_Orb ver: %s\n", find_orb_version_jd( NULL));
+      if( _include_comment( "Per"))
+         {
+         fprintf( ofile, "# Perturbers: %08lx ", (unsigned long)perturbers);
+         if( !perturbers)
+            fprintf( ofile, "(unperturbed orbit)");
+         else if( (perturbers & 0x3fe) == 0x3fe)
+            fprintf( ofile, (perturbers & 0x400) ? "(Merc-Pluto plus Luna)" :
+                  "(Merc-Pluto, Earth & moon combined)");
+         else if( perturbers == 0x408)
+            fprintf( ofile, "(Sun/Earth/Moon)");
+         }
       get_jpl_ephemeris_info( &jpl_de_version, NULL, NULL);
-      if( jpl_de_version)
-         fprintf( ofile, ";  JPL DE-%d\n", jpl_de_version);
-      else
-         fprintf( ofile, ";  not using JPL DE\n");
+      if( _include_comment( "DE"))
+         {
+         if( jpl_de_version)
+            fprintf( ofile, ";  JPL DE-%d\n", jpl_de_version);
+         else
+            fprintf( ofile, ";  not using JPL DE\n");
+         }
 
       if( !elem.central_obj)
          {
-         if( elem.ecc < 1.)
+         if( elem.ecc < 1. && _include_comment( "Tis"))
             {
             for( i = 0; i < 3; i++)  /* show Tisserand data for Ear, Jup & Nep */
                {                     /* if orbits come close to overlapping */
@@ -2160,7 +2179,7 @@ int write_out_elements_to_file( const double *orbit,
                         names[i], tisserand);
                }
             }
-         if( helio_elem.q < 1.04)
+         if( helio_elem.q < 1.04 && _include_comment( "Vin"))
             fprintf( ofile, "# Earth encounter velocity %.4f km/s\n",
                               encounter_velocity( &helio_elem, 1.));
          }
@@ -2173,7 +2192,7 @@ int write_out_elements_to_file( const double *orbit,
             fprintf( ofile, "# Perihelion (%.3f, %.3f)\n",
                   ecliptic_lon * 180. / PI, ecliptic_lat * 180. / PI);
             }
-      if( barbee_style_delta_v && helio_elem.q < 1.3)
+      if( barbee_style_delta_v && helio_elem.q < 1.3 && _include_comment( "Vin"))
          fprintf( ofile, "# Barbee-style encounter velocity: %.4f km/s\n",
                               barbee_style_delta_v);
       if( elem.abs_mag && elem.is_asteroid)
@@ -2185,7 +2204,8 @@ int write_out_elements_to_file( const double *orbit,
                (diam > 10000. ? "km" : "meters"), optical_albedo * 100.);
          }
 
-      fprintf( ofile, "# Score: %f\n", evaluate_initial_orbit( obs, n_obs, orbit));
+      if( _include_comment( "Sco"))
+         fprintf( ofile, "# Score: %f\n", evaluate_initial_orbit( obs, n_obs, orbit));
       }
 
    *impact_buff = '\0';
@@ -2250,7 +2270,7 @@ int write_out_elements_to_file( const double *orbit,
                    vel[0] * 1000., vel[1] * 1000., vel[2] * 1000.);
          }
       }
-   if( !(options & ELEM_OUT_NO_COMMENT_DATA))
+   if( !(options & ELEM_OUT_NO_COMMENT_DATA) && _include_comment( "Pse"))
       {
       char time_buff[40];
       bool nongrav_sigmas_found = false;
