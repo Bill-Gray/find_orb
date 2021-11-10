@@ -47,14 +47,9 @@ class notes at
 http://spiff.rit.edu/classes/ast613/lectures/signal/signal_illus.html
 https://www.noao.edu/kpno/manuals/dim/#ccdtime
 
-   The Lowell paper makes certain assumptions about the use
-of a near-optimal measuring aperture.  (Use too large a measuring
-aperture,  and you're gathering lots of background noise and not
-adding much signal from the asteroid;  too small an aperture,
-and you may toss out some useful signal.)  They use a rather
-primitive sky brightness function;  for Find_Orb,  we'll lean
-on the Schaefer & Krisciunas model (see 'vislimit.cpp' in the
-'lunar' repository).    */
+   The Lowell paper uses a somewhat primitive sky brightness function; for
+Find_Orb,  we'll lean on the Schaefer & Krisciunas model (see 'vislimit.cpp'
+in the 'lunar' repository).  See note below on aperture size.  */
 
 typedef struct
 {
@@ -62,6 +57,40 @@ typedef struct
    double extinction;            /* mags per airmass */
    double zero_point;
 } filter_t;
+
+/* The Lowell paper cited above points out that the theoretical
+optimal pinhole photometry aperture should be about 0.67 times
+the full width at half maximum (fwhm).  More than that,  and
+you're bringing in outlying pixels with less signal intensity
+and your SNR will suffer.  Less than that,  and you're excluding
+some pixels whose signals could make your SNR better.
+
+   The Lowell paper also suggests "a minimum of nine pixels,
+for a minimum radius of 2.5 pixels".  There's a contradiction
+here,  since sqrt(9/pi) = 1.693.  I _think_ that's what they
+really meant,  and that's the minimum aperture implemented below.
+
+   Note that now that we're using the above logic to determine an
+'optimal' aperture,  the aperture stored in the expcalc_config_t
+structure is completely ignored.
+
+   Finally,  after some discussions with CSS,  we agreed that the
+'fwhm' for a site should be assumed to be that at the zenith,
+and should be multiplied by the airmass (i.e.,  the seeing gets
+worse near the horizon).  Must admit I'm not totally certain of
+that;  a better understanding of how the PSF spreads as a function
+of airmass would help.  Presumably,  for small scopes,  the FWHM
+is just going to be proportional to wavelength/scope diameter;
+you need to get beyond some point for the airmass to matter.
+*/
+
+static double _optimal_aperture( const expcalc_config_t *c)
+{
+   double rval = c->fwhm * c->airmass * 0.67;
+   const double min_aperture = c->pixel_size * 1.693;
+
+   return( rval > min_aperture ? rval : min_aperture);
+}
 
 /* The 'zero point' is the counts from a mag 0 star in this band
 per cm^2 per second.  Multiply by the collecting area of the
@@ -80,13 +109,23 @@ I0/2 = I0 * exp( -(.5 * fwhm / sigma)^2 / 2)
 1/2 = exp( -(.5 * fwhm / sigma)^2 / 2)
 -ln(2) = -(.5 * fwhm / sigma)^2 / 2
 2 * ln(2) = (.5 * fwhm / sigma)^2
-fwhm / sigma = 2 * sqrt( 2 * ln(2)) = 2.354820045030949 */
+fwhm / sigma = 2 * sqrt( 2 * ln(2)) = 2.354820045030949
 
-static double fraction_inside( const expcalc_config_t *c)
+NOTE (2021 Nov 2) : a couple of revisions have been made.  First,  after some
+discussion with CSS folks,  we agreed that the 'fwhm' is proportional to
+airmass.  The value given for a particular site is assumed to be for
+the zenith,  and should be multiplied by the airmass.  Second,  the
+'aperture' given for a site is nearly useless.  We now just follow
+the advice in the Lowell white paper and set aperture = 0.67 * fwhm,
+which means aperture = 0.67 * fwhm_at_zenith * airmass,  with a minimum
+aperture size to guarantee we use at least nine pixels;  see the
+above _optimal_aperture() function.   */
+
+static double _fraction_inside( const expcalc_config_t *c)
 {
    const double full_widths_per_sigma = 2.354820045030949;
    const double real_fwhm = c->fwhm * c->airmass;
-   const double r_scaled = full_widths_per_sigma * c->aperture / real_fwhm;
+   const double r_scaled = full_widths_per_sigma * _optimal_aperture( c) / real_fwhm;
 
    return( 1. - exp( -r_scaled * r_scaled / 2.));
 }
@@ -118,7 +157,7 @@ static double star_electrons_per_second_per_pixel( const expcalc_config_t *c, co
 {
    const double mag_corr = mag + c->airmass * e->extinction;
    const double rval = pow( 10., -0.4 * mag_corr) * e->zero_point * effective_area( c)
-                                    * c->qe * fraction_inside( c);
+                                    * c->qe * _fraction_inside( c);
    return( rval);
 }
 
@@ -157,10 +196,12 @@ static int find_filter( expcalc_internals_t *e, const char filter)
 
 static int set_internals( expcalc_internals_t *e, const expcalc_config_t *c)
 {
+   const double optimal_aperture_radius_in_pixels = _optimal_aperture( c) / c->pixel_size;
+
    if( find_filter( e, c->filter))
       return( EXPCALC_UNKNOWN_FILTER);
-   e->n_pixels_in_aperture = pi * c->aperture * c->aperture
-                  / (c->pixel_size * c->pixel_size);
+   e->n_pixels_in_aperture = pi * optimal_aperture_radius_in_pixels
+                                * optimal_aperture_radius_in_pixels;
    e->noise2 = c->readnoise * c->readnoise;
    e->s = sky_electrons_per_second_per_pixel( c, e->zero_point);
    return( 0);
@@ -178,7 +219,7 @@ static double internal_mag_from_snr_and_exposure(
       return( EXPCALC_FAILED);
    e->n_star = solve_quadratic( exposure * exposure, -tval,
                     e->n_pixels_in_aperture * (e->noise2 - tval * e->s));
-   mag_exp = e->n_star / (e->zero_point * effective_area( c) * c->qe * fraction_inside( c));
+   mag_exp = e->n_star / (e->zero_point * effective_area( c) * c->qe * _fraction_inside( c));
    mag = -2.5 * log10( mag_exp);
    mag -=  c->airmass * e->extinction;
    return( mag);
@@ -573,7 +614,7 @@ int main( const int argc, const char **argv)
       printf( "Filter %c, QE %.2f, read noise %.2f electrons/pixel\n",
                   c.filter, c.qe, c.readnoise);
       printf( "Pixels are %.2f arcsec;  aperture %.2f arcsec, FWHM %.2f arcsec\n",
-                  c.pixel_size, c.aperture, c.fwhm);
+                  c.pixel_size, _optimal_aperture( &c), c.fwhm);
       printf( "Sky brightness %.2f mag/arcsec^2; airmass %.2f\n",
                   c.sky_brightness, c.airmass);
       }
@@ -586,7 +627,7 @@ int main( const int argc, const char **argv)
       mag = internal_mag_from_snr_and_exposure( &e, &c, snr, exposure);
    else
       usage( );
-   printf( "SNR %.2f with exposure time %.0f seconds and magnitude %.2f\n",
+   printf( "SNR %.2f with exposure time %.1f seconds and magnitude %.2f\n",
                   snr, exposure, mag);
    if( debug)
       {

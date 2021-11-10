@@ -3,7 +3,8 @@ typedef struct
    const char *mpc_code;
    char filter;
    double primary_diam, obstruction_diam;   /* in cm */
-   double aperture, fwhm;                   /* arcsec */
+   double aperture;                         /* arcsec,  _radius_ of the aperture */
+   double fwhm;                             /* arcsec,  _full_ width (i.e., diameter) */
    double qe;                               /* unitless,  0-1 */
    double readnoise;                        /* counts per pixel */
    double pixel_size;                       /* arcsec */
