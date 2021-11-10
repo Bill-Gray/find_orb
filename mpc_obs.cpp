@@ -673,24 +673,23 @@ static int get_rover_index( const char *obscode)
    return( rval);
 }
 
-/* The following function paws through the STATIONS.TXT file (or the
-   ObsCodes.html or .htm file),  looking for the observer code in
-   question.  When it finds it,  it just copies the entire line into
-   buff.  If lon_in_radians and the rho_xxx_phi values are non-NULL,
-   they're extracted from the buffer.
+/* The following function paws through the ObsCodes.htm or ObsCodes.html
+   file,  looking for the observer code in question.  If found,  the
+   line is simply copied into 'buff'.  If lon_in_radians and the
+   rho_xxx_phi values are non-NULL,  they're extracted from the buffer.
 
    There are a few "supplemental" observers,  mostly satellite observers
    who don't have MPC codes.  These could be handled as roving observers
-   (code 247),  but this can be a hassle;  it's better if they have their
-   own codes.  These codes are put into 'rovers.txt',  and have designations
-   that are the initials of the observer;  that way,  they don't look
-   too much like "real,  official" MPC designations.  At present,  there
-   are a few codes there for artificial satellite observers.
+   (code 247),  or as 'temporary' observers (code XXX).  However,  it can
+   be better if they have their own codes.  These non-MPC-approved codes
+   are put into 'rovers.txt'.  They are three characters,  but not of the
+   uppercase letter and two digits sort;  that way,  they don't look
+   too much like "real,  official" MPC designations.  Also,  some fixes
+   for defective MPC code lat/lon/alt values are provided in the file.
 
    Return value:
 
-      -2:  stations.txt,  obscodes.htm,  obscodes.html not found (need
-               any one of these)
+      -2:  obscodes.htm,  obscodes.html not found (need one of these)
        Other:  index of planet of MPC station (3=earth,  most common
             case;  0=sun, 1=mercury,  etc.)
 */
@@ -4337,7 +4336,7 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
 
 /* put_observer_data_in_text( ) takes a 'station_no' and fills 'buff'
    with a little bit of text about that station,  as found from
-   STATIONS.TXT:  bits such as the lat/lon and name of the station.
+   ObsCodes.htm:  bits such as the lat/lon and name of the station.
    In Find_Orb, these details are shown for the station that made
    the currently-selected observation. */
 
