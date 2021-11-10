@@ -1302,6 +1302,12 @@ COM Find_Orb default details
 OBS N. Teamo
 TEL 0.35-m f/2.0 Schmidt + 1392x1040 CCD
 
+COD G00
+OBS M. Jaeger, E. Prosperi, S. Prosperi
+COM Default details extracted from MPEC 2021-V21
+MEA M. Jaeger
+TEL 0.28-m f/2.2 reflector + CCD
+
 COD G02
 OBS M. Urbanik
 COM Default details extracted from MPEC 2021-P47
@@ -2149,6 +2155,11 @@ OBS T. Scarmato
 COM Default details extracted from MPEC 2021-J28
 TEL 0.25-m Newtonian reflector + CCD
 
+COD M10
+OBS C. Pin-ferrier
+COM Default details extracted from MPEC 2021-V21
+TEL 0.25-m f/5 reflector + CCD
+
 COD M43
 OBS A. Gabuya
 COM Default details extracted from MPEC 2020-W26
@@ -2428,6 +2439,11 @@ COD U71
 OBS M. Forslund
 COM Default details extracted from MPEC 2021-B143
 TEL 0.36-m f/2.2 reflector + CCD
+
+COD U74
+OBS N. Saini, C. Zhai, R. Trahan, M. Zhan, M. Shao
+COM Default details extracted from MPEC 2021-T266
+TEL 0.36-m f/2.2 Schmidt
 
 COD U76
 OBS P. Lewin
@@ -2772,7 +2788,8 @@ CON [cjacqueslf (at) gmail (dot) com]
 OBS C. Jacques, E. Pimentel, J. Barros
 MEA C. Jacques
 NET UCAC4
-TEL 0.28-m f/2.2 astrograph + CCD
+COM Was TEL 0.28-m f/2.2 astrograph + CCD
+TEL 0.45-m f/2.9 astrograph + CCD
 
 COD Y28
 COM Find_Orb default details
