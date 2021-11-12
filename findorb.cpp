@@ -81,6 +81,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
                             | MOUSE_WHEEL_SCROLL | BUTTON_MODIFIERS    \
                             | BUTTON4_PRESSED | BUTTON5_PRESSED)
 
+/* Some terminals don't actually report mouse movements.  'Hint' text
+relies on such reports;  we show no hints until at least one movement
+report is received. */
+
+static bool _mouse_movements_are_reported = false;
+
 #include <wchar.h>
 #include <math.h>
 #include <stdio.h>
@@ -2498,6 +2504,8 @@ static void get_mouse_data( int *mouse_x, int *mouse_y,
    *mouse_y = mouse_event.y;
    *mouse_z = mouse_event.z;
    *button  = mouse_event.bstate;
+   if( *button & REPORT_MOUSE_POSITION)
+      _mouse_movements_are_reported = true;
          /* Mouse events are sometimes 'lost' in some terminals.  If we get
          a button release and,  based on past history,  thought the button
          should have already been released,  we turn it into a click.  This
@@ -4084,8 +4092,9 @@ int main( int argc, const char **argv)
                napms( 50);      /* a 'tick' is 50 milliseconds long */
                n_ticks_elapsed++;
                n_ticks_mouse_stationary++;
-               if( n_ticks_mouse_stationary == 20)    /* after a second of no activity, */
-                  show_hint( mouse_x, mouse_y);    /* show a hint */
+               if( n_ticks_mouse_stationary == 20 /* = 1 second w/no motion */
+                              && _mouse_movements_are_reported)
+                  show_hint( mouse_x, mouse_y);
                }
             if( c == KEY_MOUSE && (button & REPORT_MOUSE_POSITION))
                c = n_ticks_mouse_stationary = 0;      /* suppress mouse moves */
