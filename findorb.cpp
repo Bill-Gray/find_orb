@@ -562,10 +562,7 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
                      rval = KEY_F( y + 1);
                   }
                else
-                  {
-                  rval = 27;
                   curr_line = -1;
-                  }
                if( button & (REPORT_MOUSE_POSITION | BUTTON_PRESS_EVENT))
                   rval = KEY_MOUSE;          /* ignore mouse moves */
                if( curr_line != highlit_line || /* move the highlight */
@@ -1844,6 +1841,7 @@ static int select_central_object( char *buff, const bool dialog_text_only)
       }
    if( dialog_text_only)
       return( 0);
+   strcat( buff, get_find_orb_text( 96002));    /* 'Cancel' */
    c = inquire( buff, NULL, 0, COLOR_DEFAULT_INQUIRY);
    if( c && (tptr = strchr( hotkeys, toupper( c))) != NULL)
       c = KEY_F( 1) + (int)( tptr - hotkeys);

@@ -233,15 +233,7 @@
 2022    Select all from $
 2022    Find prev from $
 2022    Find next from $
-
-# Following pop-up shown when you right-click on the _orbital elements_ :
-
-2024    Get obs from clipboard
-2024    Open file
-2024    Select object
-2024    Save elements
-2024    Copy elements to clipboard
-2024    Toggle element details
+2022    Cancel
 
 2025    Click on an observation to get information about it.  Right-click to get
 2025    further options.  Ctrl-click to select multiple observations.\n
@@ -276,20 +268,13 @@
 2031    C Copy astrometry from clipboard
 2031    N Give object name and get data from MPC
 
-2032    0 No non-gravitational forces
-2032    R Radial force only
-2032    T Tangential force only
-2032    2 Radial & tangential
-2032    3 Radial, tangential, & out-of-plane
-2032    I Inverse-square force
-2032    C Comet (Marsden-Sekanina) force
-
 2033    Use arrow keys to select object,  then hit the space bar or Enter (or use mouse)
 
 2034    0   Default frame
 2034    1   J2000 ecliptic
 2034    2   J2000 equatorial
 2034    3   Body frame
+2034    Cancel
 
 2035    English
 2035    French
@@ -312,6 +297,7 @@
 2037    Increase precision
 2037    Decrease precision
 2037    Element center=$CEN
+2037    Cancel
 
 2038    Enter element reference :
 
@@ -333,6 +319,7 @@
 2050    Find next from $
 2050    Find prev from $
 2050    Find obs from a given code
+2050    Cancel
 
 2052    Some observations of this object are marked as 'private' and not
 2052    for public redistribution.  Do you want to include them?  (Y/N)
