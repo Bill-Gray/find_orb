@@ -3099,9 +3099,12 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
 
       c = inquire( buff, NULL, 30, COLOR_DEFAULT_INQUIRY);
       free( buff);
-      tptr = strchr( hotkeys, c);
-      if( tptr)
-         c = base_key + (int)( tptr - hotkeys);
+      if( c >= ' ' && c < 127)
+         {
+         tptr = strchr( hotkeys, c);
+         if( tptr)
+            c = base_key + (int)( tptr - hotkeys);
+         }
       i = c - base_key;
       if( i < n_prev)
          strcpy( ifilename, prev_files[prev_idx[i]]);
