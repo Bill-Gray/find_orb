@@ -1616,6 +1616,7 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
                force_bogus_orbit = true;
                      /* FALLTHRU */
             case ' ':
+            case 10:
             case 13:
                rval = choice;
                break;
