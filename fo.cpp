@@ -353,20 +353,22 @@ static void get_summary_info( char *buff, const char *mpec_filename)
 can be transformed into the following,  which will cause the eccentricity
 to be highlighted in red :
 
-...\033[me=1.005\033\1330m...           */
+...\033[me=1.005\033[0m...           */
+
+#define VT_CSI "\033\133"
 
 static void add_vt100_colors( char *text, size_t nbytes, const char color)
 {
    size_t len;
 
    memmove( text + 5, text, strlen( text) + 1);
-   memcpy( text, "\033[3xm", 5);
+   memcpy( text, VT_CSI "3xm", 5);
    text[3] = color;
    text += 5;
    len = strlen( text);
    text += (len < nbytes ? len : nbytes);
    memmove( text + 4, text, strlen( text) + 1);
-   memcpy( text, "\033[0m", 4);
+   memcpy( text, VT_CSI "0m", 4);
 }
 
 static void colorize_text( char *text)
@@ -988,7 +990,7 @@ int main( int argc, const char **argv)
                               && show_processing_steps)
                   {
                   if( use_colors)        /* reverse colors to draw attn */
-                     printf( "\033[30;47m");
+                     printf( VT_CSI "30;47m");
                   printf( " %d /", n_obs_included);
                   }
                }
@@ -1007,7 +1009,7 @@ int main( int argc, const char **argv)
          if( show_processing_steps)
             printf( "  %s\n", tbuff);
          if( use_colors)
-            printf( "\033[0m");
+            printf( VT_CSI "0m");
          }
    free( ids);
    if( summary_ofile)
