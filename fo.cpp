@@ -57,12 +57,11 @@ for Windows and other non-*nix systems. */
 #include "mpc_obs.h"
 #include "date.h"
 #include "monte0.h"
+#include "stringex.h"
 
 extern int debug_level;
 
 void ensure_config_directory_exists(); /* miscell.c */
-size_t strlcpy_err( char *dst, const char *src, size_t dsize); /* miscell.c */
-size_t strlcat_err( char *dst, const char *src, size_t dsize); /* miscell.c */
 
    /* MSVC/C++ lacks snprintf.  See 'ephem0.cpp' for details. */
 #if defined(_MSC_VER) && _MSC_VER < 1900
@@ -354,7 +353,7 @@ static void get_summary_info( char *buff, const char *mpec_filename)
 can be transformed into the following,  which will cause the eccentricity
 to be highlighted in red :
 
-...\033[33me=1.005\033[0m...           */
+...\033[me=1.005\033\1330m...           */
 
 static void add_vt100_colors( char *text, size_t nbytes, const char color)
 {
@@ -426,7 +425,7 @@ static int add_json_data( const char *ofilename, const bool have_json_ephem,
       {
       if( !strcmp( buff, "    }") && !is_last_call)
          {
-         strcat( buff, ",");
+         strlcat_err( buff, ",", sizeof( buff));
          found_end = true;
          }
       fprintf( ofile, "%s\n", buff);
@@ -851,7 +850,7 @@ int main( int argc, const char **argv)
                   create_obs_file_with_computed_values( obs, n_obs_actually_loaded, 0);
                   observe_filename = tptr;
                   }
-               strcpy( tbuff, orbit_summary_text);
+               strlcpy_err( tbuff, orbit_summary_text, sizeof( tbuff));
                if( use_colors)
                   colorize_text( tbuff);
                if( show_processing_steps)
@@ -943,7 +942,8 @@ int main( int argc, const char **argv)
                         {
                         char fullpath[100];
 
-                        sprintf( fullpath, "%s/%s.htm", mpec_path, ids[i].packed_desig);
+                        snprintf_err( fullpath, sizeof( fullpath),
+                                        "%s/%s.htm", mpec_path, ids[i].packed_desig);
                         text_search_and_replace( fullpath, " ", "");
 
                         make_pseudo_mpec( fullpath, ids[i].obj_name);
@@ -963,13 +963,13 @@ int main( int argc, const char **argv)
                            if( j == 4)
                               {
                               tbuff[23] = tbuff[39] = tbuff[73] = '\0';
-                              sprintf( new_line + strlen( new_line), "  %s  %s  %s",
+                              snprintf_append( new_line, sizeof( new_line), "  %s  %s  %s",
                                        tbuff + 15, tbuff + 30, tbuff + 57);
                                              /* now add sigma from end of ephem: */
                               while( fgets_trimmed( tbuff, sizeof( tbuff), ephemeris_ifile))
                                  ;
                               tbuff[73] = '\0';
-                              sprintf( new_line + strlen( new_line), "%s", tbuff + 68);
+                              snprintf_append( new_line, sizeof( new_line), "%s", tbuff + 68);
                               }
                            fclose( ephemeris_ifile);
                            summary_lines[n_lines_written]
