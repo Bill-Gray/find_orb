@@ -86,6 +86,7 @@ at present;  the slight loss of precision inherent in removing roots this
 way is more worrisome than the slight gain in speed. */
 
 #include <math.h>       /* used for fabs( ) prototype */
+#include <assert.h>
 
 int find_real_polynomial_roots( const double *poly, int poly_degree,
                                 double *real_roots);        /* roots.cpp */
@@ -378,6 +379,7 @@ int find_real_polynomial_roots( const double *poly, int poly_degree,
       }
 #endif
 
+   assert( poly_degree >= 1);
    if( poly_degree == 1)      /* simple linear case */
       real_roots[n_roots_found++] = -poly[0] / poly[1];
    else
