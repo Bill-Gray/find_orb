@@ -4203,15 +4203,12 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
                loc = 0;
             else if( !rval[loc].packed_desig[0])   /* it's a new one */
                {
+               memset( rval + loc, 0, sizeof( OBJECT_INFO));
                memcpy( rval[loc].packed_desig, buff, 12);
-               rval[loc].packed_desig[12] = '\0';
-               rval[loc].n_obs = rval[loc].solution_exists = 0;
                rval[loc].jd_start = rval[loc].jd_end = jd;
                rval[loc].jd_updated = jd;    /* at minimum */
-               if( is_neocp)   /* for NEOCP obs,  we need to start at the */
-                  rval[loc].file_offset = 0L;   /* beginning of the file  */
-               else
-                  {
+               if( !is_neocp)   /* for NEOCP obs,  we need to start at the */
+                  {                             /* beginning of the file  */
                   rval[loc].file_offset = ftell( ifile) - (long)iline_len
                                        - 100;
                   if( (long)rval[loc].file_offset < 0)
