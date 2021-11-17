@@ -47,6 +47,7 @@ OBJECT_INFO
    char *obj_name;
    int n_obs;
    char packed_desig[13], solution_exists;
+   char mpc_codes[16];        /* first five three-char codes,  plus a null terminator */
    };
 
 #define OBJECT_INFO_COMPARE_PACKED           0

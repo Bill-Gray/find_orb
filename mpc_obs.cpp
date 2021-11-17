@@ -4188,6 +4188,7 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
          if( !station || !memcmp( buff + 76, station, 3))
             {
             int loc;
+            char *tptr;
 
             if( *buff == '#')
                *buff = ' ';           /* handle remarked-out lines,  too */
@@ -4225,6 +4226,12 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
                rval[loc].jd_end = jd;
             if( rval[loc].jd_updated < jd)
                rval[loc].jd_updated = jd;
+            i = 0;
+            tptr = rval[loc].mpc_codes;
+            while( tptr[i] && memcmp( tptr + i, buff + 77, 3))
+               i += 3;
+            if( i < 15)     /* new obscode for this object */
+               memcpy( tptr + i, buff + 77, 3);
             if( !memcmp( buff + 72, "NEOCP", 5))
                {
                const double jd_u = get_neocp_update_jd( buff);
