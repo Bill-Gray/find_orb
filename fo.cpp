@@ -953,7 +953,7 @@ int main( int argc, const char **argv)
                         if( summary_ofile)
                            {
                            FILE *ephemeris_ifile = fopen_ext( ephemeris_filename, "tfcrb");
-                           char new_line[420];
+                           char new_line[700];
 
                            tbuff[14] = '\0';
                            snprintf( new_line, sizeof( new_line), "<a href=\"%s\">%s</a>%s",
