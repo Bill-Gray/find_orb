@@ -69,10 +69,8 @@ some pixels whose signals could make your SNR better.
 for a minimum radius of 2.5 pixels".  There's a contradiction
 here,  since sqrt(9/pi) = 1.693.  I _think_ that's what they
 really meant,  and that's the minimum aperture implemented below.
-
-   Note that now that we're using the above logic to determine an
-'optimal' aperture,  the aperture stored in the expcalc_config_t
-structure is completely ignored.
+(But temporarily disabled;  we're using the user-specified aperture
+for the nonce.)
 
    Finally,  after some discussions with CSS,  we agreed that the
 'fwhm' for a site should be assumed to be that at the zenith,
@@ -84,6 +82,7 @@ is just going to be proportional to wavelength/scope diameter;
 you need to get beyond some point for the airmass to matter.
 */
 
+#ifdef NOT_CURRENTLY_IN_USE
 static double _optimal_aperture( const expcalc_config_t *c)
 {
    double rval = c->fwhm * c->airmass * 0.67;
@@ -91,6 +90,7 @@ static double _optimal_aperture( const expcalc_config_t *c)
 
    return( rval > min_aperture ? rval : min_aperture);
 }
+#endif
 
 /* The 'zero point' is the counts from a mag 0 star in this band
 per cm^2 per second.  Multiply by the collecting area of the
@@ -111,21 +111,18 @@ I0/2 = I0 * exp( -(.5 * fwhm / sigma)^2 / 2)
 2 * ln(2) = (.5 * fwhm / sigma)^2
 fwhm / sigma = 2 * sqrt( 2 * ln(2)) = 2.354820045030949
 
-NOTE (2021 Nov 2) : a couple of revisions have been made.  First,  after some
-discussion with CSS folks,  we agreed that the 'fwhm' is proportional to
-airmass.  The value given for a particular site is assumed to be for
-the zenith,  and should be multiplied by the airmass.  Second,  the
-'aperture' given for a site is nearly useless.  We now just follow
-the advice in the Lowell white paper and set aperture = 0.67 * fwhm,
-which means aperture = 0.67 * fwhm_at_zenith * airmass,  with a minimum
-aperture size to guarantee we use at least nine pixels;  see the
-above _optimal_aperture() function.   */
+NOTE (2021 Nov 2) : After some discussion with CSS folks,  we agreed
+that the 'fwhm' is proportional to airmass.  The value given for a
+particular site is assumed to be for the zenith,  and should be
+multiplied by the airmass.  (Or -- I think more likely -- the square
+root of the airmass.  Due to some uncertainty about all of this,  we have
+reverted this change and are _not_ adjusting for airmass here.)   */
 
 static double _fraction_inside( const expcalc_config_t *c)
 {
    const double full_widths_per_sigma = 2.354820045030949;
-   const double real_fwhm = c->fwhm * c->airmass;
-   const double r_scaled = full_widths_per_sigma * _optimal_aperture( c) / real_fwhm;
+/* const double real_fwhm = c->fwhm * c->airmass;     */
+   const double r_scaled = full_widths_per_sigma * c->aperture / c->fwhm;
 
    return( 1. - exp( -r_scaled * r_scaled / 2.));
 }
@@ -196,12 +193,10 @@ static int find_filter( expcalc_internals_t *e, const char filter)
 
 static int set_internals( expcalc_internals_t *e, const expcalc_config_t *c)
 {
-   const double optimal_aperture_radius_in_pixels = _optimal_aperture( c) / c->pixel_size;
-
    if( find_filter( e, c->filter))
       return( EXPCALC_UNKNOWN_FILTER);
-   e->n_pixels_in_aperture = pi * optimal_aperture_radius_in_pixels
-                                * optimal_aperture_radius_in_pixels;
+   e->n_pixels_in_aperture = pi * c->aperture * c->aperture
+                  / (c->pixel_size * c->pixel_size);
    e->noise2 = c->readnoise * c->readnoise;
    e->s = sky_electrons_per_second_per_pixel( c, e->zero_point);
    return( 0);
@@ -614,7 +609,7 @@ int main( const int argc, const char **argv)
       printf( "Filter %c, QE %.2f, read noise %.2f electrons/pixel\n",
                   c.filter, c.qe, c.readnoise);
       printf( "Pixels are %.2f arcsec;  aperture %.2f arcsec, FWHM %.2f arcsec\n",
-                  c.pixel_size, _optimal_aperture( &c), c.fwhm);
+                  c.pixel_size, c.aperture, c.fwhm);
       printf( "Sky brightness %.2f mag/arcsec^2; airmass %.2f\n",
                   c.sky_brightness, c.airmass);
       }
