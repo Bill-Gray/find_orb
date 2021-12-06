@@ -530,18 +530,18 @@ int main( const int argc, const char **argv)
    memset( &c, 0, sizeof( expcalc_config_t));
    switch( find_expcalc_config_from_mpc_code( mpc_code, ifile, &c))
       {
-      case 0:
+      case EXPCALC_NO_CONFIG_FOUND:
          fprintf( stderr, "No default details (not supposed to happen)\n");
          usage( );
          break;
-      case 1:
+      case EXPCALC_GEOCENTRIC_CONFIG:
          fprintf( stderr, "No details for MPC code '%s'\n", mpc_code);
          fprintf( stderr, "Using default 'geocentric' values\n");
          fprintf( stderr, "At present,  this program only knows about the following codes:\n"
                        "(703) (E12) (I52) (G96) (V06)\n");
          break;
-      case 2:           /* got the details we wanted for the site */
-         break;
+      case EXPCALC_SITE_SPECIFIC_CONFIG:
+         break;               /* got the details we wanted for the site */
       }
    fclose( ifile);
    for( i = 1; i < argc; i++)
