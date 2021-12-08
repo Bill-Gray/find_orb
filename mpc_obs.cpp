@@ -1726,7 +1726,7 @@ void set_up_observation( OBSERVE FAR *obs)
          }
       observer_planet = 3;    /* default to geocentric */
       }
-   else if( obs->note2 != 'S' && strcmp( obs->mpc_code, "247")
+   else if( obs->note2 != 'S' && obs->note2 != 'V'
                && !memcmp( tbuff + 3, "                          ", 26))
       {
       obs->is_included = 0;
