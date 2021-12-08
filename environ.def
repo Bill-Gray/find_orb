@@ -456,3 +456,8 @@ LAGRANGE_000005=0.933299, 1.069807, -0.999443
    making pseudo-MPECs.
 COMMENT_SHUTOFF=
 
+   By default,  observational uncertainties in position,  time,  and magnitude
+   are extracted from 'sigma.txt' (q.v.).  If you alter that file,  though,
+   you can rename it and specify that filename on the following line.  Find_Orb
+   will then use those sigmas instead.
+SIGMAS_FILE=

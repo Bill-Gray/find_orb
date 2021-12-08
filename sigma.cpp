@@ -96,10 +96,17 @@ static int parse_sigma_record( SIGMA_RECORD *w, const char *buff)
    return( rval);
 }
 
+const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
+
 int load_up_sigma_records( const char *filename)
 {
-   FILE *ifile = fopen_ext( filename, "fcrb");
+   const char *override_filename = get_environment_ptr( "SIGMAS_FILE");
+   FILE *ifile;
 
+   if( *override_filename)
+      ifile = fopen_ext( override_filename, "frb");
+   else
+      ifile = fopen_ext( filename, "fcrb");
    if( ifile)
       {
       int i, j = 0;

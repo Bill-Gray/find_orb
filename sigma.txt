@@ -19,6 +19,11 @@
 #
 #  for details.
 #
+#   Also,  note that if you revise this file,  it's recommended to rename
+# it and to put the new name on the SIGMAS_FILE line in 'environ.dat'.
+# If you just edit this file without renaming,  it will get clobbered
+# the next time you update.
+#
 #   This is a revised version of what used to be 'weight.txt'.  That
 # file was quite similar,  except that instead of storing uncertainties,
 # weights were stored.  These basically just boiled down to 1/sigma_posn,
