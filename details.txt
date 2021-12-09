@@ -981,6 +981,17 @@ OBS J. M. Trigo-Rodriguez
 COM Default details extracted from MPEC 2020-J16
 TEL 0.25-m f/6.3 Schmidt-Cassegrain + CCD
 
+COD B15
+OBS B. Thinius
+COM Default details extracted from MPEC 2021-X108
+TEL 0.36-m f/5.6 Schmidt-Cassegrain + CCD
+
+COD B18
+MEA M. Andreev
+OBS V. Kozlov, G. Butenko
+COM Default details extracted from MPEC 2021-W138
+TEL 0.6-m f/12.8 Cassegrain + CCD
+
 COD B20
 OBS J. M. Aymami
 COM Default details extracted from MPEC 2021-A190
@@ -1023,11 +1034,17 @@ TEL 0.30-m f/10.28 Schmidt-Cassegrain + CCD
 COD B56
 OBS J. Lopesino
 COM Default details extracted from MPEC 2021-B143
-TEL 0.30-m Schmidt- Cassegrain
+TEL 0.30-m Schmidt-Cassegrain
 
 COD B63
 COM Default details from http://www.6roads.com.pl/
 TEL 0.25-m f/3.8 Newtonian + CCD
+
+COD B66
+MEA W. Borghini
+OBS W. Borghini, M. Botti
+COM Default details extracted from MPEC 2021-W31
+TEL 0.4-m f/7.3 Ritchey-Chretien + CCD
 
 COD B69
 OBS S. Beck
@@ -1068,6 +1085,16 @@ COD C23
 OBS A. Diepvens
 COM Default details extracted from MPEC 2021-P47
 TEL 0.20-m f/9 refractor + CCD
+
+COD C27
+OBS A. Jorba
+COM Default details extracted from MPEC 2021-W31
+TEL 0.36-m f/8.0 Ritchey-Chretien + CCD
+
+COD C32
+OBS S. Korotkiy
+COM Default details extracted from MPEC 2021-W31
+TEL 0.13-m f/2 refractor + CCD
 
 COD C35
 OBS J. Aledo
@@ -1328,6 +1355,11 @@ OBS B. Klemt
 COM Default details extracted from MPEC 2021-F20
 TEL 0.31-m f/5.7 Ritchey-Chretien + CCD
 
+COD G14
+OBS G. Attard
+COM Default details extracted from MPEC 2021-U31
+TEL 0.28-m f/1.9 reflector + CCD
+
 COD G15
 COM Default details extracted from MPEC 2021-R52
 OBS A. De Pieri
@@ -1336,7 +1368,7 @@ TEL 0.25-m f/6.7 Schmidt-Cassegrain + CCD
 COD G17
 OBS L. Grazzini
 COM Default details extracted from MPEC 2021-B143
-TEL 0.20-m f/10 Schmidt- Cassegrain + CCD + f/6.3 focal reducer
+TEL 0.20-m f/10 Schmidt-Cassegrain + CCD + f/6.3 focal reducer
 
 COD G18
 MEA A. Valvasori
@@ -1357,7 +1389,7 @@ TEL 0.12-m refractor + CCD
 COD G26
 OBS W. Pei
 COM Default details extracted from MPEC 2021-B143
-TEL 0.28-m f/2 Schmidt- Cassegrain + CCD
+TEL 0.28-m f/2 Schmidt-Cassegrain + CCD
 
 COD G33
 OBS G. Neue
@@ -1834,11 +1866,16 @@ OBS C. Demeautis
 COM Default details extracted from MPEC 2021-B143
 TEL 0.16-m f/3.3 reflector + CCD
 
+COD K21
+OBS H. Boussier
+COM Default details extracted from MPEC 2021-W31
+TEL 0.20-m f/6 Schmidt-Cassegrain + CCD
+
 COD K22
 OBS M. Deldem
 COM Default details extracted from MPEC 2021-F20
 TEL 0.28-m f/10 Schmidt-Cassegrain + CCD + f/6.4 focal reducer
-TEL 0.20-m f/10 Schmidt- Cassegrain + CCD + f/8.1 focal reducer
+TEL 0.20-m f/10 Schmidt-Cassegrain + CCD + f/8.1 focal reducer
 
 COD K30
 OBS L. Grimm
@@ -2148,7 +2185,12 @@ TEL 0.51-m f/6.7 astrograph + CCD
 COD L85
 OBS M. Feraco
 COM Default details extracted from MPEC 2021-A190
-TEL 0.28-m f/6.3 Schmidt- Cassegrain + CCD
+TEL 0.28-m f/6.3 Schmidt-Cassegrain + CCD
+
+COD L87
+OBS G. Duszanowicz
+COM Default details extracted from MPEC 2021-W31
+TEL 0.36-m f/7.7 reflector + CCD
 
 COD L92
 OBS T. Scarmato
@@ -2269,7 +2311,7 @@ TEL 0.4-m reflector + CCD
 COD Q59
 OBS A. Hale
 COM Default details extracted from MPEC 2021-J28
-TEL 0.40-m f/8 Schmidt- Cassegrain + CCD
+TEL 0.40-m f/8 Schmidt-Cassegrain + CCD
 
 COD Q60
 COM Find_Orb default details
@@ -2583,6 +2625,11 @@ OBS D. Crowson
 COM Default details extracted from MPEC 2020-C98
 TEL 0.30-m f/8.0  Ritchey-Chretien + CCD
 
+COD V19
+OBS K. G. DeGroff
+COM Default details extracted from MPEC 2021-T130
+TEL 0.46-m f/4.2 Newtonian reflector + CCD
+
 COD V26
 MEA A. Mokhnatkin
 OBS A. Mokhnatkin, R. Celaya
@@ -2601,6 +2648,11 @@ OBS T. Lister, M. Hui, M. S. P. Kelley, J. Chatelain, E. Gomez
 OBS S. Greenstreet
 COM Default details extracted from MPEC 2020-Y117
 TEL 1.0-m f/8.0 Ritchey-Chretien + CCD
+
+COD V72
+OBS J. Purcell
+COM Default details extracted from MPEC 2021-W138
+TEL 0.13-m refractor + CCD
 
 COD W16
 OBS M. Holbrook
@@ -2800,6 +2852,11 @@ MEA M. Micheli, F. Monteiro
 TEL 1.0-m f/7 reflector + CCD
 NET PPMXL
 
+COD Z03
+OBS A. Garcia
+COM Default details extracted from MPEC 2021-W31
+TEL 0.25-m f/6.3 Schmidt-Cassegrain + CCD
+
 COD Z08
 MEA E. Bryssinck
 OBS E. Guido, M. Rocchetto, E. Bryssinck, M. Fulle, G. Milani, C. Nassef
@@ -2846,10 +2903,16 @@ OBS T. Santana-Ros, L. Conversi, M. Micheli
 MEA M. Micheli
 TEL 1.0-m f/8 Ritchey-Chretien + CCD
 
+COD Z28
+MEA L. Buzzi, G. Galli, A. Aletti
+OBS L. Buzzi, L. Demetz
+COM Default details extracted from MPEC 2021-W31
+TEL 0.50-m f/6.9 astrograph + CCD
+
 COD Z30
 OBS D. Storey
 COM Default details extracted from MPEC 2021-B143
-TEL 0.35-m Schmidt- Cassegrain + CCD
+TEL 0.35-m Schmidt-Cassegrain + CCD
 
 COD Z32
 MEA M. Mahlke
@@ -2919,7 +2982,7 @@ NET Gaia-DR2
 COD Z55
 OBS R. Farfan
 COM Default details extracted from MPEC 2021-B143
-TEL 0.28-m f/6.3 Schmidt- Cassegrain + CCD
+TEL 0.28-m f/6.3 Schmidt-Cassegrain + CCD
 
 COD Z58
 COM Find_Orb default details
