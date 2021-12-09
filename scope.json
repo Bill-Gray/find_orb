@@ -165,5 +165,50 @@
      355, 10
      ],
      "SkyBrightness": 18.5
+  },
+  "WIY":
+  {
+     "Comment1": "For the WIYN 0.9-m scope on Kitt Peak.  Values from",
+     "Comment2": "http://spiff.rit.edu/richmond/wiyn/technotes/signal_wiyn09.cgi",
+     "Comment3": "http://spiff.rit.edu/richmond/signal.shtml",
+     "Comment4": "for the HDI,  V magnitudes.",
+     "Primary": 90,
+     "Obstruction": 52,
+     "PixelSize": 0.427,
+     "SkyBrightness": 21.7,
+     "QE": 0.77,
+     "Aperture": 1,
+     "ReadNoise": 10,
+     "FWHM": 1.5
+  },
+  "G37":
+  {
+     "Comment1": "Reverse-engineered/extracted from",
+     "Comment2": "http://www2.lowell.edu/rsch/LMI/etc_calc.php and its accompanying",
+     "Comment3": "equations and assumptions.  The Lowell calculator assumes aperture",
+     "Comment4": "is 0.67 x FWHM.  The following matches V magnitude and DCT/LMI",
+     "Comment5": "unbinned results at new moon,  when they expect a background",
+     "Comment6": "sky brightness of 22.2 mags/arcsec^2.",
+     "Primary": 430.0,
+     "Obstruction": 100.0,
+     "PixelSize": 0.12,
+     "SkyBrightness": 22.2,
+     "QE": 0.85,
+     "Aperture": 1,
+     "ReadNoise": 6,
+     "FWHM": 1.5
+  },
+  "Hal":
+  {
+     "Comment1": "See above comments for (G37) Lowell Discovery Telescope.",
+     "Comment2": "Similarly assumes optimal aperture,  new moon,  Vmag,  no binning.",
+     "Primary": 104.0,
+     "Obstruction": 30.0,
+     "PixelSize": 0.37,
+     "SkyBrightness": 22.2,
+     "QE": 0.40,
+     "Aperture": 1,
+     "ReadNoise": 4.6,
+     "FWHM": 1.5
   }
 }
