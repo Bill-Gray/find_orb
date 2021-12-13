@@ -183,7 +183,7 @@ int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
 #endif
 ;
 int fetch_astrometry_from_mpc( FILE *ofile, const char *desig);
-static void get_mouse_data( int *mouse_x, int *mouse_y, int *mouse_z, unsigned long *button);
+static void get_mouse_data( int *mouse_x, int *mouse_y, int *mouse_z, mmask_t *button);
 int make_pseudo_mpec( const char *mpec_filename, const char *obj_name);
                                               /* ephem0.cpp */
 int store_defaults( const ephem_option_t ephemeris_output_options,
@@ -399,7 +399,7 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
       char tbuff[200];
       int *buffered_screen;
       int x, y, z;
-      unsigned long button;
+      mmask_t button;
 
       for( i = 0; prompt[i]; i++)
          if( prompt[i] == '\n' || !prompt[i + 1])
@@ -1386,6 +1386,8 @@ static void select_element_frame( void)
 
 static void object_comment_text( char *buff, const OBJECT_INFO *id)
 {
+   int i;
+
    sprintf( buff, "%d obs; ", id->n_obs);
    make_date_range_text( buff + strlen( buff), id->jd_start, id->jd_end);
    if( id->jd_updated != id->jd_end)
@@ -1396,6 +1398,8 @@ static void object_comment_text( char *buff, const OBJECT_INFO *id)
                   | FULL_CTIME_NO_YEAR | CALENDAR_JULIAN_GREGORIAN);
       snprintf_append( buff, 90, " Updated %s", time_buff);
       }
+   for( i = 0; id->mpc_codes[i]; i += 3)
+      snprintf_append( buff, 90, " %.3s", id->mpc_codes + i);
 }
 
 /* select_object_in_file( ) uses the find_objects_in_file( ) function to
@@ -1524,7 +1528,7 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
             if( c == KEY_MOUSE)
                {
                int x, y, z;
-               unsigned long button;
+               mmask_t button;
 
                get_mouse_data( &x, &y, &z, &button);
                if( button & REPORT_MOUSE_POSITION)
@@ -2298,7 +2302,7 @@ static void show_a_file( const char *filename)
          if( c == KEY_MOUSE)
             {
             int x, y, z;
-            unsigned long button;
+            mmask_t button;
 
             get_mouse_data( &x, &y, &z, &button);
             if( button & BUTTON4_PRESSED)   /* actually 'wheel up' */
@@ -2493,7 +2497,7 @@ static int get_epoch_range_of_included_obs( const OBSERVE FAR *obs,
 }
 
 static void get_mouse_data( int *mouse_x, int *mouse_y,
-                            int *mouse_z, unsigned long *button)
+                            int *mouse_z, mmask_t *button)
 {
    MEVENT mouse_event;
    int i;
@@ -2512,10 +2516,10 @@ static void get_mouse_data( int *mouse_x, int *mouse_y,
    for( i = 0; i < 3; i++)
       {
       static int old_buttons_pressed = 0;
-      static const int releases[3] = { BUTTON1_RELEASED, BUTTON2_RELEASED, BUTTON3_RELEASED };
-      static const int presses[3] = { BUTTON1_PRESSED, BUTTON2_PRESSED, BUTTON3_PRESSED };
-      static const int clicks[3] = { BUTTON1_CLICKED, BUTTON2_CLICKED, BUTTON3_CLICKED };
-      static const int button_up[3] = {
+      static const mmask_t releases[3] = { BUTTON1_RELEASED, BUTTON2_RELEASED, BUTTON3_RELEASED };
+      static const mmask_t presses[3] = { BUTTON1_PRESSED, BUTTON2_PRESSED, BUTTON3_PRESSED };
+      static const mmask_t clicks[3] = { BUTTON1_CLICKED, BUTTON2_CLICKED, BUTTON3_CLICKED };
+      static const mmask_t button_up[3] = {
                   BUTTON1_RELEASED | BUTTON1_CLICKED | BUTTON1_DOUBLE_CLICKED,
                   BUTTON2_RELEASED | BUTTON2_CLICKED | BUTTON2_DOUBLE_CLICKED,
                   BUTTON3_RELEASED | BUTTON3_CLICKED | BUTTON3_DOUBLE_CLICKED };
@@ -3469,7 +3473,7 @@ int main( int argc, const char **argv)
    bool single_obs_selected = false;
    extern unsigned random_seed;
    unsigned mouse_x = (unsigned)-1, mouse_y = 0, mouse_z = 0;
-   unsigned long button = 0;
+   mmask_t button = 0;
 
    random_seed = get_random_seed( );
    if( !strcmp( argv[0], "find_orb"))
@@ -4123,7 +4127,7 @@ int main( int argc, const char **argv)
 
          if( debug_mouse_messages)
             sprintf( message_to_user, "x=%d y=%d z=%d button=%lx",
-                              mouse_x, mouse_y, mouse_z, button);
+                              mouse_x, mouse_y, mouse_z, (unsigned long)button);
          if( mouse_wheel_motion && mouse_y < station_start_line)
             {
             int n_selected = 0;
