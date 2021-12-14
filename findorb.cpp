@@ -789,7 +789,7 @@ static void set_ra_dec_format( void)
 ephemeris type (see 'efindorb.txt'),  this sets the appropriate pseudo-radio
 button. */
 
-static void _set_radio_button( char *text, const int option_num)
+static char *_set_radio_button( char *text, const int option_num)
 {
    char tbuff[10], *line_ptr;
 
@@ -798,6 +798,7 @@ static void _set_radio_button( char *text, const int option_num)
    assert( line_ptr);
    if( line_ptr)
       line_ptr[3] = '*';
+   return( line_ptr);
 }
 
 #define EARTH_MAJOR_AXIS  6378.14
@@ -3265,26 +3266,24 @@ static int non_grav_menu( char *message_to_user)
 
 static int resid_format_menu( char *message_to_user, int resid_format)
 {
-   char buff[300], *tptr, tbuff[7];
-   int c;
+   char buff[300];
+   int c, option_selected = 0;
    size_t i;
 
    strcpy( buff, get_find_orb_text( 2062));
-   strlcpy_err( tbuff, "0 ( ) ", sizeof( tbuff));
    if( resid_format & RESIDUAL_FORMAT_NORMALIZED)
-      *tbuff = '2';
+      option_selected = 2;
    else if( resid_format & RESIDUAL_FORMAT_TIME_RESIDS)
-      *tbuff = '1';
-   tptr = strstr( buff, tbuff);
-   assert( tptr);
-   tptr[3] = '*';
+      option_selected = 1;
+   _set_radio_button( buff, option_selected);
    help_file_name = "residfmt.txt";
    c = full_inquire( buff, NULL, 0, COLOR_MENU, -1, -1);
-   tptr[3] = ' ';
    if( c >= KEY_F(1) && c <= KEY_F(3))
       c += '0' - KEY_F( 1);
    if( c >= '0' && c <= '2')
       {
+      char *line_ptr;
+
       resid_format &= ~(RESIDUAL_FORMAT_TIME_RESIDS | RESIDUAL_FORMAT_NORMALIZED);
       switch( c)
          {
@@ -3297,12 +3296,10 @@ static int resid_format_menu( char *message_to_user, int resid_format)
             resid_format |= RESIDUAL_FORMAT_NORMALIZED;
             break;
          }
-      tbuff[0] = c;
-      tptr = strstr( buff, tbuff);
-      assert( tptr);
-      tptr += 6;
-      for( i = 0; tptr[i] >= ' '; i++)
-         message_to_user[i] = tptr[i];
+      strcpy( buff, get_find_orb_text( 2062));
+      line_ptr = _set_radio_button( buff, c - '0') + 6;
+      for( i = 0; line_ptr[i] >= ' '; i++)
+         message_to_user[i] = line_ptr[i];
       message_to_user[i] = '\0';
       }
    else
