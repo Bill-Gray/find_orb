@@ -4118,7 +4118,11 @@ int main( int argc, const char **argv)
 
       *message_to_user = '\0';
       if( c == KEY_MOUSE && !(button & REPORT_MOUSE_POSITION))
+         {
          c = find_command_area( mouse_x, mouse_y, NULL);
+         if( c == ALT_X && mouse_wheel_motion)
+            c = (mouse_wheel_motion < 0 ? KEY_F( 4) : KEY_F( 5));
+         }
 
       if( c == KEY_MOUSE && !(button & REPORT_MOUSE_POSITION))
          {
