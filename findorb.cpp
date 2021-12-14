@@ -785,6 +785,21 @@ static void set_ra_dec_format( void)
       }
 }
 
+/* For 'radio button' dialogs such as the comet model,  resid type,  and
+ephemeris type (see 'efindorb.txt'),  this sets the appropriate pseudo-radio
+button. */
+
+static void _set_radio_button( char *text, const int option_num)
+{
+   char tbuff[10], *line_ptr;
+
+   snprintf_err( tbuff, sizeof( tbuff), "%d ( )", option_num);
+   line_ptr = strstr( text, tbuff);
+   assert( line_ptr);
+   if( line_ptr)
+      line_ptr[3] = '*';
+}
+
 #define EARTH_MAJOR_AXIS  6378.14
 
 /* Here's a simplified example of the use of the 'ephemeris_in_a_file'
@@ -1061,13 +1076,8 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             break;
          case 'c': case 'C':
             {
-            char tbuff[6], *line_ptr;
-
-            snprintf_err( tbuff, sizeof( tbuff), "%d ( )", ephem_type);
             strcpy( buff, get_find_orb_text( 2064));
-            line_ptr = strstr( buff, tbuff);
-            if( line_ptr)
-               line_ptr[3] = '*';
+            _set_radio_button( buff, ephem_type);
             help_file_name = "eph_type.txt";
             c = inquire( buff, NULL, 0, COLOR_DEFAULT_INQUIRY);
             if( c >= KEY_F( 1))
