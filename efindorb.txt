@@ -291,7 +291,7 @@
 2037    Copy elements to clipboard
 2037    Save elements
 2037    Reference=$REF
-2037    Epoch
+2037    Epoch=$EPO
 2037    Frame=$FRA
 2037    Constraints=$CON
 2037    Increase precision

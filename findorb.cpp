@@ -3343,7 +3343,7 @@ static void setup_elements_dialog( char *buff, const char *constraints)
                      && (tptr = strstr( tbuff + 6, " TT")) != NULL)
          {
          *tptr = '\0';
-         text_search_and_replace( buff, "Epoch", tbuff);
+         text_search_and_replace( buff, "$EPO", tbuff + 6);
          }
    fclose( ifile);
 }
