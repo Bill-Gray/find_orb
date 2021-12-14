@@ -1359,14 +1359,10 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
 
 static void element_frame_dialog_text( char *buff)
 {
-   const char *curr_frame = get_environment_ptr( "ELEMENTS_FRAME");
-   size_t i;
+   const int curr_frame = atoi( get_environment_ptr( "ELEMENTS_FRAME"));
 
    strcpy( buff, get_find_orb_text( 2034));
-   for( i = 0; buff[i]; i++)
-      if( buff[i] == *curr_frame && buff[i + 1] == ' ' &&
-                  buff[i + 2] == ' ')
-         buff[i + 2] = '*';
+   _set_radio_button( buff, curr_frame);
 }
 
 static void select_element_frame( void)
@@ -1834,7 +1830,7 @@ static int select_central_object( char *buff, const bool dialog_text_only)
       {
       bool is_selected = (i == forced_central_body);
 
-      sprintf( buff + strlen( buff), "%c%c ",
+      sprintf( buff + strlen( buff), "%c (%c) ",
                hotkeys[i + 2], is_selected ? '*' : ' ');
       switch( i)
          {
@@ -3338,9 +3334,7 @@ static void setup_elements_dialog( char *buff, const char *constraints)
          {
          size_t i;
 
-         tptr++;
-         while( *tptr == ' ')
-            tptr++;
+         tptr += 3;
          for( i = 0; tptr[i] >= ' '; i++)
             tbuff[i] = tptr[i];
          tbuff[i] = '\0';

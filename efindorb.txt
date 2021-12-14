@@ -270,10 +270,10 @@
 
 2033    Use arrow keys to select object,  then hit the space bar or Enter (or use mouse)
 
-2034    0   Default frame
-2034    1   J2000 ecliptic
-2034    2   J2000 equatorial
-2034    3   Body frame
+2034    0 ( ) Default frame
+2034    1 ( ) J2000 ecliptic
+2034    2 ( ) J2000 equatorial
+2034    3 ( ) Body frame
 2034    Cancel
 
 2035    English
