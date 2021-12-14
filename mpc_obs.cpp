@@ -661,9 +661,11 @@ static int get_rover_index( const char *obscode)
 {
    int rval = -1;
 
-   if( obscode[0] == '2' && obscode[1] == '4')
+   if( obscode[0] == '2' && (obscode[1] == '4' || obscode[1] == '7'))
       {
-      if( obscode[2] == '7')
+      if( obscode[1] == '4' && obscode[2] == '7')     /* 247 */
+         rval = 0;
+      else if( obscode[1] == '7' && obscode[2] == '0')     /* 270 */
          rval = 0;
       else if( obscode[2] >= 'a')
          rval = obscode[2] - 'a' + 1;
