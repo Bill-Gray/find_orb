@@ -4151,7 +4151,7 @@ int main( int argc, const char **argv)
             strcpy( tbuff, get_find_orb_text( 2050));
             tptr = tbuff + 1;
             for( i = 0; i < (int)(list_codes & 3); i++)
-                tptr = strstr( tptr, "[ ]") + 1;
+                tptr = strstr( tptr, "( )") + 1;
             *tptr = '*';
             text_search_and_replace( tbuff, "$", search_code);
             if( mouse_wheel_motion)
