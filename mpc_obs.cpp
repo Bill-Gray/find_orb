@@ -5285,9 +5285,6 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
                }
             }
          break;
-      case 5:
-         put_observer_data_in_text( optr->mpc_code, buff);
-         break;
      }
    return( 0);
 }
@@ -5452,11 +5449,7 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff)
       const int alt_info = atoi( get_environment_ptr( "ALT_INFO"));
 
       n_lines = 0;
-#ifdef _MSC_VER
-      for( i = 0; i < 6; i++)
-#else
       for( i = 0; i < 5; i++)
-#endif
          {
          generate_observation_text( obs, (int)first, n_obs, (int)i, tptr, alt_info);
          if( *tptr)
@@ -5466,11 +5459,6 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff)
             n_lines++;
             }
          }
-#ifdef _MSC_VER
-      recreate_observation_line( tptr, obs + first);
-      strcat( tptr, "\n");
-      n_lines++;
-#endif
       }
    if( n_lines <= 4)    /* got room for version info */
       {
