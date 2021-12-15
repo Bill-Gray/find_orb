@@ -671,7 +671,9 @@ https://solarsystem.nasa.gov/docs/03b_Justus_EDLatmospheres.pdf
 
    The interpolation is actually done within a table of the (natural)
 logs of the original table.  That eliminates taking a logarithm at
-runtime and makes the code slightly simpler.
+runtime and makes the code slightly simpler.  Also,  ln(rho) is
+_much_,  much closer to being a linear function than rho itself.  So
+the linear interpolation is much more accurate.
 
    The line marked '(1)' ensures that,  for negative ht_in_km,  the
 returned value extrapolates correctly,  contining to increase for a few
