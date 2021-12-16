@@ -42,6 +42,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "mpc_obs.h"
 #include "mpc_func.h"
 #include "stackall.h"
+#include "stringex.h"
 #include "sigma.h"
 #include "date.h"
 #include "pl_cache.h"
@@ -94,17 +95,9 @@ static void reduce_designation( char *desig, const char *idesig);
 int set_tholen_style_sigmas( OBSERVE *obs, const char *buff);  /* mpc_obs.c */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 #ifdef _MSC_VER
-     /* Microsoft Visual C/C++ has no snprintf.  See 'ephem0.cpp'.  */
-int snprintf( char *string, const size_t max_len, const char *format, ...);
-     /* Doesn't have a strncasecmp,  either.   strncmp will do. */
+     /* Microsoft Visual C/C++ has no strncasecmp.  strncmp will do.  */
 #define strncasecmp strncmp
 #endif
-int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
-                                   const char *format, ...)
-#ifdef __GNUC__
-         __attribute__ (( format( printf, 3, 4)))
-#endif
-;
 int compute_canned_object_state_vect( double *loc, const char *mpc_code,
                      const double jd);                 /* elem_out.cpp */
 char *mpc_station_name( char *station_data);       /* mpc_obs.cpp */
@@ -117,12 +110,6 @@ double n_nearby_obs( const OBSERVE FAR *obs, const unsigned n_obs,
 void convert_ades_sigmas_to_error_ellipse( const double sig_ra,
          const double sig_dec, const double correl, double *major,
          double *minor, double *angle);                      /* errors.cpp */
-#ifndef strlcpy
-size_t strlcpy(char *dest, const char *src, size_t size);   /* miscell.cpp */
-size_t strlcat(char *dest, const char *src, size_t size);   /* miscell.cpp */
-size_t strlcpy_err( char *dst, const char *src, size_t dsize); /* miscell.c */
-size_t strlcat_err( char *dst, const char *src, size_t dsize); /* miscell.c */
-#endif
 
 int debug_printf( const char *format, ...)
 {
@@ -573,7 +560,7 @@ static inline char **load_mpc_stations( int *n_stations)
             }
          if( ifile)
             {
-            char buff[200];
+            char buff[100];
 
             while( fgets_trimmed( buff, sizeof( buff), ifile))
                {
@@ -585,7 +572,7 @@ static inline char **load_mpc_stations( int *n_stations)
                   if( rval)
                      {
                      rval[*n_stations] = codes + buff_loc;
-                     strcpy( rval[*n_stations], buff);
+                     strlcpy_err( rval[*n_stations], buff, sizeof( buff));
                      }
                   buff_loc += strlen( buff) + 1;
                   (*n_stations)++;
@@ -820,12 +807,12 @@ int get_observer_data( const char FAR *mpc_code, char *buff,
       {
       char tbuff[90];
 
-      strcpy( tbuff, mpc_code);
-      strcat( tbuff, "   ");
-      sprintf( tbuff + 4, "!%15.9f%13.9f%13.3f %s",
+      strlcpy_error( tbuff, mpc_code);
+      strlcat_error( tbuff, "   ");
+      snprintf_err( tbuff + 4, sizeof( tbuff) - 4, "!%15.9f%13.9f%13.3f %s",
                     lon0, lat0, alt0, override_observatory_name);
       if( buff)
-         strcpy( buff, tbuff);
+         strlcpy_err( buff, tbuff, sizeof( tbuff));
       rval = extract_mpc_station_data( tbuff, lon_in_radians,
                                         rho_cos_phi, rho_sin_phi);
       return( rval);
