@@ -2,21 +2,13 @@
 # and NORAD (five-digit,  eventually to be nine-digit) identifiers.  The
 # following gives my unofficial IDs for such objects.  'eph2tle' uses these
 # to set both identifiers.  Eventually,  'sat_id' may use it as well.
-# 2020 Sep 26 version.  Comments can be added freely if starting with #.
+# 2021 Dec 16 version.  Comments can be added freely if starting with #.
 
-# A few identifiers were eventually associated with other objects and are
-# commented out.  They're kept here to keep the ordering right and because
-# they may occur in older TLEs.
+# I started with 89999 and worked backward.  The amateur tracking community
+# uses numbers starting with 90000;  in recent years,  Space-Track has had
+# 'analyst' objects starting with 80000. For COSPAR,  I've started with
+# 00000AAA and went up.
 
-# This one is from the amateur tracking community.
-
-  000090084 09710A   9O0DC57 = unk P=2.26d, i=25
-
-# And these are my additions.  I started with 89999 and worked backward.
-# The amateur tracking community uses numbers starting with 90000;  in
-# recent years,  Space-Track has had 'analyst' objects starting with 80000.
-# For COSPAR,  I've started with 00000AAA and went up.
-#
 # In a few cases,  objects appear under multiple names,  either because I
 # made an identification later (00000AAQ,  for example) or just messed up
 # (00000AAU,  for example).
@@ -83,6 +75,8 @@
   000089949 00000ABY ZTF0IsC = ZTF0IsN
   000089948 00000ABZ C5VRL32 = C5Y6DL2
   000089947 00000ACA A10AKvK = A10ACM5 = A10zoXc
+  000089946 00000ACB A10CpZV = A10Cpdo = A10Dkci = ZTF0NQD
+  000089945 00000ACC A10DMjY = A10DOip = ZTF0NUM
 
   000008753 76023H   S510923
   000002426 66084B   2020 SO = Surveyor 2 Centaur

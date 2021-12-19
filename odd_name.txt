@@ -240,7 +240,7 @@ XMM          1999-066A = XMM-Newton = NORAD 25989
      HJ0110  HJ0110 = unk P=1.27d, i=17
      E1NB003 E1NB003 = unk P=.9d, i=24
      9V9BAC8 9V9BAC8 = unk P=1.11d, i=22
-     9O0DC57 9O0DC57 = unk P=2.26d, i=25
+     9O0DC57 1970-027C = NORAD 50000 = Vela 6 booster
      8Q58E4F 8Q58E4F = unk Molniya
      6Q0B44E 6Q0B44E = unk P=80d
      5X2744B 5X2744B = unk P=1.2d, i=23
