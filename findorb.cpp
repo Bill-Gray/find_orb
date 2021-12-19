@@ -2095,7 +2095,7 @@ static void show_one_observation( OBSERVE obs, const int line,
          break;
       }
                      /* show corresponding 1s or 0.1s HHMMSS fmt */
-   recreate_observation_line( buff, &obs);
+   recreate_observation_line( buff, &obs, residual_format);
    memmove( buff, buff + dropped_start, strlen( buff + dropped_start) + 1);
    strcat( buff, resid_data);
    if( obs.flags & OBS_IS_SELECTED)
@@ -4563,7 +4563,7 @@ int main( int argc, const char **argv)
             {
             extern const char *observe_filename;
 
-            create_obs_file( obs, n_obs, 0);
+            create_obs_file( obs, n_obs, 0, residual_format);
             show_a_file( get_file_name( tbuff, observe_filename));
             }
             break;
@@ -4869,7 +4869,7 @@ int main( int argc, const char **argv)
                strcpy( orbit_constraints, "e=1,i=26,O=81"); /* q=.049? */
             break;
          case 'm': case 'M':
-            create_obs_file( obs, n_obs, 0);
+            create_obs_file( obs, n_obs, 0, residual_format);
             create_ephemeris( orbit, curr_epoch, obs, n_obs, obj_name,
                            ifilename, residual_format);
             break;
@@ -5624,7 +5624,7 @@ int main( int argc, const char **argv)
             integrate_orbit( orbit2, curr_epoch, epoch_shown);
             store_solution( obs, n_obs, orbit2, epoch_shown,
                                           perturbers);
-            create_obs_file( obs, n_obs, 0);
+            create_obs_file( obs, n_obs, 0, residual_format);
 #ifdef _WIN32                /* MS is different. */
             _unlink( get_file_name( tbuff, ephemeris_filename));
 #else
@@ -5801,11 +5801,24 @@ int main( int argc, const char **argv)
             break;
          case '&':
             {
-            extern bool force_traditional_format;
+            const int curr_format = GET_RESID_RA_DEC_FORMAT( residual_format);
+            const int n_ra_dec_formats = 4;    /* at least for now */
 
-            force_traditional_format = !force_traditional_format;
-            strcpy( message_to_user, "Force punched-card format");
-            add_off_on = force_traditional_format;
+            strcpy( tbuff, get_find_orb_text( 2068));
+            assert( curr_format >= 0);
+            assert( curr_format < n_ra_dec_formats);
+            _set_radio_button( tbuff, curr_format);
+            c = full_inquire( tbuff, NULL, 0, COLOR_MENU, -1, -1);
+            if( c >= KEY_F(1) && c <= KEY_F(14))
+               c -= KEY_F( 1);
+            else
+               c -= '0';
+            if( c >= 0 && c < n_ra_dec_formats)
+               {
+               residual_format &= ~RESIDUAL_FORMAT_RA_DEC;
+               residual_format |= (c % n_ra_dec_formats) << 14;
+               }
+            strcpy( message_to_user, "Obs RA/dec format reset");
             }
             break;
          case 9:
@@ -5923,7 +5936,7 @@ Shutdown_program:
    curses_running = false;
    if( obs && n_obs)
       {
-      create_obs_file( obs, n_obs, 0);
+      create_obs_file( obs, n_obs, 0, residual_format);
       create_ades_file( "observe.xml",  obs, n_obs);
       }
    unload_observations( obs, n_obs);

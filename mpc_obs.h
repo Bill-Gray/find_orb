@@ -212,13 +212,15 @@ void sort_object_info( OBJECT_INFO *ids, const int n_ids,
 int get_object_name( char *obuff, const char *packed_desig);
 int get_observer_data( const char FAR *mpc_code, char *buff,
            double *lon_in_radians, double *rho_cos_phi, double *rho_sin_phi);
-void recreate_observation_line( char *obuff,
-                                   const OBSERVE FAR *obs);    /* ephem0.cpp */
+void recreate_observation_line( char *obuff, const OBSERVE FAR *obs,
+                           const int residual_format);   /* ephem0.cpp */
 void put_observer_data_in_text( const char FAR *mpc_code, char *buff);
 
-void create_obs_file( const OBSERVE FAR *obs, int n_obs, const int append);
+void create_obs_file( const OBSERVE FAR *obs, int n_obs, const int append,
+                  const int resid_format);            /* ephem0.cpp */
 void create_obs_file_with_computed_values( const OBSERVE FAR *obs,
-                  int n_obs, const int append);
+                  int n_obs, const int append,
+                  const int resid_format);            /* ephem0.cpp */
 int find_worst_observation( const OBSERVE FAR *obs, const int n_obs);
 double calc_absolute_magnitude( OBSERVE FAR *obs, int n_obs);
 double compute_rms( const OBSERVE FAR *obs, const int n_obs);
@@ -340,7 +342,16 @@ int clean_up_find_orb_memory( void);         /* orb_func.cpp */
             3 = times in MJD
             4-7 = not currently used */
 #define RESIDUAL_FORMAT_TIME               0x3800
-#define GET_RESID_TIME_FORMAT( residual_format)   ((residual_format & RESIDUAL_FORMAT_TIME) >> 11)
+#define GET_RESID_TIME_FORMAT( residual_format)   ((residual_format >> 11) & 7)
+
+      /* ...and similarly,  three bits reserved for RA format.
+            0 = RA/decs in reported format
+            1 = RA/decs always in decimal degrees (ADES form)
+            2 = RA/decs always in HH.hhhh, dd.dddd
+            3 = RA/decs always in HH MM SS.s, dd mm ss.sss (MPC80 form)
+            4-7 = not currently used */
+#define RESIDUAL_FORMAT_RA_DEC            0x1c000
+#define GET_RESID_RA_DEC_FORMAT( residual_format)   ((residual_format >> 14) & 7)
 
 int write_residuals_to_file( const char *filename, const char *ast_filename,
         const int n_obs, const OBSERVE FAR *obs_data, const int resid_format);

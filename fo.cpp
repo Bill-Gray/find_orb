@@ -849,7 +849,7 @@ int main( int argc, const char **argv)
                   const char *tptr = observe_filename;
 
                   observe_filename = computed_obs_filename;
-                  create_obs_file_with_computed_values( obs, n_obs_actually_loaded, 0);
+                  create_obs_file_with_computed_values( obs, n_obs_actually_loaded, 0, 0);
                   observe_filename = tptr;
                   }
                strlcpy_err( tbuff, orbit_summary_text, sizeof( tbuff));
@@ -916,7 +916,7 @@ int main( int argc, const char **argv)
                   if( !*mpc_code)
                      sscanf( get_environment_ptr( "CONSOLE_OPTS"), "%9s",
                                  mpc_code);
-                  create_obs_file( obs, n_obs_actually_loaded, 0);
+                  create_obs_file( obs, n_obs_actually_loaded, 0, 0);
                   ephemeris_mag_limit = 999.;
                   if( available_sigmas == COVARIANCE_AVAILABLE)
                      {

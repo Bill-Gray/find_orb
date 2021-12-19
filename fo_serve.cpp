@@ -420,7 +420,7 @@ int main( const int argc, const char **argv)
       return( 0);
       }
 
-   create_obs_file( obs, n_obs_actually_loaded, 0);
+   create_obs_file( obs, n_obs_actually_loaded, 0, 0);
    if( available_sigmas == COVARIANCE_AVAILABLE)
       {
       n_orbits_in_ephem = 2;

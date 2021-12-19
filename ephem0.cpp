@@ -79,7 +79,6 @@ int earth_lunar_posn( const double jd, double FAR *earth_loc,
                                        double FAR *lunar_loc);
 bool nighttime_only( const char *mpc_code);                 /* mpc_obs.cpp */
 void remove_trailing_cr_lf( char *buff);      /* ephem0.cpp */
-void create_obs_file( const OBSERVE FAR *obs, int n_obs, const int append);
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 void set_environment_ptr( const char *env_ptr, const char *new_value);
 uint64_t parse_bit_string( const char *istr);                /* miscell.cpp */
@@ -4084,13 +4083,9 @@ static void put_sigma( char *buff, const double val)
 
 
 int sigmas_in_columns_57_to_65 = 0;
-bool force_traditional_format = false;
-      /* The above causes 'extended' time and position formats to
-      be shown in punched-card format.  This can help if you want
-      to create data for use in (most) software that doesn't support
-      Find_Orb's extensions to the MPC format. */
 
-void recreate_observation_line( char *obuff, const OBSERVE FAR *obs)
+void recreate_observation_line( char *obuff, const OBSERVE FAR *obs,
+                           const int residual_format)
 {
    char buff[100];
    int mag_digits_to_erase = 0;
@@ -4102,14 +4097,24 @@ void recreate_observation_line( char *obuff, const OBSERVE FAR *obs)
       return;
       }
 // set_obs_to_microday( &tobs);
-   if( force_traditional_format)
+   switch( GET_RESID_RA_DEC_FORMAT( residual_format))
       {
-      if( tobs.ra_precision > 3)
-         tobs.ra_precision = 3;
-      if( tobs.dec_precision > 2)
-         tobs.dec_precision = 2;
-      if( tobs.time_precision > 6)
-         tobs.time_precision = 6;
+      case 0:           /* use same format as obs was reported in */
+         break;
+      case 1:           /* always use decimal degrees */
+         tobs.ra_precision = 207;  /* see 'mpc_fmt.cpp' in 'lunar' library */
+         tobs.dec_precision = 106;
+         break;
+      case 2:           /* always use decimal hrs for RA, decimal */
+         tobs.ra_precision = 106;             /*  degrees for dec */
+         tobs.dec_precision = 106;
+         break;
+      case 3:           /* always force base-60 (MPC) form */
+         if( tobs.ra_precision > 3)
+            tobs.ra_precision = 3;
+         if( tobs.dec_precision > 2)
+            tobs.dec_precision = 2;
+         break;
       }
    format_observation( &tobs, buff, 4);
    memcpy( obuff, obs->packed_id, 12);
@@ -4193,7 +4198,8 @@ char *get_file_name( char *filename, const char *template_file_name)
    return( filename);
 }
 
-void create_obs_file( const OBSERVE FAR *obs, int n_obs, const int append)
+void create_obs_file( const OBSERVE FAR *obs, int n_obs, const int append,
+                  const int resid_format)
 {
    char filename[81], curr_sigma_text[81];
    FILE *ofile;
@@ -4222,7 +4228,7 @@ void create_obs_file( const OBSERVE FAR *obs, int n_obs, const int append)
          fprintf( ofile, "%s\n", obuff);
          strlcpy_error( curr_sigma_text, obuff);
          }
-      recreate_observation_line( obuff, obs);
+      recreate_observation_line( obuff, obs, resid_format);
       fprintf( ofile, "%s\n", obuff);
       if( obs->second_line)
          fprintf( ofile, "%s\n", obs->second_line);
@@ -4238,7 +4244,8 @@ rounding error).  Computed mags are supplied for all observations,
 and they're all V mags. */
 
 void create_obs_file_with_computed_values( const OBSERVE FAR *obs,
-                  int n_obs, const int append)
+                  int n_obs, const int append,
+                  const int resid_format)
 {
    OBSERVE *tobs = (OBSERVE *)calloc( n_obs, sizeof( OBSERVE));
    int i;
@@ -4253,7 +4260,7 @@ void create_obs_file_with_computed_values( const OBSERVE FAR *obs,
       tobs[i].mag_precision = 2;
       tobs[i].mag_band = 'V';
       }
-   create_obs_file( tobs, n_obs, append);
+   create_obs_file( tobs, n_obs, append, resid_format);
    free( tobs);
 }
 
