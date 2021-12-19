@@ -136,6 +136,7 @@ SJ3 !   0.0000       0.00000   +0.00 @90000053 Sun-Jupiter L3
 SJ4 !   0.0000       0.00000   +0.00 @90000054 Sun-Jupiter L4
 SJ5 !   0.0000       0.00000   +0.00 @90000055 Sun-Jupiter L5
 
+Luc !   0.0000       0.00000   +0.00000    @0  Lucy
 MEx !   0.0000       0.00000   +0.00000    @4  Mars Express
 LCO ! 311.75834      -84.56139        10   @10 LCROSS impact site
 
@@ -1373,3 +1374,12 @@ P5m !-116.86503    +33.35627         1662.     Palomar 5m
 
    Coords from Andrea Mattei.
 L78 !+014.780211   +40.6826087        134.     San Marco Observatory, Salerno
+
+   I'm still trying to get good coordinates for Arecibo.  The following
+   position is the one used by _Horizons_;  on G__gle Maps,  it's at
+   the center of the dish.  The MPC position is halfway off the dish
+   and about 54 meters higher. It does not appear that anybody is sure
+   what coordinates should be used; the following is probably an
+   improvement, but may be changed based on further info.
+
+251 !-066.7527     +18.3442           450.557  Arecibo
