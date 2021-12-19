@@ -9,7 +9,7 @@
    #define NCURSES_WIDECHAR 1
    #define HAVE_NCURSESW
 
-   #if defined( __cplusplus) 
+   #if defined( __cplusplus)
        #if defined(__has_include)
            #if __has_include( <ncursesw/cursesw.h>)
                #include <ncursesw/cursesw.h>
@@ -142,131 +142,131 @@ int wgetn_wstr_ex(WINDOW *win, wint_t *wstr, int *loc, const int maxlen, const i
         if( wget_wch_rval == KEY_CODE_YES)
             switch( ch)
             {
-            case KEY_DC:             /* delete char */
-               if( wstr[*loc])
-                   for( i = *loc + 1; i <= len; i++)
-                       wstr[i - 1] = wstr[i];
-               break;
+               case KEY_DC:             /* delete char */
+                  if( wstr[*loc])
+                      for( i = *loc + 1; i <= len; i++)
+                          wstr[i - 1] = wstr[i];
+                  break;
 
-            case KEY_BACKSPACE:        /* CTRL-H -- Delete character */
-               if( *loc)
-               {
-                   for( i = *loc; i <= len; i++)
-                       wstr[i - 1] = wstr[i];
-                   (*loc)--;
-               }
-               break;
+               case KEY_BACKSPACE:        /* CTRL-H -- Delete character */
+                  if( *loc)
+                  {
+                      for( i = *loc; i <= len; i++)
+                          wstr[i - 1] = wstr[i];
+                      (*loc)--;
+                  }
+                  break;
 
-            case KEY_LEFT:
-               if( *loc)
-                  (*loc)--;
-               break;
+               case KEY_LEFT:
+                  if( *loc)
+                     (*loc)--;
+                  break;
 
-            case KEY_RIGHT:
-               if( wstr[*loc])
-                  (*loc)++;
-               break;
+               case KEY_RIGHT:
+                  if( wstr[*loc])
+                     (*loc)++;
+                  break;
 
-            case KEY_IC:
-               _insert_mode = !_insert_mode;
-               curs_set( _insert_mode ? CURSOR_INSERT : CURSOR_OVERWRITE);
-               break;
+               case KEY_IC:
+                  _insert_mode = !_insert_mode;
+                  curs_set( _insert_mode ? CURSOR_INSERT : CURSOR_OVERWRITE);
+                  break;
 
-            case KEY_HOME:
-               *loc = 0;
-               break;
+               case KEY_HOME:
+                  *loc = 0;
+                  break;
 
-            case KEY_END:
-               *loc = len;
-               break;
+               case KEY_END:
+                  *loc = len;
+                  break;
 
-            case KEY_MOUSE:
-               {
-               MEVENT mouse_event;
+               case KEY_MOUSE:
+                  {
+                  MEVENT mouse_event;
 
 #ifdef __PDCURSES__
-               nc_getmouse( &mouse_event);
+                  nc_getmouse( &mouse_event);
 #else
-               getmouse( &mouse_event);    /* sneak a peek at where the */
-               ungetmouse( &mouse_event);  /* click occurred */
-               wget_wch( win, &ch);
+                  getmouse( &mouse_event);    /* sneak a peek at where the */
+                  ungetmouse( &mouse_event);  /* click occurred */
+                  wget_wch( win, &ch);
 #endif
-               if( (mouse_event.bstate & BUTTON1_CLICKED) && mouse_event.y == y
-                    && mouse_event.x >= x && mouse_event.x < x + size)
-                  {
-                  *loc = offset + mouse_event.x - x;
-                  if( *loc > len)
-                      *loc = len;
+                  if( (mouse_event.bstate & BUTTON1_CLICKED) && mouse_event.y == y
+                       && mouse_event.x >= x && mouse_event.x < x + size)
+                     {
+                     *loc = offset + mouse_event.x - x;
+                     if( *loc > len)
+                         *loc = len;
+                     }
+                  else
+                     rval = ch;
                   }
-               else
-                  rval = ch;
-               }
-               break;
+                  break;
 
-            default:
-               rval = ch;
-               break;
+               default:
+                  rval = ch;
+                  break;
             }
 
         if( wget_wch_rval == OK)
             switch( ch)
             {
-            case _DLCHAR:       /* CTRL-U -- Delete line */
-               *loc = 0;
-               wstr[0] = '\0';
-               break;
+               case _DLCHAR:       /* CTRL-U -- Delete line */
+                  *loc = 0;
+                  wstr[0] = '\0';
+                  break;
 
-            case _DWCHAR:       /* CTRL-W -- Delete word */
-               {
-               int i = 0;
-
-               while( *loc && wstr[*loc - 1] == ' ')
-                  (*loc)--;     /* back up over spaces,  if any */
-               while( *loc && wstr[*loc - 1] != ' ')
-                  (*loc)--;     /* back up to start of actual word */
-               while( *loc && wstr[*loc - 1] == ' ')
+               case _DWCHAR:       /* CTRL-W -- Delete word */
                   {
-                  (*loc)--;     /* back up over preceding spaces,  if any */
-                  i++;
+                  int i = 0;
+
+                  while( *loc && wstr[*loc - 1] == ' ')
+                     (*loc)--;     /* back up over spaces,  if any */
+                  while( *loc && wstr[*loc - 1] != ' ')
+                     (*loc)--;     /* back up to start of actual word */
+                  while( *loc && wstr[*loc - 1] == ' ')
+                     {
+                     (*loc)--;     /* back up over preceding spaces,  if any */
+                     i++;
+                     }
+                  while( *loc + i < len && wstr[*loc + i] != ' ')
+                     i++;        /* count characters in the word */
+                  len -= i;
+                  memmove( wstr + *loc, wstr + *loc + i,
+                                    (len + 1 - *loc) * sizeof( wint_t));
                   }
-               while( *loc + i < len && wstr[*loc + i] != ' ')
-                  i++;        /* count characters in the word */
-               len -= i;
-               memmove( wstr + *loc, wstr + *loc + i,
-                                 (len + 1 - *loc) * sizeof( wint_t));
-               }
-               break;
+                  break;
 
-            case '\n':
-            case '\r':
-                rval = 0;
-                break;
+               case '\n':
+               case '\r':
+                   rval = 0;
+                   break;
 
-            case _ESCAPE:
-            case _TAB:
-                rval = ch;
-                break;
+               case _ESCAPE:
+               case _TAB:
+                   rval = ch;
+                   break;
 
-            default:
-                if( ch >= ' ')
-                {
-                    if( (!_insert_mode && *loc < maxlen - 1)
-                        || (_insert_mode && len < maxlen - 1))
-                    {
-                        if( *loc == len)    /* at end of line */
-                            wstr[len + 1] = 0;
-                        else if( _insert_mode)
-                        {
-                            for( i = len; i >= *loc; i--)
-                                wstr[i + 1] = wstr[i];
-                        }
-                        wstr[*loc] = ch;
-                        (*loc)++;
-                    }
-                    else
-                        beep( );
-                }
-                break;
+               default:
+                   if( ch >= ' ')
+                   {
+                       if( (!_insert_mode && *loc < maxlen - 1)
+                           || (_insert_mode && len < maxlen - 1))
+                       {
+                           if( *loc == len)    /* at end of line */
+                               wstr[len + 1] = 0;
+                           else if( _insert_mode)
+                           {
+                               for( i = len; i >= *loc; i--)
+                                   wstr[i + 1] = wstr[i];
+                           }
+                           wstr[*loc] = ch;
+                           (*loc)++;
+                       }
+                       else
+                           beep( );
+                   }
+                   break;
             }
     }
 #ifdef __PDCURSES__
