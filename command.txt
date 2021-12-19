@@ -81,7 +81,7 @@ End colors
 
 Start hints
 
-b              Toggle time format
+b              Select format for observation times
 r              Enter dist to object at start and end of arc
 q              Quit Find_Orb
 o              Open a file of astrometry
@@ -129,7 +129,7 @@ U+31004        Add a line of menu options
 U+31005        Remove last line of menu options
 ?              Get help
 %              Set uncertainties for the selected observation(s)
-&              Toggle use of punched-card RA/dec format
+&              Select format for observation RA/decs
 Ctrl-W         Toggle observations above the currently selected one
 F2             Toggle observations below the currently selected one
 Ctrl-X         Save orbits for re-use
