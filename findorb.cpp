@@ -3290,6 +3290,34 @@ static int non_grav_menu( char *message_to_user)
    return( force_model);
 }
 
+static int _obs_format_menu( int residual_format, const bool is_time_fmt)
+{
+   char tbuff[300];
+   const int curr_format = (is_time_fmt ?
+                        GET_RESID_TIME_FORMAT( residual_format) :
+                        GET_RESID_RA_DEC_FORMAT( residual_format));
+   const int n_formats = 4;    /* at least for now,  for both */
+   int c;
+
+   strlcpy_error( tbuff, get_find_orb_text( is_time_fmt ? 2070 : 2068));
+   assert( curr_format >= 0);
+   assert( curr_format < n_formats);
+   _set_radio_button( tbuff, curr_format);
+// help_file_name = (is_time_fmt ? "time_fmt.txt" : "radecfmt.txt");
+   c = full_inquire( tbuff, NULL, 0, COLOR_MENU, -1, -1);
+   if( c >= KEY_F(1) && c <= KEY_F(14))
+      c -= KEY_F( 1);
+   else
+      c -= '0';
+   if( c >= 0 && c < n_formats)
+      {
+      residual_format &= (is_time_fmt ? ~RESIDUAL_FORMAT_TIME :
+                                        ~RESIDUAL_FORMAT_RA_DEC);
+      residual_format |= c << (is_time_fmt ? 11 : 14);
+      }
+   return( residual_format);
+}
+
 static int resid_format_menu( char *message_to_user, int resid_format)
 {
    char buff[300];
@@ -5404,25 +5432,7 @@ int main( int argc, const char **argv)
                }
             else
                {
-               const int curr_format = GET_RESID_TIME_FORMAT( residual_format);
-               const int n_time_formats = 4;    /* at least for now */
-
-               strcpy( tbuff, get_find_orb_text( 2070));
-               debug_printf( "Curr format %d (%x)\n", curr_format, residual_format);
-               assert( curr_format >= 0);
-               assert( curr_format < n_time_formats);
-               _set_radio_button( tbuff, curr_format);
-//             help_file_name = "time_fmt.txt";
-               c = full_inquire( tbuff, NULL, 0, COLOR_MENU, -1, -1);
-               if( c >= KEY_F(1) && c <= KEY_F(14))
-                  c -= KEY_F( 1);
-               else
-                  c -= '0';
-               if( c >= 0 && c < n_time_formats)
-                  {
-                  residual_format &= ~RESIDUAL_FORMAT_TIME;
-                  residual_format |= (c % n_time_formats) << 11;
-                  }
+               residual_format = _obs_format_menu( residual_format, true);
                strcpy( message_to_user, "Obs time format reset");
                }
             break;
@@ -5800,26 +5810,8 @@ int main( int argc, const char **argv)
             }
             break;
          case '&':
-            {
-            const int curr_format = GET_RESID_RA_DEC_FORMAT( residual_format);
-            const int n_ra_dec_formats = 4;    /* at least for now */
-
-            strcpy( tbuff, get_find_orb_text( 2068));
-            assert( curr_format >= 0);
-            assert( curr_format < n_ra_dec_formats);
-            _set_radio_button( tbuff, curr_format);
-            c = full_inquire( tbuff, NULL, 0, COLOR_MENU, -1, -1);
-            if( c >= KEY_F(1) && c <= KEY_F(14))
-               c -= KEY_F( 1);
-            else
-               c -= '0';
-            if( c >= 0 && c < n_ra_dec_formats)
-               {
-               residual_format &= ~RESIDUAL_FORMAT_RA_DEC;
-               residual_format |= (c % n_ra_dec_formats) << 14;
-               }
+            residual_format = _obs_format_menu( residual_format, false);
             strcpy( message_to_user, "Obs RA/dec format reset");
-            }
             break;
          case 9:
             sort_obs_by_code = !sort_obs_by_code;
