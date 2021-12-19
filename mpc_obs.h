@@ -326,13 +326,21 @@ int clean_up_find_orb_memory( void);         /* orb_func.cpp */
 #define RESIDUAL_FORMAT_80_COL                3
 #define RESIDUAL_FORMAT_FOUR_DIGIT_YEARS      4
 #define RESIDUAL_FORMAT_TIME_RESIDS           8
-#define RESIDUAL_FORMAT_HMS                0x10
+         /* 0x10 reserved     */
 #define RESIDUAL_FORMAT_MAG_RESIDS         0x20
 #define RESIDUAL_FORMAT_PRECISE            0x40
 #define RESIDUAL_FORMAT_OVERPRECISE        0x80
 #define RESIDUAL_FORMAT_COMPUTER_FRIENDLY  0x100
 #define RESIDUAL_FORMAT_EXTRA              0x200
 #define RESIDUAL_FORMAT_NORMALIZED         0x400
+      /* three bits reserved for time format.
+            0 = times in reported format
+            1 = times always in decimal days (MPC80 form)
+            2 = times always in HHMMSS.sss (ADES form)
+            3 = times in MJD
+            4-7 = not currently used */
+#define RESIDUAL_FORMAT_TIME               0x3800
+#define GET_RESID_TIME_FORMAT( residual_format)   ((residual_format & RESIDUAL_FORMAT_TIME) >> 11)
 
 int write_residuals_to_file( const char *filename, const char *ast_filename,
         const int n_obs, const OBSERVE FAR *obs_data, const int resid_format);

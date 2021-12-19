@@ -2063,18 +2063,37 @@ static void show_one_observation( OBSERVE obs, const int line,
    int color = COLOR_BACKGROUND;       /* show in 80-column MPC */
    char resid_data[70];      /* format, w/added data if it fits */
    const int dropped_start = 12;     /* ...but omit designation */
-   const int time_prec = obs.time_precision;
 
    put_colored_text( "", line, 0, -1, COLOR_BACKGROUND);
    add_to_mpc_color( obs.mpc_code, 1000);
    format_observation( &obs, buff,
-                        (residual_format & ~(3 | RESIDUAL_FORMAT_HMS))
+                        (residual_format & ~(3 | RESIDUAL_FORMAT_TIME))
                         | RESIDUAL_FORMAT_FOUR_DIGIT_YEARS);
    strcpy( resid_data, buff + 49);
    *resid_data = ' ';
-   if( residual_format & RESIDUAL_FORMAT_HMS)
-      if( time_prec == 5 || time_prec == 6)  /* 1e-5 or 1e-6 day */
-         obs.time_precision += 16;
+   switch( GET_RESID_TIME_FORMAT( residual_format))
+      {
+      case 1:     /* force all to MPC80-style decimal day format */
+         if( obs.time_precision == 20)
+            obs.time_precision = 5;
+         else if( obs.time_precision > 6)
+            obs.time_precision = 6;
+         break;
+      case 2:     /* force all to HHMMSS format */
+         if( obs.time_precision >= 4 && obs.time_precision <= 6)
+            obs.time_precision += 16;
+         else if( obs.time_precision < 20 || obs.time_precision > 23)
+            obs.time_precision = 23;
+         break;
+      case 3:     /* force all to MJD */
+         if( obs.time_precision <= 6)   /* any MPC80 decimal day format */
+            obs.time_precision += 40;      /* corresponding MJD format */
+         else if( obs.time_precision >= 20 && obs.time_precision < 24)
+            obs.time_precision += 25;
+         else
+            obs.time_precision = 49;      /* max precision MJD format */
+         break;
+      }
                      /* show corresponding 1s or 0.1s HHMMSS fmt */
    recreate_observation_line( buff, &obs);
    memmove( buff, buff + dropped_start, strlen( buff + dropped_start) + 1);
@@ -2143,9 +2162,18 @@ static void show_residual_legend( const int line_no, const int residual_format)
    if( residual_format & RESIDUAL_FORMAT_MAG_RESIDS)
       text_search_and_replace( buff, "delta  R", "delta mresid");
 
-   if( residual_format & RESIDUAL_FORMAT_HMS)
-      text_search_and_replace( buff, "YYYY MM DD.DDDDD ",
+   switch( GET_RESID_TIME_FORMAT( residual_format))
+      {
+      case 2:     /* HMS form */
+         text_search_and_replace( buff, "YYYY MM DD.DDDDD ",
                                      "CYYMMDD:HHMMSSsss");
+         break;
+      case 3:     /* MJD form */
+         text_search_and_replace( buff, "YYYY MM DD.DDDDD ",
+                                     "MJDDDDD.ddddddddd");
+         break;
+      }
+
    if( residual_format & RESIDUAL_FORMAT_EXTRA)
       strcat( buff, (residual_format & RESIDUAL_FORMAT_TIME_RESIDS)
                   ? "      Xres  Yres  total Mres"
@@ -5376,11 +5404,26 @@ int main( int argc, const char **argv)
                }
             else
                {
-               residual_format ^= RESIDUAL_FORMAT_HMS;
-               strcpy( message_to_user,
-                    (residual_format & RESIDUAL_FORMAT_HMS) ?
-                    "Showing observation times as HH:MM:SS" :
-                    "Showing observation times as decimal days");
+               const int curr_format = GET_RESID_TIME_FORMAT( residual_format);
+               const int n_time_formats = 4;    /* at least for now */
+
+               strcpy( tbuff, get_find_orb_text( 2070));
+               debug_printf( "Curr format %d (%x)\n", curr_format, residual_format);
+               assert( curr_format >= 0);
+               assert( curr_format < n_time_formats);
+               _set_radio_button( tbuff, curr_format);
+//             help_file_name = "time_fmt.txt";
+               c = full_inquire( tbuff, NULL, 0, COLOR_MENU, -1, -1);
+               if( c >= KEY_F(1) && c <= KEY_F(14))
+                  c -= KEY_F( 1);
+               else
+                  c -= '0';
+               if( c >= 0 && c < n_time_formats)
+                  {
+                  residual_format &= ~RESIDUAL_FORMAT_TIME;
+                  residual_format |= (c % n_time_formats) << 11;
+                  }
+               strcpy( message_to_user, "Obs time format reset");
                }
             break;
          case 27:

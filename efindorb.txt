@@ -370,3 +370,15 @@
 
 2066    '%s' is %d bytes long.  Packed designations must be less
 2066    than twelve bytes long.  Try again with a shorter designation.
+
+2068    0 ( ) RA/decs in reported format
+2068    1 ( ) RA/decs in decimal degrees
+2068    2 ( ) RA/decs in HH.hhhhh, dd.dddd
+2068    3 ( ) RA/decs in HH MM SS.s, dd mm ss.ss
+2068    Cancel
+
+2070    0 ( ) Times in reported format
+2070    1 ( ) Times in YYYY MM DD.DDDDD
+2070    2 ( ) Times in YY MM DD HH:MM:SS
+2070    3 ( ) Times in MJD DDDDD.DDDDDD
+2070    Cancel

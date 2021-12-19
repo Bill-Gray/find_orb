@@ -3820,19 +3820,24 @@ void format_observation( const OBSERVE FAR *obs, char *text,
             else
                snprintf( text, 7, "%02d\t%02d\t", abs( (int)year % 100), month);
             text += strlen( text);
-            if( resid_format & RESIDUAL_FORMAT_HMS)
-               show_dd_hh_mm_ss_point_sss( text, day, 0);
-            else
+            switch( GET_RESID_TIME_FORMAT( resid_format))
                {
-               const char *date_format_text[7] = { "%02.0f       ",
-                                                   "%04.1f     ",
-                                                   "%05.2f    ",
-                                                   "%06.3f   ",
-                                                   "%07.4f  ",
-                                                   "%08.5f ",
-                                                   "%09.6f" };
+               case 2:        /* force HHMMSS */
+                  show_dd_hh_mm_ss_point_sss( text, day, 0);
+                  break;
+               default:
+                  {
+                  const char *date_format_text[7] = { "%02.0f       ",
+                                                      "%04.1f     ",
+                                                      "%05.2f    ",
+                                                      "%06.3f   ",
+                                                      "%07.4f  ",
+                                                      "%08.5f ",
+                                                      "%09.6f" };
 
-               snprintf( text, 10, date_format_text[n_time_digits], day);
+                  snprintf( text, 10, date_format_text[n_time_digits], day);
+                  }
+                  break;
                }
             }
             break;

@@ -1,0 +1,10 @@
+   Observed times can be in any of four formats :
+
+   -- The originally reported format,  whatever it may be.  This is
+the default.
+
+   -- MPC80 format,  in decimal days.  ADES observation times are converted.
+
+   -- Hour/minute/second format.  MPC80 observation times are converted.
+
+   -- MJD (Modified Julian Day) format.  All times are converted.
