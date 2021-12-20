@@ -2185,7 +2185,7 @@ static void show_residual_legend( const int line_no, const int residual_format)
    add_cmd_area( ALT_K, line_no, 44, 8);  /* 'sigmas' toggles sigma display */
    add_cmd_area( '&', line_no, 21, 17);  /* 'ra dec' toggles forced punch card fmt */
    add_cmd_area( ALT_X, line_no, 65, 3);  /* Show list of MPC codes */
-   add_cmd_area( 'b', line_no, 5, 12);    /* Toggle time format _or_ scan obs for time */
+   add_cmd_area( 'b', line_no, 0, 20);    /* Reset obs time format _or_ scan obs for time */
 }
 
 static int find_rgb( const unsigned irgb);
@@ -5412,7 +5412,7 @@ int main( int argc, const char **argv)
          case KEY_MOUSE:   /* already handled above */
             break;
          case 'b':
-            if( mouse_wheel_motion)
+            if( mouse_wheel_motion && mouse_x >= 5 && mouse_x < 17)
                {       /* clicked on YY MM DD.DDD */
                static const double time_diffs[] = { 3650., 365., 180., 90., 30.,
                               0., 10., 1., .3, 0.1, 0.01, 0.001 };
