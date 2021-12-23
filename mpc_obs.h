@@ -352,6 +352,7 @@ int clean_up_find_orb_memory( void);         /* orb_func.cpp */
             4-7 = not currently used */
 #define RESIDUAL_FORMAT_RA_DEC            0x1c000
 #define GET_RESID_RA_DEC_FORMAT( residual_format)   ((residual_format >> 14) & 7)
+#define RESIDUAL_FORMAT_SHOW_DESIGS              0x20000
 
 int write_residuals_to_file( const char *filename, const char *ast_filename,
         const int n_obs, const OBSERVE FAR *obs_data, const int resid_format);

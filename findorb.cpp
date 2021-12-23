@@ -156,8 +156,6 @@ devoted to station data.   */
 
 #define PI 3.1415926535897932384626433832795028841971693993751058209749445923
 
-#define RESIDUAL_FORMAT_SHOW_DESIGS              0x2000
-
 void ensure_config_directory_exists(); /* miscell.c */
 static int user_select_file( char *filename, const char *title, const int flags);
 double get_planet_mass( const int planet_idx);                /* orb_func.c */
