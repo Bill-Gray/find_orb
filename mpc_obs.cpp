@@ -999,7 +999,7 @@ static int get_obs_alt_azzes( const OBSERVE FAR *obs, DPT *sun_alt_az,
    if( !rval)
       {
       DPT ra_dec;
-      const double utc = obs->jd - td_minus_utc( obs->jd) / seconds_per_day;
+      const double ut1 = obs->jd - td_minus_ut( obs->jd) / seconds_per_day;
 
       for( i = 0; i < 2; i++)
          {
@@ -1029,7 +1029,7 @@ static int get_obs_alt_azzes( const OBSERVE FAR *obs, DPT *sun_alt_az,
                   ra_dec.y = obs->dec;
                   }
                }
-            full_ra_dec_to_alt_az( &ra_dec, alt_az, NULL, &latlon, utc, NULL);
+            full_ra_dec_to_alt_az( &ra_dec, alt_az, NULL, &latlon, ut1, NULL);
             }
          }
       }
