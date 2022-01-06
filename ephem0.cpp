@@ -3748,6 +3748,20 @@ static void show_resid_in_sigmas( char *buff, const double sigmas)
    show_number_in_four_bytes( buff, fabs( sigmas));
 }
 
+static double utc_from_td( const double jdt, double *delta_t)
+{
+   double diff = td_minus_utc( jdt), utc = jdt - diff / seconds_per_day;
+
+   if( floor( utc - 0.5) != floor( jdt - 0.5))
+      {
+      diff = td_minus_utc( utc);
+      utc = jdt - diff / seconds_per_day;
+      }
+   if( delta_t)
+      *delta_t = diff;
+   return( utc);
+}
+
 /* format_observation( ) takes an observation and produces text for it,
    suitable for display on a console (findorb) or in a Windoze scroll
    box (FIND_ORB),  or for writing to a file.  */
@@ -3770,7 +3784,7 @@ void format_observation( const OBSERVE FAR *obs, char *text,
    char *original_text_ptr = text;
    MOTION_DETAILS m;
 
-   utc = obs->jd - td_minus_utc( obs->jd) / seconds_per_day;
+   utc = utc_from_td( obs->jd, NULL);
    day = decimal_day_to_dmy( utc, &year, &month, CALENDAR_JULIAN_GREGORIAN);
 
    if( base_format != RESIDUAL_FORMAT_SHORT)
