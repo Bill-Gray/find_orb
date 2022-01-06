@@ -2961,7 +2961,7 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
       double prev_score;
       int pass;
 
-      if( !*get_environment_ptr( "KEEP_PREVIOUS_EPOCH"))
+      if( !*get_environment_ptr( "KEEP_PREVIOUS_EPOCH") && !got_vectors)
          {
          const double new_epoch = find_epoch_shown( obs, n_obs);
 
