@@ -1374,14 +1374,14 @@ static void _store_extra_orbit_info( const char *packed_id,
    fclose( ofile);
 }
 
-static void _get_extra_orbit_info( const char *packed_id,
+static int _get_extra_orbit_info( const char *packed_id,
                 unsigned *perturbers, int *n_extra_params,
                 double *solar_pressure, char *constraints)
 {
    extern int force_model;
    size_t n_lines;
    char **lines = load_file_into_memory( _extras_filename, &n_lines, true);
-   int i, j;
+   int i, j, rval = 0;
 
    assert( strlen( packed_id) == 12);
    for( i = 0; i < (int)n_lines; i++)
@@ -1407,9 +1407,12 @@ static void _get_extra_orbit_info( const char *packed_id,
          if( (tptr = strstr( lines[i], " Constraint=")) != NULL)
             if( constraints)
                sscanf( tptr + 12, "%s", constraints);
+         if( strstr( lines[i], "ignore"))
+            rval = -1;
          break;
          }
    free( lines);
+   return( rval);
 }
 
 /* see 'environ.def' for an explanation of how/why this works. */
@@ -2925,15 +2928,19 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
          *orbit_epoch = elems.epoch;
          if( got_vectors == 1)
             *perturbers = 0x7fe;    /* Merc-Pluto plus moon */
-         _get_extra_orbit_info( obs->packed_id, perturbers, &n_extra_params,
-                     solar_pressure, NULL);
-         if( n_obs > 1)
+         if( _get_extra_orbit_info( obs->packed_id, perturbers, &n_extra_params,
+                     solar_pressure, NULL))
+            got_vectors = 0;
+         else
             {
-            set_locs( orbit, *orbit_epoch, obs, n_obs);
-            filter_obs( obs, n_obs, rms_resid * 3., 1);
-            do_full_improvement = true;
+            if( n_obs > 1)
+               {
+               set_locs( orbit, *orbit_epoch, obs, n_obs);
+               filter_obs( obs, n_obs, rms_resid * 3., 1);
+               do_full_improvement = true;
+               }
+            abs_mag = elems.abs_mag;
             }
-         abs_mag = elems.abs_mag;
          }
       }
    if( !got_vectors)
