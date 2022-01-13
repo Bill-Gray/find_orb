@@ -1732,7 +1732,7 @@ int write_out_elements_to_file( const double *orbit,
       extern double solar_pressure[];
 
       add_sof_to_file( "orbits.sof", &elem, n_obs, obs, "orbitdef.sof");
-      if( (perturbers & ~0x7ff) || n_extra_params > 1 || *constraints)
+      if( (perturbers & ~0x7ff) || n_extra_params || *constraints)
          _store_extra_orbit_info( obs->packed_id, perturbers, n_extra_params,
                      solar_pressure, constraints);
       }
