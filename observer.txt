@@ -38,6 +38,7 @@
  Ernst                                     <a href="http://www.starkenburg-sternwarte.de/asteroiden/namen/7686.htm">Ernst</a>
  Fitzsimmons                               <a href="https://alanfitzsimmons.wordpress.com/">Fitzsimmons</a>
  Flewelling                                <a href="https://twitter.com/heatherflew">Flewelling</a>
+ F\"ohring                                 F&ouml;hring
  Foglia                                    <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=13147&amp;view=OPD">Foglia</a>
  Fuls                                      <a href="https://catalina.lpl.arizona.edu/person/carson-fuls">Fuls</a>
  Galad                                     <a href="http://en.wikipedia.org/wiki/Adri%C3%A1n_Gal%C3%A1d">Gal&aacute;d</a>
@@ -112,6 +113,7 @@
  Oschin Schmidt                            <a href="https://en.wikipedia.org/wiki/Samuel_Oschin_telescope">Oschin Schmidt</a>
  Ory                                       <a href="https://en.wikipedia.org/wiki/Michel_Ory">Ory</a>
  P\'al                                     <a href="http://en.scientificcommons.org/andras_pal">P&aacute;l</a>
+ Pallar\'es                                Pallar&eacute;s
  Pelle                                     <a href="http://chez.mana.pf/~jcpelle/">Pelle</a>
  Pettarin                                  <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=7258&amp;view=OPD">Pettarin</a>
  Piani                                     <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=10573&amp;view=OPD">Piani</a>
