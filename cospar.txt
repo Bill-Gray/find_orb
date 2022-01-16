@@ -1,0 +1,712 @@
+# Description of this file is at bottom.
+
+Remap: 3001 10  4001 28  4002 29  5005 47  5014 48  5015 49  5016 50
+Remap: 5001 11  5002 12  5003 13  5004 14  6001 15  6002 16  6003 17  6004 18
+Remap: 6005 19  6006 20  6007 21  6008 22  6009 40
+Remap: 6015 51  6016 52  6017 53  6018 54
+Remap: 7001 23  7002 24  7003 25  7004 26  7005 27  7006 55  7007 56  7008 57
+Remap: 7009 58  7010 59  7011 60  7012 61  7013 62  7014 63  7015 64
+Remap: 8001 30  8003 71  8004 70  8005 68  8006 69  8007 67  8008 66
+Remap: 9001 31  9002 109 9003 108 9004 173 9005 174
+
+# Not actually in use yet:
+
+Remap: 6010 175 6011 176 6012 177 6013 178 6014 179
+
+Planet: p
+
+Obj: 0 # Sun
+   a0=286.13
+   d0=63.87
+   W=84.176+14.1844000d
+
+# See Mercury under 'H' (Mars uses 'M')
+
+Obj: 2 # Venus
+   a0= 272.76
+   d0= 67.16
+   W2=160.20-85.7142857d # (k)
+   W=160.20-1.4813688d   # (b)
+
+# Earth:  for reference only (see comment (m))
+Obj: 3
+   a0= 0.00-0.641T
+   d0= 90.00-0.557T
+   W= 190.147+360.9856235d
+
+# See Mars under 'M'
+
+Obj: 5 # Jupiter
+   a0= 268.056595-.006499T
+   d0= 64.495303+.002413T
+   W2=  43.3+870.270d        #     (System II)
+   W3= 284.95+870.536d       # (d) (System III)
+   W=  67.1+877.900d         #     (System I)
+
+Obj: 6 # Saturn
+   a0= 40.589-0.036T
+   d0= 83.537-0.004T
+   W2= 104.90+812d           #     (System II)
+   W3= 38.90+810.7939024d    # (d) (System III)
+   W= 227.90+844.3d          #     (System I)
+
+Obj: 7 # Uranus
+   a0= 257.311
+   d0=-15.175
+   W= 203.81-501.1600928d    # (d)
+
+# (See Neptune under 'N'; it has trig terms)
+
+Obj: 9 # Pluto
+   a0= 132.993
+   d0= -6.163
+   W= 302.695+56.3625225d   # (e)
+
+# Recommended values for the direction of the north pole of rotation and the
+# prime meridian of the satellites (2000)
+
+# a0, d0, T and d have the same meanings as in Table I (epoch 2000 January 1.5,
+# i.e., JD 2451545.0 TCB).
+
+Planet: H
+  H1=174.7910857 + 4.092335d
+  H2=349.5821714 + 8.184670d
+  H3=164.3732571 + 12.277005d
+  H4=339.1643429 + 16.369340d
+  H5=153.9554286 + 20.461675d
+
+Obj: 1 # Mercury
+   a0=281.0103-0.0328T
+   d0= 61.4155-0.0049T
+   W=329.5988+6.1385108d+0.01067257 sin H1 -0.00112309 sin H2 -0.00011040 sin H3 -0.00002539 sin H4 -0.00000571 sin H5
+   # (a) (l)
+
+Planet: E
+  E1=125.045-0.0529921d
+  E2=250.089-0.1059842d
+  E3=260.008+13.0120009d
+  E4=176.625+13.3407154d
+  E5=357.529+0.9856003d
+  E6=311.589+26.4057084d
+  E7=134.963+13.0649930d
+  E8=276.617+0.3287146d
+  E9=34.226+1.7484877d
+  E10=15.134-0.1589763d
+  E11=119.743+0.0036096d
+  E12=239.961+0.1643573d
+  E13=25.053+12.9590088d
+
+Obj: 3001 # Earth's moon
+   a0=269.9949 +0.0031T -3.8787 sin E1 -0.1204 sin E2 +0.0700 sin E3 -0.0172 sin E4 +0.0072 sin E6 -0.0052 sin E10 +0.0043 sin E13
+   d0=66.5392 +0.0130T +1.5419 cos E1 +0.0239 cos E2 -0.0278 cos E3 +0.0068 cos E4 -0.0029 cos E6 +0.0009 cos E7 +0.0008 cos E10 -0.0009 cos E13
+   W=38.3213 +13.17635815d -1.4e-12d2 +3.5610 sin E1 +0.1208 sin E2 -0.0642 sin E3 +0.0158 sin E4 +0.0252 sin E5 -0.0066 sin E6 -0.0047 sin E7 -0.0046 sin E8 +0.0028 sin E9 +0.0052 sin E10 +0.0040 sin E11 +0.0019 sin E12 -0.0044 sin E13
+
+Planet: M
+
+  M1 = 190.72646643 + 15917.10818695T
+  M2 = 21.46892470  + 31834.27934054T
+  M3 = 332.86082793 + 19139.89694742T
+  M4 = 394.93256437 + 38280.79631835T
+  M5 = 189.63271560 + 41215158.18420050T # + 12.71192322 T2
+  M6 = 121.46893664 + 660.22803474T
+  M7 = 231.05028581 + 660.99123540T
+  M8 = 251.37314025 + 1320.50145245T
+  M9 = 217.98635955 + 38279.96125550T
+  M10 = 196.19729402 + 19139.83628608T
+
+  M11 =  79.398797 +     0.5042615T
+  M12 = 166.325722 +     0.5042615T
+  M13 =  95.391654 +     0.5042615T
+
+Obj: 4001 # Phobos (s)
+   a0 = 317.67071657 -0.10844326T -1.78428399 sin M1 +0.02212824 sin M2
+   d0 =  52.88627266 -0.06134706T -1.07516537 cos M1 +0.00668626 cos M2
+   W  =  34.9964842535 +1128.84475928d + 12.72192797 T2 + 1.42421769 sin M1 - 0.02273783 sin M2 + 1.145 sin M5
+
+Obj: 4002 # Deimos (s)
+   a0 = 316.65705808 -0.10518014T +3.09217726 sin M6 + 0.22980637 sin M7
+   d0 = 53.50992033 -0.0597909T + 1.83936044 cos M6 + 0.14325320 cos M7
+   W = 79.39932954 +285.16188899d - 2.73954829 sin M6 - 0.39968606 sin M7
+
+Obj: 4 # Mars
+   a0= 317.269202 − 0.10927547T + 0.419057 sin M11
+   d0= 54.432516 - 0.05827105T + 1.591274 cos M12
+   W= 176.049863 + 350.891982443297d + 0.584542 sin M13   # (c) See 2018 Jul 17 comments
+
+Planet: J
+  J1=73.32+91472.9T
+  J2=24.62+45137.2T
+  J3=283.90+4850.7T
+  J4=355.80+1191.3T
+  J5=119.90+262.1T
+  J6=229.80+64.3T
+  J7=352.35+2382.6T
+  J8=113.35+6070.0T
+
+Obj: 5016 # XVI Metis
+   a0=268.05    -0.009T
+   d0=64.49   +0.003T
+   W=346.09   +1221.2547301d
+
+Obj: 5015 # XV Adrastea
+   a0=268.05    -0.009T
+   d0=64.49   +0.003T
+   W=33.29   +1206.9986602d
+
+Obj: 5005 # V Amalthea
+   a0=268.05    -0.009T    -0.84 sin J1   +0.01 sin 2J1
+   d0=64.49   +0.003T    -0.36 cos J1
+   W=231.67   +722.6314560d   +0.76 sin J1    -0.01 sin 2J1
+
+Obj: 5014 # XIV Thebe
+   a0=268.05    -0.009T    -2.11 sin J2   +0.04 sin 2J2
+   d0=64.49   +0.003T    -0.91 cos J2   +0.01 cos 2J2
+   W=8.56   +533.7004100d   +1.91 sin J2    -0.04 sin 2J2
+
+Obj: 5001 # Io
+   a0=268.05 -0.009T +0.094 sin J3 +0.024 sin J4
+   d0=64.50 +0.003T +0.040 cos J3 +0.011 cos J4
+   W=200.39 +203.4889538d -0.085 sin J3 -0.022 sin J4
+
+Obj: 5002 # Europa
+   a0=268.08 -0.009T +1.086 sin J4 +0.060 sin J5 +0.015 sin J6 +0.009 sin J7
+   d0=64.51 +0.003T +0.468 cos J4 +0.026 cos J5 +0.007 cos J6 +0.002 cos J7
+   W=36.022 +101.3747235d -0.980 sin J4 -0.054 sin J5 -0.014 sin J6 -0.008 sin J7 # (a)
+
+Obj: 5003 # Ganymede
+   a0=268.20 -0.009T -0.037 sin J4 +0.431 sin J5 +0.091 sin J6
+   d0=64.57 +0.003T -0.016 cos J4 +0.186 cos J5 +0.039 cos J6
+   W=44.064 +50.3176081d +0.033 sin J4 -0.389 sin J5 -0.082 sin J6
+
+Obj: 5004 # Callisto
+   a0=268.72 -0.009T -0.068 sin J5 +0.590 sin J6 +0.010 sin J8
+   d0=64.83 +0.003T -0.029 cos J5 +0.254 cos J6 -0.004 cos J8
+   W=259.51 +21.5710715d +0.061 sin J5 -0.533 sin J6 -0.009 sin J8
+
+Planet: S
+  S1=353.32+75706.7T
+  S2=28.72+75706.7T
+  S3=177.40-36505.5T
+  S4=300.00-7225.9T
+  S5=316.45+506.2T
+  S6=345.20-1016.3T
+# S7=29.80-52.1T
+
+Obj: 6018 # XVIII Pan
+   a0=40.6   -0.036T
+   d0=83.5   -0.004T
+   W=48.8   +626.0440000d
+
+Obj: 6015 # XV Atlas
+   a0=40.58   -0.036T
+   d0=83.53   -0.004T
+   W=137.88   +598.3060000d
+
+Obj: 6016 # XVI Prometheus
+   a0=40.58   -0.036T
+   d0=83.53   -0.004T
+   W=296.14   +587.289000d
+
+Obj: 6017 # XVII Pandora
+   a0=40.58 -0.036T
+   d0=83.53 -0.004T
+   W=162.92 +572.7891000d
+
+Obj: 6010 # X Janus
+   a0=40.58 -0.036T   -1.623 sin S2   +0.023 sin 2S2
+   d0=83.52 -0.004T   -0.183 cos S2   +0.001 cos 2S2
+   W=58.83  +518.2359876d   +1.613 sin S2   -0.023 sin 2S2      # (j)
+
+Obj: 6011 # XI Epimetheus
+   a0=40.58 -0.036T   -3.153 sin S1   +0.086 sin 2S1
+   d0=83.52 -0.004T   -0.356 cos S1   +0.005 cos 2S1
+   W=293.87 +518.4907239d   +3.133 sin S1   -0.086 sin 2S1      # (j)
+
+Obj: 6001 # I Mimas
+   a0=40.66   -0.036T   +13.56 sin S3
+   d0=83.52   -0.004T   -1.53 cos S3
+   W=337.46 +381.9945550d -13.48 sin S3   -44.85 sin S5     # (d)
+
+Obj: 6002 # II Enceladus
+   a0=40.66   -0.036T
+   d0=83.52   -0.004T
+   W=2.82   +262.7318996d     # (e)
+
+Obj: 6003 # III Tethys
+   a0=40.66   -0.036T   +9.66 sin S4
+   d0=83.52   -0.004T   -1.09 cos S4
+   W=10.45   +190.6979085d   -9.60 sin S4  +2.23 sin S5    # (f)
+
+Obj: 6013 # XIII Telesto
+   a0=50.51   -0.036T
+   d0=84.06   -0.004T
+   W=56.88   +190.6979332d       # (j)
+
+Obj: 6014 # XIV Calypso
+   a0=36.41   -0.036T
+   d0=85.04   -0.004T
+   W=153.51   +190.69792373d     # (j)
+
+Obj: 6004 # IV Dione
+   a0=40.66  -0.036T
+   d0=83.52  -0.004T
+   W=357.00  +131.5349316d      # (g)
+
+Obj: 6012 # XII Helene
+   a0=40.85  -0.036T
+   d0=83.34  -0.004T
+   W=245.12  +131.6174056d
+
+Obj: 6005 # V Rhea
+   a0=40.38 -0.036T   +3.10 sin S6
+   d0=83.55 -0.004T   -0.35 cos S6
+   W=235.16 +79.6900478d  -3.08 sin S6     # (h)
+
+Obj: 6006 # VI Titan
+   a0=39.4827
+   d0=83.4279
+   W=186.5855+22.5769768d
+# Previous (pre-2009 resolution) version:
+#  a0=36.41   -0.036T   +2.66 sin S7
+#  d0=83.94   -0.004T   -0.30 cos S7
+#  W=189.64   +22.5769768d   -2.64 sin S7
+
+Obj: 6008 # VIII Iapetus
+   a0=318.16  -3.949T
+   d0=75.03   -1.143T
+   W=350.20   +4.5379572d        # (i)
+
+Obj: 6009 # IX Phoebe
+   a0=356.90
+   d0=77.80
+   W=178.58   +931.639d
+
+Planet: U
+  U1=115.75+54991.87T
+  U2=141.69+41887.66T
+  U3=135.03+29927.35T
+  U4=61.77+25733.59T
+  U5=249.32+24471.46T
+  U6=43.86+22278.41T
+  U7=77.66+20289.42T
+  U8=157.36+16652.76T
+  U9=101.81+12872.63T
+  U10=138.64+8061.81T
+  U11=102.23-2024.22T
+  U12=316.41+2863.96T
+  U13=304.01-51.94T
+  U14=308.71-93.17T
+  U15=340.82-75.32T
+  U16=259.14-504.81T
+
+Obj: 7006   # VI Cordelia
+   a0=257.31  -0.15 sin U1
+   d0=-15.18  +0.14 cos U1
+   W=127.69   -1074.5205730d   -0.04 sin U1
+
+Obj: 7007 # VII Ophelia
+   a0=257.31  -0.09 sin U2
+   d0=-15.18  +0.09 cos U2
+   W=130.35   -956.4068150d   -0.03 sin U2
+
+Obj: 7008  # VIII Bianca
+   a0=257.31  -0.16 sin U3
+   d0=-15.18  +0.16 cos U3
+   W=105.46   -828.3914760d   -0.04 sin U3
+
+Obj: 7009 # IX Cressida
+   a0=257.31  -0.04 sin U4
+   d0=-15.18  +0.04 cos U4
+   W=59.16   -776.5816320d   -0.01 sin U4
+
+Obj: 7010 # X Desdemona
+   a0=257.31  -0.17 sin U5
+   d0=-15.18  +0.16 cos U5
+   W=95.08   -760.0531690d   -0.04 sin U5
+
+Obj: 7011 # XI Juliet
+   a0=257.31  -0.06 sin U6
+   d0=-15.18  +0.06 cos U6
+   W=302.56   -730.1253660d   -0.02 sin U6
+
+Obj: 7012 # XII Portia
+   a0=257.31  -0.09 sin U7
+   d0=-15.18  +0.09 cos U7
+   W=25.03   -701.4865870d   -0.02 sin U7
+
+Obj: 7013 # XIII Rosalind
+   a0=257.31  -0.29 sin U8
+   d0=-15.18  +0.28 cos U8
+   W=314.90   -644.6311260d   -0.08 sin U8
+
+Obj: 7014 # XIV Belinda
+   a0=257.31  -0.03 sin U9
+   d0=-15.18  +0.03 cos U9
+   W=297.46   -577.3628170d   -0.01 sin U9
+
+Obj: 7015 # XV Puck
+   a0=257.31  -0.33 sin U10
+   d0=-15.18  +0.31 cos U10
+   W=91.24   -472.5450690d   -0.09 sin U10
+
+Obj: 7001 # I Ariel
+   a0=257.43  +0.29 sin U13
+   d0=-15.10  +0.28 cos U13
+   W=156.22   -142.8356681d   +0.05 sin U12   +0.08 sin U13
+
+Obj: 7002 # II Umbriel
+   a0=257.43  +0.21 sin U14
+   d0=-15.10  +0.20 cos U14
+   W=108.05   -86.8688923d   -0.09 sin U12   +0.06 sin U14
+
+Obj: 7003 # III Titania
+   a0=257.43  +0.29 sin U15
+   d0=-15.10  +0.28 cos U15
+   W=77.74   -41.3514316d   +0.08 sin U15
+
+Obj: 7004 # IV Oberon
+   a0=257.43 +0.16 sin U16
+   d0=-15.10 +0.16 cos U16
+   W=6.77 -26.7394932d +0.04 sin U16
+
+Obj: 7005 # V Miranda
+   a0=257.43 +4.41 sin U11 -0.04 sin 2U11
+   d0=-15.08 +4.25 cos U11 -0.02 cos 2U11
+   W=30.70 -254.6906892d -1.27 sin U12 +0.15 sin 2U12 +1.15 sin U11 -0.09 sin 2U11
+
+Planet: N
+  N0=357.85+52.316T
+  N1=323.92+62606.6T
+  N2=220.51+55064.2T
+  N3=354.27+46564.5T
+  N4=75.31+26109.4T
+  N5=35.36+14325.4T
+  N6=142.61+2824.6T
+  N7=177.85+52.316T
+
+Obj: 8 # Neptune
+   a0= 299.36+0.70 sin N0
+   d0= 43.46-0.51 cos N0
+   W= 249.978 + 541.1397757d -0.48 sin N0   # (d) (2018 Jul 17)
+
+Obj: 8003 # III Naiad
+   a0=299.36 +0.70 sin N0 -6.49 sin N1 +0.25 sin 2N1
+   d0=43.36 -0.51 cos N0 -4.75 cos 2N1 +0.09 cos 2N1
+   W=254.06 +1222.8441209d -0.48 sin N0 +4.40 sin N1 -0.27 sin 2N1
+
+Obj: 8004 # IV Thalassa
+   a0=299.36 +0.70 sin N0 -0.28 sin N2
+   d0=43.45 -0.51 cos N0 -0.21 cos N2
+   W=102.06 +1155.7555612d -0.48 sin N0 +0.19 sin N2
+
+Obj: 8005 # V Despina
+   a0=299.36 +0.70 sin N0 -0.09 sin N3
+   d0=43.45 -0.51 cos N0 -0.07 cos N3
+   W=306.51 +1075.7341562d -0.49 sin N0 +0.06 sin N3
+
+Obj: 8006 # VI Galatea
+   a0=299.36 +0.70 sin N0 -0.07 sin N4
+   d0=43.43 -0.51 cos N0 -0.05 cos N4
+   W=258.09 +839.6597686d -0.48 sin N0 +0.05 sin N4
+
+Obj: 8007 # VII Larissa
+   a0=299.36 +0.70 sin N0 -0.27 sin N5
+   d0=43.41 -0.51 cos N0 -0.20 cos N5
+   W=179.41 +649.0534470d -0.48 sin N0 +0.19 sin N5
+
+Obj: 8008 # VIII Proteus
+   a0=299.27 +0.70 sin N0 -0.05 sin N6
+   d0=42.91 -0.51 cos N0 -0.04 cos N6
+   W=93.38 +320.7654228d -0.48 sin N0 +0.04 sin N6
+
+Obj: 8001 # I Triton
+   a0=299.36 -32.35 sin N7 -6.28 sin 2N7 -2.08 sin 3N7 -0.74 sin 4N7 -0.28 sin 5N7 -0.11 sin 6N7 -0.07 sin 7N7 -0.02 sin 8N7 -0.01 sin 9N7
+   d0=41.17 +22.55 cos N7 +2.10 cos 2N7 +0.55 cos 3N7 +0.16 cos 4N7 +0.05 cos 5N7 +0.02 cos 6N7 +0.01 cos 7N7
+   W=296.53 -61.2572637d +22.25 sin N7 +6.73 sin 2N7 +2.05 sin 3N7 +0.74 sin 4N7 +0.28 sin 5N7 +0.11 sin 6N7 +0.05 sin 7N7 +0.02 sin 8N7 +0.01 sin 9N7
+
+Planet: P
+
+Obj: 9001 # Charon/Pluto I
+   a0= 132.993
+   d0= -6.163
+   W=122.695 +56.3625225d
+
+Obj: 9002 # Nix/Pluto II = S/2005 P 2      (n)
+   a0= 132.993
+   d0= -6.163
+   W=272.24 +14.483934d
+
+Obj: 9003 # Hydra/Pluto III = S/2005 P 1   (n)
+   a0= 132.993
+   d0= -6.163
+   W=57.19 +9.422837d
+
+Obj: 9004 # Kerberos/Pluto IV = S/2011 (134340) 1 (n)
+   a0= 132.993
+   d0= -6.163
+   W=90.19 +11.1913026d
+
+Obj: 9005 # Styx/Pluto V = S/2012 (134340) 1      (n)
+   a0= 132.993
+   d0= -6.163
+   W=11.7 +17.8551357d
+
+Obj: -1      # Ceres  (r), (t)
+   a0=291.42763
+   d0=66.76033
+   W=170.309 +952.1532635d
+
+Obj: -2     # Pallas
+   a0= 33
+   d0= -3
+   W= 38 + 1105.8036d
+
+Obj: -4     # Vesta
+   a=309.031   # +/- 0.01   (p)
+   d=42.235    # +/- 0.01
+   W=285.39+1617.3329428d
+
+Obj: -21     # Lutetia
+   a0=52   # +/- 5
+   d0=12   # +/- 5
+   W=94 + 1057.7515d
+
+Obj: -52      # Europa
+   a0=257
+   d0=12   # no uncertainties given
+   W=55 + 1534.6472187d
+
+Obj: -243     # Ida
+   a0=168.76
+   d0=-87.12
+   W=274.05 + 1864.6280070d  (2018 Jul 17)
+
+Obj: -433    # Eros
+   a0=11.35    # +/- 0.02
+   d0=17.22    # +/- 0.02
+   W=326.07+1639.38864745d
+
+Obj: -511    # Davida
+   a0=297
+   d0=5
+   W=268.1 +1684.4193549d
+
+Obj: -951    # (951) Gaspra
+   a0 = 9.47
+   d0 = 26.70
+   W = 83.67 + 1226.9114850d
+
+Obj: -2867   # (2867) Šteins
+   a0 = 90
+   d0 =-62
+   W = 93.94 + 1428.852332d
+
+Obj: -25143  # (25143) Itokawa
+   a0 = 90.53
+   d0 =-66.30
+   W = 0+ 712.143d      # No central meridian defined yet
+
+END      (This is the for-real end!  Everything after this is a comment.)
+
+(a) The 182 meridian is defined by the crater Cilix.
+(b) The 128 meridian is defined by the crater Anat.
+(c) The 326 meridian is defined by the crater Saga.
+(d) The 162 meridian is defined by the crater Palomides.
+(e) The 5 meridian is defined by the crater Salih.
+(f) The 299 meridian is defined by the crater Arete.
+(g) The 63 meridian is defined by the crater Palinurus.
+(h) The 340 meridian is defined by the crater Tore.
+(i) The 276 meridian is defined by the crater Almeric.
+(j) These equations are correct for the period of the Voyager encounters.
+   Because of precession they may not be accurate at other time periods.
+(k) "System II" for Venus is a proposed system for tracking clouds.
+   See 8 Jan 2008 comments below.
+(l) Mercury updated from this comment at
+http://ssd.jpl.nasa.gov/?horizons_news :
+
+Feb 07, 2008:
+    -- The Mercury rotation model was updated based on radar observations
+        reported by Margot et al., Science 316, 2007, and a 2007-Dec-2 memo:
+
+         alpha-0 (RA J2000) = 281.0097 -0.0328T
+         delta-0 (DEC J200) = 61.4143 - 0.0049T
+                          W = 329.548 + 6.1385025d
+
+       ... where T is time in Julian centuries (36525 days) from J2000 epoch,
+       and d is interval in days (86400 SI seconds) from J2000 epoch, with the
+       J2000 epoch being JD 2451545.0 Coordinate Time (2000-Jan-1.5)
+
+(m) COSPAR data for the earth is provided for reference only.  At least in
+  my code,  the earth's orientation is actually computed using the IAU
+  precession and nutation models (see 'precess.cpp').  WGCCRE dropped this
+  model in their 2015 report.
+(n) As far as I know,  there is no "official" rotation model for Nix and
+   Hydra.  I took the polar axis for Pluto and Charon,  then came up with
+   values for the constant and linear term in W that produced near-zero
+   longitudes facing Pluto over the 2000-2020 period (the time span for
+   which I have Nix and Hydra ephemerides).
+      Once the COSPAR folks come up with official values,  I expect they
+   will be close to (but not exactly equal to) the results I've given.
+   Note: on 2015 May 12,  I added similarly "unofficial" rotation models
+   for Pluto IV = Kerberos and Pluto V = Styx.
+(o) (2013 May 17) Mercury updated to IAU 2009 version,  with trig terms.
+(p) (2013 Nov 26) Updated Vesta to use Dawn-based spin axis.  The COSPAR
+   axes,  which as you can see have much higher sigmas,  are :
+   a=305.8    # +/- 3.1
+   d=41.4     # +/- 1.5
+   Note that W is unchanged here,  though I'm sure Dawn got a better
+   rotation period and fiddled with the zero point a little.
+(q) (2015 May 6) Follow-up to the above:  Dawn _did_ get a better rotation
+   period and offset.  I modified Vesta's W to use the value from
+   http://astropedia.astrogeology.usgs.gov/download/Docs/WGCCRE/IAU-WGCCRE-Coordinate-System-for-Vesta.pdf
+   (pole RA/dec didn't change).
+(r) (2016 Oct 2) Updated Ceres to use Dawn measurements from
+   https://naif.jpl.nasa.gov/pub/naif/DAWN/kernels/pck/dawn_ceres_v05.tpc
+(s) (2018 Mar 26) Updated Phobos & Deimos to use
+   ftp://ssd.jpl.nasa.gov/pub/eph/satellites/orientation/iom.392R-17-004.pdf
+   This has a small effect on Deimos and a larger one on Phobos,  partly
+   because the sign for the sin(M1) term was reversed.
+(t) Ceres now uses v06 from Dawn.  See 2020 Oct 19 "news item" at
+   https://ssd.jpl.nasa.gov/?horizons_news .
+
+Satellites for which no suitable data are yet available have been omitted
+from this table. Nereid is not included in this table because it is not in
+synchronous rotation.
+
+Errata to the published version:
+
+In Table 2, Page 87, of the 2000 report (Seidelmann, et al., 2002): For the
+Moon, for "0.1204 E2", read "0.1204 sin E2".
+
+DESCRIPTION OF THIS FILE
+
+   Comments can be added freely within the file.  However,  if you put
+them after the actual data,  the code doesn't have to dig through all
+this text.  That speeds things up very slightly.
+
+   The file is processed by 'cospar.cpp',  which should give insight as
+to what's going on here.
+
+   Some of my software used a numbering system in which sun=0,  Mer-Plu
+=1...9,  Moon=10,  Io...Callisto=11..14,  and so on,  with the numbering
+reflecting the order in which objects were added.  Now,  I (mostly) use
+the JPL/IAU scheme,  in which numbered satellites have four digits,  the
+first specifying the planet,  the remaining three the object number.  So
+5014 = Jupiter XIV,  803 = Neptune III.  For backward compatibility,  a
+"remap" table is given at the top;  some of my software uses this to
+convert the old numbers to the JPL/IAU style.
+
+   All lines are considered comments until a line starting with 'Planet'
+or 'Obj' is encountered.  After a 'Planet' line,  the code starts looking
+for angular coefficients;  after an 'Obj' line,  it starts to look for
+lines describing a0, d0, and W.  Data are from
+
+http://astrogeology.usgs.gov/Projects/WGCCRE/
+
+   with corrections/updates as described below.  Asteroid rotation data is
+given at the above sites,  too,  but that will have to wait for another day.
+
+   (8 Jan 2008) Added the proposed coordinate system for cloud observations of
+Venus made in UV.  This system has a rotational period of exactly 4.2 days,
+and coincides with the "usual" system at J2000. Nothing official yet, and it
+means several changes will eventually be needed in Guide:  to display both
+systems in 'more info',  to ensure that features and radar-based bitmaps are
+shown in System I while clouds are shown in System II,  and probably more.
+
+   (8 Feb 2008) Altered Mercury rotation _very_ slightly,  as described
+at comment (l) above.
+
+   (29 Jan 2010) Added data for Nix and Hydra.  See comment (n) above.
+
+   (2 Feb 2010) Revised the Sun,  Jupiter, Pluto,  Charon,  and Phoebe in
+accordance with the 'report of the IAU/IAG Working Group on cartographic
+coordinates and rotational elements: 2006' (Celestial Mech Dyn Astr (2007)
+98:155-180.)  Also revised a0 and d0 for Nix and Hydra to match the new
+Pluto/Charon values.
+
+   The 2006 report modified Jupiter's pole position,  both constant and
+linear terms,  and also has some periodic terms.  They don't add up
+to more than .003 degree,  so for the nonce,  I've not added them:
+
+a0 += .000117 sin Ja + .000938 sin Jb + .001432 sin Jc + .000030 sin Jd
+         + .002150 sin Je
+d0 += .000050 cos Ja + .000404 cos Jb + .000617 cos Jc - .000013 sin Jd
+         + .000926 cos Je
+
+   where Ja = 99.360714 + .4850.4046T, Jb = 175.895369 + 1191.9605T,
+         Jc = 300.323162 + 252.5475T, Jd = 114.012305 + 6070.2476T,
+         Je = 49.511251 + 64.3000T
+
+   Note,  though,  that these _could_ be added in the same manner in which
+periodic terms have been added for Neptune.
+
+   (23 May 2011) After comments from Jean-Claude Pelle,  cleaned up some
+spurious text that didn't interfere with my code,  but _would_ confuse
+other code and really shouldn't have been there.  Un-commented data for
+five Saturnian satellites Helene,  Calypso,  Telesto,  Epimetheus, Janus.
+
+   Also,  I had some hard-wired code that allowed for multiple systems
+("system II and III") longitudes only for Jupiter and Saturn.  This is now
+fixed in 'cospar.cpp',  and requires that the 'W=' line _must_ follow the
+'W2=' and 'W3=' lines.  (The idea is that if you ask for a system II result
+for an object that has no W2 line,  the code will eventually trickle down
+to the W= line and use that instead.)
+
+   Also switched from Guide's semi-random numbering of objects to the JPL
+one,  wherein numbered satellites have four digits:  one giving the planet,
+the remaining three the IAU numbering.  (With remapping given at the top so
+that the "old" Guide-style numbering can be used.)
+
+   (2013 May 17) Modified Mercury to use the IAU 2009 model,  complete with
+rotation terms;  Titan to use IAU 2009,  i.e.,  no more trig terms.
+
+   (2013 Jul 13) Added COSPAR 2009 data for minor/"dwarf" planets from
+
+http://astropedia.astrogeology.usgs.gov/download/Docs/WGCCRE/WGCCRE2009reprint.pdf
+
+   (2013 Aug 26) Because Pluto is now a "dwarf planet",  the poles of it
+and its satellites are flipped and W increases with time rather than
+decreasing.  I should have made those changes when switching to the 2009
+rotation models,  but failed to do so.  This is now corrected (including
+for Hydra and Nix,  which have unofficial models as described above...
+and so do Kerberos and Styx,  as of 2015 May.)  See the 2011 erratum to
+the COSPAR 2009 data at
+
+http://astropedia.astrogeology.usgs.gov/download/Docs/WGCCRE/WGCCRE-Erratum-2011reprint.pdf
+
+for details.
+
+   (2015 Nov 17) The 2009 WGCCRE report mentions that the change in the
+System III rotation rate,  to 870.5366420 degrees/day,  had some problems.
+Further determinations didn't quite match up with it,  and they decided to
+go back to the old value of 870.536 degrees/day.  That change has now been
+made in this file.  Also found that some of the trig terms for Mercury were
+botched (used 'M' instead of 'H'),  resulting in not getting any value at all.
+
+   (2018 Jul 17) Corrections based on the WGCCRE 2015 report,  at
+
+https://astrogeology.usgs.gov/search/map/Docs/WGCCRE/WGCCRE2015reprint
+
+   Mercury's rotation has the same general form as before,  but various
+coefficients have changed.  I caught and corrected a spurious extra term in
+W that caused a sub-arcsecond error.
+
+   Mars now includes five trig terms for the pole position and
+six for W.  One term for each has considerable amplitude;  the others are
+below an arcsecond and are omitted here.  Small changes made for Phobos and
+Deimos have been incorporated,  again with some lesser terms dropped. The
+quadratic bit for M5 is dropped,  mostly because I've no straightforward
+way of including it anyway (and it's small).
+
+   W for Neptune has changed,  with the rotation rate increasing from 536.3128
+degrees/day to 541.1397757 degrees/day,  based on observations of two unusually
+stable features : https://doi.org/10.1016/j.icarus.2011.05.013
+
+   (243) Ida was far off in previous WGCCRE reports (dec for pole off by 90
+degrees!).  It should now be correct.
+
+   WGCCRE has dropped orientation models for the earth and moon.  I've not
+used the former for some time (the IAU precession/nutation model is much more
+accurate).  I do still use the latter in situations where the accurate
+alternative (orientations from DE-4xx) would be overkill.
+
