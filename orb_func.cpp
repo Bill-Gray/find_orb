@@ -2553,21 +2553,14 @@ static double reweight_for_overobserving( const OBSERVE FAR *obs,
             const unsigned n_obs, const unsigned idx)
 {
    double rval;
+   const double Nmax = (double)overobserving_ceiling;
    const double n_nearby = n_nearby_obs( obs, n_obs, idx,
                                    overobserving_time_span);
 
    if( !strcmp( obs->mpc_code, "258"))    /* Gaia comes already corrected */
       return( 1.);                        /* for over-observing           */
-#ifdef PREVIOUS_METHOD_SEE_ABOVE_COMMENTS
-   if( n_nearby > overobserving_ceiling)
-      rval = sqrt( (double)overobserving_ceiling / n_nearby);
-   else
-      rval = 1.;
-#else                  /* newer,  less ad hoc reweighting scheme */
-   const double Nmax = (double)overobserving_ceiling;
 
    rval = sqrt( Nmax / (n_nearby + Nmax - 1.));
-#endif
    return( rval);
 }
 
