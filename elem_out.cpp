@@ -461,6 +461,33 @@ double current_jd( void)
    return( jd);
 }
 
+/* I am not entirely sure of this,  but I gather that MPC defines an
+'opposition' to occur if 17 half-months have elapsed between consecutive
+observations.  The length of that can vary,  depending on the weirdnesses
+of the Gregorian calendar.  I'll just take it to be 237 days,  since
+that's a prime number and is "close enough". */
+
+const double opposition_time = 237.;
+
+bool opposition_break( const OBSERVE *obs)
+{
+
+   return( obs[1].jd - obs[0].jd > opposition_time);
+}
+
+static int _n_oppositions( const OBSERVE *obs, const int n)
+{
+   int i, j, rval = 1;
+
+   for( i = j = 0; i < n; i++)
+      if( obs[i].jd - obs[j].jd > opposition_time)
+         {
+         rval++;
+         j = i;
+         }
+   return( rval);
+}
+
 int n_clones_accepted = 0;
 
 static int elements_in_mpcorb_format( char *buff, const char *packed_desig,
@@ -2101,6 +2128,9 @@ int write_out_elements_to_file( const double *orbit,
          fprintf( ofile, "# MOIDs: Ju%10.6f Sa%10.6f Ur%10.6f Ne%10.6f\n",
                   moids[5], moids[6], moids[7], moids[8]);
          }
+
+      if( !planet_orbiting && _include_comment( "OPP"))
+         fprintf( ofile, "# %d oppositions\n", _n_oppositions( obs, n_obs));
 
       geocentric_score = geo_score( orbit, curr_epoch);
       if( geocentric_score > 0)
