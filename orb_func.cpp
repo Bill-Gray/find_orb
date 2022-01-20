@@ -2542,7 +2542,12 @@ is shown below in the PREVIOUS_METHOD_SEE_ABOVE_COMMENTS section.
    Since then,  I've revisited the question of what Nobs should be (number
 of observations that night?  Within four hours?  etc.) and have put the
 reweighting factor on a less ad hoc,  more solid mathematical foundation.
-See https://www.projectpluto.com/errors.htm for details.  */
+See https://www.projectpluto.com/errors.htm for details.
+
+   A further detail : every now and then,  we have two (sometimes more)
+observations from one observatory made at the same time,  but in different
+places.  Often, we can exclude one as "obviously wrong".  If we can't,
+all are included, but at sqrt(1/n_dups) of the usual weight.         */
 
 double overobserving_time_span = 0.;
 unsigned overobserving_ceiling = 4;
@@ -2553,6 +2558,7 @@ static double reweight_for_overobserving( const OBSERVE FAR *obs,
             const unsigned n_obs, const unsigned idx)
 {
    double rval;
+   unsigned i, n_dups = 1;
    const double Nmax = (double)overobserving_ceiling;
    const double n_nearby = n_nearby_obs( obs, n_obs, idx,
                                    overobserving_time_span);
@@ -2561,6 +2567,15 @@ static double reweight_for_overobserving( const OBSERVE FAR *obs,
       return( 1.);                        /* for over-observing           */
 
    rval = sqrt( Nmax / (n_nearby + Nmax - 1.));
+   for( i = idx; i && obs[i - 1].jd == obs[idx].jd; i--)
+      if( obs[i - 1].is_included && !strcmp( obs[i - 1].mpc_code, obs[idx].mpc_code))
+         n_dups++;
+   for( i = idx + 1; i < n_obs && obs[i].jd == obs[idx].jd; i++)
+      if( obs[i].is_included && !strcmp( obs[i].mpc_code, obs[idx].mpc_code))
+         n_dups++;
+   assert( n_dups > 0);
+   if( n_dups > 1)
+      rval /= sqrt( (double)n_dups);
    return( rval);
 }
 
