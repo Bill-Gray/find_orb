@@ -225,6 +225,7 @@ int find_worst_observation( const OBSERVE FAR *obs, const int n_obs);
 double calc_absolute_magnitude( OBSERVE FAR *obs, int n_obs);
 double compute_rms( const OBSERVE FAR *obs, const int n_obs);
 double compute_weighted_rms( const OBSERVE FAR *obs, const int n_obs, int *n_resids);
+bool opposition_break( const OBSERVE *obs);              /* elem_out.cpp */
 int herget_method( OBSERVE FAR *obs, int n_obs, double r1, double r2,
          double *orbit, double *d_r1, double *d_r2, const char *limited_orbit);
 int adjust_herget_results( OBSERVE FAR *obs, int n_obs, double *orbit);

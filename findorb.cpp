@@ -5883,6 +5883,28 @@ int main( int argc, const char **argv)
                      "Exclusion file of %d obs written",
                                      write_excluded_observations_file( obs, n_obs));
             break;
+         case CTL_UP:
+            if( curr_obs)
+               {
+               curr_obs--;
+               while( curr_obs && !opposition_break( obs + curr_obs - 1))
+                  curr_obs--;
+               single_obs_selected = true;
+               }
+            break;
+#ifdef CTL_DOWN        /* PDCurses uses this #define */
+         case CTL_DOWN:
+#else                  /* ncurses uses this #define */
+         case CTL_DN:
+#endif
+            if( curr_obs < n_obs - 1)
+               {
+               curr_obs++;
+               while( curr_obs < n_obs - 1 && !opposition_break( obs + curr_obs))
+                  curr_obs++;
+               single_obs_selected = true;
+               }
+            break;
          case 'j': case 'J':
          case ';': case '\'': case ']':
          case CTRL( 'E'): case CTRL( 'J'): case CTRL( 'L'):
@@ -5890,12 +5912,7 @@ int main( int argc, const char **argv)
          case CTRL( 'V'):
          case CTRL( '_'): case CTRL( ']'):
          case ALT_Y:
-         case CTL_UP: case CTL_LEFT: case CTL_RIGHT:
-#ifdef CTL_DOWN        /* PDCurses uses this #define */
-         case CTL_DOWN:
-#else                  /* ncurses uses this #define */
-         case CTL_DN:
-#endif
+         case CTL_LEFT: case CTL_RIGHT:
          case KEY_F( 13):        /* shift-f1 */
          case KEY_F( 14):        /* shift-f2 */
          case KEY_F( 15):        /* shift-f3 */
