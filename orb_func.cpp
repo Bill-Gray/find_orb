@@ -796,8 +796,8 @@ static void light_bending( const double *observer, double *result)
      /* "dir" is now a unit vector perpendicular to p,  aimed away */
      /* from the sun */
    phi1 = acose( dot_product( result, observer) / (rlen * olen));
-   phi2 = acose( -dot_product( p, observer) / (plen * olen));
-   bending = bend_factor * (tan( phi1 / 2.) - tan( phi2 / 2.));
+   phi2 = acose( dot_product( p, observer) / (plen * olen));
+   bending = bend_factor * (tan( phi2 / 2.) - tan( phi1 / 2.));
    bending *= plen;
    for( i = 0; i < 3; i++)
       result[i] += bending * dir[i];
