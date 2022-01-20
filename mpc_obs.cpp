@@ -3919,8 +3919,6 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
          if( toupper( rval[i].note2) != 'X' && toupper( rval[i - 1].note2) != 'X')
             if( !spacewatch_duplication( rval + i - 1))
                {
-               rval[i].is_included = 0;
-               rval[i].flags |= OBS_DONT_USE;
                comment_observation( rval + i, "Duplicate");
                if( rval[i].ra == rval[i - 1].ra
                         && rval[i].dec == rval[i - 1].dec
@@ -3930,8 +3928,6 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                   {
                   comment_observation( rval + i - 1, "Duplicate");
                   n_spurious_matches++;
-                  rval[i - 1].is_included = 0;
-                  rval[i - 1].flags |= OBS_DONT_USE;
                   }
                }
    if( n_spurious_matches)
