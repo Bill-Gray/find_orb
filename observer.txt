@@ -7,6 +7,7 @@
 ; a citation describing the honoree is usually included.
 ;
  Africano                                  <a href="https://catalina.lpl.arizona.edu/about/staff/brian-africano">Africano</a>
+ Bacci                                     <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=108205&amp;view=OPD">Bacci</a>
  Bamberger                                 <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=128345&amp;view=OPD">Bamberger</a>
  Bedient                                   <a href="http://www.ifa.hawaii.edu/tops/bedient.html">Bedient</a>
  Bauer                                     <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=19494&amp;view=OPD">Bauer</a>
@@ -33,9 +34,11 @@
  Cutri                                     <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=241529&amp;view=OPD">Cutri</a>
  Dailey                                    <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=249522&amp;view=OPD">Dailey</a>
  Delbo                                     <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=16250&amp;view=OPD">Delb&oacute;</a>
+ Demeautis                                 <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=14141&amp;view=OPD">Demeautis</a>
  Denisenko                                 <a href="https://en.wikipedia.org/wiki/Denis_Denisenko">Denisenko</a>
  Denneau                                   <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=12267&amp;view=OPD">Denneau</a>
  Ernst                                     <a href="http://www.starkenburg-sternwarte.de/asteroiden/namen/7686.htm">Ernst</a>
+ Fagioli                                   <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=27959&amp;view=OPD">Fagioli</a>
  Fitzsimmons                               <a href="https://alanfitzsimmons.wordpress.com/">Fitzsimmons</a>
  Flewelling                                <a href="https://twitter.com/heatherflew">Flewelling</a>
  F\"ohring                                 F&ouml;hring
@@ -65,6 +68,7 @@
  Hui                                       <a href="http://comethunter.lamost.org/">Hui</a>
  Hurtado                                   <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=362911&amp;view=OPD">Hurtado</a>
  Jahn                                      <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=10340&amp;view=OPD">Jahn</a>
+ N. James                                  <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=8914&amp;view=OPD">N. James</a>
  Jelinek                                   Jel&iacute;nek
  Kadota                                    <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=9751&amp;view=OPD">Kadota</a>
  Kavelaars                                 <a href="http://salish.dao.nrc.ca/~kavelaar/">Kavelaars</a>
@@ -146,6 +150,7 @@
  Stecklum                                  <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=69295&amp;view=OPD">Stecklum</a>
  Stoss                                     <a href="http://www.starkenburg-sternwarte.de/asteroiden/namen/7689.htm">Stoss</a>
  Tancredi                                  <a href="http://www.anii.org.uy/cvuy/SNI2008/Ciencias%20Naturales%20y%20Exactas/Ciencias%20F%C3%ADsicas/Gonzalo%20TANCREDI%20Machado.pdf">Tancredi</a>
+ Tesi                                      <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=15817&amp;view=OPD">Tesi</a>
  Testa                                     <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=11667&amp;view=OPD">Testa</a>
  Tholen                                    <a href="http://www.ifa.hawaii.edu/faculty/tholen/">Tholen</a>
  Ticha, J                                  <a href="https://www.klet.org/en/klenot-staff-members">Tich&aacute;, J</a>
