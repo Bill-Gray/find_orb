@@ -3459,7 +3459,7 @@ int ephemeris_in_a_file_from_mpc_code( const char *filename,
          ephem_option_t options, const unsigned n_objects)
 {
    double rho_cos_phi, rho_sin_phi, lon;
-   char note_text[100], buff[100];
+   char note_text[200], buff[100];
    int real_number_of_steps, rval;
    const int planet_no = get_observer_data( mpc_code, buff, &lon,
                                            &rho_cos_phi, &rho_sin_phi);
