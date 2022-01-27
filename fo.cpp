@@ -460,7 +460,7 @@ static const char *get_arg( const int argc, const char **argv, const int idx)
 
 int main( int argc, const char **argv)
 {
-   char tbuff[300], mpc_code[20];
+   char tbuff[300], mpc_code[200];
    char **summary_lines = NULL;
    const char *separate_residual_file_name = NULL;
    const char *mpec_path = NULL;
@@ -524,7 +524,9 @@ int main( int argc, const char **argv)
                }
                break;
             case 'C':
-               strlcpy_err( mpc_code, arg, sizeof( mpc_code));
+               if( *mpc_code)
+                  strlcat_err( mpc_code, " ", sizeof( mpc_code));
+               strlcat_err( mpc_code, arg, sizeof( mpc_code));
                break;
             case 'd':
                debug_level = atoi( arg);

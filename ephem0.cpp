@@ -3458,32 +3458,44 @@ int ephemeris_in_a_file_from_mpc_code( const char *filename,
          const int n_steps, const char *mpc_code,
          ephem_option_t options, const unsigned n_objects)
 {
-   double rho_cos_phi, rho_sin_phi, lon;
-   char note_text[200], buff[100];
-   int real_number_of_steps, rval;
-   const int planet_no = get_observer_data( mpc_code, buff, &lon,
-                                           &rho_cos_phi, &rho_sin_phi);
+   int rval = -1;
 
-   assert( strlen( mpc_code) >= 3);
-   strlcpy_error( ephem_mpc_code, mpc_code);
-   snprintf( note_text, sizeof( note_text),
-                    "(%s) %s", mpc_code, mpc_station_name( buff));
-   get_object_name( buff, obs->packed_id);
-   snprintf_append( note_text, sizeof( note_text), ": %s", buff);
-   get_scope_params( mpc_code, &exposure_config);
-   if( !strcmp( stepsize, "Obs"))
-      real_number_of_steps = n_obs;
-   else if( *stepsize == 't')
-      real_number_of_steps = get_ephem_times_from_file( stepsize + 1);
-   else
-      real_number_of_steps = n_steps;
-   mpc_code_for_ephems = mpc_code;
-   rval = ephemeris_in_a_file( filename, orbit, obs, n_obs, planet_no,
-               epoch_jd, jd_start, stepsize, lon, rho_cos_phi, rho_sin_phi,
-               real_number_of_steps,
-               note_text, options, n_objects);
-   mpc_code_for_ephems = "";
-   free_expcalc_config_t( &exposure_config);
+   while( *mpc_code)
+      {
+      double rho_cos_phi, rho_sin_phi, lon;
+      char note_text[200], buff[100];
+      int real_number_of_steps, i = 0, planet_no;
+
+      while( mpc_code[i] > ' ')
+         i++;
+      assert( i <= 7);      /* allows for '807-100' and such */
+      assert( i >= 3);
+      memcpy( ephem_mpc_code, mpc_code, i);
+      ephem_mpc_code[i] = '\0';
+      planet_no = get_observer_data( ephem_mpc_code, buff, &lon,
+                                              &rho_cos_phi, &rho_sin_phi);
+      mpc_code += i;
+      while( *mpc_code == ' ')
+         mpc_code++;
+      snprintf( note_text, sizeof( note_text),
+                       "(%s) %s", ephem_mpc_code, mpc_station_name( buff));
+      get_object_name( buff, obs->packed_id);
+      snprintf_append( note_text, sizeof( note_text), ": %s", buff);
+      get_scope_params( ephem_mpc_code, &exposure_config);
+      if( !strcmp( stepsize, "Obs"))
+         real_number_of_steps = n_obs;
+      else if( *stepsize == 't')
+         real_number_of_steps = get_ephem_times_from_file( stepsize + 1);
+      else
+         real_number_of_steps = n_steps;
+      mpc_code_for_ephems = ephem_mpc_code;
+      rval = ephemeris_in_a_file( filename, orbit, obs, n_obs, planet_no,
+                  epoch_jd, jd_start, stepsize, lon, rho_cos_phi, rho_sin_phi,
+                  real_number_of_steps,
+                  note_text, options, n_objects);
+      mpc_code_for_ephems = "";
+      free_expcalc_config_t( &exposure_config);
+      }
    return( rval);
 }
 
