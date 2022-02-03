@@ -40,7 +40,9 @@
 # numbers.  These six numbers are a state vector,  numerically integrated
 # using a simplified force model.  This is necessary for objects at L2 or
 # L1,  and sometimes for objects in high orbits where the SDP4/SGP4 model
-# fails.  I'll be posting source code for this.  But be aware:  it's my
+# fails.  Some documentation is in 'get_el.cpp' in the source code at
+# https://www.github.com/Bill-Gray/sat_code ; look for 'hex' in that file,
+# with the actual integration done in 'sdp4.cpp'.  But be aware:  it's my
 # own extension,  doesn't work with other code,  and is therefore used
 # only when necessary.
 #
