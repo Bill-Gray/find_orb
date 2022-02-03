@@ -3428,9 +3428,14 @@ static void get_scope_params( const char *mpc_code, expcalc_config_t *c)
       }
    if( scope_details == EXPCALC_NO_CONFIG_FOUND && *scope_json_file)
       {
-      ifile = fopen_ext( scope_json_file, "frb");
-      scope_details = find_expcalc_config_from_mpc_code( mpc_code, ifile, c);
-      fclose( ifile);
+      strcpy( filename, scope_json_file);
+      text_search_and_replace( filename, "%c", mpc_code);
+      ifile = fopen_ext( filename, "rb");
+      if( ifile)
+         {
+         scope_details = find_expcalc_config_from_mpc_code( mpc_code, ifile, c);
+         fclose( ifile);
+         }
       }
    if( scope_details == EXPCALC_NO_CONFIG_FOUND)
       {

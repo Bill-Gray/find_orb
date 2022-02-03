@@ -702,6 +702,7 @@ int get_observer_data( const char FAR *mpc_code, char *buff,
    size_t i;
    const char *override_observatory_name = NULL;
    double lat0 = 0., lon0 = 0., alt0 = 0.;
+   char temp_code[4];
 
    if( !mpc_code)    /* freeing up resources */
       {
@@ -711,6 +712,13 @@ int get_observer_data( const char FAR *mpc_code, char *buff,
       n_stations = 0;
       xref_designation( NULL);
       return( 0);
+      }
+
+   if( strlen( mpc_code) > 6 && mpc_code[3] == '-')
+      {        /* CSS-style extended codes,  such as 807-100 or 807-061a */
+      memcpy( temp_code, mpc_code, 3);
+      temp_code[3] = '\0';
+      mpc_code = temp_code;
       }
 
    if( !n_stations)
