@@ -36,6 +36,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "lunar.h"
 #include "monte0.h"     /* for put_double_in_buff() proto */
 #include "showelem.h"
+#include "stringex.h"
 
 #ifndef _WIN32
 #include <fcntl.h>
@@ -64,28 +65,10 @@ static const char *_extras_filename = "hints.txt";
 extern int available_sigmas;
 extern double optical_albedo;
 
-#ifdef _MSC_VER   /* MSVC/C++ lacks snprintf.  See 'ephem0.cpp' for details. */
-int snprintf( char *string, const size_t max_len, const char *format, ...);
-#endif
-// void elements_in_tle_format( char *buff, const ELEMENTS *elem);
-int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
-                                   const char *format, ...)
-#ifdef __GNUC__
-         __attribute__ (( format( printf, 3, 4)))
-#endif
-;
-
-int snprintf_err( char *string, const size_t max_len,      /* miscell.cpp */
-                                   const char *format, ...)
-#ifdef __GNUC__
-         __attribute__ (( format( printf, 3, 4)))
-#endif
-;
 #ifdef NOT_CURRENTLY_IN_USE
 #define ssnprintf_append( obuff, ...) snprintf_append( obuff, sizeof( obuff), __VA_ARGS__)
 #define ssnprintf( obuff, ...) snprintf( obuff, sizeof( obuff), __VA_ARGS__)
 #endif
-size_t strlcat_err( char *dst, const char *src, size_t dsize); /* miscell.c */
 int store_defaults( const ephem_option_t ephemeris_output_options,
          const int element_format, const int element_precision,
          const double max_residual_for_filtering,
