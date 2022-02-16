@@ -577,6 +577,16 @@ char *iso_time( char *buff, const double jd, const int precision)
    return( buff);
 }
 
+/* For linkages,  we're only looking at the provisional or temporary
+designation,  the last seven bytes in the twelve-byte packed designation. */
+
+static int _unpack_desig_for_linkage( const char *packed_id, char *reduced)
+{
+   strlcpy_err( reduced, packed_id, 13);
+   memset( reduced, ' ', 5);
+   return( unpack_mpc_desig( NULL, reduced));
+}
+
 /* This is ludicrously high,  but let's say that we'll never
 report a linkage between 50 or more tracklets at once. */
 
@@ -586,16 +596,16 @@ static int make_linkage_json( const int n_obs, const OBSERVE *obs, const ELEMENT
 {
    int i, j, n_ids = 0, idx[MAX_LINKAGE_IDS], n_designated = 0;
    FILE *ofile, *ifile;
-   char buff[200];
+   char buff[200], packed_id2[13];
 
    for( i = 0; i < n_obs && n_ids < MAX_LINKAGE_IDS; i++)
       {
       j = 0;
-      while( j < n_ids && strcmp( obs[i].packed_id, obs[idx[j]].packed_id))
+      while( j < n_ids && memcmp( obs[i].packed_id + 5, obs[idx[j]].packed_id + 5, 7))
          j++;
-      if( j == n_ids)
+      if( j == n_ids && memcmp( obs[i].packed_id + 5, "       ", 7))
          {
-         const int desig_type = unpack_mpc_desig( NULL, obs[i].packed_id);
+         const int desig_type = _unpack_desig_for_linkage( obs[i].packed_id, packed_id2);
 
          if( desig_type != OBJ_DESIG_OTHER && desig_type != OBJ_DESIG_ARTSAT)
             n_designated++;
@@ -620,6 +630,9 @@ static int make_linkage_json( const int n_obs, const OBSERVE *obs, const ELEMENT
             full_ctime( tbuff, current_jd( ), FULL_CTIME_YMD);
             text_search_and_replace( buff, "%t", tbuff);
             }
+         tptr = strstr( buff, "%v");
+         if( tptr)
+            text_search_and_replace( buff, "%v", find_orb_version_jd( NULL));
          if( elem->central_obj == 3)
             text_search_and_replace( buff, "\"comment\": \"",
                      "\"comment\": \"Identified as artsat. ");
@@ -636,31 +649,34 @@ static int make_linkage_json( const int n_obs, const OBSERVE *obs, const ELEMENT
       fprintf( ofile, "      \"designations\": [\n");
       for( i = j = 0; i < n_ids; i++)
          {
-         const int desig_type = unpack_mpc_desig( NULL, obs[idx[i]].packed_id);
+         const int desig_type = _unpack_desig_for_linkage( obs[idx[i]].packed_id, packed_id2);
 
          if( desig_type != OBJ_DESIG_OTHER && desig_type != OBJ_DESIG_ARTSAT)
             {
-            strcpy( buff, obs[idx[i]].packed_id);
+            strcpy( buff, packed_id2);
             text_search_and_replace( buff, " ", "");
             j++;
             fprintf( ofile, "        \"%s\"%s\n", buff, (j == n_designated ? "" : ","));
             }
          }
-      fprintf( ofile, "      ],\n");
+      if( n_ids == n_designated)
+         fprintf( ofile, "      ]\n");
+      else
+         fprintf( ofile, "      ],\n");
       }
    if( n_ids != n_designated)
       {
       fprintf( ofile, "      \"trksubs\": [\n");
       for( i = j = 0; i < n_ids; i++)
          {
-         const int desig_type = unpack_mpc_desig( NULL, obs[idx[i]].packed_id);
+         const int desig_type = _unpack_desig_for_linkage( obs[idx[i]].packed_id, packed_id2);
 
          if( desig_type == OBJ_DESIG_OTHER || desig_type == OBJ_DESIG_ARTSAT)
             {
             const double obs_utc_jd = obs[idx[i]].jd
                         - td_minus_utc( obs[idx[i]].jd) / seconds_per_day;
 
-            strcpy( buff, obs[idx[i]].packed_id);
+            strcpy( buff, packed_id2);
             text_search_and_replace( buff, " ", "");
             j++;
             fprintf( ofile, "        [\n");
