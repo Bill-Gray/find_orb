@@ -58,7 +58,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #define LIGHT_YEAR_IN_KM    (365.25 * seconds_per_day * SPEED_OF_LIGHT)
 
 int generic_message_box( const char *message, const char *box_type);
-int save_ephemeris_file( const char *filename);       /* ephem0.cpp */
 double centralize_ang( double ang);             /* elem_out.cpp */
 double vector_to_polar( double *lon, double *lat, const double *vector);
 char *fgets_trimmed( char *buff, size_t max_bytes, FILE *ifile); /*elem_out.c*/
@@ -3352,28 +3351,6 @@ int remove_rgb_code( char *buff)
    if( buff && sscanf( buff + 1, "%06x", &rval) == 1)
       memmove( buff, buff + 7, strlen( buff + 6));
    return( (int)rval);
-}
-
-int save_ephemeris_file( const char *filename)
-{
-   int rval = -1;
-   char buff[400];
-   FILE *ifile = fopen_ext( get_file_name( buff, ephemeris_filename),
-               is_default_ephem ? "tcr" : "r");
-
-   if( ifile)
-      {
-      FILE *ofile = fopen_ext( filename, "fw");
-
-      while( fgets( buff, sizeof( buff), ifile))
-         {
-         remove_rgb_code( buff);
-         fputs( buff, ofile);
-         }
-      fclose( ofile);
-      rval = 0;
-      }
-   return( rval);
 }
 
 /* "is_topocentric_mpc_code( )" is taken to mean "can you compute alt/az
