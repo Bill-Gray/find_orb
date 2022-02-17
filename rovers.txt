@@ -84,10 +84,19 @@ Brb !   5.896093     +43.155552      240       Barbeau
    When 2008 TC3 impacted the earth on 7 Oct 2008,  I added the impact point
    as an "observatory" so I could get impact-centered ephemerides easily.
    Similarly for the 2014 AA estimated impact coordinates,  100 km above
-   the Atlantic Ocean.
+   the Atlantic Ocean,  and various other impact points.
 
 Sud !  33.11952      +20.59777       10        Sudan impact site
 Atl ! -43.2          +12.5       100000        2014 AA impact location
+C5i !+233.51049    +05.19390          10   @10 Chang'e 5-T1 stage impact point
+LCO ! 311.75834      -84.56139        10   @10 LCROSS impact site
+WT1 !  80.9004       +05.5488          0       WT1190F nominal impact point
+
+   Shortly after the Chelyabinsk meteor impacted,  I computed a (_very) rough
+   orbit based on the object coming in ten km above Chelyabinsk at 17.3 km/s
+   from azimuth 97,  alt +18.  The following 'Che' code helped :
+
+Che !  61.42         +55.1528      10000       Chelyabinsk meteor
 
    Bowdoinham,  Maine,  my home town in the northeastern United States,
    added so I could get topocentric ephemerides readily :
@@ -95,10 +104,8 @@ Atl ! -43.2          +12.5       100000        2014 AA impact location
 Bow ! -69.9          +44.01         100        Bowdoinham
 
     The centers of the Sun,  moon,  and planets are treated as 'rovers'.
-    (You'll see below Spirit and Opportunity set up as 'rovers' on Mars,
-    plus one for the point of the LCROSS impact so that I could compute
-    ephems from that viewpoint,  showing the distance dwindling to zero at
-    the time of impact.)
+    (You'll see below Spirit,  Opportunity,  and various other spacecraft
+    set up as 'rovers' on Mars.)
 
 Bar !   0.0000       0.00000   +0.00000    @12 SS Barycenter
 Sun !   0.0000       0.00000   +0.00000    @0  Sun
@@ -136,9 +143,20 @@ SJ3 !   0.0000       0.00000   +0.00 @90000053 Sun-Jupiter L3
 SJ4 !   0.0000       0.00000   +0.00 @90000054 Sun-Jupiter L4
 SJ5 !   0.0000       0.00000   +0.00 @90000055 Sun-Jupiter L5
 
-Luc !   0.0000       0.00000   +0.00000    @0  Lucy
-MEx !   0.0000       0.00000   +0.00000    @4  Mars Express
-LCO ! 311.75834      -84.56139        10   @10 LCROSS impact site
+   Note that ephems generated from these spacecraft require auxiliary
+   files saying where the spacecraft were at a given time.  I don't
+   distribute those files by default,  because (a) some of them are
+   large and (b) you can only go just so far into the future before
+   they may not be entirely accurate.  Should you want ephems for
+   objects as seen from these spacecraft,  or any other spacecraft
+   listed on JPL's Horizons system,  contact me.
+
+Luc !   0.0000       0.00000   +0.00000    @-2 Lucy
+SoO !   0.0000       0.00000   +0.00000    @-2 Solar Orbiter
+PSP !   0.0000       0.00000   +0.00000    @-2 Parker Space Probe
+Cas !   0.0000       0.00000   +0.00000    @-2 Cassini
+JWT !   0.0000       0.00000   +0.00000    @-2 James Webb Space Telescope
+MEx !   0.0000       0.00000   +0.00000    @-2 Mars Express
 
 Met !   7.212778     +51.520802       54       Bernd Brinkmann meteor site
 JSt !   8.32         +52.02          300       Joerg Strunk meteor site
@@ -254,14 +272,6 @@ Zhu ! 109.9249       +25.0644          0   @4  Zhurong landing site
    In some cases,  viewpoints from the Moon may be useful.
 Ch4 ! 177.589        -45.457           0   @10 Chang'e 4 lander
 Ch3 ! -19.5116       +44.1214          0   @10 Chang'e 3 lander
-
-   Shortly after the Chelyabinsk meteor impacted,  I computed a (_very) rough
-   orbit based on the object coming in ten km above Chelyabinsk at 17.3 km/s
-   from azimuth 97,  alt +18.  The following 'Che' code helped :
-
-Che !  61.42         +55.1528      10000       Chelyabinsk meteor
-
-WT1 !  80.9004       +05.5488          0       WT1190F nominal impact point
 
 LNA ! -45.896527     -22.01097      1000       LNA (Laboratorio Nacional de Astrofisica)
 
@@ -1383,3 +1393,5 @@ L78 !+014.780211   +40.6826087        134.     San Marco Observatory, Salerno
    improvement, but may be changed based on further info.
 
 251 !-066.7527     +18.3442           450.557  Arecibo
+
+UAZ !-110.947361   +32.232722         100.000  University of Arizona 24"
