@@ -1837,7 +1837,7 @@ int write_out_elements_to_file( const double *orbit,
                text_search_and_replace( buff, "TT", sigma_buff);
                }
 
-         if( n_extra_params >= 2 && n_extra_params <= 4)
+         if( (n_extra_params >= 2 && n_extra_params <= 4) || force_model == FORCE_MODEL_YARKO_A2)
             {
             char tbuff0[80], sig_name[20];
             int j = 0;
@@ -1860,7 +1860,9 @@ int write_out_elements_to_file( const double *orbit,
                   snprintf_append( buff, sizeof( buff), "DT: %s", tbuff0);
                else
                   {
-                  snprintf_append( buff, sizeof( buff), "A%d: %s", j + 1, tbuff0);
+                  const int n_to_use = (force_model == FORCE_MODEL_YARKO_A2 ? 2 : j + 1);
+
+                  snprintf_append( buff, sizeof( buff), "A%d: %s", n_to_use, tbuff0);
                   if( j == n_extra_params - 1 || j == 2)
                      {
                      strcat( tt_ptr, " AU/day^2");
@@ -1888,7 +1890,7 @@ int write_out_elements_to_file( const double *orbit,
          int j;
          const double SRP1AU = 2.3e-7;
 
-         if( n_extra_params == 1)
+         if( force_model == FORCE_MODEL_SRP)
             {
             sprintf( tt_ptr, "; AMR %.5g",
                                  solar_pressure[0] * SOLAR_GM / SRP1AU);

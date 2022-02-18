@@ -3249,24 +3249,24 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
 
 static int non_grav_menu( char *message_to_user)
 {
-   char buff[300];
+   char buff[400];
    int c;
    size_t i = 0;
    extern int force_model;
    static int models[] = { FORCE_MODEL_NO_NONGRAVS, FORCE_MODEL_SRP,
             FORCE_MODEL_SRP_TWO_PARAM, FORCE_MODEL_SRP_THREE_PARAM,
             FORCE_MODEL_COMET_TWO_PARAM, FORCE_MODEL_COMET_THREE_PARAM,
-            FORCE_MODEL_COMET_FOUR_PARAM };
+            FORCE_MODEL_COMET_FOUR_PARAM, FORCE_MODEL_YARKO_A2 };
    const size_t n_models = sizeof( models) / sizeof( models[0]);
 
    while( i < n_models && force_model != models[i])
       i++;
    assert( i < n_models);
-   strcpy( buff, get_find_orb_text( 2060));
+   strlcpy_error( buff, get_find_orb_text( 2060));
    _set_radio_button( buff, (int)i);
    help_file_name = "nongravs.txt";
    c = full_inquire( buff, NULL, 0, COLOR_MENU, -1, -1);
-   if( c >= KEY_F(1) && c <= KEY_F(7))
+   if( c >= KEY_F(1) && c <= KEY_F(8))
       c -= KEY_F( 1);
    else
       c -= '0';

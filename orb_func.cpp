@@ -3407,15 +3407,17 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
          sigma_squared = matrix[i + i * n_params];
          assert( sigma_squared >= 0.);
          sigma = sqrt( sigma_squared);
-         if( n_params == 7 && !asteroid_mass)
+         if( force_model == FORCE_MODEL_SRP)
             sigma *= SOLAR_GM / SRP1AU;
          put_double_in_buff( tbuff, sigma);
 
-         if( n_params == 7)
-            strcpy( title_text, (asteroid_mass ? "Sigma_mass" : "Sigma_AMR"));
+         if( force_model == FORCE_MODEL_SRP)
+            strcpy( title_text, "Sigma_AMR");
+         else if( asteroid_mass)
+            strcpy( title_text, "Sigma_mass");
          else
             {           /* comet A1, A2, maybe A3 included */
-            assert( n_params >= 8);
+            assert( n_params >= 7);
             sprintf( title_text, "Sigma_A%d", i - 5);
             }
          fprintf( ofile, "\n%s: %s", title_text, tbuff);

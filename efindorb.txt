@@ -352,6 +352,7 @@
 2060    4 ( ) Comet model (A1 and A2)
 2060    5 ( ) Comet model (A1, A2, A3)
 2060    6 ( ) Comet model (A1, A2, A3, DT)
+2060    7 ( ) Yarkovsky (A2-only)
 2060    Cancel
 
 2062    0 ( ) Resids in RA/dec arcsec

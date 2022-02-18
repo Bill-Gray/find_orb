@@ -842,7 +842,7 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
    double lunar_loc[3], jupiter_loc[3], saturn_loc[3];
    ldouble relativistic_accel[3];
    double fraction_illum = 1., ival_as_double[3];
-   extern int n_extra_params;
+   extern int n_extra_params, force_model;
    static const double sphere_of_influence_radius[10] = {
             10000., 0.00075, 0.00412, 0.00618,   /* sun, mer, ven, ear */
             0.00386, 0.32229, 0.36466, 0.34606,  /* mar, jup, sat, ura */
@@ -882,7 +882,7 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
       earth_lunar_posn( jd, earth_loc, NULL);
       fraction_illum = shadow_check( earth_loc, ival_as_double, EARTH_R);
       }
-   if( n_extra_params == 1)  /* straightforward radiation pressure */
+   if( force_model == FORCE_MODEL_SRP)
       {
       extern double solar_pressure[];
 
@@ -928,7 +928,7 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
             oval[i] += asteroid_accel[i];
          }
 
-   if( n_extra_params >= 2 && n_extra_params <= 4)
+   if( (n_extra_params >= 2 && n_extra_params <= 4) || force_model == FORCE_MODEL_YARKO_A2)
       {                  /* Marsden & Sekanina comet formula */
       extern double solar_pressure[];
       const ldouble lag = (n_extra_params == 4 ? solar_pressure[3] : 0.);
@@ -944,8 +944,12 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
       for( i = 0; i < 3; i++)
          transverse[i] -= ival[i] * dot_prod / r;
       dot_prod = vector3_lengthl( transverse);
-      for( i = 0; i < 3; i++)
-         oval[i + 3] += g * (solar_pressure[0] * ival[i] / r
+      if( force_model == FORCE_MODEL_YARKO_A2)
+         for( i = 0; i < 3; i++)
+            oval[i + 3] += g * (solar_pressure[0] * transverse[i] / dot_prod);
+      else
+         for( i = 0; i < 3; i++)
+            oval[i + 3] += g * (solar_pressure[0] * ival[i] / r
                      + solar_pressure[1] * transverse[i] / dot_prod);
       if( n_extra_params >= 3)
          {
