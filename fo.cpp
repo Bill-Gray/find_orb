@@ -98,6 +98,7 @@ const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 int load_environment_file( const char *filename);          /* mpc_obs.cpp */
 int reset_astrometry_filename( int *argc, const char **argv);
 uint64_t parse_bit_string( const char *istr);                /* miscell.cpp */
+char *real_packed_desig( char *obuff, const char *packed_id);     /* ephem0.cpp */
 FILE *open_json_file( char *filename, const char *env_ptr, const char *default_name,
                   const char *packed_desig, const char *permits); /* ephem0.cpp */
 
@@ -486,6 +487,7 @@ int main( int argc, const char **argv)
    bool drop_single_obs = true;
    const char *ephem_option_string = NULL;
    const char *computed_obs_filename = NULL;
+   const char *ephemeris_filename_template = NULL;
 #ifdef FORKING
    int child_status;
 #endif
@@ -543,12 +545,8 @@ int main( int argc, const char **argv)
                   }
                break;
             case 'e':
-               {
-               extern const char *ephemeris_filename;
-
-               ephemeris_filename = arg;
+               ephemeris_filename_template = arg;
                is_default_ephem = false;
-               }
                break;
             case 'E':
                ephem_option_string = arg;
@@ -937,7 +935,7 @@ int main( int argc, const char **argv)
                   while( *mpc_code_tptr)
                      {
                      int j = 0;
-                     char mpc_code[10];
+                     char mpc_code[10], ephem_filename[200];
 
                      while( j < 9 && *mpc_code_tptr > ' ' && *mpc_code_tptr != ',')
                         mpc_code[j++] = *mpc_code_tptr++;
@@ -945,6 +943,16 @@ int main( int argc, const char **argv)
                      mpc_code[j] = '\0';
                      while( *mpc_code_tptr == ' ' || *mpc_code_tptr == ',')
                         mpc_code_tptr++;
+                     if( ephemeris_filename_template)
+                        {
+                        char packed_desig[20];
+
+                        strlcpy_error( ephem_filename, ephemeris_filename_template);
+                        text_search_and_replace( ephem_filename, "%c", mpc_code);
+                        real_packed_desig( packed_desig, obs->packed_id);
+                        text_search_and_replace( ephem_filename, "%p", packed_desig);
+                        ephemeris_filename = ephem_filename;
+                        }
                      if( !ephemeris_in_a_file_from_mpc_code( ephemeris_filename,
                               orbits_to_use, obs, n_obs_actually_loaded,
                               curr_epoch, jd_start, ephemeris_step_size,
