@@ -460,7 +460,7 @@ static const char *get_arg( const int argc, const char **argv, const int idx)
 
 int main( int argc, const char **argv)
 {
-   char tbuff[300], mpc_code[200];
+   char tbuff[300], mpc_codes[200];
    char **summary_lines = NULL;
    const char *separate_residual_file_name = NULL;
    const char *mpec_path = NULL;
@@ -495,7 +495,7 @@ int main( int argc, const char **argv)
    else
       use_config_directory = false;
    ensure_config_directory_exists();
-   *mpc_code = '\0';
+   *mpc_codes = '\0';
    if( reset_astrometry_filename( &argc, argv))
       drop_single_obs = false;
 
@@ -524,9 +524,9 @@ int main( int argc, const char **argv)
                }
                break;
             case 'C':
-               if( *mpc_code)
-                  strlcat_err( mpc_code, " ", sizeof( mpc_code));
-               strlcat_err( mpc_code, arg, sizeof( mpc_code));
+               if( *mpc_codes)
+                  strlcat_err( mpc_codes, " ", sizeof( mpc_codes));
+               strlcat_err( mpc_codes, arg, sizeof( mpc_codes));
                break;
             case 'd':
                debug_level = atoi( arg);
@@ -893,6 +893,7 @@ int main( int argc, const char **argv)
                   int n_orbits_in_ephem = 1;
                   int n_ephemeris_steps = 50;
                   char ephemeris_step_size[80];
+                  char *mpc_code_tptr = mpc_codes;
                   extern const char *ephemeris_filename;
                   extern const char *residual_filename;
                   extern int available_sigmas;
@@ -915,9 +916,9 @@ int main( int argc, const char **argv)
                            sizeof( ephemeris_step_size),
                            "%f", ephem_end_jd - jd_start);
                      }
-                  if( !*mpc_code)
+                  if( !*mpc_codes)
                      sscanf( get_environment_ptr( "CONSOLE_OPTS"), "%9s",
-                                 mpc_code);
+                                 mpc_codes);
                   create_obs_file( obs, n_obs_actually_loaded, 0, 0);
                   ephemeris_mag_limit = 999.;
                   if( available_sigmas == COVARIANCE_AVAILABLE)
@@ -933,53 +934,65 @@ int main( int argc, const char **argv)
                      orbits_to_use = sr_orbits;
                      n_orbits_in_ephem = n_sr_orbits;
                      }
-                  if( !ephemeris_in_a_file_from_mpc_code( ephemeris_filename,
+                  while( *mpc_code_tptr)
+                     {
+                     int j = 0;
+                     char mpc_code[10];
+
+                     while( j < 9 && *mpc_code_tptr > ' ' && *mpc_code_tptr != ',')
+                        mpc_code[j++] = *mpc_code_tptr++;
+                     assert( j < 9);
+                     mpc_code[j] = '\0';
+                     while( *mpc_code_tptr == ' ' || *mpc_code_tptr == ',')
+                        mpc_code_tptr++;
+                     if( !ephemeris_in_a_file_from_mpc_code( ephemeris_filename,
                               orbits_to_use, obs, n_obs_actually_loaded,
                               curr_epoch, jd_start, ephemeris_step_size,
                               n_ephemeris_steps, mpc_code,
                               ephemeris_output_options,
                               n_orbits_in_ephem))
-                     {
-                     write_residuals_to_file( residual_filename, argv[1],
-                                    n_obs_actually_loaded, obs, RESIDUAL_FORMAT_SHORT);
-                     if( mpec_path)
                         {
-                        char fullpath[100];
-
-                        snprintf_err( fullpath, sizeof( fullpath),
-                                        "%s/%s.htm", mpec_path, ids[i].packed_desig);
-                        text_search_and_replace( fullpath, " ", "");
-
-                        make_pseudo_mpec( fullpath, ids[i].obj_name);
-                        get_summary_info( tbuff, fullpath);
-                        if( summary_ofile)
+                        write_residuals_to_file( residual_filename, argv[1],
+                                       n_obs_actually_loaded, obs, RESIDUAL_FORMAT_SHORT);
+                        if( mpec_path)
                            {
-                           FILE *ephemeris_ifile = fopen_ext( ephemeris_filename, "tfcrb");
-                           char new_line[700];
+                           char fullpath[100];
 
-                           tbuff[14] = '\0';
-                           snprintf( new_line, sizeof( new_line), "<a href=\"%s\">%s</a>%s",
-                                    fullpath, tbuff, tbuff + 15);
-                           memset( tbuff, 0, sizeof( tbuff));
-                           while( j < 4 && fgets_trimmed( tbuff, sizeof( tbuff),
-                                                         ephemeris_ifile))
-                              j++;
-                           if( j == 4)
+                           snprintf_err( fullpath, sizeof( fullpath),
+                                           "%s/%s.htm", mpec_path, ids[i].packed_desig);
+                           text_search_and_replace( fullpath, " ", "");
+
+                           make_pseudo_mpec( fullpath, ids[i].obj_name);
+                           get_summary_info( tbuff, fullpath);
+                           if( summary_ofile)
                               {
-                              tbuff[23] = tbuff[39] = tbuff[73] = '\0';
-                              snprintf_append( new_line, sizeof( new_line), "  %s  %s  %s",
-                                       tbuff + 15, tbuff + 30, tbuff + 57);
-                                             /* now add sigma from end of ephem: */
-                              while( fgets_trimmed( tbuff, sizeof( tbuff), ephemeris_ifile))
-                                 ;
-                              tbuff[73] = '\0';
-                              snprintf_append( new_line, sizeof( new_line), "%s", tbuff + 68);
+                              FILE *ephemeris_ifile = fopen_ext( ephemeris_filename, "tfcrb");
+                              char new_line[700];
+
+                              tbuff[14] = '\0';
+                              snprintf( new_line, sizeof( new_line), "<a href=\"%s\">%s</a>%s",
+                                       fullpath, tbuff, tbuff + 15);
+                              memset( tbuff, 0, sizeof( tbuff));
+                              while( j < 4 && fgets_trimmed( tbuff, sizeof( tbuff),
+                                                            ephemeris_ifile))
+                                 j++;
+                              if( j == 4)
+                                 {
+                                 tbuff[23] = tbuff[39] = tbuff[73] = '\0';
+                                 snprintf_append( new_line, sizeof( new_line), "  %s  %s  %s",
+                                          tbuff + 15, tbuff + 30, tbuff + 57);
+                                                /* now add sigma from end of ephem: */
+                                 while( fgets_trimmed( tbuff, sizeof( tbuff), ephemeris_ifile))
+                                    ;
+                                 tbuff[73] = '\0';
+                                 snprintf_append( new_line, sizeof( new_line), "%s", tbuff + 68);
+                                 }
+                              fclose( ephemeris_ifile);
+                              summary_lines[n_lines_written]
+                                         = (char *)malloc( strlen( new_line) + 1);
+                              strcpy( summary_lines[n_lines_written], new_line);
+                              n_lines_written++;
                               }
-                           fclose( ephemeris_ifile);
-                           summary_lines[n_lines_written]
-                                      = (char *)malloc( strlen( new_line) + 1);
-                           strcpy( summary_lines[n_lines_written], new_line);
-                           n_lines_written++;
                            }
                         }
                      }
