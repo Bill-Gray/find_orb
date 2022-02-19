@@ -1,4 +1,4 @@
-   Find_Orb supports (at present) six different non-gravitational force
+   Find_Orb supports (at present) seven different non-gravitational force
 models.  More may be added later.
 
    'Solar radiation pressure (radial, 1/r^2)' is the simplest : the model
@@ -6,21 +6,29 @@ assumes that the object is pushed outward from the sun by a force that
 is proportional to the amount of sunlight hitting it,  i.e.,  the inverse
 square of the distance to the sun (except when in the earth's shadow).
 
+   (Pro tip : hit the '* key,  then '1' to turn simple SRP on,  '*' then
+'0' to turn non-gravs off,  and so on.  This can save you a lot of mouse
+activity.)
+
    'Solar radiation pressure (two-parameter)' adds a force in the direction
 of the object's motion around the sun,  proportional to the radial force.
-This is commonly seen with small asteroids and even more so with space
-junk.  It is a simplification of the Yarkovsky effect : if the object has
-prograde rotation,  it will absorb some sunlight,  emit it as it rotates,
-and be (very gently) accelerated.  If its rotation is retrograde,  the
-opposite will occur.  For most asteroids,  setting the constraint A1=0
-will make sense;  they will show little radial effect,  but the accumulated
-acceleration along-orbit will show up nicely.
+This is sometimes seen with small asteroids (a few meters across),  and is
+quite often seen with space junk.  It is a simplification of the Yarkovsky
+effect : if the object has prograde rotation,  it will absorb some sunlight,
+emit it as it rotates, and be (very gently) accelerated.  If its rotation
+is retrograde,  the opposite will occur.
+
+   For most asteroids larger than a few meters across,  though,  the
+radial term is negligible (the object is too big/massive to be forced
+"outward" noticeably).  Unless an asteroid is really small,  you should
+use the 'Yarkovsky (A2-only)' model described below.
 
    'Solar radiation pressure (three-parameter)' adds a force in the
 out-of-plane direction,  normal to the other two forces.  This can result
 in a better fit to the data for space junk;  I've yet to see it apply to
-a natural one.  Even with space junk,  it does not really match the
-actual physics and should be used with caution.
+a natural one,  except for 2006 RH120 (very small,  temporarily captured
+object).  Even with space junk,  it does not really match the actual
+physics and should be used with caution.
 
    'Comet model (A1 and A2)' applies the standard Marsden-Sekanina force
 model;  see page 3 of
@@ -48,4 +56,14 @@ the sun to get to the point where it's really pushed around,  and then
 it will take it a while before it cools back down.  Such cases can be
 modelled with the A1, A2, A3, DT model : the 'DT' corresponds to a time
 lag in days.  It takes at least a few oppositions to get enough data
-to determine this value reliably.
+to determine this value reliably.  This model only makes sense if you
+know the object to be a comet.
+
+   The 'Yarkovsky (A2-only)' model is used for objects where the
+Yarkovsky effect can be modelled,  to decent accuracy,  as being only a
+tangential ("along-orbit") force proportional to the amount of solar
+radiation hitting the object : i.e., it's an inverse-square force,  like
+the various SRP models.  This is basically the same as the 'solar
+radiation pressure (two-parameter)' model, except with A1 constrained to
+be zero.  (In fact, you can set that model, constrain A1=0,  and get
+exactly the same result as with the Yarkovsky (A2-only) model.)
