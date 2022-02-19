@@ -1395,3 +1395,9 @@ L78 !+014.780211   +40.6826087        134.     San Marco Observatory, Salerno
 251 !-066.7527     +18.3442           450.557  Arecibo
 
 UAZ !-110.947361   +32.232722         100.000  University of Arizona 24"
+
+   DSS 47 isn't in the aforementioned file where I got data for other DSN
+   locations.  The following coordinates came from JPL's radar astrometry
+   service at https://ssd.jpl.nasa.gov/sb/radar.html .
+
+d47 ! 149.5501     -30.31287         235.23    DSS 47
