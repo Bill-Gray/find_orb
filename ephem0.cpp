@@ -1998,7 +1998,7 @@ double ephemeris_mag_limit = 22.;
 
 const char *mpc_code_for_ephems = "";
 
-int ephemeris_in_a_file( const char *filename, const double *orbit,
+static int _ephemeris_in_a_file( const char *filename, const double *orbit,
          OBSERVE *obs, const int n_obs,
          const int planet_no,
          const double epoch_jd, const double jd_start, const char *stepsize,
@@ -3471,7 +3471,7 @@ int ephemeris_in_a_file_from_mpc_code( const char *filename,
       else
          real_number_of_steps = n_steps;
       mpc_code_for_ephems = ephem_mpc_code;
-      rval = ephemeris_in_a_file( filename, orbit, obs, n_obs, planet_no,
+      rval = _ephemeris_in_a_file( filename, orbit, obs, n_obs, planet_no,
                   epoch_jd, jd_start, stepsize, lon, rho_cos_phi, rho_sin_phi,
                   real_number_of_steps,
                   note_text, options, n_objects);

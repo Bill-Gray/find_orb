@@ -244,13 +244,6 @@ int get_idx1_and_idx2( const int n_obs, const OBSERVE FAR *obs,
 double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit);
 double get_step_size( const char *stepsize, char *step_units,
                                  int *step_digits);          /* ephem0.cpp */
-int ephemeris_in_a_file( const char *filename, const double *orbit,
-         OBSERVE *obs, const int n_obs,
-         const int planet_no,
-         const double epoch_jd, const double jd_start, const char *stepsize,
-         double lon, double rho_cos_phi, double rho_sin_phi,
-         const int n_steps, const char *note_text,
-         ephem_option_t options, unsigned n_objects);
 int ephemeris_in_a_file_from_mpc_code( const char *filename,
          const double *orbit,
          OBSERVE *obs, const int n_obs,
