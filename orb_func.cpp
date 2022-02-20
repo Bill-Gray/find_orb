@@ -3151,7 +3151,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
             high_change = worst_error_in_sigmas;
             }
          rescale = optimal_change / worst_error_in_sigmas;
-         if( low_change && high_change)  /* we've got it bracketed */
+         if( low_change && high_change && (n_iterations & 1))  /* we've got it bracketed */
             {
             const double slope = log( high_delta / low_delta)
                                / log( high_change / low_change);
