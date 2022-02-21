@@ -4506,13 +4506,14 @@ static int write_observer_data_to_file( FILE *ofile, const char *ast_filename,
 
       get_observer_details_from_obs( obs_data, n_obs, tbuff,
                                  details[1], details[2], details[3]);
-      for( j = 0; j < 3; j++)
-         {
-         const char *filenames[3] = { "progcode.txt", "details.txt", "scopes.txt" };
+      if( !*get_environment_ptr( "SUPPRESS_DETAILS"))
+         for( j = 0; j < 3; j++)
+            {
+            const char *filenames[3] = { "progcode.txt", "details.txt", "scopes.txt" };
 
-         get_observer_details( filenames[j], obs_data,
-                   n_obs, stations[i], program_codes, details[1], details[2], details[3]);
-         }
+            get_observer_details( filenames[j], obs_data,
+                      n_obs, stations[i], program_codes, details[1], details[2], details[3]);
+            }
       for( j = 1; j <= 3; j++)
          add_final_period( details[j]);
       if( !strcmp( details[2], details[1]))  /* observers = measurers; */
