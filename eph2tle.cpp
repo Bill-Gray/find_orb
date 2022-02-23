@@ -941,8 +941,14 @@ int main( const int argc, const char **argv)
          if( lsquare_rval)
             {
             if( tle.ephemeris_type != EPHEM_TYPE_HIGH)
-                           printf( "ERROR %d in lsquare soln: MJD %f\n",
-                           lsquare_rval, tdt - 2400000.5);
+               {
+               char date_string[30];
+
+               full_ctime( date_string, tdt,
+                    FULL_CTIME_YMD | FULL_CTIME_DATE_ONLY);
+               fprintf( stderr, "ERROR %d in lsquare soln: MJD %f = %s\n",
+                           lsquare_rval, tdt - 2400000.5, date_string);
+               }
             use_damping = 1;
             }
          else if( tle.ephemeris_type == EPHEM_TYPE_HIGH)
