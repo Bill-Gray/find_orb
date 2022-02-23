@@ -577,13 +577,15 @@ char *iso_time( char *buff, const double jd, const int precision)
    return( buff);
 }
 
-/* For linkages,  we're only looking at the provisional or temporary
-designation,  the last seven bytes in the twelve-byte packed designation. */
-
 static int _unpack_desig_for_linkage( const char *packed_id, char *reduced)
 {
+   size_t i = 0;
+
    strlcpy_err( reduced, packed_id, 13);
-   memset( reduced, ' ', 5);
+   while( i < 12 && reduced[i] != ' ')
+      i++;
+   if( i == 12)                  /* both permanent and provisional desigs; */
+      memset( reduced + 5, ' ', 7);          /* just use the permanent one */
    return( unpack_mpc_desig( NULL, reduced));
 }
 
@@ -599,19 +601,25 @@ static int make_linkage_json( const int n_obs, const OBSERVE *obs, const ELEMENT
    char buff[200], packed_id2[13];
 
    for( i = 0; i < n_obs && n_ids < MAX_LINKAGE_IDS; i++)
-      {
-      j = 0;
-      while( j < n_ids && memcmp( obs[i].packed_id + 5, obs[idx[j]].packed_id + 5, 7))
-         j++;
-      if( j == n_ids && memcmp( obs[i].packed_id + 5, "       ", 7))
+      if( !i || strcmp( obs[i].packed_id, obs[i - 1].packed_id))
          {
          const int desig_type = _unpack_desig_for_linkage( obs[i].packed_id, packed_id2);
 
-         if( desig_type != OBJ_DESIG_OTHER && desig_type != OBJ_DESIG_ARTSAT)
-            n_designated++;
-         idx[n_ids++] = i;
+         for( j = 0; j < n_ids; j++)
+            {
+            char packed_id[13];
+
+            _unpack_desig_for_linkage( obs[idx[j]].packed_id, packed_id);
+            if( !strcmp( packed_id, packed_id2))
+               break;
+            }
+         if( j == n_ids)
+            {
+            if( desig_type != OBJ_DESIG_OTHER && desig_type != OBJ_DESIG_ARTSAT)
+               n_designated++;
+            idx[n_ids++] = i;
+            }
          }
-      }
    if( n_ids < 2 || n_ids >= MAX_LINKAGE_IDS)
       if( elem->central_obj != 3)
          return( n_ids);                  /* no ID to be made */
