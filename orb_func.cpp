@@ -195,6 +195,9 @@ double compute_weighted_rms( const OBSERVE FAR *obs, const int n_obs,
                            int *n_resids);                  /* orb_func.cpp */
 double find_epoch_shown( const OBSERVE *obs, const int n_obs); /* elem_out */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
+void rotate_state_vector_to_current_frame( double *state_vect,
+                  const double epoch_shown, const int planet_orbiting,
+                  char *body_frame_note);               /* elem_out.cpp */
 const char *get_find_orb_text( const int index);      /* elem_out.cpp */
 int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
                                    const char *format, ...)
@@ -2935,6 +2938,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
             /* into an array form: */
    elem.gm = get_planet_mass( planet_orbiting);
    elem.abs_mag = calc_absolute_magnitude( obs, n_obs);
+   rotate_state_vector_to_current_frame( orbit2, epoch2, planet_orbiting, NULL);
    calc_classical_elements( &elem, orbit2, epoch2, 1);
 
    put_orbital_elements_in_array_form( &elem, elements_in_array);
@@ -3056,6 +3060,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
                   /* into an array form: */
          elem.gm = get_planet_mass( planet_orbiting);
          elem.abs_mag = calc_absolute_magnitude( obs, n_obs);
+         rotate_state_vector_to_current_frame( rel_orbit, epoch2, planet_orbiting, NULL);
          calc_classical_elements( &elem, rel_orbit, epoch2, 1);
 
          put_orbital_elements_in_array_form( &elem, element_slopes[i]);
