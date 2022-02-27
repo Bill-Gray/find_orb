@@ -1698,7 +1698,7 @@ static double find_closest_approach( const double *input_orbit, double jde,
       double loc[3], r2, new_jde;
       int i;
 
-      assert( b.n_iterations < 30);
+      assert( b.n_iterations < 50);
       new_jde = brent_min_next( &b);
       integrate_orbit( orbit, jde, new_jde);
       jde = new_jde;
