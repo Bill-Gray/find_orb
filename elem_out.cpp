@@ -159,6 +159,9 @@ uint64_t parse_bit_string( const char *istr);                /* miscell.cpp */
 const char *write_bit_string( char *ibuff, const uint64_t bits);
 double generate_mc_variant_from_covariance( double *var_orbit,
                                     const double *orbit);    /* orb_func.c */
+void rotate_state_vector_to_current_frame( double *state_vect,
+                  const double epoch_shown, const int planet_orbiting,
+                  char *body_frame_note);               /* elem_out.cpp */
 
 int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
 #ifdef __GNUC__
@@ -1498,6 +1501,62 @@ static double encounter_velocity( const ELEMENTS *elem, const double a0)
    return( rval);
 }
 
+#define ELEMENT_FRAME_DEFAULT                   0
+#define ELEMENT_FRAME_J2000_ECLIPTIC            1
+#define ELEMENT_FRAME_J2000_EQUATORIAL          2
+#define ELEMENT_FRAME_BODY_FRAME                3
+
+void rotate_state_vector_to_current_frame( double *state_vect,
+                  const double epoch_shown, const int planet_orbiting,
+                  char *body_frame_note)
+{
+   int elements_frame = atoi( get_environment_ptr( "ELEMENTS_FRAME"));
+   const char *frame_str = NULL;
+
+            /* By default,  we use J2000 equatorial elements for geocentric
+            elements,  J2000 ecliptic for everybody else. */
+   if( elements_frame == ELEMENT_FRAME_DEFAULT)
+      elements_frame = ((planet_orbiting == 3) ?
+                  ELEMENT_FRAME_J2000_EQUATORIAL :
+                  ELEMENT_FRAME_J2000_ECLIPTIC);
+
+   if( elements_frame == ELEMENT_FRAME_J2000_ECLIPTIC)
+      {
+      const char *elem_epoch = get_environment_ptr( "ELEMENT_EPOCH");
+
+      if( !*elem_epoch)
+         frame_str = "(J2000 ecliptic)";
+      else
+         {
+         double year = atof( elem_epoch + 1);
+         double precession_matrix[9];
+
+         if( !year)
+             year = JD_TO_YEAR( epoch_shown);
+         if( body_frame_note)
+            sprintf( body_frame_note, "(%s)", elem_epoch);
+         setup_ecliptic_precession( precession_matrix, 2000., year);
+         precess_vector( precession_matrix, state_vect, state_vect);
+         precess_vector( precession_matrix, state_vect + 3, state_vect + 3);
+         }
+      }
+   if( elements_frame == ELEMENT_FRAME_J2000_EQUATORIAL)
+      {
+      ecliptic_to_equatorial( state_vect);
+      ecliptic_to_equatorial( state_vect + 3);
+      frame_str = "(J2000 equator)";
+      }
+   if( elements_frame == ELEMENT_FRAME_BODY_FRAME)
+      {
+      ecliptic_to_planetary_plane(
+                  (planet_orbiting == 100 ? -1 : planet_orbiting),
+                  epoch_shown, state_vect);
+      frame_str = "(body frame)";
+      }
+   if( body_frame_note && frame_str)
+      strcpy( body_frame_note, frame_str);
+}
+
 /* Used to provide a link to Tony Dunn's Orbit Simulator when making
 pseudo-MPECs.  Epoch is stored in the sixth element of the array. */
 
@@ -1601,11 +1660,6 @@ double comet_total_magnitude = 0.;          /* a.k.a. "M1" */
 double comet_nuclear_magnitude = 0.;        /* a.k.a. "M2" */
 bool saving_elements_for_reuse = false;
 
-#define ELEMENT_FRAME_DEFAULT                   0
-#define ELEMENT_FRAME_J2000_ECLIPTIC            1
-#define ELEMENT_FRAME_J2000_EQUATORIAL          2
-#define ELEMENT_FRAME_BODY_FRAME                3
-
 #define ORBIT_SUMMARY_Q                1
 #define ORBIT_SUMMARY_H                2
 
@@ -1624,7 +1678,7 @@ int write_out_elements_to_file( const double *orbit,
    int planet_orbiting, n_lines, i, bad_elements = 0;
    ELEMENTS elem, helio_elem;
    char *tptr, *tbuff;
-   char impact_buff[80], elem_epoch_text[30];
+   char impact_buff[80];
    int n_more_moids = 0;
    int output_format = (precision | SHOWELEM_PERIH_TIME_MASK);
    extern int n_extra_params;
@@ -1637,10 +1691,9 @@ int write_out_elements_to_file( const double *orbit,
    const bool rms_ok = (compute_rms( obs, n_obs) < max_monte_rms);
    extern int available_sigmas;
    int geocentric_score = -1;
-   const char *body_frame_note = NULL;
+   char body_frame_note[30];
    bool body_frame_note_shown = false;
    int showing_sigmas = available_sigmas;
-   int elements_frame = atoi( get_environment_ptr( "ELEMENTS_FRAME"));
    const unsigned orbit_summary_options = atoi( get_environment_ptr( "ORBIT_SUMMARY_OPTIONS"));
    extern int is_interstellar;         /* orb_func.cpp */
 
@@ -1674,46 +1727,8 @@ int write_out_elements_to_file( const double *orbit,
       planet_orbiting = find_best_fit_planet( epoch_shown, orbit2, rel_orbit);
 
    memcpy( j2000_ecliptic_rel_orbit, rel_orbit, 6 * sizeof( double));
-            /* By default,  we use J2000 equatorial elements for geocentric
-            elements,  J2000 ecliptic for everybody else. */
-   if( elements_frame == ELEMENT_FRAME_DEFAULT)
-      elements_frame = ((planet_orbiting == 3) ?
-                  ELEMENT_FRAME_J2000_EQUATORIAL :
-                  ELEMENT_FRAME_J2000_ECLIPTIC);
-
-   if( elements_frame == ELEMENT_FRAME_J2000_ECLIPTIC)
-      {
-      const char *elem_epoch = get_environment_ptr( "ELEMENT_EPOCH");
-
-      if( !*elem_epoch)
-         body_frame_note = "(J2000 ecliptic)";
-      else
-         {
-         double year = atof( elem_epoch + 1);
-         double precession_matrix[9];
-
-         body_frame_note = elem_epoch_text;
-         if( !year)
-             year = JD_TO_YEAR( epoch_shown);
-         snprintf( elem_epoch_text, sizeof( elem_epoch_text), "(%s)", elem_epoch);
-         setup_ecliptic_precession( precession_matrix, 2000., year);
-         precess_vector( precession_matrix, rel_orbit, rel_orbit);
-         precess_vector( precession_matrix, rel_orbit + 3, rel_orbit + 3);
-         }
-      }
-   if( elements_frame == ELEMENT_FRAME_J2000_EQUATORIAL)
-      {
-      ecliptic_to_equatorial( rel_orbit);
-      ecliptic_to_equatorial( rel_orbit + 3);
-      body_frame_note = "(J2000 equator)";
-      }
-   if( elements_frame == ELEMENT_FRAME_BODY_FRAME)
-      {
-      ecliptic_to_planetary_plane(
-                  (planet_orbiting == 100 ? -1 : planet_orbiting),
-                  epoch_shown, rel_orbit);
-      body_frame_note = "(body frame)";
-      }
+   rotate_state_vector_to_current_frame( rel_orbit, epoch_shown, planet_orbiting,
+                       body_frame_note);
 
    if( !(options & ELEM_OUT_ALTERNATIVE_FORMAT))
       showing_sigmas = 0;
@@ -2058,7 +2073,7 @@ int write_out_elements_to_file( const double *orbit,
                break;
             }
          }
-      assert( body_frame_note);
+      assert( *body_frame_note);
       if( !body_frame_note_shown)
          {
          size_t j = strlen( buff);
