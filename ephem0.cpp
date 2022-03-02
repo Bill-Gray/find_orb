@@ -1692,7 +1692,8 @@ static double find_closest_approach( const double *input_orbit, double jde,
    brent_min_init( &b, jde, prev_r[0] * prev_r[0],
                 jde - step, prev_r[1] * prev_r[1],
                 jde - 2. * step, prev_r[2] * prev_r[2]);
-   b.tolerance = 1e-6;
+   b.tolerance = 1e-6;        /* tolerance in time of a microday = 86 ms */
+   b.ytolerance = 6e-12;      /* tolerance in dist in AU;  about a meter */
    while( !is_done)
       {
       double loc[3], r2, new_jde;
