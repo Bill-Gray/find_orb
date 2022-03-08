@@ -12,8 +12,7 @@
   "header": {
     "name": "J. Doe",
     "email": "john_doe@example.com",
-    "comment": "Default identification comment.  Linkage written %t UTC.",
-    "comment2": "Find_Orb version %v."
+    "comment": "Default identification comment.  Linkage written %t UTC.  Find_Orb version %v."
   },
   "links": {
     "link_0": {
