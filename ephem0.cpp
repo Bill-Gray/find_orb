@@ -4887,8 +4887,9 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
                      else if( !strcmp( search_str, "$SV"))   /* state vect */
                         {                           /* for Orbit Simulator */
                         extern double helio_ecliptic_j2000_vect[];
+                        const int n_output = (helio_ecliptic_j2000_vect[7] == 0.15 ? 8 : 6);
                         int year = (int)JD_TO_YEAR(
-                                          helio_ecliptic_j2000_vect[6] + 182.6);
+                                          helio_ecliptic_j2000_vect[8] + 182.6);
 
                         if( year < 1950)    /* Orbit Simul has precomputed */
                            year = 1950;     /* solar syst data from 1950   */
@@ -4896,16 +4897,20 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
                            year = 2050;
                         snprintf( replace_str, sizeof( replace_str),
                                         "%d.html?sv,1,%s,%.2f", year, obj_name,
-                                        helio_ecliptic_j2000_vect[6]);
+                                        helio_ecliptic_j2000_vect[8]);
                         text_search_and_replace( replace_str, " ", "%20");
-                        for( i = 0; i < 6; i++)
+                        for( i = 0; i < n_output; i++)
                            {
-                           double oval = helio_ecliptic_j2000_vect[i] * AU_IN_METERS;
+                           double oval = helio_ecliptic_j2000_vect[i];
 
-                           if( i >= 3)    /* velocity,  in km/s,  is desired */
-                              oval /= seconds_per_day;
+                           if( i < 3)          /* cvt AU to meters */
+                              oval *= AU_IN_METERS;
+                           else if( i < 6)     /* cvt AU/day to meters/sec */
+                              oval *= AU_IN_METERS / seconds_per_day;
                            snprintf_append( replace_str, sizeof( replace_str),
                                     ",%f", oval);
+                           if( i == 5)    /* after the vz component */
+                              strlcat_error( replace_str, ",0,0,00FF00,90,65,,16000,0,12,1,0");
                            }
                         got_it = 1;
                         }

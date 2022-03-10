@@ -1558,9 +1558,11 @@ void rotate_state_vector_to_current_frame( double *state_vect,
 }
 
 /* Used to provide a link to Tony Dunn's Orbit Simulator when making
-pseudo-MPECs.  Epoch is stored in the sixth element of the array. */
+pseudo-MPECs.  First six array elements are the actual state vector,
+in the heliocentric J2000 ecliptic frame.  H and G are the sixth
+and seventh array elements.  Epoch is stored in the eighth.   */
 
-double helio_ecliptic_j2000_vect[7];
+double helio_ecliptic_j2000_vect[9];
 
 /* The results from write_out_elements_to_file() can be somewhat
 varied.  The output for elliptical and parabolic/hyperbolic orbits are
@@ -1716,8 +1718,6 @@ int write_out_elements_to_file( const double *orbit,
       }
    memcpy( orbit2, orbit, 6 * sizeof( double));
    integrate_orbit( orbit2, curr_epoch, epoch_shown);
-   memcpy( helio_ecliptic_j2000_vect, orbit2, 6 * sizeof( double));
-   helio_ecliptic_j2000_vect[6] = epoch_shown;
    if( forced_central_body != ORBIT_CENTER_AUTO)
       {
       planet_orbiting = forced_central_body;
@@ -1776,6 +1776,10 @@ int write_out_elements_to_file( const double *orbit,
             comet_total_magnitude = elem.abs_mag;
          }
       }
+   memcpy( helio_ecliptic_j2000_vect, orbit2, 6 * sizeof( double));
+   helio_ecliptic_j2000_vect[6] = elem.abs_mag;
+   helio_ecliptic_j2000_vect[7] = elem.slope_param;
+   helio_ecliptic_j2000_vect[8] = epoch_shown;
 
    add_sof_to_file( (n_extra_params >= 2 ? "cmt_sof.txt" : sof_filename),
                     &elem, n_obs, obs, NULL);      /* elem_ou2.cpp */
