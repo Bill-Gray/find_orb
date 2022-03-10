@@ -3694,7 +3694,7 @@ static double adjustment_for_orbit_likelihood( const double semimajor_axis,
                + (double)( tptr2[1] + tptr1[0] - tptr1[1] - tptr2[0])
                               * xbin * ybin;
       if( q < 1.2)
-         rval *= (q - 1.1) / 10.;
+         rval *= (q - 1.1) * 10.;
       }
    else
       rval = 0.;
@@ -4681,7 +4681,16 @@ void attempt_extensions( OBSERVE *obs, const int n_obs, double *orbit,
          full_improvement( obs, n_obs, orbit, epoch, NULL,
                            NO_ORBIT_SIGMAS_REQUESTED, epoch);
       else
+         {
+         int j = 0;
+
+         while( j < n_obs && !obs[j].is_included)
+            j++;
+         assert( j < n_obs);
+         integrate_orbit( orbit, epoch, obs[j].jd);
          adjust_herget_results( obs, n_obs, orbit);
+         integrate_orbit( orbit, obs[j].jd, epoch);
+         }
       }
    set_locs( orbit, epoch, obs, n_obs);
 }
