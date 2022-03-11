@@ -3020,6 +3020,7 @@ static void fix_radar_time( char *buff)
 int unload_observations( OBSERVE FAR *obs, const int n_obs)
 {
    int i;
+   extern int available_sigmas;
 
    if( obs)
       {
@@ -3036,6 +3037,7 @@ int unload_observations( OBSERVE FAR *obs, const int n_obs)
       free_observation_details( obs_details);
       obs_details = NULL;
       }
+   available_sigmas = NO_SIGMAS_AVAILABLE;
    return( 0);
 }
 
