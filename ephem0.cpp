@@ -4888,15 +4888,9 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
                         {                           /* for Orbit Simulator */
                         extern double helio_ecliptic_j2000_vect[];
                         const int n_output = (helio_ecliptic_j2000_vect[7] == 0.15 ? 8 : 6);
-                        int year = (int)JD_TO_YEAR(
-                                          helio_ecliptic_j2000_vect[8] + 182.6);
 
-                        if( year < 1950)    /* Orbit Simul has precomputed */
-                           year = 1950;     /* solar syst data from 1950   */
-                        if( year > 2050)    /* to 2050 */
-                           year = 2050;
                         snprintf( replace_str, sizeof( replace_str),
-                                        "%d.html?sv,1,%s,%.2f", year, obj_name,
+                                        "2022.html?sv,1,%s,%.2f", obj_name,
                                         helio_ecliptic_j2000_vect[8]);
                         text_search_and_replace( replace_str, " ", "%20");
                         for( i = 0; i < n_output; i++)
