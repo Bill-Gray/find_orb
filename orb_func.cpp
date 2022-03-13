@@ -3617,47 +3617,50 @@ static inline void look_for_best_subarc( const OBSERVE FAR *obs,
 
 /* The following was created by plotting semimajor axes versus
 inclinations as a scatterplot,  from the recent 'mpcorb.dat' file.
+See 'incl_a.c' in the Bill-Gray/miscell repository.
+
 The result is a 30x60 graph,  with 30 vertical bins representing
 2 degrees each in inclination (from incl=0 at the top to incl=60
 at the bottom),  and 60 bins across representing .1 AU in semimajor
-axis (from 0 AU to 6 AU).  The natural logarithm of the counts in
-each bin are shown;  those ranged from zero to 9,  so I didn't need
-to do any scaling.  This basically reflects the scatterplot provided
+axis (from 0 AU to 6 AU).  The scaled logarithm of the counts in
+each bin are shown,  stretched out to cover the range from ASCII 32
+(space) to 126 (~).  This basically reflects the scatterplot provided
 by MPC at https://www.minorplanetcenter.net/iau/plot/OrbEls51.gif
 (except that the vertical axis is flipped).   */
 
 /*           0 AU      1         2         3         4         5         6 */
 static const char *incl_vs_a_scattergram[30] = {
-/* incl=0*/ "000000012222232223333778877777776331002520000000001332000000",
-            "000000112333233333334789988888886331202630100000002442000000",
-            "000000112223333233334799888876776332111520000000002442000000",
-            "000000022233333333333699888876776342111520010000002442000000",
-            "000000011222233233333577787877886443011510000000002442000000",
-/* 10 deg*/ "000000011222223323332357678868886443101410000010001442000000",
-            "000000012223332232222246689866776331000410000000002441000000",
-            "000000012222323222332124688766776331100310000000001340000000",
-            "000000002222222223462222466655786331011200000000001341000000",
-            "000000012122223223562233355544675332000100000000000431000000",
-/* 20 deg*/ "000000011122232223562255456433565210010100000000001331000000",
-            "000000111222222123662366555423565210100100000000000331000000",
-            "000000011122223222562356444533464100000000000000001330000000",
-            "000000012112212222442244355422464100000000000000000321000000",
-            "000000011112122122231222156421353110000000000000000321000000",
-/* 30 deg*/ "000000011112111122221111245410132000000000000000000230000000",
-            "000000011110011212211111135410122000000000000000000220000000",
-            "000000001111211221221120033320011100000000000000000120000000",
-            "000000000112111211201110122310000000000000000000000110000000",
-            "000000000011122212201110111110000000000000000000000000000000",
-/* 40 deg*/ "000000001101111121111110101100001000000000000000000000000000",
-            "000000000011010001101110000001000000000000000000000000000000",
-            "000000000001100001101010010100000000000000000000000000000000",
-            "000000000000011011100110010000000000000000000000000000000000",
-            "000000000100100000000000000000000000000000000000000000000000",
-/* 50 deg*/ "000000001000100100100000000000000000000000000000000000000000",
-            "000000000000100011010100000000000000000000000000000000000000",
-            "000000000000011000110000000000000000000000000000000000000000",
-            "000000000000010000000011000000000000000000000000000000000000",
-            "000000000000000000000000000000000000000000000000000000000000" };
+/* incl=0*/ "      ):GJLKLMLKLMMNOfnxtmnklkon_D?2.09XC)&))& &&&5HJ; & & &",
+            "      4?HKMOOOPOOOOQSpy~ywyxrprpbIC=>,?bM0,).0  ,,@QSC&  &  ",
+            "      .@IKMNMNPOONPSUp|}vyz{mjqpeKNC9.>[H,00,).,00CUVD,),&&)",
+            "      ,BGHLNMPMONNOQSjz|uuwxlkqpcORB214Y>..&.&)&,<D[[H&    &",
+            "     &1=BJJKKMLLMMNOO]lojssxlrzzgXXM778]=, 0))&&,5B[[C.),&&&",
+/* 10 deg*/ "      ,=DHJIKLLKKKKMIL_jgrxsit{zhWXM869V:.01,,),,,=VWA&&,. )",
+            "      ,:BEGHLKJJKHIKGEQddw}thksteOL:364O7,.1),), 2?UV?&)), )",
+            "     &,6ACFIHJHIHGONHDGXdtwoidpveNM91,4K20))&),, 0:ST> && ,)",
+            "      &3@DGFHHFGHHZcLCGKViifa_pveNJC0.:A..0)&.&&),8ST:,& )  ",
+            "     &)2=BDDGIIHFNfjKBJNJ]^]VVhm`GGD103=,,,).)&&&07RS<&&,&  ",
+/* 20 deg*/ "      &7=CBFIIHGDPijIHX]R[dZQNbg]FB))0.5&)). ) )&,2QR;   )  ",
+            "      ,1<ABEGFEDFQikJMbfWZdWEJ_gXC1.&.,1&&) )& &&13OO:)&& & ",
+            "      &68>CEHGEAHMaeLL]aRTW^JJ[j]<3,)..0&) ))) ,)&1MP7 &    ",
+            "      )1;@>CBDD@EHTREJQPG^^XDF^l]<)&1)3&& &)&)&   8NO<&   & ",
+            "     &02::>@BCB>EHIHAEHE@`aTAAUcS:)&),,0&   && &) 6NO:     &",
+/* 30 deg*/ "    && 17:8;:<=>AGDB=8<:A]]O=7FSJ2))&&) &&&       )MM1&    &",
+            "      &)56;:=:<?ADA;::=<5Z]J<2>JK.&.&  && && &    &EH)  )&) ",
+            "        615;::<<>@@?;5<2;QQL<55>?, ))&&& )   &   &&>@     & ",
+            "        ,53:=;;8<?=:7;846DBD51014& &&&&  &  &    &)::       ",
+            "      ) &0.1777:8>;448646=:400&)0.& ,    &      & &75,      ",
+/* 40 deg*/ "      &),,142476:8<539<53374,  .22  &              ),       ",
+            "        .12300147761052,0131 ,)&.&&&)&&         &  0.&   )  ",
+            "       ) .2.4550,574,051.2 .,), )  && &   && &       &      ",
+            "     &   ,).112)205),33 &.))) & && &       &&       &       ",
+            "       &)0, 2.1&1.0,,.) 2)&.&& &,   &      &                ",
+/* 50 deg*/ "        , &)2)).0,2) &.,,&   &  ,      &  &      &          ",
+            "        && .,&,.11,.),&& )&&)) & &)      &                  ",
+            "          && .0&,).1,)., ))) )& & &&       &       )        ",
+            "         ) &). &)0 ,.)),&&)&& &  &&          &              ",
+            "           ) ),&&,.&.&)&)) & &  &)&  &                      " };
+
 
 /* evaluate_initial_orbit( ) is supposed to give a "score" of sorts,      */
 /* describing just how likely this orbit seems to be,  given its rms      */
@@ -3688,7 +3691,7 @@ static double adjustment_for_orbit_likelihood( const double semimajor_axis,
 
       xbin -= (double)ixbin;
       ybin -= (double)iybin;
-      rval = (double)( *tptr1 - '0')
+      rval = (double)( *tptr1 - ' ')
                + (double)( tptr1[1] - tptr1[0]) * xbin
                + (double)( tptr2[0] - tptr1[0]) * ybin
                + (double)( tptr2[1] + tptr1[0] - tptr1[1] - tptr2[0])
@@ -3698,7 +3701,7 @@ static double adjustment_for_orbit_likelihood( const double semimajor_axis,
       }
    else
       rval = 0.;
-   return( rval * .1);
+   return( rval * .01);
 }
 
 int is_interstellar = 0;
