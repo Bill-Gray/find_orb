@@ -276,8 +276,11 @@ static void get_field_size( double *width, double *height, const double jd,
       case 'T':         /* ATLAS (T05), (T08)   */
          *width = 7.4;
          break;
-      case 'V':         /* V06:  580" field of view */
-         *width = 580. / 3600.;
+      case 'V':
+         if( obs_code[2] == '0')       /* (V00) Bok */
+            *width = 1.16;
+         else           /* V06:  580" field of view */
+            *width = 580. / 3600.;
          break;
       default:
          *width = 0.;
