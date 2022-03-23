@@ -5278,26 +5278,24 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
                            (apply_debiasing ? ' ' : '['),
                            optr->ra_bias, optr->dec_bias,
                            (apply_debiasing ? ' ' : ']'));
+         if( !strcmp( optr->reference, "NEOCP") && optr->columns_57_to_65[3] == '~'
+                                       && !show_alt_info)
+            {
+            const int month = mutant_hex_char_to_int( optr->columns_57_to_65[4]);
+
+            snprintf_append( buff, MAX_INFO_LEN, "  TTag:%s %d %02d:%02d",
+                     set_month_name( month, NULL),
+                     mutant_hex_char_to_int( optr->columns_57_to_65[5]),
+                     mutant_hex_char_to_int( optr->columns_57_to_65[6]),
+                     mutant_hex_char_to_int( optr->columns_57_to_65[7]));
+            }
          if( show_alt_info)
             {
-            if( !strcmp( optr->reference, "NEOCP") && optr->columns_57_to_65[3] == '~')
-               {
-               const int month = mutant_hex_char_to_int( optr->columns_57_to_65[4]);
+            extern double overobserving_time_span;
 
-               snprintf_append( buff, MAX_INFO_LEN, "   %s %d %02d:%02d",
-                        set_month_name( month, NULL),
-                        mutant_hex_char_to_int( optr->columns_57_to_65[5]),
-                        mutant_hex_char_to_int( optr->columns_57_to_65[6]),
-                        mutant_hex_char_to_int( optr->columns_57_to_65[7]));
-               }
-            else
-               {
-               extern double overobserving_time_span;
-
-               snprintf_append( buff, MAX_INFO_LEN, " Nnear=%.3f",
+            snprintf_append( buff, MAX_INFO_LEN, " Nnear=%.3f",
                         n_nearby_obs( obs, n_obs, idx,
                                      overobserving_time_span));
-               }
             }
          break;
      }
