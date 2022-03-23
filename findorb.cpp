@@ -5905,8 +5905,17 @@ int main( int argc, const char **argv)
                single_obs_selected = true;
                }
             break;
+         case '\'':
+            if( !inquire( "Enter override absolute mag (H) value:",
+                       tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY) && *tbuff)
+            {
+            extern double override_abs_mag;
+
+            override_abs_mag = atof( tbuff);
+            }
+            break;
          case 'j': case 'J':
-         case ';': case '\'': case ']':
+         case ';': case ']':
          case CTRL( 'E'): case CTRL( 'J'): case CTRL( 'L'):
          case CTRL( 'N'): case CTRL( 'O'): case CTRL( 'T'):
          case CTRL( 'V'):

@@ -3383,6 +3383,8 @@ double mag_band_shift( const char mag_band)
    return( 0.);
 }
 
+double override_abs_mag = 0.;
+
 static double _calc_absolute_magnitude_internal( OBSERVE FAR *obs, int n_obs)
 {
    int obs_no;
@@ -3418,9 +3420,11 @@ static double _calc_absolute_magnitude_internal( OBSERVE FAR *obs, int n_obs)
       }
    if( n_mags)
       rval /= n_mags;
+   if( override_abs_mag)
+      rval = override_abs_mag;
    obs -= n_obs;
    for( obs_no = 0; obs_no < n_obs; obs_no++, obs++)
-      if( n_mags)
+      if( rval)
          obs->computed_mag += rval;
       else
          obs->computed_mag = 0.;
