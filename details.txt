@@ -1026,6 +1026,11 @@ OBS A. Garrigos
 COM Default details extracted from MPEC 2020-V57
 TEL 0.51-m f/4.0 reflector + CCD
 
+COD B42
+OBS V. Nevski
+COM Default details extracted from MPEC 2022-F14
+TEL 0.3-m f/5.0 reflector + CCD
+
 COD B49
 OBS J. Camarasa
 COM Default details extracted from MPEC 2021-C96
@@ -1968,6 +1973,11 @@ OBS R. Fichtl
 COM Default details extracted from MPEC 2020-C98
 TEL 0.40-m f/2.6  reflector + CCD
 
+COD K78
+OBS G. Scarfi, L. Sannino, L. Bertagna, F. Francini
+MEA G. Scarfi, L. Sannino
+TEL 0.40-m f/6 reflector + CCD
+
 COD K80
 COM Find_Orb default details
 TEL 0.28-m f/2.2 Schmidt astrograph + CCD
@@ -2222,10 +2232,20 @@ OBS T. Scarmato
 COM Default details extracted from MPEC 2021-J28
 TEL 0.25-m Newtonian reflector + CCD
 
+COD M09
+OBS P.-J. Dekelver
+COM Default details extracted from MPEC 2022-F14
+TEL 0.3-m f/4.0 Newtonian reflector + CCD
+
 COD M10
 OBS C. Pin-ferrier
 COM Default details extracted from MPEC 2021-V21
 TEL 0.25-m f/5 reflector + CCD
+
+COD M16
+OBS S. Negri
+COM Default details extracted from MPEC 2022-F14
+TEL 0.20-m f/10 Schmidt- Cassegrain + CCD
 
 COD M18
 OBS S. Fritsche
