@@ -3034,6 +3034,7 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
          *orbit_epoch = new_epoch;
          }
       memcpy( saved_obs, obs, n_obs * sizeof( OBSERVE));
+      filter_obs( obs, n_obs, 3., 0);
       prev_score = evaluate_initial_orbit( obs, n_obs, orbit);
       for( pass = 0; pass < 2; pass++)
          {
