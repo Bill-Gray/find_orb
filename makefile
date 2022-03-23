@@ -283,8 +283,8 @@ else
 	$(CP) $(FIND_ORB_EXE) $(INSTALL_DIR)/bin
 	$(CP) $(FO_EXE)       $(INSTALL_DIR)/bin
 endif
-	$(CP) command.txt cospar.txt details.txt dosephem.txt dos_help.txt             $(IDIR)
-	$(CP) ?findorb.txt environ.def eph2tle.txt eph_expl.txt                        $(IDIR)
+	$(CP) cometdef.sof command.txt cospar.txt details.txt dosephem.txt             $(IDIR)
+	$(CP) dos_help.txt ?findorb.txt environ.def eph2tle.txt eph_expl.txt           $(IDIR)
 	$(CP) eph_type.txt frame_he.txt geo_rect.txt header.htm jpl_eph.txt            $(IDIR)
 	$(CP) link_def.json mpc_area.txt mpcorb.hdr mu1.txt nongravs.txt               $(IDIR)
 	$(CP) observer.txt obslinks.htm ObsCodes.htm ObsCodesF.html                    $(IDIR)

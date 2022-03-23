@@ -1286,7 +1286,9 @@ static void clobber_leading_zeroes_in_exponent( char *buff)
 char *get_file_name( char *filename, const char *template_file_name);
 
 /* Write out the elements in SOF (Standard Orbit Format) at the end of an
-existing file,  one in which the first line is the header.      */
+existing file,  one in which the first line is the header.  If it turns
+out the file doesn't actually exist yet,  we use the 'fallback_filename'
+to get the template line. */
 
 static int add_sof_to_file( const char *filename,
              const ELEMENTS *elem,
@@ -1300,42 +1302,42 @@ static int add_sof_to_file( const char *filename,
 
    while( *obj_name == ' ')
       obj_name++;
-   fp = fopen_ext( filename, "cr+b");
    get_file_name( output_filename, filename);
    forking = strcmp( output_filename, filename);
-   if( !fp && fallback_filename && !forking)
+   fp = fopen_ext( output_filename, "cr+b");
+   if( !fp && fallback_filename)
       {
       fp = fopen_ext( fallback_filename, "fcr+b");
       if( !fgets( templat, sizeof( templat), fp))
          assert( 1);          /* should never happen */
       fclose( fp);
-      fp = fopen_ext( filename, "fcw+b");
+      fp = fopen_ext( output_filename, "fcw+b");
       fputs( templat, fp);
       }
+   assert( fp);
    if( fp)
       {
-      bool got_it = false;
-
       fseek( fp, 0L, SEEK_SET);
       if( !fgets( templat, sizeof( templat), fp))
          {
          fclose( fp);
          return( -1);
          }
-      if( forking)
+      if( forking)                   /* simply append */
+         fseek( fp, 0L, SEEK_END);
+      else           /* we may be replacing an existing entry */
          {
-         fclose( fp);
-         fp = fopen_ext( output_filename, "cr+b");
-         assert( fp);
+         bool got_it = false;
+
+         fseek( fp, 0L, SEEK_SET);
+         while( !got_it && fgets( obuff, sizeof( obuff), fp))
+            if( !memcmp( obuff, obj_name, strlen( obj_name)) &&
+                        obuff[strlen( obj_name)] == ' ')
+               {
+               got_it = true;
+               fseek( fp, -(long)strlen( obuff), SEEK_CUR);
+               }
          }
-      fseek( fp, 0L, SEEK_SET);
-      while( !got_it && fgets( obuff, sizeof( obuff), fp))
-         if( !memcmp( obuff, obj_name, strlen( obj_name)) &&
-                     obuff[strlen( obj_name)] == ' ')
-            {
-            got_it = true;
-            fseek( fp, -(long)strlen( obuff), SEEK_CUR);
-            }
       rval = put_elements_into_sof( obuff, templat, elem, n_obs, obs);
       fwrite( obuff, strlen( obuff), 1, fp);
       fclose( fp);
@@ -1782,7 +1784,8 @@ int write_out_elements_to_file( const double *orbit,
    helio_ecliptic_j2000_vect[8] = epoch_shown;
 
    add_sof_to_file( (n_extra_params >= 2 ? "cmt_sof.txt" : sof_filename),
-                    &elem, n_obs, obs, NULL);      /* elem_ou2.cpp */
+                    &elem, n_obs, obs,
+                    (n_extra_params >= 2 ? "cometdef.sof" : "orbitdef.sof"));
    if( saving_elements_for_reuse && available_sigmas == COVARIANCE_AVAILABLE)
       {
       extern double solar_pressure[];
@@ -1804,7 +1807,7 @@ int write_out_elements_to_file( const double *orbit,
          }
       else        /* insert dummy elements */
          elem2.q = elem2.ecc = elem2.incl = elem2.arg_per = elem2.asc_node = 0.;
-      add_sof_to_file( sofv_filename, &elem2, n_obs, obs, NULL); /* elem_ou2.cpp */
+      add_sof_to_file( sofv_filename, &elem2, n_obs, obs, "orbitdef.sof"); /* elem_ou2.cpp */
       }
    helio_elem = elem;            /* Heliocentric J2000 ecliptic elems */
    helio_elem.central_obj = 0;
