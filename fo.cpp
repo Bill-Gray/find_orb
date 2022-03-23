@@ -188,7 +188,25 @@ static int unlink_config_file( const char *filename)
 
 static bool unlink_partial_files = true;
 
-static void combine_element_files( const char *filename, const int n_processes)
+/* This does an n_processes-way merger of orbital element files.  It is
+slightly complicated by the fact that we have three different types of
+orbital element files.
+
+The MPCORB ones are simplest;  there's no header data.  We just take a
+line from file 0,  then file 1,  then file 2, ... file n_processes-1,
+and repeat,  writing them out as we go,  doing a multi-way merge.
+
+.sof files are almost as easy,  except that there's a single header line.
+So we skip the first n_processes - 1 lines read in,  because they're all
+header lines.  Then we get a header line (and write it);  then we start
+reading in actual orbital element lines and write them.
+
+'elements.txt' files,  signified with skip_over == -1,  mean that for each
+file,  we keep reading in lines until we hit the '# Sigmas avail" one.
+We don't really care about that or anything after it.       */
+
+static void _merge_element_files( const char *filename, const int n_processes,
+                  const int skip_over)
 {
    FILE **input_files = (FILE **)calloc( (size_t)n_processes, sizeof( FILE *));
    char buff[400];
@@ -196,45 +214,27 @@ static void combine_element_files( const char *filename, const int n_processes)
    FILE *ofile;
    extern int process_count;
 
-   if( !strcmp( filename, sof_filename) || !strcmp( filename, sofv_filename))
-      {
-      FILE *ifile = fopen_ext( filename, "fclr");
-
-      assert( ifile);
-      if( !fgets( buff, sizeof( buff), ifile))
-         {        /* get header line */
-         printf( "Failed to read sof.txt\n");
-         free( input_files);
-         return;
-         }
-      fclose( ifile);
-      ofile = fopen( filename, "w");
-      fwrite( buff, strlen( buff), 1, ofile);
-      }           /* above writes header line back out */
-   else
-      ofile = fopen( filename, "w");
+   ofile = fopen( filename, "w");
    assert( ofile);
    for( i = 0; i < n_processes; i++)
       {
       process_count = i + 1;
       input_files[i] = fopen_ext( get_file_name( buff, filename), "tfclr");
       }
-   for( i = quit = 0; !quit; i = (i + 1) % n_processes)
-      if( !fgets( buff, sizeof( buff), input_files[i]))
+   for( i = quit = 0; !quit; i++)
+      {
+      if( !fgets( buff, sizeof( buff), input_files[i % n_processes]))
          quit = 1;
-      else
+      else if( skip_over == -1)           /* 'elements.txt' format */
          {
-         extern const char *elements_filename;
-
          fputs( buff, ofile);
-         if( !strcmp( filename, elements_filename))
-            {
-            while( fgets( buff, sizeof( buff), input_files[i]) &&
+         while( fgets( buff, sizeof( buff), input_files[i % n_processes]) &&
                      memcmp( buff, "# Sigmas avail", 14))
-               fputs( buff, ofile);
             fputs( buff, ofile);
-            }
          }
+      else if( i >= skip_over)
+         fputs( buff, ofile);
+      }
    for( i = 0; i < n_processes; i++)
       {
       int err_code;
@@ -387,6 +387,9 @@ static void colorize_text( char *text)
    tptr = strstr( text, "MOID ");
    if( tptr && atof( tptr + 5) < 0.0105)
       add_vt100_colors( tptr, 10, VT100_RED);
+   tptr = strstr( text, "No sigmas");
+   if( tptr)
+      add_vt100_colors( tptr, 9, VT100_PURPLE);
 }
 
 static int create_combined_json_header( const OBJECT_INFO *ids,
@@ -837,6 +840,7 @@ int main( int argc, const char **argv)
 
             if( (n_obs_actually_loaded > 1 || !drop_single_obs) && curr_epoch > 0.)
                {
+               extern int available_sigmas;
                int n_obs_included = 0;
                unsigned j = 0;
 
@@ -853,6 +857,8 @@ int main( int argc, const char **argv)
                   observe_filename = tptr;
                   }
                strlcpy_err( tbuff, orbit_summary_text, sizeof( tbuff));
+               if( available_sigmas == NO_SIGMAS_AVAILABLE)
+                  strlcat_err( tbuff, "No sigmas", sizeof( tbuff));
                if( use_colors)
                   colorize_text( tbuff);
                if( show_processing_steps)
@@ -894,7 +900,6 @@ int main( int argc, const char **argv)
                   char *mpc_code_tptr = mpc_codes;
                   extern const char *ephemeris_filename;
                   extern const char *residual_filename;
-                  extern int available_sigmas;
                   extern double ephemeris_mag_limit;
                   double *orbits_to_use = orbit;
                   const double jd_start = get_time_from_string( curr_jd( ),
@@ -1022,7 +1027,8 @@ int main( int argc, const char **argv)
             if( ephemeris_output_options & OPTION_COMPUTER_FRIENDLY)
                if( mpec_path || !is_default_ephem)
                   have_json_ephem = true;
-            add_json_data( "total.json", have_json_ephem, obs->packed_id,
+            if( n_processes == 1)
+               add_json_data( "total.json", have_json_ephem, obs->packed_id,
                      i == starting_object + total_objects - 1);
             unload_observations( obs, n_obs_actually_loaded);
             }
@@ -1081,10 +1087,10 @@ int main( int argc, const char **argv)
       extern const char *elements_filename;
       extern const char *mpc_fmt_filename;
 
-      combine_element_files( elements_filename, n_processes);
-      combine_element_files( mpc_fmt_filename, n_processes);
-      combine_element_files( sof_filename, n_processes);
-      combine_element_files( sofv_filename, n_processes);
+      _merge_element_files( elements_filename, n_processes, - 1);
+      _merge_element_files( mpc_fmt_filename, n_processes, 0);
+      _merge_element_files( sof_filename, n_processes, n_processes - 1);
+      _merge_element_files( sofv_filename, n_processes, n_processes - 1);
       for( i = 0; i < n_processes; i++)
          {                             /* clean up temp files: */
          process_count = i + 1;
