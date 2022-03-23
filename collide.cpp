@@ -81,7 +81,8 @@ double find_collision_time( ELEMENTS *elem, double *latlon, const int is_impact)
    double t_low = (is_impact ? -2. / 24. : 2. / 24.);
    double t_high = 0.;    /* assume impact within 2 hrs */
    double t0 = t_low / 2.;
-   const double alt_0 = atof( get_environment_ptr( "COLLISION_ALTITUDE"));
+   const double alt_0 = (elem->central_obj == 3 ?
+                   atof( get_environment_ptr( "COLLISION_ALTITUDE")) : 0.);
    const double planet_radius_in_au =
           planet_radius_in_meters( elem->central_obj) / AU_IN_METERS;
    int iter = 25;
