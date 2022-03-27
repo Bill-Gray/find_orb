@@ -939,9 +939,9 @@ int main( int argc, const char **argv)
                      }
                   while( *mpc_code_tptr)
                      {
-                     int j = 0;
                      char mpc_code[10], ephem_filename[200];
 
+                     j = 0;
                      while( j < 9 && *mpc_code_tptr > ' ' && *mpc_code_tptr != ',')
                         mpc_code[j++] = *mpc_code_tptr++;
                      assert( j < 9);
@@ -986,6 +986,7 @@ int main( int argc, const char **argv)
                               snprintf( new_line, sizeof( new_line), "<a href=\"%s\">%s</a>%s",
                                        fullpath, tbuff, tbuff + 15);
                               memset( tbuff, 0, sizeof( tbuff));
+                              j = 0;
                               while( j < 4 && fgets_trimmed( tbuff, sizeof( tbuff),
                                                             ephemeris_ifile))
                                  j++;
