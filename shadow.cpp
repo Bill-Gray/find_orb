@@ -24,9 +24,9 @@ up those ring contributions gets you a value between 0% (total eclipse)
 and 100% (no eclipse).
 
    A formula on page 216 of
-http://www.minorplanet.info/MPB/issues/MPB_45-3.pdf gives a decent
-approximation of disk brightness as a function of radius,  as found
-by S. Youles :
+https://ui.adsabs.harvard.edu/abs/2018MPBu...45..215B/abstract gives
+a decent approximation of disk brightness as a function of radius,
+as found by S. Youles :
 
 I = 0.436 + 0.72 * mu - 0.16 mu^2
 
