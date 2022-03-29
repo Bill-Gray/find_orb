@@ -25,8 +25,10 @@
 ifeq ($(origin CXX),default)
 	ifdef CLANG
 		CXX=clang++
+		CC=clang
 	else
 		CXX=g++
+		CC=gcc
 	endif
 endif
 LIBSADDED=-L $(INSTALL_DIR)/lib -lm
@@ -183,7 +185,7 @@ clipfunc.o:        clipfunc.cpp
 	$(CXX) $(CXXFLAGS) $(CURSES_FLAGS) $<
 
 getstrex.o:        getstrex.c
-	$(CXX) $(CXXFLAGS) $(CURSES_FLAGS) $<
+	$(CC) $(CXXFLAGS) $(CURSES_FLAGS) $<
 
 $(FO_EXE):          fo.o $(OBJS) $(RES_FILENAME)
 	$(CXX) -o $(FO_EXE) fo.o $(OBJS) $(LIBS) $(RES_FILENAME) $(LDFLAGS)
