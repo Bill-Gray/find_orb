@@ -126,4 +126,12 @@ inpop19a_TDB_m100_p100_littleendian.dat
 ; (168 MBytes)
 inpop19a_TDB_m1000_p1000_littleendian.dat
 
+; https://ftp.imcce.fr/pub/ephem/planets/inpop21a/inpop21a_TDB_m100_p100_littleendian.dat
+; (17 MBytes)
+inpop21a_TDB_m100_p100_littleendian.dat
+
+; https://ftp.imcce.fr/pub/ephem/planets/inpop21a/inpop21a_TDB_m1000_p1000_littleendian.dat
+; (168 MBytes)
+inpop21a_TDB_m1000_p1000_littleendian.dat
+
 sm_eph.440
