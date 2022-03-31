@@ -104,6 +104,7 @@ endif
 
 ifdef MINGW
 	CXX=$(MINGW)gcc
+	CC=$(MINGW)gcc
 	WINDRES=$(MINGW)windres
 	CURSES_FLAGS=-I $(INSTALL_DIR)/include -I../PDCursesMod
 	EXE=.exe
