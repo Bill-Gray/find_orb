@@ -1807,8 +1807,11 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
    utc += observation_time_offset;
    obs->jd = utc + td_minus_utc( utc) / seconds_per_day;
 
-   obs->mag_band = buff[70];
-   obs->astrometric_net_code = buff[71];
+   if( !is_radar_obs)
+      {
+      obs->mag_band = buff[70];
+      obs->astrometric_net_code = buff[71];
+      }
    obs->discovery_asterisk = buff[12];
    obs->note1 = buff[13];
    obs->note2 = buff[14];
