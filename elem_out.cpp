@@ -3186,6 +3186,53 @@ double get_max_included_resid( const OBSERVE *obs, int n_obs)
    return( rval);
 }
 
+static void _log_problems( const OBJECT_INFO *id, const OBSERVE FAR *obs)
+{
+   int i, n_obs_used = 0, n_real_obs = 0;
+   double first_jd = -1., last_jd = obs->jd, arc_used, full_arc;
+   const double rms_err = compute_weighted_rms( obs, id->n_obs, NULL);
+   char error_message[200];
+
+   error_message[0] = '\0';
+   for( i = 0; i < id->n_obs; i++, obs++)
+      if( obs->is_included)
+         {
+         if( first_jd < 0.)
+            first_jd = obs->jd;
+         last_jd = obs->jd;
+         n_obs_used++;
+         if( !(obs->flags & OBS_DONT_USE))
+            n_real_obs++;
+         }
+   if( n_real_obs < 2)        /* skip singleton cases */
+      return;
+   obs -= id->n_obs;
+   if( n_obs_used <= n_real_obs * 2 / 3)
+      snprintf_append( error_message, sizeof( error_message),
+               " %d of %d observations used", n_obs_used, n_real_obs);
+   arc_used = last_jd - first_jd;
+   full_arc = obs[id->n_obs - 1].jd - obs[0].jd;
+   if(  arc_used < full_arc / 2.)
+      snprintf_append( error_message, sizeof( error_message),
+               " %lf/%lf of arclength used", arc_used, full_arc);
+   if( available_sigmas == NO_SIGMAS_AVAILABLE)
+      snprintf_append( error_message, sizeof( error_message),
+               " no sigmas");
+   if( rms_err > 3.)
+      snprintf_append( error_message, sizeof( error_message),
+               " rms=%lf", rms_err);
+   if( *error_message)
+      {
+      FILE *ofile = fopen_ext( "errors.txt", "tca");
+
+      if( ofile)
+         {
+         fprintf( ofile, "%s : %s\n", id->packed_desig, error_message);
+         fclose( ofile);
+         }
+      }
+}
+
 OBSERVE FAR *load_object( FILE *ifile, OBJECT_INFO *id,
                        double *curr_epoch, double *epoch_shown, double *orbit)
 {
@@ -3219,6 +3266,7 @@ OBSERVE FAR *load_object( FILE *ifile, OBJECT_INFO *id,
       *epoch_shown = *curr_epoch;
       if( got_vector <= 0)
          *epoch_shown = find_epoch_shown( obs, id->n_obs);
+      _log_problems( id, obs);
       }
    else                           /* indicate failure */
       *epoch_shown = *curr_epoch = 0.;
