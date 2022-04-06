@@ -563,12 +563,17 @@ that make it particularly well-suited to Halley's method.
 
    We start out with a rough approximation for inverf( y),  and
 then do a root search for y = erf( x) with Halley's method.  At
-most,  four iterations are required,  near y = +/- erf_limit.   */
+most,  four iterations are required,  near y = +/- erf_limit.
+(With a caveat : Ralph Pass found that on his Mac,  for y=0.9993,
+the iterations settled down with 'diff' alternating between
++3.074775e-14 and -3.074775e-14.  So the code now breaks out after
+ten iterations.)               */
 
 static double inverf( const double y)
 {
    double x, diff;
    const double erf_limit = .915;
+   int n_iterations = 0;
 
    if( y < -erf_limit)
       return( -inverf( -y));
@@ -587,7 +592,7 @@ static double inverf( const double y)
       diff = -dy / (slope + x * dy);   /* This gets us Halley's method */
       x += diff;
       }
-      while( fabs( diff) > 1e-14);
+      while( n_iterations++ < 10 && fabs( diff) > 1e-14);
    return( x);
 }
 
