@@ -679,15 +679,15 @@ double current_jd( void);                       /* elem_out.cpp */
 
 static int extract_date( const char *buff, double *jd)
 {
-   int rval = 0;
+   int rval = 0, is_ut;
 
                /* If the date seems spurious,  use 'now' as our zero point: */
    if( *jd < minimum_jd || *jd > maximum_jd || *jd == -.5 || *jd == 0.)
       *jd = current_jd( );
    *jd = get_time_from_string( *jd, buff,
-                     FULL_CTIME_YMD | CALENDAR_JULIAN_GREGORIAN, NULL);
+                     FULL_CTIME_YMD | CALENDAR_JULIAN_GREGORIAN, &is_ut);
    rval = 2;
-   if( *jd == 0.)
+   if( *jd == 0. || is_ut < 0)
       rval = -1;
    return( rval);
 }
@@ -827,7 +827,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
       const int ephem_type = (int)(ephemeris_output_options & 7);
       bool reset_vect_units = false;
       extern double ephemeris_mag_limit;
-      const char *tptr;
+      const char *tptr, *err_msg = NULL;
       const bool is_topocentric =
                is_topocentric_mpc_code( mpc_code);
 
@@ -1110,7 +1110,8 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                      buff, sizeof( buff), COLOR_MESSAGE_TO_USER))
                {
                format_start = extract_date( buff, &jd_end);
-               if( format_start == 1 || format_start == 2)
+               if( (format_start == 1 || format_start == 2)
+                               && jd_end > minimum_jd && jd_end < maximum_jd)
                   {
                   n_ephemeris_steps = (int)ceil( (jd_end - jd_start) / step);
                   if( n_ephemeris_steps < 0)
@@ -1127,6 +1128,8 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                         }
                      }
                   }
+               else
+                  err_msg = "Couldn't parse the time you entered!";
                }
             break;
          case 'f': case 'F':
@@ -1154,7 +1157,9 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
          case 'l': case 'L':
             if( !inquire( "Enter MPC code: ", buff, sizeof( buff), COLOR_MESSAGE_TO_USER))
                {
-               if( strlen( buff) < 50 || !memcmp( buff, "Ast", 3))
+               if( strlen( buff) < 3)
+                  err_msg = "MPC codes must be at least three characters long";
+               else if( strlen( buff) < 50 || !memcmp( buff, "Ast", 3))
                   strcpy( mpc_code, buff);
                else if( !get_observer_data( buff, buff, NULL, NULL, NULL))
                   {
@@ -1188,8 +1193,6 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             break;
          case 'm': case 'M':
             {
-            const char *err_msg = NULL;
-
             if( jd_start < minimum_jd || jd_start > maximum_jd)
                err_msg = "You need to set a valid starting date!";
             else if( !n_ephemeris_steps)
@@ -1198,8 +1201,6 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                err_msg = "You need to set a valid step size!";
             else                 /* yes,  we can make an ephemeris */
                c = -2;
-            if( err_msg)
-               inquire( err_msg, NULL, 0, COLOR_FINAL_LINE);
             }
             break;
          case 'n': case 'N': case KEY_F( 4):
@@ -1248,7 +1249,16 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             strlcpy_err( buff, ephemeris_start, sizeof( ephemeris_start));
             if( !inquire( "Enter start of ephemeris (YYYY MM DD, or JD, or 'now'):",
                          buff, sizeof( ephemeris_start), COLOR_MESSAGE_TO_USER))
-               strlcpy_err( ephemeris_start, buff, sizeof( ephemeris_start));
+               {
+               double jd = 0.;
+               const int format = extract_date( buff, &jd);
+
+               if( (format == 1 || format == 2)
+                               && jd > minimum_jd && jd < maximum_jd)
+                  strlcpy_err( ephemeris_start, buff, sizeof( ephemeris_start));
+               else
+                  err_msg = "Couldn't parse the time you entered!";
+               }
             break;
          case ALT_T:
             strcpy( ephemeris_start, "+0");
@@ -1300,6 +1310,8 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             show_a_file( "dosephem.txt");
             break;
          }
+      if( err_msg)
+         inquire( err_msg, NULL, 0, COLOR_FINAL_LINE);
       if( reset_vect_units)
          {
          snprintf( buff, sizeof( buff), "%d,%f,%f", vect_frame,
