@@ -824,6 +824,7 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
    extern const char *combine_all_observations;
    const char *packed_id;
    extern double uncertainty_parameter;
+   const char *reference = get_environment_ptr( "REFERENCE");
 
    if( combine_all_observations && *combine_all_observations)
       {
@@ -875,6 +876,8 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
    i = (int)strlen( buff);
    buff[i - 1] = '\0';    /* strip trailing paren */
    fprintf( ofile, "        \"frame\": \"%s\",\n", buff);
+   if( *reference)
+      fprintf( ofile, "        \"reference\": \"%s\",\n", reference);
    fprintf( ofile, "        \"epoch_iso\": \"%s\",\n", iso_time( buff, elem->epoch, 0));
    fprintf( ofile, "        \"epoch\": %17.8f,", elem->epoch);
    if( elem->ecc < 1.)
