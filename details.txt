@@ -976,6 +976,11 @@ COM Default details extracted from MPEC 2019-U80
 MEA I. Bikmaev, I. Khamitov
 TEL 1.50-m f/7.7 reflector + CCD
 
+COD A92
+OBS C. Titescu
+COM Default details extracted from MPEC 2022-G109
+TEL 0.30-m f/3.3 reflector + CCD
+
 COD A98
 OBS S. Shurpakov
 COM Default details extracted from MPEC 2021-J28
@@ -1205,6 +1210,11 @@ TEL 1-m f/2.5 reflector + CCD
 COD D03
 COM Default details from http://www.6roads.com.pl/
 TEL 0.40-m f/3.8 Newtonian + CCD
+
+COD D15
+OBS T. Lehmann
+COM Default details extracted from MPEC 2022-G109
+TEL 0.28-m f/2.2 reflector
 
 COD D20
 COM Default details extracted from MPEC 2020-U161
@@ -1465,6 +1475,11 @@ COM Find_Orb default details
 OBS G. McKeegan
 TEL 0.9-m f/4.5 Schmidt-Cassegrain + CCD
 
+COD G80
+OBS D. De Martin
+COM Default details extracted from MPEC 2022-G109
+TEL 0.61-m f/6.8 Corrected Dall-Kirkham + CCD
+
 COD G83
 COM Find_Orb default details
 COM https://www.lbto.org/overview.html
@@ -1544,6 +1559,11 @@ TEL 0.43-m f/6.8 astrograph + CCD + f/4.5 focal reducer
 TEL 0.25-m f/3.4 reflector + CCD
 TEL 0.50-m f/6.8 reflector + CCD + f/4.5 focal reducer
 TEL 0.10-m f/5.0 astrograph + CCD
+
+COD H15
+OBS L. Elenin
+COM Default details extracted from MPEC 2022-G109
+TEL 0.45-m f/2.8 astrograph + CCD
 
 COD H21
 COM Find_Orb default details
@@ -2231,6 +2251,11 @@ COD L92
 OBS T. Scarmato
 COM Default details extracted from MPEC 2021-J28
 TEL 0.25-m Newtonian reflector + CCD
+
+COD M03
+OBS C. Grabenbauer
+COM Default details extracted from MPEC 2022-G109
+TEL 0.15-m f/4 refractor + CCD
 
 COD M09
 OBS P.-J. Dekelver
