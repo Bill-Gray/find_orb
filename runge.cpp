@@ -41,6 +41,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #define ldouble long double
 
 #ifdef __WATCOMC__
+#define ceill ceil
+#define expl exp
+#define fabsl fabs
+#define isnanl isnan
+#define powl pow
 #define sqrtl sqrt
 #endif
 

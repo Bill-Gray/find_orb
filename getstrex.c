@@ -1,5 +1,9 @@
 #define _XOPEN_SOURCE_EXTENDED 1
 
+#ifdef __WATCOMC__
+   #define PDC_NCMOUSE
+#endif
+
 #if defined( VT) || defined( XCURSES) || defined( _WIN32)
    #define PDC_WIDE
    #define PDC_FORCE_UTF8
@@ -54,6 +58,20 @@ int getn_wstr_ex( wint_t *wstr, int *loc, const int maxlen, const int size);
 #define _ESCAPE    0x1B
 #define _TAB       0x09
 
+#ifdef __WATCOMC__
+int wget_wch(WINDOW *win, wint_t *wch)
+{
+   const int key = wgetch( win);
+
+    if (key == ERR)
+        return ERR;
+
+    *wch = (wint_t)key;
+
+    return( key >= KEY_MIN && key < KEY_MAX) ? KEY_CODE_YES : OK;
+}
+#endif
+
 /* At least for the nonce,  the cursor will be 'normal' in overwrite mode
 and 'very visible' in insert mode.     */
 
@@ -84,7 +102,7 @@ reposition the cursor using the mouse.
 To do : return when Shift-Tab,  etc. are hit;  fullwidth/combining characters;
 perhaps allow text to be marked by click-drag.    */
 
-static bool _insert_mode = false;
+static bool _insert_mode = FALSE;
 
 int wgetn_wstr_ex(WINDOW *win, wint_t *wstr, int *loc, const int maxlen, const int size)
 {

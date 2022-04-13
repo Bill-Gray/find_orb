@@ -35,42 +35,42 @@ unxp1600-2200_intel_mac_ifort.405
 jpl_eph.422
 
 ; Same file as above,  under a different name,  available at
-; ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de422/lnxm3000p3000.422
+; https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de422/lnxm3000p3000.422
 ; (about 545 MBytes)
 lnxm3000p3000.422
 
 ; Similar files from same site:
-; ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de421/lnxp1900p2053.421
+; https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de421/lnxp1900p2053.421
 ; (about 13 MBytes)
 lnxp1900p2053.421
-; ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de423/lnxp1900.423
+; https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de423/lnxp1900.423
 ; (about 13.6 MBytes, 1900-2050)
 lnxp1900.423
 
-; ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de423/lnxp1800p2200.423
+; https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de423/lnxp1800p2200.423
 ; (about 37 MBytes)
 lnxp1800p2200.423
 
-; ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de418/lnxp1900p2050.418
+; https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de418/lnxp1900p2050.418
 ; (about 13 MBytes)
 lnxp1900p2050.418
-; ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de414/lnxp1600p2200.414
+; https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de414/lnxp1600p2200.414
 ; (about 55 MBytes)
 lnxp1600p2200.414
-;ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de405/lnxp1600p2200.405
+;https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de405/lnxp1600p2200.405
 ; (about 55 MBytes)
 lnxp1600p2200.405
-; ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de406/lnxm3000p3000.406
+; https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de406/lnxm3000p3000.406
 ; (about 200 MBytes)
 lnxm3000p3000.406
-; ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de403/lnxp1600p2200.403
+; https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de403/lnxp1600p2200.403
 ; (about 55 MBytes)
 lnxp1600p2200.403
 
 ; From the second Guide 8.0 disk: 1800-2200,  about 13.3 MBytes:
 sub_de.406
 
-; ftp://ssd.jpl.nasa.gov/pub/eph/planets/unix/de406/unxp1800.406
+; https://ssd.jpl.nasa.gov/ftp/eph/planets/unix/de406/unxp1800.406
 ; Covers 1800-2100 (now renamed as shown above)
 unxp1800.406
 
@@ -91,25 +91,25 @@ unix.200
 
 jpleph.431
 jpleph.430
-; ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de430/linkp1550p2650.430
+; https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de430/linkp1550p2650.430
 linkp1550p2650.430
-; ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de430/linux_p1550p2650.430
+; https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de430/linux_p1550p2650.430
 linux_p1550p2650.430
-; ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de430t/linux_p1550p2650.430t
+; https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de430t/linux_p1550p2650.430t
 linux_p1550p2650.430t
 
-; ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de431/lnxm13000p17000.431
+; https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de431/lnxm13000p17000.431
 lnxm13000p17000.431
 
-; ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de440/linux_p1550p2650.440
+; https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de440/linux_p1550p2650.440
 ; 100 MBytes
 linux_p1550p2650.440
 
-; ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de440t/linux_p1550p2650.440t
+; https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de440t/linux_p1550p2650.440t
 ; 110 MBytes
 linux_p1550p2650.440t
 
-; ftp://ssd.jpl.nasa.gov/pub/eph/planets/Linux/de441/linux_m13000p17000.441
+; https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de441/linux_m13000p17000.441
 ; 2723 MBytes
 linux_m13000p17000.441
 

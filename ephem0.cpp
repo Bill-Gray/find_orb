@@ -17,7 +17,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301, USA.    */
 
-#ifdef _WIN32
+#if defined( _WIN32) || defined( __WATCOMC__)
    #include <direct.h>        /* for _mkdir() definition */
 #else
    #include <sys/stat.h>
@@ -1544,7 +1544,7 @@ static void make_path_available( const char *filename)
       if( i && filename[i] == '/')
          {
          path[i] = '\0';
-#ifdef _WIN32
+#if defined( _WIN32) || defined( __WATCOMC__)
          _mkdir( path);
 #else
          mkdir( path, 0777);
@@ -4341,7 +4341,7 @@ static bool get_details_from_here( const char *buff, const char *mpc_code,
        if( buff[7] < ' ')
           rval = true;
        else
-          rval = strchr( program_codes, buff[8]);
+          rval = (NULL != strchr( program_codes, buff[8]));
        }
    return( rval);
 }

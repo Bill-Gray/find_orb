@@ -145,7 +145,6 @@ const char *sof_filename = "sof.txt";
 const char *sofv_filename = "sofv.txt";
 int force_model = 0;
 extern int forced_central_body;
-double extract_yyyymmdd_to_jd( const char *buff);        /* sof.cpp */
 int get_planet_posn_vel( const double jd, const int planet_no,
                      double *posn, double *vel);         /* runge.cpp */
 void compute_variant_orbit( double *variant, const double *ref_orbit,
@@ -168,6 +167,12 @@ int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
          __attribute__ (( format( printf, 1, 2)))
 #endif
 ;
+
+/* Old MSVCs and OpenWATCOM lack erf() and many other math functions: */
+
+#if defined( _MSC_VER) && (_MSC_VER < 1800) || defined( __WATCOMC__)
+double erf( double x);     /* orb_fun2.cpp */
+#endif
 
 bool is_inverse_square_force_model( void)
 {
@@ -2580,9 +2585,6 @@ static void compute_two_body_state_vect( ELEMENTS *elems, double *orbit, const d
 ELEMENTS.COMET,  Find_Orb can sometimes flounder about a bit in its
 efforts to determine an orbit. */
 
-int extract_sof_data_ex( ELEMENTS *elem, const char *buff, const char *header,
-                        double *extra_info);
-
 static int get_orbit_from_mpcorb_sof( const char *filename,
                  const char *object_name, double *orbit, ELEMENTS *elems,
                  const double full_arc_len, double *max_resid)
@@ -3637,7 +3639,7 @@ The first instance of Find_Orb,  fo,  or fo_serve will attempt to put a lock
 on /tmp/fo_lock.  Subsequent instances will see that and fail to get a lock.
 Basically,  an interprocess mutex.     */
 
-#ifndef _WIN32
+#if !defined( _WIN32) && !defined( __WATCOMC__)
 int check_for_other_processes( const int locking)
 {
    const char *lock_filename = "/tmp/fo_lock";
@@ -3708,7 +3710,7 @@ int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
    const char *eop_filename = get_environment_ptr( "EOP_FILE");
    const char *albedo = get_environment_ptr( "OPTICAL_ALBEDO");
 
-#ifndef _WIN32
+#if !defined( _WIN32) && !defined( __WATCOMC__)
    findorb_already_running = (check_for_other_processes( 1) != 0);
 #endif
    if( *language)

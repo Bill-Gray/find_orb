@@ -57,12 +57,14 @@ namespace fs = ghc::filesystem;
 
 #endif
 
-#ifndef _WIN32
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
+#if defined( _WIN32) || defined( __WATCOMC__)
+   #include <direct.h>        /* for _mkdir() definition */
+#else
+   #include <sys/stat.h>
+   #include <sys/types.h>
+   #include <unistd.h>
 
-const char *get_find_orb_text( const int index);
+   const char *get_find_orb_text( const int index);
 #endif
 
 /* This function allows one to put the following options in front of
@@ -221,10 +223,18 @@ int get_temp_dir( char *name, const size_t max_len)
       const bool first_time = (process_id == 0);
 
       if( first_time)
+#if defined( _WIN32) || defined( __WATCOMC__)
+         process_id = 1;
+#else
          process_id = getpid( );
+#endif
       snprintf_err( name, max_len, "/tmp/find_orb%d", process_id);
       if( first_time)
+#if defined( _WIN32) || defined( __WATCOMC__)
+         _mkdir( name);
+#else
          mkdir( name, 0777);
+#endif
       }
    return( process_id);
 }
@@ -248,7 +258,7 @@ FILE *fopen_ext( const char *filename, const char *permits)
 
    if( *permits == 't')
       {
-#ifndef _WIN32
+#if !defined( _WIN32) && !defined( __WATCOMC__)
       extern bool findorb_already_running;
 
       is_temporary = findorb_already_running || (output_directory != NULL);
@@ -416,7 +426,7 @@ int fetch_astrometry_from_mpc( FILE *ofile, const char *desig)
          }
       for( i = 0; desig[i]; i++)
          j = j * 314159u + (unsigned)desig[i];
-#ifdef _WIN32
+#if defined( _WIN32) || defined( __WATCOMC__)
       snprintf_err( filename, sizeof( filename),      "temp%02u.ast", j % 100);
 #else
       snprintf_err( filename, sizeof( filename), "/tmp/temp%02u.ast", j % 100);
@@ -433,7 +443,7 @@ int fetch_astrometry_from_mpc( FILE *ofile, const char *desig)
             bytes_written += (int)fwrite( tbuff, 1, strlen( tbuff), ofile);
          fclose( ifile);
          }
-#ifndef _WIN32
+#if !defined( _WIN32) && !defined( __WATCOMC__)
       else
          {
          fprintf( stderr, "grab_mpc error code %d (%x) %s\n", err_code, err_code,

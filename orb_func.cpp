@@ -64,6 +64,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 int snprintf( char *string, const size_t max_len, const char *format, ...);
 #endif
 
+#ifdef __WATCOMC__
+#define sqrtl sqrt
+#define powl pow
+#define fabsl fabs
+#define ceill ceil
+#endif
+
 unsigned perturbers = 0;
 int integration_method = 0;
 extern int debug_level;
@@ -4753,7 +4760,7 @@ void update_environ_dot_dat( void);     /* mpc_obs.cpp */
 int galactic_confusion( const double ra, const double dec);
 void pop_all_orbits( void);         /* orb_func2.cpp */
 char *find_numbered_mp_info( const int number);    /* mpc_obs.cpp */
-#ifndef _WIN32
+#if !defined( _WIN32) && !defined( __WATCOMC__)
 int check_for_other_processes( const int locking);    /* elem_out.cpp */
 int get_temp_dir( char *name, const size_t max_len);   /* miscell.cpp */
 #endif
@@ -4783,7 +4790,7 @@ int clean_up_find_orb_memory( void)
    pop_all_orbits( );
    galactic_confusion( -99., 0.);
    find_numbered_mp_info( 0);
-#ifndef _WIN32
+#if !defined( _WIN32) && !defined( __WATCOMC__)
    if( check_for_other_processes( 0))
       {
       char cmd[100];
