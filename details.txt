@@ -2277,6 +2277,12 @@ OBS S. Fritsche
 COM Default details extracted from MPEC 2022-C56
 TEL 0.10-m f/5.8 refractor
 
+COD M21
+MEA L. Buzzi
+OBS A. Aletti, F. Bellini, L. Buzzi, G. Galli
+COM Default details extracted from MPEC 2022-H30
+TEL 0.36-m f/8.4 reflector + CCD
+
 COD M22
 MEA L. Denneau, N. Erasmus, A. Fitzsimmons, A. Lawrence, J. Robinson
 MEA R. Siverd, J. Tonry, H. Weiland
