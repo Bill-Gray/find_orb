@@ -544,6 +544,7 @@ int main( const int argc, const char **argv)
    double *vectors, worst_resid_in_run = 0., worst_mjd = 0.;
    double tdt = 0., *computed_vects;
    int ephem, progress_bar_freq = 2, ref_frame = -1;
+   int epoch_index = -1;
    tle_t tle;
    const time_t t0 = time( NULL);
    bool use_precession = true, archival = false;
@@ -635,6 +636,9 @@ int main( const int argc, const char **argv)
                break;
             case 'u': case 'U':
                archival = true;
+               break;
+            case 'x':
+               epoch_index = atoi( argv[i] + 2);
                break;
             case 'y':
                max_simplex_iter = (size_t)atoi( argv[i] + 2);
@@ -823,9 +827,10 @@ int main( const int argc, const char **argv)
          {
          double start_params[max_n_params];
 
-         i = output_freq / 2;    /* use middle vector;  it improves the */
-         tle.epoch += (double)i * step;      /* convergence for simplex */
-         ephem = iterated_vector_to_tle( &tle, vectors + i * 6, tle.epoch);
+         if( epoch_index == -1)
+            epoch_index = output_freq / 2;    /* use middle vector;  it improves the */
+         tle.epoch += (double)epoch_index * step;      /* convergence for simplex */
+         ephem = iterated_vector_to_tle( &tle, vectors + epoch_index * 6, tle.epoch);
          if( ephem != -1)
             ephem = select_ephemeris( &tle);
          if( verbose)
@@ -883,7 +888,7 @@ int main( const int argc, const char **argv)
             double resid2 = 0.;
 //          const double time_diff_in_minutes = (double)j
 //                                     * step * minutes_per_day;
-            const double time_diff_in_minutes = (double)(j - output_freq / 2)
+            const double time_diff_in_minutes = (double)(j - epoch_index)
                                        * step * minutes_per_day;
 
             for( i = 0; i < n_params; i++)
