@@ -19,8 +19,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 
 #define _XOPEN_SOURCE_EXTENDED   1
 #define PDC_NCMOUSE
-#define PDC_FORCE_UTF8
-#define PDC_WIDE
+#ifndef __WATCOMC__
+   #define PDC_FORCE_UTF8
+   #define PDC_WIDE
+#endif
 #define MOUSE_MOVEMENT_EVENTS_ENABLED
 
 #ifdef _WIN32
@@ -335,6 +337,14 @@ is commented out by default. */
    #define VT_IGNORE_ALL_MOUSE      "\033\133?1003l\n"
    #define VT_RECEIVE_ALL_MOUSE     "\033\133?1003h\n"
 #endif
+#endif
+
+#ifdef __WATCOMC__
+#undef endwin
+extern "C" {
+PDCEX  int     endwin_x64_4302(void);
+}
+#define endwin endwin_x64_4302
 #endif
 
 static int full_endwin( void)
@@ -1908,7 +1918,7 @@ static MPC_STATION *mpc_color_codes = NULL;
    'default_color' unless it's excluded.  If it is,  the residuals
    are shown in COLOR_EXCLUDED_OBS. */
 
-#ifdef __APPLE__
+#if defined( __APPLE__) || defined( __WATCOMC__)
    static int make_unicode_substitutions = 0;
 #else
    static int make_unicode_substitutions = 1;
@@ -2943,6 +2953,8 @@ handy at some point (not used yet) :
 
 https://github.com/maravento/winzenity */
 
+#ifndef __WATCOMC__
+
 static int try_a_file_dialog_program( char *filename, const char *command)
 {
    FILE *f = popen( command, "r");
@@ -2952,9 +2964,11 @@ static int try_a_file_dialog_program( char *filename, const char *command)
       *filename = '\0';
    return( (pclose( f) & 0x4000) ? -1 : 0);
 }
+#endif
 
 static int user_select_file( char *filename, const char *title, const int flags)
 {
+#ifndef __WATCOMC__
    const bool is_save_dlg = (flags & 1);
    char cmd[256];
    int rval;
@@ -3000,6 +3014,7 @@ static int user_select_file( char *filename, const char *title, const int flags)
    restart_curses( );
    if( !rval)
       return( 0);
+#endif
 
             /* We have none of the 'usual' file dialogues available
             to us.  So we'll just ask outright for the file name : */
@@ -3232,17 +3247,21 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
       }
    else
       {
-      FILE *ofile =  fopen_ext( prev_fn, "fcw");
-#ifdef _WIN32
+      FILE *ofile = fopen_ext( prev_fn, "fcw");
+#if defined( _WIN32)
       char canonical_path[MAX_PATH];
       DWORD len =
                  GetFullPathNameA( ifilename, MAX_PATH, canonical_path, NULL);
 
       assert( len && len < MAX_PATH);
 #else
+   #if defined( __WATCOMC__)
+      char *canonical_path = ifilename;
+   #else
       char *canonical_path = realpath( ifilename, NULL);
 
       assert( canonical_path);
+   #endif
 #endif
       set_solutions_found( ids, *n_ids);
       for( i = 0; i < n_lines; i++)
