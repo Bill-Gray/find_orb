@@ -1862,6 +1862,49 @@ double find_next_auto_step( const double target_diff, const bool going_backward,
    return( rval);
 }
 
+/* A lunar eclipse is said to have an 'eclipse magnitude' U of 0 when the
+umbral phase starts/ends,  and 1 when totality starts/ends.  During
+totality,  the magnitude will be greater than 1.  During the penumbral
+phases,  the magnitude will be less than zero.
+
+   The brightness of the moon should,  of course,  drop during a lunar
+eclipse.
+
+https://www.th-brandenburg.de/~piweb/mitarbeiter/papers/AO_2008_1_klein.pdf
+
+   shows the brightness drop is basically a function of U.  The following
+computes U using equation (15) from that paper,  and the resulting
+magnitude drop is then computed using an eyeballed curve fit to figure 6.  */
+
+static double lunar_eclipse_magnitude( const double *earth, const double *moon)
+{
+   double vect[3], dot, rval = -3;    /* -3 -> 'not eclipsed' */
+   size_t i;
+
+   for( i = 0; i < 3; i++)
+      vect[i] = moon[i] - earth[i];
+   dot = dot_product( vect, earth);
+   if( dot > 0.)        /* between first and last quarter */
+      {
+      const double sun_earth = vector3_length( earth);
+      const double r = vector3_length( vect);
+      const double theta = acose( dot / (r * sun_earth));
+
+      if( theta < 10. * PI / 180.)    /* near enough opposition to be worth checking */
+         {
+         const double lunar_radius = 1737.4 / AU_IN_KM;
+         const double expansion_factor = 1.02;     /* adds a bit for earth's atmosphere */
+         const double earth_radius = expansion_factor * 6378.4 / AU_IN_KM;
+         const double solar_radius = 695700. / AU_IN_KM;
+         const double umbra_angle = earth_radius / r - (solar_radius - earth_radius) / sun_earth;
+         const double lunar_angle = lunar_radius / r;
+
+         rval = (umbra_angle - theta) / (2. * lunar_angle) + 0.5;
+         }
+      }
+   return( rval);
+}
+
 static int compare_doubles( const void *a, const void *b, void *context)
 {
    const double *a1 = (const double *)a;
@@ -2576,6 +2619,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                double phase_ang, curr_mag, air_mass = 40.;
                char visibility_char = ' ';
                BRIGHTNESS_DATA bdata;
+               double lunar_eclipse_mag_drop = 0.;
 
                solar_r = vector3_length( orbi_after_light_lag);
                earth_r = vector3_length( obs_posn_equatorial);
@@ -2604,7 +2648,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                            vect[k] = -obs_posn_equatorial[k];
                      else
                         {           /* we want the lunar posn */
-                        double moon_dist, earth_loc[3];
+                        double moon_dist, earth_loc[3], lunar_eclipse_mag;
                         const double lunar_radius = 1737.4 / AU_IN_KM;
 #ifdef SHOW_LUNAR_OFFSETS
                         double moon_lon, moon_lat, obs_lon, obs_lat;
@@ -2612,6 +2656,20 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
 #endif
 
                         earth_lunar_posn( ephemeris_t, earth_loc, vect);
+                        lunar_eclipse_mag = lunar_eclipse_magnitude( earth_loc, vect);
+                        if( lunar_eclipse_mag > -0.75)
+                           {
+                           if( lunar_eclipse_mag < 0.25)
+                              {
+                              const double tval = lunar_eclipse_mag + 0.75;
+
+                              lunar_eclipse_mag_drop = tval * tval * 1.45;
+                              }
+                           else if( lunar_eclipse_mag < 1.)
+                              lunar_eclipse_mag_drop = 9 * 0.25 / (1.25 - lunar_eclipse_mag);
+                           else        /* totally eclipsed */
+                              lunar_eclipse_mag_drop = 9.;
+                           }
                         for( k = 0; k < 3; k++)
                            vect[k] -= obs_posn[k];
                         moon_dist = vector3_length( vect);
@@ -2715,6 +2773,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                   bdata.zenith_ang_sun  = PI / 2. - alt_az[1].y;
                   bdata.zenith_ang_moon = PI / 2. - alt_az[2].y;
                   set_brightness_params( &bdata);
+                  bdata.lunar_mag += lunar_eclipse_mag_drop;
                   compute_sky_brightness( &bdata);
                   light_pollution_mags_per_arcsec_squared +=
                                2.5 * log10( sin( alt_az[0].y));
@@ -2948,6 +3007,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                   bdata.zenith_ang_sun  = PI / 2. - best_alt_az[1].y;
                   bdata.zenith_ang_moon = PI / 2. - best_alt_az[2].y;
                   set_brightness_params( &bdata);
+                  bdata.lunar_mag += lunar_eclipse_mag_drop;
                   compute_sky_brightness( &bdata);
                   mags_per_arcsec2 = -2.5 * log10( bdata.brightness[3]) - 11.055;  /* R brightness */
                   exposure_config.sky_brightness = mags_per_arcsec2;
