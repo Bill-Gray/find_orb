@@ -63,9 +63,9 @@ namespace fs = ghc::filesystem;
    #include <sys/stat.h>
    #include <sys/types.h>
    #include <unistd.h>
-
-   const char *get_find_orb_text( const int index);
 #endif
+
+const char *get_find_orb_text( const int index);
 
 /* This function allows one to put the following options in front of
 the 'permits' string :
@@ -443,14 +443,12 @@ int fetch_astrometry_from_mpc( FILE *ofile, const char *desig)
             bytes_written += (int)fwrite( tbuff, 1, strlen( tbuff), ofile);
          fclose( ifile);
          }
-#if !defined( _WIN32) && !defined( __WATCOMC__)
       else
          {
-         fprintf( stderr, "grab_mpc error code %d (%x) %s\n", err_code, err_code,
+         debug_printf( "grab_mpc error code %d (%x) %s\n", err_code, err_code,
                      strerror( err_code));
          generic_message_box( get_find_orb_text( 2058), "o");
          }
-#endif
       }
    return( bytes_written);
 }
