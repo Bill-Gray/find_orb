@@ -6,7 +6,7 @@
      "3":   "   Site details default to (500),  with specifics being",
      "4":   "overridden on a site-by-site basis.  Report your site",
      "5":   "info to pluto (at) projectpluto (.) com to be added to",
-     "6":   "this file.  2021 May 29 version.",
+     "6":   "this file.  2022 Apr 28 version.",
      "7":   "See 'site_310.txt' for an alternative,  simpler way to",
      "8":  "describe site parameters (and comments that may help in",
      "9":   "understanding this file)."
@@ -30,6 +30,34 @@
      "MaxHA": 180.0,
      "MinElong": 0.0,
      "MaxElong": 180.0
+  },
+  "310":
+  {
+    "Comment1": "MPC test code.  Let's use it as a test code here,  with",
+    "Comment2": "a very unusual horizon profile.  Horizon profile format",
+    "Comment3": "documented at https://www.projectpluto.com/findhist.htm#horizon",
+    "Comment4": "and in site_310.txt.",
+    "Primary": 40,
+    "Obstruction": 10,
+    "PixelSize": 2.0,
+    "Horizon":
+     [
+     355, 10,
+     15, 25,
+     60, 25,
+     90, 10,
+     110, 20,
+     110, 5,
+     170, 15,
+     180, 15,
+     175, 40,
+     200, 30,
+     230, 0,
+     240, 15,
+     300, 20,
+     355, 10
+     ],
+     "SkyBrightness": 18.5
   },
   "703":
   {
@@ -74,6 +102,23 @@
      "PixelSize": 1.8,
      "SkyBrightness": 20
   },
+  "G37":
+  {
+     "Comment1": "Reverse-engineered/extracted from",
+     "Comment2": "http://www2.lowell.edu/rsch/LMI/etc_calc.php and its accompanying",
+     "Comment3": "equations and assumptions.  The Lowell calculator assumes aperture",
+     "Comment4": "is 0.67 x FWHM.  The following matches V magnitude and DCT/LMI",
+     "Comment5": "unbinned results at new moon,  when they expect a background",
+     "Comment6": "sky brightness of 22.2 mags/arcsec^2.",
+     "Primary": 430.0,
+     "Obstruction": 100.0,
+     "PixelSize": 0.12,
+     "SkyBrightness": 22.2,
+     "QE": 0.85,
+     "Aperture": 1,
+     "ReadNoise": 6,
+     "FWHM": 1.5
+  },
   "G96":
   {
      "Primary": 152,
@@ -89,6 +134,33 @@
      "MinHA": -105.0,
      "MaxHA": 105.0,
      "MinElong": 40.0
+  },
+  "H21c":
+  {
+     "Primary": 81,
+     "Obstruction": 17,
+     "PixelSize": 1.34,
+     "Comment": "http://www.astro-research.org/phase2.htm"
+  },
+  "H21d":
+  {
+     "Primary": 61,
+     "Obstruction": 17,
+     "PixelSize": 1.55,
+     "Comment": "http://www.astro-research.org/phase3.htm"
+  },
+  "Hal":
+  {
+     "Comment1": "See above comments for (G37) Lowell Discovery Telescope.",
+     "Comment2": "Similarly assumes optimal aperture,  new moon,  Vmag,  no binning.",
+     "Primary": 104.0,
+     "Obstruction": 30.0,
+     "PixelSize": 0.37,
+     "SkyBrightness": 22.2,
+     "QE": 0.40,
+     "Aperture": 1,
+     "ReadNoise": 4.6,
+     "FWHM": 1.5
   },
   "I52":
   {
@@ -124,48 +196,6 @@
      "FieldWidth": 0.1611,
      "FieldHeight": 0.1611
   },
-  "H21c":
-  {
-     "Primary": 81,
-     "Obstruction": 17,
-     "PixelSize": 1.34,
-     "Comment": "http://www.astro-research.org/phase2.htm"
-  },
-  "H21d":
-  {
-     "Primary": 61,
-     "Obstruction": 17,
-     "PixelSize": 1.55,
-     "Comment": "http://www.astro-research.org/phase3.htm"
-  },
-  "310":
-  {
-    "Comment1": "MPC test code.  Let's use it as a test code here,  with",
-    "Comment2": "a very unusual horizon profile.  Horizon profile format",
-    "Comment3": "documented at https://www.projectpluto.com/findhist.htm#horizon",
-    "Comment4": "and in site_310.txt.",
-    "Primary": 40,
-    "Obstruction": 10,
-    "PixelSize": 2.0,
-    "Horizon":
-     [
-     355, 10,
-     15, 25,
-     60, 25,
-     90, 10,
-     110, 20,
-     110, 5,
-     170, 15,
-     180, 15,
-     175, 40,
-     200, 30,
-     230, 0,
-     240, 15,
-     300, 20,
-     355, 10
-     ],
-     "SkyBrightness": 18.5
-  },
   "WIY":
   {
      "Comment1": "For the WIYN 0.9-m scope on Kitt Peak.  Values from",
@@ -179,36 +209,6 @@
      "QE": 0.77,
      "Aperture": 1,
      "ReadNoise": 10,
-     "FWHM": 1.5
-  },
-  "G37":
-  {
-     "Comment1": "Reverse-engineered/extracted from",
-     "Comment2": "http://www2.lowell.edu/rsch/LMI/etc_calc.php and its accompanying",
-     "Comment3": "equations and assumptions.  The Lowell calculator assumes aperture",
-     "Comment4": "is 0.67 x FWHM.  The following matches V magnitude and DCT/LMI",
-     "Comment5": "unbinned results at new moon,  when they expect a background",
-     "Comment6": "sky brightness of 22.2 mags/arcsec^2.",
-     "Primary": 430.0,
-     "Obstruction": 100.0,
-     "PixelSize": 0.12,
-     "SkyBrightness": 22.2,
-     "QE": 0.85,
-     "Aperture": 1,
-     "ReadNoise": 6,
-     "FWHM": 1.5
-  },
-  "Hal":
-  {
-     "Comment1": "See above comments for (G37) Lowell Discovery Telescope.",
-     "Comment2": "Similarly assumes optimal aperture,  new moon,  Vmag,  no binning.",
-     "Primary": 104.0,
-     "Obstruction": 30.0,
-     "PixelSize": 0.37,
-     "SkyBrightness": 22.2,
-     "QE": 0.40,
-     "Aperture": 1,
-     "ReadNoise": 4.6,
      "FWHM": 1.5
   }
 }
