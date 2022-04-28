@@ -537,8 +537,8 @@ int main( const int argc, const char **argv)
       case EXPCALC_GEOCENTRIC_CONFIG:
          fprintf( stderr, "No details for MPC code '%s'\n", mpc_code);
          fprintf( stderr, "Using default 'geocentric' values\n");
-         fprintf( stderr, "At present,  this program only knows about the following codes:\n"
-                       "(703) (E12) (I52) (G96) (V06)\n");
+         fprintf( stderr, "Check ~/.find_orb/scope.json to see if (%s) is listed.\n",
+                       mpc_code);
          break;
       case EXPCALC_SITE_SPECIFIC_CONFIG:
          break;               /* got the details we wanted for the site */
