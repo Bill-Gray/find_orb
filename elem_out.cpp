@@ -2882,6 +2882,7 @@ double mid_epoch_of_arc( const OBSERVE *obs, const int n_obs)
 const char *state_vect_text = NULL;
 int ignore_prev_solns;
 bool take_first_soln = false, force_final_full_improvement = false;
+int n_extra_full_steps = 0;
 
 static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit,
                double *orbit_epoch, unsigned *perturbers)
@@ -3088,6 +3089,16 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
                            (pass ? "e=1" : NULL),
                            ORBIT_SIGMAS_REQUESTED, *orbit_epoch);
             }
+         if( !pass)
+            for( i = n_extra_full_steps; i; i--)
+               {
+               if( i > 1)
+                  filter_obs( obs, n_obs, 3., 0);
+               full_improvement( obs, n_obs, orbit, mid_epoch,
+                              (pass ? "e=1" : NULL),
+                              ORBIT_SIGMAS_REQUESTED, *orbit_epoch);
+
+               }
          if( prev_score < evaluate_initial_orbit( obs, n_obs, orbit) - .001)
             {
             pop_orbit( orbit_epoch, orbit);    /* we were better off with the old orbit */

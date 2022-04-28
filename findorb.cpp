@@ -3705,6 +3705,13 @@ int main( int argc, const char **argv)
                saving_elements_for_reuse = true;
                }
                break;
+            case 'y':
+               {
+               extern int n_extra_full_steps;
+
+               n_extra_full_steps = atoi( arg);
+               }
+               break;
             case 'z':
                {
                extern const char *alt_config_directory;
