@@ -3076,13 +3076,15 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
          {
          const int64_t t0 = nanoseconds_since_1970( );
          const int64_t QUARTER_SECOND = 250000000;
+         const double mid_epoch = mid_epoch_of_arc( obs, n_obs);
 
          push_orbit( *orbit_epoch, orbit);
+         integrate_orbit( orbit, *orbit_epoch, mid_epoch);
          for( i = 0; i < 4 && (nanoseconds_since_1970( ) - t0) < QUARTER_SECOND; i++)
             {
             if( i)
                filter_obs( obs, n_obs, 3., 0);
-            full_improvement( obs, n_obs, orbit, *orbit_epoch,
+            full_improvement( obs, n_obs, orbit, mid_epoch,
                            (pass ? "e=1" : NULL),
                            ORBIT_SIGMAS_REQUESTED, *orbit_epoch);
             }
@@ -3095,6 +3097,7 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
             {
             pass = 100;
             pop_orbit( NULL, NULL);
+            integrate_orbit( orbit, mid_epoch, *orbit_epoch);
             }
          }
       free( saved_obs);
