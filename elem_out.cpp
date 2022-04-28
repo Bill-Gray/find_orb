@@ -2851,6 +2851,34 @@ static double extract_state_vect_from_text( const char *text,
    return( epoch);
 }
 
+int find_first_and_last_obs_idx( const OBSERVE *obs, const int n_obs,
+         int *last)
+{
+   int i;
+
+   if( last)
+      {
+      for( i = n_obs - 1; i > 0 && !obs[i].is_included; i--)
+         ;
+      *last = i;
+      }
+   for( i = 0; i < n_obs - 1 && !obs[i].is_included; i++)
+      ;
+   return( i);
+}
+
+/* When doing (for example) a full six-parameter fit to an orbit,  it can
+be helpful to use an epoch that is at the mid-point of the arc of
+observations that is being fitted.  This improves stability.  */
+
+double mid_epoch_of_arc( const OBSERVE *obs, const int n_obs)
+{
+   int first, last;
+
+   first = find_first_and_last_obs_idx( obs, n_obs, &last);
+   return( (obs[first].jd + obs[last].jd) / 2.);
+}
+
 const char *state_vect_text = NULL;
 int ignore_prev_solns;
 bool take_first_soln = false, force_final_full_improvement = false;
