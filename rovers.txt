@@ -1385,19 +1385,20 @@ P5m !-116.86503    +33.35627         1662.     Palomar 5m
    Coords from Andrea Mattei.
 L78 !+014.780211   +40.6826087        134.     San Marco Observatory, Salerno
 
-   I'm still trying to get good coordinates for Arecibo.  The following
-   position is the one used by _Horizons_;  on G__gle Maps,  it's at
-   the center of the dish.  The MPC position is halfway off the dish
-   and about 54 meters higher. It does not appear that anybody is sure
-   what coordinates should be used; the following is probably an
-   improvement, but may be changed based on further info.
+   The following position is from a GPS survey, from a private communication
+   from Mike Nolan.  _Horizons_ uses an almost identical position,  except
+   with altitude 450.557m.  Possibly an ellipsoid difference?  And a VLBI
+   survey reported by Dave Graham differs by ~5 meters,  mostly in altitude
+   (I don't know which way).  The MPC position is horrible,  about 90m south
+   and at altitude 504m.  On G__gle Maps,  it's almost halfway off the dish.
 
-251 !-066.7527     +18.3442           450.557  Arecibo
+251 !-066.752693   +18.344219         453.340  Arecibo
 
 UAZ !-110.947361   +32.232722         100.000  University of Arizona 24"
 
    DSS 47 isn't in the aforementioned file where I got data for other DSN
    locations.  The following coordinates came from JPL's radar astrometry
-   service at https://ssd.jpl.nasa.gov/sb/radar.html .
+   service at https://ssd.jpl.nasa.gov/sb/radar.html .  I am not sure they're
+   right;  I can't get good results for the DSS 47 radar astrometry.
 
 d47 ! 149.5501     -30.31287         235.23    DSS 47
