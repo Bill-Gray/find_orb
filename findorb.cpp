@@ -4002,6 +4002,7 @@ int main( int argc, const char **argv)
                else if( !show_commented_elements && *tbuff != '#')
                   {
                   char *tptr;
+                  int n_chars_to_highlight = 0;
 
                   if( !memcmp( tbuff, "IMPACT", 6))
                      elem_color = COLOR_ATTENTION + A_BLINK;
@@ -4018,11 +4019,23 @@ int main( int argc, const char **argv)
                   if( right_side_col < (unsigned)strlen( tbuff) + spacing)
                      right_side_col = (unsigned)strlen( tbuff) + spacing;
                   tptr = strstr( tbuff, "Earth MOID:");
-                  if( tptr)         /* low Earth MOID:  show in flashing text to draw attn */
-                     if( atof( tptr + 11) < .01)
-                        put_colored_text( tptr, line_no + iline,
+                  if( tptr && atof( tptr + 11) < .01)
+                     n_chars_to_highlight = 20;
+                  if( !tptr)
+                     {
+                     tptr = strstr( tbuff, "AMR ");
+                     if( tptr)
+                        {
+                        const double amr = atof( tptr + 4);
+
+                        if( amr < 0. || amr > 90.)    /* unrealistic values */
+                           n_chars_to_highlight = 20;
+                        }
+                     }
+                  if( n_chars_to_highlight)
+                     put_colored_text( tptr, line_no + iline,
                               count_wide_chars_in_utf8_string( tbuff, tptr),
-                              20, COLOR_ATTENTION);
+                              n_chars_to_highlight, COLOR_ATTENTION);
                   iline++;
                   }
                else
