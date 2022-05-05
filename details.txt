@@ -874,6 +874,11 @@ OBS M. Rodriguez, M. Rodriguez-Alarcon
 MEA C. Boldea, O. Vaduvescu
 TEL 2.5-m f/3.3 reflector + CCD
 
+COD 952
+OBS J. J. Gomez
+COM Default details extracted from MPEC 2022-H122
+TEL 0.25-m f/3.3 Schmidt-Cassegrain + CCD
+
 COD 954
 OBS J. A. Mansour, M. Popescu
 MEA M. Popescu
@@ -2211,6 +2216,11 @@ COD L63
 OBS M. Iozzi
 COM Default details extracted from MPEC 2021-A190
 TEL 0.2-m f/7.4 Schmidt-Cassegrain + CCD
+
+COD L68
+OBS S. L. Ferreira
+COM Default details extracted from MPEC 2022-H122
+TEL 0.35-m f/6.3 Schmidt- Cassegrain + CCD
 
 COD L74
 OBS G. Morra
