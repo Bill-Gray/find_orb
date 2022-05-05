@@ -858,12 +858,15 @@ int write_excluded_observations_file( const OBSERVE *obs, int n_obs)
    return( n_excluded);
 }
 
+double automatic_outlier_rejection_limit = 3.;
+
 int apply_excluded_observations_file( OBSERVE *obs, const int n_obs)
 {
    char filename[90], buff[90];
    FILE *ifile;
    int n_excluded = 0, i;
 
+   automatic_outlier_rejection_limit = 3.;
    snprintf( filename, sizeof( filename), "excl_%s.txt", obs->packed_id);
    text_search_and_replace( filename, " ", "");
    ifile = fopen_ext( filename, "crb");
@@ -888,6 +891,8 @@ int apply_excluded_observations_file( OBSERVE *obs, const int n_obs)
                   n_excluded++;
                   }
             }
+         else if( !memcmp( buff, "# Outlier rejection ", 20))
+            automatic_outlier_rejection_limit = atof( buff + 20);
       fclose( ifile);
       }
    return( n_excluded);

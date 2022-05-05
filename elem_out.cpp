@@ -3059,6 +3059,7 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
       }
    if( do_full_improvement || available_sigmas == NO_SIGMAS_AVAILABLE)
       {
+      extern double automatic_outlier_rejection_limit;
       OBSERVE *saved_obs = (OBSERVE *)calloc( n_obs, sizeof( OBSERVE));
       double prev_score;
       int pass;
@@ -3071,7 +3072,7 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
          *orbit_epoch = new_epoch;
          }
       memcpy( saved_obs, obs, n_obs * sizeof( OBSERVE));
-      filter_obs( obs, n_obs, 3., 0);
+      filter_obs( obs, n_obs, automatic_outlier_rejection_limit, 0);
       prev_score = evaluate_initial_orbit( obs, n_obs, orbit);
       for( pass = 0; pass < 2; pass++)
          {
@@ -3084,7 +3085,7 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
          for( i = 0; i < 4 && (nanoseconds_since_1970( ) - t0) < QUARTER_SECOND; i++)
             {
             if( i)
-               filter_obs( obs, n_obs, 3., 0);
+               filter_obs( obs, n_obs, automatic_outlier_rejection_limit, 0);
             full_improvement( obs, n_obs, orbit, mid_epoch,
                            (pass ? "e=1" : NULL),
                            ORBIT_SIGMAS_REQUESTED, *orbit_epoch);
@@ -3093,7 +3094,7 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
             for( i = n_extra_full_steps; i; i--)
                {
                if( i > 1)
-                  filter_obs( obs, n_obs, 3., 0);
+                  filter_obs( obs, n_obs, automatic_outlier_rejection_limit, 0);
                full_improvement( obs, n_obs, orbit, mid_epoch,
                               (pass ? "e=1" : NULL),
                               ORBIT_SIGMAS_REQUESTED, *orbit_epoch);
