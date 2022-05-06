@@ -755,6 +755,6 @@ int snprintf_err( char *string, const size_t max_len,      /* miscell.cpp */
 const char *find_orb_version_jd( double *jd)
 {
     if( jd)
-      *jd = 2459675.5;
-    return( "2022 Apr 06");
+      *jd = 2459705.5;
+    return( "2022 May 06");
 }
