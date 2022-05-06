@@ -975,18 +975,14 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
       }
    if( geocentric_score > 0)
       fprintf( ofile, "\n        \"geo_score\": %d,", geocentric_score);
-/* if( moids[1])        */
-      {
-      char tbuff[80];
 
-      fprintf( ofile, "\n        \"MOIDs\":");
-      fprintf( ofile, "\n        {");
-      for( i = 1; i <= 8; i++)
-         fprintf( ofile, "\n          \"%s\" : %.6f%c",
-                     object_name( tbuff, i), moids[i],
-                     (i == 8) ? ' ' : ',');
-      fprintf( ofile, "\n        }");
-      }
+   fprintf( ofile, "\n        \"MOIDs\":");
+   fprintf( ofile, "\n        {");
+   for( i = 1; i <= 8; i++)
+      fprintf( ofile, "\n          \"%s\" : %.6f%c",
+                  object_name( buff, i), moids[i],
+                  (i == 8) ? ' ' : ',');
+   fprintf( ofile, "\n        }");
 
    fprintf( ofile, "\n      },\n      \"observations\":\n      {");
    get_first_and_last_included_obs( obs, n_obs, &first, &last);
