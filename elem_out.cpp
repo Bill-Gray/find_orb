@@ -3258,13 +3258,13 @@ static void _log_problems( const OBJECT_INFO *id, const OBSERVE FAR *obs)
    full_arc = obs[id->n_obs - 1].jd - obs[0].jd;
    if(  arc_used < full_arc / 2.)
       snprintf_append( error_message, sizeof( error_message),
-               " %lf/%lf of arclength used", arc_used, full_arc);
+               " %f/%f of arclength used", arc_used, full_arc);
    if( available_sigmas == NO_SIGMAS_AVAILABLE)
       snprintf_append( error_message, sizeof( error_message),
                " no sigmas");
    if( rms_err > 3.)
       snprintf_append( error_message, sizeof( error_message),
-               " rms=%lf", rms_err);
+               " rms=%f", rms_err);
    if( *error_message)
       {
       FILE *ofile = fopen_ext( "errors.txt", "tca");
