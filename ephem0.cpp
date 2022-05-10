@@ -4900,6 +4900,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
          if( *buff != '#')
             {
             char *tptr = strstr( buff, "_xx");
+            bool found_replacement_text = true;
 
             if( tptr)
                {
@@ -4917,10 +4918,12 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
                   strlcat_error( buff, "</b> </p>");
                   }
                }
-            while( (tptr = strchr( buff, '$')) != NULL)
+            while( (tptr = strchr( buff, '$')) != NULL && found_replacement_text)
                {                       /* See comments in 'header.htm'.  */
-               int got_it = 0, i;      /* code replaces text between $s  */
+               int i;                  /* code replaces text between $s  */
                                        /* in that file.                  */
+
+               found_replacement_text = false;
                for( i = 1; tptr[i] && tptr[i] != '$'; i++)
                   ;        /* search for matching $ */
                if( i < 20 && tptr[i] == '$')
@@ -4937,12 +4940,12 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
                         {
                         full_ctime( replace_str, current_jd( ),
                                        FULL_CTIME_YMD);
-                        got_it = 1;
+                        found_replacement_text = true;
                         }
                      else if( !strcmp( search_str, "$Name"))
                         {
                         strlcpy_error( replace_str, obj_name);
-                        got_it = 1;
+                        found_replacement_text = true;
                         }
                      else if( !strcmp( search_str, "$SV"))   /* state vect */
                         {                           /* for Orbit Simulator */
@@ -4966,11 +4969,11 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
                            if( i == 5)    /* after the vz component */
                               strlcat_error( replace_str, ",0,0,00FF00,90,65,,16000,0,12,1,0");
                            }
-                        got_it = 1;
+                        found_replacement_text = true;
                         }
 
                      fseek( elements_file, 0L, SEEK_SET);
-                     while( !got_it &&
+                     while( !found_replacement_text &&
                              fgets_trimmed( tbuff, sizeof( tbuff), elements_file))
                         if( (tptr2 = strstr( tbuff, search_str)) != NULL
                                     && tptr2[i] == '=')
@@ -4979,17 +4982,17 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
                            for( i = 0; tptr2[i] > ' '; i++)
                               replace_str[i] = tptr2[i];
                            replace_str[i] = '\0';
-                           got_it = 1;
+                           found_replacement_text = true;
                            }
                      strlcat_error( search_str, "$");
-                     if( got_it)
+                     if( found_replacement_text)
                         text_search_and_replace( buff, search_str, replace_str);
                      }
                   }
                else        /* no matching '$' found */
                   *tptr = '!';
                }
-            if( !suppressed)
+            if( !suppressed && found_replacement_text)
                fputs( buff, ofile);
             }
          else if( !memcmp( buff, "# helio_only", 12) && !orbit_is_heliocentric)
