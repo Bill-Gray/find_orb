@@ -111,6 +111,8 @@ void convert_ades_sigmas_to_error_ellipse( const double sig_ra,
          const double sig_dec, const double correl, double *major,
          double *minor, double *angle);                      /* errors.cpp */
 
+static void *_ades_ids_stack = NULL;
+
 int debug_printf( const char *format, ...)
 {
    FILE *ofile = fopen_ext( "debug.txt", "tca");
@@ -2283,7 +2285,7 @@ static bool get_neocp_data( char *buff, char *desig, char *mpc_code)
          generic_message_box( get_find_orb_text( 2006), "o");
          }
       }
-   else if( !memcmp( buff, " observatory code ", 18))
+   else if( len >= 21 && !memcmp( buff, " observatory code ", 18))
       memcpy( mpc_code, buff + 18, 3);
    else if( len > 64 && buff[26] == '.' && *desig && *mpc_code)
       {
@@ -3053,6 +3055,11 @@ int unload_observations( OBSERVE FAR *obs, const int n_obs)
       free_observation_details( obs_details);
       obs_details = NULL;
       }
+   if( _ades_ids_stack)
+      {
+      destroy_stack( _ades_ids_stack);
+      _ades_ids_stack = NULL;
+      }
    available_sigmas = NO_SIGMAS_AVAILABLE;
    return( 0);
 }
@@ -3439,7 +3446,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
 {
    const double days_per_year = 365.25;
    char buff[650], mpc_code_from_neocp[4], desig_from_neocp[15];
-   char obj_name[80];
+   char obj_name[80], curr_ades_ids[100];
    OBSERVE FAR *rval;
    bool including_obs = true;
    int i = 0, n_fixes_made = 0;
@@ -3496,6 +3503,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
       obs_details = init_observation_details( );
    ades_context = init_ades2mpc( );
    memset( buff, 0, 13);         /* suppress spurious Valgrind messages */
+   *curr_ades_ids = '\0';
    while( fgets_with_ades_xlation( buff, sizeof( buff), ades_context, ifile)
                   && i != n_obs)
       {
@@ -3716,6 +3724,15 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                      posn_sigma_theta = 0.;
                      }
                   }
+               if( *curr_ades_ids)
+                  {
+                  if( !_ades_ids_stack)
+                     _ades_ids_stack = create_stack( 2000);
+                  rval[i].ades_ids = (char *)stack_alloc( _ades_ids_stack,
+                           strlen( curr_ades_ids) + 1);
+                  strcpy( rval[i].ades_ids, curr_ades_ids);
+                  *curr_ades_ids = '\0';
+                  }
 
                            /* The observation data's precision has already been */
                            /* used to figure out a minimum sigma;  e.g.,  a mag */
@@ -3841,6 +3858,8 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                ;     /* deliberately empty loop */
          else if( !memcmp( buff, "#Offset center ", 15))
             spacecraft_offset_reference = atoi( buff + 15);
+         else if( !memcmp( buff, "#IDs ", 5))
+            strlcpy_err( curr_ades_ids, buff + 5, sizeof( curr_ades_ids));
          }
       }
    free_ades2mpc_context( ades_context);
@@ -5163,6 +5182,8 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
       case 2:
          if( show_alt_info && optr->second_line)
             strcpy( buff, optr->second_line);
+         else if( show_alt_info && optr->ades_ids)
+            strcpy( buff, optr->ades_ids);
 //          sprintf( buff, "Vel %.8f %.8f %.8f",
 //                         optr->obs_vel[0] * 1000.,
 //                         optr->obs_vel[1] * 1000.,
