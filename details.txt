@@ -2277,6 +2277,11 @@ OBS C. Pin-ferrier
 COM Default details extracted from MPEC 2021-V21
 TEL 0.25-m f/5 reflector + CCD
 
+COD M11
+OBS G. Attard
+COM Default details extracted from MPEC 2022-G14
+TEL 0.28-m f/2.2 reflector + CCD
+
 COD M16
 OBS S. Negri
 COM Default details extracted from MPEC 2022-F14
@@ -2304,6 +2309,11 @@ COD M43
 OBS A. Gabuya
 COM Default details extracted from MPEC 2020-W26
 TEL 0.41-m f/8 Schmidt-Cassegrain + CCD
+
+COM O85
+OBS Y. Yu, K. Tang, A. Pomazan
+COM Default details extracted from MPEC 2020-J29
+TEL 0.50-m f/7.0 Cassegrain + CCD
 
 COD N42
 COM Default details from private communication
@@ -2497,6 +2507,12 @@ COD R65
 COM Default details extracted from MPEC 2021-S94
 OBS R. B. Glassey
 Tel 0.4-m f/8.0 Schmidt-Cassegrain + CCD
+
+COD T03
+OBS T. Santana-Ros, M. Micheli, L. Conversi
+COM Default details extracted from MPEC 2022-G189
+MEA M. Micheli
+TEL 0.4-m reflector + CCD
 
 COD T04
 OBS T. Santana-Ros, M. Micheli, L. Conversi
@@ -2737,6 +2753,11 @@ COD V21
 OBS D. T. Durig
 COM Default details extracted from MPEC 2022-C56
 TEL 0.4-m f/8 Ritchey-Chretien + 4656x3520 CCD
+
+COD V22
+OBS D. Husar
+COM Default details extracted from MPEC 2022-J42
+TEL 0.4-m f/3.7 reflector + CCD
 
 COD V26
 MEA A. Mokhnatkin
