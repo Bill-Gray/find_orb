@@ -36,6 +36,7 @@ OBSERVE
    char columns_57_to_65[10];
    char mag_band, astrometric_net_code, discovery_asterisk, note1, note2, satellite_obs;
    const char **obs_details;
+   char *ades_ids;
    };
 
 #define OBJECT_INFO struct object_info
