@@ -2657,7 +2657,8 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
 
                         earth_lunar_posn( ephemeris_t, earth_loc, vect);
                         lunar_eclipse_mag = lunar_eclipse_magnitude( earth_loc, vect);
-                        if( lunar_eclipse_mag > -0.75)
+                        if( lunar_eclipse_mag > -0.75 &&
+                                       !*get_environment_ptr( "NO_LUNAR_ECLIPSES"))
                            {
                            if( lunar_eclipse_mag < 0.25)
                               {
