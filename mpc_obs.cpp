@@ -5323,6 +5323,26 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
                         n_nearby_obs( obs, n_obs, idx,
                                      overobserving_time_span));
             }
+         else if( optr->ades_ids)
+            {
+            const char *tptr = strstr( optr->ades_ids, "obsID:");
+
+            if( tptr)
+               {
+               const int ymd = get_mutant_hex_value( tptr + 6, 3);
+               const int hms = get_mutant_hex_value( tptr + 9, 3);
+               const int millisec = get_mutant_hex_value( tptr + 12, 2);
+               const int year = ymd / (31 * 12) + 1800;
+               const int month = (ymd / 31) % 12 + 1;
+               const int day = ymd % 31 + 1;
+
+               snprintf_append( buff, MAX_INFO_LEN,
+                           "  TTag %04d-%02d-%02d %02d:%02d:%02d.%03d",
+                           year, month, day,
+                           hms / 3600, (hms / 60) % 60, hms % 60,
+                           millisec);
+               }
+            }
          break;
      }
    return( 0);
