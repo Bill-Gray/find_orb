@@ -209,6 +209,12 @@ neat_xvt$(EXE):          neat_xvt.o
 fo_serve.cgi:          fo_serve.o $(OBJS)
 	$(CXX) -o fo_serve.cgi fo_serve.o $(OBJS) $(LIBS)
 
+cvt_elem.cgi:	         cvt_elem.o
+	$(CXX) -o cvt_elem.cgi cvt_elem.o $(LIBS)
+
+cvt_elem.o:         conv_ele.cpp
+	$(CXX) $(CXXFLAGS) -o cvt_elem.o -DCGI_VERSION $<
+
 IDIR=$(PREFIX)/share/findorb/data
 ifeq ($(PREFIX),~)
 	# backwards compatibility
