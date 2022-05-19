@@ -2620,6 +2620,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                char visibility_char = ' ';
                BRIGHTNESS_DATA bdata;
                double lunar_eclipse_mag_drop = 0.;
+               const bool is_geocentric = (!rho_sin_phi && !rho_cos_phi);
 
                solar_r = vector3_length( orbi_after_light_lag);
                earth_r = vector3_length( obs_posn_equatorial);
@@ -2717,6 +2718,8 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                         sun_ra_dec = obj_ra_dec;
                      }
                   obj_ra_dec.x = -obj_ra_dec.x;
+                  if( is_geocentric)
+                     latlon = best_latlon;
                   full_ra_dec_to_alt_az( &obj_ra_dec, &alt_az[j], NULL, &latlon, utc,
                                               &hour_angle[j]);
                   full_ra_dec_to_alt_az( &obj_ra_dec, &best_alt_az[j], NULL, &best_latlon, utc,
@@ -2952,14 +2955,11 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                      strlcat_error( fake_line, "| |");
                   }
 
-               if( rho_cos_phi || rho_sin_phi)
-                  {
-                  exposure_config.sky_brightness = mags_per_arcsec2;
-                  if( alt_az[0].y < 0.)
-                     exposure_config.airmass = 1e+10;
-                  else
-                     exposure_config.airmass = air_mass;
-                  }
+               exposure_config.sky_brightness = mags_per_arcsec2;
+               if( alt_az[0].y < 0.)
+                  exposure_config.airmass = 1e+10;
+               else
+                  exposure_config.airmass = air_mass;
 
                if( options & OPTION_SNR)
                   {
