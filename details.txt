@@ -2508,6 +2508,11 @@ COM Default details extracted from MPEC 2021-S94
 OBS R. B. Glassey
 Tel 0.4-m f/8.0 Schmidt-Cassegrain + CCD
 
+COD R66
+COM Default details extracted from MPEC 2022-K07
+OBS R. B. Glassey
+TEL 0.15-m f/5.0 Newtonian + CCD
+
 COD T03
 OBS T. Santana-Ros, M. Micheli, L. Conversi
 COM Default details extracted from MPEC 2022-G189
