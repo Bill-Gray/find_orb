@@ -27,6 +27,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include <math.h>
 #include <stdio.h>
 #include "watdefs.h"
+#include "stringex.h"
 #include "comets.h"
 #include "afuncs.h"
 #include "mpc_obs.h"
@@ -58,6 +59,8 @@ int simplex_step( double **vects, double *fvals,
                void *context, const int n);        /* simplex.c */
 int apply_excluded_observations_file( OBSERVE *obs, const int n_obs);
 int write_excluded_observations_file( const OBSERVE *obs, int n_obs);
+char **load_file_into_memory( const char *filename, size_t *n_lines,
+                        const bool fail_if_not_found);      /* mpc_obs.cpp */
 
 extern int available_sigmas;
 extern int debug_level;
@@ -816,15 +819,35 @@ double generate_mc_variant_from_covariance( double *var_orbit,
 int text_search_and_replace( char FAR *str, const char *oldstr,
                                      const char *newstr);   /* ephem0.cpp */
 
+const char *excluded_filename = "excluded.txt";
+
 int write_excluded_observations_file( const OBSERVE *obs, int n_obs)
 {
-   char filename[90];
    FILE *ofile;
    int n_excluded = 0;
+   size_t i, n_lines;
+   char **ilines = load_file_into_memory( excluded_filename, &n_lines, false);
 
-   snprintf( filename, sizeof( filename), "excl_%s.txt", obs->packed_id);
-   text_search_and_replace( filename, " ", "");
-   ofile = fopen_ext( filename, "fcwb");
+   ofile = fopen_ext( excluded_filename, "fcwb");
+   if( ilines)
+      {
+      bool write_it_out = true;
+      char reduced_desig[13];
+      size_t len;
+
+      strlcpy_error( reduced_desig, obs->packed_id);
+      text_search_and_replace( reduced_desig, " ", "");
+      len = strlen( reduced_desig);
+      for( i = 0; i < n_lines; i++)
+         {
+         if( strstr( ilines[i], "Banned obs"))
+            write_it_out = memcmp( ilines[i] + 2, reduced_desig, len)
+                           || ilines[i][len + 2] != ' ';
+         if( write_it_out)
+            fprintf( ofile, "%s\n", ilines[i]);
+         }
+      free( ilines);
+      }
    while( n_obs--)
       {
       if( !obs->is_included)
@@ -834,7 +857,8 @@ int write_excluded_observations_file( const OBSERVE *obs, int n_obs)
             char time_buff[80];
 
             full_ctime( time_buff, current_jd( ), FULL_CTIME_YMD);
-            fprintf( ofile, "# Banned obs file written %s\n", time_buff);
+            fprintf( ofile, "# %s Banned obs file written %s\n",
+                           obs->packed_id, time_buff);
             }
          n_excluded++;
          fprintf( ofile, "%s %.6f %010.6f %+010.6f\n",
@@ -844,17 +868,6 @@ int write_excluded_observations_file( const OBSERVE *obs, int n_obs)
       obs++;
       }
    fclose( ofile);
-   if( n_excluded == 0)
-      {
-      char fullname[255];
-
-      make_config_dir_name( fullname, filename);
-#ifndef _WIN32
-      unlink( fullname);
-#else
-      _unlink( fullname);
-#endif
-      }
    return( n_excluded);
 }
 
@@ -862,37 +875,50 @@ double automatic_outlier_rejection_limit = 3.;
 
 int apply_excluded_observations_file( OBSERVE *obs, const int n_obs)
 {
-   char filename[90], buff[90];
+   char buff[90];
    FILE *ifile;
    int n_excluded = 0, i;
 
    automatic_outlier_rejection_limit = 3.;
-   snprintf( filename, sizeof( filename), "excl_%s.txt", obs->packed_id);
-   text_search_and_replace( filename, " ", "");
-   ifile = fopen_ext( filename, "crb");
+   ifile = fopen_ext( excluded_filename, "crb");
    if( ifile)
       {
-      while( fgets( buff, sizeof( buff), ifile))
-         if( *buff != '#')
-            {
-            const double jd = 2400000.5 + atof( buff + 4);
-            const double ra = atof( buff + 17) * PI / 180.;
-            const double dec = atof( buff + 28) * PI / 180.;
-            const double date_tolerance = 1e-6;
-            const double ang_tolerance = 2e-6 * (PI / 180.);
+      bool read_it_in = false;
+      char reduced_desig[13];
+      size_t len;
 
-            for( i = 0; i < n_obs; i++)
-               if( fabs( obs[i].jd - jd) < date_tolerance
-                     && fabs( obs[i].ra - ra) < ang_tolerance
-                     && fabs( obs[i].dec - dec) < ang_tolerance)
-                  {
-                  obs[i].flags |= OBS_DONT_USE;
-                  obs[i].is_included = 0;
-                  n_excluded++;
-                  }
+      strlcpy_error( reduced_desig, obs->packed_id);
+      text_search_and_replace( reduced_desig, " ", "");
+      len = strlen( reduced_desig);
+      while( fgets( buff, sizeof( buff), ifile))
+         {
+         if( strstr( buff, "Banned obs"))
+            read_it_in = !memcmp( buff + 2, reduced_desig, len)
+                           && buff[len + 2] != ' ';
+         if( read_it_in)
+            {
+            if( *buff != '#')
+               {
+               const double jd = 2400000.5 + atof( buff + 4);
+               const double ra = atof( buff + 17) * PI / 180.;
+               const double dec = atof( buff + 28) * PI / 180.;
+               const double date_tolerance = 1e-6;
+               const double ang_tolerance = 2e-6 * (PI / 180.);
+
+               for( i = 0; i < n_obs; i++)
+                  if( fabs( obs[i].jd - jd) < date_tolerance
+                        && fabs( obs[i].ra - ra) < ang_tolerance
+                        && fabs( obs[i].dec - dec) < ang_tolerance)
+                     {
+                     obs[i].flags |= OBS_DONT_USE;
+                     obs[i].is_included = 0;
+                     n_excluded++;
+                     }
+               }
+            else if( !memcmp( buff, "# Outlier rejection ", 20))
+               automatic_outlier_rejection_limit = atof( buff + 20);
             }
-         else if( !memcmp( buff, "# Outlier rejection ", 20))
-            automatic_outlier_rejection_limit = atof( buff + 20);
+         }
       fclose( ifile);
       }
    return( n_excluded);
