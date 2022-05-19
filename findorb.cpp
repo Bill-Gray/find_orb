@@ -4168,7 +4168,8 @@ int main( int argc, const char **argv)
 
                   strlcpy_err( tbuff, ctime( &t0) + 11, sizeof( tbuff));
                   tbuff[9] = '\0';
-                  put_colored_text( tbuff, clock_line, 72, 9, COLOR_OBS_INFO);
+                  put_colored_text( tbuff, clock_line,
+                                 getmaxx( stdscr) - 9, 9, COLOR_OBS_INFO);
                   }
                napms( 50);      /* a 'tick' is 50 milliseconds long */
                n_ticks_elapsed++;
