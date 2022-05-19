@@ -67,6 +67,8 @@
  J95                                    .2          .2    Great Shefford
  J75                                    .2          .1    La Sagra
  Y00                                                .2    SONEAR
+ F51                                    .2                PanSTARRS
+ F52                                    .2                PanSTARRS 2
 #   (J95), (Y00) and Tholen at (568) have demonstrated,  via observations of
 # artsats,  that they really have gotten timing right.  (J75) has had
 # cause to observe very fast-moving artsats;  their actual time sigma
@@ -131,6 +133,12 @@
  C49 4                                  10                STEREO-A
  C50 4                                  140               STEREO-B
  C50 5                                  10                STEREO-B
+# Still puzzling out how Solar Orbiter astrometry should be handled.
+# Based on exactly one object,  let's say 20".
+ SoO                                    20                Solar Orbiter
+# TESS data has (I assume) beautiful photometry,  but the astrometry
+# appears to be approximate at best.
+ C57                                     5                TESS
 # MPC appears to be weighting (C51) WISE data lightly,  which appears to
 # be... well... wise.  I am also informed by Joe Masiero that the mag
 # data from WISE (which is an R magnitude guesstimated from W1 and W2)
@@ -154,6 +162,11 @@
  256                                     7         1e-9   Green Bank
  257                                     7         1e-9   Goldstone DSS 25, Fort Irwin
  259                                     7         1e-9   EISCAT Tromso UHF
+#  Marco Micheli tells me that (Z84) Calar Alto has been tested
+#  to be good to about 0.05 seconds.  He usually provides positional
+#  uncertainties with the data,  so I'll just specify a 0.1-s timing
+#  uncertainty here.
+ Z84                                                .1     Calar Alto
 #  Gaia data will carry its own sigmas,  except for time.  We'll set that
 # to be effectively zero,  same as for radar.
  258                                     7         1e-9   Gaia
