@@ -17,6 +17,15 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301, USA.    */
 
+/*  This can be compiled with -DTEST_MAIN to get a simple command-line
+test version,  or with -DCGI_VERSION to get code used for an on-line
+converter.  See https://www.projectpluto.com/cvt_elem.htm for an
+example of the latter usage.
+
+gcc -Wall -Wextra -pedantic -I../include -DCGI_VERSION -o cvt_elem conv_ele.cpp -L../lib -l lunar -lm
+*/
+
+
 #include <math.h>
 #include "watdefs.h"
 #include "afuncs.h"
@@ -120,6 +129,68 @@ int main( const int argc, const char **argv)
       show_angles( incl, omega, Omega);
       printf( "Should be:      47.1220   151.4486   45.7481\n");
       }
+   return( 0);
+}
+#endif
+
+#ifdef CGI_VERSION
+
+#include <string.h>
+#include <stdio.h>
+#ifdef __has_include
+   #if __has_include("cgi_func.h")
+       #include "cgi_func.h"
+   #else
+       #error   \
+         'cgi_func.h' not found.  This project depends on the 'lunar'\
+         library.  See www.github.com/Bill-Gray/lunar .\
+         Clone that repository,  'make'  and 'make install' it.
+       #ifdef __GNUC__
+         #include <stop_compiling_here>
+            /* Above line suppresses cascading errors. */
+       #endif
+   #endif
+#else
+   #include "cgi_func.h"
+#endif
+
+int main( void)
+{
+   char field[30], buff[100];
+   int rval;
+   double incl = 0., asc_node = 0., arg_per = 0.;
+   double start_epoch = 1950., end_epoch = 2000.;
+
+   printf( "Content-type: text/html\n\n");
+   printf( "<pre>");
+   avoid_runaway_process( 300);
+   rval = initialize_cgi_reading( );
+   if( rval <= 0)
+      {
+      printf( "<p> <b> CGI data reading failed : error %d </b>", rval);
+      printf( "This isn't supposed to happen.</p>\n");
+      return( 0);
+      }
+   while( !get_cgi_data( field, buff, NULL, sizeof( buff)))
+      {
+      if( !strcmp( field, "iota"))
+         incl = atof( buff) * PI / 180.;
+      else if( !strcmp( field, "arg_per"))
+         arg_per = atof( buff) * PI / 180.;
+      else if( !strcmp( field, "asc"))
+         asc_node = atof( buff) * PI / 180.;
+      else if( !strcmp( field, "epoch1"))
+         start_epoch = atof( buff);
+      else if( !strcmp( field, "epoch2"))
+         end_epoch = atof( buff);
+      else
+         printf( "Unidentified field '%s'\n", field);
+      }
+   convert_elements( start_epoch, end_epoch, &incl, &asc_node, &arg_per);
+   printf( "After conversion to epoch %.3f:\n", end_epoch);
+   printf( "Ascending node (&Omega;) = %.6f\n", asc_node * 180. / PI);
+   printf( "Argument of periapsis (&omega;) = %.6f\n", arg_per * 180. / PI);
+   printf( "Inclination (&iota;) = %.6f\n", incl * 180. / PI);
    return( 0);
 }
 #endif
