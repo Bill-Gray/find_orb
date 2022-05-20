@@ -1976,15 +1976,12 @@ int write_out_elements_to_file( const double *orbit,
                            sizeof( orbit_summary_text), " MOID %.3f", moid);
                   }
                }
-         reference_shown = show_reference( buff);
          }
       else if( *more_moids)
          {
          space_pad_buffer( buff, 33);
          strcpy( buff + 33, more_moids);
          *more_moids = '\0';
-         if( !reference_shown)
-            reference_shown = show_reference( buff);
          }
       else if( !reference_shown && *buff == 'M' && buff[1] != '(' &&
                        !available_sigmas &&
@@ -2021,12 +2018,8 @@ int write_out_elements_to_file( const double *orbit,
          switch( buff[0])
             {
             case 'M':
-               if( buff[1] != '(')         /* don't do this if the 'M' */
-                  {                        /* refers to a comet mag */
+               if( buff[1] != '(')  /* if the 'M' doesn't refer to a comet mag */
                   consider_replacing( buff, "M", "sigma_M");
-                  if( !reference_shown)
-                     reference_shown = show_reference( buff);
-                  }
                break;
             case 'q':
                consider_replacing( buff, "q", "sigma_q");
@@ -2075,8 +2068,6 @@ int write_out_elements_to_file( const double *orbit,
                   consider_replacing( buff, "q", "sigma_q");
                   strcat( buff, "    ");
                   strcat( buff, tbuff);
-                  if( !reference_shown)
-                     reference_shown = show_reference( buff);
                   }
                }
                break;
@@ -2084,6 +2075,8 @@ int write_out_elements_to_file( const double *orbit,
                break;
             }
          }
+      if( !reference_shown)
+         reference_shown = show_reference( buff);
       assert( *body_frame_note);
       if( !body_frame_note_shown)
          {
