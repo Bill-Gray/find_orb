@@ -700,6 +700,8 @@ int main( const int argc, const char **argv)
 
       sscanf( buff, "%lf %lf %u %d,%lf,%lf\n", &tdt, &step, &total_lines,
                   &ref_frame, &dist_units, &time_units);
+      if( tdt > 3e+7)         /* probably in seconds after J2000, */
+         tdt = 2451545. + tdt / seconds_per_day;  /* a SPK convention */
       if( ref_frame == -1)
          {                             /* input coords are already mean */
          use_precession = false;       /* of date;  don't precess 'em */
@@ -783,14 +785,18 @@ int main( const int argc, const char **argv)
 
          if( sscanf( buff, "%lf%lf%lf%lf%lf%lf%lf", &jdt,
                         ivect, ivect + 1, ivect + 2,
-                        ivect + 3, ivect + 4, ivect + 5) != 7
-                 || jdt < jan_1956 || jdt > jan_2050)
+                        ivect + 3, ivect + 4, ivect + 5) != 7)
             {
-            printf( "Error reading input ephem:\n%s\n", buff);
+            fprintf( stderr, "Error reading input ephem:\n%s\n", buff);
             return( -2);
             }
-                     /* I don't think TLEs work outside this range: */
-         assert( jdt > jan_1956 && jdt < jan_2050);
+         if( jdt > 3e+7)         /* probably in seconds after J2000, */
+            jdt = 2451545. + jdt / seconds_per_day;  /* a SPK convention */
+         if( jdt < jan_1956 || jdt > jan_2050)
+            {
+            fprintf( stderr, "JDT %f is outside the valid range\n", jdt);
+            return( -3);
+            }
          jd_utc = jdt - td_minus_utc( jdt) / seconds_per_day;
          for( j = 0; j < 6; j++)
             ivect[j] /= dist_units;
