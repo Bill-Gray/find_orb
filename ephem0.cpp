@@ -3078,13 +3078,17 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                   add_lon_lat_to_ephem( tbuff, sizeof( tbuff),
                               galactic_lon, galactic_lat);
                   }
+               strlcat_error( buff, tbuff);
+               strlcat_error( alt_buff, tbuff);
                if( options & OPTION_GALACTIC_CONFUSION)
                   {
                   const double galact_conf =
                                galactic_confusion( ra * 15, dec) * 100 / 256;
 
-                  snprintf_append( tbuff, sizeof( buff), " %02.0f", galact_conf);
+                  snprintf_append( buff, sizeof( buff), " %02.0f", galact_conf);
+                  snprintf_append( alt_buff, sizeof( alt_buff), " %6.3f", galact_conf);
                   }
+               *tbuff = '\0';
                if( options & OPTION_SUN_TARGET_PA)
                   {
                   double sun_target_pa, unused_elongation;
