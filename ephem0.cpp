@@ -1732,15 +1732,16 @@ and is distributed by default with Find_Orb.  'bright.pgm' has ten times
 the resolution,  but does require a correspondingly bigger download.
 We look for the latter;  if it fails,  we try the former. */
 
-int galactic_confusion( const double ra, const double dec)
+double galactic_confusion( const double ra, const double dec)
 {
    static FILE *image_file;
    static long hdr_offset;
    static int xsize, ysize;
    static unsigned char **buff = NULL;
    static void *stack = NULL;
-   int i, ix, iy;
+   int i, ix, iy, diff1, diff2, diff3;
    double x, y;
+   const double half_a_pixel = 0.5;
 
    if( ra == -99.)       /* flag for "we're done here;  free everything up" */
       {
@@ -1785,9 +1786,13 @@ int galactic_confusion( const double ra, const double dec)
             }
       }
    assert( xsize);
-   x = fmod( (720. - ra) * (double)xsize / 360., xsize);
+   x = fmod( (720. - ra) * (double)xsize / 360. - half_a_pixel, xsize);
+   if( x < 0.)
+      x += xsize;
    ix = (int)x;
-   y = (90. - dec) * (double)ysize / 180.;
+   y = (90. - dec) * (double)ysize / 180. - half_a_pixel;
+   if( y < 0.)
+      y = 0.;
    iy = (int)y;
    assert( y >= 0 && y <= ysize);
    for( i = iy - 1; i < iy + 2; i++)
@@ -1801,7 +1806,14 @@ int galactic_confusion( const double ra, const double dec)
          buff[i][xsize] = buff[i][0];   /* simplifies interpolation at lon=360 */
          assert( bytes_read == (size_t)xsize);
          }
-   return( buff[iy][ix]);
+   diff1 = (int)buff[iy][ix + 1] - (int)buff[iy][ix];
+   diff2 = (int)buff[iy + 1][ix] - (int)buff[iy][ix];
+   diff3 = (int)buff[iy + 1][ix + 1] + (int)buff[iy][ix]
+                        - (int)buff[iy][ix + 1] - (int)buff[iy + 1][ix];
+   x -= (double)ix;
+   y -= (double)iy;
+   return( buff[iy][ix] + x * (double)diff1
+            + y * (double)diff2 + x * (double)diff3);
 }
 
 static double round_to( const double x, const double step)
@@ -2785,12 +2797,12 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                                  light_pollution_mags_per_arcsec_squared);
                   if( galactic_confusion_addendum)
                      {
-                     int galact_conf = galactic_confusion( ra * 15, dec);
+                     double galact_conf = galactic_confusion( ra * 15, dec);
 
                      if( galact_conf)
                         adjust_sky_brightness_for_added_light_source( &bdata,
                                   galactic_confusion_addendum -
-                                  2.5 * log10( (double)galact_conf / 255.));
+                                  2.5 * log10( galact_conf / 255.));
                      }
                   rgb = 0;
                   for( j = 0; j < 3; j++)
@@ -2895,21 +2907,21 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                   tbuff[3] = '\0';
                   if( visibility_char == ' ')
                      {
-                     int galact_conf = galactic_confusion( ra * 15, dec);
+                     double galact_conf = galactic_confusion( ra * 15, dec);
 
-                     if( galact_conf > 15)
+                     if( galact_conf > 15.)
                         {
                         int band;
 
-                        galact_conf = galact_conf * 100 / 256;       /* scale to 0-99 */
+                        galact_conf *= 100. / 256.;        /* scale to 0-99 */
                         for( band = 0; band < 24; band += 8)
                            if( ((rgb >> band) & 0xff) < (long)galact_conf)
                               {
                               rgb &= ~(0xff << band);
                               rgb |= (unsigned long)galact_conf << band;
                               }
-                        if( galact_conf > 25)
-                           tbuff[1] = (galact_conf > 60 ? 'G' : 'g');
+                        if( galact_conf > 25.)
+                           tbuff[1] = (galact_conf > 60. ? 'G' : 'g');
                         }
                      }
                   if( computer_friendly || suppress_coloring)
@@ -3068,10 +3080,10 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                   }
                if( options & OPTION_GALACTIC_CONFUSION)
                   {
-                  const int galact_conf =
+                  const double galact_conf =
                                galactic_confusion( ra * 15, dec) * 100 / 256;
 
-                  snprintf_append( tbuff, sizeof( buff), " %02d", galact_conf);
+                  snprintf_append( tbuff, sizeof( buff), " %02.0f", galact_conf);
                   }
                if( options & OPTION_SUN_TARGET_PA)
                   {

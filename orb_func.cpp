@@ -4757,7 +4757,7 @@ int metropolis_search( OBSERVE *obs, const int n_obs, double *orbit,
 #include "pl_cache.h"
 
 void update_environ_dot_dat( void);     /* mpc_obs.cpp */
-int galactic_confusion( const double ra, const double dec);
+double galactic_confusion( const double ra, const double dec);
 void pop_all_orbits( void);         /* orb_func2.cpp */
 char *find_numbered_mp_info( const int number);    /* mpc_obs.cpp */
 #if !defined( _WIN32) && !defined( __WATCOMC__)
