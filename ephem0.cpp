@@ -3083,7 +3083,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                if( options & OPTION_GALACTIC_CONFUSION)
                   {
                   const double galact_conf =
-                               galactic_confusion( ra * 15, dec) * 100 / 256;
+                               galactic_confusion( ra * 15, dec) * 99. / 255.;
 
                   snprintf_append( buff, sizeof( buff), " %02.0f", galact_conf);
                   snprintf_append( alt_buff, sizeof( alt_buff), " %6.3f", galact_conf);
