@@ -1150,7 +1150,8 @@ static int show_reference( char *buff)
 
       if( !*reference)
          reference = "Find_Orb";
-      strcpy( buff + reference_loc, reference);
+      strcat( buff, "   ");
+      strcat( buff, reference);
       }
    return( rval);
 }
