@@ -1813,7 +1813,7 @@ double galactic_confusion( const double ra, const double dec)
    x -= (double)ix;
    y -= (double)iy;
    return( buff[iy][ix] + x * (double)diff1
-            + y * (double)diff2 + x * (double)diff3);
+            + y * (double)diff2 + x * y * (double)diff3);
 }
 
 static double round_to( const double x, const double step)
