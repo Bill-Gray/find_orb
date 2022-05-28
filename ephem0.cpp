@@ -2095,6 +2095,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                                  || ephem_type != OPTION_OBSERVABLES)
       options &= ~(OPTION_ALT_AZ_OUTPUT | OPTION_VISIBILITY | OPTION_MOON_ALT
                      | OPTION_MOON_AZ | OPTION_SUN_ALT | OPTION_SUN_AZ
+                     | OPTION_SNR | OPTION_EXPOSURE_TIME
                      | OPTION_SKY_BRIGHTNESS | OPTION_SUPPRESS_UNOBSERVABLE);
    if( n_objects == 1 || ephem_type != OPTION_OBSERVABLES)
       options &= ~OPTION_SHOW_SIGMAS;
