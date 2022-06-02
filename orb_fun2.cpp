@@ -834,15 +834,18 @@ int write_excluded_observations_file( const OBSERVE *obs, int n_obs)
    strlcpy_error( reduced_desig, obs->packed_id);
    text_search_and_replace( reduced_desig, " ", "");
    len = strlen( reduced_desig);
-   for( i = 0; i < n_lines; i++)
+   if( ilines)
       {
-      if( strstr( ilines[i], "Banned obs"))
-         write_it_out = memcmp( ilines[i] + 2, reduced_desig, len)
-                        || ilines[i][len + 2] != ' ';
-      if( write_it_out)
-         fprintf( ofile, "%s\n", ilines[i]);
+      for( i = 0; i < n_lines; i++)
+         {
+         if( strstr( ilines[i], "Banned obs"))
+            write_it_out = memcmp( ilines[i] + 2, reduced_desig, len)
+                           || ilines[i][len + 2] != ' ';
+         if( write_it_out)
+            fprintf( ofile, "%s\n", ilines[i]);
+         }
+      free( ilines);
       }
-   free( ilines);
 
    while( n_obs--)
       {
