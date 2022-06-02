@@ -468,7 +468,6 @@ int find_circular_orbits( OBSERVE FAR *obs1, OBSERVE FAR *obs2,
    double r1 = 1.02, r2, radii[50];
    int n_solutions = 0, soln_type, types[50];
 
-   debug_printf( "Delta_t = %f\n", dt);
    while( r1 < 100. && n_solutions <= desired_soln)
       {
       r2 = r1;
@@ -827,27 +826,24 @@ int write_excluded_observations_file( const OBSERVE *obs, int n_obs)
    int n_excluded = 0;
    size_t i, n_lines;
    char **ilines = load_file_into_memory( excluded_filename, &n_lines, false);
+   char reduced_desig[13];
+   bool write_it_out = true;
+   size_t len;
 
    ofile = fopen_ext( excluded_filename, "fcwb");
-   if( ilines)
+   strlcpy_error( reduced_desig, obs->packed_id);
+   text_search_and_replace( reduced_desig, " ", "");
+   len = strlen( reduced_desig);
+   for( i = 0; i < n_lines; i++)
       {
-      bool write_it_out = true;
-      char reduced_desig[13];
-      size_t len;
-
-      strlcpy_error( reduced_desig, obs->packed_id);
-      text_search_and_replace( reduced_desig, " ", "");
-      len = strlen( reduced_desig);
-      for( i = 0; i < n_lines; i++)
-         {
-         if( strstr( ilines[i], "Banned obs"))
-            write_it_out = memcmp( ilines[i] + 2, reduced_desig, len)
-                           || ilines[i][len + 2] != ' ';
-         if( write_it_out)
-            fprintf( ofile, "%s\n", ilines[i]);
-         }
-      free( ilines);
+      if( strstr( ilines[i], "Banned obs"))
+         write_it_out = memcmp( ilines[i] + 2, reduced_desig, len)
+                        || ilines[i][len + 2] != ' ';
+      if( write_it_out)
+         fprintf( ofile, "%s\n", ilines[i]);
       }
+   free( ilines);
+
    while( n_obs--)
       {
       if( !obs->is_included)
@@ -858,7 +854,7 @@ int write_excluded_observations_file( const OBSERVE *obs, int n_obs)
 
             full_ctime( time_buff, current_jd( ), FULL_CTIME_YMD);
             fprintf( ofile, "# %s Banned obs file written %s\n",
-                           obs->packed_id, time_buff);
+                           reduced_desig, time_buff);
             }
          n_excluded++;
          fprintf( ofile, "%s %.6f %010.6f %+010.6f\n",
@@ -894,7 +890,7 @@ int apply_excluded_observations_file( OBSERVE *obs, const int n_obs)
          {
          if( strstr( buff, "Banned obs"))
             read_it_in = !memcmp( buff + 2, reduced_desig, len)
-                           && buff[len + 2] != ' ';
+                           && buff[len + 2] == ' ';
          if( read_it_in)
             {
             if( *buff != '#')
