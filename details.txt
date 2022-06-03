@@ -2305,6 +2305,12 @@ OBS L. Denneau, R. Siverd, J. Tonry, H. Weiland
 COM Default details extracted from MPEC 2022-C56
 TEL 0.5-m reflector + CCD
 
+COD M26
+MEA M. Lombardo
+OBS M. Lombardo, K. Lombardo
+COM Default details extracted from MPEC 2022-K19
+TEL 0.30-m f/8 Ritchey-Chretien + CCD
+
 COD M43
 OBS A. Gabuya
 COM Default details extracted from MPEC 2020-W26
@@ -2390,6 +2396,13 @@ MEA H. Sato
 OBS T. Ikemura
 COM Default details extracted from MPEC 2021-B143
 TEL 0.35-m f/5 reflector + CCD
+
+COD Q12
+MEA M. Micheli, R. Reszelewski
+OBS R. Reszelewski, M. Zolnowski, M. Gedek, K. Zukowski, T. Santana-Ros
+OBS L. Conversi, M. Micheli
+COM Default details extracted from MPEC 2022-L04
+TEL 0.28-m f/2.2 reflector + CMO
 
 COD Q21
 OBS H. Nohara
@@ -2580,6 +2593,12 @@ NET Gaia-DR1
 COM Valid: 2018 mar 1-2100
 NET Gaia-DR2
 
+COD U52
+OBS J. E. Rogers
+MEA J. E. Rogers, D. Parrott
+COM Default details extracted from MPEC 2022-K98
+TEL 0.30-m Helin Telescope + CCD
+
 COD U55
 OBS B. Kumar
 COM Default details extracted from MPEC 2021-E118
@@ -2610,6 +2629,11 @@ COD U74
 OBS N. Saini, C. Zhai, R. Trahan, M. Zhan, M. Shao
 COM Default details extracted from MPEC 2021-T266
 TEL 0.36-m f/2.2 Schmidt
+
+COD U75
+OBS R. Matson
+COM Default details from private communication
+TEL 0.28-m f/7 Schmidt-Cassegrain + CCD
 
 COD U76
 OBS P. Lewin
