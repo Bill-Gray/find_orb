@@ -164,7 +164,6 @@ const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 static int evaluate_limited_orbit( const double *orbit,
                     const int planet_orbiting, const double epoch,
                     const char *limited_orbit, double *constraints);
-void remove_trailing_cr_lf( char *buff);      /* ephem0.cpp */
 int find_relative_orbit( const double jd, const double *ivect,
                ELEMENTS *elements, const int ref_planet);     /* runge.cpp */
 void format_dist_in_buff( char *buff, const double dist_in_au); /* ephem0.c */

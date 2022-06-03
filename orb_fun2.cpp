@@ -63,12 +63,6 @@ char **load_file_into_memory( const char *filename, size_t *n_lines,
                         const bool fail_if_not_found);      /* mpc_obs.cpp */
 
 extern int available_sigmas;
-extern int debug_level;
-int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
-#ifdef __GNUC__
-         __attribute__ (( format( printf, 1, 2)))
-#endif
-;
 
 typedef struct
    {
@@ -289,7 +283,6 @@ void pop_all_orbits( void)
 }
 
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
-void make_config_dir_name( char *oname, const char *iname);  /* miscell.cpp */
 void set_distance( OBSERVE FAR *obs, double r);             /* orb_func.c */
 
 /* The linear regression fit here is used to determine a perihelion distance
