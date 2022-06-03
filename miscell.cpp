@@ -98,7 +98,7 @@ int fetch_astrometry_from_mpc( FILE *ofile, const char *desig);
 int generic_message_box( const char *message, const char *box_type);
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
-void make_config_dir_name( char *oname, const char *iname);  /* miscell.cpp */
+char *make_config_dir_name( char *oname, const char *iname);  /* miscell.cpp */
 int reset_astrometry_filename( int *argc, const char **argv);
 uint64_t parse_bit_string( const char *istr);                /* miscell.cpp */
 const char *write_bit_string( char *ibuff, const uint64_t bits);
@@ -183,7 +183,7 @@ static FILE *fopen_tilde( const char *filename, const char *permits)
 #endif
 }
 
-void make_config_dir_name( char *oname, const char *iname)
+char *make_config_dir_name( char *oname, const char *iname)
 {
 #ifndef _WIN32
    char *home_ptr = getenv( "HOME");
@@ -193,7 +193,7 @@ void make_config_dir_name( char *oname, const char *iname)
       {
       strcpy( oname, alt_config_directory);
       strcat( oname, iname);
-      return;
+      return( oname);
       }
 #ifdef _WIN32
    strcpy( oname, iname);
@@ -207,6 +207,7 @@ void make_config_dir_name( char *oname, const char *iname)
       *oname = '\0';
    strcat( oname, iname);
 #endif
+   return( oname);
 }
 
 const char *output_directory = NULL;

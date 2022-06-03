@@ -55,7 +55,7 @@ static void *jpl_eph = NULL;
 #define JD_TO_YEAR( jd)  (((jd)-J2000) / 365.25 + 2000.)
 
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
-void make_config_dir_name( char *oname, const char *iname);  /* miscell.cpp */
+char *make_config_dir_name( char *oname, const char *iname);  /* miscell.cpp */
 char *fgets_trimmed( char *buff, size_t max_bytes, FILE *ifile); /*elem_out.c*/
 int generic_message_box( const char *message, const char *box_type);
 

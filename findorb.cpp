@@ -236,7 +236,7 @@ int load_environment_file( const char *filename);          /* mpc_obs.cpp */
 void set_environment_ptr( const char *env_ptr, const char *new_value);
 int orbital_monte_carlo( const double *orbit, OBSERVE *obs, const int n_obs,
          const double curr_epoch, const double epoch_shown);   /* orb_func.cpp */
-void make_config_dir_name( char *oname, const char *iname);    /* miscell.cpp */
+char *make_config_dir_name( char *oname, const char *iname);    /* miscell.cpp */
 int reset_astrometry_filename( int *argc, const char **argv);
 int set_language( const int language);                      /* elem_out.cpp */
 void shellsort_r( void *base, const size_t n_elements, const size_t esize,

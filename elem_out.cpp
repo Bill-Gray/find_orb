@@ -149,7 +149,7 @@ int get_planet_posn_vel( const double jd, const int planet_no,
                      double *posn, double *vel);         /* runge.cpp */
 void compute_variant_orbit( double *variant, const double *ref_orbit,
                      const double n_sigmas);       /* orb_func.cpp */
-void make_config_dir_name( char *oname, const char *iname);  /* miscell.cpp */
+char *make_config_dir_name( char *oname, const char *iname);  /* miscell.cpp */
 int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid);
 int put_elements_into_sof( char *obuff, const char *templat,
          const ELEMENTS *elem,

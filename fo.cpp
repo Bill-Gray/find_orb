@@ -156,7 +156,7 @@ static int remove_single_observation_objects( OBJECT_INFO *ids, const int n_ids)
    return( j);
 }
 
-void make_config_dir_name( char *oname, const char *iname);
+char *make_config_dir_name( char *oname, const char *iname);
 
 #ifdef FORKING
 static int unlink_config_file( const char *filename)
