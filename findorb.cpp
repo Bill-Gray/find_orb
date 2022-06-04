@@ -3074,7 +3074,7 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
                     const bool drop_single_obs, const bool already_got_obs)
 {
    OBJECT_INFO *ids;
-   extern const char *temp_obs_filename;     /* miscell.cpp */
+   extern char *temp_obs_filename;     /* miscell.cpp */
    size_t n_lines, i;
    const char *prev_fn = "previous.txt";
    char **prev_files = load_file_into_memory( prev_fn, &n_lines, false);
@@ -3161,7 +3161,7 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
             if( !inquire( "Enter object name :", object_name, 40, COLOR_DEFAULT_INQUIRY)
                      && *object_name)
                {
-               FILE *ofile = fopen_ext( temp_obs_filename, "twb");
+               FILE *ofile = fopen_ext( temp_obs_filename, "fwb");
 
                assert( ofile);
                fetch_astrometry_from_mpc( ofile, object_name);

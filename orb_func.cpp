@@ -4766,7 +4766,7 @@ int get_temp_dir( char *name, const size_t max_len);   /* miscell.cpp */
 
 int clean_up_find_orb_memory( void)
 {
-   extern const char *temp_obs_filename;     /* miscell.cpp */
+   extern char *temp_obs_filename;     /* miscell.cpp */
 
    free_sigma_recs( );
    get_observer_data( NULL, NULL, NULL, NULL, NULL);
@@ -4803,5 +4803,6 @@ int clean_up_find_orb_memory( void)
 #else
    _unlink( temp_obs_filename);
 #endif
+   free( temp_obs_filename);
    return( 0);
 }
