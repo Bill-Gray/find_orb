@@ -106,7 +106,7 @@ ifdef MINGW
 	CXX=$(MINGW)gcc
 	CC=$(MINGW)gcc
 	WINDRES=$(MINGW)windres
-	CURSES_FLAGS=-I $(INSTALL_DIR)/include -I../PDCursesMod
+	CURSES_FLAGS=-I../PDCursesMod
 	EXE=.exe
 	CURSES_LIB=-lpdcurses
 	LIBSADDED=-L $(LIB_DIR) -lm -lgdi32 -luser32 -mwindows -static-libgcc
@@ -283,6 +283,17 @@ clean_temp:
 	$(RM) $(IDIR)/virtu?.txt
 	$(RM) $(IDIR)/virtual.txt
 
+INSTALL_FILES= \
+   cometdef.sof command.txt cospar.txt details.txt dosephem.txt \
+   dos_help.txt ?findorb.txt environ.def eph2tle.txt eph_expl.txt \
+   eph_type.txt frame_he.txt geo_rect.txt header.htm jpl_eph.txt \
+   link_def.json mpc_area.txt mpcorb.hdr mu1.txt nongravs.txt \
+   observer.txt obslinks.htm ObsCodes.htm ObsCodesF.html \
+   obj_help.txt obj_name.txt odd_name.txt openfile.txt \
+   orbitdef.sof previous.def progcode.txt radecfmt.txt residfmt.txt \
+   rovers.txt sat_xref.txt scope.json scopes.txt sigma.txt site_310.txt \
+   timehelp.txt xdesig.txt bright.pgm bright2.pgm elem_pop.txt
+
 install:
 	$(MKDIR) $(IDIR)
 ifdef EXE
@@ -291,17 +302,10 @@ ifdef EXE
 else
 	$(CP) $(FIND_ORB_EXE) $(INSTALL_DIR)/bin
 	$(CP) $(FO_EXE)       $(INSTALL_DIR)/bin
+
 endif
-	$(CP) cometdef.sof command.txt cospar.txt details.txt dosephem.txt             $(IDIR)
-	$(CP) dos_help.txt ?findorb.txt environ.def eph2tle.txt eph_expl.txt           $(IDIR)
-	$(CP) eph_type.txt frame_he.txt geo_rect.txt header.htm jpl_eph.txt            $(IDIR)
-	$(CP) link_def.json mpc_area.txt mpcorb.hdr mu1.txt nongravs.txt               $(IDIR)
-	$(CP) observer.txt obslinks.htm ObsCodes.htm ObsCodesF.html                    $(IDIR)
-	$(CP) obj_help.txt obj_name.txt odd_name.txt openfile.txt                      $(IDIR)
-	$(CP) orbitdef.sof previous.def progcode.txt radecfmt.txt residfmt.txt         $(IDIR)
-	$(CP) rovers.txt sat_xref.txt scope.json scopes.txt sigma.txt site_310.txt     $(IDIR)
-	$(CP) timehelp.txt xdesig.txt bright.pgm bright2.pgm elem_pop.txt              $(IDIR)
-	$(CP) -n hints.txt                                                             $(IDIR)
+	$(CP) $(INSTALL_FILES) $(IDIR)
+	$(CP) -n hints.txt $(IDIR)
 
 uninstall:
 ifdef EXE
