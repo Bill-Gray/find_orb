@@ -284,15 +284,15 @@ clean_temp:
 	$(RM) $(IDIR)/virtual.txt
 
 INSTALL_FILES= \
-   cometdef.sof command.txt cospar.txt details.txt dosephem.txt \
-   dos_help.txt ?findorb.txt environ.def eph2tle.txt eph_expl.txt \
-   eph_type.txt frame_he.txt geo_rect.txt header.htm jpl_eph.txt \
-   link_def.json mpc_area.txt mpcorb.hdr mu1.txt nongravs.txt \
-   observer.txt obslinks.htm ObsCodes.htm ObsCodesF.html \
-   obj_help.txt obj_name.txt odd_name.txt openfile.txt \
-   orbitdef.sof previous.def progcode.txt radecfmt.txt residfmt.txt \
-   rovers.txt sat_xref.txt scope.json scopes.txt sigma.txt site_310.txt \
-   timehelp.txt xdesig.txt bright.pgm bright2.pgm elem_pop.txt
+   bright.pgm bright2.pgm cometdef.sof command.txt cospar.txt \
+   details.txt dosephem.txt dos_help.txt elem_pop.txt environ.def \
+   eph2tle.txt eph_expl.txt eph_type.txt ?findorb.txt frame_he.txt \
+   geo_rect.txt header.htm jpl_eph.txt link_def.json mpc_area.txt \
+   mpcorb.hdr mu1.txt nongravs.txt obj_help.txt obj_name.txt \
+   ObsCodes.htm ObsCodesF.html observer.txt obslinks.htm  \
+   odd_name.txt openfile.txt orbitdef.sof previous.def progcode.txt \
+   radecfmt.txt residfmt.txt rovers.txt sat_xref.txt scope.json \
+   scopes.txt sigma.txt site_310.txt timehelp.txt xdesig.txt
 
 install:
 	$(MKDIR) $(IDIR)
