@@ -4743,24 +4743,40 @@ static bool is_neocp_line( const char *mpc_line)
    return( strlen( mpc_line) == 80 && !memcmp( mpc_line + 72, "NEOCP", 5));
 }
 
+static bool _is_greenlit( const char *env_line, const char *mpc_line,
+                                                const bool is_heliocentric)
+{
+   while( NULL != (env_line = strstr( env_line, mpc_line + 77)))
+      {
+      env_line += 3;
+      if( *env_line == ':')      /* specific program code */
+         {
+         if( env_line[1] == mpc_line[13])      /* yup,  right program code */
+            if( is_heliocentric || env_line[2] != '*')
+               return( true);
+         }
+      else                 /* anything from this obscode */
+         if( is_heliocentric || *env_line != '*')
+            return( true);
+      }
+   return( false);
+}
+
 static bool line_must_be_redacted( const char *mpc_line,
                                                 const bool is_heliocentric)
 {
-   bool rval = false;
-
    if( is_neocp_line( mpc_line) && neocp_redaction_turned_on)
       {
-      const char *greenlit = strstr( get_environment_ptr( "GREENLIT"),
-                                       mpc_line + 77);
+      const char *to_check[4] = { "GREENLIT", "GREENLIT2", "GREENLIT3", "GREENLIT4" };
+      size_t i;
 
-      rval = true;
-      if( !greenlit)        /* try an alternative string w/additional codes */
-         greenlit = strstr( get_environment_ptr( "GREENLIT2"),
-                               mpc_line + 77);
-      if( greenlit && (is_heliocentric || greenlit[3] != '*'))
-         rval = false;
+      for( i = 0; i < 4; i++)
+         if( _is_greenlit( get_environment_ptr( to_check[i]), mpc_line, is_heliocentric))
+            return( false);
+      return( true);
       }
-   return( rval);
+   else
+      return( false);
 }
 
 int text_search_and_replace( char FAR *str, const char *oldstr,
