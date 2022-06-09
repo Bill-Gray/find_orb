@@ -129,6 +129,19 @@ INTEGRAL     2002-048A    2002-048A = NORAD 27540 = Integral
     SK06S040 S051S        Saturn LI = Greip = S/2006 S 4
     SK07S010 S052S        Saturn LII = Tarqeq = S/2007 S 1
 
+    SK04S220 S055S        Saturn LV = S/2004 S 22
+    SK04S230 S056S        Saturn LVI = S/2004 S 23
+    SK04S250 S057S        Saturn LVII = S/2004 S 25
+    SK04S260 S058S        Saturn LVIII = S/2004 S 26
+    SK04S270 S059S        Saturn LIX = S/2004 S 27
+    SK04S290 S060S        Saturn LX = S/2004 S 29
+    SK04S300 S061S        Saturn LXI = S/2004 S 30
+    SK04S320 S062S        Saturn LXII = S/2004 S 32
+    SK04S330 S063S        Saturn LXIII = S/2004 S 33
+    SK04S340 S064S        Saturn LXIV = S/2004 S 34
+    SK04S350 S065S        Saturn LXV = S/2004 S 35
+    SK04S380 S066S        Saturn LXVI = S/2004 S 38
+
     SK02N010 N009S        Neptune IX = S/2002 N1 = Halimede
     SK03N010 N010S        Neptune X = S/2003 N1 = Psamathe
     SK02N020 N011S        Neptune XI = S/2002 N2 = Sao
