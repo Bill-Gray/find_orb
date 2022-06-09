@@ -2875,7 +2875,7 @@ bool take_first_soln = false, force_final_full_improvement = false;
 int n_extra_full_steps = 0;
 
 static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit,
-               double *orbit_epoch, unsigned *perturbers)
+               double *orbit_epoch, double *epoch_shown, unsigned *perturbers)
 {
    FILE *ifile = NULL;
    int got_vectors = 0, i;
@@ -3047,6 +3047,7 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
       obs->obs_mag = floor( obs->obs_mag * 10. + .5) * .1;
       obs->mag_precision = 1;         /* start out assuming mag to .1 mag */
       }
+   *epoch_shown = *orbit_epoch;
    if( do_full_improvement || available_sigmas == NO_SIGMAS_AVAILABLE)
       {
       extern double automatic_outlier_rejection_limit;
@@ -3055,12 +3056,7 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
       int pass;
 
       if( !*get_environment_ptr( "KEEP_PREVIOUS_EPOCH") && !got_vectors)
-         {
-         const double new_epoch = find_epoch_shown( obs, n_obs);
-
-         integrate_orbit( orbit, *orbit_epoch, new_epoch);
-         *orbit_epoch = new_epoch;
-         }
+         *epoch_shown = find_epoch_shown( obs, n_obs);
       memcpy( saved_obs, obs, n_obs * sizeof( OBSERVE));
       filter_obs( obs, n_obs, automatic_outlier_rejection_limit, 0);
       prev_score = evaluate_initial_orbit( obs, n_obs, orbit);
@@ -3072,22 +3068,23 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
 
          push_orbit( *orbit_epoch, orbit);
          integrate_orbit( orbit, *orbit_epoch, mid_epoch);
+         *orbit_epoch = mid_epoch;
          for( i = 0; i < 4 && (nanoseconds_since_1970( ) - t0) < QUARTER_SECOND; i++)
             {
             if( i)
                filter_obs( obs, n_obs, automatic_outlier_rejection_limit, 0);
-            full_improvement( obs, n_obs, orbit, mid_epoch,
+            full_improvement( obs, n_obs, orbit, *orbit_epoch,
                            (pass ? "e=1" : NULL),
-                           ORBIT_SIGMAS_REQUESTED, *orbit_epoch);
+                           ORBIT_SIGMAS_REQUESTED, *epoch_shown);
             }
          if( !pass)
             for( i = n_extra_full_steps; i; i--)
                {
                if( i > 1)
                   filter_obs( obs, n_obs, automatic_outlier_rejection_limit, 0);
-               full_improvement( obs, n_obs, orbit, mid_epoch,
+               full_improvement( obs, n_obs, orbit, *orbit_epoch,
                               (pass ? "e=1" : NULL),
-                              ORBIT_SIGMAS_REQUESTED, *orbit_epoch);
+                              ORBIT_SIGMAS_REQUESTED, *epoch_shown);
 
                }
          if( prev_score < evaluate_initial_orbit( obs, n_obs, orbit) - .001)
@@ -3099,7 +3096,6 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
             {
             pass = 100;
             pop_orbit( NULL, NULL);
-            integrate_orbit( orbit, mid_epoch, *orbit_epoch);
             }
          }
       free( saved_obs);
@@ -3299,9 +3295,8 @@ OBSERVE FAR *load_object( FILE *ifile, OBJECT_INFO *id,
    if( n_obs_actually_loaded > 0)
       {
       const int got_vector = fetch_previous_solution( obs, id->n_obs, orbit,
-                            curr_epoch, &perturbers);
+                            curr_epoch, epoch_shown, &perturbers);
 
-      *epoch_shown = *curr_epoch;
       if( got_vector <= 0)
          *epoch_shown = find_epoch_shown( obs, id->n_obs);
       _log_problems( id, obs);
