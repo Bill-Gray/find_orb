@@ -1395,7 +1395,6 @@ static void _store_extra_orbit_info( const char *packed_id,
    size_t n_lines;
    char **lines = load_file_into_memory( _extras_filename, &n_lines, true);
    FILE *ofile;
-   char buff[200];
    int i;
 
    assert( strlen( packed_id) == 12);
@@ -1405,16 +1404,21 @@ static void _store_extra_orbit_info( const char *packed_id,
       if( memcmp( lines[i], packed_id, 12))
          fprintf( ofile, "%s\n", lines[i]);
    free( lines);
-   strcpy( buff, packed_id);
-   if( perturbers & ~0x7ff)
-      snprintf_append( buff, sizeof( buff), " p=%x", perturbers);
-   if( force_model)
-      snprintf_append( buff, sizeof( buff), " model=%x", force_model);
-   for( i = 0; i < n_extra_params; i++)
-      snprintf_append( buff, sizeof( buff), " A%d=%e", i + 1, solar_pressure[i]);
-   if( *constraints)
-      snprintf_append( buff, sizeof( buff), " Constraint=%s", constraints);
-   fprintf( ofile, "%s\n", buff);
+   if( (perturbers & ~0x7ff) || n_extra_params || *constraints)
+      {
+      char buff[200];
+
+      strcpy( buff, packed_id);
+      if( perturbers & ~0x7ff)
+         snprintf_append( buff, sizeof( buff), " p=%x", perturbers);
+      if( force_model)
+         snprintf_append( buff, sizeof( buff), " model=%x", force_model);
+      for( i = 0; i < n_extra_params; i++)
+         snprintf_append( buff, sizeof( buff), " A%d=%e", i + 1, solar_pressure[i]);
+      if( *constraints)
+         snprintf_append( buff, sizeof( buff), " Constraint=%s", constraints);
+      fprintf( ofile, "%s\n", buff);
+      }
    fclose( ofile);
 }
 
@@ -1796,8 +1800,7 @@ int write_out_elements_to_file( const double *orbit,
       extern double solar_pressure[];
 
       add_sof_to_file( "orbits.sof", &elem, n_obs, obs, "orbitdef.sof");
-      if( (perturbers & ~0x7ff) || n_extra_params || *constraints)
-         _store_extra_orbit_info( obs->packed_id, perturbers, n_extra_params,
+     _store_extra_orbit_info( obs->packed_id, perturbers, n_extra_params,
                      solar_pressure, constraints);
       }
 /* if( showing_sigmas == COVARIANCE_AVAILABLE)
