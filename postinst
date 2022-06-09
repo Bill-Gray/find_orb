@@ -1,0 +1,4 @@
+mkdir -p ~/bin
+mv -iv /tmp/exes bin
+mkdir -p ~/.find_orb
+mv -iv /tmp/config_files ~/.find_orb

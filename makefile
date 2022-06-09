@@ -318,5 +318,26 @@ endif
 	rm -f $(IDIR)/*
 	rmdir $(IDIR)
 
+DEB_DIR=/tmp/find-orb_1.0-1_amd64
+
+make_deb:
+	$(MKDIR) $(DEB_DIR)/DEBIAN
+	$(CP) control postinst $(DEB_DIR)/DEBIAN
+	chmod 755 $(DEB_DIR)/DEBIAN/postinst
+	$(MKDIR) $(DEB_DIR)/tmp/exes
+	$(CP) $(FIND_ORB_EXE) $(DEB_DIR)/tmp/exes
+	$(CP) $(FO_EXE) $(DEB_DIR)/tmp/exes
+	$(MKDIR) $(DEB_DIR)/tmp/config_files
+	$(CP) $(INSTALL_FILES) $(DEB_DIR)/tmp/config_files
+	dpkg-deb --build $(DEB_DIR)
+	rm -f $(DEB_DIR)/DEBIAN/*
+	rm -f $(DEB_DIR)/tmp/config_files/*
+	rm -f $(DEB_DIR)/tmp/exes/*
+	rmdir $(DEB_DIR)/DEBIAN
+	rmdir $(DEB_DIR)/tmp/config_files/
+	rmdir $(DEB_DIR)/tmp/exes
+	rmdir $(DEB_DIR)/tmp/
+	rmdir $(DEB_DIR)
+
 .cpp.o:
 	$(CXX) $(CXXFLAGS) $<

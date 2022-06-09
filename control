@@ -1,0 +1,6 @@
+Package: find-orb
+Version: 1.0
+Architecture: amd64
+Maintainer: Bill Gray <pluto@projectpluto.com>
+Description: Find_Orb orbit determination software
+	Given observations in any of several standard astrometric formats,  Find_Orb can determine an orbit and compute ephemerides.  See https://www.projectpluto.com/find_orb.htm for details.

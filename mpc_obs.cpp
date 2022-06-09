@@ -2549,6 +2549,26 @@ static void xfer_rwo_time_to_mpc( char *obuff, const char *ibuff)
       }
 }
 
+/* JPL gives DSS locations negative numbers.  These have to be converted
+to three-character MPC codes for Find_Orb usage.  Note that four codes,
+at present,  lack official MPC codes,  and have d## codes listed in
+'rovers.txt'. */
+
+static void _jpl_to_mpc_code( char *mpc_code, const int jpl_code)
+{
+   const int jpl_codes[] = { -1, -2, -9, -13, -14, -25, -35, -36, -38, -43, -47, -73 };
+   const char *mpc_codes = "251 254 256 252 253 257 d35 d36 255 d43 d47 273";
+   size_t i;
+
+   for( i = 0; i < sizeof( jpl_codes) / sizeof( jpl_codes[0]); i++)
+      if( jpl_code == jpl_codes[i])
+         {
+         memcpy( mpc_code, mpc_codes + i * 4, 3);
+         return;
+         }
+   assert( 0);       /* shouldn't get here */
+}
+
 #define MINIMUM_RWO_LENGTH 117
 
 /* Circa 2019,  AstDyS/NEODyS revised their spacecraft offset lines to
@@ -2564,6 +2584,7 @@ static int rwo_to_mpc( char *buff, double *ra_bias, double *dec_bias,
    int rval = 0, i, second_line = 0;
    const size_t line_len = strlen( buff);
    char obuff[82], second_radar_line[82];
+   const size_t old_radar_length = 118, new_radar_length = 125;
 
    *second_radar_line = '\0';
    if( debug_level > 2)
@@ -2666,9 +2687,10 @@ static int rwo_to_mpc( char *buff, double *ra_bias, double *dec_bias,
          memcpy( obuff + 72, ".rwo ", 5);
       rval = 1;
       }
-   else if( buff[30] == ':' && buff[33] == ':' &&
-                                    strlen( buff) == 118)
-      {                          /* Radar data: not really handled yet */
+   else if( buff[30] == ':' && buff[33] == ':'
+             && (buff[11] == 'R' || buff[11] == 'V')
+             && (line_len == old_radar_length || line_len == new_radar_length))
+      {                          /* Radar data:  */
       double val1, val2;
 
       if( sscanf( buff + 36, "%lf %lf", &val1, &val2) == 2)
@@ -2695,8 +2717,16 @@ static int rwo_to_mpc( char *buff, double *ra_bias, double *dec_bias,
          obuff[26] = buff[32];   /* minutes */
          obuff[27] = buff[34];   /* tens of seconds */
          obuff[28] = buff[35];   /* seconds */
-         memcpy( obuff + 68, buff + 99, 3);    /* transmitting MPC code */
-         memcpy( obuff + 77, buff + 103, 3);    /* receiving MPC code */
+         if( line_len == old_radar_length)    /* older,  shorter lines store the MPC codes */
+            {
+            memcpy( obuff + 68, buff + 99, 3);    /* transmitting MPC code */
+            memcpy( obuff + 77, buff + 103, 3);    /* receiving MPC code */
+            }
+         else        /* newer,  ESA-style 125-byte lines store JPL codes */
+            {
+            _jpl_to_mpc_code( obuff + 68, atoi( buff + 102));
+            _jpl_to_mpc_code( obuff + 77, atoi( buff + 107));
+            }
          strcpy( second_radar_line, obuff);
          freq_in_mhz = get_radar_frequency( atoi( buff + 99), year);
          sprintf( obuff + 62, "%5.0f", freq_in_mhz);
