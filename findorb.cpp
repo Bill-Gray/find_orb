@@ -5646,18 +5646,19 @@ int main( int argc, const char **argv)
                    extend_orbit_solution( obs, n_obs, 100., 365.25 * 20.));
             break;
 #endif
-         case ALT_T:
-         case ALT_V:
-            for( i = (c == ALT_T ? 0 : curr_obs);
-                 i <= (c == ALT_T ? n_obs - 1 : curr_obs); i++)
-               {
-               MOTION_DETAILS m;
+         case ALT_T:     /* remove timing errors for all obs */
+         case ALT_V:     /* remove timing errors for selected obs */
+            for( i = 0; i < n_obs; i++)
+               if( c == ALT_T || (obs[i].flags & OBS_IS_SELECTED))
+                  {
+                  MOTION_DETAILS m;
 
-               compute_observation_motion_details( obs + i, &m);
-               debug_printf( "Time resid %f\n", m.time_residual);
-               obs[i].jd += m.time_residual / seconds_per_day;
-               set_up_observation( obs + i);         /* mpc_obs.cpp */
-               }
+                  compute_observation_motion_details( obs + i, &m);
+                  obs[i].jd += m.time_residual / seconds_per_day;
+                  set_up_observation( obs + i);         /* mpc_obs.cpp */
+                  sprintf( message_to_user, "Timing errors zeroed for %s obs",
+                           (c == ALT_T ? "all" : "selected"));
+                  }
             break;
          case KEY_F(17):    /* shift-f5 */
             if( !inquire( "Enter element filename: ", tbuff, sizeof( tbuff),
