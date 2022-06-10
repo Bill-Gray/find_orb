@@ -5630,15 +5630,17 @@ int main( int argc, const char **argv)
          case '>':
             perturbers = 1;
             break;
-         case ALT_C:
-         case ALT_B:
-            for( i = (c == ALT_B ? curr_obs : 0);
-                       i < (c == ALT_B ? curr_obs + 1 : n_obs); i++)
-               {
-               obs[i].ra  = obs[i].computed_ra;
-               obs[i].dec = obs[i].computed_dec;
-               }
-            strcpy( message_to_user, "Observation(s) set to computed values");
+         case ALT_B:  /* set observed RA/dec = computed for selected obs */
+         case ALT_C:  /* set observed RA/dec = computed for all obs */
+            for( i = 0; i < n_obs; i++)
+               if( c == ALT_C || (obs[i].flags & OBS_IS_SELECTED))
+                  {
+                  obs[i].ra  = obs[i].computed_ra;
+                  obs[i].dec = obs[i].computed_dec;
+                  }
+            snprintf_err( message_to_user, sizeof( message_to_user),
+                      "RA/decs for %s obs set to computed values",
+                      (c == ALT_C ? "all" : "selected"));
             break;
 #ifdef ALT_MINUS
          case ALT_MINUS:
