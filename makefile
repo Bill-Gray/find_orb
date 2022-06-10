@@ -292,7 +292,7 @@ INSTALL_FILES= \
    ObsCodes.htm ObsCodesF.html observer.txt obslinks.htm  \
    odd_name.txt openfile.txt orbitdef.sof previous.def progcode.txt \
    radecfmt.txt residfmt.txt rovers.txt sat_xref.txt scope.json \
-   scopes.txt sigma.txt site_310.txt timehelp.txt xdesig.txt
+   scopes.txt splash.txt sigma.txt site_310.txt timehelp.txt xdesig.txt
 
 install:
 	$(MKDIR) $(IDIR)

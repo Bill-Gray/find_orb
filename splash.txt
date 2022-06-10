@@ -1,0 +1,48 @@
+21 75
+______________________
+\                     \
+ \     ____________    \
+  |    |           \    \
+  |    |            \    \
+  |    |             \    \
+  |    |              )    )  Project Pluto
+  |    |             /    /   Software for the discriminating astronomer
+  |    |            /    /
+  |    |___________/    /     Find_Orb orbit determination software
+  |                    /      Version $v
+  |     ______________/       https://www.projectpluto.com/find_orb.htm
+  |    |
+  |    |
+  |    |
+  |    |
+  |    |
+  |    |                 /|
+  |    |________________/ |
+ /                        |
+/_________________________|
+14 62
+______________
+\             \
+ |  +-------\  \
+ |  |        \  \
+ |  |         )  )  Project Pluto
+ |  |        /  /   Software for the discriminating astronomer
+ |  +-------/  /
+ |  __________/     Find_Orb orbit determination software
+ |  |               Version $v
+ |  |               https://www.projectpluto.com/find_orb.htm
+ |  |
+ |  |          /|
+ |  +---------/ |
+/_______________|
+10 45
+__________
+\  ______ \
+ | |     \ \
+ | |      ) )  Project Pluto
+ | |_____/ /
+ | _______/    Find_Orb orbit determination software
+ | |           Version $v
+ | |           www.projectpluto.com/find_orb.htm
+ | |_______/|
+/___________|

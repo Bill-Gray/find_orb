@@ -3404,6 +3404,33 @@ static void setup_elements_dialog( char *buff, const char *constraints)
    fclose( ifile);
 }
 
+static void show_splash_screen( void)
+{
+   FILE *ifile = fopen_ext( "splash.txt", "crb");
+
+   if( ifile)
+      {
+      char buff[200];
+      bool show_it = false;
+
+      clear( );
+      while( !show_it && fgets( buff, sizeof( buff), ifile))
+         {
+         int lines, cols, i;
+
+         sscanf( buff, "%d %d", &lines, &cols);
+         show_it = (lines < LINES && cols < COLS);
+         for( i = 0; i < lines && fgets_trimmed( buff, sizeof( buff), ifile); i++)
+            if( show_it)
+               {
+               text_search_and_replace( buff, "$v", find_orb_version_jd( NULL));
+               put_colored_text( buff, (LINES - lines) / 2 + i, 0, -1, COLOR_BACKGROUND);
+               }
+         }
+      fclose( ifile);
+      }
+}
+
 static int find_command_area( const unsigned mouse_x, const unsigned mouse_y,
                               size_t *index)
 {
@@ -3866,6 +3893,7 @@ int main( int argc, const char **argv)
                strlcat_err( tbuff, " | ", sizeof( tbuff));
                strlcat_err( tbuff, ids[id_number].obj_name, sizeof( tbuff));
                PDC_set_title( tbuff);
+               show_splash_screen( );
                obs = load_object( ifile, ids + id_number, &curr_epoch,
                                                      &epoch_shown, orbit);
                assert( obs);
