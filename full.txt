@@ -93,9 +93,9 @@ then compute RA/decs for each observation,  and an orbit for the epoch
 and that O(h) term causes error;  too small,  and you get roundoff error.
 Find_Orb tries to keep the tweak size such that the maximum change in
 computed RA/decs (or computed range or range-dot,  for radar data) is
-1.5 sigmas.  (Though a large range can work and will be used.) If the
-change is too big or small,  then we try again with a suitably
-resized tweak.
+1.5 sigmas.  (Though if we fall within a wide tolerance of 1.5 sigmas,
+it'll be good enough for our purposes.)   If the change is too big or
+small,  then we try again with a suitably resized tweak.
 
    Eventually,  though,  we're all done:  we've computed RA/decs for
 each observation and (usually) orbital elements at 'epoch2',  and done
