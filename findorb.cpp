@@ -5903,9 +5903,6 @@ int main( int argc, const char **argv)
             n_command_lines--;
             strcpy( message_to_user, "Removing a menu line");
             break;
-         case 'c': case 'C':        /* temporary,  just to verify that sorting */
-            sort_obs_by_code ^= SORT_OBS_RADAR_LAST;  /* is being done correctly */
-            break;
          case ALT_P:    /* see 'environ.def' comments for COMET_CONSTRAINTS */
             {
             char prompt[200];
@@ -5965,6 +5962,7 @@ int main( int argc, const char **argv)
             override_abs_mag = atof( tbuff);
             }
             break;
+         case 'c': case 'C':
          case 'j': case 'J':
          case ';': case ']':
          case CTRL( 'E'): case CTRL( 'J'): case CTRL( 'L'):
