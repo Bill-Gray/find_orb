@@ -5094,8 +5094,17 @@ int main( int argc, const char **argv)
             else if( *tbuff == 'l')
                {
                extern double levenberg_marquardt_lambda;
+               const double orig_lambda = levenberg_marquardt_lambda;
 
-               levenberg_marquardt_lambda = atof( tbuff + 1);
+               if( tbuff[1] == '*')
+                  levenberg_marquardt_lambda *= atof( tbuff + 2);
+               else if( tbuff[1] == '-')
+                  levenberg_marquardt_lambda = pow( 0.1, atof( tbuff + 2));
+               else
+                  levenberg_marquardt_lambda = atof( tbuff + 1);
+               snprintf( message_to_user, sizeof( message_to_user),
+                     "Lambda changed from %.3e to %.3e", orig_lambda,
+                                             levenberg_marquardt_lambda);
                }
             update_element_display = 1;
             break;
@@ -5514,25 +5523,6 @@ int main( int argc, const char **argv)
             list_codes = (list_codes + 1) % 3;
             strcpy( message_to_user, messages[list_codes]);
             }
-            break;
-         case '\\':
-            inquire( "Enter observatory code and time offset: ",
-                               tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY);
-            for( i = 0; i < n_obs; i++)
-               if( !memcmp( tbuff, obs[i].mpc_code, 3))
-                  obs[i].jd += atof( tbuff + 3) / seconds_per_day;
-                        /* Make sure obs remain sorted by time: */
-            for( i = 0; i < n_obs - 1; i++)
-               if( obs[i].jd > obs[i + 1].jd)
-                  {
-                  OBSERVE temp = obs[i];
-
-                  obs[i] = obs[i + 1];
-                  obs[i + 1] = temp;
-                  if( i)
-                     i -= 2;
-                  }
-            update_element_display = 1;
             break;
          case ',':
             show_a_file( "debug.txt");
@@ -5965,6 +5955,7 @@ int main( int argc, const char **argv)
             override_abs_mag = atof( tbuff);
             }
             break;
+         case '\\':
          case 'c': case 'C':
          case 'j': case 'J':
          case ';': case ']':
