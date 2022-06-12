@@ -79,6 +79,10 @@ F10    Find the last included observation in the arc.
             to reset the positional uncertainty to 0.3 arcseconds;  'm.2'
             to reset the photometric uncertainty to 0.2 magnitudes;  or
             't4' to reset the uncertainty in timing to four seconds.
+Ctrl-Up   Find the last observation of the preceding opposition
+Ctrl-Dn   Find the first observation of the next opposition
+Alt-X   Gets you a list of all MPC codes for the current object;  click on
+            one,  and the next observation from that code will be found
 
             ON-SCREEN DISPLAY:
 
@@ -112,9 +116,17 @@ O      Toggles display of the orbital elements.  You normally wouldn't want
          or use most of that area for observatory data.
 Alt-K  Toggle display of observational uncertainties in columns 57 to 65 of
          the MPC 80-column format.  Those columns usually go unused.
-&      Toggle obs to be shown in 'traditional' punched-card format,  even if
-         the time was given in base-60 and the positions as decimal degrees.
-
+&      Select format for observation RA/decs (minutes/seconds or decimal
+         degrees).  You can also get this by clicking on "RA (J2000)  dec"
+         on the black-on-cyan observation legend line.
+Alt-Q  Toggle observation info (white-on-red area) to show observer info
+         (TEL, OBS, MEA lines).  Or just click on that area.
+Alt-N  Get options for the orbital elements frame (ecliptic,  equatorial,
+         body frame).  Or right-click on orbital elements to get a pop-up
+         menu option to do this.
+Ctrl-B Toggle display of some "alternative" orbital element data,  such as
+         MOIDs for all planets,  encounter velocity,  etc.  You can also do
+         this by clicking on the orbital elements area.
         RESIDUAL-RELATED COMMANDS:
 
 Cursor keys :  move up/down one observation,  or a "page" up/down
@@ -130,8 +142,8 @@ x      Toggle the inclusion of the currently selected observation.
 b      When in "usual" one-obs-per-line residual formats,  toggles
          between decimal day display and HH:MM:SS display.
 d      Show resiDuals in current format & save to file 'residual.txt'
-t      Toggle between "usual" residuals in RA and dec,  and residuals in
-       time and cross-track distance.
+t      Select "usual" display of residuals in RA and dec,  or resids in
+       time and cross-track distance,  or in sigmas along error ellipse.
 =      Toggle between "usual" residuals,  and display of total angular
        residual and magnitude residuals.
 w      Find Worst (highest-residuals) observation.
@@ -150,6 +162,9 @@ w      Find Worst (highest-residuals) observation.
          the others,  in time,  RA, and dec,  will be shown.  Useful
          to get a quick how-far-is-this- obs-from-that-one, in time or
          position.
+Alt-K Toggles display of sigmas in the observations area.  (Or click on
+         'sigmas' on the black-on-cyan legend line.)
+Shift-F6  Toggle to display (over-)'precise' residuals
 
       EPHEMERIS-RELATED COMMANDS:
 
@@ -158,6 +173,11 @@ m      Make an ephemeris.  You get a menu asking for a starting date/time,
           location (by MPC code) and have a little control over what
           ends up in the ephemeris  Ephemeris-specific help is available
           from within this menu.
+
+     CLIPBOARD COMMANDS:
+
+Alt-I  Copy orbital elements text to the clipboard.  (Or left-click the
+          orbital elements area to get a pop-up menu option to do this.)
 
    MISCELLANEOUS COMMANDS:
 
@@ -178,6 +198,10 @@ s      Save orbital elements to a file.  (Whatever elements are shown
          the file 'covar.txt';  this command really just displays that file.
 F8     In Linux/*BSD/OSX,  show the 'original' console as it looked when
          Find_Orb started.  Hit Enter to return to Find_Orb.
+Alt-R  Reset the 'reference' (defaults to 'Find_Orb';  you should put your
+         name here so people know who computed the orbit)
+Alt-L  Select a different language.  Note that none of the translations is
+         particularly complete.
 q      Exit the program
 
    COMMANDS NOBODY SHOULD HAVE TO USE (mostly for my testing purposes,  or
