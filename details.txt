@@ -1132,6 +1132,11 @@ OBS T. Santana-Ros
 MEA M. Micheli
 TEL 0.80-m f/9.6 Ritchey-Chretien + CCD
 
+COD C73
+OBS O. Tercu, D. Manole, C. Fotin, C. Antohi, F. Jiglau, A. Serbanescu
+COM Default details extracted from MPEC 2022-L66
+TEL 0.4-m f/8 Ritchey-Chretien + CCD
+
 COD C77
 OBS A. Mantero
 COM Default details extracted from MPEC 2021-E131
@@ -1389,6 +1394,10 @@ COM Find_Orb default details
 COM https://www.lbto.org/overview.html
 TEL 8.4-m f/1.14 reflector
 
+COD G84
+COM Default details extracted from MPEC 2022-J102
+TEL 0.8-m f/7.0 reflector + CMOS
+
 COD G96
 COM Find_Orb default details
 COM Valid: 2003 jan 1 - 2100
@@ -1535,7 +1544,7 @@ TEL 0.20-m f/5 reflector + CCD
 
 COD I52
 COM Find_Orb default details
-TEL 1.0-m reflector + CCD
+TEL 1.0-m prime focus + CCD
 
 COD I72
 OBS J. L. Martin
@@ -2085,6 +2094,11 @@ OBS S. Negri
 COM Default details extracted from MPEC 2022-F14
 TEL 0.20-m f/10 Schmidt- Cassegrain + CCD
 
+COD M17
+OBS L. Bertagna
+COM Default details extracted from MPEC 2022-L66
+TEL 0.20-m f/4 reflector + CCD
+
 COD M18
 OBS S. Fritsche
 COM Default details extracted from MPEC 2022-C56
@@ -2220,6 +2234,12 @@ TEL 0.23-m f/10 Schmidt-Cassegrain + CCD
 COD Q38
 COM Find_Orb default details
 OBS M. Mattiazzo
+
+COD Q55
+MEA T. Prystavski
+OBS M. Petkovic, T. Preston, P. Tisserand, P. Oates, C. Vest, G. Bloxham
+COM Default details extracted from MPEC 2022-L66
+TEL 1.35-m Cassegrain + CCD
 
 COD Q57
 COM Find_Orb default details
@@ -2440,7 +2460,7 @@ TEL 0.36-m reflector + CCD
 
 COD V00
 COM Find_Orb default details
-TEL 2.25-m reflector + CCD
+TEL 2.25-m reflector + 4x4K mosaic CCD
 
 COD V01
 OBS B. Sheets
