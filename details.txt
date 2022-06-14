@@ -635,56 +635,6 @@ TEL 0.59-m LONEOS Schmidt + CCD
    else as "measurers",  but we don't really know who that one person was.
 COD 703
 COM Find_Orb default details
-COM Valid: 2019 Jan 20 - 2100
-OBS T. A. Pruyne
-COM Valid: 2018 Jan 1 - 2100
-OBS B. M. Africano
-COM Valid: 2010-2014
-OBS J. D. Ahern
-COM Valid: 1900-2014
-OBS E. C. Beshore
-COM Valid: 2006-2014
-OBS A. Boattini
-COM Valid: 2004 jul 1 - 2006
-OBS C. M. Casey
-COM Valid: 2011-2100
-OBS E. J. Christensen
-COM Valid: 2018 Jul 1 - 2300
-OBS G. A. Farneth
-COM Valid: 2014 Jan 1 - 2300
-OBS D. C. Fuls
-COM Valid: 2004 jul 1-2011
-OBS G. J. Garradd
-COM Valid: 2006-2100
-OBS A. R. Gibbs, A. D. Grauer
-COM Valid: 2018 may 1 - 2100
-OBS H. Groeller
-COM Valid: 1999 jan 1 - 2015 Oct 1
-OBS R. E. Hill
-COM Valid: 2014-2100
-OBS J. A. Johnson
-COM Valid: 1900 - 2004 jul 1
-OBS S. Kolar
-COM Valid: 2006 - 2100
-OBS R. A. Kowalski
-COM Valid: 2004 jul 1 - 2100
-OBS S. M. Larson
-COM Valid: 2014 - 2100
-OBS G. J. Leonard
-COM Valid: 2014 - 2018 Feb 20
-OBS R. G. Matheny
-COM Valid: 1900-2004 jul 1
-OBS D. McLean
-COM Valid: 2004 jul 1 - 2015
-OBS R. H. McNaught
-COM Valid: 2019 - 2100
-OBS D. Rankin
-COM Valid: 2014 - 2100
-OBS R. L. Seaman
-COM Valid: 2014 - 2100
-OBS F. C. Shelly
-COM Valid: 2019 Oct 1 - 2100
-OBS K. W. Wierzchos
 COM Valid: 2003 jan 1 - 2100
 TEL 0.68 m Schmidt
 COM Valid: 2003 jan 1 - 2016 Dec 02
@@ -1263,57 +1213,6 @@ TEL 2.0-m Ritchey-Chretien + CCD
 
 COD E12
 COM Find_Orb default details
-COM Valid: 2019 Jan 20 - 2100
-OBS T. A. Pruyne
-COM Valid: 2018 Jan 1 - 2100
-OBS B. M. Africano
-COM Valid: 2010-2014
-OBS J. D. Ahern
-COM Valid: 1900-2014
-OBS E. C. Beshore
-COM Valid: 2006-2014
-OBS A. Boattini
-COM Valid: 2004 jul 1 - 2006
-OBS C. M. Casey
-COM Valid: 2011-2100
-OBS E. J. Christensen
-COM Valid: 2018 Jul 1 - 2300
-OBS G. A. Farneth
-COM Valid: 2014 Jan 1 - 2300
-OBS D. C. Fuls
-COM Valid: 2004 jul 1-2011
-OBS G. J. Garradd
-COM Valid: 2006-2100
-OBS A. R. Gibbs, A. D. Grauer
-COM Valid: 2018 may 1 - 2100
-OBS H. Groeller
-COM Valid: 1999 jan 1 - 2015 Oct 1
-OBS R. E. Hill
-COM Valid: 2014-2100
-OBS J. A. Johnson
-COM Valid: 1900 - 2004 jul 1
-OBS S. Kolar
-COM Valid: 2006 - 2100
-OBS R. A. Kowalski
-COM Valid: 2004 jul 1 - 2100
-OBS S. M. Larson
-COM Valid: 2014 - 2100
-OBS G. J. Leonard
-COM Valid: 2014 - 2018 Feb 20
-OBS R. G. Matheny
-COM Valid: 1900-2004 jul 1
-OBS D. McLean
-COM Valid: 2004 jul 1 - 2015
-OBS R. H. McNaught
-COM Valid: 2019 - 2100
-OBS D. Rankin
-COM Valid: 2014 - 2100
-OBS R. L. Seaman
-COM Valid: 2014 - 2100
-OBS F. C. Shelly
-COM Valid: 2019 Oct 1 - 2100
-OBS K. W. Wierzchos
-COM Valid: 1900 - 2100
 TEL 0.5-m Uppsala Schmidt + CCD
 NET UCAC2
 
@@ -1492,56 +1391,6 @@ TEL 8.4-m f/1.14 reflector
 
 COD G96
 COM Find_Orb default details
-COM Valid: 2019 Jan 20 - 2100
-OBS T. A. Pruyne
-COM Valid: 2018 Jan 1 - 2100
-OBS B. M. Africano
-COM Valid: 2010-2014
-OBS J. D. Ahern
-COM Valid: 1900-2014
-OBS E. C. Beshore
-COM Valid: 2006-2014
-OBS A. Boattini
-COM Valid: 2004 jul 1 - 2006
-OBS C. M. Casey
-COM Valid: 2011-2100
-OBS E. J. Christensen
-COM Valid: 2018 Jul 1 - 2300
-OBS G. A. Farneth
-COM Valid: 2014 Jan 1 - 2300
-OBS D. C. Fuls
-COM Valid: 2004 jul 1-2011
-OBS G. J. Garradd
-COM Valid: 2006-2100
-OBS A. R. Gibbs, A. D. Grauer
-COM Valid: 2018 may 1 - 2100
-OBS H. Groeller
-COM Valid: 1999 jan 1 - 2015 Oct 1
-OBS R. E. Hill
-COM Valid: 2014-2100
-OBS J. A. Johnson
-COM Valid: 1900 - 2004 jul 1
-OBS S. Kolar
-COM Valid: 2006 - 2100
-OBS R. A. Kowalski
-COM Valid: 2004 jul 1 - 2100
-OBS S. M. Larson
-COM Valid: 2014 - 2100
-OBS G. J. Leonard
-COM Valid: 2014 - 2018 Feb 20
-OBS R. G. Matheny
-COM Valid: 1900-2004 jul 1
-OBS D. McLean
-COM Valid: 2004 jul 1 - 2015
-OBS R. H. McNaught
-COM Valid: 2019 - 2100
-OBS D. Rankin
-COM Valid: 2014 - 2100
-OBS R. L. Seaman
-COM Valid: 2014 - 2100
-OBS F. C. Shelly
-COM Valid: 2019 Oct 1 - 2100
-OBS K. W. Wierzchos
 COM Valid: 2003 jan 1 - 2100
 TEL 1.5-m reflector
 COM Valid: 2003 jan 1 - 2016 May 26
@@ -1686,57 +1535,6 @@ TEL 0.20-m f/5 reflector + CCD
 
 COD I52
 COM Find_Orb default details
-COM Valid: 2019 Jan 20 - 2100
-OBS T. A. Pruyne
-COM Valid: 2018 Jan 1 - 2100
-OBS B. M. Africano
-COM Valid: 2010-2014
-OBS J. D. Ahern
-COM Valid: 1900-2014
-OBS E. C. Beshore
-COM Valid: 2006-2014
-OBS A. Boattini
-COM Valid: 2004 jul 1 - 2006
-OBS C. M. Casey
-COM Valid: 2011-2100
-OBS E. J. Christensen
-COM Valid: 2018 Jul 1 - 2300
-OBS G. A. Farneth
-COM Valid: 2014 Jan 1 - 2300
-OBS D. C. Fuls
-COM Valid: 2004 jul 1-2011
-OBS G. J. Garradd
-COM Valid: 2006-2100
-OBS A. R. Gibbs, A. D. Grauer
-COM Valid: 2018 may 1 - 2100
-OBS H. Groeller
-COM Valid: 1999 jan 1 - 2015 Oct 1
-OBS R. E. Hill
-COM Valid: 2014-2100
-OBS J. A. Johnson
-COM Valid: 1900 - 2004 jul 1
-OBS S. Kolar
-COM Valid: 2006 - 2100
-OBS R. A. Kowalski
-COM Valid: 2004 jul 1 - 2100
-OBS S. M. Larson
-COM Valid: 2014 - 2100
-OBS G. J. Leonard
-COM Valid: 2014 - 2018 Feb 20
-OBS R. G. Matheny
-COM Valid: 1900-2004 jul 1
-OBS D. McLean
-COM Valid: 2004 jul 1 - 2015
-OBS R. H. McNaught
-COM Valid: 2019 - 2100
-OBS D. Rankin
-COM Valid: 2014 - 2100
-OBS R. L. Seaman
-COM Valid: 2014 - 2100
-OBS F. C. Shelly
-COM Valid: 2019 Oct 1 - 2100
-OBS K. W. Wierzchos
-COM Valid: 1999-2100
 TEL 1.0-m reflector + CCD
 
 COD I72
@@ -2642,57 +2440,6 @@ TEL 0.36-m reflector + CCD
 
 COD V00
 COM Find_Orb default details
-COM Valid: 2019 Jan 20 - 2100
-OBS T. A. Pruyne
-COM Valid: 2018 Jan 1 - 2100
-OBS B. M. Africano
-COM Valid: 2010-2014
-OBS J. D. Ahern
-COM Valid: 1900-2014
-OBS E. C. Beshore
-COM Valid: 2006-2014
-OBS A. Boattini
-COM Valid: 2004 jul 1 - 2006
-OBS C. M. Casey
-COM Valid: 2011-2100
-OBS E. J. Christensen
-COM Valid: 2018 Jul 1 - 2300
-OBS G. A. Farneth
-COM Valid: 2014 Jan 1 - 2300
-OBS D. C. Fuls
-COM Valid: 2004 jul 1-2011
-OBS G. J. Garradd
-COM Valid: 2006-2100
-OBS A. R. Gibbs, A. D. Grauer
-COM Valid: 2018 may 1 - 2100
-OBS H. Groeller
-COM Valid: 1999 jan 1 - 2015 Oct 1
-OBS R. E. Hill
-COM Valid: 2014-2100
-OBS J. A. Johnson
-COM Valid: 1900 - 2004 jul 1
-OBS S. Kolar
-COM Valid: 2006 - 2100
-OBS R. A. Kowalski
-COM Valid: 2004 jul 1 - 2100
-OBS S. M. Larson
-COM Valid: 2014 - 2100
-OBS G. J. Leonard
-COM Valid: 2014 - 2018 Feb 20
-OBS R. G. Matheny
-COM Valid: 1900-2004 jul 1
-OBS D. McLean
-COM Valid: 2004 jul 1 - 2015
-OBS R. H. McNaught
-COM Valid: 2019 - 2100
-OBS D. Rankin
-COM Valid: 2014 - 2100
-OBS R. L. Seaman
-COM Valid: 2014 - 2100
-OBS F. C. Shelly
-COM Valid: 2019 Oct 1 - 2100
-OBS K. W. Wierzchos
-COM Valid: 1900-2100
 TEL 2.25-m reflector + CCD
 
 COD V01
@@ -2710,56 +2457,6 @@ TEL 0.30-m reflector + CCD
 
 COD V06
 COM Find_Orb default details
-COM Valid: 2019 Jan 20 - 2100
-OBS T. A. Pruyne
-COM Valid: 2018 Jan 1 - 2100
-OBS B. M. Africano
-COM Valid: 2010-2014
-OBS J. D. Ahern
-COM Valid: 1900-2014
-OBS E. C. Beshore
-COM Valid: 2006-2014
-OBS A. Boattini
-COM Valid: 2004 jul 1 - 2006
-OBS C. M. Casey
-COM Valid: 2011-2100
-OBS E. J. Christensen
-COM Valid: 2018 Jul 1 - 2300
-OBS G. A. Farneth
-COM Valid: 2014 Jan 1 - 2300
-OBS D. C. Fuls
-COM Valid: 2004 jul 1-2011
-OBS G. J. Garradd
-COM Valid: 2006-2100
-OBS A. R. Gibbs, A. D. Grauer
-COM Valid: 2018 may 1 - 2100
-OBS H. Groeller
-COM Valid: 1999 jan 1 - 2015 Oct 1
-OBS R. E. Hill
-COM Valid: 2014-2100
-OBS J. A. Johnson
-COM Valid: 1900 - 2004 jul 1
-OBS S. Kolar
-COM Valid: 2006 - 2100
-OBS R. A. Kowalski
-COM Valid: 2004 jul 1 - 2100
-OBS S. M. Larson
-COM Valid: 2014 - 2100
-OBS G. J. Leonard
-COM Valid: 2014 - 2018 Feb 20
-OBS R. G. Matheny
-COM Valid: 1900-2004 jul 1
-OBS D. McLean
-COM Valid: 2004 jul 1 - 2015
-OBS R. H. McNaught
-COM Valid: 2019 - 2100
-OBS D. Rankin
-COM Valid: 2014 - 2100
-OBS R. L. Seaman
-COM Valid: 2014 - 2100
-OBS F. C. Shelly
-COM Valid: 2019 Oct 1 - 2100
-OBS K. W. Wierzchos
 COM Valid: 1900-2100
 TEL 1.55-m reflector + CCD
 
@@ -3218,3 +2915,54 @@ OBS A. Mickleburgh
 COM Default details extracted from MPEC 2021-B143
 TEL 0.36-m f/8 Schmidt-Cassegrain + CCD
 
+COD 703  E12  G96  I52  V00  V06
+COM Valid: 2019 Jan 20 - 2100
+OBS T. A. Pruyne
+COM Valid: 2018 Jan 1 - 2100
+OBS B. M. Africano
+COM Valid: 2010-2014
+OBS J. D. Ahern
+COM Valid: 1900-2014
+OBS E. C. Beshore
+COM Valid: 2006-2014
+OBS A. Boattini
+COM Valid: 2004 jul 1 - 2006
+OBS C. M. Casey
+COM Valid: 2011-2100
+OBS E. J. Christensen
+COM Valid: 2018 Jul 1 - 2300
+OBS G. A. Farneth
+COM Valid: 2014 Jan 1 - 2300
+OBS D. C. Fuls
+COM Valid: 2004 jul 1-2011
+OBS G. J. Garradd
+COM Valid: 2006-2100
+OBS A. R. Gibbs, A. D. Grauer
+COM Valid: 2018 may 1 - 2100
+OBS H. Groeller
+COM Valid: 1999 jan 1 - 2015 Oct 1
+OBS R. E. Hill
+COM Valid: 2014-2100
+OBS J. A. Johnson
+COM Valid: 1900 - 2004 jul 1
+OBS S. Kolar
+COM Valid: 2006 - 2100
+OBS R. A. Kowalski
+COM Valid: 2004 jul 1 - 2100
+OBS S. M. Larson
+COM Valid: 2014 - 2100
+OBS G. J. Leonard
+COM Valid: 2014 - 2018 Feb 20
+OBS R. G. Matheny
+COM Valid: 1900-2004 jul 1
+OBS D. McLean
+COM Valid: 2004 jul 1 - 2015
+OBS R. H. McNaught
+COM Valid: 2019 - 2100
+OBS D. Rankin
+COM Valid: 2014 - 2100
+OBS R. L. Seaman
+COM Valid: 2014 - 2100
+OBS F. C. Shelly
+COM Valid: 2019 Oct 1 - 2100
+OBS K. W. Wierzchos

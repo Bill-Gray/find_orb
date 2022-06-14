@@ -4413,13 +4413,14 @@ static bool get_details_from_here( const char *buff, const char *mpc_code,
                   const char *program_codes)
 {
    bool rval = false;
+   const char *tptr = strstr( buff + 4, mpc_code);
 
-   if( !memcmp( buff, "COD ", 4) && !memcmp( buff + 4, mpc_code, 3))
+   if( tptr && !memcmp( buff, "COD ", 4))
        {
-       if( buff[7] < ' ')
+       if( tptr[3] < ' ' || tptr[4] <= ' ')
           rval = true;
        else
-          rval = (NULL != strchr( program_codes, buff[8]));
+          rval = (NULL != strchr( program_codes, tptr[4]));
        }
    return( rval);
 }

@@ -38,12 +38,18 @@ typedef struct
 {
    void *stack;
    mpc_code_details_t *code_details;
-   int n_code_details;
-   int curr_idx;        /* index into code_details for last COD line seen */
+   int n_code_details, n_curr;
+   int curr_idx[10];
 } observation_details_t;
 
 #define min_n_code_details 16
 #define min_code_lines 16
+
+int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
+#ifdef __GNUC__
+         __attribute__ (( format( printf, 1, 2)))
+#endif
+;
 
 void *init_observation_details( void)
 {
@@ -52,7 +58,7 @@ void *init_observation_details( void)
                      stack_calloc( stack, sizeof( observation_details_t));
 
    rval->stack = stack;
-   rval->curr_idx = -1;    /* i.e.,  "no COD line yet" */
+   rval->n_curr = 0;    /* i.e.,  "no COD line yet" */
    rval->code_details = (mpc_code_details_t *)stack_calloc( stack,
                               min_n_code_details * sizeof( mpc_code_details_t));
    return( rval);
@@ -151,7 +157,7 @@ static int reset_mpc_code( observation_details_t *det, const char *mpc_code)
    det->code_details[idx].n_lines = 0;
    det->code_details[idx].lines = (char **)stack_calloc( det->stack,
                      (min_code_lines + 1) * sizeof( char *));
-   det->curr_idx = idx;
+   det->curr_idx[det->n_curr++] = idx;
 #ifdef DEBUG_PRINTFS
    printf( "Done\n");
 #endif
@@ -177,15 +183,27 @@ int add_line_to_observation_details( void *obs_details, const char *iline)
    const char *valid_lines = "COD CON OBS MEA TEL NET BND COM NUM ACK AC2 ";
    int i, compare = 1, rval;
 
+   debug_printf( "Got line '%s'\n", iline);
    if( !memcmp( iline, "COM Sigmas", 10))    /* skip ADES comment lines */
       return( OBS_DETAILS_IRRELEVANT_LINE);
    while( len && (iline[len - 1] == 10 || iline[len - 1] == 13))
       len--;               /* drop trailing carriage returns/line feeds */
    if( !memcmp( iline, "COD ", 4))
-      reset_mpc_code( det, iline + 4);
-   if( det->curr_idx < 0)        /* no COD line seen yet */
+      {
+      det->n_curr = 0;
+      debug_printf( "Got line '%s'\n", iline);
+      for( i = 4; i < (int)len; i += 5)
+         {
+         char tbuff[4];
+
+         memcpy( tbuff, iline + i, 3);
+         tbuff[3] = '\0';
+         reset_mpc_code( det, tbuff);
+         debug_printf( "Details for '%s' : %d\n", tbuff, det->n_curr);
+         }
+      }
+   if( !det->n_curr)        /* no COD line seen yet */
       return( OBS_DETAILS_IRRELEVANT_LINE);
-   assert( det->curr_idx < det->n_code_details);
    if( len == 80 && probable_mpc_record( iline))
       {
       const int idx = find_code_details( det, iline + 77, &compare);
@@ -208,29 +226,30 @@ int add_line_to_observation_details( void *obs_details, const char *iline)
       compare = memcmp( iline, valid_lines + i, 4);
 
    if( !compare)    /* yup,  it's a valid header line */
-      {
-      mpc_code_details_t *mptr = det->code_details + det->curr_idx;
-      const bool reallocation_needed = (mptr->observations_found
-             || (is_power_of_two( mptr->n_lines)
-                 && mptr->n_lines >= min_code_lines));
-
-      if( reallocation_needed)
+      for( i = 0; i < det->n_curr; i++)
          {
-         size_t new_size = min_code_lines;
-         char **tptr;
+         mpc_code_details_t *mptr = det->code_details + det->curr_idx[i];
+         const bool reallocation_needed = (mptr->observations_found
+                || (is_power_of_two( mptr->n_lines)
+                    && mptr->n_lines >= min_code_lines));
 
-         while( new_size < mptr->n_lines)
-            new_size <<= 1;
-         tptr = (char **)stack_calloc( det->stack,
-                           (2 * new_size + 1) * sizeof( char *));
-         memcpy( tptr, mptr->lines, mptr->n_lines * sizeof( char *));
-         mptr->lines = tptr;
+         if( reallocation_needed)
+            {
+            size_t new_size = min_code_lines;
+            char **tptr;
+
+            while( new_size < mptr->n_lines)
+               new_size <<= 1;
+            tptr = (char **)stack_calloc( det->stack,
+                              (2 * new_size + 1) * sizeof( char *));
+            memcpy( tptr, mptr->lines, mptr->n_lines * sizeof( char *));
+            mptr->lines = tptr;
+            }
+         mptr->lines[mptr->n_lines] = (char *)stack_calloc( det->stack, len + 1);
+         memcpy( mptr->lines[mptr->n_lines], iline, len);
+         mptr->n_lines++;
+         rval = OBS_DETAILS_HEADER_LINE;
          }
-      mptr->lines[mptr->n_lines] = (char *)stack_calloc( det->stack, len + 1);
-      memcpy( mptr->lines[mptr->n_lines], iline, len);
-      mptr->n_lines++;
-      rval = OBS_DETAILS_HEADER_LINE;
-      }
    else
       rval = OBS_DETAILS_IRRELEVANT_LINE;
    return( rval);
