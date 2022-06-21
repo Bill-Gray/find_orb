@@ -3427,6 +3427,7 @@ static void show_splash_screen( void)
                put_colored_text( buff, (LINES - lines) / 2 + i, 0, -1, COLOR_BACKGROUND);
                }
          }
+      doupdate( );
       fclose( ifile);
       }
 }
@@ -5974,8 +5975,13 @@ int main( int argc, const char **argv)
          case ALT_DEL:
          case KEY_B2:            /* central key on numeric keypad */
          case KEY_ENTER:         /* on numeric keypad */
+         case ALT_UP:
+         case ALT_LEFT: case ALT_RIGHT:
 #ifdef __PDCURSES__
          case PADPLUS: case PADMINUS: case PADSLASH:
+         case ALT_DOWN:          /* PDCurses uses this #define... */
+#else
+         case ALT_DN:            /* ...and ncurses uses this one */
 #endif
          default:
             debug_printf( "Key %d hit\n", c);
