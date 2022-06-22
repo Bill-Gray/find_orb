@@ -41,6 +41,7 @@
  Fagioli                                   <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=27959&amp;view=OPD">Fagioli</a>
  Fitzsimmons                               <a href="https://alanfitzsimmons.wordpress.com/">Fitzsimmons</a>
  Flewelling                                <a href="https://twitter.com/heatherflew">Flewelling</a>
+ Flynn                                     <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=Randyflynn&amp;view=OPD">Flynn</a>
  F\"ohring                                 F&ouml;hring
  Foglia                                    <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=13147&amp;view=OPD">Foglia</a>
  Fuls                                      <a href="https://catalina.lpl.arizona.edu/person/carson-fuls">Fuls</a>

@@ -1551,6 +1551,11 @@ OBS J. L. Martin
 COM Default details extracted from MPEC 2021-B143
 TEL 0.30-m f/8 Ritchey-Chretien + CCD
 
+COD I75
+OBS A. Betoret
+COM Default details extracted from MPEC 2022-M21
+TEL 0.25-m f/6.3 Schmidt Cassegrain + CCD
+
 COD I77
 COM Find_Orb default details
 OBS C. Jacques,E. Pimentel
@@ -2137,6 +2142,12 @@ COD N42
 COM Default details from private communication
 TEL 1.0-m reflector + CCD
 
+COD N50
+OBS D. K. Sahu, S. Pramod Kumar, T. Santana-Ros, M. Micheli, L. Conversi
+MEA M. Micheli
+COM Default details extracted from MPEC 2022-L21
+TEL 2.01-m reflector + CCD
+
 COD N51
 MEA K. Sharma, B. T. Bolin
 OBS K. Sharma, H. Kumar, P. Dorjay, J. Stanzin, V. Bhalerao, G. C. Anupama
@@ -2550,7 +2561,7 @@ OBS R. L. Flynn
 COM Valid: 1900 - 2019 May 29
 TEL 0.20-m f/10 Schmidt-Cassegrain + f/7.0 focal reducer
 COM Valid: 2019 May 29 - 2100
-TEL 0.35-m f/1.9 Schmidt-Cassegrain + CCD
+TEL 0.36-m f/1.9 Schmidt-Cassegrain + CCD
 COM Aplanatic Schmidt-Cassegrain
 COM Photo/astrometry Astrometrica 4.12.0.488
 COM (Default details from R. L. Flynn,  2019 Sep 4)
@@ -2800,6 +2811,12 @@ COD Z30
 OBS D. Storey
 COM Default details extracted from MPEC 2021-B143
 TEL 0.35-m Schmidt-Cassegrain + CCD
+
+COD Z31
+OBS M. Micheli, T. Santana-Ros, L. Conversi
+COM Default details extracted from MPEC 2022-M32
+MEA M. Micheli
+TEL 1.0-m reflector + CCD
 
 COD Z32
 MEA M. Mahlke
