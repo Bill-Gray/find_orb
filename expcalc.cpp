@@ -58,6 +58,10 @@ typedef struct
    double zero_point;
 } filter_t;
 
+/* 'zero_point = photons per square cm per second for a mag 0 star
+with a Vega-like spectrum,  as measured above the atmosphere.  See
+http://spiff.rit.edu/richmond/wiyn/technotes/signal_wiyn09.cgi */
+
 /* The Lowell paper cited above points out that the theoretical
 optimal pinhole photometry aperture should be about 0.67 times
 the full width at half maximum (fwhm).  More than that,  and
