@@ -109,8 +109,8 @@ int wgetn_wstr_ex(WINDOW *win, wint_t *wstr, int *loc, const int maxlen, const i
     int i, x, y, offset = 0, initial_cursor_state;
     int rval = -1;
 #ifdef __PDCURSES__
-    const bool oldcbreak = SP->cbreak; /* remember states */
-    const bool oldecho = SP->echo;
+    const bool oldcbreak = PDC_getcbreak( ); /* remember states */
+    const bool oldecho = PDC_getecho( );
     const bool oldnodelay = win->_nodelay;
 #endif
 
@@ -288,8 +288,8 @@ int wgetn_wstr_ex(WINDOW *win, wint_t *wstr, int *loc, const int maxlen, const i
             }
     }
 #ifdef __PDCURSES__
-    SP->cbreak = oldcbreak;     /* restore states */
-    SP->echo = oldecho;
+    oldcbreak ? cbreak( ) : nocbreak( );     /* restore states */
+    oldecho ? echo( ) : noecho( );
     win->_nodelay = oldnodelay;
 #endif
     curs_set( initial_cursor_state);
