@@ -183,7 +183,6 @@ int add_line_to_observation_details( void *obs_details, const char *iline)
    const char *valid_lines = "COD CON OBS MEA TEL NET BND COM NUM ACK AC2 ";
    int i, compare = 1, rval;
 
-   debug_printf( "Got line '%s'\n", iline);
    if( !memcmp( iline, "COM Sigmas", 10))    /* skip ADES comment lines */
       return( OBS_DETAILS_IRRELEVANT_LINE);
    while( len && (iline[len - 1] == 10 || iline[len - 1] == 13))
@@ -191,7 +190,6 @@ int add_line_to_observation_details( void *obs_details, const char *iline)
    if( !memcmp( iline, "COD ", 4))
       {
       det->n_curr = 0;
-      debug_printf( "Got line '%s'\n", iline);
       for( i = 4; i < (int)len; i += 5)
          {
          char tbuff[4];
@@ -199,7 +197,6 @@ int add_line_to_observation_details( void *obs_details, const char *iline)
          memcpy( tbuff, iline + i, 3);
          tbuff[3] = '\0';
          reset_mpc_code( det, tbuff);
-         debug_printf( "Details for '%s' : %d\n", tbuff, det->n_curr);
          }
       }
    if( !det->n_curr)        /* no COD line seen yet */
