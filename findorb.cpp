@@ -3531,7 +3531,6 @@ int main( int argc, const char **argv)
    bool is_monte_orbit = false;
    unsigned list_codes = SHOW_MPC_CODES_NORMAL;
    int i, quit = 0, n_obs = 0, clock_line = 0;
-   int observation_display = 0;
    OBSERVE FAR *obs = NULL;
    int curr_obs = 0;
    double epoch_shown, curr_epoch, orbit[6];
@@ -3753,8 +3752,8 @@ int main( int argc, const char **argv)
                return( -1);
             }
          }
-   sscanf( get_environment_ptr( "CONSOLE_OPTS"), "%s %d %d %u",
-               mpc_code, &observation_display, &residual_format, &list_codes);
+   sscanf( get_environment_ptr( "CONSOLE_OPTS"), "%s %*d %d %u",
+               mpc_code, &residual_format, &list_codes);
    text_search_and_replace( mpc_code, "_", " ");
 
    residual_format |= RESIDUAL_FORMAT_80_COL;      /* force 80-column mode */
@@ -3962,7 +3961,6 @@ int main( int argc, const char **argv)
       if( debug_level)
          refresh( );
       line_no = n_command_lines + 1;
-      if(  observation_display & DISPLAY_OBSERVATION_DETAILS)
          {
          char *tptr = tbuff;
 
@@ -4002,7 +4000,6 @@ int main( int argc, const char **argv)
             refresh( );
          top_line_orbital_elements = line_no;
          }
-      if( observation_display & DISPLAY_ORBITAL_ELEMENTS)
          {
          FILE *ifile;
 
@@ -4411,8 +4408,7 @@ int main( int argc, const char **argv)
          else if( mouse_y > n_command_lines
                && mouse_y < top_line_orbital_elements)   /* in obs details area: */
             c = ALT_Q;         /* toggle display header/'traditional' data */
-         else if( (observation_display & DISPLAY_ORBITAL_ELEMENTS)
-                  && c == KEY_MOUSE
+         else if( c == KEY_MOUSE
                   && mouse_y >= top_line_orbital_elements)
             {
             if( button & (BUTTON2_RELEASED | BUTTON2_CLICKED
@@ -4918,12 +4914,6 @@ int main( int argc, const char **argv)
             update_element_display = 1;
             sprintf( message_to_user, "Radii set: %f %f", r1, r2);
             break;
-         case 'i': case 'I':
-            observation_display ^= DISPLAY_OBSERVATION_DETAILS;
-            strcpy( message_to_user, "Observation details toggled");
-            add_off_on = (observation_display & DISPLAY_OBSERVATION_DETAILS);
-            clear( );
-            break;
          case 'l': case 'L':
             if( !*orbit_constraints)
                {
@@ -4959,12 +4949,6 @@ int main( int argc, const char **argv)
             get_new_object = true;
             update_element_display = 1;
             pop_all_orbits( );
-            break;
-         case 'O':
-            observation_display ^= DISPLAY_ORBITAL_ELEMENTS;
-            strcpy( message_to_user, "Display of orbital elements toggled");
-            add_off_on = (observation_display & DISPLAY_ORBITAL_ELEMENTS);
-            clear( );
             break;
          case 'P':         /* show one less digit of precision in elements */
          case 'p':         /* show one more digit of precision in elements */
@@ -5958,7 +5942,9 @@ int main( int argc, const char **argv)
             break;
          case '\\':
          case 'c': case 'C':
+         case 'i': case 'I':
          case 'j': case 'J':
+         case 'O':
          case ';': case ']':
          case CTRL( 'E'): case CTRL( 'J'): case CTRL( 'L'):
          case CTRL( 'N'): case CTRL( 'O'): case CTRL( 'T'):
@@ -6007,8 +5993,7 @@ Shutdown_program:
    unload_observations( obs, n_obs);
 
    text_search_and_replace( mpc_code, " ", "_");
-   sprintf( tbuff, "%s %d %d %d", mpc_code,
-             observation_display, residual_format, list_codes);
+   sprintf( tbuff, "%s 0 %d %d", mpc_code, residual_format, list_codes);
    set_environment_ptr( "CONSOLE_OPTS", tbuff);
    store_defaults( ephemeris_output_options, element_format,
          element_precision, max_residual_for_filtering,
