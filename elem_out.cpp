@@ -107,7 +107,7 @@ double find_collision_time( ELEMENTS *elem, double *latlon, const int is_impact)
 char *fgets_trimmed( char *buff, size_t max_bytes, FILE *ifile); /*elem_out.c*/
 int get_idx1_and_idx2( const int n_obs, const OBSERVE FAR *obs,
                                 int *idx1, int *idx2);      /* elem_out.c */
-double mag_band_shift( const char mag_band);                /* elem_out.c */
+double mag_band_shift( const char mag_band, int *err_code);   /* elem_out.c */
 int get_jpl_ephemeris_info( int *de_version, double *jd_start, double *jd_end);
 double *get_asteroid_mass( const int astnum);   /* bc405.cpp */
 double current_jd( void);                       /* elem_out.cpp */
@@ -3435,7 +3435,7 @@ typedef struct
    double v_mag_correction;
 } band_shift_t;
 
-double mag_band_shift( const char mag_band)
+double mag_band_shift( const char mag_band, int *err_code)
 {
    size_t i;
    static bool unknown_band_warning_shown = false;
@@ -3462,11 +3462,13 @@ double mag_band_shift( const char mag_band)
       snprintf( buff, sizeof( buff),
                 "Band '%c' is unknown to Find_Orb.  Photometry in this\n"
                 "band will be unadjusted.  If this really is a legitimate\n"
-                "photometric band,  please contact Project Pluto.",  mag_band);
+                "photometric band,  please contact Project Pluto.\n",  mag_band);
       if( *get_environment_ptr( "BAND_WARNING"))
          generic_message_box( buff, "o");
       else
          debug_printf( "%s", buff);
+      if( err_code)
+         *err_code = -1;
       }
    return( 0.);
 }
@@ -3489,6 +3491,7 @@ static double _calc_absolute_magnitude_internal( OBSERVE FAR *obs, int n_obs)
          if( earth_sun)
             {
             bool use_obs = true;
+            int err = 0;
 
             if( object_type == OBJECT_TYPE_COMET
                             && obs->mag_band != default_comet_magnitude_type)
@@ -3496,11 +3499,18 @@ static double _calc_absolute_magnitude_internal( OBSERVE FAR *obs, int n_obs)
             if( obs->obs_mag == BLANK_MAG || !obs->is_included)
                use_obs = false;
             obs->computed_mag = calc_obs_magnitude(
-                  obs->solar_r, obs->r, earth_sun, NULL) - mag_band_shift( obs->mag_band);
+                  obs->solar_r, obs->r, earth_sun, NULL) - mag_band_shift( obs->mag_band, &err);
             if( use_obs)
                {
                rval += (obs->obs_mag - obs->computed_mag) / obs->mag_sigma;
                n_mags += 1. / obs->mag_sigma;
+               }
+            if( err)
+               {
+               char buff[90];
+
+               recreate_observation_line( buff, obs, 0);
+               debug_printf( "Unknown band '%s'\n", buff);
                }
             }
          }

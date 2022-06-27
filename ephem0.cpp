@@ -92,7 +92,7 @@ int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
 int calc_derivatives( const double jd, const double *ival, double *oval,
                            const int reference_planet);     /* runge.cpp */
 char *iso_time( char *buff, const double jd, const int precision);   /* elem_out.c */
-double mag_band_shift( const char mag_band);                /* elem_out.c */
+double mag_band_shift( const char mag_band, int *err_code);   /* elem_out.c */
 char *get_file_name( char *filename, const char *template_file_name);
 double current_jd( void);                       /* elem_out.cpp */
 double diameter_from_abs_mag( const double abs_mag,      /* ephem0.cpp */
@@ -3766,7 +3766,7 @@ static void put_mag_resid( char *output_text, const double obs_mag,
    if( obs_mag < BLANK_MAG && computed_mag)
       snprintf_err( output_text, 8, "%6.2f ",
                obs_mag - computed_mag);
-//             obs_mag - computed_mag - mag_band_shift( mag_band);
+//             obs_mag - computed_mag - mag_band_shift( mag_band, NULL);
    else
       strcpy( output_text, "------ ");
 }
@@ -4329,7 +4329,7 @@ void create_obs_file_with_computed_values( const OBSERVE FAR *obs,
 
    for( i = 0; i < n_obs; i++)
       {
-      tobs[i].obs_mag = tobs[i].computed_mag + mag_band_shift( tobs[i].mag_band);
+      tobs[i].obs_mag = tobs[i].computed_mag + mag_band_shift( tobs[i].mag_band, NULL);
       tobs[i].ra  = tobs[i].computed_ra;
       tobs[i].dec = tobs[i].computed_dec;
       tobs[i].mag_precision = 2;
