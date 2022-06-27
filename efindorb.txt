@@ -322,7 +322,7 @@
 2050    Cancel
 
 2052    Some observations of this object are marked as 'private' and not
-2052    for public redistribution.  Do you want to include them?  (Y/N)
+2052    for public redistribution.  Do you want to include them?  (Y/N)\n
 
 # See comments about RA_DEC_FORMAT in 'environ.def' for the meanings of
 # the number pairs.  You can add more if there are other formats you'd
