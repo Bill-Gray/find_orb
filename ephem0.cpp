@@ -1942,6 +1942,29 @@ static double normalize_vect( double *ivect)
    return( rval);
 }
 
+int xlate_filter_to_ubvri( const char filter);     /* expcalc.c */
+
+static double get_brightness_for_filter( const BRIGHTNESS_DATA *bdata,
+                              char filter)
+{
+   static bool first_time = true;
+   int idx = xlate_filter_to_ubvri( filter);
+
+   if( idx == -1 && first_time)
+      {
+      char buff[200];
+
+      snprintf_err( buff, sizeof( buff), "Filter '%c' is unrecognized.\n"
+                     "Defaulting to R.", filter);
+      generic_message_box( buff, "o");
+      first_time = false;
+      }
+   if( idx == -1)
+      idx = 3;
+   return( -2.5 * log10( bdata->brightness[3]) - 11.055);
+
+}
+
 /* To give a 'generic',  non-site-specific concept of observability,  we
 try to compute an optimum part of the earth from which to observe the
 object at that time.  Arguably,  a decent candidate for such a site
@@ -2648,6 +2671,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                output_angle_to_buff( ra_buff, ra, ra_format);
                remove_trailing_cr_lf( ra_buff);
                find_best_site( utc, &best_latlon, obs_posn_equatorial, topo);
+               exposure_config.sky_brightness = 99.;
                for( j = 0; j < 3; j++)    /* compute alt/azzes of object (j=0), */
                   {                       /* sun (j=1), and moon (j=2)          */
                   DPT obj_ra_dec = ra_dec;
@@ -2819,6 +2843,8 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                         rgb |= (unsigned)component << (j * 8);
                      }
                   mags_per_arcsec2 = -2.5 * log10( bdata.brightness[3]) - 11.055;  /* R brightness */
+                  exposure_config.sky_brightness = get_brightness_for_filter( &bdata,
+                                             exposure_config.filter);
                   air_mass = bdata.air_mass;
                   }
                output_signed_angle_to_buff( dec_buff, dec, dec_format);

@@ -173,7 +173,34 @@ static double solve_quadratic( const double a, const double b, const double c)
 #define EXPCALC_UNKNOWN_FILTER         -1
 #define EXPCALC_FAILED        (-99.)
 
-static int find_filter( expcalc_internals_t *e, const char filter)
+/* Both the exposure calculation code (see 'expcalc.cpp') and sky
+brightness code (see 'vislimit.cpp' in the 'lunar' repository) can handle
+UBVRI photometry.  For other bands,  we translate to the nearest band.
+At some point,  a smarter solution may be used in which we interpolate or
+extrapolate between bands.  But I expect that to be quite challenging.
+This should be good enough for most purposes;  in practice,  neither
+exposure times nor sky brightness can be computed accurately enough to
+notice the difference.  Note that the return value is an _index_,
+0=U, 1=B, 2=V, 3=R, 4=I, -1=unknown.  Also note that the exposure
+calculator also knows about N and W;  those shouldn't be translated.
+*/
+
+int xlate_filter_to_ubvri( const char filter)
+{
+   int i;
+   const char *groups[5] = { "Uu",           /* filters closest to U */
+                             "B",            /* filters closest to B */
+                             "Vg",           /* filters closest to V */
+                             "RrWwcoN",      /* filters closest to R */
+                             "Iizy" };       /* filters closest to I */
+
+   for( i = 0; i < 5; i++)
+      if( strchr( groups[i], filter))
+         return( i);
+   return( -1);
+}
+
+static int find_filter( expcalc_internals_t *e, char filter)
 {
    size_t i;
    static filter_t filters[] = {
@@ -185,6 +212,16 @@ static int find_filter( expcalc_internals_t *e, const char filter)
      { 'N', 0.20, 4.32e+06 },
      { 'W', 0.15, 2.00e+06 } };
 
+   if( filter != 'N' && filter != 'W')
+      {
+      const char *filts = "UBVRI";
+      int idx = xlate_filter_to_ubvri( filter);
+
+      if( idx == -1)    /* unrecognized filter */
+         filter = 'R';
+      else
+         filter = filts[idx];
+      }
    for( i = 0; i < sizeof( filters) / sizeof( filters[0]); i++)
       if( filter == filters[i].band)
          {
