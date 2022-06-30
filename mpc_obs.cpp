@@ -115,13 +115,20 @@ static void *_ades_ids_stack = NULL;
 
 int debug_printf( const char *format, ...)
 {
-   FILE *ofile = fopen_ext( "debug.txt", "tca");
+   const char *debug_file_name = "debug.txt";
+   FILE *ofile = fopen_ext( debug_file_name, "tca");
 
    if( ofile)
       {
       va_list argptr;
       const time_t t0 = time( NULL);
+      const long max_debug_file_size = 10000;  /* 100 MBytes should be enough */
 
+      if( ftell( ofile) > max_debug_file_size)
+         {
+         fclose( ofile);
+         ofile = fopen_ext( debug_file_name, "tcw");
+         }
       fprintf( ofile, "%02d:%02d:%02d ",
                ((int)t0 / 3600) % 24, ((int)t0 / 60) % 60, (int)t0 % 60);
       va_start( argptr, format);
