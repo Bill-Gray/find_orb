@@ -2302,12 +2302,12 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
          snprintf_append( buff, sizeof( buff), " Maz");
       if( options & OPTION_RADIAL_VEL_OUTPUT)
          snprintf_append( buff, sizeof( buff), "  rvel-");
+      if( options & OPTION_SPACE_VEL_OUTPUT)
+         snprintf_append( buff, sizeof( buff), "  svel-");
       if( show_radar_data)
          snprintf_append( buff, sizeof( buff), "  SNR");
       if( options & OPTION_GROUND_TRACK)
          snprintf_append( buff, sizeof( buff), " -lon---- -lat---- -alt-(km)-");
-      if( options & OPTION_SPACE_VEL_OUTPUT)
-         snprintf_append( buff, sizeof( buff), "  svel-");
       if( options & OPTION_SHOW_SIGMAS)
          snprintf_append( buff, sizeof( buff), " \"-sig-PA");
       if( ephem_type == OPTION_OBSERVABLES)
@@ -3275,6 +3275,16 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                                       " %11.6f", rvel_in_km_per_sec);
                   format_velocity_in_buff( end_ptr, rvel_in_km_per_sec);
                   }
+               if( options & OPTION_SPACE_VEL_OUTPUT)
+                  {
+                           /* get 'full' velocity; cvt AU/day to km/sec: */
+                  const double total_vel =
+                             vector3_length( topo_vel) * AU_IN_KM / seconds_per_day;
+
+                  format_velocity_in_buff( tbuff, total_vel);
+                  strlcat_error( buff, tbuff);
+                  snprintf_append( alt_buff, sizeof( alt_buff),  " %11.6f", total_vel);
+                  }
                if( show_radar_data)
                   {
                   if( alt_az[0].y < 0.)
@@ -3307,16 +3317,6 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                   strlcat_error( buff, tbuff);
                   }
 
-               if( options & OPTION_SPACE_VEL_OUTPUT)
-                  {
-                           /* get 'full' velocity; cvt AU/day to km/sec: */
-                  const double total_vel =
-                             vector3_length( topo_vel) * AU_IN_KM / seconds_per_day;
-
-                  format_velocity_in_buff( tbuff, total_vel);
-                  strlcat_error( buff, tbuff);
-                  snprintf_append( alt_buff, sizeof( alt_buff),  " %11.6f", total_vel);
-                  }
                if( options & OPTION_SUPPRESS_UNOBSERVABLE)
                   if( show_this_line)
                      {
