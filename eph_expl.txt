@@ -2,6 +2,8 @@
 ; # is a directive to say "show the following explanatory text
 ; if and only if the quantity in question is turned on."  Except
 ; that #! means "show it only if the quantity is _off_."
+; Keep explanations in order of ephemeris entries,  _not_ in
+; order of the quantity numbers.
 ;
 ; Not all ephemeris quantities have comments.  Much work to do
 ; all of this...
@@ -25,22 +27,6 @@ precisions,  etc.)
 
    Distances are in kilometers for distances under one million km
 (about 0.00668 AU),  and in AUs for larger distances.
-#  3
-
-   Alt/az values are in degrees.  North=0, East=90.
-#  4,19
-
-   Radial and 'space' velocities are in km/s.  Negative radial
-velocities mean the object is approaching the observer.
-#  5
-
-   Apparent motions are given in arcminutes/hour,  or (equivalently)
-arcseconds/minute.
-# 11
-
-   The phase angle bisector gives the ecliptic lat/lon of the point
-midway between the vector from observer to target and the vector
-from sun to target.  This can be useful in analyzing light curves.
 # 14
 
    The "SM" (Sun-Moon) flags consist of one or two letters,  extended
@@ -61,7 +47,6 @@ from a scheme used on JPL's Horizons system.  Letters used are :
       g Some galactic confusion
       G Lots of galactic confusion
       B Object is below the horizon
-
 # 29
 
    Sky brightness is in magnitudes per square arcsecond,  computed
@@ -72,12 +57,61 @@ http://articles.adsabs.harvard.edu/full/1991PASP..103.1033K
 
    This provides a good approximation to background brightness due
 to moonlight,  twilight,  and airglow.
+# 11
+
+   The phase angle bisector gives the ecliptic lat/lon of the point
+midway between the vector from observer to target and the vector
+from sun to target.  This can be useful in analyzing light curves.
 # 34
 
    The 'galactic confusion' is computed from star counts per unit
 area from Gaia-DR2.  Values range from zero (effectively no
 confusion) to 100 (densest parts of the Milky Way,  Magellanic
 Clouds,  or globular clusters).
+# 30
+
+   'PsAng' is applied mostly to comets : it is the position angle at which
+an observer would see an ionized gas tail,  if that tail pointed exactly
+away from the sun (i.e.,  if the gas was found exactly along a ray going
+out the comet opposite the sun).  See the related 'PsAMV' value.
+# 31
+
+   'PsAMV' is applied mostly to comets : it is the position angle at which
+an observer would see a dust tail,  if that tail pointed back along the
+object's orbit.  Heavier dust particles will essentially do this;  they
+will come off the comet and go into a slightly higher orbit,  and
+gradually fall behind the comet.  Actual mid-size particles will be found
+somewhere between this angle and the one specified by 'PsAng',  the
+theoretical angle at which an ionized gas trail would be seen.
+# 32
+
+   'PlAng' is the angle between the observer and the target's orbital plane,
+as measured from the target.  If it is positive,  you are looking at the
+object from above the ecliptic.  This quantity can be useful with comets.
+#  5
+
+   Apparent motions are given in arcminutes/hour,  or (equivalently)
+arcseconds/minute.
+#  3
+
+   Alt/az values are in degrees.  North=0, East=90.
+#  4,19
+
+   Radial and 'space' velocities are in km/s,  relative to the observer.
+Negative radial velocities mean the object is approaching the observer.
+# 16
+
+   Uncertainties are one-sigma values shown in arcseconds (unless they
+are very large, in which case they are shown in arcminutes or degrees).
+In theory,  the object should be within this distance of the nominal
+RA/dec 67% of the time,  within twice that distance 95% of the time,
+and within three times that distance 99.7% of the time.  In practice,
+astrometric errors are not actually Gaussian,  which means these
+uncertainties are sometimes over- or underestimated.  So you may have
+to look farther,  or not nearly as far,  as the uncertainties say.
+
+   The object will probably be offset from nominal somewhere along the
+indicated position angle,  especially if the orbit is well determined.
 
 # Type 1   (state vectors)
 # Type 2   (positions)
