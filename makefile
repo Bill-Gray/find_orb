@@ -294,7 +294,7 @@ INSTALL_FILES= \
    radecfmt.txt residfmt.txt rovers.txt sat_xref.txt scope.json \
    scopes.txt splash.txt sigma.txt site_310.txt timehelp.txt xdesig.txt
 
-install:
+install: all
 	$(MKDIR) $(IDIR)
 ifdef EXE
 	$(CP) $(FIND_ORB_EXE) $(IDIR)
