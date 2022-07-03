@@ -3330,7 +3330,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                   strlcpy_error( buff, fake_line);
                if( !show_this_line)
                   {
-                  if( last_line_shown)
+                  if( last_line_shown && !fake_astrometry)
                      strlcpy_error( buff, "................");
                   else
                      *buff = '\0';
