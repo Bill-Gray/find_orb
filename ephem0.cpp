@@ -2306,6 +2306,8 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
          snprintf_append( buff, sizeof( buff), "  svel-");
       if( show_radar_data)
          snprintf_append( buff, sizeof( buff), "  SNR");
+      if( options & OPTION_CONSTELLATION)
+         snprintf_append( buff, sizeof( buff), "  Con");
       if( options & OPTION_GROUND_TRACK)
          snprintf_append( buff, sizeof( buff), " -lon---- -lat---- -alt-(km)-");
       if( options & OPTION_SHOW_SIGMAS)
@@ -3300,6 +3302,20 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                      }
                   strlcat_error( alt_buff, tbuff);
                   strlcat_error( buff, tbuff);
+                  }
+               if( options & OPTION_CONSTELLATION)
+                  {
+                  char constell[6];
+                  DPT loc_1875;
+
+                  constell[0] = constell[1] = ' ';
+                  ra_dec.x *= -1.;    /* odd sign convention */
+                  precess_pt( &loc_1875, &ra_dec, 2000., 1875.);
+                  constell_from_ra_dec( -loc_1875.x * 180. / PI,
+                                        loc_1875.y * 180. / PI,
+                                        constell + 2);
+                  strlcat_error( alt_buff, constell);
+                  strlcat_error( buff, constell);
                   }
                if( options & OPTION_GROUND_TRACK)
                   {

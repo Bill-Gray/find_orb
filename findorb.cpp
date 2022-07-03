@@ -984,6 +984,8 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                   (ephemeris_output_options & OPTION_SNR) ? '*' : ' ');
             snprintf_append( buff, sizeof( buff), "} [%c] Exposure time\n",
                   (ephemeris_output_options & OPTION_EXPOSURE_TIME) ? '*' : ' ');
+            snprintf_append( buff, sizeof( buff), "= [%c] Constellation\n",
+                  (ephemeris_output_options & OPTION_CONSTELLATION) ? '*' : ' ');
             }
          }
       for( i = n_lines = 0; buff[i]; i++)
@@ -1306,6 +1308,9 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             break;
          case '#':
             ephemeris_output_options ^= OPTION_MOIDS;
+            break;
+         case '=':
+            ephemeris_output_options ^= OPTION_CONSTELLATION;
             break;
          case 'q': case 'Q':
          case 27:
