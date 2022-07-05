@@ -3037,6 +3037,12 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
       *orbit_epoch = initial_orbit( obs, n_obs, orbit);
       if( force_final_full_improvement)
          do_full_improvement = true;
+      for( i = 0; i < n_obs; i++)
+         if( obs[i].note2 == 'R')      /* radar observations require an */
+            {                          /* added full step */
+            do_full_improvement = true;
+            break;
+            }
       }
    else if( n_obs == 1 && !strcmp( obs->reference, "Dummy"))
       {
