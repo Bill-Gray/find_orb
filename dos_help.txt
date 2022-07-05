@@ -97,17 +97,10 @@ Shift-F7    Toggle between the 'pure' MPC-formatted eight-line elements,  with
          you can get geocentric,  Jovicentric,  etc. elements.  Use '+' to
          a particular central object (which can be the barycenter of the
          solar system).
-i      Toggles the 'information' about the currently-selected observation
-         (reference,  observing station,  magnitude/motion of the object).
-         This data takes up three lines;  when shut off,  three more lines
          of residuals are shown.
 j      Toggles the two lines showing which perturbers are included,  R1 and R2,
          orbital restrictions,  and the step size.  When shut off,  two
          more lines of residuals are shown.
-O      Toggles display of the orbital elements.  You normally wouldn't want
-         to shut them off,  but if you do,  ten more lines of residuals are
-         shown.  Combine with the above 'i' and 'j' commands,  and you can
-         get a full-screen display of observations/residuals.
 ;      Toggles display of the "residual legend",  which explains what the
          assorted data in the residual area mean.
 -      Cycles display of the list of observatories among three options:

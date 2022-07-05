@@ -34,10 +34,11 @@ is no such thing as an altitude or azimuth,  and they won't be shown.
 default),  or as separate RA and dec motions.  'e' toggles this.
 
    By default,  Find_Orb will show this sort of "observables" data.
-Hitting 'c' cycles from display of observables to display of state
-vectors (position and velocity in Cartesian coordinates), positions
-(same thing minus the velocities),  orbital elements in MPCORB format,
-elements in MPC eight-line form,  and close approaches.
+Hitting 'c' gets a list of the different types of ephemerides you can
+make : "observables",  state vectors (position and velocity in
+Cartesian coordinates), positions (same thing minus the velocities),
+orbital elements in MPCORB format, elements in MPC eight-line form,
+and close approaches.
 
    If you tell Find_Orb to show Close Approaches, it will generate the
 ephemeris,  then search within it for distance minima.  As it finds them,
@@ -45,6 +46,9 @@ it will interpolate to find a time/date/distance of closest approach.
 The end result will be a list of the closest approaches during that time
 span.  (It's best to do this from a geocentric or heliocentric or
 other-planet-centric viewpoint.)
+
+   For state vector or position ephemerides,  you'll have options for
+time and distance units and to choose ecliptic or equatorial coordinates.
 
    Any unrecognized key will get you this help text (contained in
 'dosephem.txt').
