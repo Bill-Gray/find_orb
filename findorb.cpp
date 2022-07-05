@@ -1166,6 +1166,9 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
          case 'j': case 'J':
             ephemeris_output_options ^= OPTION_LUNAR_ELONGATION;
             break;
+         case 'k': case 'K':
+            ephemeris_output_options ^= OPTION_GALACTIC_COORDS;
+            break;
          case 'l': case 'L':
             if( !inquire( "Enter MPC code: ", buff, sizeof( buff), COLOR_MESSAGE_TO_USER))
                {
@@ -1190,9 +1193,6 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                      /* FALLTHRU */
          case ALT_G:
             strcpy( mpc_code, "500");
-            break;
-         case 'k': case 'K':
-            ephemeris_output_options ^= OPTION_GALACTIC_COORDS;
             break;
          case '%':
             ephemeris_output_options ^= OPTION_GALACTIC_CONFUSION;
@@ -1294,14 +1294,14 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
          case 'v': case 'V':
             ephemeris_output_options ^= OPTION_VISIBILITY;
             break;
+         case 'w': case 'W':
+            ephemeris_output_options ^= OPTION_ROUND_TO_NEAREST_STEP;
+            break;
          case 'x': case 'X':
             ephemeris_output_options ^= OPTION_TOPO_ECLIPTIC;
             break;
          case 'y': case 'Y':
             ephemeris_output_options ^= OPTION_COMPUTER_FRIENDLY;
-            break;
-         case 'w': case 'W':
-            ephemeris_output_options ^= OPTION_ROUND_TO_NEAREST_STEP;
             break;
          case 'z': case 'Z':
             ephemeris_output_options ^= OPTION_MOTION_OUTPUT;
@@ -1322,6 +1322,10 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             break;
 #endif
          default:
+         case '\'': case '"': case '<':
+         case ',': case '.': case '>':
+         case '^': case '&': case '*':
+         case '(': case ')': case '[': case ']':
             show_a_file( "dosephem.txt");
             break;
          }
@@ -3091,10 +3095,12 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
    if( *ifilename == '@')     /* can use '@' followed by end of filename */
       {                      /* if that file is a recently accessed one */
       size_t len, len1 = strlen( ifilename) - 1;
+      struct stat file_info;
 
       for( i = n_lines - 1; i; i--)
-         if( (len = strlen( prev_files[i])) >= len1 &&
-                        !strcmp( prev_files[i] + len - len1, ifilename + 1))
+         if( (len = strlen( prev_files[i])) >= len1
+                      && !strcmp( prev_files[i] + len - len1, ifilename + 1)
+                      && !stat( prev_files[i], &file_info))
             {
             strcpy( ifilename, prev_files[i]);
             break;
