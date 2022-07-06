@@ -122,7 +122,7 @@ int debug_printf( const char *format, ...)
       {
       va_list argptr;
       const time_t t0 = time( NULL);
-      const long max_debug_file_size = 10000;  /* 100 MBytes should be enough */
+      const long max_debug_file_size = 10000000;  /* 10 MBytes should be enough */
 
       if( ftell( ofile) > max_debug_file_size)
          {
