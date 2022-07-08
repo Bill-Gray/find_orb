@@ -50,14 +50,16 @@
 #
 #   Some comments on how to assign sigmas are at the bottom of this text.
 # I've noticed that the following stations get unusually good astrometry.
-# These uncertainties roughly reflect how well I've seen them do :
+# These uncertainties roughly reflect how well I've seen them do.  Note
+# that (413) made some pre-CCD observations that ought to just get the
+# default "old-era",  larger uncertainties.
 #
 #Obs P  <--start-> <--end -->           Pos   Mag  Time
 #COD C  yyyy mm dd yyyy mm dd mag1 mag2 sig   sig  sig    Comment
  689                                    .1                Flagstaff
  673                                    .1                Table Mountain
  422                                    .3                Loomberah
- 413                                    .3                Siding Spring
+ 413    1993 01 01                      .3                Siding Spring
  E12                                    .25               Siding Spring #2
  568 2                                  .1          .2    David Tholen et. al., Mauna Kea
  T09                                    .1          .2    David Tholen et. al., Subaru
