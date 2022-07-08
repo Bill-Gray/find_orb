@@ -100,6 +100,31 @@
  249 B                        -0.2  1.2 84                SOHO
  249 B                        -1.2 -0.2 112               SOHO
  249 B                             -1.2 168               SOHO
+
+# Older SOHO astrometry uses "program code" 2 for SOHO C2 (instead
+# of the A used more recently) and 3 for SOHO C3 (instead of B).  Makes
+# sense to me;  dunno why they changed... it does mean the above
+# SOHO uncertainties have to be duplicated redundantly.
+ 249 2                         8.7      36                SOHO
+ 249 2                         8.2  8.8 24                SOHO
+ 249 2                         7.2  8.2 12                SOHO
+ 249 2                         4.2  7.2  6                SOHO
+ 249 2                         2.7  4.2 12                SOHO
+ 249 2                         1.7  2.7 18                SOHO
+ 249 2                         0.2  1.7 24                SOHO
+ 249 2                        -1.8  0.2 36                SOHO
+ 249 2                             -1.8 48                SOHO
+ 249 3                         9.7      280               SOHO
+ 249 3                         9.2  9.7 224               SOHO
+ 249 3                         7.7  9.2 168               SOHO
+ 249 3                         7.2  7.7 112               SOHO
+ 249 3                         6.7  7.2 84                SOHO
+ 249 3                         5.7  6.7 56                SOHO
+ 249 3                         2.7  5.7 28                SOHO
+ 249 3                         1.2  2.7 56                SOHO
+ 249 3                        -0.2  1.2 84                SOHO
+ 249 3                        -1.2 -0.2 112               SOHO
+ 249 3                             -1.2 168               SOHO
 # Karl also guesstimates sigmas for HI-1 to be pretty bad,  maybe
 # two 70" pixels.  COR-2 is much better by comparison,  10".
  C49 G                                  140               STEREO-A
