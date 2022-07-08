@@ -11,9 +11,10 @@
 #
 #   The resulting uncertainties are simply default values,  used when
 # there's no other way to know the uncertainty.  If you use the
-# AstDyS/NEODyS .rwo format,  the data have astrometric uncertainties
-# given with each observation.  And Find_Orb provides ways to specify
-# uncertainties via special keywords within the observations.  See
+# AstDyS/NEODyS .rwo format or the ADES format,  the data have
+# astrometric uncertainties given with each observation.  And
+# Find_Orb provides ways to specify uncertainties via special keywords
+# within the observations.  See
 #
 # https://www.projectpluto.com/find_orb.htm#sigmas
 #
@@ -29,7 +30,7 @@
 # weights were stored.  These basically just boiled down to 1/sigma_posn,
 # with sigma_posn expressed in arcseconds.  Also,  only sigmas for
 # position could be defined;  'sigma.txt' adds sigmas for magnitude
-# and time as well;  and allows you to specify a project code as well.
+# and time as well,  and allows you to specify a project code.
 #
 #   Find_Orb looks through this file from top to bottom.  Non-comment
 # lines give an observatory code,  an optional program code,  and a date
@@ -38,6 +39,11 @@
 # or upper limit on that range.)  The idea is that such a line defines
 # what the sigmas are for any observation from that code,  taken within
 # that date range,  and within that magnitude range.
+#
+#   Assigning uncertainties this way isn't a great idea.  Just because
+# two observations were made at around the same time from the same place
+# with comparable magnitudes doesn't mean they'll have similar uncertainties.
+# This is a hack to get around the absence of observer-supplied sigmas.
 #
 #   When Find_Orb finds a line describing the observation in question,
 # it extracts any non-blank sigmas.  It keeps going,  possibly to
