@@ -21,7 +21,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #define PDC_NCMOUSE
 #ifndef __WATCOMC__
    #define PDC_FORCE_UTF8
-   #define PDC_WIDE
 #endif
 #define MOUSE_MOVEMENT_EVENTS_ENABLED
 
@@ -5992,8 +5991,8 @@ int main( int argc, const char **argv)
    show_final_line( n_obs, curr_obs, COLOR_BACKGROUND);
 Shutdown_program:
    full_endwin( );                 /* terminals to end mouse movement */
-#ifdef __PDCURSES__
-   delscreen( SP);
+#ifdef __PDCURSESMOD__      /* Not really needed,  but ensures Valgrind  */
+    PDC_free_memory_allocations( );      /* says all memory was freed */
 #endif
    curses_running = false;
    if( obs && n_obs)
