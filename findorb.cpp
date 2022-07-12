@@ -163,7 +163,7 @@ double get_planet_mass( const int planet_idx);                /* orb_func.c */
 int simplex_method( OBSERVE FAR *obs, int n_obs, double *orbit,
                const double r1, const double r2, const char *constraints);
 int superplex_method( OBSERVE FAR *obs, int n_obs, double *orbit, const char *constraints);
-static void show_a_file( const char *filename);
+static void show_a_file( const char *filename, const int flags);
 static void put_colored_text( const char *text, const int line_no,
                const int column, const int n_bytes, const int color);
 int find_trial_orbit( double *orbit, OBSERVE FAR *obs, int n_obs,
@@ -520,7 +520,7 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
                {
                int *buffered_screen_2 = store_curr_screen( );
 
-               show_a_file( help_file_name);
+               show_a_file( help_file_name, 0);
                restore_screen( buffered_screen_2);
                free( buffered_screen_2);
                }
@@ -604,7 +604,7 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
             show_help = true;
          if( show_help)
             {
-            show_a_file( help_file_name);
+            show_a_file( help_file_name, 0);
             rval = -1;
             }
          }
@@ -1325,7 +1325,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
          case ',': case '.': case '>':
          case '^': case '&': case '*':
          case '(': case ')': case '[': case ']':
-            show_a_file( "dosephem.txt");
+            show_a_file( "dosephem.txt", 0);
             break;
          }
       if( err_msg)
@@ -1370,7 +1370,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                               COLOR_MESSAGE_TO_USER);
          else
             {
-            show_a_file( get_file_name( buff, ephemeris_filename));
+            show_a_file( get_file_name( buff, ephemeris_filename), 3);
             create_resid_file( obs, n_obs, input_filename, residual_format);
             make_pseudo_mpec( get_file_name( buff, "mpec.htm"), obj_name);
             if( ephemeris_output_options
@@ -1642,7 +1642,7 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
          switch( c)
             {
             case '?':
-               show_a_file( "obj_help.txt");
+               show_a_file( "obj_help.txt", 0);
                break;
             case 9:
                force_full_width_display ^= 1;
@@ -2218,7 +2218,7 @@ static void show_residual_legend( const int line_no, const int residual_format)
 
 static int find_rgb( const unsigned irgb);
 
-static void show_a_file( const char *filename)
+static void show_a_file( const char *filename, const int flags)
 {
    FILE *ifile = fopen_ext( filename, "tclrb");
    char buff[260], err_text[100];
@@ -2262,9 +2262,7 @@ static void show_a_file( const char *filename)
       const char *msgs[] = { "1Cursor keys to move",
                              "2Already at end of file!",
                              "2Already at top of file!" };
-      extern const char *ephemeris_filename;
-      const int is_ephem =
-               !strcmp( filename, get_file_name( buff, ephemeris_filename));
+      const int is_ephem = (flags & 2);
       const int top_possible_line = (is_ephem ? 3 : 0);
       const int n_lines_to_show = getmaxy( stdscr) - 1;
       int top_line;
@@ -2297,8 +2295,9 @@ static void show_a_file( const char *filename)
          {
          const int curr_line = top_line + i;
          int color_col = -1, rgb = 255;
+         const int marked_up = (flags & 1);
 
-         if( is_ephem)
+         if( marked_up)
             {
             char *tptr = strchr( buff, '$');
 
@@ -2309,7 +2308,7 @@ static void show_a_file( const char *filename)
          if( i >= 3 || !is_ephem)
             put_colored_text( buff, i, 0, -1,
                (line_no == curr_line ? COLOR_ORBITAL_ELEMENTS : COLOR_BACKGROUND));
-         if( color_col >= 0 && rgb >= 0 && i >= 3 && is_ephem
+         if( color_col >= 0 && rgb >= 0 && i >= 3 && marked_up
                         && color_visibility)
             {
             const int blue =  ((rgb >> 3) & 0x1f);
@@ -4648,7 +4647,7 @@ int main( int argc, const char **argv)
             extern const char *observe_filename;
 
             create_obs_file( obs, n_obs, 0, residual_format);
-            show_a_file( get_file_name( tbuff, observe_filename));
+            show_a_file( get_file_name( tbuff, observe_filename), 0);
             }
             break;
          case 'd':
@@ -4656,7 +4655,7 @@ int main( int argc, const char **argv)
             extern const char *residual_filename;
 
             create_resid_file( obs, n_obs, ifilename, residual_format);
-            show_a_file( get_file_name( tbuff, residual_filename));
+            show_a_file( get_file_name( tbuff, residual_filename), 0);
             }
             break;
          case 'e': case'E':
@@ -5034,7 +5033,7 @@ int main( int argc, const char **argv)
                   curr_epoch = obs[i].jd;
                   update_element_display = 1;
                   set_locs( orbit, curr_epoch, obs, n_obs);
-                  show_a_file( "sr_elems.txt");
+                  show_a_file( "sr_elems.txt", 0);
                   }
                free( orbits);
                }
@@ -5299,7 +5298,7 @@ int main( int argc, const char **argv)
             }
             break;
          case 'y': case 'Y':
-            show_a_file( "gauss.out");
+            show_a_file( "gauss.out", 0);
             break;
          case 'z': case 'Z':
             {
@@ -5451,7 +5450,7 @@ int main( int argc, const char **argv)
          case ')':
             if( !inquire( "Enter name of file to be displayed: ",
                                tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY))
-               show_a_file( tbuff);
+               show_a_file( tbuff, 1);
             break;
          case '`':
             {
@@ -5506,7 +5505,7 @@ int main( int argc, const char **argv)
             update_element_display = 1;
             break;
          case '[':
-            show_a_file( get_file_name( tbuff, "covar.txt"));
+            show_a_file( get_file_name( tbuff, "covar.txt"), 0);
             break;
          case '-':
             {
@@ -5520,7 +5519,7 @@ int main( int argc, const char **argv)
             }
             break;
          case ',':
-            show_a_file( "debug.txt");
+            show_a_file( "debug.txt", 0);
             break;
          case '.':
             {
@@ -5610,7 +5609,7 @@ int main( int argc, const char **argv)
             break;
          case '_':
             link_arcs( obs, n_obs, r1, r2);
-            show_a_file( "gauss.out");
+            show_a_file( "gauss.out", 0);
             break;
          case '>':
             perturbers = 1;
@@ -5868,7 +5867,7 @@ int main( int argc, const char **argv)
             break;
          case 'k':
             write_environment_pointers( );
-            show_a_file( "env.txt");
+            show_a_file( "env.txt", 0);
             break;
          case ALT_Z:
             {
@@ -5981,7 +5980,7 @@ int main( int argc, const char **argv)
 #endif
          default:
             debug_printf( "Key %d hit\n", c);
-            show_a_file( "dos_help.txt");
+            show_a_file( "dos_help.txt", 0);
             sprintf( message_to_user, "Key %d ($%x, o%o) '%s' hit",
                                c, c, c, keyname( c));
             break;
