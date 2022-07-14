@@ -2956,7 +2956,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                   if( computer_friendly || suppress_coloring)
                      strlcat_error( buff, tbuff);
                   else
-                     snprintf_append( buff, sizeof( buff), "$%06lx%s", rgb, tbuff);
+                     snprintf_append( buff, sizeof( buff), " $%06lx%s", rgb, tbuff + 1);
                   if( tbuff[1] == ' ' && tbuff[2] == ' ')
                      tbuff[1] = '-';
                   strlcat_error( alt_buff, tbuff);
@@ -3468,8 +3468,7 @@ int remove_rgb_code( char *buff)
 {
    unsigned rval = (unsigned)-1;
 
-   buff = strchr( buff, '$');
-   if( buff && sscanf( buff + 1, "%06x", &rval) == 1)
+   while( (buff = strchr( buff, '$')) && sscanf( buff + 1, "%06x", &rval) == 1)
       memmove( buff, buff + 7, strlen( buff + 6));
    return( (int)rval);
 }

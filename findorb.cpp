@@ -2321,7 +2321,7 @@ static void show_a_file( const char *filename, const int flags)
 
             init_color( color_idx, red * 990 / 31, green * 999 / 31, blue * 999 / 31);
             init_pair( color_pair_idx, text_color, color_idx);
-            mvchgat( i, color_col + 1, 2, A_NORMAL, color_pair_idx, NULL);
+            mvchgat( i, color_col, 2, A_NORMAL, color_pair_idx, NULL);
             }
          }
                /* show "scroll bar" to right of text: */
