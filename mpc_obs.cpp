@@ -3916,12 +3916,16 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
    i = sort_obs_by_date_and_remove_duplicates( rval, n_obs_actually_loaded);
    if( i && rval[i - 1].jd - rval[0].jd > maximum_observation_span * days_per_year)
       {
+      int j = 0;
+
       snprintf( buff, sizeof( buff), get_find_orb_text( 2007),
                      (rval[i - 1].jd - rval[0].jd) /  days_per_year,
                      maximum_observation_span);
       generic_message_box( buff, "o");
-      while( rval[i - 1].jd - rval[0].jd > maximum_observation_span * days_per_year)
-         i--;
+      while( rval[i - 1].jd - rval[j].jd > maximum_observation_span * days_per_year)
+         j++;
+      i -= j;
+      memmove( rval, rval + j, i * sizeof( OBSERVE));
       }
 
    n_duplicate_obs_found = n_obs_actually_loaded - i;
