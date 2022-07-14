@@ -1402,3 +1402,9 @@ UAZ !-110.947361   +32.232722         100.000  University of Arizona 24"
    right;  I can't get good results for the DSS 47 radar astrometry.
 
 d47 ! 149.5501     -30.31287         235.23    DSS 47
+
+   (Opt) is a 'floating' location.  It should be the best topocentric location
+   for observing an object at a given time,  and therefore moves around as the
+   Earth rotates and the object moves around in the sky.
+
+Opt !   0.0000       0.00000   +0.00000    @3  Optimal topocentric location

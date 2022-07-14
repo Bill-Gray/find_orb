@@ -2115,7 +2115,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
    const bool fake_astrometry = ((options & 7) == OPTION_FAKE_ASTROMETRY);
 
    if( (!rho_cos_phi && !rho_sin_phi && !use_observation_times && !show_geo_quantities)
-                                 || ephem_type != OPTION_OBSERVABLES)
+               && memcmp( note_text, "(Opt)", 5)) || ephem_type != OPTION_OBSERVABLES)
       options &= ~(OPTION_ALT_AZ_OUTPUT | OPTION_VISIBILITY | OPTION_MOON_ALT
                      | OPTION_MOON_AZ | OPTION_SUN_ALT | OPTION_SUN_AZ
                      | OPTION_SNR | OPTION_EXPOSURE_TIME
