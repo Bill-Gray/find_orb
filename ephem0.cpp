@@ -4189,13 +4189,24 @@ static inline void set_obs_to_microday( OBSERVE FAR *obs)
 static void put_sigma( char *buff, const double val)
 {
    char tbuff[15];
-   const char *format = (val > 10. && val < 999. ? "%3.0f" : "%.2f");
 
-   snprintf( tbuff, sizeof( tbuff), format, val);
-   if( *tbuff == '0')    /* skip leading zero */
-      memcpy( buff, tbuff + 1, 3);
+   if( val < 0.099)
+      snprintf( tbuff, sizeof( tbuff), "%2.0fm", val * 1000.);
+   else if( val < 9.9)
+      {
+      snprintf( tbuff, sizeof( tbuff), "%.2f", val);
+      if( *tbuff == '0')         /* skip leading zero */
+         memmove( tbuff, tbuff + 1, strlen( tbuff));
+      }
+   else if( val < 999.)
+      snprintf( tbuff, sizeof( tbuff), "%3.0f", val);
+   else if( val < 60. * 99.)
+      snprintf( tbuff, sizeof( tbuff), "%2.0f'", val / 60.);
+   else if( val < 3600. * 99.)
+      snprintf( tbuff, sizeof( tbuff), "%2.0fd", val / 3600.);
    else
-      memcpy( buff, tbuff, 3);
+      strcpy( tbuff, "---");
+   memcpy( buff, tbuff, 3);
 }
 
 
