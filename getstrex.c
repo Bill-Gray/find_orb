@@ -1,13 +1,9 @@
 #define _XOPEN_SOURCE_EXTENDED 1
 
-#ifdef __WATCOMC__
-   #define PDC_NCMOUSE
-#endif
+#define PDC_NCMOUSE
 
 #if defined( VT) || defined( XCURSES) || defined( _WIN32)
-   #define PDC_WIDE
    #define PDC_FORCE_UTF8
-   #define PDC_NCMOUSE
    #include <curses.h>
 #else
    #define NCURSES_WIDECHAR 1
