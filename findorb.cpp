@@ -274,6 +274,8 @@ extern double maximum_jd, minimum_jd;        /* orb_func.cpp */
 #define COLOR_MPC_CODES            14
 #define COLOR_HINT_TEXT            18
 
+#define SHOW_FILE_IS_EPHEM          1
+
 static int curses_kbhit( )
 {
    int c;
@@ -1370,7 +1372,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                               COLOR_MESSAGE_TO_USER);
          else
             {
-            show_a_file( get_file_name( buff, ephemeris_filename), 3);
+            show_a_file( get_file_name( buff, ephemeris_filename), SHOW_FILE_IS_EPHEM);
             create_resid_file( obs, n_obs, input_filename, residual_format);
             make_pseudo_mpec( get_file_name( buff, "mpec.htm"), obj_name);
             if( ephemeris_output_options
@@ -2262,11 +2264,13 @@ static void show_a_file( const char *filename, const int flags)
       const char *msgs[] = { "1Cursor keys to move",
                              "2Already at end of file!",
                              "2Already at top of file!" };
-      const int is_ephem = (flags & 2);
+      const int is_ephem = (flags & SHOW_FILE_IS_EPHEM);
       const int top_possible_line = (is_ephem ? 3 : 0);
       const int n_lines_to_show = getmaxy( stdscr) - 1;
       int top_line;
       int color_start = 18;      /* see 'command.txt' */
+      short color_pair_idx = (short)color_start;
+      short color_idx = (short)color_start * 2;
       const bool color_visibility = (can_change_color( ) &&
                   n_lines_to_show + color_start < COLORS);
 
@@ -2294,34 +2298,37 @@ static void show_a_file( const char *filename, const int flags)
                         && fgets_trimmed( buff, sizeof( buff), ifile); i++)
          {
          const int curr_line = top_line + i;
-         int color_col = -1, rgb = 255;
-         const int marked_up = (flags & 1);
+         int color_col[20], rgb[20], n_colored = 0, j;
 
-         if( marked_up)
+         if( i > 3 && flags && color_visibility)
             {
-            char *tptr = strchr( buff, '$');
+            char *tptr = buff;
 
-            if( tptr)
-               color_col = (int)( tptr - buff);
+            while( (tptr = strchr( tptr, '$')) != NULL)
+               {
+               color_col[n_colored] = (int)(tptr - buff) - 7 * n_colored;
+               tptr++;
+               sscanf( tptr, "%6x", (unsigned *)rgb + n_colored);
+               n_colored++;
+               }
             }
-         rgb = remove_rgb_code( buff);
+         remove_rgb_code( buff);
          if( i >= 3 || !is_ephem)
             put_colored_text( buff, i, 0, -1,
                (line_no == curr_line ? COLOR_ORBITAL_ELEMENTS : COLOR_BACKGROUND));
-         if( color_col >= 0 && rgb >= 0 && i >= 3 && marked_up
-                        && color_visibility)
+         for( j = 0; j < n_colored; j++)
             {
-            const int blue =  ((rgb >> 3) & 0x1f);
-            const int green = ((rgb >> 11) & 0x1f);
-            const int red =   ((rgb >> 19) & 0x1f);
+            const int blue =  ((rgb[j] >> 3) & 0x1f);
+            const int green = ((rgb[j] >> 11) & 0x1f);
+            const int red =   ((rgb[j] >> 19) & 0x1f);
             const int text_color = find_rgb(
                               blue + red + green > 48 ? 0 : 0xffffff);
-            const short color_pair_idx = (short)( i + color_start);
-            const short color_idx = (short)( i + 2 * color_start);
 
             init_color( color_idx, red * 990 / 31, green * 999 / 31, blue * 999 / 31);
             init_pair( color_pair_idx, text_color, color_idx);
-            mvchgat( i, color_col, 2, A_NORMAL, color_pair_idx, NULL);
+            mvchgat( i, color_col[j], 2, A_NORMAL, color_pair_idx, NULL);
+            color_pair_idx++;
+            color_idx++;
             }
          }
                /* show "scroll bar" to right of text: */
@@ -5450,7 +5457,7 @@ int main( int argc, const char **argv)
          case ')':
             if( !inquire( "Enter name of file to be displayed: ",
                                tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY))
-               show_a_file( tbuff, 1);
+               show_a_file( tbuff, 0);
             break;
          case '`':
             {
