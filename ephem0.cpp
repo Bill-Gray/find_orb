@@ -1500,6 +1500,8 @@ static int create_json_ephemeris( FILE *ofile, FILE *ifile, char *header,
                is_text = true;
             if( !strcmp( out_token, "RGB"))
                is_text = true;
+            if( !strcmp( out_token, "Con"))
+               is_text = true;
             remove_trailing_cr_lf( out_text);
             if( is_text)      /* Text must be enclosed in quotes for JSON */
                {
