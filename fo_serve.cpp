@@ -167,7 +167,7 @@ int main( const int argc, const char **argv)
    extern char **environ;
    extern bool findorb_already_running;
 
-   avoid_runaway_process( 45);
+   avoid_runaway_process( 90);
 #endif         /* _WIN32 */
    INTENTIONALLY_UNUSED_PARAMETER( argv);
    INTENTIONALLY_UNUSED_PARAMETER( argc);
@@ -242,6 +242,20 @@ int main( const int argc, const char **argv)
          bytes_written += fetch_astrometry_from_mpc( ofile, buff);
          fclose( ofile);
          }
+      else if( !strcmp( field, "min_obs_t") && *buff)
+         {
+         extern double minimum_observation_jd;  /* default is 1     */
+
+         minimum_observation_jd = get_time_from_string( 0., buff,
+                          FULL_CTIME_YMD | CALENDAR_JULIAN_GREGORIAN, NULL);
+         }
+      else if( !strcmp( field, "max_obs_t") && *buff)
+         {
+         extern double maximum_observation_jd;  /* default is +1e+9. */
+
+         maximum_observation_jd = get_time_from_string( 0., buff,
+                          FULL_CTIME_YMD | CALENDAR_JULIAN_GREGORIAN, NULL);
+         }
       else if( !strcmp( field, "year") || !strcmp( field, "t_end"))
          {
          const double jd = get_time_from_string( current_jd( ), buff,
@@ -287,13 +301,6 @@ int main( const int argc, const char **argv)
          mag_limit = atof( buff);
       else if( !strcmp( field, "element_center"))
          center_object = atoi( buff);
-      else if( !strcmp( field, "motion"))
-         {             /* '0'=no motions, '1'=total motion & PA', */
-         if( buff[0] != '0')       /* '2'=separate RA/dec motions */
-            ephemeris_output_options |= OPTION_MOTION_OUTPUT;
-         if( buff[0] == '2')
-            ephemeris_output_options |= OPTION_SEPARATE_MOTIONS;
-         }
       else if( !strcmp( field, "resids"))
          {
          if( buff[0] == '1')
@@ -301,6 +308,12 @@ int main( const int argc, const char **argv)
          if( buff[0] == '2')
             residual_format |= RESIDUAL_FORMAT_TIME_RESIDS;
          }
+      else if( !strcmp( field, "constell"))
+         ephemeris_output_options |= OPTION_CONSTELLATION;
+      else if( !strcmp( field, "total_motion"))
+         ephemeris_output_options |= OPTION_MOTION_OUTPUT;
+      else if( !strcmp( field, "separate_motions"))
+         ephemeris_output_options |= OPTION_SEPARATE_MOTIONS;
       else if( !strcmp( field, "alt_az"))
          ephemeris_output_options |= OPTION_ALT_AZ_OUTPUT;
       else if( !strcmp( field, "radial"))
