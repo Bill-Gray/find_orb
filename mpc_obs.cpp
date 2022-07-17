@@ -134,6 +134,8 @@ int debug_printf( const char *format, ...)
       va_start( argptr, format);
       vfprintf( ofile, format, argptr);
       va_end( argptr);
+      if( *format && format[strlen( format) - 1] != '\n')
+         fprintf( ofile, "\n");     /* ensure a line break */
       fclose( ofile);
       }
    return( 0);
