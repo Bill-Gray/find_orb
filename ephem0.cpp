@@ -2287,9 +2287,10 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
       if( options & OPTION_LUNAR_ELONGATION)
          snprintf_append( buff, sizeof( buff), "  LuElo");
       if( options & OPTION_MOTION_OUTPUT)
-         snprintf_append( buff, sizeof( buff),
-                (options & OPTION_SEPARATE_MOTIONS) ? " -RA--'/hr--dec-"
-                                                    : " -'/hr-- --PA--");
+         snprintf_append( buff, sizeof( buff), " -'/hr-- --PA--");
+      if( options & OPTION_SEPARATE_MOTIONS)
+         snprintf_append( buff, sizeof( buff), " -RA--'/hr--dec-");
+
       if( options & OPTION_ALT_AZ_OUTPUT)
          snprintf_append( buff, sizeof( buff), " alt -az");
       if( options & OPTION_SUN_ALT)
@@ -3202,33 +3203,38 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                                                              dist_in_deg);
                   }
 
-               if( options & OPTION_MOTION_OUTPUT)
+               if( options & (OPTION_MOTION_OUTPUT | OPTION_SEPARATE_MOTIONS))
                   {
                   MOTION_DETAILS m;
                   char *end_ptr = buff + strlen( buff);
                   char *alt_tptr = alt_buff + strlen( alt_buff);
 
                   compute_observation_motion_details( &temp_obs, &m);
-                  strlcat_error( buff, " ");
-                  if( options & OPTION_SEPARATE_MOTIONS)
-                     {
-                     format_motion( end_ptr + 1, m.ra_motion);
-                     format_motion( end_ptr + 9, m.dec_motion);
-                     snprintf_append( alt_buff, sizeof( alt_buff),
-                                 " %f %f", m.ra_motion, m.dec_motion);
-                     }
-                  else
+                  if( options & OPTION_MOTION_OUTPUT)
                      {
                      format_motion( end_ptr + 1, m.total_motion);
                      snprintf( end_ptr + 9, 7, "%5.1f ",
                                      m.position_angle_of_motion);
+                     end_ptr[8] = end_ptr[0] = ' ';
                      snprintf_append( alt_buff, sizeof( alt_buff),
                                  " %f %.4f", m.total_motion, m.position_angle_of_motion);
+                     if( computer_friendly)
+                        strcpy( end_ptr, alt_tptr);
+                     end_ptr += strlen( end_ptr);
+                     alt_tptr += strlen( alt_tptr);
                      }
-                  end_ptr[8] = ' ';
-                  if( computer_friendly)
-                     strcpy( end_ptr, alt_tptr);
+                  if( options & OPTION_SEPARATE_MOTIONS)
+                     {
+                     format_motion( end_ptr + 1, m.ra_motion);
+                     format_motion( end_ptr + 9, m.dec_motion);
+                     end_ptr[8] = end_ptr[0] = ' ';
+                     snprintf_append( alt_buff, sizeof( alt_buff),
+                                 " %f %f", m.ra_motion, m.dec_motion);
+                     if( computer_friendly)
+                        strcpy( end_ptr, alt_tptr);
+                     }
                   }
+
                for( j = 0; j < 3; j++)
                   {
                   bool show_alt, show_az;

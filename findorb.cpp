@@ -912,10 +912,9 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
          }
       if( ephem_type == OPTION_OBSERVABLES)    /* for other tables,        */
          {                          /* these options are irrelevant:       */
-         snprintf_append( buff, sizeof( buff), "Z [%c] Motion info\n",
+         snprintf_append( buff, sizeof( buff), "Z [%c] Total motion & position angle\n",
                   (ephemeris_output_options & OPTION_MOTION_OUTPUT) ? '*' : ' ');
-         if( ephemeris_output_options & OPTION_MOTION_OUTPUT)
-            snprintf_append( buff, sizeof( buff), "O [%c] Separate motions\n",
+         snprintf_append( buff, sizeof( buff), "O [%c] Motions in RA and dec\n",
                   (ephemeris_output_options & OPTION_SEPARATE_MOTIONS) ? '*' : ' ');
          if( is_topocentric)
             snprintf_append( buff, sizeof( buff), "A [%c] Alt/az info\n",
