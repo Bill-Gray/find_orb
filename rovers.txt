@@ -1,7 +1,8 @@
      Roving observer file.  This contains "MPC codes" for observers who
-  don't have MPC codes,  mostly satellite observers.  They could be handled
-  using code 247 (Roving Observer),  or using the XXX code (see below for
-  details),  but it can be more convenient if they have their own codes.
+  don't have MPC codes,  mostly satellite observers.  Also,  MPC provides
+  wrong or imprecise coordinates for many obscodes,  and/or lumps many
+  telescopes spread out over a mountaintop under one obscode.  This file
+  provides corrected locations in such cases.
 
      Locations can be in the MPC standard longitude/rho_cos_phi/rho_sin_phi
   triplet format,  or as lon/lat/altitude.  So far,  MPC has used codes
@@ -18,12 +19,13 @@
      The '!' in column 5 indicates that the data depart from the usual MPC
   format.  The observatory name starts in column 48,  rather than column
   31,  to allow more precision.  It also gives room to specify a non-Earth
-  based observer (see examples below for planets,  MSL,  LCROSS impact
-  point, etc.)  It allows for four-character MPC codes.  Punched-card format
-  astrometry won't support that,  but ADES will,  and some of my software
-  allows one to request (for example) ephemerides from a four-character
-  "MPC code".  I may support such codes by allowing 81-column astrometry,
-  though that would force us to abandon punched cards.
+  based observer (see examples below for planets,  MSL,  LCROSS and Chang'e
+  5-T1 booster impact points,  Lagrange points,  etc.)  It allows for
+  four-character MPC codes.  Punched-card format astrometry won't support
+  those,  but ADES will,  and some of my software allows one to request
+  (for example) ephemerides from a four-character "MPC code".  I may
+  support such codes by allowing 81-column astrometry,  though that would
+  force us to abandon punched cards.
 
      Longitudes and latitudes are either in decimal degree or deg/min/sec
   form.  See,  e.g.,  (273) EISCAT for an example of the latter.  East and
@@ -39,8 +41,14 @@
   corrected;  GPS positions have to be flagged so that MPC can know
   whether to correct them.
 
-     Any line starting with a space is assumed to be a comment.  Negative
-  longitudes (and those between 180 and 360) are in the Western Hemisphere.
+     To get the correction ("geoid height") between ellipsoidal and
+  geodetic (sea level) altitudes,  use this :
+
+  http://geographiclib.sourceforge.net/cgi-bin/GeoidEval
+
+     Any line in this file starting with a space is assumed to be a
+  comment.  Negative longitudes (and those between 180 and 360) are in
+  the Western Hemisphere.
 
    NOTE that rather than add codes here,  one can use code (247),  the
    "roving observer",  as described at
