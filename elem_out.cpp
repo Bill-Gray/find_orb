@@ -452,13 +452,27 @@ double current_jd( void)
    return( jd);
 }
 
-/* I am not entirely sure of this,  but I gather that MPC defines an
-'opposition' to occur if 17 half-months have elapsed between consecutive
-observations.  The length of that can vary,  depending on the weirdnesses
-of the Gregorian calendar.  I'll just take it to be 237 days,  since
-that's a prime number and is "close enough". */
+/* For some time,  I only had second-hand info on MPC's definition of
+an 'opposition'.  It sounded as if their definition was that 17 half-months
+had elapsed between consecutive observations,  with the length varying
+depending on the weirdnesses of the Gregorian calendar.
 
-const double opposition_time = 237.;
+I ignored calendrical issues and just took it to be 237 days,  since
+that's a prime number and is "close enough".  Margaret Pan at MPC tells me
+the actual definition is :
+
+-- If the arc is less than 238 days,  it's one opposition.
+-- If it's greater than that,  the times of solar conjunction are computed.
+If there are observations between consecutive conjunctions,  that's an
+opposition at which the object was observed.  She notes that "for earth
+co-orbital objects,  this can sometimes depend on the resolution of the
+conjunction computation and the range of elongations allowed."
+
+   I don't expect to implement this scheme soon.  Thus far,  all I've
+done is to change my 237-day span to 238 days.  The result is usually
+fairly close to the MPC value.         */
+
+const double opposition_time = 238.;
 
 bool opposition_break( const OBSERVE *obs)
 {
