@@ -1385,6 +1385,16 @@ P5m !-116.86503    +33.35627         1662.     Palomar 5m
    Coords from Andrea Mattei.
 L78 !+014.780211   +40.6826087        134.     San Marco Observatory, Salerno
 
+   The MPC coordinates for Bucharest are in a pond.  I'm pretty sure one of
+   these two domes,  about 60m apart from each other and ~300m south-southwest
+   of the MPC coordinates,  are the "right" place. 37m added for geoid height.
+073 !+026.09487    +44.41095          124.     Bucharest
+073a!+026.09485    +44.41038          134.     Bucharest (southern dome)
+
+   The MPC coordinates for Geneva are about 190m north-northeast of the dome
+   as seen on G__gle Maps.  50m added for geoid height.
+517 !+006.13497    +46.30916          512.     Geneva (from 1967)
+
    The following position is from a GPS survey, from a private communication
    from Mike Nolan.  _Horizons_ uses an almost identical position,  except
    with altitude 450.557m.  Possibly an ellipsoid difference?  And a VLBI
