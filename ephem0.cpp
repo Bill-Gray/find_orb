@@ -2375,9 +2375,8 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
          {
          if( !i || strcmp( obs[i].mpc_code, obs[i - 1].mpc_code))
             {
-            get_observer_data( obs[i].mpc_code, buff, &lon,
+            get_observer_data( obs[i].mpc_code, buff, &latlon.x,
                                              &rho_cos_phi, &rho_sin_phi);
-            latlon.x = lon;
             reset_lat_alt = (planet_no >= 0);
             }
          curr_jd = obs[i].jd;
@@ -2423,15 +2422,8 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
          ephemeris_t = curr_jd + delta_t;
          utc = curr_jd;
          }
-      compute_observer_loc( ephemeris_t, planet_no, rho_cos_phi, rho_sin_phi,
-                              lon, obs_posn);
-      compute_observer_vel( ephemeris_t, planet_no, rho_cos_phi, rho_sin_phi,
-                              lon, obs_vel);
       compute_observer_loc( ephemeris_t, planet_no, 0., 0., 0., geo_posn);
       compute_observer_vel( ephemeris_t, planet_no, 0., 0., 0., geo_vel);
-                /* we need the observer position in equatorial coords too: */
-      memcpy( obs_posn_equatorial, obs_posn, 3 * sizeof( double));
-      ecliptic_to_equatorial( obs_posn_equatorial);
       strlcpy_error( buff, "Nothing to see here... move along... uninteresting... who cares?...");
       for( obj_n = 0; obj_n < n_objects; obj_n++)
          {
@@ -2445,9 +2437,20 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
 
          integrate_orbit( orbi, prev_ephem_t, ephemeris_t);
          for( j = 0; j < 3; j++)
+            geo[j] = orbi[j] - geo_posn[j];
+         if( !obj_n)
+            {
+            compute_observer_loc( ephemeris_t, planet_no,
+                        rho_cos_phi, rho_sin_phi, latlon.x, obs_posn);
+            compute_observer_vel( ephemeris_t, planet_no,
+                        rho_cos_phi, rho_sin_phi, latlon.x, obs_vel);
+                /* we need the observer position in equatorial coords too: */
+            memcpy( obs_posn_equatorial, obs_posn, 3 * sizeof( double));
+            ecliptic_to_equatorial( obs_posn_equatorial);
+            }
+         for( j = 0; j < 3; j++)
             {
             topo[j] = orbi[j] - obs_posn[j];
-            geo[j] = orbi[j] - geo_posn[j];
             topo_vel[j] = orbi[j + 3] - obs_vel[j];
             }
          r = vector3_length( topo);
