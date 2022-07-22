@@ -189,15 +189,22 @@ int add_line_to_observation_details( void *obs_details, const char *iline)
       len--;               /* drop trailing carriage returns/line feeds */
    if( !memcmp( iline, "COD ", 4))
       {
-      det->n_curr = 0;
-      for( i = 4; i < (int)len; i += 5)
-         {
-         char tbuff[4];
+      char tbuff[4];
 
-         memcpy( tbuff, iline + i, 3);
+      det->n_curr = 0;
+      if( memcmp( iline + 4, "Multi ", 6))
+         {
+         memcpy( tbuff, iline + 4, 3);
          tbuff[3] = '\0';
          reset_mpc_code( det, tbuff);
          }
+      else       /* details for multiple codes;  see 'details.txt' */
+         for( i = 10; i < (int)len - 2; i += 5)
+            {
+            memcpy( tbuff, iline + i, 3);
+            tbuff[3] = '\0';
+            reset_mpc_code( det, tbuff);
+            }
       }
    if( !det->n_curr)        /* no COD line seen yet */
       return( OBS_DETAILS_IRRELEVANT_LINE);

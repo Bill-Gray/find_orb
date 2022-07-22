@@ -2128,6 +2128,11 @@ OBS M. Lombardo, K. Lombardo
 COM Default details extracted from MPEC 2022-K19
 TEL 0.30-m f/8 Ritchey-Chretien + CCD
 
+COM M28
+OBS N. Erasmus
+COM Default details extracted from MPEC 2022-O04
+TEL 1.0-m f/8 Reflector + CCD
+
 COD M43
 OBS A. Gabuya
 COM Default details extracted from MPEC 2020-W26
@@ -2726,6 +2731,11 @@ OBS C. Fornari
 COM Default details extracted from MPEC 2021-C16
 TEL 0.40-m f/8 Ritchey-Chretien + CCD
 
+COD X39
+OBS N. Suarez
+COM Default details extracted from MPEC 2022-O01
+TEL 0.25-m f/4.72 reflector + CCD
+
 COD X74
 OBS L. S. Amaral
 COM Default details extracted from MPEC 2021-B143
@@ -2952,7 +2962,7 @@ OBS A. Mickleburgh
 COM Default details extracted from MPEC 2021-B143
 TEL 0.36-m f/8 Schmidt-Cassegrain + CCD
 
-COD 703  E12  G96  I52  V00  V06
+COD Multi 703  E12  G96  I52  V00  V06
 COM Valid: 2019 Jan 20 - 2100
 OBS T. A. Pruyne
 COM Valid: 2018 Jan 1 - 2100
