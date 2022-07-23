@@ -5968,9 +5968,17 @@ int main( int argc, const char **argv)
             override_abs_mag = atof( tbuff);
             }
             break;
+         case 'i': case 'I':
+            {
+            extern int show_alt_info;
+
+            show_alt_info ^= 1;
+            strlcpy_error( message_to_user, "Display of 'alternative' observation info is");
+            add_off_on = show_alt_info;
+            }
+            break;
          case '\\':
          case 'c': case 'C':
-         case 'i': case 'I':
          case 'j': case 'J':
          case 'O':
          case ';': case ']':

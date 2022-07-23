@@ -5076,9 +5076,10 @@ line 4: (709) W & B Observatory, Cloudcroft  (N32.95580 E254.22882)
 
 #define MAX_INFO_LEN 100
 
+int show_alt_info = 0;
+
 static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
-                 const int n_obs, const int line_number, char *buff,
-                 const int show_alt_info)
+                 const int n_obs, const int line_number, char *buff)
 {
    const OBSERVE FAR *optr = obs + idx;
    const double earth_sun = vector3_length( optr->obs_posn);
@@ -5536,12 +5537,10 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff)
       }
    else        /* "standard",  computed details */
       {
-      const int alt_info = atoi( get_environment_ptr( "ALT_INFO"));
-
       n_lines = 0;
       for( i = 0; i < 5; i++)
          {
-         generate_observation_text( obs, (int)first, n_obs, (int)i, tptr, alt_info);
+         generate_observation_text( obs, (int)first, n_obs, (int)i, tptr);
          if( *tptr)
             {
             strcat( tptr, "\n");
