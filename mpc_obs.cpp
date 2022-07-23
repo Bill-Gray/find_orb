@@ -39,8 +39,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "comets.h"
 #include "lunar.h"
 #include "afuncs.h"
-#include "mpc_obs.h"
 #include "mpc_func.h"
+#include "mpc_obs.h"
 #include "stackall.h"
 #include "stringex.h"
 #include "sigma.h"
@@ -517,24 +517,30 @@ extern int debug_level;
 /* usual value... but note that rovers.txt contains extraterrestrial "MPC   */
 /* stations",  so values from 0 to 10 may occur.)                           */
 
-static int extract_mpc_station_data( const char *buff, double *lon_in_radians,
-                            double *rho_cos_phi, double *rho_sin_phi)
+static int extract_mpc_station_data( const char *buff, mpc_code_t *cinfo)
 {
-   mpc_code_t cinfo;
-   const int rval = get_mpc_code_info( &cinfo, buff);
+   int rval;
 
-   if( lon_in_radians)           /* keep longitude in -180 to +180 */
+   if( !cinfo)
       {
-      *lon_in_radians = cinfo.lon;
-      if( *lon_in_radians > PI)
-          *lon_in_radians -= PI + PI;
+      mpc_code_t unused;
+
+      rval = get_mpc_code_info( &unused, buff);
+      }
+   else                          /* keep longitude in -180 to +180 */
+      {                          /* put parallaxes in AU */
+      rval = get_mpc_code_info( cinfo, buff);
       if( rval >= 0)
          {
          const double scale = planet_radius_in_meters( rval) / AU_IN_METERS;
 
-         *rho_cos_phi = cinfo.rho_cos_phi * scale;
-         *rho_sin_phi = cinfo.rho_sin_phi * scale;
+         cinfo->rho_cos_phi *= scale;
+         cinfo->rho_sin_phi *= scale;
+         if( cinfo->lon > PI)
+             cinfo->lon -= PI + PI;
          }
+      else
+         memset( cinfo, 0, sizeof( mpc_code_t));
       }
    return( rval);
 }
@@ -575,8 +581,7 @@ static inline char **load_mpc_stations( int *n_stations)
 
             while( fgets_trimmed( buff, sizeof( buff), ifile))
                {
-               const int planet_idx = extract_mpc_station_data( buff, NULL,
-                              NULL, NULL);
+               const int planet_idx = extract_mpc_station_data( buff, NULL);
 
                if( planet_idx != -1)
                   {
@@ -713,8 +718,7 @@ typedef struct
 static rover_t *rovers = NULL;
 int n_obs_actually_loaded, n_rovers = 0;
 
-int get_observer_data( const char FAR *mpc_code, char *buff,
-              double *lon_in_radians, double *rho_cos_phi, double *rho_sin_phi)
+int get_observer_data( const char FAR *mpc_code, char *buff, mpc_code_t *cinfo)
 {
    static char *curr_station = NULL;
    static char **station_data = NULL;
@@ -759,9 +763,7 @@ int get_observer_data( const char FAR *mpc_code, char *buff,
                station_data[i] = station_data[i - 1];
             }
       }
-   if( lon_in_radians)
-      *lon_in_radians = *rho_cos_phi = *rho_sin_phi = 0.;
-   else           /* attempting to look up an MPC code from the station name */
+   if( !cinfo)   /* attempting to look up an MPC code from the station name */
       {
       int pass;
 
@@ -843,8 +845,7 @@ int get_observer_data( const char FAR *mpc_code, char *buff,
                     lon0, lat0, alt0, override_observatory_name);
       if( buff)
          strlcpy_err( buff, tbuff, sizeof( tbuff));
-      rval = extract_mpc_station_data( tbuff, lon_in_radians,
-                                        rho_cos_phi, rho_sin_phi);
+      rval = extract_mpc_station_data( tbuff, cinfo);
       return( rval);
       }
 
@@ -884,8 +885,7 @@ int get_observer_data( const char FAR *mpc_code, char *buff,
       {
       if( buff)
          strcpy( buff, curr_station);
-      rval = extract_mpc_station_data( curr_station, lon_in_radians,
-                                        rho_cos_phi, rho_sin_phi);
+      rval = extract_mpc_station_data( curr_station, cinfo);
       }
    return( rval);
 }
@@ -899,23 +899,14 @@ static int get_observer_data_latlon( const char FAR *mpc_code,
               char *buff, double *lon_in_radians, double *lat_in_radians,
               double *alt_in_meters)
 {
-   double rho_cos_phi, rho_sin_phi, alt = 0.;
+   mpc_code_t cinfo;
    int rval;
 
-   *lon_in_radians = *lat_in_radians = 0.;
-   rval = get_observer_data( mpc_code, buff, lon_in_radians,
-                                   &rho_cos_phi, &rho_sin_phi);
-   if( rval >= 0 && (rho_cos_phi || rho_sin_phi))
-      {       /* Cvt parallax data from AU back into earth-axis units: */
-      rho_cos_phi /= EARTH_MAJOR_AXIS_IN_AU;
-      rho_sin_phi /= EARTH_MAJOR_AXIS_IN_AU;
-      parallax_to_lat_alt( rho_cos_phi, rho_sin_phi,
-                                      lat_in_radians, &alt, rval);
-      }
-   else
-      rval = -2;
+   rval = get_observer_data( mpc_code, buff, &cinfo);
+   *lon_in_radians = cinfo.lon;
+   *lat_in_radians = cinfo.lat;
    if( alt_in_meters)
-      *alt_in_meters = alt;
+      *alt_in_meters = cinfo.alt;
    return( rval);
 }
 
@@ -1711,12 +1702,9 @@ static int jpl_code_to_planet_idx( const int spice_code)
 
 void set_up_observation( OBSERVE FAR *obs)
 {
-   double rho_cos_phi = 0.;
-   double rho_sin_phi = 0.;
-   double lon = 0.;
    char tbuff[300];
-   int observer_planet = get_observer_data( obs->mpc_code, tbuff,
-                           &lon, &rho_cos_phi, &rho_sin_phi);
+   mpc_code_t cinfo;
+   int observer_planet = get_observer_data( obs->mpc_code, tbuff, &cinfo);
 
    if( observer_planet == -1)
       {
@@ -1755,9 +1743,9 @@ void set_up_observation( OBSERVE FAR *obs)
    if( observer_planet == -2)          /* satellite observation */
       observer_planet = jpl_code_to_planet_idx( obs->ref_center);
    compute_observer_loc( obs->jd, observer_planet,
-               rho_cos_phi, rho_sin_phi, lon, obs->obs_posn);
+               cinfo.rho_cos_phi, cinfo.rho_sin_phi, cinfo.lon, obs->obs_posn);
    compute_observer_vel( obs->jd, observer_planet,
-               rho_cos_phi, rho_sin_phi, lon, obs->obs_vel);
+               cinfo.rho_cos_phi, cinfo.rho_sin_phi, cinfo.lon, obs->obs_vel);
    set_obs_vect( obs);
 }
 
@@ -4967,7 +4955,7 @@ int compute_radar_info( const OBSERVE *obs, RADAR_INFO *rinfo)
 {
    double time_diff = obs->r * AU_IN_KM / SPEED_OF_LIGHT;
    const double jd = obs->jd - time_diff / seconds_per_day;
-   double rho_cos_phi, rho_sin_phi, longitude;
+   mpc_code_t cinfo;
    double xyz[3], vel[3];
    double v1, v2, doppler_factor;
    char tbuff[20];
@@ -4978,20 +4966,20 @@ int compute_radar_info( const OBSERVE *obs, RADAR_INFO *rinfo)
    assert( obs->second_line);
    memcpy( tbuff, obs->second_line + 68, 3);
    tbuff[3] = '\0';
-   get_observer_data( tbuff, NULL, &longitude, &rho_cos_phi, &rho_sin_phi);
+   get_observer_data( tbuff, NULL, &cinfo);
    for( iter = 0; iter < 3; iter++)
       {
       int i;
       double delta[3];
 
       compute_observer_loc( jd - time_diff / seconds_per_day, 3,
-               rho_cos_phi, rho_sin_phi, longitude, xyz);
+               cinfo.rho_cos_phi, cinfo.rho_sin_phi, cinfo.lon, xyz);
       for( i = 0; i < 3; i++)
          delta[i] = xyz[i] - obs->obj_posn[i];
       time_diff = vector3_length( delta) * AU_IN_KM / SPEED_OF_LIGHT;
       }
    compute_observer_vel( jd - time_diff / seconds_per_day, 3,
-               rho_cos_phi, rho_sin_phi, longitude, vel);
+               cinfo.rho_cos_phi, cinfo.rho_sin_phi, cinfo.lon, vel);
    time_diff += obs->r * AU_IN_KM / SPEED_OF_LIGHT;
    v1 = relative_velocity( obs->obj_posn, obs->obj_vel,
                            obs->obs_posn, obs->obs_vel);

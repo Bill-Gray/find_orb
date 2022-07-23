@@ -4769,7 +4769,7 @@ int clean_up_find_orb_memory( void)
    extern char *temp_obs_filename;     /* miscell.cpp */
 
    free_sigma_recs( );
-   get_observer_data( NULL, NULL, NULL, NULL, NULL);
+   get_observer_data( NULL, NULL, NULL);
    get_object_name( NULL, NULL);
    planet_posn( -1, 0., NULL);
    add_gaussian_noise_to_obs( 0, NULL, 0.);

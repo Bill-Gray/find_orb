@@ -1176,7 +1176,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                   err_msg = "MPC codes must be at least three characters long";
                else if( strlen( buff) < 50 || !memcmp( buff, "Ast", 3))
                   strcpy( mpc_code, buff);
-               else if( !get_observer_data( buff, buff, NULL, NULL, NULL))
+               else if( !get_observer_data( buff, buff, NULL))
                   {
                   buff[3] = '\0';
                   strcpy( mpc_code, buff);

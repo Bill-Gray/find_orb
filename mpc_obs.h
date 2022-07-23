@@ -81,6 +81,10 @@ RADAR_INFO
    double rtt_sigma;
    };
 
+#ifndef MPC_FUNC_H_INCLUDED
+   #include "mpc_func.h"
+#endif
+
 int compute_radar_info( const OBSERVE *obs, RADAR_INFO *rinfo);
 
 /* So far,  there can be zero,  one,  two,  or three nongravitational
@@ -212,8 +216,7 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
 void sort_object_info( OBJECT_INFO *ids, const int n_ids,
                                           int compare_by_last_obs_time);
 int get_object_name( char *obuff, const char *packed_desig);
-int get_observer_data( const char FAR *mpc_code, char *buff,
-           double *lon_in_radians, double *rho_cos_phi, double *rho_sin_phi);
+int get_observer_data( const char FAR *mpc_code, char *buff, mpc_code_t *cinfo);
 void recreate_observation_line( char *obuff, const OBSERVE FAR *obs,
                            const int residual_format);   /* ephem0.cpp */
 void put_observer_data_in_text( const char FAR *mpc_code, char *buff);

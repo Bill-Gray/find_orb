@@ -40,8 +40,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "lunar.h"
 #include "date.h"
 #include "comets.h"
-#include "mpc_obs.h"
 #include "mpc_func.h"
+#include "mpc_obs.h"
 #include "vislimit.h"
 #include "brentmin.h"
 #include "stackall.h"
@@ -492,17 +492,16 @@ static void setup_obj_loc( obj_location_t *p, double *orbit,
           const size_t n_orbits, const double epoch_jd, const char *mpc_code)
 {
    size_t i, j;
-   double rho_sin_phi = 0., rho_cos_phi = 0., lon = 0.;
+   mpc_code_t cinfo;
    double obs_posn[3];
    int planet_no = 3;
 
    assert( p->jd > 2e+6);
    assert( p->jd < 3e+6);
-   if( mpc_code)
-      planet_no = get_observer_data( mpc_code, NULL,
-                          &lon, &rho_cos_phi, &rho_sin_phi);
-   compute_observer_loc( p->jd, planet_no, rho_cos_phi, rho_sin_phi,
-                                    lon, obs_posn);
+   assert( mpc_code);
+   planet_no = get_observer_data( mpc_code, NULL, &cinfo);
+   compute_observer_loc( p->jd, planet_no, cinfo.rho_cos_phi, cinfo.rho_sin_phi,
+                                    cinfo.lon, obs_posn);
    for( i = 0; i < n_orbits; i++)
       {
       double topo[3];
@@ -2014,6 +2013,57 @@ static void find_best_site( const double jd_utc, DPT *latlon,
    latlon->x = centralize_ang( latlon->x);
 }
 
+static void set_group_loc( const char *group_data, const double jd_utc,
+         mpc_code_t *cinfo,
+         const double *target_eclip, const double *earth_loc_eclip)
+{
+   size_t i;
+   double target[3], earth[3], best_score = 1e+80;
+   const double gst = green_sidereal_time( jd_utc);
+
+   memcpy( target, target_eclip, 3 * sizeof( double));
+   ecliptic_to_equatorial( target);
+   normalize_vect( target);
+   memcpy( earth, earth_loc_eclip, 3 * sizeof( double));
+   ecliptic_to_equatorial( earth);
+   normalize_vect( earth);
+   for( i = 0; group_data[i]; i++)
+      if( !i || (group_data[i] != ' ' && group_data[i - 1] == ' '))
+         {
+         char mpc_code[4], buff[90];
+         int planet_number;
+         double vect[3];      /* vertical from the site */
+         double sin_sun_alt, sin_target_alt;
+         double score;
+         mpc_code_t temp_cinfo;
+
+         memcpy( mpc_code, group_data + i, 3);
+         mpc_code[3] = '\0';
+         planet_number = get_observer_data( mpc_code, buff, &temp_cinfo);
+         assert( 3 == planet_number);
+         vect[0] = temp_cinfo.rho_cos_phi * cos( gst + temp_cinfo.lon);
+         vect[1] = temp_cinfo.rho_cos_phi * sin( gst + temp_cinfo.lon);
+         vect[2] = temp_cinfo.rho_sin_phi;
+         normalize_vect( vect);
+         sin_sun_alt = -dot_product( vect, earth);
+         sin_target_alt = dot_product( vect, target);
+         full_ctime( buff, jd_utc, FULL_CTIME_YMD);
+         if( sin_target_alt > .02)
+            score = 1. / sin_target_alt;
+         else
+            score = 1. / .02;
+         if( sin_sun_alt > -.1)   /* approx civil twilight or brighter */
+            score += 300. * 0.2;
+         else if( sin_sun_alt > -.3)   /* astronomical twilight or brighter */
+            score += 300. * (sin_sun_alt + 0.3);
+         if( !i || score < best_score)
+            {                          /* this site is better than any we've */
+            *cinfo = temp_cinfo;                   /* seen thus far */
+            best_score = score;
+            }
+         }
+}
+
 static double *list_of_ephem_times = NULL;
 
 static int get_ephem_times_from_file( const char *filename)
@@ -2081,9 +2131,8 @@ const char *mpc_code_for_ephems = "";
 
 static int _ephemeris_in_a_file( const char *filename, const double *orbit,
          OBSERVE *obs, const int n_obs,
-         const int planet_no,
          const double epoch_jd, const double jd_start, const char *stepsize,
-         double lon, double rho_cos_phi, double rho_sin_phi,
+         mpc_code_t *cinfo,
          const int n_steps, const char *note_text,
          ephem_option_t options, unsigned n_objects)
 {
@@ -2100,23 +2149,23 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
    const char *timescale = get_environment_ptr( "TT_EPHEMERIS");
    const char *override_date_format = get_environment_ptr( "DATE_FORMAT");
    double abs_mag = calc_absolute_magnitude( obs, n_obs);
-   double ht_in_meters = 0., max_auto_step = 0.;
-   DPT latlon;
+   double max_auto_step = 0.;
    bool last_line_shown = true;
    RADAR_DATA rdata;
    bool show_radar_data = (get_radar_data( note_text + 1, &rdata) == 0);
-   const double planet_radius_in_au =
-          planet_radius_in_meters( planet_no) / AU_IN_METERS;
    int ra_format = 3, dec_format = 2;
    char buff[440], *header = NULL, alt_buff[500];
    const bool use_observation_times = !strncmp( stepsize, "Obs", 3);
    const bool show_geo_quantities = atoi( get_environment_ptr( "GEO_QUANTITIES"));
    const bool suppress_coloring = atoi( get_environment_ptr( "SUPPRESS_EPHEM_COLORING"));
    double curr_jd = jd_start, real_jd_start = jd_start;
-   bool reset_lat_alt = (planet_no >= 0);
    const bool fake_astrometry = ((options & 7) == OPTION_FAKE_ASTROMETRY);
+   const char *group_data;
 
-   if( (!rho_cos_phi && !rho_sin_phi && !use_observation_times && !show_geo_quantities
+   snprintf( buff, sizeof( buff), "GROUP_%.3s", note_text + 1);
+   group_data = get_environment_ptr( buff);
+   if( (!cinfo->rho_cos_phi && !cinfo->rho_sin_phi && !use_observation_times && !show_geo_quantities
+               && !*group_data
                && memcmp( note_text, "(Opt)", 5)) || ephem_type != OPTION_OBSERVABLES)
       options &= ~(OPTION_ALT_AZ_OUTPUT | OPTION_VISIBILITY | OPTION_MOON_ALT
                      | OPTION_MOON_AZ | OPTION_SUN_ALT | OPTION_SUN_AZ
@@ -2172,7 +2221,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
       fclose( ofile);
       return( rval);
       }
-   if( planet_no < 0 && planet_no != -2)      /* bad observatory code */
+   if( cinfo->planet < 0 && cinfo->planet != -2)      /* bad observatory code */
       return( -3);
    if( !abs_mag)
       abs_mag = atof( get_environment_ptr( "ABS_MAG"));
@@ -2359,7 +2408,6 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
       }
 
    prev_r[0] = prev_r[1] = 0.;
-   latlon.x = lon;
    for( i = 0; i < n_steps; i++)
       {
       unsigned obj_n;
@@ -2374,11 +2422,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
       if( use_observation_times)
          {
          if( !i || strcmp( obs[i].mpc_code, obs[i - 1].mpc_code))
-            {
-            get_observer_data( obs[i].mpc_code, buff, &latlon.x,
-                                             &rho_cos_phi, &rho_sin_phi);
-            reset_lat_alt = (planet_no >= 0);
-            }
+            get_observer_data( obs[i].mpc_code, buff, cinfo);
          curr_jd = obs[i].jd;
          }
       else if( *stepsize == 't')
@@ -2403,12 +2447,6 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
          else
             curr_jd = jd_start + (double)i * step;
          }
-      if( reset_lat_alt)
-         parallax_to_lat_alt(
-                  rho_cos_phi / planet_radius_in_au,
-                  rho_sin_phi / planet_radius_in_au, &latlon.y,
-                                      &ht_in_meters, planet_no);
-      reset_lat_alt = false;
       delta_t = td_minus_utc( curr_jd) / seconds_per_day;
       if( use_observation_times)
          curr_jd -= delta_t;
@@ -2422,8 +2460,8 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
          ephemeris_t = curr_jd + delta_t;
          utc = curr_jd;
          }
-      compute_observer_loc( ephemeris_t, planet_no, 0., 0., 0., geo_posn);
-      compute_observer_vel( ephemeris_t, planet_no, 0., 0., 0., geo_vel);
+      compute_observer_loc( ephemeris_t, cinfo->planet, 0., 0., 0., geo_posn);
+      compute_observer_vel( ephemeris_t, cinfo->planet, 0., 0., 0., geo_vel);
       strlcpy_error( buff, "Nothing to see here... move along... uninteresting... who cares?...");
       for( obj_n = 0; obj_n < n_objects; obj_n++)
          {
@@ -2440,10 +2478,13 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
             geo[j] = orbi[j] - geo_posn[j];
          if( !obj_n)
             {
-            compute_observer_loc( ephemeris_t, planet_no,
-                        rho_cos_phi, rho_sin_phi, latlon.x, obs_posn);
-            compute_observer_vel( ephemeris_t, planet_no,
-                        rho_cos_phi, rho_sin_phi, latlon.x, obs_vel);
+            if( group_data)
+               set_group_loc( group_data, utc, cinfo,
+                           geo, geo_posn);
+            compute_observer_loc( ephemeris_t, cinfo->planet,
+                        cinfo->rho_cos_phi, cinfo->rho_sin_phi, cinfo->lon, obs_posn);
+            compute_observer_vel( ephemeris_t, cinfo->planet,
+                        cinfo->rho_cos_phi, cinfo->rho_sin_phi, cinfo->lon, obs_vel);
                 /* we need the observer position in equatorial coords too: */
             memcpy( obs_posn_equatorial, obs_posn, 3 * sizeof( double));
             ecliptic_to_equatorial( obs_posn_equatorial);
@@ -2568,7 +2609,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                char date_buff[80];
                double dist;
                const double max_close_approach = 0.5;
-               const double jd = find_closest_approach( orbi, ephemeris_t, planet_no,
+               const double jd = find_closest_approach( orbi, ephemeris_t, cinfo->planet,
                                     &dist, step, prev_r);
 
                if( dist < max_close_approach)
@@ -2664,7 +2705,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                char visibility_char = ' ';
                BRIGHTNESS_DATA bdata;
                double lunar_eclipse_mag_drop = 0.;
-               const bool is_geocentric = (!rho_sin_phi && !rho_cos_phi);
+               const bool is_geocentric = (!cinfo->rho_sin_phi && !cinfo->rho_cos_phi);
 
                solar_r = vector3_length( orbi_after_light_lag);
                earth_r = vector3_length( obs_posn_equatorial);
@@ -2682,7 +2723,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                exposure_config.sky_brightness = 99.;
                for( j = 0; j < 3; j++)    /* compute alt/azzes of object (j=0), */
                   {                       /* sun (j=1), and moon (j=2)          */
-                  DPT obj_ra_dec = ra_dec;
+                  DPT obj_ra_dec = ra_dec, temp_latlon;
 
                   if( j)
                      {
@@ -2763,12 +2804,17 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                         sun_ra_dec = obj_ra_dec;
                      }
                   obj_ra_dec.x = -obj_ra_dec.x;
-                  if( is_geocentric)
-                     latlon = best_latlon;
-                  full_ra_dec_to_alt_az( &obj_ra_dec, &alt_az[j], NULL, &latlon, utc,
-                                              &hour_angle[j]);
-                  full_ra_dec_to_alt_az( &obj_ra_dec, &best_alt_az[j], NULL, &best_latlon, utc,
-                                              NULL);
+                  if( is_geocentric && !group_data)
+                     {
+                     cinfo->lon = best_latlon.x;
+                     cinfo->lat = best_latlon.y;
+                     }
+                  temp_latlon.x = cinfo->lon;
+                  temp_latlon.y = cinfo->lat;
+                  full_ra_dec_to_alt_az( &obj_ra_dec, &alt_az[j], NULL,
+                                 &temp_latlon, utc, &hour_angle[j]);
+                  full_ra_dec_to_alt_az( &obj_ra_dec, &best_alt_az[j], NULL,
+                                 &best_latlon, utc, NULL);
                   alt_az[j].x = centralize_ang( alt_az[j].x + PI);
                   best_alt_az[j].x = centralize_ang( best_alt_az[j].x + PI);
                   }
@@ -2801,7 +2847,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                   visibility_char = 'B';
                   rgb = RGB_BELOW_HORIZON;
                   }
-               bdata.ht_above_sea_in_meters = ht_in_meters;
+               bdata.ht_above_sea_in_meters = cinfo->alt;
                bdata.temperature_in_c = 20.;      /* centigrade */
                bdata.moon_elongation = lunar_elong;
                bdata.relative_humidity = 20.;  /* 20% */
@@ -2817,7 +2863,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                   double galactic_confusion_addendum =
                            atof( get_environment_ptr( "GALACTIC_ADDENDUM"));
 
-                  bdata.latitude = latlon.y;
+                  bdata.latitude = cinfo->lat;
                   bdata.zenith_angle    = PI / 2. - alt_az[0].y;
                   bdata.zenith_ang_sun  = PI / 2. - alt_az[1].y;
                   bdata.zenith_ang_moon = PI / 2. - alt_az[2].y;
@@ -3333,7 +3379,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                   double lat_lon[2], alt_in_meters;
                   const double meters_per_km = 1000.;
 
-                  alt_in_meters = find_lat_lon_alt( utc, geo, planet_no, lat_lon,
+                  alt_in_meters = find_lat_lon_alt( utc, geo, cinfo->planet, lat_lon,
                            *get_environment_ptr( "GEOMETRIC_GROUND_TRACK") == '1');
                   snprintf( tbuff, 30, "%9.4f %+08.4f %10.3f",
                         lat_lon[0] * 180. / PI,
@@ -3490,12 +3536,10 @@ figuring out which options are available for an ephemeris. */
 
 bool is_topocentric_mpc_code( const char *mpc_code)
 {
-   char buff[100];
-   double rho_cos_phi, rho_sin_phi, lon;
-   const int planet_idx = get_observer_data( mpc_code,
-                    buff, &lon, &rho_cos_phi, &rho_sin_phi);
+   mpc_code_t cinfo;
+   const int planet_idx = get_observer_data( mpc_code, NULL, &cinfo);
 
-   return( planet_idx >= 0 && (rho_cos_phi != 0. || rho_sin_phi != 0.));
+   return( planet_idx >= 0 && (cinfo.rho_cos_phi != 0. || cinfo.rho_sin_phi != 0.));
 }
 
 static double get_telescope_primary_diameter( const char *mpc_code)
@@ -3571,13 +3615,12 @@ int ephemeris_in_a_file_from_mpc_code( const char *filename,
          const int n_steps, const char *mpc_code,
          ephem_option_t options, const unsigned n_objects)
 {
-   double rho_cos_phi, rho_sin_phi, lon;
+   mpc_code_t cinfo;
    char note_text[200], buff[100];
    int real_number_of_steps, rval;
-   const int planet_no = get_observer_data( mpc_code, buff, &lon,
-                                           &rho_cos_phi, &rho_sin_phi);
 
    assert( strlen( mpc_code) >= 3);
+   get_observer_data( mpc_code, buff, &cinfo);
    strlcpy_error( ephem_mpc_code, mpc_code);
    snprintf( note_text, sizeof( note_text),
                     "(%s) %s", mpc_code, mpc_station_name( buff));
@@ -3591,8 +3634,8 @@ int ephemeris_in_a_file_from_mpc_code( const char *filename,
    else
       real_number_of_steps = n_steps;
    mpc_code_for_ephems = mpc_code;
-   rval = _ephemeris_in_a_file( filename, orbit, obs, n_obs, planet_no,
-               epoch_jd, jd_start, stepsize, lon, rho_cos_phi, rho_sin_phi,
+   rval = _ephemeris_in_a_file( filename, orbit, obs, n_obs,
+               epoch_jd, jd_start, stepsize, &cinfo,
                real_number_of_steps,
                note_text, options, n_objects);
    mpc_code_for_ephems = "";

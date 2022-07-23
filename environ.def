@@ -466,3 +466,13 @@ COMMENT_SHUTOFF=
    you can rename it and specify that filename on the following line.  Find_Orb
    will then use those sigmas instead.
 SIGMAS_FILE=
+
+   If you generate ephems from the 'MPC code' (ATL),  Find_Orb will check
+   visibility of the target and of the sun as seen from the four ATLAS
+   telescopes,  (M22),  (T05),  (T08),  (W68),  and will pick the one that
+   is best placed.  This is useful with telescope networks where you might
+   well shift the imaging to whichever scope is best placed at a given time.
+   Note that these 'MPC codes' also have lines in rovers.txt (q.v.).
+GROUP_ATL=M22 T05 T08 W68
+GROUP_LC2=E10 F65
+GROUP_LC1=V37 W85 K91 Q63 Z31 097

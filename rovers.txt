@@ -1426,3 +1426,12 @@ d47 ! 149.5501     -30.31287         235.23    DSS 47
    Earth rotates and the object moves around in the sky.
 
 Opt !   0.0000       0.00000   +0.00000    @3  Optimal topocentric location
+
+   One can specify a 'code' for a group of individual codes.  In ephemerides,
+   the 'best' code for a given time and object will be chosen (ideally,  object
+   high in the sky and sun well below the horizon).  The individual codes
+   collected in a group code are specified in 'environ.dat' (q. v.)
+
+LC1 !   0.0000       0.00000   +0.00000    @3  Las Cumbres Observatory (1m)
+LC2 !   0.0000       0.00000   +0.00000    @3  Las Cumbres Observatory (2m)
+ATL !   0.0000       0.00000   +0.00000    @3  ATLAS (all scopes)
