@@ -4044,13 +4044,26 @@ int main( int argc, const char **argv)
                   {
                   char *tptr;
                   int n_chars_to_highlight = 0;
+                  const char *reference = get_environment_ptr( "REFERENCE");
 
                   if( !memcmp( tbuff, "IMPACT", 6))
                      elem_color = COLOR_ATTENTION + A_BLINK;
                   if( !memcmp( tbuff, "Epoch", 5))
                      add_cmd_area( 'e', line_no + iline, 0, 5);
                   if( !memcmp( tbuff + 3, "Peri", 4))
-                     add_cmd_area( '+', line_no + iline, 3, 7);
+                     add_cmd_area( '+', line_no + iline, 3, 13);
+                  tptr = strstr( tbuff, " mean residual");
+                  if( tptr)
+                     add_cmd_area( 't', line_no + iline,
+                                          (int)( tptr - tbuff), 20);
+                  tptr = strstr( tbuff, "(J2000 ");
+                  if( tptr)
+                     add_cmd_area( ALT_N, line_no + iline,
+                                          (int)( tptr - tbuff) - 3, 20);
+                  tptr = strstr( tbuff, reference);
+                  if( tptr)
+                     add_cmd_area( ALT_R, line_no + iline,
+                                          (int)( tptr - tbuff) - 3, strlen( reference) + 6);
                   if( make_unicode_substitutions)
                      {
                      text_search_and_replace( tbuff, " +/- ", " \xc2\xb1 ");

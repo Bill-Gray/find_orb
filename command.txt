@@ -123,6 +123,8 @@ w              Show included observation with the worst residuals
 a              Toggle perturbations from asteroids
 t              Select how residuals are shown
 Alt-K          Toggle display of uncertainties
+Alt-N          Select frame for orbital elements
+Alt-R          Set reference for orbital elements
 Alt-X          Find next obs with a desired MPC code
 U+9            Toggle sort obs by date vs. sort by MPC code
 U+31004        Add a line of menu options
