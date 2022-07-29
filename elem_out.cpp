@@ -611,6 +611,11 @@ static int _unpack_desig_for_linkage( const char *packed_id, char *reduced)
    return( unpack_mpc_desig( NULL, reduced));
 }
 
+static double td_to_utc( const double td)
+{
+   return( td - td_minus_utc( td) / seconds_per_day);
+}
+
 /* This is ludicrously high,  but let's say that we'll never
 report a linkage between 50 or more tracklets at once. */
 
@@ -703,8 +708,7 @@ static int make_linkage_json( const int n_obs, const OBSERVE *obs, const ELEMENT
 
          if( desig_type == OBJ_DESIG_OTHER || desig_type == OBJ_DESIG_ARTSAT)
             {
-            const double obs_utc_jd = obs[idx[i]].jd
-                        - td_minus_utc( obs[idx[i]].jd) / seconds_per_day;
+            const double obs_utc_jd = td_to_utc( obs[idx[i]].jd);
 
             strcpy( buff, packed_id2);
             text_search_and_replace( buff, " ", "");
@@ -1005,15 +1009,15 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
    fprintf( ofile, "\n        \"count\": %u,", n_obs);
    fprintf( ofile, "\n        \"used\": %u,", n_used);
 
-   jd_first = obs[0].jd - td_minus_utc( obs[0].jd) / seconds_per_day;
-   jd_last  = obs[n_obs - 1].jd - td_minus_utc( obs[n_obs - 1].jd) / seconds_per_day;
+   jd_first = td_to_utc( obs[0].jd);
+   jd_last  = td_to_utc( obs[n_obs - 1].jd);
    fprintf( ofile, "\n        \"earliest\": %16.8f,", jd_first);
    fprintf( ofile, "\n        \"latest\": %16.8f,", jd_last);
    fprintf( ofile, "\n        \"earliest iso\": \"%s\",", iso_time( buff, jd_first, 3));
    fprintf( ofile, "\n        \"latest iso\": \"%s\",", iso_time( buff, jd_last, 3));
 
-   jd_first = obs[first].jd - td_minus_utc( obs[first].jd) / seconds_per_day;
-   jd_last  = obs[last].jd - td_minus_utc( obs[last].jd) / seconds_per_day;
+   jd_first = td_to_utc( obs[first].jd);
+   jd_last  = td_to_utc( obs[last].jd);
    fprintf( ofile, "\n        \"earliest_used\": %16.8f,", jd_first);
    fprintf( ofile, "\n        \"latest_used\": %16.8f,", jd_last);
    fprintf( ofile, "\n        \"earliest_used iso\": \"%s\",", iso_time( buff, jd_first, 3));
@@ -1026,7 +1030,7 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
       int n_digits = 3;
       double total_resid, normalized_xresid, normalized_yresid;
 
-      jd = obs[i].jd - td_minus_utc( obs[i].jd) / seconds_per_day;
+      jd = td_to_utc( obs[i].jd);
       compute_observation_motion_details( obs + i, &m);
       fprintf( ofile, "\n          {\"JD\": %.6f, \"iso date\": \"%s\", \"obscode\": \"%s\",",
                   jd, iso_time( buff, jd, 3), obs[i].mpc_code);
@@ -2307,8 +2311,7 @@ int write_out_elements_to_file( const double *orbit,
          char *end_ptr;
          const double lon = latlon[0] * 180. / PI;
          const double impact_time_td = elem.perih_time + t0;
-         const double impact_time_utc = impact_time_td -
-                        td_minus_utc( impact_time_td) / seconds_per_day;
+         const double impact_time_utc = td_to_utc( impact_time_td);
 
          full_ctime( buff, impact_time_utc,
                        FULL_CTIME_HUNDREDTH_SEC | CALENDAR_JULIAN_GREGORIAN);
@@ -2806,7 +2809,7 @@ static double extract_state_vect_from_text( const char *text,
       else if( !memcmp( text, "H=", 2))
          *abs_mag = atof( text + 2);
       else if( !_memicmp( text, "UTC", 3))
-         epoch += td_minus_utc( epoch) / seconds_per_day;
+         epoch = td_to_utc( epoch);
       else if( !_memicmp( text, "TDB", 3))
          {
          const double t_cen = (epoch - J2000) / 36525.;
