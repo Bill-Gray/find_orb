@@ -1023,6 +1023,19 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
    fprintf( ofile, "\n        \"earliest_used iso\": \"%s\",", iso_time( buff, jd_first, 3));
    fprintf( ofile, "\n        \"latest_used iso\": \"%s\",", iso_time( buff, jd_last, 3));
 
+   first = 0;
+   while( first < (int)n_obs && (obs[first].flags & OBS_DONT_USE))
+      first++;
+   last = 0;
+   while( last > first && (obs[last].flags & OBS_DONT_USE))
+      last--;
+   jd_first = td_to_utc( obs[first].jd);
+   jd_last  = td_to_utc( obs[last].jd);
+   fprintf( ofile, "\n        \"earliest_unbanned\": %16.8f,", jd_first);
+   fprintf( ofile, "\n        \"latest_unbanned\": %16.8f,", jd_last);
+   fprintf( ofile, "\n        \"earliest_unbanned iso\": \"%s\",", iso_time( buff, jd_first, 3));
+   fprintf( ofile, "\n        \"latest_unbanned iso\": \"%s\",", iso_time( buff, jd_last, 3));
+
    fprintf( ofile, "\n        \"residuals\":\n        [");
    for( i = 0; show_obs && i < (int)n_obs; i++)
       {
