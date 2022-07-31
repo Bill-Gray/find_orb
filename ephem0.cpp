@@ -774,7 +774,7 @@ static int find_precovery_plates( OBSERVE *obs, const int n_obs,
                else if( new_p2_jd != p2->jd)
                   {
                   p2->jd = new_p2_jd;
-                  setup_obj_loc( p2, orbi, n_orbits, epoch_jd, NULL);
+                  setup_obj_loc( p2, orbi, n_orbits, epoch_jd, "500");
                   epoch_jd = p2->jd;
                   }
                while( stepsize > p2->r * scale_factor)
@@ -782,7 +782,7 @@ static int find_precovery_plates( OBSERVE *obs, const int n_obs,
                while( stepsize < p2->r * scale_factor)
                   stepsize *= 2.;
                p1->jd = new_p2_jd - stepsize;
-               setup_obj_loc( p1, orbi, n_orbits, epoch_jd, NULL);
+               setup_obj_loc( p1, orbi, n_orbits, epoch_jd, "500");
                epoch_jd = p1->jd;
                }
             fraction = (jdt - p1->jd) / stepsize;
