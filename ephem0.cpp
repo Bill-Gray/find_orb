@@ -95,6 +95,7 @@ char *iso_time( char *buff, const double jd, const int precision);   /* elem_out
 double mag_band_shift( const char mag_band, int *err_code);   /* elem_out.c */
 char *get_file_name( char *filename, const char *template_file_name);
 double current_jd( void);                       /* elem_out.cpp */
+double utc_from_td( const double jdt, double *delta_t);     /* ephem0.cpp */
 double diameter_from_abs_mag( const double abs_mag,      /* ephem0.cpp */
                                      const double optical_albedo);
 double shadow_check( const double *planet_loc,           /* ephem0.cpp */
@@ -2095,7 +2096,7 @@ static int get_ephem_times_from_file( const char *filename)
          if( jd > 1.)
             {
             if( time_system)   /* Input times are in TD;  cvt to UTC */
-               jd -= td_minus_utc( jd) / seconds_per_day;
+               jd = utc_from_td( jd, NULL) / seconds_per_day;
             list_of_ephem_times[n_times++] = jd;
             }
          else if( !memcmp( buff, "OPTION ", 7))
@@ -3904,7 +3905,12 @@ static void show_resid_in_sigmas( char *buff, const double sigmas)
    show_number_in_four_bytes( buff, fabs( sigmas));
 }
 
-static double utc_from_td( const double jdt, double *delta_t)
+/* If,  in converting from TD to UTC,  we cross midnight,  we have to
+check for a possible intervening leap second.  We can't just say
+utc = td - td_minus_utc( jdt),  because td_minus_utc() takes a UTC
+instant as an argument.    */
+
+double utc_from_td( const double jdt, double *delta_t)
 {
    double diff = td_minus_utc( jdt), utc = jdt - diff / seconds_per_day;
 
@@ -4218,7 +4224,7 @@ reasonably happy.   */
 #ifdef CURRENTLY_UNUSED_POSSIBLY_OBSOLETE
 static inline void set_obs_to_microday( OBSERVE FAR *obs)
 {
-   const double utc = obs->jd - td_minus_utc( obs->jd) / seconds_per_day;
+   const double utc = utc_from_td( obs->jd);
    double delta_jd = utc - floor( utc);
 
    delta_jd = 1e+6 * delta_jd + .5;
