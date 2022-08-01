@@ -383,3 +383,9 @@
 2070    2 ( ) Times in YY MM DD HH:MM:SS
 2070    3 ( ) Times in MJD DDDDD.DDDDDD
 2070    Cancel
+
+2072    At least one observation,  made at %s,  has
+2072    an uncertainty that is less than its precision.  This doesn't
+2072    make sense, and may indicate something's wrong with the data.
+2072    See https://www.projectpluto.com/errors.htm#precision for
+2072    further discussion.

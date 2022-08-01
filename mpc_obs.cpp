@@ -54,6 +54,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #define EARTH_MINOR_AXIS_IN_AU (EARTH_MINOR_AXIS / AU_IN_METERS)
 #define J2000 2451545.
 
+double utc_from_td( const double jdt, double *delta_t);     /* ephem0.cpp */
 int apply_excluded_observations_file( OBSERVE *obs, const int n_obs);
 void set_up_observation( OBSERVE FAR *obs);                 /* mpc_obs.c */
 static double observation_jd( const char *buff);
@@ -3440,6 +3441,15 @@ bool nighttime_only( const char *mpc_code)
    return( strstr( get_environment_ptr( "DAYTIME_OBS_OK1"), mpc_code) == NULL);
 }
 
+static void warn_about_insufficient_precision( const OBSERVE *obs)
+{
+   char buff[90], msg[500];
+
+   full_ctime( buff, utc_from_td( obs->jd, NULL), 0);
+   snprintf_err( msg, sizeof( msg), get_find_orb_text( 2072), buff);
+   generic_message_box( msg, "o");
+}
+
 /* Uncertainties on time,  magnitude,  and the error ellipse all will have
 default values.  If ADES or Tholen or .rwo uncertainties have been set,  or
 uncertainties in columns 57-65,  we use them.  (Such uncertainties apply to
@@ -3502,6 +3512,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
    void *ades_context;
    int spacecraft_offset_reference = 399;    /* default is geocenter */
    static int suppress_private_obs = -1;
+   int insufficient_precision_warning_shown = 0;
 
 #ifdef CONSOLE
    move_add_nstr( 1, 2, "Loading observations", -1);
@@ -3689,6 +3700,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                observation_is_good = false;
             if( observation_is_good)
                {
+               int insufficient_precision = 0;
                const double radians_per_arcsec = PI / (180. * 3600.);
                double mag_sigma = 0., time_sigma = 0.;
                double posn_sigma_1, posn_sigma_2;
@@ -3770,12 +3782,27 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                            /* those sigmas whether they "make sense" or not. */
                if( mag_sigma > rval[i].mag_sigma || !use_sigmas)
                   rval[i].mag_sigma = mag_sigma;
+               else
+                  insufficient_precision |= 1;
                if( time_sigma > rval[i].time_sigma || !use_sigmas)
                   rval[i].time_sigma = time_sigma;
+               else
+                  insufficient_precision |= 2;
                if( posn_sigma_1 > rval[i].posn_sigma_1 || !use_sigmas)
                   rval[i].posn_sigma_1 = posn_sigma_1;
+               else
+                  insufficient_precision |= 4;
                if( posn_sigma_2 > rval[i].posn_sigma_2 || !use_sigmas)
                   rval[i].posn_sigma_2 = posn_sigma_2;
+               else
+                  insufficient_precision |= 8;
+               if( insufficient_precision && !insufficient_precision_warning_shown
+                           && use_sigmas)
+                  {
+                  debug_printf( "Insufficient flags %d\n", insufficient_precision);
+                  warn_about_insufficient_precision( rval + i);
+                  insufficient_precision_warning_shown = 1;
+                  }
                rval[i].posn_sigma_theta = posn_sigma_theta;
                if( !including_obs)
                   rval[i].is_included = 0;
