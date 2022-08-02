@@ -189,9 +189,7 @@ Tar !   6.92389      +43.75222      1270       TAROT Calern Observatory
    units always makes me worry) and given to a meaningless precision of
    about 0.3 millimeters -- those sorts of mistakes usually mean bogus data
    -- but checks with people who have actually been on Mauna Kea with GPS
-   units have assuaged those worries.  And since then,  Dave Tholen has gotten
-   a precise measurement for the 2.2-m scope by imaging navigation satellites;
-   that confirmed the following position to within about a meter.
+   units and by Dave Tholen (see below) have assuaged those worries.
       Lat/lon/alts in this file are supposed to be on the WGS84 ellipsoid.
    I just took the NAD83 lat/longs and ignored the difference (about two
    meters).  I increased altitudes by 26 meters,  the approximate geoid
@@ -208,20 +206,26 @@ Tar !   6.92389      +43.75222      1270       TAROT Calern Observatory
    -155.4722,  lat 19.8262,  4202 meters.  After allowing for roundoff
    (only five digits on parallaxes!),  this looks like the correct
    position for IRTF.
+      Dave Tholen has gotten a precise measurement for the 2.2-m scope
+   by imaging navigation satellites.  The resulting position was 1.3133e-5
+   degrees (about 1.46 meters) north,  2.6364e-5 degrees (about 2.76 meters)
+   west,  and 4.975 meters higher than the aerial survey position.  We think
+   the aerial survey is internally consistent,  so I've added the same
+   offset to the other Mauna Kea scopes in that survey.
 
         longitude    latitude       height
-      DDDmmss.sssss   DDmmss.sssss       (m)
-0.6 !-1552815.46587  +194917.81149  4212.327   Univ of Hawaii 0.6-m, Mauna Kea
-2.2 !-1552809.96073  +194922.76784  4239.555   Univ of Hawaii 2.2-m, Mauna Kea
-CFH !-1552807.95258  +194930.90648  4230.106   Canada-France-Hawaii Telescope, Mauna Kea (CFHT)
-IRT !-1552819.19564  +194934.38594  4194.067   Infrared Telescope Facility (IRTF)
-UKI !-1552813.17630  +194920.75334  4224.498   UK Infrared Telescope (UKIRT)
-JCM !-1552837.20394  +194922.10741  4216       James Clerke Maxwell Telescope (JCMT)
-CSO !-1552831.78945  +194920.77658  4216       Caltech Submillimeter Observatory (CSO)
-Ke1 !-1552828.98665  +194933.40757  4185.581   Keck 1, Mauna Kea
-Ke2 !-1552827.24268  +194935.61788  4185.581   Keck 2, Mauna Kea
-Sub !-1552833.66719  +194931.81425  4189.001   Subaru, Mauna Kea
-Gem !-1552808.56831  +194925.68521  4239.439   Gemini North, Mauna Kea
+      DDD.ddddddddd   DD.ddddddddd       (m)
+0.6 !-155.470989106  +19.821627436  4217.302   Univ of Hawaii 0.6-m, Mauna Kea
+2.2 !-155.469459900  +19.823004200  4244.530   Univ of Hawaii 2.2-m, Mauna Kea
+CFH !-155.468902081  +19.825264933  4235.081   Canada-France-Hawaii Telescope, Mauna Kea (CFHT)
+IRT !-155.472025153  +19.826231450  4199.042   Infrared Telescope Facility (IRTF)
+UKI !-155.470353114  +19.822444616  4229.473   UK Infrared Telescope (UKIRT)
+JCM !-155.477027458  +19.822820747  4220.975   James Clerke Maxwell Telescope (JCMT)
+CSO !-155.475523433  +19.822451072  4220.975   Caltech Submillimeter Observatory (CSO)
+Ke1 !-155.474744878  +19.825959680  4190.556   Keck 1, Mauna Kea
+Ke2 !-155.474260442  +19.826573655  4190.556   Keck 2, Mauna Kea
+Sub !-155.476045028  +19.825517091  4193.976   Subaru, Mauna Kea
+Gem !-155.469073117  +19.823814580  4244.414   Gemini North, Mauna Kea
 
    From http://cso.caltech.edu/wiki/cso/telescope/telescope : a position
    about 400 meters northwest of the above aerial survey position,  and
@@ -237,11 +241,11 @@ MKV !-155.45551209   +19.8013877    3763.061   Mauna Kea VLBA
       The following five (official) MPC sites have corrected positions,
    copy/pasted from the above.
 
-266 !-1552833.66719  +194931.81425  4189.001   New Horizons KBO Search-Subaru
-267 !-1552807.95258  +194930.90648  4230.106   New Horizons KBO Search-CFHT
-T09 !-1552833.66719  +194931.81425  4189.001   Mauna Kea-UH/Tholen NEO Follow-Up (Subaru)
-T12 !-1552809.96073  +194922.76784  4239.555   Mauna Kea-UH/Tholen NEO Follow-Up (2.24-m)
-T14 !-1552807.95258  +194930.90648  4230.106   Mauna Kea-UH/Tholen NEO Follow-Up (CFHT)
+266 !-155.476045028  +19.825517091  4193.976   New Horizons KBO Search-Subaru
+267 !-155.468902081  +19.825264933  4235.081   New Horizons KBO Search-CFHT
+T09 !-155.476045028  +19.825517091  4193.976   Mauna Kea-UH/Tholen NEO Follow-Up (Subaru)
+T12 !-155.469459900  +19.823004200  4244.530   Mauna Kea-UH/Tholen NEO Follow-Up (2.24-m)
+T14 !-155.468902081  +19.825264933  4235.081   Mauna Kea-UH/Tholen NEO Follow-Up (CFHT)
 
 Ce1 !  -2.566025     +37.982840     1532       Centu1 (J75 scope)
 
