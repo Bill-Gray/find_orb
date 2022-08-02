@@ -3782,7 +3782,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                            /* those sigmas whether they "make sense" or not. */
                if( mag_sigma > rval[i].mag_sigma || !use_sigmas)
                   rval[i].mag_sigma = mag_sigma;
-               else
+               else if( rval[i].obs_mag != BLANK_MAG)
                   insufficient_precision |= 1;
                if( time_sigma > rval[i].time_sigma || !use_sigmas)
                   rval[i].time_sigma = time_sigma;
