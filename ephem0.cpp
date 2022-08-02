@@ -5100,7 +5100,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
                         const int n_output = (helio_ecliptic_j2000_vect[7] == 0.15 ? 8 : 6);
 
                         snprintf( replace_str, sizeof( replace_str),
-                                        "2022.html?sv,1,%s,%.2f", obj_name,
+                                        "%s,%.2f", obj_name,
                                         helio_ecliptic_j2000_vect[8]);
                         text_search_and_replace( replace_str, " ", "%20");
                         for( i = 0; i < n_output; i++)
