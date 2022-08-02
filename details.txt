@@ -1092,6 +1092,13 @@ OBS A. Ivanov, A. Barcov, V. Ivanov, V. Lysenko, M. Astapov, N. Ivanova
 COM Default details extracted from MPEC 2021-A190
 TEL 0.51-m f/8 reflector + CCD
 
+COD C41
+OBS E. Gorbovskoy, V. Lipunov, N. Tiurina, P. Balanutsa, V. Kornilov
+OBS V. Chazov, A. Kuznetsov, K. Ivanov, O. Gress, A. Tlatov, V. Senik
+OBS D. Dormidontov, A. Parkhomenko
+COM Default details extracted from MPEC 2022-O116
+TEL 0.4-m f/2.5 reflector
+
 COD C42
 COM Find_Orb default details
 OBS H. Tan, X. Gao, P. Sun
@@ -1702,6 +1709,12 @@ COM Valid: 2002-2005 sep 15
 TEL 0.30-m f/6.3 Schmidt-Cassegrain + CCD
 COM Valid: 2005 sep 15-2100
 TEL 0.41-m f/6.3 Schmidt-Cassegrain + CCD
+
+COD J96
+MEA J. Temprano
+OBS J. Ruiz
+COM Default details extracted from MPEC 2022-O116
+TEL 0.40-m f/5.0 Ritchey-Chretien + CCD
 
 COD J97 Alginet
 COM Find_Orb default details
@@ -2580,6 +2593,11 @@ COD W53
 OBS R. Jennings
 COM Default details extracted from MPEC 2021-N06
 TEL 0.20-m f/3.9 reflector + CCD
+
+COD W58
+OBS M. Mabson
+COM Default details extracted from MPEC 2022-O116
+TEL 0.28-m f/2.0 Schmidt-Cassegrain + CCD
 
 COD W62
 OBS J. Maikner
