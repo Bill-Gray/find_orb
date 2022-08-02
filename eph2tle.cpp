@@ -556,6 +556,7 @@ int main( const int argc, const char **argv)
    double sum_of_worst_resids = 0.;
    double dist_units = 1., time_units = 1.;
    const char *search_dist = NULL;
+   long end_of_header_offset = 0L;
 
    if( argc < 2)
       error_exit( -1);
@@ -698,8 +699,20 @@ int main( const int argc, const char **argv)
       double mjdt;
       char *tptr = strstr( buff, "(500) Geocentric: ");
 
-      sscanf( buff, "%lf %lf %u %d,%lf,%lf\n", &tdt, &step, &total_lines,
-                  &ref_frame, &dist_units, &time_units);
+      while( *buff == ';')       /* skip leading comments,  if any */
+         if( !fgets_trimmed( buff, sizeof( buff), ifile))
+            {
+            fprintf( stderr, "Nothing but comments in '%s'\n", argv[1]);
+            return( -1);
+            }
+      if( sscanf( buff, "%lf %lf %u %d,%lf,%lf\n", &tdt, &step, &total_lines,
+                  &ref_frame, &dist_units, &time_units) != 6)
+         {
+         fprintf( stderr, "Bad header in '%s'\n", argv[1]);
+         fprintf( stderr, "Header was:\n%s\n", buff);
+         return( -1);
+         }
+      end_of_header_offset = ftell( ifile);
       if( tdt > 3e+7)         /* probably in seconds after J2000, */
          tdt = 2451545. + tdt / seconds_per_day;  /* a SPK convention */
       if( ref_frame == -1)
@@ -763,12 +776,7 @@ int main( const int argc, const char **argv)
    fprintf( ofile, "#\n");
    fprintf( ofile, "# 1 NoradU COSPAR   Epoch.epoch     dn/dt/2  d2n/dt2/6 BSTAR    T El# C\n");
    fprintf( ofile, "# 2 NoradU Inclina RAAscNode Eccent  ArgPeri MeanAno  MeanMotion Rev# C\n");
-   fseek( ifile, 0L, SEEK_SET);
-   if( !fgets( buff, sizeof( buff), ifile))
-      {
-      printf( "Couldn't re-read the header\n");
-      return( -1);
-      }
+   fseek( ifile, end_of_header_offset, SEEK_SET);
    n_steps = total_lines / output_freq;
    while( n_steps--)
       {
