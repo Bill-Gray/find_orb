@@ -94,6 +94,39 @@ for a full list of time specification options.  */
 #define PI \
    3.1415926535897932384626433832795028841971693993751058209749445923
 
+/* Reads a string such as,  say,  "1,12,3-6,9" and returns a 64-bit
+integer with (in this case) bits 1, 12,  3-6,  and 9 turned on:
+hex 127A = binary 0001 0010 0111 1010.  Note that bits are toggled,
+so "4-9,6" would turn bits 4-9 on,  then turn off bit 6.  This also
+means that the order is unimportant;  "6,4-9" would give the same result.
+See 'miscell.cpp',  from which this was borrowed.   */
+
+uint64_t parse_bit_string( const char *istr)
+{
+   uint64_t rval = 0;
+   int bytes_scanned, bit1;
+   int prev_bit1 = -1;
+
+   while( sscanf( istr, "%d%n", &bit1, &bytes_scanned) == 1)
+      {
+      assert( bit1 >= 0 && bit1 < 64);
+      if( prev_bit1 >= 0)     /* we're doing a range here */
+         rval ^= (((uint64_t)2 << bit1) - ((uint64_t)2 << prev_bit1));
+      else
+         rval ^= (uint64_t)1 << bit1;
+      istr += bytes_scanned;
+      prev_bit1 = -1;
+      if( *istr == ',')
+         istr++;
+      else if( *istr == '-')
+         {
+         prev_bit1 = bit1;
+         istr++;
+         }
+      }
+   return( rval);
+}
+
 #pragma pack( 1)
 
 typedef struct
@@ -343,11 +376,17 @@ int main( const int argc, const char **argv)
 
    setvbuf( stdout, NULL, _IONBF, 0);
    for( i = 1; i < argc; i++)
-      if( argv[i][0] == '-')
+      if( argv[i][0] == '-' && argv[i][1])
+         {
+         const char *arg = (i < argc - 1 && !argv[i][2] ? argv[i + 1] : argv[i] + 2);
+
          switch( argv[i][1])
             {
             case 'o':
-               included ^= (1 << atoi( argv[i] + 2));
+               included ^= (1 << atoi( arg));
+               break;
+            case 'O':
+               included ^= parse_bit_string( arg);
                break;
             case 'v':
                verbose = 1;
@@ -356,6 +395,7 @@ int main( const int argc, const char **argv)
                printf( "'%s' is unrecognized\n", argv[i]);
                return( -1);
             }
+        }
 
    for( file_number = 0; file_number < 10; file_number++)
       if( (included >> file_number) & 1)
