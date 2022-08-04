@@ -1491,7 +1491,7 @@ static int create_json_ephemeris( FILE *ofile, FILE *ifile, char *header,
                }
             memcpy( out_text, bptr, blen);
             out_text[blen] = '\0';
-            if( out_token[hlen - 2] == '6' && out_token[hlen - 1] == '0')
+            if( hlen > 2 && out_token[hlen - 2] == '6' && out_token[hlen - 1] == '0')
                {        /* RA60 or Dec60 */
                is_text = true;
                text_search_and_replace( out_text, "_", " ");
