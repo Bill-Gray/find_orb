@@ -3441,12 +3441,25 @@ bool nighttime_only( const char *mpc_code)
    return( strstr( get_environment_ptr( "DAYTIME_OBS_OK1"), mpc_code) == NULL);
 }
 
-static void warn_about_insufficient_precision( const OBSERVE *obs)
+#define INSUFFICIENT_PRECISION_MAG      1
+#define INSUFFICIENT_PRECISION_TIME     2
+#define INSUFFICIENT_PRECISION_POSN1    4
+#define INSUFFICIENT_PRECISION_POSN2    8
+
+static void warn_about_insufficient_precision( const OBSERVE *obs, const int flags)
 {
    char buff[90], msg[500];
+   const char *quantity;
 
-   full_ctime( buff, utc_from_td( obs->jd, NULL), 0);
-   snprintf_err( msg, sizeof( msg), get_find_orb_text( 2072), buff);
+   full_ctime( buff, utc_from_td( obs->jd, NULL), FULL_CTIME_YMD);
+   if( flags & INSUFFICIENT_PRECISION_MAG)
+      quantity = "magnitude";
+   else if( flags & INSUFFICIENT_PRECISION_MAG)
+      quantity = "time";
+   else
+      quantity = "RA/dec";
+   snprintf_err( msg, sizeof( msg), get_find_orb_text( 2072),
+             buff, obs->mpc_code, quantity);
    generic_message_box( msg, "o");
 }
 
@@ -3783,24 +3796,23 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                if( mag_sigma > rval[i].mag_sigma || !use_sigmas)
                   rval[i].mag_sigma = mag_sigma;
                else if( rval[i].obs_mag != BLANK_MAG)
-                  insufficient_precision |= 1;
+                  insufficient_precision |= INSUFFICIENT_PRECISION_MAG;
                if( time_sigma > rval[i].time_sigma || !use_sigmas)
                   rval[i].time_sigma = time_sigma;
                else
-                  insufficient_precision |= 2;
+                  insufficient_precision |= INSUFFICIENT_PRECISION_TIME;
                if( posn_sigma_1 > rval[i].posn_sigma_1 || !use_sigmas)
                   rval[i].posn_sigma_1 = posn_sigma_1;
                else
-                  insufficient_precision |= 4;
+                  insufficient_precision |= INSUFFICIENT_PRECISION_POSN1;
                if( posn_sigma_2 > rval[i].posn_sigma_2 || !use_sigmas)
                   rval[i].posn_sigma_2 = posn_sigma_2;
                else
-                  insufficient_precision |= 8;
+                  insufficient_precision |= INSUFFICIENT_PRECISION_POSN2;
                if( insufficient_precision && !insufficient_precision_warning_shown
                            && use_sigmas)
                   {
-                  debug_printf( "Insufficient flags %d\n", insufficient_precision);
-                  warn_about_insufficient_precision( rval + i);
+                  warn_about_insufficient_precision( rval + i, insufficient_precision);
                   insufficient_precision_warning_shown = 1;
                   }
                rval[i].posn_sigma_theta = posn_sigma_theta;
