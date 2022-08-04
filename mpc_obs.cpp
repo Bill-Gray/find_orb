@@ -3789,19 +3789,19 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                            /* sigma determined from the # of places given. */
                            /* If we're enforcing uniform sigmas,  though,  we use */
                            /* those sigmas whether they "make sense" or not. */
-               if( mag_sigma > rval[i].mag_sigma || !use_sigmas)
+               if( mag_sigma * 1.1 > rval[i].mag_sigma || !use_sigmas)
                   rval[i].mag_sigma = mag_sigma;
                else if( rval[i].obs_mag != BLANK_MAG)
                   insufficient_precision |= INSUFFICIENT_PRECISION_MAG;
-               if( time_sigma > rval[i].time_sigma || !use_sigmas)
+               if( time_sigma * 1.1 > rval[i].time_sigma || !use_sigmas)
                   rval[i].time_sigma = time_sigma;
                else
                   insufficient_precision |= INSUFFICIENT_PRECISION_TIME;
-               if( posn_sigma_1 > rval[i].posn_sigma_1 || !use_sigmas)
+               if( posn_sigma_1 * 1.1 > rval[i].posn_sigma_1 || !use_sigmas)
                   rval[i].posn_sigma_1 = posn_sigma_1;
                else
                   insufficient_precision |= INSUFFICIENT_PRECISION_POSN1;
-               if( posn_sigma_2 > rval[i].posn_sigma_2 || !use_sigmas)
+               if( posn_sigma_2 * 1.1 > rval[i].posn_sigma_2 || !use_sigmas)
                   rval[i].posn_sigma_2 = posn_sigma_2;
                else
                   insufficient_precision |= INSUFFICIENT_PRECISION_POSN2;
