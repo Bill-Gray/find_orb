@@ -2270,8 +2270,8 @@ static void show_a_file( const char *filename, const int flags)
       int color_start = 18;      /* see 'command.txt' */
       short color_pair_idx = (short)color_start;
       short color_idx = (short)color_start * 2;
-      const bool color_visibility = (can_change_color( ) &&
-                  n_lines_to_show + color_start < COLORS);
+      const bool color_visibility =
+                  n_lines_to_show + color_start < COLORS;
 
       clear( );
       if( line_no < top_possible_line)
@@ -2323,11 +2323,16 @@ static void show_a_file( const char *filename, const int flags)
             const int text_color = find_rgb(
                               blue + red + green > 48 ? 0 : 0xffffff);
 
-            init_color( color_idx, red * 990 / 31, green * 999 / 31, blue * 999 / 31);
-            init_pair( color_pair_idx, text_color, color_idx);
+            if( can_change_color( ))
+               {
+               init_color( color_idx, red * 999 / 31, green * 999 / 31, blue * 999 / 31);
+               init_pair( color_pair_idx, text_color, color_idx);
+               color_idx++;
+               }
+            else
+               init_pair( color_pair_idx, text_color, find_rgb( rgb[j]));
             mvchgat( i, color_col[j], 2, A_NORMAL, color_pair_idx, NULL);
             color_pair_idx++;
-            color_idx++;
             }
          }
                /* show "scroll bar" to right of text: */
@@ -2738,47 +2743,6 @@ static const char *get_arg( const int argc, const char **argv, const int idx)
    return( rval);
 }
 
-/* ncurses' color_content( ) returns bogus RGB values if the color is
-uninitialized,  or if it can't really change colors.  The following
-ought to get the 'real' RGB for xterm-256colors,  which seems to be
-the most common case. */
-
-static void default_color_content( const int color, short *r,
-                     short *g, short *b)
-{
-   if( color < 16)      /* 'base' 8 low-intensity,  8 high-intensity */
-      {
-      const short level = (color & 8 ? 0xff : 0xc0);
-
-      *r = (color & COLOR_RED) ? level : 0;
-      *g = (color & COLOR_GREEN) ? level : 0;
-      *b = (color & COLOR_BLUE) ? level : 0;
-      }
-   else if( color < 16 + 216)    /* 6x6x6 color cube */
-      {
-      const short idx = color - 16;
-
-      *r = idx / 36;
-      *g = (idx / 6) % 6;
-      *b = idx % 6;
-      if( *r)
-         *r = *r * 40 + 55;
-      if( *g)
-         *g = *g * 40 + 55;
-      if( *b)
-         *b = *b * 40 + 55;
-      }
-   else              /* 24 shades of gray */
-      {
-      const short level = (short)( color - 16 - 216);
-
-      *r = *g = *b = 8 + level * 10;
-      }
-   *r = *r * 200 / 51;
-   *g = *g * 200 / 51;
-   *b = *b * 200 / 51;
-}
-
 static bool force_eight_color_mode = false;
 
       /* Either locate a palette color close to the desired RGB,  or
@@ -2790,11 +2754,20 @@ static int find_rgb( const unsigned irgb)
    static int n_colors = 0;
    short rgb0[3];
 
-   if( !can_change_color( ) || COLORS <= 8 || force_eight_color_mode)
-      n_colors = COLORS;            /* limited to a fixed palette */
    rgb0[0] = (int)( irgb >> 16);
    rgb0[1] = (int)( (irgb >> 8) & 0xff);
    rgb0[2] = (int)( irgb & 0xff);
+   if( COLORS <= 8 || force_eight_color_mode)
+      return( (rgb0[0] > 127 ? 1 : 0) | (rgb0[1] > 127 ? 2 : 0)
+                                      | (rgb0[2] > 127 ? 4 : 0));
+   if( !can_change_color( ) && COLORS >= 256)
+      {
+      const int r_idx = (rgb0[0] + 10) / 50;
+      const int g_idx = (rgb0[1] + 10) / 50;
+      const int b_idx = (rgb0[2] + 10) / 50;
+
+      return( 16 + b_idx + 6 * g_idx + 36 * r_idx);
+      }
    for( i = 0; i < 3; i++)
       rgb0[i] = rgb0[i] * 200 / 51;
    for( i = 0; i < n_colors && i < 256; i++)
@@ -2802,10 +2775,7 @@ static int find_rgb( const unsigned irgb)
       short rgb[3];
       int j, dist = 0;
 
-      if( force_eight_color_mode)
-         default_color_content( (short)i, rgb, rgb + 1, rgb + 2);
-      else
-         color_content( (short)i, rgb, rgb + 1, rgb + 2);
+      color_content( (short)i, rgb, rgb + 1, rgb + 2);
       for( j = 0; j < 3; j++)
          dist += abs( rgb[j] - rgb0[j]);
       if( best_dist > dist)
@@ -2854,7 +2824,7 @@ static inline int initialize_curses( const int argc, const char **argv)
 #else
    INTENTIONALLY_UNUSED_PARAMETER( argc);
    INTENTIONALLY_UNUSED_PARAMETER( argv);
-   if( !newterm( "xterm-256color", stdout, stdin))
+   if( force_eight_color_mode || !newterm( "xterm-256color", stdout, stdin))
       initscr( );
 #endif
    if( debug_level > 2)
