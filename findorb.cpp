@@ -2854,7 +2854,8 @@ static inline int initialize_curses( const int argc, const char **argv)
 #else
    INTENTIONALLY_UNUSED_PARAMETER( argc);
    INTENTIONALLY_UNUSED_PARAMETER( argv);
-   initscr( );
+   if( !newterm( "xterm-256color", stdout, stdin))
+      initscr( );
 #endif
    if( debug_level > 2)
       debug_printf( "Curses initialised, ");
@@ -4063,7 +4064,7 @@ int main( int argc, const char **argv)
                   tptr = strstr( tbuff, reference);
                   if( tptr)
                      add_cmd_area( ALT_R, line_no + iline,
-                                          (int)( tptr - tbuff) - 3, strlen( reference) + 6);
+                                          (int)( tptr - tbuff) - 3, (int)strlen( reference) + 6);
                   if( make_unicode_substitutions)
                      {
                      text_search_and_replace( tbuff, " +/- ", " \xc2\xb1 ");
