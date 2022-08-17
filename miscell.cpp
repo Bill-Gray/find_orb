@@ -528,7 +528,23 @@ int reset_astrometry_filename( int *argc, const char **argv)
          fclose( ofile);
          }
       else
+         {
+         const size_t len = strlen( obj_name);
+         char unpacked[50], aligned[13];
+
+         if( len > 4 && len < 9 && !strchr( obj_name, ' '))
+            {
+            memset( aligned, ' ', 12);
+            aligned[12] = '\0';
+            if( len == 5)
+               memcpy( aligned, obj_name, 5);
+            else
+               memcpy( aligned + 12 - len, obj_name, len);
+            if( unpack_mpc_desig( unpacked, aligned) != OBJ_DESIG_OTHER)
+               strlcpy_error( obj_name, unpacked);
+            }
          make_fake_astrometry( obj_name, temp_obs_filename);
+         }
       argv[1] = temp_obs_filename;
       for( j = 2; i < *argc; j++, i++)
          argv[j] = argv[i];
@@ -758,6 +774,6 @@ int snprintf_err( char *string, const size_t max_len,      /* miscell.cpp */
 const char *find_orb_version_jd( double *jd)
 {
     if( jd)
-      *jd = 2459795.5;
-    return( "2022 Aug 04");
+      *jd = 2459808.5;
+    return( "2022 Aug 17");
 }
