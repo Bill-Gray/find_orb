@@ -35,6 +35,11 @@ LIBSADDED=-L $(INSTALL_DIR)/lib -lm
 EXE=
 RM=rm -f
 
+ifeq ($(shell uname -s),FreeBSD)
+	CC=cc
+	CXX=c++
+endif
+
 ifeq ($(OS),Windows_NT)
     detected_OS := Windows
 else

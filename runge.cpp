@@ -40,7 +40,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 
 #define ldouble long double
 
-#ifdef __WATCOMC__
+#if defined( __WATCOMC__) || defined( __FreeBSD__)
 #define ceill ceil
 #define expl exp
 #define fabsl fabs
