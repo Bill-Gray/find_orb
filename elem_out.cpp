@@ -1042,6 +1042,7 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
       MOTION_DETAILS m;
       int n_digits = 3;
       double total_resid, normalized_xresid, normalized_yresid;
+      double ecliptic_lon, ecliptic_lat;
 
       jd = td_to_utc( obs[i].jd);
       compute_observation_motion_details( obs + i, &m);
@@ -1098,6 +1099,16 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
                                        obs[i].discovery_asterisk);
       fprintf( ofile, "\n                 \"flags\" : %d,", obs[i].flags);
       fprintf( ofile, "\n                 \"incl\" : %d", obs[i].is_included);
+      ecliptic_lon = atan2( obs[i].vect[1], obs[i].vect[0]);
+      ecliptic_lat = asine( obs[i].vect[2]);
+      fprintf( ofile, "\n                 \"ecliptic_lon\" : %f",
+                                    centralize_ang( ecliptic_lon) * 180. / PI);
+      fprintf( ofile, "\n                 \"ecliptic_lat\" : %f",
+                                                   ecliptic_lat * 180. / PI);
+      ecliptic_lon = 100.46435 + (obs[i].jd - J2000) * 0.9856091005;
+      ecliptic_lon *= PI / 180.;
+      fprintf( ofile, "\n                 \"earth_ecliptic_lon\" : %f",
+                                    centralize_ang( ecliptic_lon) * 180. / PI);
       fprintf( ofile, " }%c", (i == (int)n_obs - 1 ? ' ' : ','));
       }
    fprintf( ofile, "\n        ]\n      }");
