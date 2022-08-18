@@ -3975,7 +3975,8 @@ int main( int argc, const char **argv)
             tptr2 = strstr( tptr, "Sigma");
             if( tptr2)
                add_cmd_area( '%', line_no, (unsigned)( tptr2 - tptr), 5);
-            put_colored_text( tptr, line_no++, 0, -1, COLOR_OBS_INFO);
+            put_colored_text( tptr, line_no++, 0, -1,
+                     (tptr[i + 1] ? COLOR_OBS_INFO : COLOR_OBS_INFO | A_UNDERLINE));
             tptr += i + 1;
             while( *tptr == 10 || *tptr == 13)
                tptr++;

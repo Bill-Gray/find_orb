@@ -4005,30 +4005,26 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
          if( rval[i].note2 != 'R')        /* no way to sanity-test */
             {                             /* radar obs yet         */
             DPT obj_alt_az, sun_alt_az;
+            const bool is_synthetic = !strcmp( rval[i].reference, "Synth")
+                                   || !strcmp( rval[i].reference, "Dummy");
 
-            if( !get_obs_alt_azzes( rval + i, &sun_alt_az, &obj_alt_az)
+            if( !is_synthetic
+                     && !get_obs_alt_azzes( rval + i, &sun_alt_az, &obj_alt_az)
                      && sun_alt_az.x > -90.)
                {                          /* I.e., not flagged as meaningless */
-               const bool is_synthetic = !strcmp( rval[i].reference, "Synth");
 
                if( sun_alt_az.y > _overall_sun_alt_limit
                                      && nighttime_only( rval[i].mpc_code))
                   {
-                  if( !is_synthetic)
-                     {
-                     rval[i].is_included = 0;
-                     rval[i].flags |= OBS_DONT_USE;
-                     }
+                  rval[i].is_included = 0;
+                  rval[i].flags |= OBS_DONT_USE;
                   n_in_sunlight++;
                   comment_observation( rval + i, "Daylit");
                   }
                if( obj_alt_az.y < _overall_obj_alt_limit)
                   {
-                  if( !is_synthetic)
-                     {
-                     rval[i].is_included = 0;
-                     rval[i].flags |= OBS_DONT_USE;
-                     }
+                  rval[i].is_included = 0;
+                  rval[i].flags |= OBS_DONT_USE;
                   n_below_horizon++;
                   comment_observation( rval + i, "Horizon");
                   }
