@@ -1145,6 +1145,18 @@ L?4 !-111.666466   +35.203037        2192.     Lowell unkn 70m WNW of L?3
 L?5 !-111.667065   +35.202916        2189.     Lowell unkn 60m WSW of L?4 (small dome)
 L?6 !-111.667204   +35.202930        2189.     Lowell roll-off roof 15m W of L?5
 
+   Five domes at (689) U. S. Naval Observatory,  Flagstaff,  Arizona.
+   I don't know which,  if any,  of the following should be used.  At least
+   some (689) data came from FASTT,  which (says Wi__p__ia) was "140m
+   southwest of the primary complex",  in a location that shows up as
+   bushes on the imagery.  The last three domes are not conclusively IDed,
+   and (u2f) may not even be a dome.  23m subtracted for geoid height.
+KST !-111.740721   +35.184047        2282.     Kaj Strand Telescope, Naval Obs. Flagstaff
+13f !-111.741083   +35.183863        2276.     1.3-m f/4 reflector, Naval Obs. Flagstaff
+10f !-111.738430   +35.184356        2287.     1.0-m Ritchey-Chretien, Naval Obs. Flagstaff?
+u1f !-111.738240   +35.184360        2288.     Unk small dome, Naval Obs. Flagstaff
+u2f !-111.738441   +35.184604        2281.     Unk small dome?, Naval Obs. Flagstaff
+
    Not entirely sure which instrument at Greenwich was used for (000).
    (I would guess the transit circle early on,  and the 28" refractor later.)
    The ATC location is from Wikipaedia;  the refractor coordinates are from
