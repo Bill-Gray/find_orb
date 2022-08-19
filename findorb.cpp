@@ -1741,27 +1741,30 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
 
 void format_dist_in_buff( char *buff, const double dist_in_au); /* ephem0.c */
 
-#define MAX_CMD_AREAS 100
+#define is_power_of_two( X)   (!((X) & ((X) - 1)))
 
 typedef struct
    {
    unsigned key, line, col1, col2;
    } command_area_t;
 
-static command_area_t command_areas[MAX_CMD_AREAS];
+static command_area_t *command_areas;
 static unsigned n_command_areas;
 
 static void add_cmd_area( const unsigned key,
               const unsigned line, const unsigned col1, const unsigned len)
 {
-   command_area_t *tptr = command_areas + n_command_areas;
+   command_area_t *tptr;
 
-   assert( n_command_areas + 1 < MAX_CMD_AREAS);
+   n_command_areas++;
+   if( is_power_of_two( n_command_areas))
+      command_areas = (command_area_t *)realloc( command_areas,
+                         n_command_areas * 2 * sizeof( command_area_t));
+   tptr = command_areas + n_command_areas - 1;
    tptr->key = key;
    tptr->line = line;
    tptr->col1 = col1;
    tptr->col2 = col1 + len;
-   n_command_areas++;
    tptr[1].key = 0;        /* move the null terminator ahead */
 }
 
@@ -6014,6 +6017,7 @@ Shutdown_program:
       free( ids);
    if( mpc_color_codes)
       free( mpc_color_codes);
+   free( command_areas);
    clean_up_find_orb_memory( );
    return( 0);
 }
