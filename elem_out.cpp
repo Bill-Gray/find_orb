@@ -1099,12 +1099,12 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
       fprintf( ofile, "\n                 \"discovery_asterisk\" : \"%c\",",
                                        obs[i].discovery_asterisk);
       fprintf( ofile, "\n                 \"flags\" : %d,", obs[i].flags);
-      fprintf( ofile, "\n                 \"incl\" : %d", obs[i].is_included);
+      fprintf( ofile, "\n                 \"incl\" : %d,", obs[i].is_included);
       ecliptic_lon = atan2( obs[i].vect[1], obs[i].vect[0]);
       ecliptic_lat = asine( obs[i].vect[2]);
-      fprintf( ofile, "\n                 \"ecliptic_lon\" : %f",
+      fprintf( ofile, "\n                 \"ecliptic_lon\" : %f,",
                                     centralize_ang( ecliptic_lon) * 180. / PI);
-      fprintf( ofile, "\n                 \"ecliptic_lat\" : %f",
+      fprintf( ofile, "\n                 \"ecliptic_lat\" : %f,",
                                                    ecliptic_lat * 180. / PI);
       ecliptic_lon = 100.46435 + (obs[i].jd - J2000) * 0.9856091005;
       ecliptic_lon *= PI / 180.;
