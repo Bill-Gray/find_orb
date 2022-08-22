@@ -2807,6 +2807,8 @@ static void PDC_set_title( const char *title)
 }
 #endif
 
+static SCREEN *screen_ptr;
+
 static inline int initialize_curses( const int argc, const char **argv)
 {
    FILE *ifile = fopen_ext( "command.txt", "fcrb");
@@ -2824,11 +2826,12 @@ static inline int initialize_curses( const int argc, const char **argv)
 #ifdef XCURSES
    resize_term( 50, 98);
    Xinitscr( argc, (char **)argv);
+   screen_ptr = SP;
 #else
    INTENTIONALLY_UNUSED_PARAMETER( argc);
    INTENTIONALLY_UNUSED_PARAMETER( argv);
-   if( force_eight_color_mode || !newterm( "xterm-256color", stdout, stdin))
-      initscr( );
+   if( force_eight_color_mode || !(screen_ptr = newterm( "xterm-256color", stdout, stdin)))
+      screen_ptr = newterm( NULL, stdout, stdin);
 #endif
    if( debug_level > 2)
       debug_printf( "Curses initialised, ");
@@ -5992,10 +5995,8 @@ int main( int argc, const char **argv)
    show_final_line( n_obs, curr_obs, COLOR_BACKGROUND);
 Shutdown_program:
    full_endwin( );                 /* terminals to end mouse movement */
-#ifdef __PDCURSESMOD__      /* Not really needed,  but ensures Valgrind  */
-    PDC_free_memory_allocations( );      /* says all memory was freed */
-#endif
-   curses_running = false;
+   delscreen( screen_ptr);  /* Not really needed,  but ensures Valgrind  */
+   curses_running = false;               /* says all memory was freed */
    if( obs && n_obs)
       {
       create_obs_file( obs, n_obs, 0, residual_format);
