@@ -1468,7 +1468,7 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
          const int n_lines = getmaxy( stdscr) - 3;
          int column_width = (force_full_width_display ? 40 : 16);
          int c, n_cols = xmax / column_width;
-         char buff[280];
+         char *buff = (char *)malloc( xmax + 1);
          const int x0 = xmax - 25;  /* column where buttons start */
 
          if( choice < 0)
@@ -1492,7 +1492,7 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
             int color = COLOR_BACKGROUND;
             const bool in_last_column = (i >= n_lines * (n_cols - 1));
             const int this_column_width = (in_last_column ?
-                    xmax - (n_cols - 1) * column_width + 1 : column_width);
+                    xmax - (n_cols - 1) * column_width : column_width);
 
             if( i + curr_page < n_ids)
                {
@@ -1732,6 +1732,7 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
                rval = -2;
                break;
             }
+         free( buff);
          }
       if( debug_level > 3)
          debug_printf( "rval = %d; leaving select_object_in_file\n", rval);
