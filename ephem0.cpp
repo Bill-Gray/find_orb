@@ -2479,7 +2479,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
             geo[j] = orbi[j] - geo_posn[j];
          if( !obj_n)
             {
-            if( group_data)
+            if( *group_data)
                set_group_loc( group_data, utc, cinfo,
                            geo, geo_posn);
             compute_observer_loc( ephemeris_t, cinfo->planet,
@@ -2805,7 +2805,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                         sun_ra_dec = obj_ra_dec;
                      }
                   obj_ra_dec.x = -obj_ra_dec.x;
-                  if( is_geocentric && !group_data)
+                  if( is_geocentric && !*group_data)
                      {
                      cinfo->lon = best_latlon.x;
                      cinfo->lat = best_latlon.y;
