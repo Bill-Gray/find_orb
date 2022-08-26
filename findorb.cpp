@@ -105,7 +105,6 @@ static bool _mouse_movements_are_reported = false;
 #include "mpc_obs.h"
 #include "date.h"
 #include "monte0.h"
-#include "expcalc.h"
 #include "stringex.h"
 
 int debug_level = 0;
@@ -1424,7 +1423,7 @@ static void object_comment_text( char *buff, const OBJECT_INFO *id)
 {
    int i;
 
-   sprintf( buff, "%d obs; ", id->n_obs);
+   snprintf_err( buff, 12, "%d obs; ", id->n_obs);
    make_date_range_text( buff + strlen( buff), id->jd_start, id->jd_end);
    if( id->jd_updated != id->jd_end)
       {
@@ -1497,13 +1496,13 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
             if( i + curr_page < n_ids)
                {
                if( show_packed)
-                  snprintf( desig, sizeof( desig), "'%s'",
+                  snprintf_err( desig, sizeof( desig), "'%s'",
                              ids[i + curr_page].packed_desig);
                else
-                  strcpy( desig, ids[i + curr_page].obj_name);
+                  strlcpy_error( desig, ids[i + curr_page].obj_name);
                if( i + curr_page == choice)
                   {
-                  sprintf( buff, "Object %d of %d: %s",
+                  snprintf_err( buff, xmax, "Object %d of %d: %s",
                               choice + 1, n_ids, desig);
                   buff[x0] = '\0';
                   put_colored_text( buff, n_lines + 1, 0, -1,
@@ -1519,7 +1518,7 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
                      color = COLOR_OBS_INFO;
                if( this_column_width > 40)
                   {
-                  strcat( desig, " ");
+                  strlcat_error( desig, " ");
                   object_comment_text( desig + strlen( desig), ids + i + curr_page);
                   }
                desig[this_column_width - 1] = ' ';
@@ -1527,7 +1526,7 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
                }
             else                        /* just want to erase space: */
                *desig = '\0';
-            sprintf( buff, "%-*s", this_column_width, desig);
+            snprintf_err( buff, xmax + 1, "%-*s", this_column_width, desig);
             put_colored_text( buff, i % n_lines,
                    (i / n_lines) * column_width, this_column_width, color);
             }
@@ -1853,7 +1852,7 @@ static unsigned show_basic_info( const OBSERVE FAR *obs, const int n_obs,
    return( line);
 }
 
-static int select_central_object( char *buff, const bool dialog_text_only)
+static int select_central_object( char *buff, const size_t buffsize, const bool dialog_text_only)
 {
    extern int forced_central_body;
    int i, c;
@@ -1864,29 +1863,29 @@ static int select_central_object( char *buff, const bool dialog_text_only)
       {
       bool is_selected = (i == forced_central_body);
 
-      sprintf( buff + strlen( buff), "%c (%c) ",
+      snprintf_append( buff, buffsize, "%c (%c) ",
                hotkeys[i + 2], is_selected ? '*' : ' ');
       switch( i)
          {
          case -2:
-            strcat( buff, "Automatic\n");
+            strlcat( buff, "Automatic\n", buffsize);
             break;
          case -1:
-            strcat( buff, "Barycentric\n");
+            strlcat( buff, "Barycentric\n", buffsize);
             break;
          case 0:
-            strcat( buff, "Heliocentric\n");
+            strlcat( buff, "Heliocentric\n", buffsize);
             break;
          default:
             {
-            strcat( buff, get_find_orb_text( 99108 + i - 1));
-            strcat( buff, "\n");
+            strlcat( buff, get_find_orb_text( 99108 + i - 1), buffsize);
+            strlcat( buff, "\n", buffsize);
             }
          }
       }
    if( dialog_text_only)
       return( 0);
-   strcat( buff, get_find_orb_text( 96002));    /* 'Cancel' */
+   strlcat( buff, get_find_orb_text( 96002), buffsize);    /* 'Cancel' */
    c = inquire( buff, NULL, 0, COLOR_DEFAULT_INQUIRY);
    if( c && (tptr = strchr( hotkeys, toupper( c))) != NULL)
       c = KEY_F( 1) + (int)( tptr - hotkeys);
@@ -3370,7 +3369,7 @@ static void setup_elements_dialog( char *buff, const char *constraints)
    for( pass = 0; pass < 2; pass++)
       {
       if( pass)
-         select_central_object( tbuff, true);
+         select_central_object( tbuff, sizeof( tbuff), true);
       else
          element_frame_dialog_text( tbuff);
       tptr = strchr( tbuff, '*');
@@ -5499,7 +5498,7 @@ int main( int argc, const char **argv)
             add_off_on = (residual_format & RESIDUAL_FORMAT_MAG_RESIDS);
             break;
          case '+':
-            select_central_object( tbuff, false);
+            select_central_object( tbuff, sizeof( tbuff), false);
             update_element_display = 1;
             break;
          case '[':
