@@ -1622,7 +1622,7 @@ FILE *open_json_file( char *filename, const char *env_ptr, const char *default_n
          real_packed_desig( tbuff, packed_desig);
       text_search_and_replace( filename, "%p", tbuff);
       text_search_and_replace( filename, "%c", ephem_mpc_code);
-      sprintf( tbuff, "%x", random_seed);
+      snprintf_err( tbuff, sizeof( tbuff), "%x", random_seed);
       text_search_and_replace( filename, "%r", tbuff);
 #ifndef _WIN32
       fix_home_dir( filename);
@@ -2284,14 +2284,14 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
       strlcpy_error( hr_min_text, pre_texts[hh_mm]);
       if( n_step_digits)
          {
-         strcat( hr_min_text, ".");
+         strlcat_error( hr_min_text, ".");
          for( i = n_step_digits; i; i--)
             {
             char tbuff[2];
 
             tbuff[0] = step_units;
             tbuff[1] = '\0';
-            strcat( hr_min_text, tbuff);
+            strlcat_error( hr_min_text, tbuff);
             }
          }
       if( note_text)
@@ -2569,7 +2569,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                                  topo[j] * posn_mult);
             if( ephem_type == OPTION_STATE_VECTOR_OUTPUT)
                {
-               strcat( buff, " ");
+               strlcat_error( buff, " ");
                for( j = 12, tval = vel_mult; tval > 1.2; j--)
                   tval /= 10.;
                snprintf( format_text, sizeof( format_text), "%%21.%df", j+5);
@@ -2921,7 +2921,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                else
                   {
                   full_ctime( buff, curr_jd, date_format);
-                  strcat( buff, " ");
+                  strlcat_error( buff, " ");
                   }
                iso_time( alt_buff + strlen( alt_buff), curr_jd, 0);
                if( !(options & OPTION_SUPPRESS_RA_DEC))
@@ -4279,7 +4279,7 @@ void recreate_observation_line( char *obuff, const OBSERVE FAR *obs,
 
    if( obs->note2 == 'R')     /* for radar obs,  we simply store the */
       {                       /* original observation line           */
-      strcpy( obuff, obs->second_line + 81);
+      strlcpy_err( obuff, obs->second_line + 81, 81);
       return;
       }
 // set_obs_to_microday( &tobs);
@@ -4657,7 +4657,7 @@ static unsigned get_list_of_stations( const unsigned n_obs,
          {
          assert( strlen( obs_data[i].mpc_code) == 3);
          memmove( stations + j + 1, stations + j, (n_stations - j)  * sizeof( stations[0]));
-         strcpy( stations[j], obs_data[i].mpc_code);
+         strlcpy( stations[j], obs_data[i].mpc_code, 4);
          n_stations++;
          assert( n_stations < max_n_stations);
          }

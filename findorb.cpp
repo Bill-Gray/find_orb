@@ -860,7 +860,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
          }
       else
          {
-         strcpy( buff, "(Ephemeris starting time isn't valid)\n");
+         strlcpy_error( buff, "(Ephemeris starting time isn't valid)\n");
          jd_start = jd_end = 0.;
          }
 
@@ -1086,7 +1086,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             break;
          case 'c': case 'C':
             {
-            strcpy( buff, get_find_orb_text( 2064));
+            strlcpy_error( buff, get_find_orb_text( 2064));
             _set_radio_button( buff, ephem_type);
             help_file_name = "eph_type.txt";
             c = inquire( buff, NULL, 0, COLOR_DEFAULT_INQUIRY);
@@ -1174,11 +1174,11 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                if( strlen( buff) < 3)
                   err_msg = "MPC codes must be at least three characters long";
                else if( strlen( buff) < 50 || !memcmp( buff, "Ast", 3))
-                  strcpy( mpc_code, buff);
+                  strlcpy_error( mpc_code, buff);
                else if( !get_observer_data( buff, buff, NULL))
                   {
                   buff[3] = '\0';
-                  strcpy( mpc_code, buff);
+                  strlcpy_error( mpc_code, buff);
                   }
                }
             break;
@@ -1187,17 +1187,17 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                            OPTION_SUN_HELIO_VEL_PA | OPTION_ORBIT_PLANE_ANGLE;
             break;
          case ALT_D:
-            strcpy( ephemeris_start, "+0");
+            strlcpy_error( ephemeris_start, "+0");
             ephemeris_output_options &= ~7;
                      /* FALLTHRU */
          case ALT_G:
-            strcpy( mpc_code, "500");
+            strlcpy_error( mpc_code, "500");
             break;
          case '%':
             ephemeris_output_options ^= OPTION_GALACTIC_CONFUSION;
             break;
          case ALT_L:
-            strcpy( mpc_code, "Lun");
+            strlcpy_error( mpc_code, "Lun");
             break;
          case ALT_O:                         /* set 'observables' */
             ephemeris_output_options &= ~7;
@@ -1229,7 +1229,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             ephemeris_output_options ^= OPTION_RADIAL_VEL_OUTPUT;
             break;
          case 's': case 'S': case KEY_F( 5):
-            strcpy( buff, ephemeris_step_size);
+            strlcpy_error( buff, ephemeris_step_size);
             if( !inquire( "Enter step size in days: ",
                                       buff, sizeof( buff), COLOR_MESSAGE_TO_USER))
                {
@@ -1242,7 +1242,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                      buff[1] = ' ';
                   }
                if( *buff)
-                  strcpy( ephemeris_step_size, buff);
+                  strlcpy_error( ephemeris_step_size, buff);
                }
             break;
          case '-':         /* reverse ephemeris direction */
@@ -1272,7 +1272,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                }
             break;
          case ALT_T:
-            strcpy( ephemeris_start, "+0");
+            strlcpy_error( ephemeris_start, "+0");
             break;
          case 'u': case 'U':
             if( vect_time_units)
@@ -1800,11 +1800,11 @@ static unsigned show_basic_info( const OBSERVE FAR *obs, const int n_obs,
    FILE *ifile = fopen_ext( "command.txt", "fcrb");
 
    get_r1_and_r2( n_obs, obs, &r1, &r2);    /* orb_func.cpp */
-   strcpy( buff, "R1:");
+   strlcpy_error( buff, "R1:");
    format_dist_in_buff( buff + 3, r1);
    put_colored_text( buff, 0, 0, 15, COLOR_BACKGROUND);
 
-   strcpy( buff, "  R2:");
+   strlcpy_error( buff, "  R2:");
    format_dist_in_buff( buff + 5, r2);
    put_colored_text( buff, 0, 10, -1, COLOR_BACKGROUND);
 
@@ -1907,14 +1907,14 @@ void show_perturbers( const unsigned line)
       char buff[20];
       char perturber_letter = (i == 10 ? 'a' : '0' + (i + 1) % 10);
 
-      strcpy( buff, "(o)");
+      strlcpy_error( buff, "(o)");
       if( (perturbers >> shift_amt) & 1)
          color = COLOR_HIGHLIT_BUTTON;
       else
          buff[1] = perturber_letter;
       put_colored_text( buff, line, i * 7, 3, color);
       add_cmd_area( perturber_letter, line, i * 7, 6);
-      strcpy( buff, get_find_orb_text( 99108 + i));
+      strlcpy_error( buff, get_find_orb_text( 99108 + i));
       strcpy( (char *)find_nth_utf8_char( buff, 3), " ");
       put_colored_text( buff, line, i * 7 + 3, (int)strlen( buff),
                                        COLOR_BACKGROUND);
@@ -2076,7 +2076,7 @@ static int show_station_info( const OBSERVE FAR *obs, const int n_obs,
                                         obs[curr_obs].mpc_code);
 
 //    put_colored_text( "", line_no, 0, -1, COLOR_BACKGROUND);
-      sprintf( buff, "(%s)", mpc_color_codes[i].code);
+      snprintf_err( buff, sizeof( buff), "(%s)", mpc_color_codes[i].code);
       put_colored_text( "(   ) ", line_no, 0, 6, COLOR_BACKGROUND);
       show_mpc_code_in_color( mpc_color_codes[i].code, line_no, 1);
       put_observer_data_in_text( mpc_color_codes[i].code, buff);
@@ -2101,7 +2101,7 @@ static void show_one_observation( OBSERVE obs, const int line,
    format_observation( &obs, buff,
                         (residual_format & ~(3 | RESIDUAL_FORMAT_TIME))
                         | RESIDUAL_FORMAT_FOUR_DIGIT_YEARS);
-   strcpy( resid_data, buff + 49);
+   strlcpy_error( resid_data, buff + 49);
    *resid_data = ' ';
    switch( GET_RESID_TIME_FORMAT( residual_format))
       {
@@ -2175,7 +2175,7 @@ static void show_residual_legend( const int line_no, const int residual_format)
 {
    char buff[290];
 
-   strcpy( buff, legend);
+   strlcpy_error( buff, legend);
    if( residual_format & (RESIDUAL_FORMAT_TIME_RESIDS | RESIDUAL_FORMAT_NORMALIZED))
       {         /* residuals in time & cross-time, not RA and dec */
       char *text_loc;
@@ -2237,7 +2237,7 @@ static void show_a_file( const char *filename, const int flags)
       ifile = fopen_ext( filename, "clrb");
    if( !ifile)
       {
-      sprintf( buff, "Couldn't open '%s'", filename);
+      snprintf_err( buff, sizeof( buff), "Couldn't open '%s'", filename);
       generic_message_box( buff, "o");
       return;
       }
@@ -2340,7 +2340,7 @@ static void show_a_file( const char *filename, const int flags)
          }
                /* show "scroll bar" to right of text: */
       show_right_hand_scroll_bar( 0, n_lines_to_show, top_line, n_lines);
-      sprintf( buff, "   Line %d of %d", line_no, n_lines);
+      snprintf_err( buff, sizeof( buff), "   Line %d of %d", line_no, n_lines);
       put_colored_text( buff, i, getmaxx( stdscr) - (int)strlen( buff) - 1,
                                  (int)strlen( buff), COLOR_FINAL_LINE);
       put_colored_text( "Back", i, 25, 4, COLOR_FINAL_LINE);
@@ -2357,15 +2357,15 @@ static void show_a_file( const char *filename, const int flags)
       put_colored_text( "Save", i, 50, 4, COLOR_FINAL_LINE);
       put_colored_text( "Copy", i, 55, 4, COLOR_FINAL_LINE);
 
-      strcpy( buff, msgs[msg_num] + 1);
+      strlcpy_error( buff, msgs[msg_num] + 1);
       if( *err_text)
-         strcpy( buff, err_text);
+         strlcpy_error( buff, err_text);
       else if( search_text[0])
          {
-         strcat( buff, "  Find: ");
-         strcat( buff, search_text);
+         strlcat_error( buff, "  Find: ");
+         strlcat_error( buff, search_text);
          if( !search_text_found)
-            strcat( buff, "   Search text not found");
+            strlcat_error( buff, "   Search text not found");
          }
       search_text_found = true;
       put_colored_text( buff, i, 0, (int)strlen( buff), msgs[msg_num][0] - '0');
@@ -2941,28 +2941,27 @@ static int user_select_file( char *filename, const char *title, const int flags)
       fix_home_dir( filename);
       return( 0);
       }
-   strcpy( cmd, "zenity --file-selection");
+   strlcpy_error( cmd, "zenity --file-selection");
    if( is_save_dlg)
-      strcat( cmd, " --save --confirm-overwrite");
+      strlcat_error( cmd, " --save --confirm-overwrite");
    snprintf_append( cmd, sizeof( cmd), " --title \"%s\"", title);
-   strcat( cmd, " 2>/dev/null");
+   strlcat_error( cmd, " 2>/dev/null");
    if( !try_a_file_dialog_program( filename, cmd))
       return( 0);
 
    memcpy( cmd, "yad   ", 6);
-   strcat( cmd, " 2>/dev/null");
    if( !try_a_file_dialog_program( filename, cmd))
       return( 0);
 
    snprintf( cmd, sizeof( cmd),
             "kdialog --get%sfilename :find_orb --title \"%s\"",
             (is_save_dlg ? "save" : "open"), title);
-   strcat( cmd, " 2>/dev/null");
+   strlcat_error( cmd, " 2>/dev/null");
    if( !try_a_file_dialog_program( filename, cmd))
       return( 0);
 
    snprintf( cmd, sizeof( cmd), "Xdialog --stdout --title \"%s\"", title);
-   strcat( cmd, " --fselect ~ 0 0");
+   strlcat_error( cmd, " --fselect ~ 0 0");
    rval = try_a_file_dialog_program( filename, cmd);
    if( !rval)
       return( 0);
@@ -3105,7 +3104,7 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
          put_colored_text( buff, (int)i++, 0, -1, COLOR_BACKGROUND);
       fclose( ifile);
 
-      strcpy( buff, get_find_orb_text( 2031));
+      strlcpy_err( buff, get_find_orb_text( 2031), buffsize);
       for( i = n_lines - 1; i && hotkeys[n_prev]
                                      && n_prev + 12 < (size_t)getmaxy( stdscr); i--)
          if( prev_files[i][0] != '#' && filename_fits_current_os( prev_files[i]))
@@ -3271,7 +3270,7 @@ static int non_grav_menu( char *message_to_user)
 
       force_model = models[c];
       n_extra_params = (force_model & 0xf);
-      strcpy( buff, get_find_orb_text( 2060));
+      strlcpy_error( buff, get_find_orb_text( 2060));
       tptr = _set_radio_button( buff, c) + 6;
       for( i = 0; tptr[i] >= ' '; i++)
          message_to_user[i] = tptr[i];
@@ -3342,7 +3341,7 @@ static int resid_format_menu( char *message_to_user, int resid_format)
             resid_format |= RESIDUAL_FORMAT_NORMALIZED;
             break;
          }
-      strcpy( buff, get_find_orb_text( 2062));
+      strlcpy_error( buff, get_find_orb_text( 2062));
       line_ptr = _set_radio_button( buff, c - '0') + 6;
       for( i = 0; line_ptr[i] >= ' '; i++)
          message_to_user[i] = line_ptr[i];
@@ -3383,7 +3382,7 @@ static void setup_elements_dialog( char *buff, const char *constraints)
          tbuff[i] = '\0';
          }
       else
-         strcpy( tbuff, "(?!)");
+         strlcpy_error( tbuff, "(?!)");
       text_search_and_replace( buff, (pass ? "$CEN" : "$FRA"), tbuff);
       }
    while( fgets( tbuff, sizeof( tbuff), ifile))
@@ -3590,7 +3589,7 @@ int main( int argc, const char **argv)
                combine_all_observations = arg;
                if( strlen( arg) > 12)
                   {           /* warn that packed desig is overlong */
-                  snprintf( tbuff, sizeof( tbuff), get_find_orb_text( 2066),
+                  snprintf_err( tbuff, sizeof( tbuff), get_find_orb_text( 2066),
                         arg, (int)strlen( arg));
                   inquire( tbuff, NULL, 30, COLOR_DEFAULT_INQUIRY);
                   return( -1);
@@ -3764,7 +3763,7 @@ int main( int argc, const char **argv)
             set_environment_ptr( tbuff, argv[i] + len + 1);
             }
          else if( !*ifilename)
-            strcpy( ifilename, argv[i]);
+            strlcpy_error( ifilename, argv[i]);
          }
 
    get_defaults( &ephemeris_output_options, &element_format,
@@ -3861,8 +3860,8 @@ int main( int argc, const char **argv)
                FILE *ifile;
                long file_offset;
 
-               strcpy( obj_name, ids[id_number].obj_name);
-               sprintf( tbuff, "Loading '%s'...", obj_name);
+               strlcpy_error( obj_name, ids[id_number].obj_name);
+               snprintf_err( tbuff, sizeof( tbuff), "Loading '%s'...", obj_name);
                put_colored_text( tbuff, getmaxy( stdscr) - 3,
                                     0, -1, COLOR_FINAL_LINE);
                if( debug_level)
@@ -3881,9 +3880,9 @@ int main( int argc, const char **argv)
                if( obs)
                   unload_observations( obs, n_obs);
 
-               strlcpy_err( tbuff, get_find_orb_text( 18), sizeof( tbuff));
-               strlcat_err( tbuff, " | ", sizeof( tbuff));
-               strlcat_err( tbuff, ids[id_number].obj_name, sizeof( tbuff));
+               strlcpy_error( tbuff, get_find_orb_text( 18));
+               strlcat_error( tbuff, " | ");
+               strlcat_error( tbuff, ids[id_number].obj_name);
                PDC_set_title( tbuff);
                show_splash_screen( );
                obs = load_object( ifile, ids + id_number, &curr_epoch,
@@ -4166,7 +4165,7 @@ int main( int argc, const char **argv)
          int xloc;
 
          if( add_off_on >= 0)
-            strcat( message_to_user, (add_off_on ? " on" : " off"));
+            strlcat_error( message_to_user, (add_off_on ? " on" : " off"));
          xloc = getmaxx( stdscr) - (int)strlen( message_to_user) - 1;
          put_colored_text( message_to_user, getmaxy( stdscr) - 1,
                            (xloc < 0 ? 0 : xloc), -1, COLOR_MESSAGE_TO_USER);
@@ -4198,7 +4197,7 @@ int main( int argc, const char **argv)
                   {                          /* update clock once a second */
                   const time_t t0 = time( NULL);
 
-                  strlcpy_err( tbuff, ctime( &t0) + 11, sizeof( tbuff));
+                  strlcpy_error( tbuff, ctime( &t0) + 11);
                   tbuff[9] = '\0';
                   put_colored_text( tbuff, clock_line,
                                  getmaxx( stdscr) - 9, 9, COLOR_OBS_INFO);
@@ -4238,7 +4237,8 @@ int main( int argc, const char **argv)
          const unsigned station_start_line = getmaxy( stdscr) - n_stations_shown;
 
          if( debug_mouse_messages)
-            sprintf( message_to_user, "x=%d y=%d z=%d button=%lx",
+            snprintf_err( message_to_user, sizeof( message_to_user),
+                              "x=%d y=%d z=%d button=%lx",
                               mouse_x, mouse_y, mouse_z, (unsigned long)button);
          if( mouse_wheel_motion && mouse_y < station_start_line)
             {
@@ -4261,7 +4261,7 @@ int main( int argc, const char **argv)
                     mpc_color_codes[mouse_y - station_start_line].code;
             char *tptr;
 
-            strcpy( tbuff, get_find_orb_text( 2050));
+            strlcpy_error( tbuff, get_find_orb_text( 2050));
             tptr = tbuff + 1;
             for( i = 0; i < (int)(list_codes & 3); i++)
                 tptr = strstr( tptr, "( )") + 1;
@@ -4363,7 +4363,7 @@ int main( int argc, const char **argv)
                         {                 /* right or middle button click/release */
                         char *search_code = obs[new_curr].mpc_code;
 
-                        strlcpy_err( tbuff, get_find_orb_text( 2022), sizeof( tbuff));
+                        strlcpy_error( tbuff, get_find_orb_text( 2022));
                         text_search_and_replace( tbuff, "$", search_code);
                         i = full_inquire( tbuff, NULL, 0, COLOR_MENU, mouse_y, mouse_x);
                         switch( i)
@@ -4394,7 +4394,7 @@ int main( int argc, const char **argv)
                                     else
                                        obs[i].flags &= ~OBS_IS_SELECTED;
                                     }
-                              snprintf( message_to_user, sizeof( message_to_user),
+                              snprintf_err( message_to_user, sizeof( message_to_user),
                                       "%d obs from (%s) %sselected\n",
                                       n_selected + n_deselected,
                                       search_code, (n_selected < n_deselected) ? "" : "de");
@@ -4521,7 +4521,7 @@ int main( int argc, const char **argv)
             extern bool use_sigmas;
 
             use_sigmas = !use_sigmas;
-            strcpy( message_to_user, get_find_orb_text( 19));
+            strlcpy_error( message_to_user, get_find_orb_text( 19));
                          /* "Weighting of posns/mags/times is" */
             add_off_on = use_sigmas;
             }
@@ -4532,7 +4532,7 @@ int main( int argc, const char **argv)
             obs[curr_obs].is_included ^= 1;
             for( i = 0; i < curr_obs; i++)
                obs[i].is_included = obs[curr_obs].is_included;
-            strcpy( message_to_user, get_find_orb_text( 20));
+            strlcpy_error( message_to_user, get_find_orb_text( 20));
             add_off_on = obs[curr_obs].is_included;
             break;
          case KEY_F(16):     /* Shift-F4:  select another object to add in */
@@ -4562,7 +4562,7 @@ int main( int argc, const char **argv)
             obs[curr_obs].is_included ^= 1;
             for( i = curr_obs; i < n_obs; i++)
                obs[i].is_included = obs[curr_obs].is_included;
-            strcpy( message_to_user, "All subsequent observations toggled");
+            strlcpy_error( message_to_user, "All subsequent observations toggled");
             add_off_on = obs[curr_obs].is_included;
             break;
          case KEY_F(3):          /* turn on/off all obs w/same observatory ID */
@@ -4570,7 +4570,7 @@ int main( int argc, const char **argv)
             for( i = 0; i < n_obs; i++)
                if( !FSTRCMP( obs[i].mpc_code, obs[curr_obs].mpc_code))
                   obs[i].is_included = obs[curr_obs].is_included;
-            strcpy( message_to_user, "All observations from xxx toggled");
+            strlcpy_error( message_to_user, "All observations from xxx toggled");
             FMEMCPY( message_to_user + 22, obs[curr_obs].mpc_code, 3);
             add_off_on = obs[curr_obs].is_included;
             break;
@@ -4615,7 +4615,7 @@ int main( int argc, const char **argv)
 #endif
          case 'a': case 'A':
             perturbers ^= (7 << 20);
-            strcpy( message_to_user, "Asteroids toggled");
+            strlcpy_error( message_to_user, "Asteroids toggled");
             add_off_on = (perturbers >> 20) & 1;
             break;
          case '!':
@@ -4636,7 +4636,7 @@ int main( int argc, const char **argv)
          case KEY_F(11):
          case CTRL( 'G'):
             auto_repeat_full_improvement ^= 1;
-            strcpy( message_to_user, "Automatic full improvement repeat is");
+            strlcpy_error( message_to_user, "Automatic full improvement repeat is");
             add_off_on = auto_repeat_full_improvement;
             break;
          case 'D':
@@ -4781,7 +4781,7 @@ int main( int argc, const char **argv)
                is_monte_orbit = true;
                memcpy( orbit2, orbit, 6 * sizeof( double));
                integrate_orbit( orbit2, curr_epoch, epoch_shown);
-               sprintf( message_to_user,
+               snprintf_err( message_to_user, sizeof( message_to_user),
                            (using_sr ? "Stat Ranging %d/%d" : "Monte Carlo %d/%d"),
                            n_clones_accepted,
                            monte_carlo_object_count);
@@ -4813,9 +4813,9 @@ int main( int argc, const char **argv)
                }
             else
                {
-               strcpy( message_to_user,
+               strlcpy_error( message_to_user,
                                (err ? "Full step FAILED" : "Full step taken"));
-               sprintf( message_to_user + strlen( message_to_user), "(%.5f s)",
+               snprintf_append( message_to_user, sizeof( message_to_user), "(%.5f s)",
                       (double)( clock( ) - t0) / (double)CLOCKS_PER_SEC);
                }
             }
@@ -4845,10 +4845,10 @@ int main( int argc, const char **argv)
                set_locs( orbit, curr_epoch, obs, n_obs);
                get_r1_and_r2( n_obs, obs, &r1, &r2);
                update_element_display = 1;
-               strcpy( message_to_user, "Gauss solution found");
+               strlcpy_error( message_to_user, "Gauss solution found");
                }
             else
-               strcpy( message_to_user, "Gauss method failed!");
+               strlcpy_error( message_to_user, "Gauss method failed!");
             }
             break;
          case '#':
@@ -4860,13 +4860,13 @@ int main( int argc, const char **argv)
             if( c == '#')
                {
                simplex_method( obs + i, n_obs - i, orbit, r1, r2, orbit_constraints);
-               strcpy( message_to_user, "Simplex method used");
+               strlcpy_error( message_to_user, "Simplex method used");
                }
             else
                {
                integrate_orbit( orbit, curr_epoch, obs[i].jd);
                superplex_method( obs + i, n_obs - i, orbit, orbit_constraints);
-               strcpy( message_to_user, "Superplex method used");
+               strlcpy_error( message_to_user, "Superplex method used");
                }
 //          integrate_orbit( orbit, obs[i].jd, curr_epoch);
             curr_epoch = obs[i].jd;
@@ -4903,11 +4903,11 @@ int main( int argc, const char **argv)
                   ;
                curr_epoch = obs[i].jd;
                update_element_display = 1;
-               strcpy( message_to_user, (c == ':') ? "Orbit linearized" :
+               strlcpy_error( message_to_user, (c == ':') ? "Orbit linearized" :
                                                   "Herget step taken");
                }
             else
-               strcpy( message_to_user, (c == ':') ? "Linearizing FAILED" :
+               strlcpy_error( message_to_user, (c == ':') ? "Linearizing FAILED" :
                                                   "Herget step FAILED");
             }
             break;
@@ -4918,7 +4918,8 @@ int main( int argc, const char **argv)
                ;
             curr_epoch = obs[i].jd;
             update_element_display = 1;
-            sprintf( message_to_user, "Radii set: %f %f", r1, r2);
+            snprintf_err( message_to_user, sizeof( message_to_user),
+                                     "Radii set: %f %f", r1, r2);
             break;
          case 'l': case 'L':
             if( !*orbit_constraints)
@@ -4933,14 +4934,14 @@ int main( int argc, const char **argv)
             else
                {
                *orbit_constraints = '\0';
-               strcpy( message_to_user, "Orbit is now unconstrained");
+               strlcpy_error( message_to_user, "Orbit is now unconstrained");
                }
             if( !strcmp( orbit_constraints, "K"))
-               strcpy( orbit_constraints, "e=1,b=282.81,l=35.22");
+               strlcpy_error( orbit_constraints, "e=1,b=282.81,l=35.22");
             if( !strcmp( orbit_constraints, "Me"))
-               strcpy( orbit_constraints, "e=1,i=72,O=72");
+               strlcpy_error( orbit_constraints, "e=1,i=72,O=72");
             if( !strcmp( orbit_constraints, "Ma"))
-               strcpy( orbit_constraints, "e=1,i=26,O=81"); /* q=.049? */
+               strlcpy_error( orbit_constraints, "e=1,i=26,O=81"); /* q=.049? */
             break;
          case 'm': case 'M':
             create_obs_file( obs, n_obs, 0, residual_format);
@@ -4963,7 +4964,8 @@ int main( int argc, const char **argv)
             else if( c == 'p' && element_precision < 15)
                element_precision++;
             update_element_display = 1;
-            sprintf( message_to_user, "%d digits\n", element_precision);
+            snprintf( message_to_user, sizeof( message_to_user),
+                                    "%d digits\n", element_precision);
             break;
          case CTRL( 'P'):
             if( !inquire( "Blunder probability: ", tbuff, sizeof( tbuff),
@@ -4994,7 +4996,8 @@ int main( int argc, const char **argv)
                   set_locs( orbit, curr_epoch, obs, n_obs);
                   total_sigma += sigma;
                   update_element_display = 1;
-                  sprintf( message_to_user,  "Epoch = %f (%f); sigma %f",
+                  snprintf( message_to_user,  sizeof( message_to_user),
+                           "Epoch = %f (%f); sigma %f",
                            curr_epoch, epoch_shown, total_sigma);
                   }
                }
@@ -5006,7 +5009,8 @@ int main( int argc, const char **argv)
             const double n_sigmas = improve_along_lov( orbit, curr_epoch,
                      eigenvects[0], n_extra_params + 6, n_obs, obs);
 
-            sprintf( message_to_user,  "Adjusted by %f sigmas", n_sigmas);
+            snprintf( message_to_user, sizeof( message_to_user),
+                                       "Adjusted by %f sigmas", n_sigmas);
             update_element_display = 1;
             }
             break;
@@ -5021,8 +5025,9 @@ int main( int argc, const char **argv)
                for( i = 0; i < n_obs - 1 && !obs[i].is_included; i++)
                   ;
                n_found = get_sr_orbits( orbits, obs + i, n_obs - i, 0, max_orbits, 3., 1.);
-               sprintf( message_to_user, "%d orbits computed: best score=%.3f\n",
-                      n_found, orbits[6]);
+               snprintf_err( message_to_user, sizeof( message_to_user),
+                                "%d orbits computed: best score=%.3f\n",
+                                n_found, orbits[6]);
                if( n_found)
                   {
                   push_orbit( curr_epoch, orbit);
@@ -5074,7 +5079,8 @@ int main( int argc, const char **argv)
                   if( tolower( tbuff[i]) == 'k')
                      r2 /= AU_IN_KM;
                   }
-               sprintf( message_to_user, "R1 = %f; R2 = %f", r1, r2);
+               snprintf_err( message_to_user, sizeof( message_to_user),
+                                                "R1 = %f; R2 = %f", r1, r2);
                }
             else if( *tbuff == 'g')
                {
@@ -5149,12 +5155,12 @@ int main( int argc, const char **argv)
          case 8:
             if( !pop_orbit( &curr_epoch, orbit))
                {
-               strcpy( message_to_user, "Last orbit operation undone");
+               strlcpy_error( message_to_user, "Last orbit operation undone");
                update_element_display = 1;
                set_locs( orbit, curr_epoch, obs, n_obs);
                }
             else
-               strcpy( message_to_user, "No more orbits to undo!");
+               strlcpy_error( message_to_user, "No more orbits to undo!");
             break;
          case 'V':         /* apply Vaisala method, without linearizing */
             if( !inquire( "Enter peri/apohelion distance: ", tbuff, sizeof( tbuff),
@@ -5224,10 +5230,12 @@ int main( int argc, const char **argv)
                                               vaisala_dist, &angle_param);
 
                   if( retval)
-                     sprintf( message_to_user, "Trial orbit error %d\n", retval);
+                     snprintf( message_to_user, sizeof( message_to_user),
+                                                "Trial orbit error %d\n", retval);
                   else
                      {
-                     sprintf( message_to_user, "Minimum at %f\n", angle_param);
+                     snprintf( message_to_user, sizeof( message_to_user),
+                                                "Minimum at %f\n", angle_param);
                      success = 1;
                      }
                   }
@@ -5237,7 +5245,8 @@ int main( int argc, const char **argv)
                                               vaisala_dist, angle_param);
 
                   if( retval)
-                     sprintf( message_to_user, "Trial orbit error %d\n", retval);
+                     snprintf_err( message_to_user, sizeof( message_to_user),
+                                                "Trial orbit error %d\n", retval);
                   else
                      {
                      if( c != 'V')
@@ -5282,7 +5291,7 @@ int main( int argc, const char **argv)
                       }
                    }
             single_obs_selected = true;
-            strcpy( message_to_user, "Worst observation found");
+            strlcpy_error( message_to_user, "Worst observation found");
             }
             break;
          case 'x': case 'X':
@@ -5290,7 +5299,7 @@ int main( int argc, const char **argv)
             unsigned n_found;
 
             add_off_on = toggle_selected_observations( obs, n_obs, &n_found);
-            snprintf( message_to_user, sizeof( message_to_user),
+            snprintf_err( message_to_user, sizeof( message_to_user),
                                        "%u observation(s) toggled", n_found);
             }
             break;
@@ -5315,7 +5324,8 @@ int main( int argc, const char **argv)
                delta_squared += state2[i] * state2[i];
                }
             t0 = nanoseconds_since_1970( ) - t0;
-            sprintf( message_to_user, "Change = %.3e AU = %.3e km; %lu.%lu seconds",
+            snprintf_err( message_to_user, sizeof( message_to_user),
+                              "Change = %.3e AU = %.3e km; %lu.%lu seconds",
                               sqrt( delta_squared),
                               sqrt( delta_squared) * AU_IN_KM,
                               (unsigned long)( t0 / one_billion),
@@ -5362,7 +5372,7 @@ int main( int argc, const char **argv)
             extern bool use_symmetric_derivatives;
 
             use_symmetric_derivatives = !use_symmetric_derivatives;
-            strcpy( message_to_user, "Symmetric derivatives are");
+            strlcpy_error( message_to_user, "Symmetric derivatives are");
             add_off_on = use_symmetric_derivatives;
             }
             break;
@@ -5370,7 +5380,7 @@ int main( int argc, const char **argv)
             {
             extern double integration_tolerance;
 
-            snprintf( tbuff, sizeof( tbuff), "Integration tolerance: (currently %.4g)",
+            snprintf_err( tbuff, sizeof( tbuff), "Integration tolerance: (currently %.4g)",
                                  integration_tolerance);
             if( !inquire( tbuff, tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY)
                                  && atof( tbuff) > 0.)
@@ -5402,12 +5412,12 @@ int main( int argc, const char **argv)
                         {
                         case 'm':
                            obs[i].mag_sigma = new_sig;
-                           snprintf( message_to_user, sizeof( message_to_user),
+                           snprintf_err( message_to_user, sizeof( message_to_user),
                                   "Magnitude sigma reset to %.3e", new_sig);
                            break;
                         case 't':
                            obs[i].time_sigma = new_sig / seconds_per_day;
-                           snprintf( message_to_user, sizeof( message_to_user),
+                           snprintf_err( message_to_user, sizeof( message_to_user),
                                   "Time sigma reset to %.3e seconds", new_sig);
                            break;
                         default:
@@ -5418,7 +5428,7 @@ int main( int argc, const char **argv)
                               }
                            else
                               set_tholen_style_sigmas( obs + i, tbuff);
-                           strcpy( message_to_user, "Positional uncertainty reset");
+                           strlcpy_error( message_to_user, "Positional uncertainty reset");
                            break;
                         }
                      }
@@ -5428,7 +5438,7 @@ int main( int argc, const char **argv)
             break;
          case '"':
             debug_mouse_messages ^= 1;
-            strcpy( message_to_user, "Mouse debugging");
+            strlcpy_error( message_to_user, "Mouse debugging");
             add_off_on = debug_mouse_messages;
             break;
          case '@':
@@ -5436,13 +5446,13 @@ int main( int argc, const char **argv)
             extern int setting_outside_of_arc;
 
             setting_outside_of_arc ^= 1;
-            strcpy( message_to_user, "Setting outside of arc turned");
+            strlcpy_error( message_to_user, "Setting outside of arc turned");
             add_off_on = setting_outside_of_arc;
             }
             break;
          case '(':
             set_locs( orbit, curr_epoch, obs, n_obs);
-            strcpy( message_to_user, "Full arc set");
+            strlcpy_error( message_to_user, "Full arc set");
             break;
          case ')':
             if( !inquire( "Enter name of file to be displayed: ",
@@ -5454,9 +5464,9 @@ int main( int argc, const char **argv)
             default_comet_magnitude_type =
                         'N' + 'T' - default_comet_magnitude_type;
             if( default_comet_magnitude_type == 'N')
-               strcpy( message_to_user, "Using nuclear mags for comets");
+               strlcpy_error( message_to_user, "Using nuclear mags for comets");
             else
-               strcpy( message_to_user, "Using total mags for comets");
+               strlcpy_error( message_to_user, "Using total mags for comets");
             }
          case KEY_MOUSE:   /* already handled above */
             break;
@@ -5477,12 +5487,12 @@ int main( int argc, const char **argv)
                   while( curr_obs > 0 && obs[curr_obs].jd > target_jd)
                      curr_obs--;
                single_obs_selected = true;
-               strcpy( message_to_user, "Stepped through observations");
+               strlcpy_error( message_to_user, "Stepped through observations");
                }
             else
                {
                residual_format = _obs_format_menu( residual_format, true);
-               strcpy( message_to_user, "Obs time format reset");
+               strlcpy_error( message_to_user, "Obs time format reset");
                }
             break;
          case 27:
@@ -5494,7 +5504,7 @@ int main( int argc, const char **argv)
             break;
          case '=':
             residual_format ^= RESIDUAL_FORMAT_MAG_RESIDS;
-            strcpy( message_to_user, "Magnitude residual display turned");
+            strlcpy_error( message_to_user, "Magnitude residual display turned");
             add_off_on = (residual_format & RESIDUAL_FORMAT_MAG_RESIDS);
             break;
          case '+':
@@ -5512,7 +5522,7 @@ int main( int argc, const char **argv)
                            "Many MPC codes listed" };
 
             list_codes = (list_codes + 1) % 3;
-            strcpy( message_to_user, messages[list_codes]);
+            strlcpy_error( message_to_user, messages[list_codes]);
             }
             break;
          case ',':
@@ -5522,12 +5532,12 @@ int main( int argc, const char **argv)
             {
             int eop_range[3];
 
-            snprintf( tbuff, sizeof( tbuff), "%s\n%s\n%s\n",
+            snprintf_err( tbuff, sizeof( tbuff), "%s\n%s\n%s\n",
                                  longname( ), termname( ), curses_version( ));
             snprintf_append( tbuff, sizeof( tbuff),
                         "%d pairs of %d colors\n", COLOR_PAIRS, COLORS);
             if( can_change_color( ))
-               strcat( tbuff, "Colors are changeable\n");
+               strlcat_error( tbuff, "Colors are changeable\n");
             snprintf_append( tbuff, sizeof( tbuff), "Find_Orb version %s\n",
                              find_orb_version_jd( NULL));
             format_jpl_ephemeris_info( tbuff + strlen( tbuff) - 1);
@@ -5549,7 +5559,8 @@ int main( int argc, const char **argv)
 #ifdef KEY_RESIZE
          case KEY_RESIZE:
             resize_term( 0, 0);
-            sprintf( message_to_user, "KEY_RESIZE: %d x %d",
+            snprintf_err( message_to_user, sizeof( message_to_user),
+                        "KEY_RESIZE: %d x %d",
                         getmaxx( stdscr), getmaxy( stdscr));
             break;
 #endif
@@ -5571,11 +5582,11 @@ int main( int argc, const char **argv)
                                     !using_normalized_resids);
 
                   if( !n_changed)
-                     strcpy( message_to_user, "No filtering done");
+                     strlcpy_error( message_to_user, "No filtering done");
                   else if( n_changed == -1)
-                     strcpy( message_to_user, "Filtering FAILED");
+                     strlcpy_error( message_to_user, "Filtering FAILED");
                   else
-                     snprintf( message_to_user, sizeof( message_to_user),
+                     snprintf_err( message_to_user, sizeof( message_to_user),
                                 "Rejections at %.3f %s; %d changes", cutoff,
                                  (using_normalized_resids ? "sigmas" : "arcsecs"),
                                  n_changed);
@@ -5588,18 +5599,18 @@ int main( int argc, const char **argv)
             if( residual_format & RESIDUAL_FORMAT_OVERPRECISE)
                {
                residual_format ^= RESIDUAL_FORMAT_OVERPRECISE;
-               strcpy( message_to_user, "Normal resids");
+               strlcpy_error( message_to_user, "Normal resids");
                }
             else if( residual_format & RESIDUAL_FORMAT_PRECISE)
                {
                residual_format ^=
                       (RESIDUAL_FORMAT_OVERPRECISE ^ RESIDUAL_FORMAT_PRECISE);
-               strcpy( message_to_user, "Super-precise resids");
+               strlcpy_error( message_to_user, "Super-precise resids");
                }
             else
                {
                residual_format ^= RESIDUAL_FORMAT_PRECISE;
-               strcpy( message_to_user, "Precise resids");
+               strlcpy_error( message_to_user, "Precise resids");
                }
             add_off_on = 1;
             }
@@ -5625,7 +5636,7 @@ int main( int argc, const char **argv)
             break;
 #ifdef ALT_MINUS
          case ALT_MINUS:
-            sprintf( message_to_user, "Extended %d obs",
+            snprintf_err( message_to_user, sizeof( message_to_user), "Extended %d obs",
                    extend_orbit_solution( obs, n_obs, 100., 365.25 * 20.));
             break;
 #endif
@@ -5639,7 +5650,8 @@ int main( int argc, const char **argv)
                   compute_observation_motion_details( obs + i, &m);
                   obs[i].jd += m.time_residual / seconds_per_day;
                   set_up_observation( obs + i);         /* mpc_obs.cpp */
-                  sprintf( message_to_user, "Timing errors zeroed for %s obs",
+                  snprintf( message_to_user, sizeof( message_to_user),
+                           "Timing errors zeroed for %s obs",
                            (c == ALT_T ? "all" : "selected"));
                   }
             break;
@@ -5675,15 +5687,15 @@ int main( int argc, const char **argv)
 #endif
             write_residuals_to_file( get_file_name( tbuff, residual_filename),
                              ifilename, n_obs, obs, RESIDUAL_FORMAT_SHORT);
-            sprintf( tbuff, "%s%s.htm", path, obs->packed_id);
+            snprintf_err( tbuff, sizeof( tbuff), "%s%s.htm", path, obs->packed_id);
             debug_printf( "Creating '%s'\n", tbuff);
             text_search_and_replace( tbuff, " ", "");
             make_pseudo_mpec( tbuff, obj_name);
-            strcpy( message_to_user, "Ephemeride-less pseudo-MPEC made");
+            strlcpy_error( message_to_user, "Ephemeride-less pseudo-MPEC made");
             }
             break;
          case KEY_F(22):    /* shift-f10 */
-            sprintf( message_to_user, "Euler = %f",
+            snprintf_err( message_to_user, sizeof( message_to_user), "Euler = %f",
                            euler_function( obs, obs + n_obs - 1));
             break;
          case KEY_F(20):    /* shift-f8 */
@@ -5718,7 +5730,7 @@ int main( int argc, const char **argv)
             break;
          case KEY_F(19):    /* shift-f7 */
             element_format ^= ELEM_OUT_ALTERNATIVE_FORMAT;
-            strcpy( message_to_user, "Alternative element format");
+            strlcpy_error( message_to_user, "Alternative element format");
             add_off_on = (element_format & ELEM_OUT_ALTERNATIVE_FORMAT);
             update_element_display = 1;
             break;
@@ -5732,7 +5744,7 @@ int main( int argc, const char **argv)
             tobs1 = obs[first];
             tobs2 = obs[last];
             if( find_circular_orbits( &tobs1, &tobs2, orbit, desired_soln++))
-               strcpy( message_to_user, "No circular orbits found");
+               strlcpy_error( message_to_user, "No circular orbits found");
             else
                {
                curr_epoch = tobs1.jd - tobs1.r / AU_PER_DAY;
@@ -5747,7 +5759,7 @@ int main( int argc, const char **argv)
             extern bool all_reasonable;
 
             all_reasonable = !all_reasonable;
-            strcpy( message_to_user,  "'All reasonable'");
+            strlcpy_error( message_to_user,  "'All reasonable'");
             add_off_on = all_reasonable;
             }
             break;
@@ -5756,7 +5768,7 @@ int main( int argc, const char **argv)
             break;
          case ALT_E:
             full_ctime( tbuff, curr_epoch, FULL_CTIME_YMD | FULL_CTIME_MILLIDAYS);
-            snprintf( message_to_user, sizeof( message_to_user),
+            snprintf_err( message_to_user, sizeof( message_to_user),
                         "Curr epoch %.40s = %.3f ", tbuff, curr_epoch);
             break;
          case ALT_M:
@@ -5789,7 +5801,7 @@ int main( int argc, const char **argv)
             extern int apply_debiasing;
 
             apply_debiasing ^= 1;
-            strcpy( message_to_user, "FCCT14 debiasing is");
+            strlcpy_error( message_to_user, "FCCT14 debiasing is");
             add_off_on = apply_debiasing;
             }
             break;
@@ -5813,7 +5825,7 @@ int main( int argc, const char **argv)
          case ALT_G:
             orbital_monte_carlo( orbit, obs, n_obs, curr_epoch, epoch_shown);
             update_element_display = 1;
-            strcpy( message_to_user, "Orbital MC generated");
+            strlcpy_error( message_to_user, "Orbital MC generated");
             break;
          case ALT_I:
             {
@@ -5823,7 +5835,7 @@ int main( int argc, const char **argv)
                inquire( get_find_orb_text( 2039), NULL, 0,
                                     COLOR_MESSAGE_TO_USER);
             else
-               strcpy( message_to_user, "Elements copied to clipboard");
+               strlcpy_error( message_to_user, "Elements copied to clipboard");
             }
             break;
          case ALT_K:
@@ -5831,7 +5843,7 @@ int main( int argc, const char **argv)
             extern int sigmas_in_columns_57_to_65;
 
             sigmas_in_columns_57_to_65 ^= 1;
-            strcpy( message_to_user, "Sigma display");
+            strlcpy_error( message_to_user, "Sigma display");
             add_off_on = sigmas_in_columns_57_to_65;
             }
             break;
@@ -5844,11 +5856,11 @@ int main( int argc, const char **argv)
             break;
          case '&':
             residual_format = _obs_format_menu( residual_format, false);
-            strcpy( message_to_user, "Obs RA/dec format reset");
+            strlcpy_error( message_to_user, "Obs RA/dec format reset");
             break;
          case 9:
             sort_obs_by_code = !sort_obs_by_code;
-            strcpy( message_to_user, sort_obs_by_code ?
+            strlcpy_error( message_to_user, sort_obs_by_code ?
                      "Obs sorted by MPC code" : "Obs sorted by date");
             break;
          case ALT_A:
@@ -5871,8 +5883,8 @@ int main( int argc, const char **argv)
             extern int integration_method;
 
             integration_method ^= 1;
-            strlcpy_err( message_to_user, integration_method ?
-                           "Using PD89" : "Using RKF", sizeof( message_to_user));
+            strlcpy_error( message_to_user, integration_method ?
+                           "Using PD89" : "Using RKF");
             }
             break;
          case ALT_X:
@@ -5881,11 +5893,11 @@ int main( int argc, const char **argv)
             break;
          case KEY_ADD_MENU_LINE:
             n_command_lines++;
-            strcpy( message_to_user, "Adding a menu line");
+            strlcpy_error( message_to_user, "Adding a menu line");
             break;
          case KEY_REMOVE_MENU_LINE:
             n_command_lines--;
-            strcpy( message_to_user, "Removing a menu line");
+            strlcpy_error( message_to_user, "Removing a menu line");
             break;
          case ALT_P:    /* see 'environ.def' comments for COMET_CONSTRAINTS */
             {
@@ -5911,7 +5923,7 @@ int main( int argc, const char **argv)
             }
             break;
          case CTRL( 'Y'):
-            snprintf( message_to_user, sizeof( message_to_user),
+            snprintf_err( message_to_user, sizeof( message_to_user),
                      "Exclusion file of %d obs written",
                                      write_excluded_observations_file( obs, n_obs));
             break;
@@ -5986,7 +5998,8 @@ int main( int argc, const char **argv)
          default:
             debug_printf( "Key %d hit\n", c);
             show_a_file( "dos_help.txt", 0);
-            sprintf( message_to_user, "Key %d ($%x, o%o) '%s' hit",
+            snprintf_err( message_to_user, sizeof( message_to_user),
+                               "Key %d ($%x, o%o) '%s' hit",
                                c, c, c, keyname( c));
             break;
          }
@@ -6005,13 +6018,14 @@ Shutdown_program:
    unload_observations( obs, n_obs);
 
    text_search_and_replace( mpc_code, " ", "_");
-   sprintf( tbuff, "%s 0 %d %d", mpc_code, residual_format, list_codes);
+   snprintf_err( tbuff, sizeof( tbuff), "%s 0 %d %d",
+                              mpc_code, residual_format, list_codes);
    set_environment_ptr( "CONSOLE_OPTS", tbuff);
    store_defaults( ephemeris_output_options, element_format,
          element_precision, max_residual_for_filtering,
          noise_in_arcseconds);
    set_environment_ptr( "EPHEM_START", ephemeris_start);
-   sprintf( tbuff, "%d", n_ephemeris_steps);
+   snprintf_err( tbuff, sizeof( tbuff), "%d", n_ephemeris_steps);
    set_environment_ptr( "EPHEM_STEPS", tbuff);
    set_environment_ptr( "EPHEM_STEP_SIZE", ephemeris_step_size);
    if( ids)
