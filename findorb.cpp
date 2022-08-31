@@ -5352,10 +5352,11 @@ int main( int argc, const char **argv)
                                 tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY))
                {
                extern double j2_multiplier;
+               extern double asteroid_magnitude_slope_param;
 
-               if( *tbuff != 'r')
-                  j2_multiplier = atof( tbuff);
-               else
+               if( *tbuff == 'G')
+                  asteroid_magnitude_slope_param = atof( tbuff + 1);
+               else if( *tbuff == 'r')
                   {
                   unsigned j;
 
@@ -5365,6 +5366,8 @@ int main( int argc, const char **argv)
                   n_obs = j;
                   update_element_display = 1;
                   }
+               else
+                  j2_multiplier = atof( tbuff);
                }
             break;
          case ALT_S:
