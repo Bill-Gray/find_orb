@@ -2549,13 +2549,33 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
             double posn_mult = 1., vel_mult = 1.;     /* default to AU & AU/day */
             double tval = 1.;
             char format_text[20];
+            int end_loc;
+            const char *vect_opts = get_environment_ptr( "VECTOR_OPTS");
 
             snprintf( buff, sizeof( buff), "%.5f", curr_jd);
-            sscanf( get_environment_ptr( "VECTOR_OPTS"), "%d,%lf,%lf",
-                        &ecliptic_coords, &posn_mult, &tval);
+            sscanf( vect_opts, "%d,%lf,%lf%n",
+                        &ecliptic_coords, &posn_mult, &tval, &end_loc);
             assert( tval);
             assert( posn_mult);
             vel_mult = posn_mult / tval;
+            if( vect_opts[end_loc] == ',')
+               {
+               double epoch_year = 2000., precess_matrix[9];
+
+               vect_opts += end_loc + 1;
+               if( vect_opts[0] == 't' || vect_opts[0] == 'm')
+                  epoch_year = JD_TO_YEAR( ephemeris_t);
+               else
+                  epoch_year = atof( vect_opts);
+               if( vect_opts[0] == 't')
+                  setup_precession_with_nutation( precess_matrix, epoch_year);
+               else
+                   setup_precession( precess_matrix, 2000., epoch_year);
+               assert( epoch_year > 1700.);
+               assert( epoch_year < 2300.);
+               precess_vector( precess_matrix, topo, topo);
+               precess_vector( precess_matrix, topo_vel, topo_vel);
+               }
             if( ecliptic_coords)
                {
                equatorial_to_ecliptic( topo);
