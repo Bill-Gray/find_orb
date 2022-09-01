@@ -1572,7 +1572,14 @@ static int _compute_lagrange_point( double *vect, const int point_number,
          snprintf( buff, sizeof( buff), "LAGRANGE_%03d%03d", obj1, obj2);
          multipliers = get_environment_ptr( buff);
          if( *multipliers)
-            multiplier = atof( multipliers + (lpoint - 1) * 10);
+            {
+            double mults[3];
+
+            i = sscanf( multipliers, "%lf,%lf,%lf",
+                        mults, mults + 1, mults + 2);
+            assert( i == 3);
+            multiplier = mults[lpoint - 1];
+            }
          }
       if( obj1 == 3 && obj2 == 10)     /* Earth-Moon case */
          {
