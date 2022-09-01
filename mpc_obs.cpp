@@ -618,22 +618,26 @@ static int get_asteroid_observer_data( const char *mpc_code, char *buff)
 {
    FILE *ifile = fopen_ext( "mu1.txt", "fcrb");
    char tbuff[100];
-   int line_no = 0;
+   int line_no = 0, rval = 0;
 
    assert( ifile);
-   while( fgets_trimmed( tbuff, sizeof( tbuff), ifile))
+   while( !rval && fgets_trimmed( tbuff, sizeof( tbuff), ifile))
       if( *tbuff != ';')
          {
          if( atoi( tbuff) == atoi( mpc_code + 3))
             {
-            strcpy( buff + 30, tbuff + 19);
-            memcpy( buff, mpc_code, 3);
-            return( line_no + 100);
+            if( buff)
+               {
+               strcpy( buff + 30, tbuff + 19);
+               memcpy( buff, mpc_code, 3);
+               }
+            rval = line_no + 100;
             }
          else
             line_no++;
          }
-   return( 0);
+   fclose( ifile);
+   return( rval);
 }
 
 /* For all MPC stations in ObsCodes.html,  the station name starts
@@ -858,9 +862,12 @@ int get_observer_data( const char FAR *mpc_code, char *buff, mpc_code_t *cinfo)
 
    if( !memcmp( mpc_code, "Ast", 3))
       {
-      assert( buff);
-      strcpy( buff, blank_line);
-      return( get_asteroid_observer_data( mpc_code, buff));
+      memset( cinfo, 0, sizeof( mpc_code_t));
+      if( buff)
+         strcpy( buff, blank_line);
+      rval = get_asteroid_observer_data( mpc_code, buff);
+      cinfo->planet = rval;
+      return( rval);
       }
 
    if( !curr_station || mpc_code_cmp( curr_station, mpc_code))
