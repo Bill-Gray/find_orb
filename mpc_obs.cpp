@@ -1031,6 +1031,8 @@ static int get_obs_alt_azzes( const OBSERVE FAR *obs, DPT *sun_alt_az,
    int rval = (get_observer_data_latlon( obs->mpc_code, NULL,
                                     &latlon.x, &latlon.y, NULL) != 3);
 
+   if( !memcmp( obs->mpc_code, "500", 3))
+      rval = -1;
    if( !rval)
       {
       DPT ra_dec;
