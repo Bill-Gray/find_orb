@@ -835,7 +835,7 @@ int main( int argc, const char **argv)
             extern char orbit_summary_text[];
             long file_offset = ids[i].file_offset - 40000L;
             int element_options = ELEM_OUT_ALTERNATIVE_FORMAT;
-            double epoch_shown, curr_epoch, orbit[12];
+            double epoch_shown, curr_epoch, orbit[2 * MAX_N_PARAMS];
             bool have_json_ephem = false;
 
                 /* Start a bit ahead of the actual data,  just in case */
@@ -933,8 +933,10 @@ int main( int argc, const char **argv)
                   ephemeris_mag_limit = 999.;
                   if( available_sigmas == COVARIANCE_AVAILABLE)
                      {
+                     extern int n_orbit_params;
+
                      n_orbits_in_ephem = 2;
-                     compute_variant_orbit( orbit + 6, orbit, 1.);
+                     compute_variant_orbit( orbit + n_orbit_params, orbit, 1.);
                      }
                   if( available_sigmas == SR_SIGMAS_AVAILABLE)
                      {

@@ -62,6 +62,7 @@ int write_excluded_observations_file( const OBSERVE *obs, int n_obs);
 char **load_file_into_memory( const char *filename, size_t *n_lines,
                         const bool fail_if_not_found);      /* mpc_obs.cpp */
 
+extern int n_orbit_params, force_model;
 extern int available_sigmas;
 
 typedef struct
@@ -69,7 +70,7 @@ typedef struct
    OBSERVE FAR *obs;
    int n_obs, n_params;
    const char *constraints;
-   double orbit[6];
+   double orbit[MAX_N_PARAMS];
    } simplex_context_t;
 
 static double simplex_scoring( void *icontext, const double *ivect)
@@ -85,7 +86,7 @@ static double simplex_scoring( void *icontext, const double *ivect)
       }
    else
       {
-      memcpy( context->orbit, ivect, 6 * sizeof( double));
+      memcpy( context->orbit, ivect, n_orbit_params * sizeof( double));
       set_locs( context->orbit, context->obs[0].jd, context->obs,
                                                     context->n_obs);
       }
@@ -99,7 +100,7 @@ int simplex_method( OBSERVE FAR *obs, int n_obs, double *orbit,
 {
    int i, iter;
    int max_iter = atoi( get_environment_ptr( "SIMPLEX_ITER"));
-   double rvals[6], *rptr[3], scores[3];
+   double rvals[MAX_N_PARAMS], *rptr[3], scores[3];
    simplex_context_t context;
 
    for( i = 0; i < 3; i++)
@@ -118,7 +119,7 @@ int simplex_method( OBSERVE FAR *obs, int n_obs, double *orbit,
       max_iter = 70;
    for( iter = 0; iter < max_iter; iter++)
       simplex_step( rptr, scores, simplex_scoring, &context, context.n_params);
-   memcpy( orbit, context.orbit, 6 * sizeof( double));
+   memcpy( orbit, context.orbit, n_orbit_params * sizeof( double));
    available_sigmas = NO_SIGMAS_AVAILABLE;
    return( iter);
 }
@@ -144,19 +145,21 @@ int superplex_method( OBSERVE FAR *obs, int n_obs, double *orbit, const char *co
 {
    int i, iter;
    int max_iter = atoi( get_environment_ptr( "SUPERPLEX_ITER"));
-   double rvals[42], *rptr[7], scores[7];
+   double *rptr[MAX_N_PARAMS + 1], scores[MAX_N_PARAMS + 1];
+   double *rvals = (double *)calloc( n_orbit_params * (n_orbit_params + 1),
+                                       sizeof( double));
    simplex_context_t context;
 
-   for( i = 0; i < 7; i++)
+   for( i = 0; i <= n_orbit_params; i++)
       {
-      rptr[i] = rvals + i * 6;
-      memcpy( rptr[i], orbit, 6 * sizeof( double));
-      if( i < 6)
+      rptr[i] = rvals + i * n_orbit_params;
+      memcpy( rptr[i], orbit, n_orbit_params * sizeof( double));
+      if( i < n_orbit_params)
          rptr[i][i] += (i < 3 ? .2 : .03);
       }
    context.obs = obs;
    context.n_obs = n_obs;
-   context.n_params = 6;
+   context.n_params = n_orbit_params;
    context.constraints = constraints;
    init_simplex( rptr, scores, simplex_scoring, &context, context.n_params);
 
@@ -164,8 +167,9 @@ int superplex_method( OBSERVE FAR *obs, int n_obs, double *orbit, const char *co
       max_iter = 70;
    for( iter = 0; iter < max_iter; iter++)
       simplex_step( rptr, scores, simplex_scoring, &context, context.n_params);
-   memcpy( orbit, context.orbit, 6 * sizeof( double));
+   memcpy( orbit, context.orbit, n_orbit_params * sizeof( double));
    available_sigmas = NO_SIGMAS_AVAILABLE;
+   free( rvals);
    return( iter);
 }
 
@@ -230,13 +234,9 @@ static STORED_ORBIT
    {
    STORED_ORBIT *prev;
    double epoch;
-   double orbit[6];
-   double solar_pressure[MAX_N_NONGRAV_PARAMS];
-   int n_extra_params;
+   double orbit[MAX_N_PARAMS];
+   int n_orbit_params, force_model;
    } *stored = NULL;
-
-extern double solar_pressure[];
-extern int n_extra_params;
 
 void push_orbit( const double epoch, const double *orbit)
 {
@@ -247,9 +247,9 @@ void push_orbit( const double epoch, const double *orbit)
       {
       head->prev = stored;
       head->epoch = epoch;
-      memcpy( head->orbit, orbit, 6 * sizeof( double));
-      memcpy( head->solar_pressure, solar_pressure, n_extra_params * sizeof( double));
-      head->n_extra_params = n_extra_params;
+      memcpy( head->orbit, orbit, n_orbit_params * sizeof( double));
+      head->n_orbit_params = n_orbit_params;
+      head->force_model = force_model;
       stored = head;
       }
 }
@@ -265,9 +265,9 @@ int pop_orbit( double *epoch, double *orbit)
       if( epoch)
          {
          *epoch = stored->epoch;
-         memcpy( orbit, stored->orbit, 6 * sizeof( double));
-         n_extra_params = stored->n_extra_params;
-         memcpy( solar_pressure, stored->solar_pressure, n_extra_params * sizeof( double));
+         n_orbit_params = stored->n_orbit_params;
+         force_model = stored->force_model;
+         memcpy( orbit, stored->orbit, n_orbit_params * sizeof( double));
          available_sigmas = NO_SIGMAS_AVAILABLE;
          }
       free( stored);
@@ -795,14 +795,12 @@ double generate_mc_variant_from_covariance( double *var_orbit,
 
    assert( eigenvects);
    memcpy( var_orbit, orbit, 6 * sizeof( double));
-   for( i = 0; i < 6 + n_extra_params; i++)
+   for( i = 0; i < n_orbit_params; i++)
       {
       const double g_rand = gaussian_random( );
 
-      for( j = 0; j < 6; j++)
+      for( j = 0; j < n_orbit_params; j++)
          var_orbit[j] += g_rand * eigenvects[i][j];
-      for( j = 0; j < n_extra_params; j++)
-         solar_pressure[j] += g_rand * eigenvects[i][j + 6];
       rval += g_rand * g_rand;
       }
    return( rval);

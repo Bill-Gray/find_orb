@@ -397,7 +397,7 @@ int main( const int argc, const char **argv)
    const int n_obs = ids[0].n_obs;
    extern int n_obs_actually_loaded;
    const int element_precision = 5;
-   double epoch_shown, curr_epoch, orbit[12];
+   double epoch_shown, curr_epoch, orbit[2 * MAX_N_PARAMS];
    double *orbits_to_use = orbit;
    extern const char *ephemeris_filename;
    extern const char *residual_filename;
@@ -436,8 +436,10 @@ int main( const int argc, const char **argv)
    create_obs_file( obs, n_obs_actually_loaded, 0, 0);
    if( available_sigmas == COVARIANCE_AVAILABLE)
       {
+      extern int n_orbit_params;
+
       n_orbits_in_ephem = 2;
-      compute_variant_orbit( orbit + 6, orbit, 1.);
+      compute_variant_orbit( orbit + n_orbit_params, orbit, 1.);
       }
    if( available_sigmas == SR_SIGMAS_AVAILABLE)
       {

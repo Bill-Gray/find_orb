@@ -153,7 +153,7 @@ void compute_variant_orbit( double *variant, const double *ref_orbit,
 char *make_config_dir_name( char *oname, const char *iname);  /* miscell.cpp */
 int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid);
 int put_elements_into_sof( char *obuff, const char *templat,
-         const ELEMENTS *elem,
+         const ELEMENTS *elem, const double *nongravs,
          const int n_obs, const OBSERVE *obs);                /* elem_ou2.cpp */
 uint64_t parse_bit_string( const char *istr);                /* miscell.cpp */
 const char *write_bit_string( char *ibuff, const uint64_t bits);
@@ -477,7 +477,6 @@ const double opposition_time = 238.;
 
 bool opposition_break( const OBSERVE *obs)
 {
-
    return( obs[1].jd - obs[0].jd > opposition_time);
 }
 
@@ -801,9 +800,9 @@ int geo_score( const double *orbit, const double epoch)
    extern unsigned n_sr_orbits;
    unsigned i, n_geo, n_orbits;
    const double gm = get_planet_mass( 3);
-   extern int n_extra_params;
+   extern int n_orbit_params;
 
-   if( n_extra_params)     /* don't bother with a geo score for objects */
+   if( n_orbit_params > 6) /* don't bother with a geo score for objects */
       return( -1);         /* so well-determined that we have non-gravs */
    if( available_sigmas == COVARIANCE_AVAILABLE)
       n_orbits = 100;
@@ -813,7 +812,8 @@ int geo_score( const double *orbit, const double epoch)
       return( -1);
    for( i = n_geo = 0; i < n_orbits; i++)
       {
-      double variant_orbit[6], earth_centric_orbit[6], r, vel_squared;
+      double variant_orbit[MAX_N_PARAMS], earth_centric_orbit[MAX_N_PARAMS];
+      double r, vel_squared;
       extern double *sr_orbits;
 
       if( available_sigmas == COVARIANCE_AVAILABLE)
@@ -831,12 +831,13 @@ int geo_score( const double *orbit, const double epoch)
 }
 
 static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
+                     const double *orbit,
                      const char *obj_name, const OBSERVE *obs,
                      const unsigned n_obs, const double *moids,
                      const char *body_frame_note, const bool show_obs,
                      const int geocentric_score)
 {
-   extern int n_extra_params;
+   extern int n_orbit_params;
    double jd = current_jd( );
    double jd_first, jd_last;
    double q_sigma = 0., weighted_rms;
@@ -958,15 +959,14 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
    if( !get_uncertainty( "sigma_Tp", buff, 0))
       fprintf( ofile, " \"Tp sigma\": %s,", buff);
    fprintf( ofile, "\n        \"Tp_iso\": \"%s\",", iso_time( buff, elem->perih_time, 3));
-   for( i = 0; i < n_extra_params; i++)
+   for( i = 6; i < n_orbit_params; i++)
       {
       char tbuff[20];
-      extern double solar_pressure[];
 
-      fprintf( ofile, "\n        \"A%d\": %.9g,", i + 1, solar_pressure[i]);
-      snprintf( tbuff, sizeof( tbuff), "Sigma_A%d:", i + 1);
+      fprintf( ofile, "\n        \"A%d\": %.9g,", i - 5, orbit[i]);
+      snprintf( tbuff, sizeof( tbuff), "Sigma_A%d:", i - 5);
       if( !get_uncertainty( tbuff, buff, 0))
-         fprintf( ofile, " \"sigma_A%d\": %s,", i + 1, buff);
+         fprintf( ofile, " \"sigma_A%d\": %s,", i - 5, buff);
       }
    if( elem->abs_mag)
       {
@@ -1336,7 +1336,7 @@ out the file doesn't actually exist yet,  we use the 'fallback_filename'
 to get the template line. */
 
 static int add_sof_to_file( const char *filename,
-             const ELEMENTS *elem,
+             const ELEMENTS *elem, const double *nongravs,
              const int n_obs, const OBSERVE *obs, const char *fallback_filename)
 {
    char templat[MAX_SOF_LEN], obuff[MAX_SOF_LEN];
@@ -1383,7 +1383,7 @@ static int add_sof_to_file( const char *filename,
                fseek( fp, -(long)strlen( obuff), SEEK_CUR);
                }
          }
-      rval = put_elements_into_sof( obuff, templat, elem, n_obs, obs);
+      rval = put_elements_into_sof( obuff, templat, elem, nongravs, n_obs, obs);
       fwrite( obuff, strlen( obuff), 1, fp);
       fclose( fp);
       }
@@ -1727,18 +1727,18 @@ int write_out_elements_to_file( const double *orbit,
    const char *file_permits = (append_elements_to_element_file ? "tfca" : "tfcw+");
    extern const char *elements_filename;
    FILE *ofile = fopen_ext( get_file_name( buff, elements_filename), file_permits);
-   double rel_orbit[6], orbit2[6];
+   double rel_orbit[MAX_N_PARAMS], orbit2[MAX_N_PARAMS];
    int planet_orbiting, n_lines, i, bad_elements = 0;
    ELEMENTS elem, helio_elem;
    char *tptr, *tbuff;
    char impact_buff[80];
    int n_more_moids = 0;
    int output_format = (precision | SHOWELEM_PERIH_TIME_MASK);
-   extern int n_extra_params;
+   extern int n_orbit_params;
    extern unsigned perturbers;
    int reference_shown = 0;
    double moids[N_MOIDS + 1];
-   double j2000_ecliptic_rel_orbit[6];
+   double j2000_ecliptic_rel_orbit[MAX_N_PARAMS];
    double barbee_style_delta_v = 0.;   /* see 'moid4.cpp' */
    const char *monte_carlo_permits;
    const bool rms_ok = (compute_rms( obs, n_obs) < max_monte_rms);
@@ -1767,7 +1767,7 @@ int write_out_elements_to_file( const double *orbit,
       fclose( ofile);
       return( -1);
       }
-   memcpy( orbit2, orbit, 6 * sizeof( double));
+   memcpy( orbit2, orbit, n_orbit_params * sizeof( double));
    integrate_orbit( orbit2, curr_epoch, epoch_shown);
    if( forced_central_body != ORBIT_CENTER_AUTO)
       {
@@ -1777,7 +1777,7 @@ int write_out_elements_to_file( const double *orbit,
    else
       planet_orbiting = find_best_fit_planet( epoch_shown, orbit2, rel_orbit);
 
-   memcpy( j2000_ecliptic_rel_orbit, rel_orbit, 6 * sizeof( double));
+   memcpy( j2000_ecliptic_rel_orbit, rel_orbit, n_orbit_params * sizeof( double));
    rotate_state_vector_to_current_frame( rel_orbit, epoch_shown, planet_orbiting,
                        body_frame_note);
 
@@ -1832,21 +1832,19 @@ int write_out_elements_to_file( const double *orbit,
    helio_ecliptic_j2000_vect[7] = elem.slope_param;
    helio_ecliptic_j2000_vect[8] = epoch_shown;
 
-   add_sof_to_file( (n_extra_params >= 2 ? "cmt_sof.txt" : sof_filename),
-                    &elem, n_obs, obs,
-                    (n_extra_params >= 2 ? "cometdef.sof" : "orbitdef.sof"));
+   add_sof_to_file( (n_orbit_params >= 8 ? "cmt_sof.txt" : sof_filename),
+                    &elem, orbit + 6, n_obs, obs,
+                    (n_orbit_params >= 8 ? "cometdef.sof" : "orbitdef.sof"));
    if( saving_elements_for_reuse && available_sigmas == COVARIANCE_AVAILABLE)
       {
-      extern double solar_pressure[];
-
-      add_sof_to_file( "orbits.sof", &elem, n_obs, obs, "orbitdef.sof");
-     _store_extra_orbit_info( obs->packed_id, perturbers, n_extra_params,
-                     solar_pressure, constraints);
+      add_sof_to_file( "orbits.sof", &elem, orbit + 6, n_obs, obs, "orbitdef.sof");
+      _store_extra_orbit_info( obs->packed_id, perturbers, n_orbit_params - 6,
+                     orbit + 6, constraints);
       }
 /* if( showing_sigmas == COVARIANCE_AVAILABLE)
 */    {
       ELEMENTS elem2 = elem;
-      double rel_orbit2[6];
+      double rel_orbit2[MAX_N_PARAMS];
 
       if( showing_sigmas == COVARIANCE_AVAILABLE)
          {
@@ -1855,7 +1853,7 @@ int write_out_elements_to_file( const double *orbit,
          }
       else        /* insert dummy elements */
          elem2.q = elem2.ecc = elem2.incl = elem2.arg_per = elem2.asc_node = 0.;
-      add_sof_to_file( sofv_filename, &elem2, n_obs, obs, "orbitdef.sof"); /* elem_ou2.cpp */
+      add_sof_to_file( sofv_filename, &elem2, orbit + 6, n_obs, obs, "orbitdef.sof"); /* elem_ou2.cpp */
       }
    helio_elem = elem;            /* Heliocentric J2000 ecliptic elems */
    helio_elem.central_obj = 0;
@@ -1874,7 +1872,7 @@ int write_out_elements_to_file( const double *orbit,
       {
       char *tt_ptr;
       char sigma_buff[80];
-      extern double solar_pressure[], uncertainty_parameter;
+      extern double uncertainty_parameter;
              /* "Solar radiation pressure at 1 AU",  in             */
              /* kg*AU^3 / (m^2*d^2),  from a private communication  */
              /* from Steve Chesley; see orb_func.cpp for details    */
@@ -1915,7 +1913,7 @@ int write_out_elements_to_file( const double *orbit,
                text_search_and_replace( buff, "TT", sigma_buff);
                }
 
-         if( (n_extra_params >= 2 && n_extra_params <= 4) || force_model == FORCE_MODEL_YARKO_A2)
+         if( (n_orbit_params >= 8 && n_orbit_params <= 10) || force_model == FORCE_MODEL_YARKO_A2)
             {
             char tbuff0[80], sig_name[20];
             int j = 0;
@@ -1924,9 +1922,9 @@ int write_out_elements_to_file( const double *orbit,
                j = 1;      /* A1 constrained to be zero -> don't show it */
             strcat( tt_ptr, "\n");
             tt_ptr += strlen( tt_ptr);
-            for( ; j < n_extra_params; j++)
+            for( ; j < n_orbit_params - 6; j++)
                {
-               put_double_in_buff( tbuff0, solar_pressure[j]);
+               put_double_in_buff( tbuff0, orbit[j + 6]);
                text_search_and_replace( tbuff0, " ", "");
                strcat( tbuff0, " ");
                sprintf( sig_name, "Sigma_A%d:", j + 1);
@@ -1941,14 +1939,14 @@ int write_out_elements_to_file( const double *orbit,
                   const int n_to_use = (force_model == FORCE_MODEL_YARKO_A2 ? 2 : j + 1);
 
                   snprintf_append( buff, sizeof( buff), "A%d: %s", n_to_use, tbuff0);
-                  if( j == n_extra_params - 1 || j == 2)
+                  if( j == n_orbit_params - 7 || j == 2)
                      {
                      strcat( tt_ptr, " AU/day^2");
                      if( is_inverse_square_force_model( ))
                         strcat( tt_ptr, " [1/r^2]");
                      }
                   }
-               if( j < n_extra_params - 1)
+               if( j < n_orbit_params - 7)
                   {
                   if( strlen( tt_ptr) > 50)
                      {
@@ -1971,7 +1969,7 @@ int write_out_elements_to_file( const double *orbit,
          if( force_model == FORCE_MODEL_SRP)
             {
             sprintf( tt_ptr, "; AMR %.5g",
-                                 solar_pressure[0] * SOLAR_GM / SRP1AU);
+                                 orbit[6] * SOLAR_GM / SRP1AU);
             if( showing_sigmas)
                consider_replacing( tt_ptr, "AMR", "Sigma_AMR:");
             strcat( tt_ptr, " m^2/kg");
@@ -2507,13 +2505,13 @@ int write_out_elements_to_file( const double *orbit,
    ofile = open_json_file( tbuff, "JSON_ELEMENTS_NAME", "elements.json", obs->packed_id,
                      "wb");
    assert( ofile);
-   elements_in_json_format( ofile, &elem, object_name, obs, n_obs, moids,
+   elements_in_json_format( ofile, &elem, orbit, object_name, obs, n_obs, moids,
                                              body_frame_note, true, geocentric_score);
    fclose( ofile);
    ofile = open_json_file( tbuff, "JSON_SHORT_ELEMENTS", "elem_short.json", obs->packed_id,
                      "wb");
    assert( ofile);
-   elements_in_json_format( ofile, &elem, object_name, obs, n_obs, moids,
+   elements_in_json_format( ofile, &elem, orbit, object_name, obs, n_obs, moids,
                                              body_frame_note, false, geocentric_score);
    fclose( ofile);
    make_linkage_json( n_obs, obs, &elem);
@@ -2793,7 +2791,7 @@ specify a TDB epoch.
 (and selenocentric) vectors,  and vectors in the body plane. */
 
 static double extract_state_vect_from_text( const char *text,
-            double *orbit, double *solar_pressure, double *abs_mag)
+            double *orbit, double *abs_mag)
 {
    char tbuff[81];
    size_t i = 0;
@@ -2852,11 +2850,11 @@ static double extract_state_vect_from_text( const char *text,
       else if( *text == 'A' && text[1] >= '1' && text[1] <= '3'
                   && text[2] == '=')
          {
-         extern int n_extra_params;
+         extern int n_orbit_params;
 
-         n_extra_params = text[1] - '1';
-         force_model = (n_extra_params | 0x10);   /* assume inverse square for the nonce */
-         solar_pressure[n_extra_params - 1] = atof( text + 3);
+         n_orbit_params = 6 + text[1] - '1';
+         force_model = ((n_orbit_params - 6) | 0x10);   /* assume inverse square for the nonce */
+         orbit[n_orbit_params - 7] = atof( text + 3);
          }
       while( *text != ',' && *text)
          text++;
@@ -2921,20 +2919,17 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
 {
    FILE *ifile = NULL;
    int got_vectors = 0, i;
-   extern int n_extra_params;
-   extern double solar_pressure[];
+   extern int n_orbit_params;
    char object_name[80];
    bool do_full_improvement = false;
    double abs_mag = 10.;         /* default value for 'dummy' use */
 
    get_object_name( object_name, obs->packed_id);
-   for( i = 0; i < MAX_N_NONGRAV_PARAMS; i++)
-      solar_pressure[i] = 0.;
-   n_extra_params = 0;
+   n_orbit_params = 6;
    if( state_vect_text)    /* state vect supplied on cmd line w/ '-v' */
       {
       *orbit_epoch = extract_state_vect_from_text(
-                  state_vect_text, orbit, solar_pressure, &abs_mag);
+                  state_vect_text, orbit, &abs_mag);
       got_vectors = (*orbit_epoch != 0.);
       }
    if( !got_vectors)
@@ -2977,19 +2972,20 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
                if( strstr( tptr, "sec"))
                   time_units = seconds_per_day;
                }
-            for( i = 0; i < MAX_N_NONGRAV_PARAMS; i++)
-                solar_pressure[i] = 0.;
+            for( i = 6; i < MAX_N_PARAMS; i++)
+                orbit[i] = 0.;
             n_read = sscanf( buff, "%lf%lf%lf%x%lf %lf %lf",
                           &orbit[0], &orbit[1], &orbit[2], perturbers,
-                          solar_pressure,
-                          solar_pressure + 1,
-                          solar_pressure + 2);
+                          orbit + 6, orbit + 7, orbit + 8);
             assert( n_read >= 3 && n_read < 8);
-            n_extra_params = n_read - 4;
-            if( n_extra_params <= 0)
-               n_extra_params = force_model = 0;
+            n_orbit_params = n_read + 2;
+            if( n_orbit_params <= 6)
+               {
+               n_orbit_params = 6;
+               force_model = 0;
+               }
             else
-               force_model = (n_extra_params | 0x10);  /* assume inv square for the nonce */
+               force_model = ((n_orbit_params - 6) | 0x10);  /* assume inv square for the nonce */
             fgets_trimmed( buff, sizeof( buff), ifile);
             sscanf( buff, "%lf%lf%lf%lf%lf%lf",
                           orbit + 3, orbit + 4, orbit + 5,
@@ -3052,14 +3048,17 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
                              object_name, orbit, &elems, full_arc_len, &rms_resid);
       if( got_vectors)
          {
+         int n_extra_params = 0;
+
          *orbit_epoch = elems.epoch;
          if( got_vectors == 1)
             *perturbers = 0x7fe;    /* Merc-Pluto plus moon */
          if( _get_extra_orbit_info( obs->packed_id, perturbers, &n_extra_params,
-                     solar_pressure, NULL))
+                     orbit + 6, NULL))
             got_vectors = 0;
          else
             {
+            n_orbit_params = n_extra_params + 6;
             if( n_obs > 1)
                {
                set_locs( orbit, *orbit_epoch, obs, n_obs);
@@ -3370,16 +3369,11 @@ int store_solution( const OBSERVE *obs, const int n_obs, const double *orbit,
          fprintf( ofile, "%21.16f", orbit[i]);
       if( perturbers)
          {
-         extern int n_extra_params;
+         extern int n_orbit_params;
 
          fprintf( ofile, " %04x", perturbers);
-         if( n_extra_params)
-            {
-            extern double solar_pressure[];
-
-            for( i = 0; i < n_extra_params; i++)
-               fprintf( ofile, " %.9g", solar_pressure[i]);
-            }
+         for( i = 6; i < n_orbit_params; i++)
+            fprintf( ofile, " %.9g", orbit[i + 6]);
          }
       get_first_and_last_included_obs( obs, n_obs, &i, &j);
       fprintf( ofile, "\n%21.16f%21.16f%21.16f %.3f %.5f %.5f\n",

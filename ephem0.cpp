@@ -127,6 +127,7 @@ bool is_default_ephem = true;
 const char *elements_filename = "elements.txt";
 
 static expcalc_config_t exposure_config;
+extern int n_orbit_params;
 
 /* Returns parallax constants (rho_cos_phi, rho_sin_phi) in AU. */
 
@@ -706,7 +707,6 @@ static void extract_field( field_location_t *field, const char *buff,
    strlcpy_error( field->obscode, groups->obscode);
 }
 
-
 static int find_precovery_plates( OBSERVE *obs, const int n_obs,
                            const char *idx_filename,
                            FILE *ofile, const double *orbit,
@@ -748,8 +748,8 @@ static int find_precovery_plates( OBSERVE *obs, const int n_obs,
    assert( groups);
    if( fread( groups, sizeof( field_group_t), n_groups, ifile) != n_groups)
       return( -3);
-   orbi = (double *)malloc( 12 * n_orbits * sizeof( double));
-   memcpy( orbi, orbit,     6 * n_orbits * sizeof( double));
+   orbi = (double *)malloc( 2 * n_orbit_params * n_orbits * sizeof( double));
+   memcpy( orbi, orbit,     n_orbit_params * n_orbits * sizeof( double));
    while( (n_fields_read = (int)fread( buff, COMPRESSED_FIELD_SIZE, FIELD_BUFF_N, ifile)) > 0)
       for( n = 0; n < n_fields_read; n++)
          {
@@ -799,9 +799,9 @@ static int find_precovery_plates( OBSERVE *obs, const int n_obs,
                                  p2->sun_obj, p2->r, p2->sun_earth, NULL);
             if( mag < limiting_mag && precovery_in_field( &field, p3, n_orbits, margin) > .01)
                {                          /* approx posn is on plate;  compute */
-               double *temp_orbit = orbi + 6 * n_orbits;
+               double *temp_orbit = orbi + n_orbit_params * n_orbits;
 
-               memcpy( temp_orbit, orbi, 6 * n_orbits * sizeof( double));
+               memcpy( temp_orbit, orbi, n_orbit_params * n_orbits * sizeof( double));
                memcpy( p3, p2, n_orbits * sizeof( obj_location_t));
                p3->jd = jdt;
                setup_obj_loc( p3, temp_orbit, n_orbits, epoch_jd, field.obscode);
@@ -1686,11 +1686,11 @@ static double find_closest_approach( const double *input_orbit, double jde,
                             const int planet_no, double *dist,
                             const double step, const double *prev_r)
 {
-   double orbit[6];
+   double orbit[MAX_N_PARAMS];
    int is_done = 0;
    brent_min_t b;
 
-   memcpy( orbit, input_orbit, 6 * sizeof( double));
+   memcpy( orbit, input_orbit, n_orbit_params * sizeof( double));
    brent_min_init( &b, jde, prev_r[0] * prev_r[0],
                 jde - step, prev_r[1] * prev_r[1],
                 jde - 2. * step, prev_r[2] * prev_r[2]);
@@ -2228,9 +2228,9 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
       abs_mag = atof( get_environment_ptr( "ABS_MAG"));
    if( ephem_type != OPTION_OBSERVABLES || !(options & OPTION_SHOW_SIGMAS))
       n_objects = 1;
-   orbits_at_epoch = (double *)calloc( n_objects, 8 * sizeof( double));
-   memcpy( orbits_at_epoch, orbit, n_objects * 6 * sizeof( double));
-   stored_ra_decs = (DPT *)( orbits_at_epoch + 6 * n_objects);
+   orbits_at_epoch = (double *)calloc( n_objects * (n_orbit_params + 2), sizeof( double));
+   memcpy( orbits_at_epoch, orbit, n_objects * n_orbit_params * sizeof( double));
+   stored_ra_decs = (DPT *)( orbits_at_epoch + n_orbit_params * n_objects);
    setvbuf( ofile, NULL, _IONBF, 0);
    switch( step_units)
       {
@@ -2466,11 +2466,11 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
       strlcpy_error( buff, "Nothing to see here... move along... uninteresting... who cares?...");
       for( obj_n = 0; obj_n < n_objects; obj_n++)
          {
-         double *orbi = orbits_at_epoch + obj_n * 6;
+         double *orbi = orbits_at_epoch + obj_n * n_orbit_params;
          double radial_vel, v_dot_r;
          double topo[3], topo_vel[3], geo[3], r;
          double topo_ecliptic[3];
-         double orbi_after_light_lag[6];
+         double orbi_after_light_lag[MAX_N_PARAMS];
          OBSERVE temp_obs;
          int j;
 
@@ -3875,7 +3875,6 @@ static void show_dd_hh_mm_ss_point_sss( char *text,
 static void put_mag_resid( char *output_text, const double obs_mag,
                            const double computed_mag, const char mag_band)
 {
-
    INTENTIONALLY_UNUSED_PARAMETER( mag_band);
 
    if( obs_mag < BLANK_MAG && computed_mag)
@@ -4223,7 +4222,6 @@ void format_observation( const OBSERVE FAR *obs, char *text,
       }
 }
 
-
 /* The MPC report format goes to only six decimal places in time,
 a "microday".  If the reported time is more precise than that -- as can
 happen with video observations -- a workaround is to make use of the object
@@ -4286,7 +4284,6 @@ static void put_sigma( char *buff, const double val)
       strcpy( tbuff, "---");
    memcpy( buff, tbuff, 3);
 }
-
 
 int sigmas_in_columns_57_to_65 = 0;
 
@@ -4469,7 +4466,6 @@ void create_obs_file_with_computed_values( const OBSERVE FAR *obs,
    create_obs_file( tobs, n_obs, append, resid_format);
    free( tobs);
 }
-
 
 static void add_final_period( char *buff)
 {

@@ -255,6 +255,7 @@ int getnstr_ex( char *str, int *loc, int maxlen, const int size);  /* getstrex.c
 
 double comet_g_func( const long double r);                   /* runge.cpp */
 
+extern int n_orbit_params;
 extern double maximum_jd, minimum_jd;        /* orb_func.cpp */
 
 #define COLOR_BACKGROUND            1
@@ -714,15 +715,15 @@ static double *set_up_alt_orbits( const double *orbit, unsigned *n_orbits)
    switch( available_sigmas)
       {
       case COVARIANCE_AVAILABLE:
-         memcpy( sr_orbits, orbit, 6 * sizeof( double));
-         compute_variant_orbit( sr_orbits + 6, sr_orbits, 1.);
+         memcpy( sr_orbits, orbit, MAX_N_PARAMS * sizeof( double));
+         compute_variant_orbit( sr_orbits + n_orbit_params, sr_orbits, 1.);
          *n_orbits = 2;
          break;
       case SR_SIGMAS_AVAILABLE:
          *n_orbits = n_sr_orbits;
          break;
       default:
-         memcpy( sr_orbits, orbit, 6 * sizeof( double));
+         memcpy( sr_orbits, orbit, MAX_N_PARAMS * sizeof( double));
          *n_orbits = 1;
          break;
       }
@@ -3265,11 +3266,10 @@ static int non_grav_menu( char *message_to_user)
       c -= '0';
    if( c >= 0 && c < (int)n_models)
       {
-      extern int n_extra_params;
       char *tptr;
 
       force_model = models[c];
-      n_extra_params = (force_model & 0xf);
+      n_orbit_params = 6 + (force_model & 0xf);
       strlcpy_error( buff, get_find_orb_text( 2060));
       tptr = _set_radio_button( buff, c) + 6;
       for( i = 0; tptr[i] >= ' '; i++)
@@ -3524,7 +3524,7 @@ int main( int argc, const char **argv)
    int i, quit = 0, n_obs = 0, clock_line = 0;
    OBSERVE FAR *obs = NULL;
    int curr_obs = 0;
-   double epoch_shown, curr_epoch, orbit[6];
+   double epoch_shown, curr_epoch, orbit[MAX_N_PARAMS];
    double r1 = 1., r2 = 1.;
    char message_to_user[180];
    int update_element_display = 1, gauss_soln = 0, residual_line = 0;
@@ -3791,8 +3791,6 @@ int main( int argc, const char **argv)
    while( !quit)
       {
       int line_no = 0, mouse_wheel_motion;
-      extern double solar_pressure[];
-      extern int n_extra_params;
 
       prev_getch = c;
       while( get_new_file || get_new_object)
@@ -4603,8 +4601,8 @@ int main( int argc, const char **argv)
          case '^':
             non_grav_menu( message_to_user);
             if( *message_to_user)      /* new force model selected */
-               for( i = 0; i < MAX_N_NONGRAV_PARAMS; i++)
-                  solar_pressure[i] = 0.;
+               for( i = 6; i < n_orbit_params; i++)
+                  orbit[i] = 0.;
             break;
 #ifndef _WIN32
          case KEY_F(8):     /* show original screens */
@@ -4679,9 +4677,9 @@ int main( int argc, const char **argv)
             else if( *tbuff == 'p')
                {
                ELEMENTS elem;
-               double orbit2[6];
+               double orbit2[MAX_N_PARAMS];
 
-               memcpy( orbit2, orbit, 6 * sizeof( double));
+               memcpy( orbit2, orbit, n_orbit_params * sizeof( double));
                integrate_orbit( orbit2, curr_epoch, epoch_shown);
                find_relative_orbit( epoch_shown, orbit2, &elem,
                         (tbuff[1] == 'g' ? 3 : 0));
@@ -4735,13 +4733,13 @@ int main( int argc, const char **argv)
                }
             else
                {
-               double saved_orbit[6];
+               double saved_orbit[MAX_N_PARAMS];
                const double mid_epoch = mid_epoch_of_arc( obs, n_obs);
 //             const double mid_epoch = curr_epoch;
 //             const double mid_epoch = epoch_shown;
 
 //             debug_printf( "From %.7f to %.7f\n", curr_epoch, mid_epoch);
-               memcpy( saved_orbit, orbit, 6 * sizeof( double));
+               memcpy( saved_orbit, orbit, n_orbit_params * sizeof( double));
                integrate_orbit( orbit, curr_epoch, mid_epoch);
                         /* Only request sigmas for i=1 (last pass... */
                         /* _only_ pass for a real 'full improvement') */
@@ -4759,7 +4757,7 @@ int main( int argc, const char **argv)
                   {        /* & recover from error by using the saved orbit */
                   debug_printf( "Full improvement fail %d\n", err);
                   set_statistical_ranging( 1);
-                  memcpy( orbit, saved_orbit, 6 * sizeof( double));
+                  memcpy( orbit, saved_orbit, n_orbit_params * sizeof( double));
                   }
                else
                   curr_epoch = mid_epoch;
@@ -4774,12 +4772,12 @@ int main( int argc, const char **argv)
             if( c == AUTO_REPEATING && !err)
                {
                ELEMENTS elem;
-               double rel_orbit[6], orbit2[6];
+               double rel_orbit[MAX_N_PARAMS], orbit2[MAX_N_PARAMS];
                int curr_planet_orbiting;
                extern int n_clones_accepted;
 
                is_monte_orbit = true;
-               memcpy( orbit2, orbit, 6 * sizeof( double));
+               memcpy( orbit2, orbit, n_orbit_params * sizeof( double));
                integrate_orbit( orbit2, curr_epoch, epoch_shown);
                snprintf_err( message_to_user, sizeof( message_to_user),
                            (using_sr ? "Stat Ranging %d/%d" : "Monte Carlo %d/%d"),
@@ -4991,8 +4989,6 @@ int main( int argc, const char **argv)
                   const double sigma = atof( tbuff);
 
                   compute_variant_orbit( orbit, orbit, sigma);
-                  for( i = 0; i < n_extra_params; i++)
-                     solar_pressure[i] += sigma * eigenvects[0][i + 6];
                   set_locs( orbit, curr_epoch, obs, n_obs);
                   total_sigma += sigma;
                   update_element_display = 1;
@@ -5007,7 +5003,7 @@ int main( int argc, const char **argv)
             {
             extern double **eigenvects;
             const double n_sigmas = improve_along_lov( orbit, curr_epoch,
-                     eigenvects[0], n_extra_params + 6, n_obs, obs);
+                     eigenvects[0], n_orbit_params, n_obs, obs);
 
             snprintf( message_to_user, sizeof( message_to_user),
                                        "Adjusted by %f sigmas", n_sigmas);
@@ -5112,7 +5108,7 @@ int main( int argc, const char **argv)
                {
                FILE *ofile;
                char filename[80];
-               double orbit2[6];
+               double orbit2[MAX_N_PARAMS];
 
 #ifndef _WIN32
                fix_home_dir( tbuff);
@@ -5128,7 +5124,7 @@ int main( int argc, const char **argv)
                   fclose( ifile);
                   fclose( ofile);
                   }
-               memcpy( orbit2, orbit, 6 * sizeof( double));
+               memcpy( orbit2, orbit, n_orbit_params * sizeof( double));
 //             debug_printf( "Before integration (epoch %f):\n%20.14f %20.14f %20.14f\n",
 //                               curr_epoch,
 //                               orbit2[0], orbit2[1], orbit2[2]);
@@ -5308,13 +5304,13 @@ int main( int argc, const char **argv)
             break;
          case 'z': case 'Z':
             {
-            double state2[6], delta_squared = 0;
+            double state2[MAX_N_PARAMS], delta_squared = 0;
             int64_t t0;
             const int64_t one_billion = (int64_t)1000000000;
 
             inquire( "Time span: ", tbuff, sizeof( tbuff),
                               COLOR_DEFAULT_INQUIRY);
-            memcpy( state2, orbit, 6 * sizeof( double));
+            memcpy( state2, orbit, n_orbit_params * sizeof( double));
             t0 = nanoseconds_since_1970( );
             integrate_orbit( state2, curr_epoch, curr_epoch + atof( tbuff));
             integrate_orbit( state2, curr_epoch + atof( tbuff), curr_epoch);
@@ -5676,9 +5672,9 @@ int main( int argc, const char **argv)
             extern const char *ephemeris_filename;
             extern const char *residual_filename;
             const char *path = get_environment_ptr( "SOHO_MPEC");
-            double orbit2[6];
+            double orbit2[MAX_N_PARAMS];
 
-            memcpy( orbit2, orbit, 6 * sizeof( double));
+            memcpy( orbit2, orbit, n_orbit_params * sizeof( double));
             integrate_orbit( orbit2, curr_epoch, epoch_shown);
             store_solution( obs, n_obs, orbit2, epoch_shown,
                                           perturbers);

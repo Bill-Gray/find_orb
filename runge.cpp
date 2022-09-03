@@ -52,9 +52,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 /* perturbers
    excluded_perturbers = -1;
    general_relativity_factor
-   n_extra_params
+   n_orbit_params
    planet_mass[],  sort of
-   solar_pressure
    best_fit_planet;
    best_fit_planet_dist;
    j2_multiplier
@@ -67,6 +66,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 double object_mass = 0.;
 double j2_multiplier = 1.;
 extern unsigned perturbers;
+extern int n_orbit_params;
 
 extern int debug_level;
 int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
@@ -847,7 +847,7 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
    double lunar_loc[3], jupiter_loc[3], saturn_loc[3];
    ldouble relativistic_accel[3];
    double fraction_illum = 1., ival_as_double[3];
-   extern int n_extra_params, force_model;
+   extern int force_model;
    static const double sphere_of_influence_radius[10] = {
             10000., 0.00075, 0.00412, 0.00618,   /* sun, mer, ven, ear */
             0.00386, 0.32229, 0.36466, 0.34606,  /* mar, jup, sat, ura */
@@ -880,7 +880,7 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
    for( i = 0; i < 3; i++)
       r2 += ival[i] * ival[i];
    r = sqrtl( r2);
-   if( n_extra_params) /* decrease non-gravs when in earth's shadow */
+   if( n_orbit_params > 6) /* decrease non-gravs when in earth's shadow */
       {
       double earth_loc[3];
 
@@ -888,11 +888,7 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
       fraction_illum = shadow_check( earth_loc, ival_as_double, EARTH_R);
       }
    if( force_model == FORCE_MODEL_SRP)
-      {
-      extern double solar_pressure[];
-
-      solar_accel -= solar_pressure[0] * fraction_illum;
-      }
+      solar_accel -= ival[6] * fraction_illum;
    if( r < planet_radius( 0))     /* special fudge to keep acceleration from reaching */
       {                          /* infinity inside the sun;  see above notes        */
       accel_multiplier = compute_accel_multiplier( r / planet_radius( 0));
@@ -933,10 +929,9 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
             oval[i] += asteroid_accel[i];
          }
 
-   if( (n_extra_params >= 2 && n_extra_params <= 4) || force_model == FORCE_MODEL_YARKO_A2)
+   if( (n_orbit_params >= 8 && n_orbit_params <= 10) || force_model == FORCE_MODEL_YARKO_A2)
       {                  /* Marsden & Sekanina comet formula */
-      extern double solar_pressure[];
-      const ldouble lag = (n_extra_params == 4 ? solar_pressure[3] : 0.);
+      const ldouble lag = (n_orbit_params == 10 ? ival[9] : 0.);
       const ldouble g = comet_g_func( lagged_dist( ival, jd, lag)) * fraction_illum;
       ldouble transverse[3], dot_prod = 0.;
 
@@ -951,19 +946,19 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
       dot_prod = vector3_lengthl( transverse);
       if( force_model == FORCE_MODEL_YARKO_A2)
          for( i = 0; i < 3; i++)
-            oval[i + 3] += g * (solar_pressure[0] * transverse[i] / dot_prod);
+            oval[i + 3] += g * (ival[6] * transverse[i] / dot_prod);
       else
          for( i = 0; i < 3; i++)
-            oval[i + 3] += g * (solar_pressure[0] * ival[i] / r
-                     + solar_pressure[1] * transverse[i] / dot_prod);
-      if( n_extra_params >= 3)
+            oval[i + 3] += g * (ival[6] * ival[i] / r
+                     + ival[7] * transverse[i] / dot_prod);
+      if( n_orbit_params >= 9)
          {
          ldouble out_of_plane[3];
 
          vector_cross_productl( out_of_plane, ival, transverse);
          dot_prod = vector3_lengthl( out_of_plane);
          for( i = 0; i < 3; i++)
-            oval[i + 3] += g * solar_pressure[2] * out_of_plane[i] / dot_prod;
+            oval[i + 3] += g * ival[8] * out_of_plane[i] / dot_prod;
          }
       }
 
@@ -1101,12 +1096,11 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
                            /* And add 'em to the output acceleration: */
                for( j = 0; j < 3; j++)
                   oval[j + 3] -= j2_multiplier * delta_j2000[j];
-               if( i == IDX_EARTH && r < ATMOSPHERIC_LIMIT && n_extra_params == 1
+               if( i == IDX_EARTH && r < ATMOSPHERIC_LIMIT && n_orbit_params == 7
                            && *get_environment_ptr( "DRAG_SHUTOFF") != '1')
                   {
-                  extern double solar_pressure[];
                   const double SRP1AU = 2.3e-7;   /* kg*AU^3 / (m^2*d^2) */
-                  const double amr_drag = solar_pressure[0] * SOLAR_GM / SRP1AU;
+                  const double amr_drag = ival[6] * SOLAR_GM / SRP1AU;
                   const double rho_cos_phi =
                           hypot( delta_planet[0], delta_planet[1]) / EARTH_R;
                   const double rho_sin_phi = delta_planet[2] / EARTH_R;
@@ -1213,13 +1207,13 @@ int calc_derivatives( const double jd, const double *ival, double *oval,
 {
    size_t i;
    int rval;
-   ldouble ival1[6], oval1[6];
+   ldouble ival1[MAX_N_PARAMS], oval1[MAX_N_PARAMS];
 
    assert( fabs( (double)jd) < 1e+9);
-   for( i = 0; i < 6; i++)
+   for( i = 0; i < (size_t)n_orbit_params; i++)
       ival1[i] = (ldouble)ival[i];
    rval = calc_derivativesl( (ldouble)jd, ival1, oval1, reference_planet);
-   for( i = 0; i < 6; i++)
+   for( i = 0; i < (size_t)n_orbit_params; i++)
       oval[i] = (double)oval1[i];
    return( rval);
 }
@@ -1262,7 +1256,7 @@ void find_relative_state_vect( const double jd, const double *ivect,
                double *ovect, const int ref_planet)
 {
    assert( ref_planet >= 0);
-   memcpy( ovect, ivect, 6 * sizeof( double));
+   memcpy( ovect, ivect, n_orbit_params * sizeof( double));
    if( ref_planet)
       {
       double planet_state[6];
@@ -1277,7 +1271,7 @@ void find_relative_state_vect( const double jd, const double *ivect,
 int find_relative_orbit( const double jd, const double *ivect,
                ELEMENTS *elements, const int ref_planet)
 {
-   double local_rel_vect[6];
+   double local_rel_vect[MAX_N_PARAMS];
 
    assert( ref_planet >= 0);
    assert( elements);
@@ -1527,7 +1521,7 @@ ldouble take_pd89_step( const ldouble jd, ELEMENTS *ref_orbit,
 
    for( j = 0; j <= N_EVALS; j++)
       {
-      ldouble ref_state_j[9], state_j[6];
+      ldouble ref_state_j[9], state_j[MAX_N_PARAMS];
       const ldouble jd_j = jd + step * avals[j];
       double temp_array[9];
 
@@ -1536,7 +1530,7 @@ ldouble take_pd89_step( const ldouble jd, ELEMENTS *ref_orbit,
          ref_state_j[i] = (ldouble)temp_array[i];
       if( !j)
          {
-         memcpy( state_j, ival, 6 * sizeof( ldouble));
+         memcpy( state_j, ival, n_orbit_params * sizeof( ldouble));
                /* subtract the analytic posn/vel from the numeric: */
          for( i = 0; i < n_vals; i++)
             ivals[0][i] = ival[i] - ref_state_j[i];
@@ -1560,7 +1554,7 @@ ldouble take_pd89_step( const ldouble jd, ELEMENTS *ref_orbit,
             ivals_p[j][k] -= ref_state_j[k + 3];
          }
       else     /* on last iteration,  we have our answer: */
-         memcpy( ovals, state_j, n_vals * sizeof( ldouble));
+         memcpy( ovals, state_j, n_orbit_params * sizeof( ldouble));
       }
 
    for( i = 0; i < n_vals; i++)
@@ -1701,7 +1695,7 @@ ldouble take_rk_stepl( const ldouble jd, ELEMENTS *ref_orbit,
 
    for( j = 0; j < 7; j++)
       {
-      ldouble ref_state_j[9], state_j[6];
+      ldouble ref_state_j[9], state_j[MAX_N_PARAMS];
       const ldouble jd_j = jd + step * avals[j];
       double temp_array[9];
 
@@ -1710,7 +1704,7 @@ ldouble take_rk_stepl( const ldouble jd, ELEMENTS *ref_orbit,
          ref_state_j[i] = (ldouble)temp_array[i];
       if( !j)
          {
-         memcpy( state_j, ival, 6 * sizeof( ldouble));
+         memcpy( state_j, ival, n_orbit_params * sizeof( ldouble));
                /* subtract the analytic posn/vel from the numeric: */
          for( i = 0; i < n_vals; i++)
             ivals[0][i] = ival[i] - ref_state_j[i];
@@ -1736,7 +1730,7 @@ ldouble take_rk_stepl( const ldouble jd, ELEMENTS *ref_orbit,
             ivals_p[j][k] -= ref_state_j[k + 3];
          }
       else     /* on last iteration,  we have our answer: */
-         memcpy( ovals, state_j, n_vals * sizeof( ldouble));
+         memcpy( ovals, state_j, n_orbit_params * sizeof( ldouble));
       }
 
    for( i = 0; i < n_vals; i++)

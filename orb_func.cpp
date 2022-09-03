@@ -138,8 +138,8 @@ const double SRP1AU = 2.3e-7;
     expect if you just multiplied 1.15 by SRP1AU,  but pretty close;  the
     tangential components are rarely large.  */
 
-int n_extra_params = 0, setting_outside_of_arc = 1;
-double solar_pressure[MAX_N_NONGRAV_PARAMS], uncertainty_parameter = 99.;
+int n_orbit_params = 6, setting_outside_of_arc = 1;
+double uncertainty_parameter = 99.;
 int available_sigmas = NO_SIGMAS_AVAILABLE;
 int available_sigmas_hash = 0;
 static bool fail_on_hitting_planet = false;
@@ -501,10 +501,10 @@ int integrate_orbitl( long double *orbit, const long double t0, const long doubl
    while( t != t1 && !rval)
       {
       long double delta_t, new_t = ceill( (t - .5) / stepsize + .5) * stepsize + .5;
-      double dorbit[6];
+      double dorbit[MAX_N_PARAMS];
       bool step_taken = true;
 
-      ldouble_to_double( dorbit, orbit, 6);
+      ldouble_to_double( dorbit, orbit, n_orbit_params);
       reset_auto_perturbers( t, dorbit);
       if( reset_of_elements_needed || !(n_steps % 50))
          if( use_encke)
@@ -610,7 +610,7 @@ int integrate_orbitl( long double *orbit, const long double t0, const long doubl
          case 0:
          default:
             {
-            long double new_vals[6];
+            long double new_vals[MAX_N_PARAMS];
             static long double min_stepsize;
             const double err = (integration_method ?
                    take_pd89_step( t, &ref_orbit, orbit, new_vals, 6, delta_t) :
@@ -628,7 +628,7 @@ int integrate_orbitl( long double *orbit, const long double t0, const long doubl
             if( err < integration_tolerance || fixed_stepsize > 0.
                         || fabs( stepsize) < min_stepsize)  /* it's good! */
                {
-               memcpy( orbit, new_vals, 6 * sizeof( long double));
+               memcpy( orbit, new_vals, n_orbit_params * sizeof( long double));
                if( err < step_increase && !fixed_stepsize)
                   if( fabsl( delta_t - stepsize) < fabsl( stepsize * .01))
                      {
@@ -694,12 +694,12 @@ int integrate_orbitl( long double *orbit, const long double t0, const long doubl
 
 int integrate_orbit( double *orbit, const double t0, const double t1)
 {
-   long double tarray[6];
+   long double tarray[MAX_N_PARAMS];
    int rval;
 
-   double_to_ldouble( tarray, orbit, 6);
+   double_to_ldouble( tarray, orbit, n_orbit_params);
    rval = integrate_orbitl( tarray, (long double)t0, (long double)t1);
-   ldouble_to_double( orbit, tarray, 6);
+   ldouble_to_double( orbit, tarray, n_orbit_params);
    return( rval);
 }
 
@@ -905,13 +905,13 @@ static int set_locs_extended( const double *orbit, const double epoch_jd,
    for( pass = 0; pass < 2; pass++)
       {
       int j = (pass ? i : i - 1);
-      long double curr_orbit[6];
+      long double curr_orbit[MAX_N_PARAMS];
       double curr_t = epoch_jd;
 
-      double_to_ldouble( curr_orbit, orbit, 6);
+      double_to_ldouble( curr_orbit, orbit, n_orbit_params);
       while( j < n_obs && j >= 0)
          {
-         double light_lagged_orbit[6], temp_orbit[6];
+         double light_lagged_orbit[6], temp_orbit[MAX_N_PARAMS];
          OBSERVE FAR *optr = obs + j;
 
          if( orbit2 && is_between( curr_t, epoch2, optr->jd))
@@ -919,14 +919,14 @@ static int set_locs_extended( const double *orbit, const double epoch_jd,
             rval = integrate_orbitl( curr_orbit, curr_t, epoch2);
             if( rval)
                return( rval);
-            ldouble_to_double( orbit2, curr_orbit, 6);
+            ldouble_to_double( orbit2, curr_orbit, n_orbit_params);
             curr_t = epoch2;
             }
          rval = integrate_orbitl( curr_orbit, curr_t, optr->jd);
          if( rval)
             return( rval);
          curr_t = optr->jd;
-         ldouble_to_double( temp_orbit, curr_orbit, 6);
+         ldouble_to_double( temp_orbit, curr_orbit, n_orbit_params);
          light_time_lag( optr->jd, temp_orbit, optr->obs_posn, light_lagged_orbit,
                   optr->note2 == 'R');
          FMEMCPY( optr->obj_posn, light_lagged_orbit, 3 * sizeof( double));
@@ -939,7 +939,7 @@ static int set_locs_extended( const double *orbit, const double epoch_jd,
             rval = integrate_orbitl( curr_orbit, curr_t, epoch2);
             if( rval)
                return( rval);
-            ldouble_to_double( orbit2, curr_orbit, 6);
+            ldouble_to_double( orbit2, curr_orbit, n_orbit_params);
             }
       }
 
@@ -1295,10 +1295,10 @@ int extended_orbit_fit( double *orbit, OBSERVE *obs, int n_obs,
    int i, j, rval = 0, n_resids;
    int n_selected;
    const int n_params = (int)( fit_type & 0xf);
-   double orbit_at_epoch[6];
+   double orbit_at_epoch[MAX_N_PARAMS];
    void *lsquare;
    double *resids, *slopes;
-   double params[10];
+   double params[MAX_N_PARAMS];
    const double delta_val = 1e-6;
    OBSERVE obs1, obs2;
 
@@ -1388,7 +1388,7 @@ int extended_orbit_fit( double *orbit, OBSERVE *obs, int n_obs,
                      fit_type, 0);
    set_locs_extended( orbit, obs1.jd, obs, n_obs, epoch, orbit_at_epoch);
             /* Except we really want to return the orbit at epoch : */
-   memcpy( orbit_at_epoch, orbit, 6 * sizeof( double));
+   memcpy( orbit_at_epoch, orbit, n_orbit_params * sizeof( double));
    integrate_orbit( orbit, obs1.jd, epoch);
    return( rval);
 }
@@ -1853,77 +1853,6 @@ static OBSERVE *get_real_arc( OBSERVE *obs, int *n_obs,
 
 #define RAD2SEC (180. * 3600. / PI)
 
-#ifdef NO_LONGER_USED
-
-int adjust_herget_results( OBSERVE FAR *obs, int n_obs, double *orbit)
-{
-   int i, n_found, rval = 0;
-
-   obs = get_real_arc( obs, &n_obs, &n_found);
-   if( n_found < 2)   /* must have at least two obs */
-      rval = -2;
-   else if( is_unreasonable_orbit( orbit))
-      rval = -3;
-   else
-      {
-      double determ;
-      double avg_x = 0., avg_xt = 0., avg_t = 0.;
-      double avg_y = 0., avg_yt = 0., avg_t2 = 0.;
-
-      for( i = 0; i < n_obs; i++)
-         if( obs[i].is_included)
-            {
-            const double dx = obs[i].computed_ra - obs[i].ra;
-            const double dy = obs[i].computed_dec - obs[i].dec;
-            const double dt = obs[i].jd - obs[0].jd;
-
-            avg_xt += dx * dt;
-            avg_yt += dy * dt;
-            avg_x += dx;
-            avg_y += dy;
-            avg_t += dt;
-            avg_t2 += dt * dt;
-            }
-
-      avg_xt /= (double)n_found;
-      avg_yt /= (double)n_found;
-      avg_x /= (double)n_found;
-      avg_y /= (double)n_found;
-      avg_t /= (double)n_found;
-      avg_t2 /= (double)n_found;
-      determ = avg_t2 - avg_t * avg_t;
-      if( determ)
-         {
-         const double ax = (avg_xt - avg_x * avg_t) / determ;
-         const double bx = (avg_t2 * avg_x - avg_t * avg_xt) / determ;
-         const double ay = (avg_yt - avg_y * avg_t) / determ;
-         const double by = (avg_t2 * avg_y - avg_t * avg_yt) / determ;
-         OBSERVE start = obs[0];
-         OBSERVE end = obs[n_obs - 1];
-
-         start.ra  = start.computed_ra - bx;
-         end.ra    = end.computed_ra - (bx + (end.jd - start.jd) * ax);
-         start.dec = start.computed_dec - by;
-         end.dec   = end.computed_dec - (by + (end.jd - start.jd) * ay);
-         set_obs_vect( &start);
-         set_obs_vect( &end);
-         set_distance( &start, start.r);
-         set_distance( &end, end.r);
-         uncertainty_parameter = 99.;
-         if( find_transfer_orbit( orbit, &start, &end, 1))
-            rval = -8;
-         else
-            rval = set_locs( orbit, start.jd, obs, n_obs);
-         }
-      else
-         rval = -1;
-      }
-   if( rval && rval != -2)
-      debug_printf( "Adjust fail %d\n", rval);
-   return( rval);
-}
-#endif      /* #ifdef NO_LONGER_USED */
-
 int adjust_herget_results( OBSERVE FAR *obs, int n_obs, double *orbit)
 {
    int n_found, rval = 0;
@@ -2289,12 +2218,12 @@ void improve_parabolic( OBSERVE FAR *obs, int n_obs, double *orbit,
 void compute_variant_orbit( double *variant, const double *ref_orbit,
                      const double n_sigmas)
 {
-   unsigned i;
+   int i;
    extern double **eigenvects;
 
    assert( eigenvects);
    if( eigenvects)
-      for( i = 0; i < 6; i++)
+      for( i = 0; i < n_orbit_params; i++)
          *variant++ = *ref_orbit++ + (n_sigmas * eigenvects[0][i]);
 }
 
@@ -2435,14 +2364,14 @@ static int evaluate_limited_orbit( const double *orbit,
                constraints[rval++] = 1. / elem.major_axis - 1. / value;
                break;
             case 'A':            /* area/mass ratio */
-               if( n_extra_params >= 1)
+               if( n_orbit_params >= 7)
                   constraints[rval++] =
-                      10000. * (solar_pressure[0] * SOLAR_GM / SRP1AU - value);
-               if( n_extra_params > 1)
+                      10000. * (orbit[6] * SOLAR_GM / SRP1AU - value);
+               if( n_orbit_params > 7)
                   constraints[rval - 1] *= 100000.;
                break;
             case '1': case '2': case '3':
-               constraints[rval++] = 1e+10 * (solar_pressure[variable - '1'] - value);
+               constraints[rval++] = 1e+10 * (orbit[6 + variable - '1'] - value);
                break;
             case 'K':
                {
@@ -2797,8 +2726,8 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
    double element_slopes[MAX_N_PARAMS][MONTE_N_ENTRIES];
    double elements_in_array[MONTE_N_ENTRIES];
    double differences[MAX_N_PARAMS];
-   double original_orbit[6], original_params[MAX_N_NONGRAV_PARAMS];
-   double central_obj_state[6], tvect[6];
+   double original_orbit[MAX_N_PARAMS];
+   double central_obj_state[6], tvect[MAX_N_PARAMS];
    const double default_delta_vals[MAX_N_PARAMS] =
                    { 1e-4, 1e-4, 1e-5, 1e-5, 1e-3, 1e-3,
                     1e-8, 1e-8, 1e-8,
@@ -2821,7 +2750,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
    const int showing_deltas_in_debug_file =
                       atoi( get_environment_ptr( "DEBUG_DELTAS"));
    const double r_mult = 1e+2;
-   double orbit2[6];
+   double orbit2[MAX_N_PARAMS];
    int set_locs_rval;
    const bool saved_fail_on_hitting_planet =
                                      fail_on_hitting_planet;
@@ -2836,11 +2765,10 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
       n_params = atoi( limited_orbit + 3);
    else
       {
-      n_params = 6 + n_extra_params;
-      if( n_extra_params == 4 && !solar_pressure[0] && !solar_pressure[1]
-                && !solar_pressure[2]) /* don't try to solve for DT if we */
-         n_params--;                  /* don't have approx A1, A2, A3 yet */
-      }
+      n_params = n_orbit_params;
+      if( n_orbit_params == 10 && !orbit[6] && !orbit[7] && !orbit[8])
+         n_params--;                /* don't try to solve for DT if we */
+      }                             /* don't have approx A1, A2, A3 yet */
    if( !obs)
       {
       if( eigenvects)
@@ -2860,8 +2788,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
    available_sigmas = NO_SIGMAS_AVAILABLE;
                /* We save the input orbit;  if there's an error,  we can */
                /* restore it:         */
-   memcpy( original_orbit, orbit, 6 * sizeof( double));
-   memcpy( original_params, solar_pressure, MAX_N_NONGRAV_PARAMS * sizeof( double));
+   memcpy( original_orbit, orbit, n_orbit_params * sizeof( double));
    sprintf( tstr, "full improvement: %f  ", JD_TO_YEAR( epoch));
    runtime_message = tstr;
    for( i = 0; i < n_obs; i++)
@@ -2990,37 +2917,27 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
 
       while( keep_iterating)
          {
-         double tweaked_orbit[6];
+         double tweaked_orbit[MAX_N_PARAMS];
          const double original_asteroid_mass = (asteroid_mass ? *asteroid_mass : 0.);
          double delta_val =
                       delta_vals[i] / (integration_length * integration_length);
          double worst_error_in_sigmas;
          double worst_error_squared = 0, rescale;
-         double original_solar_pressure[MAX_N_NONGRAV_PARAMS];
          double *slope_ptr;
-         double rel_orbit[6];
+         double rel_orbit[MAX_N_PARAMS];
          bool trouble_happened = false;
 
                   /* for asteroid mass computations,  on first pass, */
                   /* try to set a "reasonable" delta :   */
          if( i == 6 && asteroid_mass && !n_iterations)
             delta_val = 1.e-15 + original_asteroid_mass / 100.;
-         memcpy( original_solar_pressure, solar_pressure,
-                               n_extra_params * sizeof( double));
          do
             {
-            memcpy( tweaked_orbit, orbit, 6 * sizeof( double));
-            memcpy( solar_pressure, original_solar_pressure,
-                                n_extra_params * sizeof( double));
-            if( i < 6)              /* adjust position/velocity */
+            memcpy( tweaked_orbit, orbit, n_orbit_params * sizeof( double));
+            if( asteroid_mass && i == 6)
+               *asteroid_mass -= delta_val;
+            else                    /* adjust position/velocity */
                tweaked_orbit[i] -= delta_val;
-            else
-               {
-               if( asteroid_mass)
-                  *asteroid_mass -= delta_val;
-               else
-                  solar_pressure[i - 6] -= delta_val;
-               }
             sprintf( tstr, "Evaluating %d of %d : iter %d   ", i + 1,
                                     n_params, n_iterations);
             if( debug_level > 4)
@@ -3042,8 +2959,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
             if( set_locs_rval == INTEGRATION_TIMED_OUT)
                {
                free( xresids);
-               memcpy( orbit, original_orbit, 6 * sizeof( double));
-               memcpy( solar_pressure, original_params, n_extra_params * sizeof( double));
+               memcpy( orbit, original_orbit, n_orbit_params * sizeof( double));
                runtime_message = NULL;
                debug_printf( "Integration timeout\n");
                return( -4);
@@ -3094,14 +3010,11 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
             }
          if( really_use_symmetric_derivatives)
             {
-            for( j = 0; j < 6; j++)
-               tweaked_orbit[j] = 2. * orbit[j] - tweaked_orbit[j];
-            if( asteroid_mass)
-               *asteroid_mass = 2. * original_asteroid_mass - *asteroid_mass;
-            else
-               for( j = 0; j < n_extra_params; j++)
-                  solar_pressure[j] = 2. * original_solar_pressure[j] -
-                                    solar_pressure[j];
+            memcpy( tweaked_orbit, orbit, n_orbit_params * sizeof( double));
+            if( asteroid_mass && i == 6)
+               *asteroid_mass += delta_val;
+            else                    /* adjust position/velocity */
+               tweaked_orbit[i] += delta_val;
             memcpy( tstr, "Reverse   ", 10);
             fail_on_hitting_planet = true;
             set_locs_rval = set_locs( tweaked_orbit, epoch, obs, n_obs);
@@ -3170,8 +3083,6 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
             rescale = exp( log( rescale) * slope);
             }
          delta_vals[i] *= rescale;
-         memcpy( solar_pressure, original_solar_pressure,
-                                n_extra_params * sizeof( double));
          if( asteroid_mass)
             *asteroid_mass = original_asteroid_mass;
          if( n_iterations++ >= max_iterations)
@@ -3179,8 +3090,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
             debug_printf( "Ran over iteration limit! %s\n", obs->packed_id);
             debug_printf( "Worst err %f sigmas\n", worst_error_in_sigmas);
             free( xresids);
-            memcpy( orbit, original_orbit, 6 * sizeof( double));
-            memcpy( solar_pressure, original_params, n_extra_params * sizeof( double));
+            memcpy( orbit, original_orbit, n_orbit_params * sizeof( double));
             runtime_message = NULL;
             return( -4);
             }
@@ -3470,25 +3380,19 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
    memcpy( orbit2, orbit, 6 * sizeof( double));
    for( i = 0; i < n_params && !err_code; i++)
       {
-      if( i < 6)
+      if( i == 6 && asteroid_mass)
+         *asteroid_mass += differences[i] / scale_factor;
+      else
          orbit[i] += differences[i] / scale_factor;
       if( i == 5)    /* is our new 'orbit' state vector reasonable?  */
          err_code = is_unreasonable_orbit( orbit);
-
-      if( i >= 6)
-         {
-         if( asteroid_mass)
-            *asteroid_mass += differences[i] / scale_factor;
-         else
-            solar_pressure[i - 6] += differences[i] / scale_factor;
-         }
       }
                /* If the orbit "blew up" or otherwise failed,  restore */
                /* the original version:  */
    if( err_code || is_unreasonable_orbit( orbit))
       debug_printf( "Failed full step: %d: %s\n", err_code, obs->packed_id);
    sprintf( tstr, "Final setting of orbit    ");
-   i = 6;
+   i = 6;      /* possibly try six half-steps */
    do
       {
       if( setting_outside_of_arc)
@@ -3502,7 +3406,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
          sprintf( tstr, "Half-stepping %d\n", 7 - i);
          if( after_rms > before_rms * 1.5 && !limited_orbit)
             {
-            for( j = 0; j < 6; j++)
+            for( j = 0; j < n_orbit_params; j++)
                orbit[j] = (orbit[j] + orbit2[j]) * .5;
             i--;
             }
@@ -3716,7 +3620,7 @@ double evaluate_initial_orbit( const OBSERVE FAR *obs,
                               const int n_obs, const double *orbit)
 {
    const double rms_err = compute_weighted_rms( obs, n_obs, NULL);
-   double rval, rel_orbit[6], planet_radius_in_au;
+   double rval, rel_orbit[MAX_N_PARAMS], planet_radius_in_au;
    ELEMENTS elem;
    int planet_orbiting = find_best_fit_planet( obs->jd,
                                   orbit, rel_orbit);
@@ -3779,6 +3683,7 @@ static double attempt_improvements( double *orbit, OBSERVE *obs, const int n_obs
       debug_printf( "Set loc fail 17\n");
       }
 
+   assert( n_orbit_params == 6);
    memcpy( temp_orbit, orbit, 6 * sizeof( double));
    curr_score = evaluate_initial_orbit( obs, n_obs, orbit);
    memcpy( best_obs, obs, n_obs * sizeof( OBSERVE));
@@ -3887,6 +3792,7 @@ static double find_sungrazer_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
    double r;
    int i, direction, start, end;
 
+   assert( n_orbit_params == 6);
                /* Don't try to do a multiple-orbit case at first : */
    look_for_best_subarc( obs, n_obs, 10., &start, &end);
    for( i = 0; i < start; i++)
@@ -4294,7 +4200,7 @@ int orbital_monte_carlo( const double *orbit, OBSERVE *obs, const int n_obs,
       fprintf( ofile, "Epoch JD %f TDT\n", epoch_shown);
    for( i = 0; i < n_sr_orbits; i++)
       {
-      double *torbit = sr_orbits + i * 6;
+      double *torbit = sr_orbits + i * n_orbit_params;
       const double sig_squared = generate_mc_variant_from_covariance( torbit, orbit);
       const char *format_str = "%+17.6f %+17.6f %+17.6f %+14.12f %+14.12f %+14.12f\n";
 
@@ -4395,6 +4301,7 @@ int extend_orbit_solution( OBSERVE FAR *obs, const int n_obs,
    double jd_low, jd_high;
    const double max_sigma = 2.;
 
+   assert( n_orbit_params == 6);
    exclude_unusable_observations( obs, n_obs);
    initial_count = count_observations_used( obs, n_obs);
    get_first_and_last_included_obs( obs, n_obs, &first_idx, &last_idx);
@@ -4573,6 +4480,7 @@ void attempt_extensions( OBSERVE *obs, const int n_obs, double *orbit,
    int best_available_sigmas;
    unsigned best_perturbers = perturbers;
 
+   assert( n_orbit_params == 6);
    if( !arc_limit_in_days)
       arc_limit_in_days = 3650;        /* Default to ten years at most */
    setting_outside_of_arc = 0;
@@ -4626,7 +4534,7 @@ void attempt_extensions( OBSERVE *obs, const int n_obs, double *orbit,
                if( debug_level > 2)
                   debug_printf( "  Seeking minimum along LOV\n");
                lov_sigmas = improve_along_lov( orbit, epoch, eigenvects[0],
-                                            n_extra_params + 6, n_obs, obs);
+                                            n_orbit_params, n_obs, obs);
                if( debug_level > 2)
                   debug_printf( "  Minimum at %f sigmas\n", lov_sigmas);
                }
@@ -4710,44 +4618,38 @@ int metropolis_search( OBSERVE *obs, const int n_obs, double *orbit,
    int iter;
    double rms = compute_weighted_rms( obs, n_obs, NULL);
    extern double **eigenvects;
-   double zorbit[9];
+   double zorbit[MAX_N_PARAMS];
 
    if( !eigenvects)
       return( -1);
 
-   memcpy( zorbit, orbit, 6 * sizeof( double));
-   memcpy( zorbit + 6, solar_pressure, n_extra_params * sizeof( double));
+   memcpy( zorbit, orbit, n_orbit_params * sizeof( double));
    for( iter = 0; iter < n_iterations; iter++)
       {
       int i, j;
-      double new_orbit[9], new_rms;
+      double new_orbit[MAX_N_PARAMS], new_rms;
 
-      memcpy( new_orbit, orbit, 9 * sizeof( double));
-      for( i = 0; i < 6 + n_extra_params; i++)
+      memcpy( new_orbit, orbit, n_orbit_params * sizeof( double));
+      for( i = 0; i < n_orbit_params; i++)
          {
          const double n_sigmas = scale * gaussian_random( );
 
-         for( j = 0; j < 6 + n_extra_params; j++)
+         for( j = 0; j < n_orbit_params; j++)
             new_orbit[j] += n_sigmas * eigenvects[i][j];
          }
-      memcpy( solar_pressure, new_orbit + 6, n_extra_params * sizeof( double));
       set_locs( new_orbit, epoch, obs, n_obs);
       new_rms = compute_weighted_rms( obs, n_obs, NULL);
       debug_printf( "Iter %d: prev rms %f; new rms %f\n", iter, rms, new_rms);
       if( new_rms < rms)
          {
          rms = new_rms;
-         memcpy( zorbit, new_orbit, 9 * sizeof( double));
+         memcpy( zorbit, new_orbit, n_orbit_params * sizeof( double));
          scale /= .9;
          }
       else           /* step rejected */
-         {
-         memcpy( solar_pressure, zorbit + 6, n_extra_params * sizeof( double));
          scale *= .7;
-         }
       }
-   memcpy( orbit, zorbit, 6 * sizeof( double));
-   memcpy( solar_pressure, zorbit + 6, n_extra_params * sizeof( double));
+   memcpy( orbit, zorbit, n_orbit_params * sizeof( double));
    set_locs( zorbit, epoch, obs, n_obs);
    return( 0);
 }

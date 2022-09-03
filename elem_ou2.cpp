@@ -37,13 +37,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 int snprintf( char *string, const size_t max_len, const char *format, ...);
 #endif
 int put_elements_into_sof( char *obuff, const char *templat,
-         const ELEMENTS *elem,
+         const ELEMENTS *elem, const double *nongravs,
          const int n_obs, const OBSERVE *obs);                /* elem_ou2.cpp */
 
 const double PI = 3.1415926535897932384626433832795028841971693993751058209749445923;
 
 int put_elements_into_sof( char *obuff, const char *templat,
-         const ELEMENTS *elem,
+         const ELEMENTS *elem, const double *nongravs,
          const int n_obs, const OBSERVE *obs)
 {
    int rval = 0;
@@ -162,12 +162,8 @@ int put_elements_into_sof( char *obuff, const char *templat,
       else if( templat[0] == 'o' && templat[1] == 'm')
          angle_to_put = elem->arg_per;
       else if( templat[0] == 'A' && templat[1] >= '1' && templat[1] <= '3')
-         {
-         extern double solar_pressure[];
-
          text_to_put = put_double_in_buff( tbuff,
-                                       solar_pressure[templat[1] - '1']);
-         }
+                                       nongravs[templat[1] - '1']);
       else        /* couldn't puzzle out what value we're storing; */
          rval++;  /* increment the error count */
 
