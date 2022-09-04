@@ -212,16 +212,20 @@ AUTO_ARC_LEN=7300
 
    VECTOR_OPTS gives three values controlling state vector and Cartesian
    coordinate ephemerides.  The first value can be zero (the default) for
-   equatorial J2000 vectors,  or one for ecliptic J2000.  (I may add
-   mean and/or apparent coordinates at some point,  and perhaps body
-   plane coordinates.)  The second value is a multiplier for length.
+   equatorial vectors,  or one for ecliptic.  (I may add body plane
+   coordinates eventually.)  The second value is a multiplier for length.
    Lengths default to being in AU,  with this multiplier being 1.
    Set it to 149597870.7 (the number of kilometers in one AU) to switch
    to kilometers,  or to 23454.7800299146773197201 to switch the distance
    unit to Earth radii (this assumes the equatorial radius of 6378.140 km.)
    The final value gives the time unit:  1=days (default),  24=hours,
    1440=minutes, 86400=seconds.  For example,  VECTOR_OPTS=1,149597870.7,86400
-   would get you ecliptic J2000 vectors in kilometers and km/s.
+   would get you ecliptic vectors in kilometers and km/s.
+      By default,  the vectors will be in the J2000 epoch.  You can add
+   (for example) ',2016' to get output in the J2016 epoch,  or ',t' for
+   output in true coordinates of date,  or ',m' for mean coordinates of
+   date.  So,  for example,  VECTOR_OPTS=0,1,1,1975 would result in
+   equatorial J1975 vectors in AU and days.
 VECTOR_OPTS=0,1,1
 
    Comet non-gravitational forces in the "standard" Marsden-Sekanina model

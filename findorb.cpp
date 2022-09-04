@@ -839,6 +839,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
       bool reset_vect_units = false;
       extern double ephemeris_mag_limit;
       const char *tptr, *err_msg = NULL;
+      char vect_epoch[9];
       const bool is_topocentric =
                is_topocentric_mpc_code( mpc_code);
 
@@ -877,10 +878,28 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
          {
          const char *vect_opts = get_environment_ptr( "VECTOR_OPTS");
          const char *otext;
+         int end_loc;
 
-         sscanf( vect_opts, "%d,%lf,%lf", &vect_frame, &vect_dist_units, &vect_time_units);
+         sscanf( vect_opts, "%d,%lf,%lf%n", &vect_frame, &vect_dist_units,
+                        &vect_time_units, &end_loc);
          snprintf_append( buff, sizeof( buff), "F  %s\n",
-                     vect_frame ? "Ecliptic J2000" : "Equatorial J2000");
+                     vect_frame ? "Ecliptic frame" : "Equatorial frame");
+         if( vect_opts[end_loc] == ',')
+            strlcpy_error( vect_epoch, vect_opts + end_loc + 1);
+         else
+            strlcpy_error( vect_epoch, "2000");
+         if( *vect_epoch == 'm')
+            strlcat_error( buff, "P  Mean coords of date\n");
+         else if( *vect_epoch == 't')
+            strlcat_error( buff, "P  True coords of date\n");
+         else
+            {
+            const double epoch_year = atof( vect_epoch);
+
+            assert( epoch_year > 1700. && epoch_year < 2300.);
+            snprintf_append( buff, sizeof( buff), "P  Coord epoch %s\n",
+                                       vect_epoch);
+            }
          if( vect_dist_units == 1.)
             otext = "AU";
          else if( fabs( vect_dist_units - AU_IN_KM) < 1.)  /* allow for roundoff */
@@ -1224,7 +1243,23 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             ephemeris_output_options ^= OPTION_SEPARATE_MOTIONS;
             break;
          case 'p': case 'P':
-            ephemeris_output_options ^= OPTION_PHASE_ANGLE_OUTPUT;
+            if( vect_frame > -1)
+               {
+               if( !inquire( "Epoch of vectors (t(rue), m(ean),  or a year) :",
+                              buff, sizeof( vect_epoch), COLOR_MESSAGE_TO_USER))
+                  {
+                  if( (!buff[1] && (buff[0] == 't' || buff[0] == 'm'))
+                        || (atof( buff) > 1700 && atof( buff) < 2300.))
+                     {
+                     strlcpy_error( vect_epoch, buff);
+                     reset_vect_units = true;
+                     }
+                  else
+                     err_msg = "Vector epoch must be t(rue), m(ean),  or a year!";
+                  }
+               }
+            else
+               ephemeris_output_options ^= OPTION_PHASE_ANGLE_OUTPUT;
             break;
          case 'r': case 'R':
             ephemeris_output_options ^= OPTION_RADIAL_VEL_OUTPUT;
@@ -1333,8 +1368,8 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
          inquire( err_msg, NULL, 0, COLOR_FINAL_LINE);
       if( reset_vect_units)
          {
-         snprintf( buff, sizeof( buff), "%d,%f,%f", vect_frame,
-                     vect_dist_units, vect_time_units);
+         snprintf( buff, sizeof( buff), "%d,%f,%f,%s", vect_frame,
+                     vect_dist_units, vect_time_units, vect_epoch);
          set_environment_ptr( "VECTOR_OPTS", buff);
          }
       }
