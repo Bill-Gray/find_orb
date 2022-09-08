@@ -275,6 +275,7 @@ extern double maximum_jd, minimum_jd;        /* orb_func.cpp */
 #define COLOR_HINT_TEXT            18
 
 #define SHOW_FILE_IS_EPHEM          1
+#define SHOW_FILE_IS_CALENDAR       2
 
 static int curses_kbhit( )
 {
@@ -2268,6 +2269,7 @@ static void show_a_file( const char *filename, const int flags)
    int n_lines_alloced = 0, search_text_length = 0;
    int *index = NULL, find_text = 0, *backup_screen;
    char search_text[100];
+   int calendar_line = -99, calendar_col = -1;
 
    if( !ifile)
       ifile = fopen_ext( filename, "clrb");
@@ -2296,6 +2298,20 @@ static void show_a_file( const char *filename, const int flags)
    index[0] = 0;
    *err_text = '\0';
    backup_screen = store_curr_screen( );
+   if( flags & SHOW_FILE_IS_CALENDAR)
+      {
+      const long jd = (long)( current_jd( ) + .5);
+      long year;
+      int day, month, day0;
+
+      day_to_dmy( jd, &day, &month, &year, CALENDAR_GREGORIAN);
+      day0 = (int)( jd - (long)day + 2) % 7;
+      day0 += day - 1;
+      calendar_line = ((year - 2022) + month - 1) * 25;
+      calendar_line += ((day0 / 7) % 5) * 4 + 5;
+      calendar_col = (day0 % 7) * 11;
+      line_no = calendar_line;
+      }
    while( keep_going)
       {
       int i, c;
@@ -2373,6 +2389,9 @@ static void show_a_file( const char *filename, const int flags)
             mvchgat( i, color_col[j], 2, A_NORMAL, color_pair_idx, NULL);
             color_pair_idx++;
             }
+         if( calendar_col >= 0 && curr_line > calendar_line - 2
+                               && curr_line < calendar_line + 2)
+            mvchgat( i, calendar_col + 1, 10, 0, COLOR_OBS_INFO, NULL);
          }
                /* show "scroll bar" to right of text: */
       show_right_hand_scroll_bar( 0, n_lines_to_show, top_line, n_lines);
@@ -6001,8 +6020,16 @@ int main( int argc, const char **argv)
             add_off_on = show_alt_info;
             }
             break;
-         case '\\':
          case 'c': case 'C':
+            {
+            FILE *ifile = fopen_ext( "calend.txt", "clrb");
+
+            if( ifile)
+               fclose( ifile);
+            show_a_file( (ifile ? "calend.txt" : "calendar.txt"), SHOW_FILE_IS_CALENDAR);
+            }
+            break;
+         case '\\':
          case 'j': case 'J':
          case 'O':
          case ';': case ']':

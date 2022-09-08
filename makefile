@@ -289,7 +289,7 @@ clean_temp:
 	$(RM) $(IDIR)/virtual.txt
 
 INSTALL_FILES= \
-   bright.pgm bright2.pgm cometdef.sof command.txt cospar.txt \
+   bright.pgm bright2.pgm calendar.txt cometdef.sof command.txt cospar.txt \
    details.txt dosephem.txt dos_help.txt elem_pop.txt environ.def \
    eph2tle.txt eph_expl.txt eph_type.txt ?findorb.txt frame_he.txt \
    geo_rect.txt header.htm jpl_eph.txt link_def.json mpc_area.txt \

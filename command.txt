@@ -13,6 +13,7 @@ e              Epoch
 !              all_perts
 u              Undo
 *              NonGravs
+c              Calend
 +              HelioOnly
 -              Obs'ories
 x              ToggObs
@@ -82,6 +83,7 @@ End colors
 Start hints
 
 b              Select format for observation times
+c              Show calendar
 r              Enter dist to object at start and end of arc
 q              Quit Find_Orb
 o              Open a file of astrometry
