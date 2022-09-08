@@ -147,7 +147,7 @@ int wgetn_wstr_ex(WINDOW *win, wint_t *wstr, int *loc, const int maxlen, const i
         wrefresh(win);
 
         wget_wch_rval = wget_wch( win, &ch);
-        if( wget_wch_rval == OK && ch == _ECHAR)
+        if( wget_wch_rval == OK && (ch == _ECHAR || ch == 127 || ch == KEY_BACKSPACE))
         {
             wget_wch_rval = KEY_CODE_YES;
             ch = KEY_BACKSPACE;

@@ -1636,6 +1636,8 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
                   rval = choice;
                }
             } while( !c);
+         if( c == 127 || c == KEY_BACKSPACE)
+            c = 8;
                      /* if a letter/number is hit,  look for an obj that */
                      /* starts with that letter/number: */
          if( (c >= ' ' && c <= 'z' && c != '?') || c == 8)
@@ -2559,12 +2561,9 @@ static void show_a_file( const char *filename, const int flags)
          case ALT_Q:
             keep_going = 0;
             break;
-#if defined( __linux)
-         case 127:                     /* backspace */
-         case 263:                     /* also backspace */
-#else
-         case 8:                       /* backspace */
-#endif
+         case 127:           /* backspace takes on different values */
+         case KEY_BACKSPACE: /* on PDCurses,  ncurses,  etc.        */
+         case 8:
             if( search_text_length)
                search_text_length--;
             else
@@ -5201,7 +5200,7 @@ int main( int argc, const char **argv)
                update_element_display = 1;
             break;
          case 127:           /* backspace takes on different values */
-         case 263:           /* on PDCurses,  ncurses,  etc.        */
+         case KEY_BACKSPACE: /* on PDCurses,  ncurses,  etc.        */
          case 8:
             if( !pop_orbit( &curr_epoch, orbit))
                {
