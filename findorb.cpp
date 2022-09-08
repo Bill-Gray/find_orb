@@ -1504,7 +1504,7 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
          const int n_lines = getmaxy( stdscr) - 3;
          int column_width = (force_full_width_display ? 40 : 16);
          int c, n_cols = xmax / column_width;
-         char *buff = (char *)malloc( xmax + 1);
+         char *buff = (char *)malloc( xmax > 89 ? xmax + 1 : 91);
          const int x0 = xmax - 25;  /* column where buttons start */
 
          if( choice < 0)
