@@ -2272,6 +2272,7 @@ static void show_a_file( const char *filename, const int flags)
    int *index = NULL, find_text = 0, *backup_screen;
    char search_text[100];
    int calendar_line = -99, calendar_col = -1;
+   int calendar_cell_width, calendar_cell_height;
 
    if( !ifile)
       ifile = fopen_ext( filename, "clrb");
@@ -2303,15 +2304,22 @@ static void show_a_file( const char *filename, const int flags)
    if( flags & SHOW_FILE_IS_CALENDAR)
       {
       const long jd = (long)( current_jd( ) + .5);
-      long year;
-      int day, month, day0;
+      long year, calendar_year0;
+      int day, month, day0, n_read;
 
+      fseek( ifile, 0L, SEEK_SET);
+      if( !fgets( buff, sizeof( buff), ifile))
+         exit( -3);
+      n_read = sscanf( buff, "%ld %d %d", &calendar_year0,
+                  &calendar_cell_width, &calendar_cell_height);
+      assert( 3 == n_read);
       day_to_dmy( jd, &day, &month, &year, CALENDAR_GREGORIAN);
       day0 = (int)( jd - (long)day + 2) % 7;
       day0 += day - 1;
-      calendar_line = ((year - 2022) + month - 1) * 25;
-      calendar_line += ((day0 / 7) % 5) * 4 + 5;
-      calendar_col = (day0 % 7) * 11;
+      calendar_line = ((year - calendar_year0) + month - 1);
+      calendar_line *= calendar_cell_height * 5 + 5;
+      calendar_line += ((day0 / 7) % 5) * calendar_cell_height + 6;
+      calendar_col = (day0 % 7) * calendar_cell_width;
       line_no = calendar_line;
       }
    while( keep_going)
@@ -2392,8 +2400,8 @@ static void show_a_file( const char *filename, const int flags)
             color_pair_idx++;
             }
          if( calendar_col >= 0 && curr_line > calendar_line - 2
-                               && curr_line < calendar_line + 2)
-            mvchgat( i, calendar_col + 1, 10, 0, COLOR_OBS_INFO, NULL);
+                   && curr_line < calendar_line + calendar_cell_height - 2)
+            mvchgat( i, calendar_col + 1, calendar_cell_width - 1, 0, COLOR_OBS_INFO, NULL);
          }
                /* show "scroll bar" to right of text: */
       show_right_hand_scroll_bar( 0, n_lines_to_show, top_line, n_lines);
