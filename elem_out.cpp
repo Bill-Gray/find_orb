@@ -3404,7 +3404,7 @@ double calc_obs_magnitude( const double obj_sun,
       rval = comet_magnitude_slope_param * log( obj_sun);
    else
       {
-      double phi1, phi2, log_tan_half_phase;
+      double phi1, phi2, log_tan_half_phase, tval;
 
       if( ph_ang < 1e-10)   /* "close enough" to zero */
          phi1 = phi2 = 1.;
@@ -3414,9 +3414,12 @@ double calc_obs_magnitude( const double obj_sun,
          phi1 = exp( -3.33 * exp( log_tan_half_phase * 0.63));
          phi2 = exp( -1.87 * exp( log_tan_half_phase * 1.22));
          }
-      rval = 5. * log( obj_sun) - 2.5 *
-                  log( (1. - asteroid_magnitude_slope_param) * phi1
-                + asteroid_magnitude_slope_param * phi2);
+      tval = (1. - asteroid_magnitude_slope_param) * phi1
+                + asteroid_magnitude_slope_param * phi2;
+      if( tval < 1e-50)    /* avoid domain errors;  results in _very_ */
+         rval = 9999.;     /* faint magnitudes */
+      else
+         rval = 5. * log( obj_sun) - 2.5 * log( tval);
       }
    rval += 5. * log( obj_earth);
    rval /= LOG_10;         /* allow for common logs,  not naturals */
