@@ -138,3 +138,4 @@ Ctrl-W         Toggle observations above the currently selected one
 F2             Toggle observations below the currently selected one
 Ctrl-X         Save orbits for re-use
 Ctrl-Y         Write excluded observations to be 'banned'
+Ctrl-G         Set magnitude slope parameter (G)

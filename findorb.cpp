@@ -4100,6 +4100,11 @@ int main( int argc, const char **argv)
                   if( tptr)
                      add_cmd_area( ALT_R, line_no + iline,
                                           (int)( tptr - tbuff) - 3, (int)strlen( reference) + 6);
+                  tptr = strstr( tbuff, "G ");
+                  if( tptr)
+                     add_cmd_area( CTRL( 'G'), line_no + iline,
+                                          (int)( tptr - tbuff) - 1, 9);
+                  if( tptr && strstr( tbuff, "H "))
                   if( make_unicode_substitutions)
                      {
                      text_search_and_replace( tbuff, " +/- ", " \xc2\xb1 ");
@@ -4692,8 +4697,17 @@ int main( int argc, const char **argv)
             curr_obs = i;
             single_obs_selected = true;
             break;
-         case KEY_F(11):
          case CTRL( 'G'):
+            if( !inquire( "Slope parameter( G): ",
+                                tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY)
+                        && *tbuff)
+               {
+               extern double asteroid_magnitude_slope_param;
+
+               asteroid_magnitude_slope_param = atof( tbuff);
+               }
+            break;
+         case KEY_F(11):
             auto_repeat_full_improvement ^= 1;
             strlcpy_error( message_to_user, "Automatic full improvement repeat is");
             add_off_on = auto_repeat_full_improvement;
@@ -5408,12 +5422,7 @@ int main( int argc, const char **argv)
             if( !inquire( "J2 multiplier: ",
                                 tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY))
                {
-               extern double j2_multiplier;
-               extern double asteroid_magnitude_slope_param;
-
-               if( *tbuff == 'G')
-                  asteroid_magnitude_slope_param = atof( tbuff + 1);
-               else if( *tbuff == 'r')
+               if( *tbuff == 'r')
                   {
                   unsigned j;
 
@@ -5424,7 +5433,11 @@ int main( int argc, const char **argv)
                   update_element_display = 1;
                   }
                else
+                  {
+                  extern double j2_multiplier;
+
                   j2_multiplier = atof( tbuff);
+                  }
                }
             break;
          case ALT_S:
