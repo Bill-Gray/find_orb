@@ -194,6 +194,13 @@ int wgetn_wstr_ex(WINDOW *win, wint_t *wstr, int *loc, const int maxlen, const i
                   *loc = len;
                   break;
 
+               case KEY_ENTER:
+#ifdef PADENTER
+               case PADENTER:
+#endif
+                  rval = 0;
+                  break;
+
                case KEY_MOUSE:
                   {
                   MEVENT mouse_event;
