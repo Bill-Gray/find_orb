@@ -3729,7 +3729,6 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                   suppress_private_obs = 0;  /* ask if user wants them included */
                else
                   suppress_private_obs = 1;
-               debug_printf( "Answer '%c' (%d)\n", c, c);
                }
             if( rval[i].reference[0] == '!' && suppress_private_obs)
                observation_is_good = false;
