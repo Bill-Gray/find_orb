@@ -5118,7 +5118,7 @@ int main( int argc, const char **argv)
 
                for( i = 0; i < n_obs - 1 && !obs[i].is_included; i++)
                   ;
-               n_found = get_sr_orbits( orbits, obs + i, n_obs - i, 0, max_orbits, 3., 1.);
+               n_found = get_sr_orbits( orbits, obs + i, n_obs - i, 0, max_orbits, 86400., 1.);
                snprintf_err( message_to_user, sizeof( message_to_user),
                                 "%d orbits computed: best score=%.3f\n",
                                 n_found, orbits[6]);
