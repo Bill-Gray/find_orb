@@ -1784,7 +1784,8 @@ void format_dist_in_buff( char *buff, const double dist_in_au); /* ephem0.c */
 
 typedef struct
    {
-   unsigned key, line, col1, col2;
+   int key;
+   unsigned line, col1, col2;
    } command_area_t;
 
 static command_area_t *command_areas;
@@ -3504,39 +3505,51 @@ static int find_command_area( const unsigned mouse_x, const unsigned mouse_y,
    return( rval);
 }
 
+static void show_hint_text( const unsigned mouse_x, const unsigned mouse_y,
+               unsigned line, unsigned col, unsigned len, const char *text)
+{
+   chtype prev_scr[100];
+   unsigned i;
+   int pass;
+
+   assert( len < 100);
+   mvinchnstr( line, col, prev_scr, len);
+   for( pass = 0; pass < 2; pass++)
+      {
+      for( i = 0; i < len; i++)
+         prev_scr[i] ^= A_REVERSE;
+      mvaddchnstr( line, col, prev_scr, len);
+      if( !pass)
+         full_inquire( text, NULL, HINT_TEXT, COLOR_MENU, mouse_y, mouse_x);
+      }
+}
+
 static void show_hint( const unsigned mouse_x, const unsigned mouse_y)
 {
    size_t index;
    const int cmd = find_command_area( mouse_x, mouse_y, &index);
 
-   if( cmd != KEY_MOUSE)
+   if( cmd != KEY_MOUSE && cmd > 0)
       {
       char buff[100];
       FILE *ifile = fopen_ext( "command.txt", "fcrb");
+      int got_it = 0;
 
       while( fgets_trimmed( buff, sizeof( buff), ifile)
                   && memcmp( buff, "Start h", 7))
          ;   /* just skip lines until we get to the section we want */
-      while( fgets_trimmed( buff, sizeof( buff), ifile))
-         if( get_character_code( buff) == cmd)
-            {
-            chtype prev_scr[100];
-            unsigned i, len = command_areas[index].col2 - command_areas[index].col1;
-            int pass;
-
-            mvinchnstr( command_areas[index].line, command_areas[index].col1,
-                      prev_scr, len);
-            for( pass = 0; pass < 2; pass++)
-               {
-               for( i = 0; i < len; i++)
-                  prev_scr[i] ^= A_REVERSE;
-               mvaddchnstr( command_areas[index].line, command_areas[index].col1,
-                             prev_scr, len);
-               if( !pass)
-                  full_inquire( buff + 15, NULL, HINT_TEXT, COLOR_MENU, mouse_y, mouse_x);
-               }
-            }
+      while( !got_it && fgets_trimmed( buff, sizeof( buff), ifile))
+         got_it = (get_character_code( buff) == cmd);
       fclose( ifile);
+      if( got_it)
+         memmove( buff, buff + 15, strlen( buff + 14));
+      else
+         *buff = '\0';
+      if( *buff)      /* yes,  we have a hint to show */
+         show_hint_text( mouse_x, mouse_y, command_areas[index].line,
+                     command_areas[index].col1,
+                     command_areas[index].col2 - command_areas[index].col1,
+                     buff);
       }
 }
 
@@ -4102,9 +4115,17 @@ int main( int argc, const char **argv)
                                           (int)( tptr - tbuff) - 3, (int)strlen( reference) + 6);
                   tptr = strstr( tbuff, "G ");
                   if( tptr)
-                     add_cmd_area( CTRL( 'G'), line_no + iline,
+                     {
+                     char *tptr2 = strstr( tbuff, "H ");
+
+                     if( tptr && tptr2)
+                        {
+                        add_cmd_area( CTRL( 'G'), line_no + iline,
                                           (int)( tptr - tbuff) - 1, 9);
-                  if( tptr && strstr( tbuff, "H "))
+                        add_cmd_area( -1,         line_no + iline,
+                                          (int)( tptr2 - tbuff) - 1, 9);
+                        }
+                     }
                   if( make_unicode_substitutions)
                      {
                      text_search_and_replace( tbuff, " +/- ", " \xc2\xb1 ");
@@ -4294,6 +4315,8 @@ int main( int argc, const char **argv)
          c = find_command_area( mouse_x, mouse_y, NULL);
          if( c == ALT_X && mouse_wheel_motion)
             c = (mouse_wheel_motion < 0 ? KEY_F( 4) : KEY_F( 5));
+         if( c < 0)      /* informational hint text; no command */
+            c = KEY_MOUSE;
          }
 
       if( c == KEY_MOUSE && !(button & REPORT_MOUSE_POSITION))
