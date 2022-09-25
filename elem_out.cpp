@@ -280,29 +280,6 @@ void get_find_orb_text_filename( char *filename)
    *filename = findorb_language;
 }
 
-         /* The following only works for Win1252,  and even there, */
-         /* the part from 0x80 to 0x9f fails.  But we don't have   */
-         /* Euro signs and such in Find_Orb at this point.         */
-#ifndef HAVE_UNICODE
-void utf8_to_win1252( char *text)
-{
-   char *optr = text;
-
-   while( *text)
-      if( (unsigned char)*text < 0x80)
-         *optr++ = *text++;
-      else
-         {
-         const unsigned char t0 = (unsigned char)text[0];
-         const unsigned char t1 = (unsigned char)text[1];
-
-         *optr++ = (char)( (t0 << 6) | (t1 & 0x3f));
-         text += 2;
-         }
-   *optr = '\0';
-}
-#endif
-
 /* Multi-line text in ?findorb.txt files is 'joined' by this function.
 If two or more consecutive lines have the same index,  we concatenate
 them, with a line feed in between them.  */

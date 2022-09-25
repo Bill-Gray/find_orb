@@ -72,9 +72,6 @@ static const TCHAR *program_name = _T( "Find_Orb");
 #define EARTH_MINOR_AXIS 6356755.
 #define EARTH_AXIS_RATIO (EARTH_MINOR_AXIS / EARTH_MAJOR_AXIS)
 
-#ifndef _UNICODE
-void utf8_to_win1252( char *text);                    /* elem_out.cpp */
-#endif
 int adjust_herget_results( OBSERVE FAR *obs, int n_obs, double *orbit);
 int find_trial_orbit( double *orbit, OBSERVE FAR *obs, int n_obs,
                  const double r1, const double angle_param);
@@ -540,6 +537,29 @@ void COrbitDlg::OnClickedOpen()
       strcpy( path, filename);
       }
 }
+         /* The following only works for Win1252,  and even there, */
+         /* the part from 0x80 to 0x9f fails.  But we don't have   */
+         /* Euro signs and such in Find_Orb at this point.         */
+#ifndef _UNICODE
+static void utf8_to_win1252( char *text)
+{
+   char *optr = text;
+
+   while( *text)
+      if( (unsigned char)*text < 0x80)
+         *optr++ = *text++;
+      else
+         {
+         const unsigned char t0 = (unsigned char)text[0];
+         const unsigned char t1 = (unsigned char)text[1];
+
+         *optr++ = (char)( (t0 << 6) | (t1 & 0x3f));
+         text += 2;
+         }
+   *optr = '\0';
+}
+#endif
+
 
 void add_version_and_de_text( char *buff);
 
