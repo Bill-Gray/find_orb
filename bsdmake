@@ -1,107 +1,229 @@
-# Make file for console Find_Orb,  using regular Curses, on BSD
-# Based on 'makefile' for Linux (q.v.)  The only difference,  at present,
-# is that bsdmake uses .ifdef/.endif instead of plain ifdef/endif.
+# Make file for console Find_Orb on BSD
+# Based largely on 'makefile' (q.v.) written for GNU make
 #
-# Usage: make -f [path/]linmake [CLANG=Y] [XCOMPILE=Y] [MSWIN=Y] [tgt]
+# Usage: make -f [path/]linmake [X=Y] [VT=Y] [tgt]
 #
 #	where tgt can be any of:
-# [all|find_orb|fo|fo_serve]
+# [all|find_orb|fo|fo_serve|clean|clean_temp|eph2tle|cssfield|neat_xvt]
 #
-#	'XCOMPILE' = cross-compile for Windows,  using MinGW,  on a BSD box
-#	'MSWIN' = compile for Windows,  using MinGW,  on a Windows machine
-#	'CLANG' = use clang instead of GCC;  BSD only
 # 'X' = use PDCurses instead of ncurses
-# None of these: compile using g++ on BSD,  for BSD
-#	Note that I've only tried the last of these,  on PC-BSD (which is based
-# on FreeBSD).  I would expect CLANG to work,  and one _can_ use MinGW
-# on BSD (so I hear;  I've not tried it).  I think PDCurses works Just
-# Fine on BSD,  but again,  haven't tried it yet.
+# 'VT' = use PDCurses with VT platform (see github.com/Bill-Gray/PDCurses/vt)
+#
+# 'clean_temp' removes various temporary files made by Find_Orb and friends:
+# orbital elements,  covariance matrices,  etc.  'clean' removes these _and_
+# the more usual object and executable files.
 
-CURSES_LIB=-lncursesw
-CC=g++
-LIBSADDED=-lm
+CXX=c++
+CC=cc
+
+LIBSADDED=-L $(INSTALL_DIR)/lib -lm
 EXE=
-OBJSADDED=
 RM=rm -f
 
-.ifdef CLANG
-	CC=clang
-.endif
+CURSES_LIB=-lncurses
+CP = cp
 
-.ifdef MSWIN
-	LIBSADDED=
-	EXE=.exe
-	OBJSADDED=clipfunc.o
-	CURSES_LIB=pdcurses.a -static-libgcc
+# I'm using 'mkdir -p' to avoid error messages if the directory exists.
+# It may fail on very old systems,  and will probably fail on non-POSIX
+# systems.  If so,  change to '-mkdir' and ignore errors.
+
+MKDIR=mkdir -p
+
+# You can have your include files in ~/include and libraries in
+# ~/lib,  in which case only the current user can use them;  or
+# (with root privileges) you can install them to /usr/local/include
+# and /usr/local/lib for all to enjoy.
+
+PREFIX?=~
+.ifdef GLOBAL
+INSTALL_DIR=/usr/local
+.else
+INSTALL_DIR=$(PREFIX)
+.endif
+.if $(PREFIX) != ~
+	# enable the automatic setup of ~/.find_orb dir from
+	# $PREFIX/share/openorb.  This at the moment requires C++17 features
+	# and works on Linux and macOS
+CXXFLAGS+=-DCONFIG_DIR_AUTOCOPY=1 -std=c++17
 .endif
 
 .ifdef X
-	ADDED_CFLAGS=-DXCURSES -DPDC_WIDE -I../PDCurses
-	CURSES_LIB=-lXCurses -lXaw -lXmu -lXt -lX11 -lSM -lICE -lXext -lXpm
+CURSES_FLAGS=-DXCURSES -I../PDCursesMod
+CURSES_LIB=-lXCurses -lXaw -lXmu -lXt -lX11 -lSM -lICE -lXext -lXpm
 .endif
 
-.ifdef XCOMPILE
-	CC=x86_64-w64-mingw32-g++
-	ADDED_CFLAGS=-DUTF8 -DPDC_WIDE -I/usr/local/include
- OBJSADDED=clipfunc.o
-	EXE=.exe
-	LIBSADDED=
-	CURSES_LIB=pdcurses.a -static-libgcc
+.ifdef VT
+CURSES_FLAGS=-DVT -I$(HOME)/PDCursesMod
+CURSES_LIB=-lpdcurses
 .endif
 
-all: fo$(EXE) find_orb$(EXE) fo_serve.cgi
+LIB_DIR=$(INSTALL_DIR)/lib
 
-CFLAGS=-c -O3 -Wall -pedantic -Wextra -Wno-unused-parameter
+.ifndef FO_EXE
+FO_EXE=fo
+FIND_ORB_EXE=find_orb
+.endif
 
-OBJS=b32_eph.o bc405.o bias.o collide.o conv_ele.o eigen.o \
-	elem2tle.o elem_out.o ephem0.o gauss.o geo_pot.o healpix.o \
-	lsquare.o miscell.o moid4.o monte0.o mpc_obs.o \
-	orb_func.o orb_fun2.o pl_cache.o roots.o  \
-	runge.o sigma.o sm_vsop.o sr.o $(OBJSADDED)
+all: $(FO_EXE) $(FIND_ORB_EXE) fo_serve.cgi eph2tle$(EXE)
 
-LIBS=-llunar -ljpl -lsatell
+CXXFLAGS+=-c -Wall -pedantic -Wextra -Werror $(ADDED_CXXFLAGS) -I $(INSTALL_DIR)/include
 
-find_orb$(EXE):          findorb.o $(OBJS)
-	$(CC) -o find_orb$(EXE) findorb.o $(OBJS) $(CURSES_LIB) $(LIBSADDED) $(LIBS)
+.ifdef DEBUG
+ CXXFLAGS += -g -O0
+.else
+ CXXFLAGS += -O3
+.endif
 
-fo$(EXE):          fo.o $(OBJS)
-	$(CC) -o fo$(EXE) fo.o $(OBJS) $(LIBSADDED) $(LIBS)
+OBJS=ades_out.o b32_eph.o bc405.o bias.o collide.o conv_ele.o details.o eigen.o \
+	elem2tle.o elem_out.o elem_ou2.o ephem0.o errors.o expcalc.o gauss.o \
+	geo_pot.o healpix.o lsquare.o miscell.o         monte0.o \
+	mpc_obs.o nanosecs.o orb_func.o orb_fun2.o pl_cache.o roots.o  \
+	runge.o shellsor.o sigma.o simplex.o sm_vsop.o sr.o stackall.o
 
-fo_serve.cgi:          fo_serve.o cgi_func.o $(OBJS)
-	$(CC) -o fo_serve.cgi fo_serve.o cgi_func.o $(OBJS) $(LIBSADDED) $(LIBS)
+LIBS=$(LIBSADDED) -llunar -ljpl -lsatell
+FIND_ORB_OBJS = clipfunc.o getstrex.o
 
-IDIR=$(HOME)/.find_orb
+$(FIND_ORB_EXE):          findorb.o $(FIND_ORB_OBJS) $(OBJS) $(RES_FILENAME)
+	$(CXX) -o $(FIND_ORB_EXE) findorb.o $(FIND_ORB_OBJS) $(OBJS) $(LIBS) $(CURSES_LIB) $(RES_FILENAME) $(LDFLAGS)
+
+findorb.o:         findorb.cpp
+	$(CXX) $(CXXFLAGS) $(CURSES_FLAGS) $<
+
+clipfunc.o:        clipfunc.cpp
+	$(CXX) $(CXXFLAGS) $(CURSES_FLAGS) $<
+
+getstrex.o:        getstrex.c
+	$(CC) $(CXXFLAGS) $(CURSES_FLAGS) $<
+
+$(FO_EXE):          fo.o $(OBJS) $(RES_FILENAME)
+	$(CXX) -o $(FO_EXE) fo.o $(OBJS) $(LIBS) $(RES_FILENAME) $(LDFLAGS)
+
+eph2tle$(EXE):          eph2tle.o conv_ele.o elem2tle.o simplex.o lsquare.o
+	$(CXX) -o eph2tle$(EXE) eph2tle.o conv_ele.o elem2tle.o simplex.o lsquare.o $(LIBS)
+
+cssfield$(EXE):          cssfield.o
+	$(CXX) -o cssfield$(EXE) cssfield.o $(LIBS)
+
+expcalc$(EXE):          expcalc.cpp
+	$(CXX) -o expcalc$(EXE) -Wall -Wextra -pedantic -DTEST_CODE expcalc.cpp
+
+roottest$(EXE):          roottest.o
+	$(CXX) -o roottest$(EXE) roottest.o roots.o
+
+neat_xvt$(EXE):          neat_xvt.o
+	$(CXX) -o neat_xvt$(EXE) neat_xvt.o
+
+fo_serve.cgi:          fo_serve.o $(OBJS)
+	$(CXX) -o fo_serve.cgi fo_serve.o $(OBJS) $(LIBS)
+
+cvt_elem.cgi:	         cvt_elem.o
+	$(CXX) -o cvt_elem.cgi cvt_elem.o $(LIBS)
+
+cvt_elem.o:         conv_ele.cpp
+	$(CXX) $(CXXFLAGS) -o cvt_elem.o -DCGI_VERSION $<
+
+IDIR=$(PREFIX)/share/findorb/data
+.if $(PREFIX) == ~
+	# backwards compatibility
+IDIR=~/.find_orb
+.endif
 
 clean:
-	$(RM) $(OBJS) fo.o findorb.o fo_serve.o find_orb$(EXE) fo$(EXE)
-	$(RM) fo_serve.cgi cgi_func.o
-	cd $(IDIR)
-	$(RM) covar.txt covar?.txt debug.txt eleme?.txt elements.txt
-	$(RM) ephemeri.txt gauss.out guide.txt guide?.txt monte.txt monte?.txt
-	$(RM) mpc_f?.txt mpc_fmt.txt mpc_s?.txt mpec.htm obser?.txt observe.txt
-	$(RM) residual.txt sr_el?.txt state.txt state?.txt virtu?.txt virtual.txt
-	$(RM) sr_elems.txt mpcorb.dat
+	$(RM) $(OBJS) fo.o findorb.o fo_serve.o $(FIND_ORB_EXE) $(FO_EXE)
+	$(RM) fo_serve.cgi eph2tle.o eph2tle$(EXE) cssfield$(EXE)
+	$(RM) $(FIND_ORB_OBJS) cssfield.o neat_xvt.o neat_xvt$(EXE)
+	$(RM) prefix.h PREFIX
+.ifdef RES_FILENAME
+	$(RM) $(RES_FILENAME)
+
+$(RES_FILENAME): find_orb.ico find_orb.rc
+	$(WINDRES) find_orb.rc -O coff -o $(RES_FILENAME)
+.endif
 
 clean_temp:
-	cd $(IDIR)
-	$(RM) covar.txt covar?.txt debug.txt eleme?.txt elements.txt
-	$(RM) ephemeri.txt gauss.out guide.txt guide?.txt monte.txt monte?.txt
-	$(RM) mpc_f?.txt mpc_fmt.txt mpc_s?.txt mpec.htm obser?.txt observe.txt
-	$(RM) residual.txt sr_el?.txt state.txt state?.txt virtu?.txt virtual.txt
-	$(RM) sr_elems.txt mpcorb.dat
+	$(RM) $(IDIR)/artsat.json
+	$(RM) $(IDIR)/bc405pre.txt
+	$(RM) $(IDIR)/cmt_sof.txt
+	$(RM) $(IDIR)/combined.json
+	$(RM) $(IDIR)/covar.txt
+	$(RM) $(IDIR)/covar.json
+	$(RM) $(IDIR)/covar?.txt
+	$(RM) $(IDIR)/covar?.json
+	$(RM) $(IDIR)/debug.txt
+	$(RM) $(IDIR)/dummy.txt
+	$(RM) $(IDIR)/elem_?.json
+	$(RM) $(IDIR)/eleme?.txt
+	$(RM) $(IDIR)/eleme?.json
+	$(RM) $(IDIR)/elements.txt
+	$(RM) $(IDIR)/elements.json
+	$(RM) $(IDIR)/elem_short.json
+	$(RM) $(IDIR)/ephemeri.txt
+	$(RM) $(IDIR)/ephemeri.json
+	$(RM) $(IDIR)/eph_json.txt
+	$(RM) $(IDIR)/gauss.out
+	$(RM) $(IDIR)/guide.txt
+	$(RM) $(IDIR)/guide?.txt
+	$(RM) $(IDIR)/linkage.json
+	$(RM) $(IDIR)/lock.txt
+	$(RM) $(IDIR)/monte.txt
+	$(RM) $(IDIR)/monte?.txt
+	$(RM) $(IDIR)/mpcorb.dat
+	$(RM) $(IDIR)/mpc_f?.txt
+	$(RM) $(IDIR)/mpc_fmt.txt
+	$(RM) $(IDIR)/mpc_s?.txt
+	$(RM) $(IDIR)/mpec.htm
+	$(RM) $(IDIR)/obser?.txt
+	$(RM) $(IDIR)/observe.txt
+	$(RM) $(IDIR)/observe.xml
+	$(RM) $(IDIR)/obs_temp.txt
+	$(RM) $(IDIR)/residual.txt
+	$(RM) $(IDIR)/sof.txt
+	$(RM) $(IDIR)/sof?.txt
+	$(RM) $(IDIR)/sofv?.txt
+	$(RM) $(IDIR)/sr_el?.txt
+	$(RM) $(IDIR)/sr_elems.txt
+	$(RM) $(IDIR)/state.txt
+	$(RM) $(IDIR)/state?.txt
+	$(RM) $(IDIR)/total.json
+	$(RM) $(IDIR)/total?.json
+	$(RM) $(IDIR)/vectors.txt
+	$(RM) $(IDIR)/virtu?.txt
+	$(RM) $(IDIR)/virtual.txt
 
-install:
-	cp find_orb $(HOME)/bin
-	-mkdir $(IDIR)
-	cp command.txt details.txt dosephem.txt dos_help.txt ?findorb.txt           $(IDIR)
-	cp environ.def geo_rect.txt header.htm jpl_eph.txt mpcorb.hdr               $(IDIR)
-	cp mu1.txt observer.txt obslinks.htm ObsCodes.htm ObsCodesF.html            $(IDIR)
-	cp  odd_name.txt rovers.txt scopes.txt sigma.txt xdesig.txt                 $(IDIR)
+INSTALL_FILES= \
+   bright.pgm bright2.pgm calendar.txt cometdef.sof command.txt cospar.txt \
+   details.txt dosephem.txt dos_help.txt elem_pop.txt environ.def \
+   eph2tle.txt eph_expl.txt eph_type.txt ?findorb.txt frame_he.txt \
+   geo_rect.txt header.htm jpl_eph.txt link_def.json mpc_area.txt \
+   mpcorb.hdr mu1.txt nongravs.txt obj_help.txt obj_name.txt \
+   ObsCodes.htm ObsCodesF.html observer.txt obslinks.htm  \
+   odd_name.txt openfile.txt orbitdef.sof previous.def progcode.txt \
+   radecfmt.txt residfmt.txt rovers.txt sat_xref.txt scope.json \
+   scopes.txt splash.txt sigma.txt site_310.txt timehelp.txt xdesig.txt
+
+install: all
+	$(MKDIR) $(IDIR)
+.ifdef EXE
+	$(CP) $(FIND_ORB_EXE) $(IDIR)
+	$(CP) $(FO_EXE)       $(IDIR)
+.else
+	$(CP) $(FIND_ORB_EXE) $(INSTALL_DIR)/bin
+	$(CP) $(FO_EXE)       $(INSTALL_DIR)/bin
+
+.endif
+	$(CP) $(INSTALL_FILES) $(IDIR)
+	$(CP) hints.txt $(IDIR)
 
 uninstall:
-	rm -f $(HOME)/bin/find_orb
+.ifdef EXE
+	rm -f $(IDIR)/$(FIND_ORB_EXE)
+	rm -f $(IDIR)/$(FO_EXE)
+.else
+	rm -f $(INSTALL_DIR)/bin/$(FIND_ORB_EXE)
+	rm -f $(INSTALL_DIR)/bin/$(FO_EXE)
+.endif
 	rm -f $(IDIR)/*
 	rmdir $(IDIR)
 
 .cpp.o:
-	$(CC) $(CFLAGS) $(ADDED_CFLAGS) $<
+	$(CXX) $(CXXFLAGS) $<
