@@ -2905,12 +2905,12 @@ static int look_for_matching_line( char *iline, char *oline)
    return( *oline ? 1 : 0);
 }
 
-/* Occasionally,  observations are duplicates,  except that one has */
-/* a blank reference or magnitude and the other doesn't.  In this   */
-/* function,  we'll copy the reference that _is_ given over the blank, */
-/* and the mag that's given over the zero mag.  Then we check to see */
-/* if that's caused the observations to become the same.  If it has, */
-/* we consider the difference to have been "corrected".              */
+/* Occasionally,  observations are duplicates,  except that one has a
+blank reference or magnitude or other datum and the other doesn't. In
+this function,  we'll copy reference that _is_ given over the blank
+one, and the mag that's given over the zero mag,  and so forth.  Then
+we check to see if that's caused the observations to become the same.
+If it has, we consider the difference to have been "corrected".    */
 
 static void correct_differences( OBSERVE *obs1, const OBSERVE *obs2)
 {
@@ -2927,6 +2927,8 @@ static void correct_differences( OBSERVE *obs1, const OBSERVE *obs2)
       obs1->astrometric_net_code = obs2->astrometric_net_code;
    if( obs1->mag_band == ' ' && obs2->mag_band != ' ')
       obs1->mag_band = obs2->mag_band;
+   if( obs1->note1 == ' ' && obs2->note1 != ' ')
+      obs1->note1 = obs2->note1;
 }
 
 /* For certain forms of orbit determination,  having radar observations right
