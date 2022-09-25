@@ -1518,7 +1518,7 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
          if( curr_page < 0)      /* ensure that we wrap around: */
             curr_page = 0;
          if( n_ids < n_lines * n_cols)
-            n_cols = n_ids / n_lines + 1;
+            n_cols = (n_ids - 1) / n_lines + 1;
          column_width = xmax / n_cols;
 //       if( column_width > 80)
 //          column_width = 80;
@@ -1553,7 +1553,7 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
                else
                   if( ids[i + curr_page].solution_exists)
                      color = COLOR_OBS_INFO;
-               if( this_column_width > 40)
+               if( force_full_width_display || this_column_width > 40)
                   {
                   strlcat_error( desig, " ");
                   object_comment_text( desig + strlen( desig), ids + i + curr_page);
