@@ -5004,6 +5004,28 @@ static inline void redacted_locations( const char *terms[],
 
 char *mpec_error_message = NULL;
 
+void size_from_h_text( const double abs_mag, char *obuff, const int obuff_size)
+{
+            /* H=4 indicates 420 (albedo=0.5) to 940 km (albedo=0.05),  so: */
+   double upper_size = 940. * exp( (4. - abs_mag) * LOG_10 / 5.);
+   const char *units = "km";
+
+   if( upper_size < .004)   /* under four meters,  use cm as units: */
+      {
+      upper_size *= 1000. * 100.;
+      units = "cm";
+      }
+   else if( upper_size < 4.)  /* under four km,  use meters: */
+      {
+      upper_size *= 1000.;
+      units = "meters";
+      }
+   snprintf_err( obuff, obuff_size,
+              "Size is probably %ld to %ld %s",
+              round_off( upper_size / sqrt( 5.), .1),
+              round_off( upper_size, .1), units);
+}
+
 int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
 {
    char buff[800], mpec_buff[7];
@@ -5395,30 +5417,14 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
             else if( *buff == 'P' && h_ptr)
                {
                const double abs_mag = atof( h_ptr);
-                        /* H=4 indicates 420 to 940 km,  so: */
-               double upper_size = 940. * exp( (4. - abs_mag) * LOG_10 / 5.);
-               const char *units = "km";
+               char size_text[80];
                const char *size_url =
-                   "href=\"https://www.minorplanetcenter.net/iau/lists/Sizes.html\">";
-               char title[50];
+                  "href=\"https://www.minorplanetcenter.net/iau/lists/Sizes.html\"";
 
                h_ptr[-1] = '\0';
-               if( upper_size < .004)   /* under four meters,  use cm as units: */
-                  {
-                  upper_size *= 1000. * 100.;
-                  units = "cm";
-                  }
-               else if( upper_size < 4.)  /* under four km,  use meters: */
-                  {
-                  upper_size *= 1000.;
-                  units = "meters";
-                  }
-               snprintf( title, sizeof( title),
-                          "\"Size is probably %ld to %ld %s\"\n",
-                          round_off( upper_size / sqrt( 5.), .1),
-                          round_off( upper_size, .1), units);
-               fprintf( ofile, "%s<a title=%s%sH</a>%s\n",
-                           buff, title, size_url, h_ptr);
+               size_from_h_text( abs_mag, size_text, sizeof( size_text));
+               fprintf( ofile, "%s<a title=\"%s\"\n%s>H</a>%s\n",
+                           buff, size_text, size_url, h_ptr);
                }
             else
                {
