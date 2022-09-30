@@ -434,6 +434,8 @@ int main( const int argc, const char **argv)
                n_scanned = sscanf( buff, "%lf %lf %70s %3s%n", &rval[n].ra,
                            &rval[n].dec, timestr, (char *)&rval[n].obscode, &offset);
                assert( n_scanned == 4);
+               if( buff[offset] == 10 || buff[offset] == 13)
+                  strcpy( buff + offset, " \n");    /* no file name */
                assert( buff[offset] == ' ');
                rval[n].jd = get_time_from_string( 0., timestr, 0, NULL);
                if( is_valid_field( rval + n))
