@@ -242,6 +242,10 @@ void shellsort_r( void *base, const size_t n_elements, const size_t esize,
 static int count_wide_chars_in_utf8_string( const char *iptr, const char *endptr);
 char **load_file_into_memory( const char *filename, size_t *n_lines,
                         const bool fail_if_not_found);      /* mpc_obs.cpp */
+void make_observatory_info_text( char *text, const size_t textlen,
+             const OBSERVE *obs, int n_obs, const char *mpc_code);
+void size_from_h_text( const double abs_mag, char *obuff,
+                                 const int obuff_size);  /* ephem0.c */
 
 #ifdef __cplusplus
 extern "C" {
@@ -3524,10 +3528,18 @@ static void show_hint_text( const unsigned mouse_x, const unsigned mouse_y,
       }
 }
 
-static void show_hint( const unsigned mouse_x, const unsigned mouse_y)
+static void show_hint_from_command_area( const unsigned mouse_x,
+               const unsigned mouse_y, const size_t index, const char *hint_text)
 {
-   size_t index;
-   const int cmd = find_command_area( mouse_x, mouse_y, &index);
+   show_hint_text( mouse_x, mouse_y, command_areas[index].line,
+                     command_areas[index].col1,
+                     command_areas[index].col2 - command_areas[index].col1,
+                     hint_text);
+}
+
+static int show_hint( const unsigned mouse_x, const unsigned mouse_y, size_t *index)
+{
+   const int cmd = find_command_area( mouse_x, mouse_y, index);
 
    if( cmd != KEY_MOUSE && cmd > 0)
       {
@@ -3546,11 +3558,9 @@ static void show_hint( const unsigned mouse_x, const unsigned mouse_y)
       else
          *buff = '\0';
       if( *buff)      /* yes,  we have a hint to show */
-         show_hint_text( mouse_x, mouse_y, command_areas[index].line,
-                     command_areas[index].col1,
-                     command_areas[index].col2 - command_areas[index].col1,
-                     buff);
+         show_hint_from_command_area( mouse_x, mouse_y, *index, buff);
       }
+   return( cmd);
 }
 
    /* On any platform with ASLR,  the address of 'zval' will be
@@ -4123,7 +4133,7 @@ int main( int argc, const char **argv)
                         add_cmd_area( CTRL( 'G'), line_no + iline,
                                           (int)( tptr - tbuff) - 1, 9);
                         add_cmd_area( -1,         line_no + iline,
-                                          (int)( tptr2 - tbuff) - 1, 9);
+                                          (int)( tptr2 - tbuff), 9);
                         }
                      }
                   if( make_unicode_substitutions)
@@ -4292,7 +4302,43 @@ int main( int argc, const char **argv)
                n_ticks_mouse_stationary++;
                if( n_ticks_mouse_stationary == 20 /* = 1 second w/no motion */
                               && _mouse_movements_are_reported)
-                  show_hint( mouse_x, mouse_y);
+                  {
+                  size_t index;
+                  const int cmd = show_hint( mouse_x, mouse_y, &index);
+
+                  if( cmd == -1)
+                     {
+                     const double abs_mag = calc_absolute_magnitude( obs, n_obs);
+
+                     size_from_h_text( abs_mag, tbuff, 80);
+                     show_hint_from_command_area( mouse_x, mouse_y, index, tbuff);
+                     }
+                  if( cmd == KEY_MOUSE)
+                     {
+                     *tbuff = '\0';
+                     i = mouse_y - top_line_residuals;
+                     if( i >= n_obs_shown)
+                        {
+                        char buff[5];
+
+                        for( i = 0; i < 5; i++)
+                           buff[i] = (char)mvinch( mouse_y, i);
+                        if( buff[0] == '(' && buff[4] == ')')
+                           {
+                           buff[4] = '\0';
+                           make_observatory_info_text( tbuff, sizeof( tbuff),
+                                                       obs, n_obs, buff + 1);
+                           }
+                        }
+#ifdef NOT_USED_YET                       /* To Do: show some info about this */
+                     else if( i >= 0)     /* observation.  Dunno what yet.    */
+                        snprintf_err( tbuff, 80, "line %d, obs %d",
+                                       i, i + top_obs_shown);
+#endif
+                     if( *tbuff)
+                        show_hint_text( mouse_x, mouse_y, 0, 0, 0, tbuff);
+                     }
+                  }
                }
             if( c == KEY_MOUSE && (button & REPORT_MOUSE_POSITION))
                c = n_ticks_mouse_stationary = 0;      /* suppress mouse moves */
