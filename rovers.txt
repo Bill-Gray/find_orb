@@ -355,7 +355,13 @@ d66 ! 3554454.89654  +402547.90955   849.87404 DSS 66 Madrid 26-meter
    and five LCO telescopes are among those listed below,  but matching
    up the telescopes listed below to their MPC codes is difficult;
    the area is a packed array of domes,  and the MPC coordinates are
-   not up to the job of puzzling out which scope is which.
+   not up to the job of puzzling out which scope is which.  Also,
+   the altitude listed for LSST is ~15m below the planned altitude
+   of the pier floor,  which is in turn somewhere below the point where
+   the optical axis crosses the altitude axis (the point we really
+   want when we say "where the telescope is").  So my bet is that
+   most of these altitudes are at least a few meters lower than they
+   really should be.
 
 W84 ! -704823.49     -301010.78     2241.4     Blanco 4-m
 S1.5! -704824.44     -301009.42     2241.9     SMARTS 1.5-m
@@ -384,6 +390,10 @@ T80S! -704820.48     -301004.31     2212       T80-South (site)
 SARA! -704757.13     -301019.72     2151       SARA South 0.6-m
 I11 ! -704412.06     -301426.67     2748       Gemini South 8.2-m
 I33 ! -704401.11     -301416.41     2738       SOAR 4.1-m
+
+   Note that LSST = Rubin now has obscode (X05),  same lat/lon
+   (almost),  but MPC puts the observatory 37m higher.  As explained
+   above,  MPC is probably correct here.
 LSST! -704457.90     -301440.68     2647       LSST 8.4-m (site)
 LSA ! -704451.80     -301441.27     2647       LSST Aux. 1.4-m (site)
 ALO ! -704417.50     -301506.37     2552       Andes LIDAR Obs. (ALO)
