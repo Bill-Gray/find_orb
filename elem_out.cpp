@@ -211,8 +211,8 @@ void make_observatory_info_text( char *text, const size_t textlen,
              const OBSERVE *obs, int n_obs, const char *mpc_code)
 {
    double jd_start = 0., jd_end = 0.;
-   int n_found = 0;
-   char date_text[80];
+   int n_found = 0, n_used = 0;
+   char date_text[80], time_text[80];
 
    while( n_obs--)
       {
@@ -222,17 +222,25 @@ void make_observatory_info_text( char *text, const size_t textlen,
             jd_start = obs->jd;
          jd_end = obs->jd;
          n_found++;
+         if( obs->is_included)
+            n_used++;
          }
       obs++;
       }
    assert( n_found);
-   snprintf_err( text, textlen, "%d observations from (%s)\n", n_found, mpc_code);
+   snprintf_err( text, textlen, "%d observations from (%s)", n_found, mpc_code);
+   if( n_used == n_found)
+      strlcat_err( text, "\n", textlen);
+   else
+      snprintf_append( text, textlen, "; %d used\n", n_used);
    full_ctime( date_text, jd_start, CALENDAR_JULIAN_GREGORIAN
             | FULL_CTIME_YMD | FULL_CTIME_LEADING_ZEROES | FULL_CTIME_MICRODAYS);
-   snprintf_append( text, textlen, "First %s\n", date_text);
+   full_ctime( time_text, jd_start, FULL_CTIME_TIME_ONLY);
+   snprintf_append( text, textlen, "First %s = %s\n", date_text, time_text);
    full_ctime( date_text, jd_end, CALENDAR_JULIAN_GREGORIAN
             | FULL_CTIME_YMD | FULL_CTIME_LEADING_ZEROES | FULL_CTIME_MICRODAYS);
-   snprintf_append( text, textlen, "Last  %s", date_text);
+   full_ctime( time_text, jd_end, FULL_CTIME_TIME_ONLY);
+   snprintf_append( text, textlen, "Last  %s = %s", date_text, time_text);
 }
 
 
