@@ -1531,9 +1531,11 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
             char desig[181];
             int color = COLOR_BACKGROUND;
             const bool in_last_column = (i >= n_lines * (n_cols - 1));
-            const int this_column_width = (in_last_column ?
+            int this_column_width = (in_last_column ?
                     xmax - (n_cols - 1) * column_width : column_width);
 
+            if( this_column_width > (int)sizeof( desig) - 1)
+               this_column_width = (int)sizeof( desig) - 1;
             if( i + curr_page < n_ids)
                {
                if( show_packed)
@@ -1837,7 +1839,7 @@ static int get_character_code( const char *buff)
 static unsigned show_basic_info( const OBSERVE FAR *obs, const int n_obs,
                                           const unsigned max_lines_to_show)
 {
-   char buff[80];
+   char buff[81];
    double r1, r2;
    unsigned line = 1, column = 24;
    unsigned max_column = (unsigned)getmaxx( stdscr);
@@ -2748,7 +2750,7 @@ static double get_elements( const char *filename, double *state_vect)
 {
    ELEMENTS elem;
    FILE *ifile = fopen( filename, "rb");
-   char buff[80];
+   char buff[82];
 
    memset( &elem, 0, sizeof( ELEMENTS));
    if( ifile)
@@ -3213,7 +3215,7 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
             break;
          case 'N': case 'n': case KEY_F( 3):
             {
-            char object_name[80];
+            char object_name[83];
 
             help_file_name = "obj_name.txt";
             if( !inquire( "Enter object name :", object_name, 40, COLOR_DEFAULT_INQUIRY)
@@ -3596,7 +3598,7 @@ int sanity_test_observations( const char *filename);
 
 int main( int argc, const char **argv)
 {
-   char obj_name[80], tbuff[500], orbit_constraints[90];
+   char obj_name[84], tbuff[500], orbit_constraints[90];
    char ifilename[256];
    unsigned n_command_lines = 1;
    int c = 1, element_precision,  add_off_on = -1;
@@ -5251,7 +5253,7 @@ int main( int argc, const char **argv)
                               sizeof( tbuff), COLOR_DEFAULT_INQUIRY) && *tbuff)
                {
                FILE *ofile;
-               char filename[80];
+               char filename[85];
                double orbit2[MAX_N_PARAMS];
 
 #ifndef _WIN32
