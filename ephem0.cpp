@@ -163,58 +163,6 @@ int parallax_to_lat_alt( const double rho_cos_phi, const double rho_sin_phi,
    return( 0);
 }
 
-#include <stdarg.h>
-
-/* I find myself frequently snprintf()-ing at the end of a string,  with
-something like snprintf( str + strlen( str), sizeof( str) - strlen(str), ...).
-snprintf_append( ) aborts if the buffer would overflow;  it is used if we
-think the output should never be that big.  snprintf_append_trunc( ) simply
-stops at max_len bytes,  with a '\0' terminator at max_len - 1,  and is
-used if truncation may legitimately be needed. */
-
-static int _sn_append( const bool no_truncation, char *string,
-                        const size_t max_len, const char *format, va_list argptr)
-{
-   int rval;
-   const size_t ilen = strlen( string);
-
-   assert( ilen <= max_len);
-#if _MSC_VER <= 1100
-   rval = vsprintf( string + ilen, format, argptr);
-#else
-   rval = vsnprintf( string + ilen, max_len - ilen, format, argptr);
-#endif
-   string[max_len - 1] = '\0';
-   va_end( argptr);
-   if( rval < 0 || rval + ilen >= max_len)
-      if( no_truncation)
-         {
-         fprintf( stderr, "snprintf_append: %ld/%ld/%ld\n%s\n",
-                     (long)ilen, (long)rval, (long)max_len, string);
-         debug_printf( "snprintf_append: %ld/%ld/%ld\n%s\n",
-                     (long)ilen, (long)rval, (long)max_len, string);
-         exit( -1);
-         }
-   return( rval + (int)ilen);
-}
-
-int snprintf_append_trunc( char *string, const size_t max_len,      /* ephem0.cpp */
-                                   const char *format, ...)
-{
-   va_list argptr;
-
-   va_start( argptr, format);
-   return( _sn_append( false, string, max_len, format, argptr));
-}
-
-int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
-                                   const char *format, ...)
-{
-   va_list argptr;
-
-   va_start( argptr, format);
-   return( _sn_append( true, string, max_len, format, argptr));
-}
 
 /* format_dist_in_buff() formats the input distance (in AU) into a
 seven-byte buffer.  It does this by choosing suitable units: kilometers
