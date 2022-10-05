@@ -25,9 +25,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 
 /* Code to convert NEAT pointing logs,  as found at
 
-https://sbn.psi.edu/archive/neat/tricam/data/tricam_archive_masterlist.tab
-https://sbn.psi.edu/archive/neat/geodss/data/geodss_archive_masterlist.tab
-https://sbn.psi.edu/archive/neat/tricam2/data/tricam_archive_masterlist_delivery2.tab
+https://sbnarchive.psi.edu/pds4/surveys/gbo.ast.neat.survey/data_tricam/tricam_archive_masterlist.tab
+https://sbnarchive.psi.edu/pds4/surveys/gbo.ast.neat.survey/data_geodss/geodss_archive_masterlist.tab
+https://sbnarchive.psi.edu/pds3/neat/tricam2/data/tricam_archive_masterlist_delivery2.tab
 
 into the .csv-formatted type of pointing log CSS uses and which Find_Orb
 can use for precovery searches,  and which list_gps can use to determine where
