@@ -25,6 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include <ctype.h>
 #include <time.h>
 #include "watdefs.h"
+#include "stringex.h"
 #include "sigma.h"
 #include "afuncs.h"
 #include "comets.h"
@@ -76,16 +77,18 @@ int inquire( const char *prompt, char *buff, const int max_len,
    INTENTIONALLY_UNUSED_PARAMETER( color);
    if( !mpec_error_message)
       {
-      mpec_error_message = (char *)malloc( strlen( prompt) + 1);
-      strcpy( mpec_error_message, prompt);
+      const size_t len = strlen( prompt) + 1;
+
+      mpec_error_message = (char *)malloc( len);
+      strlcpy_err( mpec_error_message, prompt, len);
       }
    else
       {
-      char *new_message = (char *)malloc( strlen( mpec_error_message) +
-                                          strlen( prompt) + 1);
+      const size_t new_msg_len = strlen( mpec_error_message) + strlen( prompt) + 1;
+      char *new_message = (char *)malloc( new_msg_len);
 
-      strcpy( new_message, mpec_error_message);
-      strcat( new_message, prompt);
+      strlcpy_err( new_message, mpec_error_message, new_msg_len);
+      strlcat_err( new_message, prompt, new_msg_len);
       free( mpec_error_message);
       mpec_error_message = new_message;
       }
@@ -127,10 +130,6 @@ static void show_problem_message( void)
       fclose( ifile);
       }
 }
-
-#ifndef strlcpy
-size_t strlcpy(char *dest, const char *src, size_t size);   /* miscell.cpp */
-#endif
 
 double current_jd( void);                       /* elem_out.cpp */
 void compute_variant_orbit( double *variant, const double *ref_orbit,
@@ -182,7 +181,7 @@ int main( const int argc, const char **argv)
 #endif
 
    fprintf( lock_file, "setrlimit called\n");
-   strcpy( mpc_code, "500");
+   strlcpy_error( mpc_code, "500");
 
                /* get_defaults( ) collects a lot of data that's for the  */
                /* interactive find_orb program.  But it also sets some   */
@@ -294,9 +293,9 @@ int main( const int argc, const char **argv)
       else if( !strcmp( field, "n_steps"))
          n_ephem_steps = atoi( buff);
       else if( !strcmp( field, "stepsize"))
-         strlcpy( ephemeris_step_size, buff, sizeof( ephemeris_step_size));
+         strlcpy_err( ephemeris_step_size, buff, sizeof( ephemeris_step_size));
       else if( !strcmp( field, "mpc_code"))
-         strlcpy( mpc_code, buff, sizeof( mpc_code));
+         strlcpy_err( mpc_code, buff, sizeof( mpc_code));
       else if( !strcmp( field, "faint_limit"))
          mag_limit = atof( buff);
       else if( !strcmp( field, "element_center"))
@@ -454,7 +453,7 @@ int main( const int argc, const char **argv)
       if( !n_ephem_steps)
          n_ephem_steps = 1;
       if( !*ephemeris_step_size)
-         snprintf( ephemeris_step_size, sizeof( ephemeris_step_size),
+         snprintf_err( ephemeris_step_size, sizeof( ephemeris_step_size),
                   "%.6fd", (jd_end - jd_start) / (double)n_ephem_steps);
       }
    fprintf( lock_file, "ready for ephem\n");
@@ -473,9 +472,9 @@ int main( const int argc, const char **argv)
                   n_obs_actually_loaded, obs, residual_format);
    fprintf( lock_file, "Resids written\n");
 
-   strlcpy( mpec_name, get_environment_ptr( "MPEC_NAME"), sizeof( mpec_name));
+   strlcpy_error( mpec_name, get_environment_ptr( "MPEC_NAME"));
    if( !*mpec_name)
-      strcpy( mpec_name, "mpec.htm");
+      strlcpy_error( mpec_name, "mpec.htm");
    make_pseudo_mpec( mpec_name, ids[0].obj_name);
    fprintf( lock_file, "pseudo-MPEC made\n");
    unload_observations( obs, n_obs);
@@ -499,7 +498,7 @@ int main( const int argc, const char **argv)
 
       if( counter)
          {
-         sprintf( mpec_name + i - 7, "%03d.htm", counter % 999 + 1);
+         snprintf_err( mpec_name + i - 7, 8, "%03d.htm", counter % 999 + 1);
          set_environment_ptr( "MPEC_NAME", mpec_name);
          }
       }
