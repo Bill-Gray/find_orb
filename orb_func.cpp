@@ -25,6 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include <stdio.h>
 #include <time.h>
 #include "watdefs.h"
+#include "stringex.h"
 #include "comets.h"
 #include "mpc_obs.h"
 #include "lsquare.h"
@@ -205,12 +206,6 @@ void rotate_state_vector_to_current_frame( double *state_vect,
                   const double epoch_shown, const int planet_orbiting,
                   char *body_frame_note);               /* elem_out.cpp */
 const char *get_find_orb_text( const int index);      /* elem_out.cpp */
-int snprintf_append( char *string, const size_t max_len,      /* ephem0.cpp */
-                                   const char *format, ...)
-#ifdef __GNUC__
-         __attribute__ (( format( printf, 3, 4)))
-#endif
-;
 void set_obs_vect( OBSERVE FAR *obs);        /* mpc_obs.h */
 double improve_along_lov( double *orbit, const double epoch, const double *lov,
           const unsigned n_params, unsigned n_obs, OBSERVE *obs);
