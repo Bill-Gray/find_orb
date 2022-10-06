@@ -382,10 +382,10 @@ void push_orbit( const double epoch, const double *orbit); /* orb_fun2.cpp */
 int pop_orbit( double *epoch, double *orbit);              /* orb_fun2.cpp */
 void pop_all_orbits( void);                                /* orb_fun2.cpp */
 
-int get_sr_orbits( double *orbits, OBSERVE FAR *obs,
+int get_sr_orbits( double *orbits, OBSERVE FAR *obs,     /* orb_func.cpp */
                const unsigned n_obs, const unsigned starting_orbit,
                const unsigned max_orbits, const double max_time,
-               const double noise_in_sigmas);            /* orb_func.cpp */
+               const double noise_in_sigmas, const int writing_sr_elems);
 
 /* For a 'classical' Herget,  we fit two parameters: R1 and R2,  assuming that they
    have zero residuals.
