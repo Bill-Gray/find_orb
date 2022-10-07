@@ -246,6 +246,8 @@ void make_observatory_info_text( char *text, const size_t textlen,
              const OBSERVE *obs, int n_obs, const char *mpc_code);
 void size_from_h_text( const double abs_mag, char *obuff,
                                  const int obuff_size);  /* ephem0.c */
+int find_fcct_biases( const double ra, const double dec, const char catalog,
+                 const double jd, double *bias_ra, double *bias_dec);
 
 #ifdef __cplusplus
 extern "C" {
@@ -5676,6 +5678,8 @@ int main( int argc, const char **argv)
          case '.':
             {
             int eop_range[3];
+            const int debias_version = find_fcct_biases( 1., 1., 0,
+                           0., NULL, NULL);
 
             snprintf_err( tbuff, sizeof( tbuff), "%s\n%s\n%s\n",
                                  longname( ), termname( ), curses_version( ));
@@ -5698,6 +5702,19 @@ int main( int argc, const char **argv)
                         "EOPs run from %s to %s\n(%s with extrapolation)\n",
                                  date_buff[0], date_buff[2], date_buff[1]);
                }
+            if( debias_version > 2000)
+               {
+               const char *ver = "?unknown?\n";
+
+               strlcat_error( tbuff, "Astrometric debiasing version ");
+               if( debias_version == 2018)
+                  ver = "EFCC18\n";
+               else if( debias_version == 2014)
+                  ver = "FCCT14\n";
+               strlcat_error( tbuff, ver);
+               }
+            else
+               strlcat_error( tbuff, "No astrometric debiasing applied\n");
             inquire( tbuff, NULL, 0, COLOR_DEFAULT_INQUIRY);
             }
             break;
@@ -6121,6 +6138,10 @@ int main( int argc, const char **argv)
             show_a_file( (ifile ? "calend.txt" : "calendar.txt"), SHOW_FILE_IS_CALENDAR);
             }
             break;
+         case KEY_F( 15):        /* shift-f3 */
+            show_splash_screen( );     /* just to test */
+            extended_getch( );
+            break;
          case '\\':
          case 'j': case 'J':
          case 'O':
@@ -6133,7 +6154,6 @@ int main( int argc, const char **argv)
          case CTL_LEFT: case CTL_RIGHT:
          case KEY_F( 13):        /* shift-f1 */
          case KEY_F( 14):        /* shift-f2 */
-         case KEY_F( 15):        /* shift-f3 */
          case KEY_F( 24):        /* shift-f12 */
          case KEY_DC:            /* delete key */
          case CTL_DEL:

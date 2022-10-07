@@ -4673,7 +4673,7 @@ int clean_up_find_orb_memory( void)
       sr_orbits = NULL;
       }
    find_objects_in_file( NULL, NULL, NULL);
-   find_fcct_biases( 0., 0., 0, 0., NULL, NULL);
+   find_fcct_biases( 0., 0., -1, 0., NULL, NULL);
    get_find_orb_text( 0);
    load_cospar_file( NULL);
    update_environ_dot_dat( );

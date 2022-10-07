@@ -82,7 +82,7 @@ int find_fcct_biases( const double ra, const double dec, const char catalog,
    const double j2000 = 2451545.;      /* JD 2451545.0 = 2000 Jan 1.5 */
    static bool bias_file_known_to_be_missing = false;
 
-   if( !bias_ra)         /* free up internal data */
+   if( catalog == -1)    /* free up internal data */
       {
       if( bias_data)
          free( bias_data);
@@ -90,7 +90,8 @@ int find_fcct_biases( const double ra, const double dec, const char catalog,
       return( 0);
       }
 
-   *bias_ra = *bias_dec = 0.;
+   if( bias_ra && bias_dec)
+      *bias_ra = *bias_dec = 0.;
    if( bias_file_known_to_be_missing)
       return( BIAS_NO_BIAS_FILE);
    if( !bias_data)
@@ -200,6 +201,8 @@ int find_fcct_biases( const double ra, const double dec, const char catalog,
          fclose( ofile);
          }
       }
+   if( !catalog)        /* just inquiring as to which version we have */
+      return( n_cats == 26 ? 2018 : 2014);
    catalog_loc = strchr( catalog_codes, catalog);
    if( !catalog_loc)    /* don't have bias data for this catalog */
       return( BIAS_NO_DATA_FOR_THAT_CATALOG);
