@@ -9,7 +9,7 @@
   with starting characters 0-9 or A-Z,  followed by two digits.  So I've
   used three letter codes,  often mixed-case,  ideally giving a hint as
   to the observatory.  One is not limited to alphanumerics;  note the use
-  of '2.2' and '0.6' for the Mauna Kea 2.2-meter and 0.6-meter scopes.
+  of '2.2' and '0.6' for the Maunakea 2.2-meter and 0.6-meter scopes.
   Characters from ASCII 33 = '!' to 126='~' can be used,  for 94^3=830584
   possible observatory codes.  That should last for a while.
 
@@ -176,19 +176,19 @@ SBo !   8.327722     +47.525778      450       Sandro Boschetti
 
 Tar !   6.92389      +43.75222      1270       TAROT Calern Observatory
 
-   There are at least eleven telescopes on Mauna Kea,  all currently lumped
-   as (568).  Some are not very close to the position specified for (568)
-   (see http://arxiv.org/pdf/1106.5835 for an example where the difference
-   matters -- admittedly unusual,  involving a close-in artificial object)
-   and in any case,  it's sometimes convenient for an observatory code to
-   tell you exactly which scope was used.  The following list is from:
-   http://irtfweb.ifa.hawaii.edu/IRrefdata/telescope_ref_data.php,  and/or
-   http://www.ifa.hawaii.edu/mko/coordinates.shtml (same data).
+   There are at least eleven telescopes on Maunakea.  Until 2022 Oct 7,
+   all (with a few exceptions) were lumped as (568).  Some are not very
+   close to the position specified for (568).  See
+   http://arxiv.org/pdf/1106.5835 for an example where the difference
+   matters -- admittedly unusual,  involving a close-in artificial object;
+   there have been a few NEOs where it also mattered.  The following list
+   is from: http://irtfweb.ifa.hawaii.edu/IRrefdata/telescope_ref_data.php,
+   and/or http://www.ifa.hawaii.edu/mko/coordinates.shtml (same data).
       I had doubts about these lat/lon/alts,  derived from an aerial survey
    and in NAD83 datum,  with altitudes in feet (data given in non-metric
    units always makes me worry) and given to a meaningless precision of
    about 0.3 millimeters -- those sorts of mistakes usually mean bogus data
-   -- but checks with people who have actually been on Mauna Kea with GPS
+   -- but checks with people who have actually been on Maunakea with GPS
    units and by Dave Tholen (see below) have assuaged those worries.
       Lat/lon/alts in this file are supposed to be on the WGS84 ellipsoid.
    I just took the NAD83 lat/longs and ignored the difference (about two
@@ -211,41 +211,47 @@ Tar !   6.92389      +43.75222      1270       TAROT Calern Observatory
    degrees (about 1.46 meters) north,  2.6364e-5 degrees (about 2.76 meters)
    west,  and 4.975 meters higher than the aerial survey position.  We think
    the aerial survey is internally consistent,  so I've added the same
-   offset to the other Mauna Kea scopes in that survey.
+   offset to the other Maunakea scopes in that survey.
+      Note that (2.2), (CFH),  and (Sub) now have official MPC codes (T12),
+   (T14),  and (T09).  I've retained the three older codes for historical
+   compatibility,  but you should now use the officially blessed codes.
 
         longitude    latitude       height
       DDD.ddddddddd   DD.ddddddddd       (m)
-0.6 !-155.470989106  +19.821627436  4217.302   Univ of Hawaii 0.6-m, Mauna Kea
-2.2 !-155.469459900  +19.823004200  4244.530   Univ of Hawaii 2.2-m, Mauna Kea
-CFH !-155.468902081  +19.825264933  4235.081   Canada-France-Hawaii Telescope, Mauna Kea (CFHT)
-IRT !-155.472025153  +19.826231450  4199.042   Infrared Telescope Facility (IRTF)
-UKI !-155.470353114  +19.822444616  4229.473   UK Infrared Telescope (UKIRT)
+0.6 !-155.470989106  +19.821627436  4217.302   Univ of Hawaii 0.6-m, Maunakea
+2.2 !-155.469459900  +19.823004200  4244.530   University of Hawaii 88-inch telescope, Maunakea
+CFH !-155.468902081  +19.825264933  4235.081   Canada-France-Hawaii Telescope, Maunakea
+T13 !-155.472025153  +19.826231450  4199.042   NASA Infrared Telescope Facility, Maunakea
+T11 !-155.470353114  +19.822444616  4229.473   United Kingdom Infrared Telescope, Maunakea
 JCM !-155.477027458  +19.822820747  4220.975   James Clerke Maxwell Telescope (JCMT)
 CSO !-155.475523433  +19.822451072  4220.975   Caltech Submillimeter Observatory (CSO)
-Ke1 !-155.474744878  +19.825959680  4190.556   Keck 1, Mauna Kea
-Ke2 !-155.474260442  +19.826573655  4190.556   Keck 2, Mauna Kea
-Sub !-155.476045028  +19.825517091  4193.976   Subaru, Mauna Kea
-Gem !-155.469073117  +19.823814580  4244.414   Gemini North, Mauna Kea
+T16 !-155.474744878  +19.825959680  4190.556   W. M. Keck Observatory, Keck 1, Maunakea
+T17 !-155.474260442  +19.826573655  4190.556   W. M. Keck Observatory, Keck 2, Maunakea
+Sub !-155.476045028  +19.825517091  4193.976   Subaru Telescope, Maunakea
+T15 !-155.469073117  +19.823814580  4244.414   Gemini North Observatory, Maunakea
 
    From http://cso.caltech.edu/wiki/cso/telescope/telescope : a position
    about 400 meters northwest of the above aerial survey position,  and
    dozens of meters lower in altitude!  (Again with 26 meters added on
    the assumption that the altitude given at the page is ASL,  not ellipsoidal.)
+   Note that MPC has added this as code (T10),  almost between (Cso) and (CSO),
+   slightly closer to the former,  but at altitude 4111 meters,  well below
+   every other telescope on the mountain.
 
-Cso !-1552842.124    +194931.698    4165       Caltech Submillimeter Observatory (CSO)
+Cso !-155.478367778  +19.825471667  4165       Caltech Submillimeter Observatory (CSO)
 
    Following position from Geoff Bowers :
 
-MKV !-155.45551209   +19.8013877    3763.061   Mauna Kea VLBA
+MKV !-155.45551209   +19.8013877    3763.061   Maunakea VLBA
 
       The following five (official) MPC sites have corrected positions,
    copy/pasted from the above.
 
 266 !-155.476045028  +19.825517091  4193.976   New Horizons KBO Search-Subaru
 267 !-155.468902081  +19.825264933  4235.081   New Horizons KBO Search-CFHT
-T09 !-155.476045028  +19.825517091  4193.976   Mauna Kea-UH/Tholen NEO Follow-Up (Subaru)
-T12 !-155.469459900  +19.823004200  4244.530   Mauna Kea-UH/Tholen NEO Follow-Up (2.24-m)
-T14 !-155.468902081  +19.825264933  4235.081   Mauna Kea-UH/Tholen NEO Follow-Up (CFHT)
+T09 !-155.476045028  +19.825517091  4193.976   Subaru Telescope, Maunakea
+T12 !-155.469459900  +19.823004200  4244.530   University of Hawaii 88-inch telescope, Maunakea
+T14 !-155.468902081  +19.825264933  4235.081   Canada-France-Hawaii Telescope, Maunakea
 
 Ce1 !  -2.566025     +37.982840     1532       Centu1 (J75 scope)
 
@@ -398,7 +404,7 @@ LSST! -704457.90     -301440.68     2647       LSST 8.4-m (site)
 LSA ! -704451.80     -301441.27     2647       LSST Aux. 1.4-m (site)
 ALO ! -704417.50     -301506.37     2552       Andes LIDAR Obs. (ALO)
 
-War ! 149.1930       -31.2763        552.      Warrumbungle Observatory
+Wrr ! 149.1930       -31.2763        552.      Warrumbungle Observatory
 Dub ! 148.58525      -31.29358       300.      Dubbo Observatory
 
 
@@ -858,9 +864,14 @@ TMT !-155.4816     +19.8327         4050.      Thirty-Meter Telescope
    Coords for these two telescopes are provided by Wikipaedia,  claimed good to
    a meter (though given to 3-m precision?),  and they do land squarely on domes
    in G__gle Maps.  Many Las Campanas telescopes are unidentified.  The
-   coordinates given for (304) and (I05) are clearly bogus.
+   coordinates given for (304) and (I05) are identical and about 500m
+   north of the nearest observatory dome.
 War !-704205.9     -290035.8        2275.      Warsaw Telescope, Las Campanas (OGLE)
 ASA !-704205.1     -290036.9        2275?      All-Sky Automated Survey (ASAS), Las Campanas
+Lc1 !-70.70397     -29.00735                   Las Campanas unk 1, northernmos
+Lc2 !-70.70121     -29.01036                   Las Campanas unk 2, ~25m SE of (ASA)
+Lc3 !-70.70026     -29.01193                   Las Campanas unk 3
+Lc4 !-70.68982     -29.02158                   Las Campanas unk 4
 
    Carolin Liefke sorted out the history of (024) Heidelberg-Konigstuhl
    (see https://groups.io/g/mpml/message/35417).  The site listed below as
