@@ -5136,12 +5136,15 @@ line 4: (709) W & B Observatory, Cloudcroft  (N32.95580 E254.22882)
 int show_alt_info = 0;
 
 static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
-                 const int n_obs, const int line_number, char *buff, const size_t buffsize)
+                 const int n_obs, const int line_number, char *const buff,
+                 size_t buffsize)
 {
    const OBSERVE FAR *optr = obs + idx;
    const double earth_sun = vector3_length( optr->obs_posn);
 
    *buff = '\0';
+   if( buffsize > 100)      /* no line should be larger than this, */
+      buffsize = 100;       /* even if the buffer does have room for it */
    switch( line_number)
       {
       case 0:
@@ -5152,32 +5155,26 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
             compute_radar_info( optr, &rinfo);
             if( rinfo.rtt_obs)
                {
-               sprintf( buff, "Time (obs) %.7f", rinfo.rtt_obs);
-               buff += strip_trailing_zeroes( buff);
-               sprintf( buff, " +/- %.1fus", rinfo.rtt_sigma * 1e+6);
-               buff += strip_trailing_zeroes( buff);
+               snprintf_err( buff, buffsize, "Time (obs) %.7f", rinfo.rtt_obs);
+               strip_trailing_zeroes( buff);
+               snprintf_append( buff, buffsize, " +/- %.1fus", rinfo.rtt_sigma * 1e+6);
+               strip_trailing_zeroes( buff);
                }
             if( rinfo.doppler_obs)
                {
                if( rinfo.rtt_obs)
-                  {
-                  strcpy( buff, "   ");
-                  buff += 3;
-                  }
-               sprintf( buff, "Shift(obs) %f", rinfo.doppler_obs);
-               buff += strip_trailing_zeroes( buff);
-               sprintf( buff, " +/- %f", rinfo.doppler_sigma);
-               buff += strip_trailing_zeroes( buff);
-               strcpy( buff, " Hz");
-//             buff += 3;
+                  strlcat_err( buff, "   ", buffsize);
+               snprintf_append( buff, buffsize, "Shift(obs) %f", rinfo.doppler_obs);
+               strip_trailing_zeroes( buff);
+               snprintf_append( buff, buffsize, " +/- %f", rinfo.doppler_sigma);
+               strip_trailing_zeroes( buff);
+               strlcat_err( buff, " Hz", buffsize);
                }
             else
                {
-               sprintf( buff, "  Dist (comp) %.9f = %.2f km", optr->r,
+               snprintf_append( buff, buffsize, "  Dist (comp) %.9f = %.2f km", optr->r,
                            optr->r * AU_IN_KM);
-//             buff += strlen( buff);
                }
-//          strcpy( buff, optr->second_line);
             }
          else
             {
@@ -5191,14 +5188,13 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
             char ra_motion_buff[15], dec_motion_buff[15];
 
             compute_observation_motion_details( optr, &m);
-            sprintf( buff, "Elong %5.1f    Phase %5.1f    ",
+            snprintf_err( buff, buffsize, "Elong %5.1f    Phase %5.1f    ",
                                         acose( cos_elong) * 180. / PI,
                                         acose( cos_phase) * 180. / PI);
             format_motion( ra_motion_buff, m.ra_motion);
             format_motion( dec_motion_buff, m.dec_motion);
             snprintf_append( buff, buffsize, "RA vel %s   decvel %s   dT=",
                                            ra_motion_buff, dec_motion_buff);
-            buff += strlen( buff);
 
             if( show_alt_info)
                {
@@ -5213,19 +5209,21 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
                {
                if( fabs( m.time_residual) < .999)
                   {
-                  sprintf( buff, "%.3f sec", fabs( m.time_residual));
-                  *buff = (m.time_residual > 0. ? '+' : '-');
+                  char *tptr = buff + strlen( buff);
+
+                  snprintf_append( buff, buffsize, "%.3f sec", fabs( m.time_residual));
+                  *tptr = (m.time_residual > 0. ? '+' : '-');
                   }
                else if( fabs( m.time_residual) < 99.9)
-                  sprintf( buff, "%.2f sec", m.time_residual);
+                  snprintf_append( buff, buffsize, "%.2f sec", m.time_residual);
                else if( fabs( m.time_residual / 60.) < 99.9)
-                  sprintf( buff, "%.2f min", m.time_residual / 60.);
+                  snprintf_append( buff, buffsize, "%.2f min", m.time_residual / 60.);
                else if( fabs( m.time_residual / 60.) < 9999.)
-                  sprintf( buff, "%d min", (int)( m.time_residual / 60.));
+                  snprintf_append( buff, buffsize, "%d min", (int)( m.time_residual / 60.));
                else if( fabs( m.time_residual / 3600.) < 9999.)
-                  sprintf( buff, "%d hr", (int)( m.time_residual / 3600.));
+                  snprintf_append( buff, buffsize, "%d hr", (int)( m.time_residual / 3600.));
                else
-                  strcpy( buff, "!!!!");
+                  strlcat_err( buff, "!!!!", buffsize);
                }
             }
          break;
@@ -5240,7 +5238,7 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
 
             compute_observation_motion_details( optr, &m);
             format_motion( tbuff, m.total_motion);
-            sprintf( buff, "ang vel %s at PA %.1f", tbuff,
+            snprintf_err( buff, buffsize, "ang vel %s at PA %.1f", tbuff,
                       m.position_angle_of_motion);
             snprintf_append( buff, buffsize, "   radial vel %.3f km/s  cross ",
                                       m.radial_vel);
@@ -5251,42 +5249,36 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
             else if( fabs( m.cross_residual) < 9999.)
                sprintf( tbuff, "%4d", (int)m.cross_residual);
             else
-               strcpy( tbuff, "!!!!");
-            strcat( buff, tbuff);
+               strlcpy_error( tbuff, "!!!!");
+            strlcat_err( buff, tbuff, buffsize);
             tdiff = current_jd() - optr->jd;
             if( fabs( tdiff) < 1. / hours_per_day)     /* less than an hour ago */
-               sprintf( tbuff, "%d min", (int)( tdiff * minutes_per_day));
+               snprintf_err( tbuff, sizeof( tbuff), "%d min", (int)( tdiff * minutes_per_day));
             else if( fabs( tdiff) < 1.)
-               sprintf( tbuff, "%.1f hr", tdiff * hours_per_day);
+               snprintf_err( tbuff, sizeof( tbuff), "%.1f hr", tdiff * hours_per_day);
             else if( fabs( tdiff) < 100.)
-               sprintf( tbuff, "%.1f days", tdiff);
+               snprintf_err( tbuff, sizeof( tbuff), "%.1f days", tdiff);
             else
                *tbuff = '\0';
             if( *tbuff)
                snprintf_append( buff, buffsize, "  %s ago", tbuff);
             if( tdiff < 0.)
-               strcat( buff, " <FUTURE!>");
+               strlcat_err( buff, " <FUTURE!>", buffsize);
             }
          break;
       case 2:
          if( show_alt_info && optr->second_line)
-            strcpy( buff, optr->second_line);
+            strlcpy_err( buff, optr->second_line, buffsize);
          else if( show_alt_info && optr->ades_ids)
-            strcpy( buff, optr->ades_ids);
-//          sprintf( buff, "Vel %.8f %.8f %.8f",
-//                         optr->obs_vel[0] * 1000.,
-//                         optr->obs_vel[1] * 1000.,
-//                         optr->obs_vel[2] * 1000.);
+            strlcpy_err( buff, optr->ades_ids, buffsize);
          else
             {
-            strcpy( buff, "Delta=");
-            buff += strlen( buff);
-            format_dist_in_buff( buff, optr->r);  /* ephem0.cpp */
+            strlcpy_err( buff, "Delta=", buffsize);
+            format_dist_in_buff( buff + strlen( buff), optr->r);  /* ephem0.cpp */
 
-            strcat( buff, "  r=");
-            buff += strlen( buff);
-            format_dist_in_buff( buff, optr->solar_r);  /* ephem0.cpp */
-            strcat( buff, "  ");
+            strlcat_err( buff, "  r=", buffsize);
+            format_dist_in_buff( buff + strlen( buff), optr->solar_r);  /* ephem0.cpp */
+            strlcat_err( buff, "  ", buffsize);
             if( optr->obs_mag < BLANK_MAG)
                snprintf_append( buff, buffsize, "mag=%5.2f  ", optr->obs_mag);
             else
@@ -5305,6 +5297,7 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
          {
          DPT sun_alt_az, object_alt_az;
          const char *net_name = byte_code_to_net_name( optr->astrometric_net_code);
+         char *end_ptr;
 
          if( optr->posn_sigma_1 > 1.01 || optr->posn_sigma_1 < .99
                   || optr->posn_sigma_1 != optr->posn_sigma_2)
@@ -5313,25 +5306,24 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
                int tilt_angle = 0;
                char sig1_buff[20], sig2_buff[20];
 
-               strcpy( buff, "Sigma ");
-               sprintf( sig1_buff, "%.6f", optr->posn_sigma_1);
+               snprintf_err( sig1_buff, sizeof( sig1_buff), "%.6f", optr->posn_sigma_1);
                remove_insignificant_digits( sig1_buff);
-               sprintf( sig2_buff, "%.6f", optr->posn_sigma_2);
+               snprintf_err( sig2_buff, sizeof( sig2_buff), "%.6f", optr->posn_sigma_2);
                remove_insignificant_digits( sig2_buff);
                if( strcmp( sig1_buff, sig2_buff))
                   {
-                  strcat( sig1_buff, "x");
-                  strcat( sig1_buff, sig2_buff);
+                  strlcat_err( sig1_buff, "x", sizeof( sig1_buff));
+                  strlcat_err( sig1_buff, sig2_buff, sizeof( sig1_buff));
                   tilt_angle = (int)( optr->posn_sigma_theta * 180. / PI);
                   }
-               sprintf( buff, "Sigma %s\" ", sig1_buff);
+               snprintf_err( buff, buffsize, "Sigma %s\" ", sig1_buff);
                if( tilt_angle % 180)
                   snprintf_append( buff, buffsize, "%d ", tilt_angle);
                }
-         buff += strlen( buff);
-         reference_to_text( buff, optr->reference, optr->jd);
-         if( *buff)
-            strcat( buff, "  ");
+         end_ptr = buff + strlen( buff);
+         reference_to_text( end_ptr, optr->reference, optr->jd);
+         if( *end_ptr)
+            strlcat_err( buff, "  ", buffsize);
          if( !get_obs_alt_azzes( optr, &sun_alt_az, &object_alt_az))
             {
             snprintf_append( buff, buffsize, "Obj alt %.1f", object_alt_az.y);
@@ -5376,14 +5368,14 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
             }
          if( net_name)
             {
-            strcat( buff, "  ");
-            strcat( buff, net_name);
+            strlcat_err( buff, "  ", buffsize);
+            strlcat_err( buff, net_name, buffsize);
             }
          }
          break;
       case 4:
          if( optr->obs_mag < BLANK_MAG)
-            snprintf( buff, buffsize, "Mag sigma %g; ", optr->mag_sigma);
+            snprintf_err( buff, buffsize, "Mag sigma %g; ", optr->mag_sigma);
          else
             *buff = '\0';
          snprintf_append( buff, buffsize, "time sigma %g",
@@ -5434,7 +5426,7 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
             }
          break;
      }
-   return( 0);
+   return( *buff ? 0 : -1);      /* indicate if anything was written */
 }
 
 void add_version_and_de_text( char *buff)
@@ -5504,9 +5496,8 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff,
       mean_cross_resid /= (double)n_selected;
       mean_tresid2 /= (double)n_selected;
       mean_cross_resid2 /= (double)n_selected;
-      buff += strlen( buff);
       n_lines++;
-      snprintf( buff, buffsize,
+      snprintf_append( buff, buffsize,
              "Mean RA residual %.3f +/- %.3f; dec %.3f +/- %.3f\n",
              mean_xresid, sqrt( mean_xresid2 - mean_xresid * mean_xresid),
              mean_yresid, sqrt( mean_yresid2 - mean_yresid * mean_yresid));
@@ -5514,9 +5505,8 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff,
          {
          mean_mresid /= (double)n_mags;
          mean_mresid2 /= (double)n_mags;
-         buff += strlen( buff);
          n_lines++;
-         snprintf( buff, buffsize,
+         snprintf_append( buff, buffsize,
              "mean mag residual %.2f +/- %.2f\n",
              mean_mresid, sqrt( mean_mresid2 - mean_mresid * mean_mresid));
          }
@@ -5534,41 +5524,37 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff,
          dist *= 180. / PI;      /* cvt radians to degrees */
          delta_time = optr2->jd - optr1->jd;
 
-         buff += strlen( buff);
          n_lines++;
-         snprintf( buff, buffsize,
+         snprintf_append( buff, buffsize,
                    "Observations are %.2f\" = %.2f' = %.3f degrees apart\n",
                    dist * 3600., dist * 60., dist);
-         buff += strlen( buff);
          n_lines++;
          if( fabs( delta_time) < 1.)
-            snprintf( buff, buffsize,
+            snprintf_append( buff, buffsize,
                      "Time diff: %.2f sec = %.2f min = %.3f hrs\n",
                      delta_time * seconds_per_day,
                      delta_time * minutes_per_day,
                      delta_time * hours_per_day);
          else
-            snprintf( buff, buffsize,
+            snprintf_append( buff, buffsize,
                      "Time diff: %.1f hrs = %.2f days\n",
                      delta_time * 24., delta_time);
          dist /= delta_time;     /* get motion in degrees/day */
          dist *= 60. / 24.;      /* then convert to '/hr */
                            /* Dunno how the PA got flipped,  but it did: */
          posn_ang = 2. * PI - posn_ang;
-         buff += strlen( buff);
          n_lines++;
-         snprintf( buff, buffsize,
+         snprintf_append( buff, buffsize,
                   "Motion: %.2f'/hr in RA, %.2f'/hr in dec",
                   dist * sin( posn_ang), dist * cos( posn_ang));
-         buff += strlen( buff);
          n_lines++;
-         snprintf( buff, buffsize,
+         snprintf_append( buff, buffsize,
                   " (total %.2f'/hr at PA %.1f)\n",
                   dist, posn_ang * 180. / PI);
          }
       make_date_range_text( buff + strlen( buff),
                                    obs[first].jd, obs[last].jd);
-      strcat( buff, "\n");
+      strlcat_err( buff, "\n", buffsize);
       n_lines++;
       }
    else if( show_observational_details)
@@ -5576,12 +5562,12 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff,
       const char **lines = obs[first].obs_details;
 
       n_lines = 0;
+      *buff = '\0';
       if( lines)
          while( lines[n_lines])
             {
-            strcpy( tptr, lines[n_lines]);
-            strcat( tptr, "\n");
-            tptr += strlen( tptr);
+            strlcat_err( buff, lines[n_lines], buffsize);
+            strlcat_err( buff, "\n", buffsize);
             n_lines++;
             }
       else
@@ -5603,21 +5589,22 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff,
          }
       if( !n_lines)
          {
-         strcpy( tptr, get_find_orb_text( 2026));
+         strlcpy_err( buff, get_find_orb_text( 2026), buffsize);
          n_lines = 1;            /* "No obs header" message */
          }
       }
    else        /* "standard",  computed details */
       {
       n_lines = 0;
+      *buff = '\0';
       for( i = 0; i < 5; i++)
          {
-         generate_observation_text( obs, (int)first, n_obs, (int)i, tptr,
-                        buffsize - (tptr - buff));
-         if( *tptr)
+         const size_t remaining_bytes = buffsize - strlen( buff);
+
+         if( !generate_observation_text( obs, (int)first, n_obs, (int)i,
+                           buff + strlen( buff), remaining_bytes))
             {
-            strcat( tptr, "\n");
-            tptr += strlen( tptr);
+            strlcat_err( buff, "\n", buffsize);
             n_lines++;
             }
          }
