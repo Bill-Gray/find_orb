@@ -4045,7 +4045,7 @@ int main( int argc, const char **argv)
          if( sort_obs_by_code)
             shellsort_r( obs, n_obs, sizeof( OBSERVE), compare_observations,
                                                    &sort_obs_by_code);
-         generate_obs_text( obs, n_obs, tbuff);
+         generate_obs_text( obs, n_obs, tbuff, sizeof( tbuff));
          if( make_unicode_substitutions)
             {
                      /* cvt +/- to the Unicode U+00B1,  in UTF-8: */

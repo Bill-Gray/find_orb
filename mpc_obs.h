@@ -258,7 +258,8 @@ int ephemeris_in_a_file_from_mpc_code( const char *filename,
 int find_best_fit_planet( const double jd, const double *ivect,
                      double *rel_vect);     /* runge.cpp */
 int integrate_orbit( double *orbit, const double t0, const double t1);
-int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff);
+int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff,
+                                          const size_t buffsize);
 double convenient_gauss( const OBSERVE FAR *obs, int n_obs, double *orbit,
                   const double mu, const int desired_soln); /* gauss.cpp */
 void set_solutions_found( OBJECT_INFO *ids, const int n_ids);
