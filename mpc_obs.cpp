@@ -5133,7 +5133,7 @@ line 3: Obj alt 4.9 az 271.2  Sun alt -17.4 az 89.1
 line 4: (709) W & B Observatory, Cloudcroft  (N32.95580 E254.22882)
 */
 
-#define MAX_INFO_LEN 100
+#define MAX_INFO_LEN 200
 
 int show_alt_info = 0;
 
@@ -5468,6 +5468,8 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff)
       {
       double mean_xresid = 0., mean_yresid = 0., mean_mresid = 0.;
       double mean_xresid2 = 0., mean_yresid2 = 0., mean_mresid2 = 0.;
+      double mean_tresid = 0., mean_cross_resid = 0.;
+      double mean_tresid2 = 0., mean_cross_resid2 = 0.;
       int n_mags = 0;
 
       snprintf( buff, MAX_INFO_LEN, "%d observations selected of %d\n",
@@ -5480,8 +5482,12 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff)
             compute_observation_motion_details( obs + i, &m);
             mean_xresid += m.xresid;
             mean_yresid += m.yresid;
+            mean_tresid += m.time_residual;
+            mean_cross_resid += m.cross_residual;
             mean_xresid2 += m.xresid * m.xresid;
             mean_yresid2 += m.yresid * m.yresid;
+            mean_tresid2 += m.time_residual * m.time_residual;
+            mean_cross_resid2 += m.cross_residual * m.cross_residual;
             if( obs[i].obs_mag && obs[i].obs_mag != BLANK_MAG)
                {
                const double mresid = obs[i].obs_mag - obs[i].computed_mag;
@@ -5495,6 +5501,10 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff)
       mean_yresid /= (double)n_selected;
       mean_xresid2 /= (double)n_selected;
       mean_yresid2 /= (double)n_selected;
+      mean_tresid /= (double)n_selected;
+      mean_cross_resid /= (double)n_selected;
+      mean_tresid2 /= (double)n_selected;
+      mean_cross_resid2 /= (double)n_selected;
       buff += strlen( buff);
       n_lines++;
       snprintf( buff, MAX_INFO_LEN,
@@ -5511,6 +5521,10 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff)
              "mean mag residual %.2f +/- %.2f\n",
              mean_mresid, sqrt( mean_mresid2 - mean_mresid * mean_mresid));
          }
+      snprintf_append( buff, MAX_INFO_LEN,
+             "Mean time residual %.3f +/- %.3fs; mean cross-track resid %.3f +/- %.3f\"\n",
+             mean_tresid, sqrt( mean_tresid2 - mean_tresid * mean_tresid),
+             mean_cross_resid, sqrt( mean_cross_resid2 - mean_cross_resid * mean_cross_resid));
       if( n_selected == 2)
          {
          double dist, posn_ang, delta_time;
