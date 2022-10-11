@@ -3500,6 +3500,13 @@ static void warn_about_insufficient_precision( const OBSERVE *obs, const int fla
    generic_message_box( msg, "o");
 }
 
+static bool _is_synthetic_obs( const OBSERVE *obs)
+{
+   return( !strcmp( obs->reference, "Synth")
+            || !strcmp( obs->reference, "neocp")
+            || !strcmp( obs->reference, "Dummy"));
+}
+
 /* Uncertainties on time,  magnitude,  and the error ellipse all will have
 default values.  If ADES or Tholen or .rwo uncertainties have been set,  or
 uncertainties in columns 57-65,  we use them.  (Such uncertainties apply to
@@ -3536,7 +3543,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
    char obj_name[80], curr_ades_ids[100];
    OBSERVE FAR *rval;
    bool including_obs = true;
-   int i = 0, n_fixes_made = 0;
+   int i = 0, n_fixes_made = 0, n_future_obs = 0;
    unsigned line_no = 0;
    unsigned n_below_horizon = 0, n_in_sunlight = 0;
    unsigned lines_actually_read = 0;
@@ -4040,9 +4047,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
          if( rval[i].note2 != 'R')        /* no way to sanity-test */
             {                             /* radar obs yet         */
             DPT obj_alt_az, sun_alt_az;
-            const bool is_synthetic = !strcmp( rval[i].reference, "Synth")
-                                   || !strcmp( rval[i].reference, "neocp")
-                                   || !strcmp( rval[i].reference, "Dummy");
+            const bool is_synthetic = _is_synthetic_obs( rval + i);
 
             if( !is_synthetic
                      && !get_obs_alt_azzes( rval + i, &sun_alt_az, &obj_alt_az)
@@ -4119,8 +4124,16 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                         n_sat_obs_without_offsets);
       generic_message_box( buff, "o");
       }
-   if( rval[n_obs_actually_loaded - 1].jd > current_jd( ))   /* warn obs are */
-      generic_message_box( get_find_orb_text( 2018), "o");   /* in future */
+   i = n_obs_actually_loaded;
+   while( i-- >= 0 && rval[i].jd > current_jd( ))
+      if( !_is_synthetic_obs( rval + i))
+         n_future_obs++;    /* warn of non-synthetic obs in the future */
+   if( n_future_obs)
+      {
+      snprintf_err( buff, sizeof( buff), get_find_orb_text( 2018),
+                     n_future_obs);
+      generic_message_box( buff, "o");
+      }
 
 #ifdef FUTURE_SATELLITE_OBS_CHECKING
    check_satellite_obs( rval, n_obs_actually_loaded);

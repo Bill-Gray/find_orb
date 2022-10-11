@@ -178,9 +178,9 @@
 
 2006    Find_Orb can use the NEOCP ephemeris you've given it.
 2006    However,  the ephemerides are geocentric.  You'll
-2006    get much better results if you select an observatory
-2006    code,  preferably one near the equator.  (781) Quito
-2006    is best for this purpose.
+2006    get much better results if you select a topocentric
+2006    observatory code,  preferably one near the equator.
+2006    (781) Quito is best for this purpose.
 
 2007    The observations span %.1f years,  greater than Find_Orb's
 2007    maximum span of %.1f years.  If you really want the whole
@@ -218,8 +218,8 @@
 2017    https://www.minorplanetcenter.net/iau/info/SatelliteObs.html
 2017    \nfor info on how to handle spacecraft-based observations.
 
-2018    The date/time for one or more observations is in the future.
-2018    If that's not what you expected,  you should check the data.
+2018    %d observations have times in the future.  If that's
+2018    not what you expected,  you should check the data.
 
 2021    No asteroid ephemeris data is available,  so
 2021    asteroid perturbations cannot be included.  You can
