@@ -1406,12 +1406,12 @@ int get_object_name( char *obuff, const char *packed_desig)
          try_artsat_xdesig( obuff);
       if( rval == OBJ_DESIG_COMET_NUMBERED)
          {
-         sprintf( xdesig, "%3d%c/", atoi( obuff + 2), *obuff);
+         snprintf_err( xdesig, sizeof( xdesig), "%3d%c/", atoi( obuff + 2), *obuff);
          try_adding_comet_name( xdesig, obuff);
          }
       if( rval == OBJ_DESIG_COMET_PROVISIONAL)
          {
-         sprintf( xdesig, "   %s ", obuff);
+         snprintf_err( xdesig, sizeof( xdesig), "   %s ", obuff);
          try_adding_comet_name( xdesig, obuff);
          }
       if( rval == OBJ_DESIG_ASTEROID_NUMBERED)
@@ -2334,11 +2334,12 @@ static bool get_neocp_data( char *buff, char *desig, char *mpc_code)
          else                       /* step size was in minutes */
             minutes = (atoi( buff + 11) / 100) * 60 +
                                           atoi( buff + 13);
-         sprintf( obuff + 25, ".%06d", minutes * 1000000 / (int)minutes_per_day);
+         snprintf_err( obuff + 25, sizeof( obuff) - 25,
+                          ".%06d", minutes * 1000000 / (int)minutes_per_day);
          memcpy( obuff + 32, buff + 18, 10);      /* RA */
          memcpy( obuff + 44, buff + 29, 9);       /* dec */
          memcpy( obuff + 65, buff + 46, 4);       /* mag */
-         strcpy( obuff + 72, "neocp");
+         strlcpy_err( obuff + 72, "neocp", sizeof( obuff) - 72);
          memcpy( obuff + 77, mpc_code, 3);
          obuff[14] = 'C';                          /* assume a CCD obs */
          obuff[70] = 'V';                          /* mags are V */
@@ -2747,9 +2748,10 @@ static int rwo_to_mpc( char *buff, double *ra_bias, double *dec_bias,
             _jpl_to_mpc_code( obuff + 68, atoi( buff + 102));
             _jpl_to_mpc_code( obuff + 77, atoi( buff + 107));
             }
-         strcpy( second_radar_line, obuff);
+         strlcpy_error( second_radar_line, obuff);
          freq_in_mhz = get_radar_frequency( atoi( buff + 99), year);
-         sprintf( obuff + 62, "%5.0f", freq_in_mhz);
+         snprintf_err( obuff + 62, sizeof( obuff) - 62,
+                                          "%5.0f", freq_in_mhz);
          second_radar_line[14] = 'r';
          if( buff[11] == 'R')
             {
@@ -2758,8 +2760,10 @@ static int rwo_to_mpc( char *buff, double *ra_bias, double *dec_bias,
             if( debug_level > 2)
                debug_printf( "%s: round trip %f +/- %f microseconds\n",
                      buff, val1 * 1e+6, val2 * 1e+6);
-            sprintf( obuff + 32, "%13.0f", val1 * 1e+8);
-            sprintf( second_radar_line + 34, "%12.0f", val2 * 1e+9);
+            snprintf_err( obuff + 32, sizeof( obuff) - 32,
+                                             "%13.0f", val1 * 1e+8);
+            snprintf_err( second_radar_line + 34, sizeof( second_radar_line) - 34,
+                                             "%12.0f", val2 * 1e+9);
             rval = 1;
             }
          else if( buff[11] == 'V')
@@ -2770,9 +2774,11 @@ static int rwo_to_mpc( char *buff, double *ra_bias, double *dec_bias,
             if( debug_level > 2)
                debug_printf( "%s: Doppler %f +/- %f Hz\n",
                      buff, val1, val2);
-            sprintf( obuff + 48, "%13.0f", fabs( val1) * 1e+9);
+            snprintf_err( obuff + 48, sizeof( obuff) - 48,
+                                   "%13.0f", fabs( val1) * 1e+9);
             obuff[47] = (val1 > 0. ? '+' : '-');
-            sprintf( second_radar_line + 48, "%13.0f", val2 * 1e+9);
+            snprintf_err( second_radar_line + 48, sizeof( second_radar_line) - 48,
+                                        "%13.0f", val2 * 1e+9);
             rval = 1;
             }
          if( !memcmp( obuff + 77, "251", 3) || !memcmp( obuff + 77, "253", 3))
@@ -2784,7 +2790,7 @@ static int rwo_to_mpc( char *buff, double *ra_bias, double *dec_bias,
          for( i = 0; i < 80; i++)
             if( !second_radar_line[i])
                second_radar_line[i] = ' ';
-         strcpy( second_radar_line + 68, obuff + 68);
+         strlcpy_err( second_radar_line + 68, obuff + 68, sizeof( second_radar_line) - 68);
          }
       }
    if( rval)
