@@ -2299,21 +2299,19 @@ static bool get_neocp_data( char *buff, char *desig, char *mpc_code)
       memcpy( desig, buff, len);
       desig[len] = '\0';
       }
-   else if( !memcmp( buff, "Ephemerides are for ", 20))
+   else if( strstr( buff, "the geocenter"))
       {
       static int already_warned = 0;
 
-      if( !memcmp( buff + 20, "observatory code ", 17))
-         memcpy( mpc_code, buff + 37, 3);
-      else if( !already_warned)
-         {
-         already_warned = 1;             /* warn about geocentric ephems */
-         memcpy( mpc_code, "500", 3);     /* see 'efindorb.txt' for more */
+      memcpy( mpc_code, "500", 3);
+      if( !already_warned)
+         {                             /* warn about geocentric ephems */
+         already_warned = 1;           /* see 'efindorb.txt' for details */
          generic_message_box( get_find_orb_text( 2006), "o");
          }
       }
-   else if( len >= 21 && !memcmp( buff, " observatory code ", 18))
-      memcpy( mpc_code, buff + 18, 3);
+   else if( (tptr = strstr( buff, " observatory code ")) != NULL)
+      memcpy( mpc_code, tptr + 18, 3);
    else if( len > 64 && buff[26] == '.' && *desig && *mpc_code)
       {
       int i;
