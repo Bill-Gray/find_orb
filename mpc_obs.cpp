@@ -2239,7 +2239,7 @@ that bold items are "decorated" with asterisks;  or it might be real HTML
 with real HTML <p><b> and </b> tags around the object designations. Example
 of each of the three:
 
-<p><b>VE82F84</b>
+<p><b>VE82F84</b>   (may have other bytes before it)
 *VE82F84*
 VE82F84
  */
@@ -2268,6 +2268,7 @@ static bool get_neocp_data( char *buff, char *desig, char *mpc_code)
 {
    size_t len;
    bool rval = false;
+   char *tptr;
 
    for( len = 0; buff[len] >= ' '; len++)
       ;
@@ -2281,11 +2282,17 @@ static bool get_neocp_data( char *buff, char *desig, char *mpc_code)
       desig[len - 2] = '\0';
       neocp_file_type = NEOCP_FILE_TYPE_ASTERISKED;
       }
-   else if( !memcmp( buff, " <p><b>", 7) && !memcmp( buff + 14, "</b>", 4))
+   else if( len > 15 && (tptr = strstr( buff, "<p><b>")) != NULL)
       {
-      memcpy( desig, buff + 7, 7);
-      desig[7] = '\0';
-      neocp_file_type = NEOCP_FILE_TYPE_HTML;
+      char *endptr = strstr( tptr, "</b>");
+
+      tptr += 6;
+      if( endptr > tptr && endptr <= tptr + 7)
+         {
+         memcpy( desig, tptr, endptr - tptr);
+         desig[endptr - tptr] = '\0';
+         neocp_file_type = NEOCP_FILE_TYPE_HTML;
+         }
       }
    else if( len && len < 10 && neocp_file_type == NEOCP_FILE_TYPE_UNKNOWN)
       {
@@ -3811,6 +3818,11 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                   *curr_ades_ids = '\0';
                   }
 
+               if( !strcmp( rval[i].reference, "neocp"))
+                  {
+                  posn_sigma_1 = 1.5;     /* NEOCP ephems are given to */
+                  posn_sigma_2 = 1.0;     /* 0.1s in RA, 1" in dec */
+                  }
                            /* The observation data's precision has already been */
                            /* used to figure out a minimum sigma;  e.g.,  a mag */
                            /* of '16.3' results in a sigma of 0.1.  If the above */
@@ -4029,6 +4041,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
             {                             /* radar obs yet         */
             DPT obj_alt_az, sun_alt_az;
             const bool is_synthetic = !strcmp( rval[i].reference, "Synth")
+                                   || !strcmp( rval[i].reference, "neocp")
                                    || !strcmp( rval[i].reference, "Dummy");
 
             if( !is_synthetic
