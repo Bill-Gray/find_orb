@@ -5465,8 +5465,9 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff,
 
       snprintf( buff, buffsize, "%d observations selected of %d\n",
                           (int)n_selected, n_obs);
+      n_selected = 0;
       for( i = 0; i < (size_t)n_obs; i++)
-         if( obs[i].flags & OBS_IS_SELECTED)
+         if( (obs[i].flags & OBS_IS_SELECTED) && obs[i].note2 != 'R')
             {
             MOTION_DETAILS m;
 
@@ -5479,6 +5480,7 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff,
             mean_yresid2 += m.yresid * m.yresid;
             mean_tresid2 += m.time_residual * m.time_residual;
             mean_cross_resid2 += m.cross_residual * m.cross_residual;
+            n_selected++;
             if( obs[i].obs_mag && obs[i].obs_mag != BLANK_MAG)
                {
                const double mresid = obs[i].obs_mag - obs[i].computed_mag;
@@ -5488,19 +5490,22 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff,
                n_mags++;
                }
             }
-      mean_xresid /= (double)n_selected;
-      mean_yresid /= (double)n_selected;
-      mean_xresid2 /= (double)n_selected;
-      mean_yresid2 /= (double)n_selected;
-      mean_tresid /= (double)n_selected;
-      mean_cross_resid /= (double)n_selected;
-      mean_tresid2 /= (double)n_selected;
-      mean_cross_resid2 /= (double)n_selected;
-      n_lines++;
-      snprintf_append( buff, buffsize,
-             "Mean RA residual %.3f +/- %.3f; dec %.3f +/- %.3f\n",
-             mean_xresid, sqrt( mean_xresid2 - mean_xresid * mean_xresid),
-             mean_yresid, sqrt( mean_yresid2 - mean_yresid * mean_yresid));
+      if( n_selected > 1)
+         {
+         mean_xresid /= (double)n_selected;
+         mean_yresid /= (double)n_selected;
+         mean_xresid2 /= (double)n_selected;
+         mean_yresid2 /= (double)n_selected;
+         mean_tresid /= (double)n_selected;
+         mean_cross_resid /= (double)n_selected;
+         mean_tresid2 /= (double)n_selected;
+         mean_cross_resid2 /= (double)n_selected;
+         n_lines++;
+         snprintf_append( buff, buffsize,
+                "Mean RA residual %.3f +/- %.3f; dec %.3f +/- %.3f\n",
+                mean_xresid, sqrt( mean_xresid2 - mean_xresid * mean_xresid),
+                mean_yresid, sqrt( mean_yresid2 - mean_yresid * mean_yresid));
+         }
       if( n_mags > 1)
          {
          mean_mresid /= (double)n_mags;
@@ -5510,7 +5515,8 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff,
              "mean mag residual %.2f +/- %.2f\n",
              mean_mresid, sqrt( mean_mresid2 - mean_mresid * mean_mresid));
          }
-      snprintf_append( buff, buffsize,
+      if( n_selected)
+         snprintf_append( buff, buffsize,
              "Mean time residual %.3f +/- %.3fs; mean cross-track resid %.3f +/- %.3f\"\n",
              mean_tresid, sqrt( mean_tresid2 - mean_tresid * mean_tresid),
              mean_cross_resid, sqrt( mean_cross_resid2 - mean_cross_resid * mean_cross_resid));
