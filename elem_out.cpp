@@ -254,29 +254,30 @@ void make_date_range_text( char *obuff, const double jd1, const double jd2)
                                     CALENDAR_JULIAN_GREGORIAN);
    static const char *month_names[] = { "Jan.", "Feb.", "Mar.", "Apr.", "May",
             "June", "July", "Aug.", "Sept.", "Oct.", "Nov.", "Dec." };
+   const size_t obuff_size = 37;
+   const double dt = jd2 - jd1;
 
    if( year == year2)
       {
-      sprintf( obuff, "%ld %s %d", year, month_names[month - 1], day1);
+      snprintf_err( obuff, obuff_size, "%ld %s %d", year, month_names[month - 1], day1);
       obuff += strlen( obuff);
       if( month == month2 && day1 != day2)
-         sprintf( obuff, "-%d", day2);
+         snprintf_err( obuff, obuff_size, "-%d", day2);
       else if( month != month2)
-         sprintf( obuff, "-%s %d", month_names[month2 - 1], day2);
+         snprintf_err( obuff, obuff_size, "-%s %d", month_names[month2 - 1], day2);
       }
    else              /* different years */
-      sprintf( obuff, "%ld %s %d-%ld %s %d", year, month_names[month - 1],
+      snprintf_err( obuff, obuff_size, "%ld %s %d-%ld %s %d", year, month_names[month - 1],
                              day1, year2, month_names[month2 - 1], day2);
 
-   obuff += strlen( obuff);
-   if( jd2 - jd1 < 10. / seconds_per_day)  /* less than 10 seconds: show to .01 sec */
-      sprintf( obuff, " (%.2f sec)", (jd2 - jd1) * seconds_per_day);
-   else if( jd2 - jd1 < 100. / seconds_per_day) /* less than 100 seconds: show to .1 sec */
-      sprintf( obuff, " (%.1f sec)", (jd2 - jd1) * seconds_per_day);
-   else if( jd2 - jd1 < 100. / minutes_per_day)     /* less than 100 minutes: show in min */
-      sprintf( obuff, " (%.1f min)", (jd2 - jd1) * minutes_per_day);
-   else if( jd2 - jd1 < 2.)
-      sprintf( obuff, " (%.1f hr)", (jd2 - jd1) * hours_per_day);
+   if( dt < 10. / seconds_per_day)  /* less than 10 seconds: show to .01 sec */
+      snprintf_append( obuff, obuff_size, " (%.2f sec)", dt * seconds_per_day);
+   else if( dt < 100. / seconds_per_day) /* less than 100 seconds: show to .1 sec */
+      snprintf_append( obuff, obuff_size, " (%.1f sec)", dt * seconds_per_day);
+   else if( dt < 100. / minutes_per_day)     /* less than 100 minutes: show in min */
+      snprintf_append( obuff, obuff_size, " (%.1f min)", dt * minutes_per_day);
+   else if( dt < 2.)
+      snprintf_append( obuff, obuff_size, " (%.1f hr)", dt * hours_per_day);
 }
 
 /* This is useful for abbreviating on-screen text;  say,  displaying */
@@ -3706,19 +3707,19 @@ int store_defaults( const ephem_option_t ephemeris_output_options,
 {
    char buff[256];
 
-   sprintf( buff, "%c,%d,%d,0,%f,%f",
+   snprintf_err( buff, sizeof( buff), "%c,%d,%d,0,%f,%f",
                default_comet_magnitude_type,
                element_format, element_precision,
                max_residual_for_filtering, noise_in_arcseconds);
    set_environment_ptr( "SETTINGS", buff);
    set_environment_ptr( "EPHEM_OPTIONS",
                    write_bit_string( buff, ephemeris_output_options));
-   sprintf( buff, "%.3f %f %u %d", probability_of_blunder * 100.,
+   snprintf_err( buff, sizeof( buff), "%.3f %f %u %d", probability_of_blunder * 100.,
               overobserving_time_span,
               overobserving_ceiling,
               use_blunder_method);
    set_environment_ptr( "FILTERING", buff);
-   sprintf( buff, "%d %.2f %d %d %d", use_sigmas ? 1 : 0,
+   snprintf_err( buff, sizeof( buff), "%d %.2f %d %d %d", use_sigmas ? 1 : 0,
                                  ephemeris_mag_limit,
                                  sigmas_in_columns_57_to_65,
                                  forced_central_body,
