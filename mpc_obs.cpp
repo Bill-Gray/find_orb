@@ -5459,10 +5459,10 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
    return( *buff ? 0 : -1);      /* indicate if anything was written */
 }
 
-void add_version_and_de_text( char *buff)
+static void _add_version_and_de_text( char *buff, const size_t buffsize)
 {
-   strcpy( buff, "Version ");
-   strcat( buff, __DATE__);
+   snprintf_err( buff, buffsize, "Version %s\n",
+                        find_orb_version_jd( NULL));
    format_jpl_ephemeris_info( buff + strlen( buff));
 }
 
@@ -5647,7 +5647,7 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff,
       }
    if( n_lines <= 4)    /* got room for version info */
       {
-      add_version_and_de_text( buff + strlen( buff));
+      _add_version_and_de_text( buff + strlen( buff), buffsize - strlen( buff));
       n_lines++;
       }
    return( n_lines);
