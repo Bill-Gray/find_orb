@@ -59,6 +59,7 @@ static double cross_then_dot( const double FAR *a, const double FAR *b,
 }
 
 #define GAUSS_K .01720209895
+#define P_MAX 10000.
 
 double gauss_method( const OBSERVE FAR *obs1, const OBSERVE FAR *obs2,
                      const OBSERVE FAR *obs3, double *orbit, const double mu,
@@ -253,8 +254,12 @@ double gauss_method( const OBSERVE FAR *obs1, const OBSERVE FAR *obs2,
       p1 = fabs( p1);
       p2 = fabs( p2);
       p3 = fabs( p3);
-      if( p1 < 0. || p2 < 0. || p3 < 0.)
+      if( p1 < 0. || p2 < 0. || p3 < 0.
+               || p1 > P_MAX || p2 > P_MAX || p3 > P_MAX)
+         {
+         rval = 0.;        /* iterations diverging */
          keep_iterating = 0;
+         }
       else
          {
          double r2_new_squared = 0., new_r2;
