@@ -182,6 +182,12 @@ OBS J.-G. Bosch
 COM Default details extracted from MPEC 2021-F115
 TEL 0.08-m f/6 refractor + CCD
 
+COD 181
+COM Default details extracted from MPEC 2022-R91
+OBS T. Santana-Ros, M. Micheli, L. Conversi, J. Berthier, F. Vachier, P. Descamps
+MEA M. Micheli
+TEL 0.6-m f/8 reflector + CMOS
+
 COD 185
 COM Find_Orb default details
 OBS M. Ory
@@ -284,6 +290,17 @@ OBS S. B. Porter, S. Sheppard.
 COM Default details extracted from MPEC 2017-M31
 MEA S. B. Porter
 TEL 8.2-m f/2.2 Subaru reflector
+
+COD 274
+MEA M. Micheli, M. S. Kelley, D. Farnocchia
+OBS M. S. Kelley, D. Farnocchia, A. McKay, M. Micheli, C. Opitom
+OBS S. Protopapa, C. Snodgrass
+COM Default details extracted from MPEC 2022-S20
+TEL 6.5-m reflector + CMO
+
+COD 290
+COM Default details extracted from MPEC 2022-T132
+TEL 1.83-m f/9.2 reflector + CCD
 
 COD 291
 COM Find_Orb default details
@@ -554,6 +571,12 @@ COM Find_Orb default details
 MEA Z. Ivezic, M. Juric, R. H. Lupton, S. Tabachnik, T. Quinn
 TEL 2.5-m SDSS Telescope + SDSS camera
 
+COD 648
+COM Default details extracted from MPEC 2022-T43
+OBS K. Kaminski, M. Kaminska, T. Santana-Ros
+MEA M. Micheli
+TEL 0.7-m f/6.5 reflector + CCD
+
 COD 649
 COM Find_Orb default details
 CON Powell Observatory Louisburg, KS USA
@@ -571,6 +594,12 @@ TEL 1.82-m reflector + CCD
 COD 654
 OBS P. Choi, N. Saini, C. Zhai, R. Trahan, M. Shao
 COM Default details extracted from MPEC 2021-G138
+
+COD 661
+MEA D. D. Balam, D. W. E. Green
+OBS P. Langill
+COM Default details extracted from MPEC 2022-S297
+TEL 0.76-m Reflector + CCD
 
 COD 673
 COM Find_Orb default details
@@ -1291,6 +1320,11 @@ OBS M. Urbanik
 COM Default details extracted from MPEC 2021-P47
 TEL 0.40-m f/4.4 reflector + CCD
 
+COD G03
+OBS T. Maroti
+COM Default details extracted from MPEC 2022-N28
+TEL 0.28-m f/2.2 reflector + CCD
+
 COD G06
 OBS G. van Buitenen
 COM Default details extracted from MPEC 2021-B143
@@ -1451,6 +1485,11 @@ COD H23
 OBS T. Haugh
 COM Default details extracted from MPEC 2021-B143
 TEL 0.32-m f/6.7 Newtonian reflector + CCD
+
+COD H27
+COM Default details extracted from MPEC 2022-Q137
+OBS M. Bruenjes
+TEL 0.36-m f/2.0 Schmidt-Cassegrain + CCD
 
 COD H36
 COM Find_Orb default details
@@ -1641,6 +1680,11 @@ COD J27
 OBS A. San Segundo
 COM Default details extracted from MPEC 2021-E131
 TEL 0.30-m f/4 reflector + CCD
+
+COD J31
+OBS J. Baez
+COM Default details extracted from MPEC 2022-S297
+TEL 0.30-m f/3 + CCD
 
 COD J36
 OBS F. Gomez
@@ -2141,7 +2185,7 @@ OBS M. Lombardo, K. Lombardo
 COM Default details extracted from MPEC 2022-K19
 TEL 0.30-m f/8 Ritchey-Chretien + CCD
 
-COM M28
+COD M28
 OBS N. Erasmus
 COM Default details extracted from MPEC 2022-O04
 TEL 1.0-m f/8 Reflector + CCD
@@ -2568,6 +2612,11 @@ OBS M. Holbrook
 COM Default details extracted from MPEC 2021-C121
 TEL 0.36-m reflector + CCD
 
+COD W24
+OBS R. Townsend
+COM Default details extracted from MPEC 2022-S297
+TEL 0.20-m f/8 Richey Chretien + CCD
+
 COD W33
 OBS D. Wilde
 COM Default details extracted from MPEC 2021-B143
@@ -2777,6 +2826,11 @@ OBS F. Monteiro, H. Medeiros, P. Arcoverde, D. Lazzaro, R. Souza, T. Rodrigues
 MEA M. Micheli, F. Monteiro
 TEL 1.0-m f/7 reflector + CCD
 NET PPMXL
+
+COD Y90
+OBS E. F. Mananes
+COM Default details extracted from MPEC 2022-S297
+TEL 0.30-m f/5.96 QHY268M + RC304 + Reductor Focal 0.66 + CCD
 
 COD Z03
 OBS A. Garcia
