@@ -2105,8 +2105,8 @@ int write_out_elements_to_file( const double *orbit,
                      assert( zptr - buff == 43);
                      memcpy( phg_line, buff, 19);
                      memcpy( phg_line + 19, "        H ", 10);
-                     memcpy( phg_line + 29, buff + 23, 4);  /* move H */
-                     memcpy( phg_line + 33, "   G ", 5);
+                     memcpy( phg_line + 29, buff + 23, 5);  /* move H */
+                     memcpy( phg_line + 34, "  G ", 5);
                      memcpy( phg_line + 38, buff + 35, 5);  /* move G */
                      phg_line[43] = '\0';
                      }
