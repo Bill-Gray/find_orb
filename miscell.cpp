@@ -273,6 +273,8 @@ FILE *fopen_ext( const char *filename, const char *permits)
    if( !use_config_directory || is_temporary)
       while( *permits == 'l' || *permits == 'c')
          permits++;
+   if( *permits == 'c' && strchr( filename, '/'))
+      permits++;              /* not really in the config directory */
    if( permits[0] == 'l' && permits[1] == 'c')
       {     /* try local,  then config version */
       try_local = false;
@@ -620,6 +622,6 @@ const char *write_bit_string( char *ibuff, const uint64_t bits)
 const char *find_orb_version_jd( double *jd)
 {
     if( jd)
-      *jd = 2459857.5;
-    return( "2022 Oct 05");
+      *jd = 2459869.5;
+    return( "2022 Oct 17");
 }
