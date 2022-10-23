@@ -90,6 +90,11 @@ int find_fcct_biases( const double ra, const double dec, const char catalog,
       /* GAUSS_K is a fixed constant. SOLAR_GM = 0.0002959122082855911025, */
       /* in AU^3/day^2; = 1.3271243994E+11 km3/s2 */
 
+#define EARTH_RADIUS_IN_KM    6378.140
+#define SUN_RADIUS_IN_KM      695700.
+#define EARTH_RADIUS_IN_AU    (EARTH_RADIUS_IN_KM / AU_IN_KM)
+#define SUN_RADIUS_IN_AU      (SUN_RADIUS_IN_KM / AU_IN_KM)
+
 
 const double SRP1AU = 2.3e-7;
    /* "Solar radiation pressure at 1 AU",  in kg*AU^3 / (m^2*d^2),       */
@@ -3607,6 +3612,66 @@ static double adjustment_for_orbit_likelihood( const double semimajor_axis,
    return( rval * .01);
 }
 
+static int generate_orthonormal_basis( double *x, double *y, double *z, const double *ivect)
+{
+   double len = vector3_length( ivect);
+   size_t i;
+
+   if( len <= 0.)
+      return( -1);
+   for( i = 0; i < 3; i++)
+      x[i] = ivect[i] / len;
+   if( ivect[0] || ivect[1])
+      {
+      len = hypot( ivect[0], ivect[1]);
+      y[0] = -ivect[1] / len;
+      y[1] =  ivect[0] / len;
+      }
+   else
+      {
+      y[0] = 1.;
+      y[1] = 0.;
+      }
+   y[2] = 0.;
+   vector_cross_product( z, x, y);
+   return( 0);
+}
+
+double distance_to_shadow( const OBSERVE FAR *obs)
+{
+   double earth_loc[3];
+   double xyz_ecl[3];   /* observer loc relative to earth center,  in AU and J2000 ecliptic */
+   double xyz[3];   /* same,  but rotated to put x along sun-earth axis,  in Earth radii */
+   double ray[3];   /* unit vector toward observed object,  in same frame as xyz */
+   double orient[3][3];
+   double alpha, ax, discr;
+   double a, b, c;    /* solve ar^2 + br + c to find distance to the shadow edge */
+   double rval;
+   size_t i;
+
+   planet_posn( PLANET_POSN_EARTH, obs->jd, earth_loc);
+   alpha = (SUN_RADIUS_IN_AU - EARTH_RADIUS_IN_AU) / vector3_length( earth_loc);
+   for( i = 0; i < 3; i++)
+      xyz_ecl[i] = obs->obs_posn[i] - earth_loc[i];
+   generate_orthonormal_basis( orient[0], orient[1], orient[2], earth_loc);
+   for( i = 0; i < 3; i++)
+      {
+      xyz[i] = dot_product( orient[i], xyz_ecl) / EARTH_RADIUS_IN_AU;
+      ray[i] = dot_product( orient[i], obs->vect);
+      }
+   ax = alpha * ray[0];
+   a = ray[1] * ray[1] + ray[2] * ray[2] - ax * ax;
+   b = 2. * (xyz[1] * ray[1] + xyz[2] * ray[2]
+               + alpha * (1. - ax) * ray[0]);
+   c = xyz[1] * xyz[1] + xyz[2] * xyz[2] - (1. - ax) * (1. - ax);
+   discr = b * b - 4. * a * c;
+   if( discr <= 0.)
+      return( -1);
+   assert( discr > 0.);
+   rval = 0.5 * (sqrt( discr) - b) / a;
+   return( rval * EARTH_RADIUS_IN_KM);
+}
+
 int is_interstellar = 0;
 
 double evaluate_initial_orbit( const OBSERVE FAR *obs,
@@ -4079,7 +4144,7 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
                if( dawn_based_observations)     /* for Dawn-based,  assume it */
                   pseudo_r = 1000. / AU_IN_KM;  /* may be a mere 1000 km away */
                if( n_geocentric_obs)            /* make sure we start outside the earth! */
-                  pseudo_r += 6378. / AU_IN_KM;
+                  pseudo_r += EARTH_RADIUS_IN_AU;
                }
             else                  /* (first) Vaisala pass */
                pseudo_r = .1;
