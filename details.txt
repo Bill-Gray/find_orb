@@ -2190,6 +2190,11 @@ OBS N. Erasmus
 COM Default details extracted from MPEC 2022-O04
 TEL 1.0-m f/8 Reflector + CCD
 
+COD M32
+OBS O. Briukhovetskyi
+COM Default details extracted from MPEC 2022-O04
+TEL 0.35-m f/2.0 reflector + CCD
+
 COD M43
 OBS A. Gabuya
 COM Default details extracted from MPEC 2020-W26
@@ -2483,6 +2488,10 @@ COM Valid: 2016-2018 mar 1
 NET Gaia-DR1
 COM Valid: 2018 mar 1-2100
 NET Gaia-DR2
+
+COD T15
+COM Default details extracted from MPEC 2022-U04
+TEL 8.1-m reflector + 3x2Kx4K mosaic CCD
 
 COD U52
 OBS J. E. Rogers
