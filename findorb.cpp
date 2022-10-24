@@ -2268,7 +2268,8 @@ static void show_residual_legend( const int line_no, const int residual_format)
    add_cmd_area( 'b', line_no, 0, 20);    /* Reset obs time format _or_ scan obs for time */
 }
 
-static int find_rgb( const unsigned irgb);
+static int find_rgb( const int irgb);
+static void set_color_table( void);
 
 static void show_a_file( const char *filename, const int flags)
 {
@@ -2625,6 +2626,7 @@ static void show_a_file( const char *filename, const int flags)
          }
       }
    restore_screen( backup_screen);
+   set_color_table( );
    free( backup_screen);
    fclose( ifile);
    free( index);
@@ -2822,12 +2824,18 @@ static bool force_eight_color_mode = false;
       /* Either locate a palette color close to the desired RGB,  or
          (on platforms where one can do so) allocate a new palette entry
          with the desired RGB value.      */
-static int find_rgb( const unsigned irgb)
+
+static int find_rgb( const int irgb)
 {
    int best_match = 0, best_dist = 4000, i;
    static int n_colors = 0;
    short rgb0[3];
 
+   if( irgb < 0)        /* resetting colors */
+      {
+      n_colors = 0;
+      return( 0);
+      }
    rgb0[0] = (int)( irgb >> 16);
    rgb0[1] = (int)( (irgb >> 8) & 0xff);
    rgb0[2] = (int)( irgb & 0xff);
@@ -2878,13 +2886,29 @@ static void PDC_set_title( const char *title)
 }
 #endif
 
+static void set_color_table( void)
+{
+   FILE *ifile = fopen_ext( "command.txt", "fcrb");
+   char buff[90];
+   const char char_to_search_for = (COLORS > 8 ? 'c' : '8');
+
+   find_rgb( -1);
+   while( fgets( buff, sizeof( buff), ifile) && memcmp( buff, "End c", 5))
+      if( *buff == char_to_search_for)
+         {
+         int idx;
+         unsigned fore_rgb, back_rgb;
+
+         if( 3 == sscanf( buff + 1, "%d %x %x", &idx, &fore_rgb, &back_rgb))
+            init_pair( idx, find_rgb( fore_rgb), find_rgb( back_rgb));
+         }
+   fclose( ifile);
+}
+
 static SCREEN *screen_ptr;
 
 static inline int initialize_curses( const int argc, const char **argv)
 {
-   FILE *ifile = fopen_ext( "command.txt", "fcrb");
-   char buff[90], char_to_search_for;
-
 #ifdef __PDCURSES__
    ttytype[0] = 20;    /* Window must have at least 20 lines in Win32a */
    ttytype[1] = 55;    /* Window can have a max of 55 lines in Win32a */
@@ -2927,18 +2951,6 @@ static inline int initialize_curses( const int argc, const char **argv)
 #ifdef VT_RECEIVE_ALL_MOUSE
    printf( VT_RECEIVE_ALL_MOUSE);
 #endif
-   char_to_search_for = (COLORS > 8 ? 'c' : '8');
-   while( fgets( buff, sizeof( buff), ifile) && memcmp( buff, "End c", 5))
-      if( *buff == char_to_search_for)
-         {
-         int idx;
-         unsigned fore_rgb, back_rgb;
-
-         if( sscanf( buff + 1, "%d %x %x", &idx, &fore_rgb, &back_rgb) == 3)
-            init_pair( idx, find_rgb( fore_rgb), find_rgb( back_rgb));
-         }
-   fclose( ifile);
-
    if( debug_level > 2)
       debug_printf( "(3)\n");
    keypad( stdscr, 1);
@@ -2947,6 +2959,7 @@ static inline int initialize_curses( const int argc, const char **argv)
 #else
    mousemask( default_mouse_events, NULL);
 #endif
+   set_color_table( );
    return( 0);
 }
 
