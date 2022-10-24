@@ -3949,6 +3949,8 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
             including_obs = false;
          else if( !memcmp( buff, "#sun_alt_limit ", 15))
             _overall_sun_alt_limit = atof( buff + 15);
+         else if( !memcmp( buff, "#reset_debug ", 13))
+             debug_level = atoi( buff + 13);
          else if( !memcmp( buff, "#obj_alt_limit ", 15))
             _overall_obj_alt_limit = atof( buff + 15);
          else if( !memcmp( buff, "#include_obs", 12))
