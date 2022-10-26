@@ -1743,6 +1743,8 @@ double galactic_confusion( const double ra, const double dec)
    y = (90. - dec) * (double)ysize / 180. - half_a_pixel;
    if( y < 0.)
       y = 0.;
+   if( y > (double)ysize - 1.000001)
+      y = (double)ysize - 1.000001;
    iy = (int)y;
    assert( y >= 0 && y <= ysize);
    for( i = iy - 1; i < iy + 2; i++)
