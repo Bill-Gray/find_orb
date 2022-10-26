@@ -1037,9 +1037,9 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
    fprintf( ofile, "\n        \"latest_used iso\": \"%s\",", iso_time( buff, jd_last, 3));
 
    first = 0;
-   while( first < (int)n_obs && (obs[first].flags & OBS_DONT_USE))
+   while( first < (int)n_obs - 1 && (obs[first].flags & OBS_DONT_USE))
       first++;
-   last = 0;
+   last = n_obs - 1;
    while( last > first && (obs[last].flags & OBS_DONT_USE))
       last--;
    jd_first = utc_from_td( obs[first].jd, NULL);
