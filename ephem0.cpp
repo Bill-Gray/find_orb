@@ -48,12 +48,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "expcalc.h"
 #include "rgb_defs.h"
 #include "stringex.h"
+#include "constant.h"
 
-#define J2000 2451545.0
-#define JD_TO_YEAR(jd)  (2000. + ((jd)-J2000) / 365.25)
-#define EARTH_MAJOR_AXIS 6378140.
-#define EARTH_MAJOR_AXIS_IN_AU (EARTH_MAJOR_AXIS / AU_IN_METERS)
-#define PI 3.1415926535897932384626433832795028841971693993751058209749445923
 #define LOG_10 2.3025850929940456840179914546843642076011014886287729760333279009675726
 #define LIGHT_YEAR_IN_KM    (365.25 * seconds_per_day * SPEED_OF_LIGHT)
 
@@ -742,7 +738,7 @@ static int find_precovery_plates( OBSERVE *obs, const int n_obs,
                p3[i].ra = p1[i].ra + fraction * centralize_ang_around_zero( delta_ra);
                p3[i].dec = p1[i].dec + fraction * (p2[i].dec - p1[i].dec);
                }
-            margin += EARTH_MAJOR_AXIS_IN_AU / p1->r;
+            margin += EARTH_RADIUS_IN_AU / p1->r;
             mag = abs_mag + calc_obs_magnitude(
                                  p2->sun_obj, p2->r, p2->sun_earth, NULL);
             if( mag < limiting_mag && precovery_in_field( &field, p3, n_orbits, margin) > .01)
@@ -1156,7 +1152,6 @@ double shadow_check( const double *planet_loc,
 {
    const double r2 = dot_product( planet_loc, planet_loc);
    const double dot = dot_product( planet_loc, obs_posn);
-   const double SUN_RADIUS_IN_AU = 696000. / AU_IN_KM;
    double d = 0., angular_sep, r;
    double ang_size_sun, ang_size_planet;
    size_t i;
@@ -1858,8 +1853,8 @@ static double lunar_eclipse_magnitude( const double *earth, const double *moon)
          {
          const double lunar_radius = 1737.4 / AU_IN_KM;
          const double expansion_factor = 1.02;     /* adds a bit for earth's atmosphere */
-         const double earth_radius = expansion_factor * 6378.4 / AU_IN_KM;
-         const double solar_radius = 695700. / AU_IN_KM;
+         const double earth_radius = expansion_factor * EARTH_RADIUS_IN_AU;
+         const double solar_radius = SUN_RADIUS_IN_KM;
          const double umbra_angle = earth_radius / r - (solar_radius - earth_radius) / sun_earth;
          const double lunar_angle = lunar_radius / r;
 
@@ -2744,7 +2739,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                         lunar_elong = acose( -cos_elong);
                         ecliptic_to_equatorial( vect);   /* mpc_obs.cpp */
                         fraction_illum = shadow_check( earth_loc, orbi_after_light_lag,
-                                    EARTH_MAJOR_AXIS_IN_AU);
+                                    EARTH_RADIUS_IN_AU);
                         if( moon_dist)
                            cos_elong = dot_product( vect, topo)
                                         / (moon_dist * vector3_length( topo));
@@ -3390,8 +3385,6 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                {
                double moid;
                ELEMENTS planet_elem, elem;
-               const double GAUSS_K = .01720209895;  /* Gauss' grav const */
-               const double SOLAR_GM = (GAUSS_K * GAUSS_K);
 
                elem.central_obj = 0;
                elem.gm = SOLAR_GM;

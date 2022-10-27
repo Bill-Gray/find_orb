@@ -106,6 +106,7 @@ static bool _mouse_movements_are_reported = false;
 #include "date.h"
 #include "monte0.h"
 #include "stringex.h"
+#include "constant.h"
 
 int debug_level = 0;
 
@@ -153,8 +154,6 @@ devoted to station data.   */
 #endif
 
 #define CTRL(c) ((c) & 0x1f)
-
-#define PI 3.1415926535897932384626433832795028841971693993751058209749445923
 
 void ensure_config_directory_exists(); /* miscell.c */
 static int user_select_file( char *filename, const char *title, const int flags);
@@ -817,8 +816,6 @@ static char *_set_radio_button( char *text, const int option_num)
    return( line_ptr);
 }
 
-#define EARTH_MAJOR_AXIS  6378.14
-
 /* Here's a simplified example of the use of the 'ephemeris_in_a_file'
    function... nothing fancy,  but it shows how it's used.  */
 
@@ -917,7 +914,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
          else
             {
             otext = "Earth radii";
-            vect_dist_units = AU_IN_KM / EARTH_MAJOR_AXIS;
+            vect_dist_units = AU_IN_KM / EARTH_RADIUS_IN_KM;
             }
          snprintf_append( buff, sizeof( buff), "D  Distances in %s\n", otext);
          if( ephem_type == OPTION_STATE_VECTOR_OUTPUT)
@@ -1134,7 +1131,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                if( vect_dist_units == 1.)
                   vect_dist_units = AU_IN_KM;
                else if( vect_dist_units == AU_IN_KM)
-                  vect_dist_units = AU_IN_KM / EARTH_MAJOR_AXIS;
+                  vect_dist_units = AU_IN_KM / EARTH_RADIUS_IN_KM;
                else
                   vect_dist_units = 1.;
                reset_vect_units = true;
@@ -2787,9 +2784,6 @@ static double get_elements( const char *filename, double *state_vect)
       }
    if( elem.epoch)
       {
-      const double GAUSS_K = .01720209895;      /* Gauss' gravitational constant */
-      const double SOLAR_GM = (GAUSS_K * GAUSS_K);
-
       derive_quantities( &elem, SOLAR_GM);
       elem.perih_time = elem.epoch - elem.mean_anomaly * elem.t0;
       elem.angular_momentum = sqrt( SOLAR_GM * elem.q);

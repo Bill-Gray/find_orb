@@ -46,13 +46,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "sigma.h"
 #include "date.h"
 #include "pl_cache.h"
-
-#define PI 3.1415926535897932384626433832795028841971693993751058209749445923
-#define EARTH_MAJOR_AXIS 6378140.
-#define EARTH_MINOR_AXIS 6356755.
-#define EARTH_MAJOR_AXIS_IN_AU (EARTH_MAJOR_AXIS / AU_IN_METERS)
-#define EARTH_MINOR_AXIS_IN_AU (EARTH_MINOR_AXIS / AU_IN_METERS)
-#define J2000 2451545.
+#include "constant.h"
 
 double utc_from_td( const double jdt, double *delta_t);     /* ephem0.cpp */
 int apply_excluded_observations_file( OBSERVE *obs, const int n_obs);
@@ -1896,7 +1890,7 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
       coord_epoch = atof( obs->columns_57_to_65 + 5);
    if( coord_epoch != 2000.)
       {
-      double year = (obs->jd - J2000) / 365.25 + 2000.;
+      double year = JD_TO_YEAR( obs->jd);
 
       if( coord_epoch == -1.)       /* true coords of date */
          {

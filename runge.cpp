@@ -32,11 +32,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "comets.h"
 #include "afuncs.h"
 #include "mpc_obs.h"
-
-#define PI 3.1415926535897932384626433832795028841971693993751058209749445923
-#define J2000 2451545.
-#define GAUSS_K .01720209895
-#define SOLAR_GM (GAUSS_K * GAUSS_K)
+#include "constant.h"
 
 #define ldouble long double
 
@@ -150,10 +146,9 @@ static void vector_cross_productl( ldouble *xprod, const ldouble *a, const ldoub
 #define J2_IN_EARTH_UNITS (1.08262539E-03)
 #define J3_IN_EARTH_UNITS (-2.53241E-06)
 #define J4_IN_EARTH_UNITS (-1.619898E-06)
-#define EARTH_R (6378.140 / AU_IN_KM)
-#define EARTH_R2 (EARTH_R * EARTH_R)
+#define EARTH_R2 (EARTH_RADIUS_IN_AU * EARTH_RADIUS_IN_AU)
 #define EARTH_J2 (J2_IN_EARTH_UNITS * EARTH_R2)
-#define EARTH_J3 (J3_IN_EARTH_UNITS * EARTH_R2 * EARTH_R)
+#define EARTH_J3 (J3_IN_EARTH_UNITS * EARTH_R2 * EARTH_RADIUS_IN_AU)
 #define EARTH_J4 (J4_IN_EARTH_UNITS * EARTH_R2 * EARTH_R2)
 
 
@@ -166,7 +161,6 @@ static void vector_cross_productl( ldouble *xprod, const ldouble *a, const ldoub
 #define MARS_J3 (J3_IN_MARS_UNITS*MARS_R * MARS_R * MARS_R)
 #define MARS_J4 (J4_IN_MARS_UNITS*MARS_R * MARS_R * MARS_R * MARS_R)
 
-#define SUN_R     (696000. / AU_IN_KM)
 #define MERCURY_R   (2439.4 / AU_IN_KM)
 #define VENUS_R     (6051. / AU_IN_KM)
 #define PLUTO_R     (1500. / AU_IN_KM)
@@ -206,15 +200,13 @@ static void vector_cross_productl( ldouble *xprod, const ldouble *a, const ldoub
             Maybe Gaia will do the trick?  Or Solar Orbiter or BepiColombo
             or Parker Solar Probe?        */
 #define J2_IN_SOLAR_UNITS 2.1961391516529825E-07
-#define SOLAR_R (696000.0 / AU_IN_KM)
-#define SOLAR_R2 (SOLAR_R * SOLAR_R)
-#define SOLAR_J2 (J2_IN_SOLAR_UNITS * SOLAR_R2)
+#define SOLAR_J2 (J2_IN_SOLAR_UNITS * SUN_RADIUS_IN_AU * SUN_RADIUS_IN_AU)
 
 #endif         /* #ifdef NOT_USED_YET */
 
 /* Start considering atmospheric drag if within 500 km of earth: */
 
-#define ATMOSPHERIC_LIMIT (EARTH_R + 500. / AU_IN_KM)
+#define ATMOSPHERIC_LIMIT (EARTH_RADIUS_IN_AU + 500. / AU_IN_KM)
 /* #define ATMOSPHERIC_LIMIT 0      */
 
 /*  Jupiter field is now from doi:10.1038/nature25776, "Measurement of
@@ -317,7 +309,7 @@ static void numerical_gradient( double *grad, const double *loc,
          }
       if( n_terms > 0)     /* n_term <= 0 -> use "usual" J2 & J3 & J4 */
          {
-         double ht_above_ground = (r / EARTH_R) - 1.;
+         double ht_above_ground = (r / EARTH_RADIUS_IN_AU) - 1.;
          int n_added_terms = 0;
 
          if( ht_above_ground > 0.)
@@ -354,9 +346,9 @@ static void numerical_gradient( double *grad, const double *loc,
       double grad2[3];
 
       debug_printf( "Loc (in earth radii): %e %e %e; radius %e\n",
-               loc[0] / EARTH_R,
-               loc[1] / EARTH_R,
-               loc[2] / EARTH_R, r / EARTH_R);
+               loc[0] / EARTH_RADIUS_IN_AU,
+               loc[1] / EARTH_RADIUS_IN_AU,
+               loc[2] / EARTH_RADIUS_IN_AU, r / EARTH_RADIUS_IN_AU);
       debug_printf( "Gradient (numerical): %e %e %e\n",
                   grad[0], grad[1], grad[2]);
 
@@ -885,7 +877,7 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
       double earth_loc[3];
 
       earth_lunar_posn( jd, earth_loc, NULL);
-      fraction_illum = shadow_check( earth_loc, ival_as_double, EARTH_R);
+      fraction_illum = shadow_check( earth_loc, ival_as_double, EARTH_RADIUS_IN_AU);
       }
    if( force_model == FORCE_MODEL_SRP)
       solar_accel -= ival[6] * fraction_illum;
@@ -1102,8 +1094,8 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
                   const double SRP1AU = 2.3e-7;   /* kg*AU^3 / (m^2*d^2) */
                   const double amr_drag = ival[6] * SOLAR_GM / SRP1AU;
                   const double rho_cos_phi =
-                          hypot( delta_planet[0], delta_planet[1]) / EARTH_R;
-                  const double rho_sin_phi = delta_planet[2] / EARTH_R;
+                          hypot( delta_planet[0], delta_planet[1]) / EARTH_RADIUS_IN_AU;
+                  const double rho_sin_phi = delta_planet[2] / EARTH_RADIUS_IN_AU;
                   double ht_in_meters, rho;
                   const double meters_per_km = 1000.;
                   const double dt = .5 / minutes_per_day;  /* half a minute */
