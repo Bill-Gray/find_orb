@@ -2919,7 +2919,11 @@ static inline int initialize_curses( const int argc, const char **argv)
 #else
    INTENTIONALLY_UNUSED_PARAMETER( argc);
    INTENTIONALLY_UNUSED_PARAMETER( argv);
-   if( force_eight_color_mode || !(screen_ptr = newterm( "xterm-256color", stdout, stdin)))
+
+   char xterm_256color_name[20];
+
+   strlcpy_error( xterm_256color_name, "xterm-256color");
+   if( force_eight_color_mode || !(screen_ptr = newterm( xterm_256color_name, stdout, stdin)))
       screen_ptr = newterm( NULL, stdout, stdin);
 #endif
    if( debug_level > 2)
