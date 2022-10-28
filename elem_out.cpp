@@ -38,6 +38,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "monte0.h"     /* for put_double_in_buff() proto */
 #include "showelem.h"
 #include "stringex.h"
+#include "constant.h"
 
 #ifndef _WIN32
 #include <fcntl.h>
@@ -55,12 +56,6 @@ bool findorb_already_running = false;
    #endif
 #endif
 
-#define J2000 2451545.
-#define PI 3.1415926535897932384626433832795028841971693993751058209749445923
-#define GAUSS_K .01720209895
-#define SOLAR_GM (GAUSS_K * GAUSS_K)
-#define JD_TO_YEAR(jd)  (2000. + ((jd)-J2000) / 365.25)
-#define YEAR_TO_JD( year) (J2000 + (year - 2000.) * 365.25)
 
 static const char *_extras_filename = "hints.txt";
 extern int available_sigmas;
