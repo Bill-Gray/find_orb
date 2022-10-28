@@ -384,7 +384,7 @@ static int fix_up_mpc_observation( char *buff)
             if( strcmp( buff, obuff))
                {
                rval |= OBS_FORMAT_INCORRECT;
-               strcpy( buff, obuff);
+               strlcpy_err( buff, obuff, 81);
                }
             }
          }
@@ -492,7 +492,7 @@ static inline int get_lat_lon_from_header( double *lat,
          char tbuff[200];
 
          warning_shown = true;      /* just do this once */
-         snprintf( tbuff, sizeof( tbuff),            /* see efindorb.txt */
+         snprintf_err( tbuff, sizeof( tbuff),   /* see efindorb.txt */
                   get_find_orb_text( 2000), mpc_code);
          generic_message_box( tbuff, "o");
          }
@@ -622,7 +622,7 @@ static int get_asteroid_observer_data( const char *mpc_code, char *buff)
             {
             if( buff)
                {
-               strcpy( buff + 30, tbuff + 19);
+               strlcpy_err( buff + 30, tbuff + 19, 15);
                memcpy( buff, mpc_code, 3);
                }
             rval = line_no + 100;
@@ -734,6 +734,7 @@ int get_observer_data( const char FAR *mpc_code, char *buff, mpc_code_t *cinfo)
    const char *override_observatory_name = NULL;
    double lat0 = 0., lon0 = 0., alt0 = 0.;
    char temp_code[4];
+   const size_t buffsize = 81;
 
    if( !mpc_code)    /* freeing up resources */
       {
@@ -777,7 +778,7 @@ int get_observer_data( const char FAR *mpc_code, char *buff, mpc_code_t *cinfo)
             if( (!pass && !memcmp( buff, station_data[i] + 30, strlen( buff)))
                      || (pass && strstr( station_data[i] + 30, buff)))
                {
-               strcpy( buff, station_data[i]);
+               strlcpy_err( buff, station_data[i], buffsize);
                return( 0);
                }
       return( -1);
@@ -858,7 +859,7 @@ int get_observer_data( const char FAR *mpc_code, char *buff, mpc_code_t *cinfo)
       {
       memset( cinfo, 0, sizeof( mpc_code_t));
       if( buff)
-         strcpy( buff, blank_line);
+         strlcpy_err( buff, blank_line, buffsize);
       rval = get_asteroid_observer_data( mpc_code, buff);
       cinfo->planet = rval;
       return( rval);
@@ -1565,7 +1566,7 @@ static int _compute_lagrange_point( double *vect, const int point_number,
          char buff[30];
          const char *multipliers;
 
-         snprintf( buff, sizeof( buff), "LAGRANGE_%03d%03d", obj1, obj2);
+         snprintf_err( buff, sizeof( buff), "LAGRANGE_%03d%03d", obj1, obj2);
          multipliers = get_environment_ptr( buff);
          if( *multipliers)
             {
@@ -1738,13 +1739,13 @@ void set_up_observation( OBSERVE FAR *obs)
          int text_to_add;
 
          FMEMCPY( unfound[n_unfound++], obs->mpc_code, 3);
-         snprintf( tbuff, sizeof( tbuff), get_find_orb_text( 2002),
+         snprintf_err( tbuff, sizeof( tbuff), get_find_orb_text( 2002),
                              obs->mpc_code);
          if( strcmp( obs->mpc_code, "XXX"))
             text_to_add = 2003;   /* See efindorb.txt.  These reference */
          else                     /* possible error messages.  */
             text_to_add = 2004;
-         strlcat( tbuff, get_find_orb_text( text_to_add), sizeof( tbuff));
+         strlcat_err( tbuff, get_find_orb_text( text_to_add), sizeof( tbuff));
          generic_message_box( tbuff, "o");
          comment_observation( obs, "? NoCode");
          }
@@ -2839,7 +2840,7 @@ static inline bool matching_lines( const char *line1, const char *line2)
 
 typedef char mpc_line[81];
 
-static int look_for_matching_line( char *iline, char *oline)
+static int look_for_matching_line( char *iline, char *oline, const size_t oline_size)
 {
    static int n_stored = 0;
    static mpc_line *stored_lines = NULL;
@@ -2853,7 +2854,6 @@ static int look_for_matching_line( char *iline, char *oline)
       if( n_stored)          /* we _do_ have leftovers;  make an error msg */
          {
          const char *bytes = "VvRrSs";
-         const int oline_size = 600;
 
          for( i = 0; bytes[i]; i++)
             {
@@ -3647,7 +3647,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                {
                if( buff[14] == 'R' && is_rwo)
                   strcpy( second_line, buff + 81);
-               else if( !look_for_matching_line( buff, second_line))
+               else if( !look_for_matching_line( buff, second_line, sizeof( second_line)))
                   observation_is_good = false;
                if( observation_is_good)
                   {
@@ -3871,7 +3871,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                   {
                   char comment[15];
 
-                  snprintf( comment, sizeof( comment), "FixMe%d ", fixes_made);
+                  snprintf_err( comment, sizeof( comment), "FixMe%d ", fixes_made);
                   comment_observation( rval + i, comment);
                   n_fixes_made++;
                   }
@@ -3990,7 +3990,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
       {
       int j = 0;
 
-      snprintf( buff, sizeof( buff), get_find_orb_text( 2007),
+      snprintf_err( buff, sizeof( buff), get_find_orb_text( 2007),
                      (rval[i - 1].jd - rval[0].jd) /  days_per_year,
                      maximum_observation_span);
       generic_message_box( buff, "o");
@@ -4005,17 +4005,17 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
 
    monte_carlo_object_count = 0;
    n_monte_carlo_impactors = 0;
-   if( look_for_matching_line( NULL, buff))
+   if( look_for_matching_line( NULL, buff, sizeof( buff)))
       generic_message_box( buff, "o");
    if( n_fixes_made)
       {
-      snprintf( buff, sizeof( buff), get_find_orb_text( 2028),
+      snprintf_err( buff, sizeof( buff), get_find_orb_text( 2028),
                      n_fixes_made);
       generic_message_box( buff, "o");
       }
    if( n_duplicate_obs_found)
       {
-      snprintf( buff, sizeof( buff), get_find_orb_text( 2009),
+      snprintf_err( buff, sizeof( buff), get_find_orb_text( 2009),
                      n_duplicate_obs_found);
       debug_printf( "%s:\n", rval->packed_id);
       generic_message_box( buff, "o");
@@ -4023,14 +4023,14 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
    if( n_bad_satellite_offsets)
       {
       debug_printf( "%u bad sat offsets\n", n_bad_satellite_offsets);
-      snprintf( buff, sizeof( buff), get_find_orb_text( 2010),
+      snprintf_err( buff, sizeof( buff), get_find_orb_text( 2010),
                      n_bad_satellite_offsets);
       generic_message_box( buff, "o");
       }
 
    if( n_parse_failures)
       {
-      snprintf( buff, sizeof( buff), get_find_orb_text( 2011),
+      snprintf_err( buff, sizeof( buff), get_find_orb_text( 2011),
                      n_parse_failures);
       debug_printf( "%s:\n", rval->packed_id);
       generic_message_box( buff, "o");
@@ -4069,12 +4069,12 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
       {
       *buff = '\0';
       if( n_below_horizon)
-         snprintf( buff, sizeof( buff), get_find_orb_text( 2012),
+         snprintf_err( buff, sizeof( buff), get_find_orb_text( 2012),
                         n_below_horizon);
       if( n_in_sunlight)
-         snprintf( buff, sizeof( buff), get_find_orb_text( 2013),
+         snprintf_err( buff, sizeof( buff), get_find_orb_text( 2013),
                         n_in_sunlight);
-      strlcat( buff, get_find_orb_text( 2014), sizeof( buff));
+      strlcat_error( buff, get_find_orb_text( 2014));
       debug_printf( "%s:\n", rval->packed_id);
       generic_message_box( buff, "o");
       }
@@ -4096,14 +4096,14 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                }
    if( n_spurious_matches)
       {
-      snprintf( buff, sizeof( buff), get_find_orb_text( 2015),
+      snprintf_err( buff, sizeof( buff), get_find_orb_text( 2015),
                n_spurious_matches);
       debug_printf( "%s:\n", rval->packed_id);
       generic_message_box( buff, "o");
       }
    if( n_almost_duplicates_found)
       {
-      snprintf( buff, sizeof( buff), get_find_orb_text( 2016),
+      snprintf_err( buff, sizeof( buff), get_find_orb_text( 2016),
                n_almost_duplicates_found);
       debug_printf( "%s:\n", rval->packed_id);
       generic_message_box( buff, "o");
@@ -4114,7 +4114,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
             n_sat_obs_without_offsets++;
    if( n_sat_obs_without_offsets)
       {
-      snprintf( buff, sizeof( buff), get_find_orb_text( 2017),
+      snprintf_err( buff, sizeof( buff), get_find_orb_text( 2017),
                         n_sat_obs_without_offsets);
       generic_message_box( buff, "o");
       }
@@ -4165,7 +4165,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
       apply_excluded_observations_file( rval, n_obs_actually_loaded);
       }
 #ifdef CONSOLE
-   snprintf( buff, sizeof( buff), "%d observations actually loaded", n_obs_actually_loaded);
+   snprintf_err( buff, sizeof( buff), "%d observations actually loaded", n_obs_actually_loaded);
    move_add_nstr( 1, 2, buff, -1);
    refresh_console( );
 #endif
@@ -4426,12 +4426,12 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
                const double t_total = t_elapsed / (fraction_file_read + .01);
 
                next_output += (int)((double)n_obs_read / (t_elapsed + 1.)) / 3;
-               snprintf( msg_buff, sizeof( msg_buff),
+               snprintf_err( msg_buff, sizeof( msg_buff),
                        "%4.1f%% complete; %.0f seconds elapsed, %.0f remain",
                                     fraction_file_read * 100.,
                                     t_elapsed, t_total - t_elapsed);
                move_add_nstr( 3, 3, msg_buff, -1);
-               snprintf( msg_buff, sizeof( msg_buff),
+               snprintf_err( msg_buff, sizeof( msg_buff),
                         "%d observations of %d objects read thus far",
                         n_obs_read, n);
                move_add_nstr( 4, 3, msg_buff, -1);
@@ -4506,17 +4506,18 @@ void put_observer_data_in_text( const char FAR *mpc_code, char *buff)
    double lon, lat, alt_in_meters;
    const int planet_idx = get_observer_data_latlon( mpc_code, buff,
                              &lon, &lat, &alt_in_meters);
+   const size_t buffsize = 100;
 
    if( planet_idx == -1)
       {
       char tbuff[4];
 
       FMEMCPY( tbuff, mpc_code, 4);
-      sprintf( buff, "No information about station '%s'", tbuff);
+      snprintf_err( buff, buffsize, "No information about station '%s'", tbuff);
       }
    else
       {
-      char *name = mpc_station_name( buff);
+      const char *name = mpc_station_name( buff);
 
       memmove( buff, name, strlen( name) + 1);
       if( lon || lat)
@@ -4525,7 +4526,7 @@ void put_observer_data_in_text( const char FAR *mpc_code, char *buff)
 
          lon *= 180. / PI;
          lat *= 180. / PI;
-         snprintf_append( buff, 80, output_format,
+         snprintf_append( buff, buffsize, output_format,
                            (lat > 0. ? 'N' : 'S'), fabs( lat),
                            (lon > 0. ? 'E' : 'W'), fabs( lon));
          if( planet_idx == 3)
@@ -5489,7 +5490,7 @@ int generate_obs_text( const OBSERVE FAR *obs, const int n_obs, char *buff,
       double mean_tresid2 = 0., mean_cross_resid2 = 0.;
       int n_mags = 0;
 
-      snprintf( buff, buffsize, "%d observations selected of %d\n",
+      snprintf_err( buff, buffsize, "%d observations selected of %d\n",
                           (int)n_selected, n_obs);
       n_selected = 0;
       for( i = 0; i < (size_t)n_obs; i++)
@@ -5675,7 +5676,7 @@ int sanity_test_observations( const char *filename)
 
                   if( !ofile)
                      ofile = fopen_ext( "sanity.txt", "fwb");
-                  snprintf( tbuff, sizeof( tbuff),
+                  snprintf_err( tbuff, sizeof( tbuff),
                      "Line %ld: Sun alt %.1f az %.1f; obj alt %.1f az %.1f\n",
                            line_no,
                            alt_az_sun.y, alt_az_sun.x,
