@@ -356,8 +356,6 @@ static const double lunar_lat_terms[] = {
       /* ELP-82 or JPL ephems.  I've included a term to convert Meeus'   */
       /* ecliptic-of-date result to J2000,  roughly. */
 
-#define AU_IN_KM 1.495978707e+8
-
 static void polar3_to_cartesian_r( double *vect,
                  const double lon, const double lat, const double r)
 {
