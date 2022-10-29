@@ -3917,9 +3917,12 @@ void format_observation( const OBSERVE FAR *obs, char *text,
          case 2:        /* CYYMMDD:HHMMSSsss:  formats 20-23 */
          case 3:        /* CYYMMDD.ddddddddd:  formats 30-39 */
          case 5:        /* CYYMMDD:HHMM:       format 50 */
-            snprintf( text, 6, "%c%02u%02u",     /* show century letter, 2digit yr, mo */
-                     (char)( 'A' + year / 100 - 10), (unsigned)( year % 100),
-                     (unsigned)month);
+            i = int_to_mutant_hex_char( year / 100);
+            if( year < 0 || year > 6199)
+               i = '!';
+            snprintf( text, 6, "%c%02u%02u",   /* show century letter, 2digit yr, mo */
+                    (char)i, (unsigned)( year % 100), (unsigned)month);
+
             if( base_time_format != 3)
                {
                show_dd_hh_mm_ss_point_sss( text + 5, day, n_time_digits);
