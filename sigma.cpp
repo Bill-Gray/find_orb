@@ -60,8 +60,8 @@ static int parse_sigma_record( SIGMA_RECORD *w, const char *buff)
       memcpy( w->mpc_code, buff + 1, 3);
       w->mpc_code[3] = '\0';
       w->program_code = buff[5];
-      w->jd1 = 0.;
-      w->jd2 = 3000000.;
+      w->jd1 = -1e+10;
+      w->jd2 = 1e+10;
       w->mag1 = -100;
       w->mag2 = 3000;
       if( buff[32] == '.')
@@ -169,14 +169,16 @@ double get_observation_sigma( const double jd, const int mag_in_tenths,
 {
    int i;
    double position_sigma = 0.;
+   extern double minimum_observation_jd;  /* default 1100 Jan 1 */
+   extern double maximum_observation_jd;  /* default 2300 Jan 1 */
 
    if( mag_sigma)
       *mag_sigma = 0.;
    if( time_sigma)
       *time_sigma = 0.;
    assert( n_sigma_recs);
-   assert( jd > 0.);
-   assert( jd < 3e+6);
+   assert( jd > minimum_observation_jd);
+   assert( jd < maximum_observation_jd);
    for( i = 0; i < n_sigma_recs; i++)
       {
       SIGMA_RECORD *w = sigma_recs + i;
