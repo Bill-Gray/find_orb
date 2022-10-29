@@ -3818,14 +3818,18 @@ static void show_dd_hh_mm_ss_point_sss( char *text,
 static void put_mag_resid( char *output_text, const double obs_mag,
                            const double computed_mag, const char mag_band)
 {
+   const double mag_resid = obs_mag - computed_mag;
+
    INTENTIONALLY_UNUSED_PARAMETER( mag_band);
 
-   if( obs_mag < BLANK_MAG && computed_mag)
-      snprintf_err( output_text, 8, "%6.2f ",
-               obs_mag - computed_mag);
-//             obs_mag - computed_mag - mag_band_shift( mag_band, NULL);
+   if( obs_mag < BLANK_MAG && computed_mag && fabs( mag_resid) < 99.)
+      {
+      const char *format = (fabs( mag_resid) < 9.9 ? "%+6.2f " : "%+6.1f ");
+
+      snprintf_err( output_text, 8, format, mag_resid);
+      }
    else
-      strcpy( output_text, "------ ");
+      strcpy( output_text, " ----- ");
 }
 
 /* Output is a number in four bytes,  such as '3.14', '31.4', '3141', '3.1k',
