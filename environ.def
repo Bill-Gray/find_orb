@@ -57,6 +57,10 @@ FIX_OBSERVATIONS=1
    to go beyond that,  alter the following line.
 TIME_RANGE=-1000,3000
 
+   Observations,  on the other hand,  normally don't go nearly that far
+   back or into the future.
+OBSERVATION_DATE_RANGE=1100,2300
+
    MPC has requested that NEOCP data not be redistributed.  So in
    pseudo-MPECs,  NEOCP observations are "redacted" (blacked out and the
    data replaced with garbage).  The following observers have kindly given

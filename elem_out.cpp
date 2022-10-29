@@ -56,7 +56,6 @@ bool findorb_already_running = false;
    #endif
 #endif
 
-
 static const char *_extras_filename = "hints.txt";
 extern int available_sigmas;
 extern double optical_albedo;
@@ -3802,6 +3801,7 @@ int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
    const char *ephem_bitstring = get_environment_ptr( "EPHEM_OPTIONS");
    const char *eop_filename = get_environment_ptr( "EOP_FILE");
    const char *albedo = get_environment_ptr( "OPTICAL_ALBEDO");
+   const char *obs_range = get_environment_ptr( "OBSERVATION_DATE_RANGE");
 
 #if !defined( _WIN32) && !defined( __WATCOMC__)
    findorb_already_running = (check_for_other_processes( 1) != 0);
@@ -3879,6 +3879,18 @@ int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
    sscanf( get_environment_ptr( "PERTURBERS"), "%x", &always_included_perturbers);
    if( *albedo)
       optical_albedo = atof( albedo);
+   if( *obs_range)
+      {
+      extern double minimum_observation_jd;  /* default 1100 Jan 1 */
+      extern double maximum_observation_jd;  /* default 2300 Jan 1 */
+
+      const int n_found = sscanf( obs_range, "%lf,%lf",
+                    &minimum_observation_jd,
+                    &maximum_observation_jd);         /* see environ.def */
+      assert( n_found == 2);
+      minimum_observation_jd = YEAR_TO_JD( minimum_observation_jd);
+      maximum_observation_jd = YEAR_TO_JD( maximum_observation_jd);
+      }
    return( 0);
 }
 
