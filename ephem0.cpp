@@ -450,15 +450,16 @@ static void setup_obj_loc( obj_location_t *p, double *orbit,
                                     cinfo.lon, obs_posn);
    for( i = 0; i < n_orbits; i++)
       {
-      double topo[3];
+      double topo[3], time_lag;
 
       if( !mpc_code)
          p[i].r = 0.;
       assert( p[i].r >= 0.);
       assert( p[i].r < 100.);
-      integrate_orbit( orbit, epoch_jd, p->jd - p[i].r / AU_PER_DAY);
+      integrate_orbit( orbit, epoch_jd, p->jd);
+      time_lag = p[i].r / AU_PER_DAY;
       for( j = 0; j < 3; j++)
-         topo[j] = orbit[j] - obs_posn[j];
+         topo[j] = orbit[j] - obs_posn[j] - time_lag * orbit[j + 3];
       ecliptic_to_equatorial( topo);
       p[i].ra = atan2( topo[1], topo[0]);
       p[i].r = vector3_length( topo);
