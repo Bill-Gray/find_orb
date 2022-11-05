@@ -1855,7 +1855,7 @@ static double lunar_eclipse_magnitude( const double *earth, const double *moon)
          const double lunar_radius = 1737.4 / AU_IN_KM;
          const double expansion_factor = 1.02;     /* adds a bit for earth's atmosphere */
          const double earth_radius = expansion_factor * EARTH_RADIUS_IN_AU;
-         const double solar_radius = SUN_RADIUS_IN_KM;
+         const double solar_radius = SUN_RADIUS_IN_AU;
          const double umbra_angle = earth_radius / r - (solar_radius - earth_radius) / sun_earth;
          const double lunar_angle = lunar_radius / r;
 
