@@ -2414,11 +2414,13 @@ and MPC code.  I figured this out based on the accumulated radar data at
 
 http://ssd.jpl.nasa.gov/?grp=ast&fmt=html&radar=             */
 
-static inline double get_radar_frequency( const int mpc_code, const int year)
+static inline double get_radar_frequency( const char *mpc_code, const int year)
 {
    double freq_in_mhz;
+   int mpc_code_as_int = 100 * mutant_hex_char_to_int( *mpc_code)
+                  + atoi( mpc_code + 1);
 
-   switch( mpc_code)
+   switch( mpc_code_as_int)
       {
       case 251:      /* Arecibo uses 2380 MHz almost all the time */
          if( year == 1975)    /* except its first two obs of Eros */
@@ -2445,8 +2447,12 @@ static inline double get_radar_frequency( const int mpc_code, const int year)
       case 272:            /* so far,  they've made one observation, */
          freq_in_mhz = 929.;     /* of (387943) Duende = 2012 DA14  */
          break;
+      case 3947:     /* 'd47' = DSS 47 */
+         freq_in_mhz = 7159.45;
+         break;
       default:                   /* unknown station;  frequency     */
          freq_in_mhz = 5000.;    /* chosen at random using fair die */
+         assert( 0);
          break;
       }
    return( freq_in_mhz);
@@ -2749,7 +2755,7 @@ static int rwo_to_mpc( char *buff, double *ra_bias, double *dec_bias,
             _jpl_to_mpc_code( obuff + 77, atoi( buff + 107));
             }
          strlcpy_error( second_radar_line, obuff);
-         freq_in_mhz = get_radar_frequency( atoi( buff + 99), year);
+         freq_in_mhz = get_radar_frequency( buff + 99, year);
          snprintf_err( obuff + 62, sizeof( obuff) - 62,
                                           "%5.0f", freq_in_mhz);
          second_radar_line[14] = 'r';
