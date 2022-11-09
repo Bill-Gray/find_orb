@@ -3343,6 +3343,7 @@ OBSERVE FAR *load_object( FILE *ifile, OBJECT_INFO *id,
       id->n_obs = n_obs_actually_loaded;
       debug_printf( "%s\n", buff);
       }
+   force_model = 0;
    obj_desig_to_perturber( id->packed_desig);
    if( id->obj_name[0] == '(')    /* numbered asteroid:  shouldn't perturb */
       excluded_asteroid_number = atoi( id->obj_name + 1);      /* itself */
