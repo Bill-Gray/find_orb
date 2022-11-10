@@ -85,6 +85,8 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit);
 int set_locs( const double *orbit, double t0, OBSERVE FAR *obs, int n_obs);
 int text_search_and_replace( char FAR *str, const char *oldstr,
                                      const char *newstr);   /* ephem0.cpp */
+void attempt_extensions( OBSERVE *obs, const int n_obs, double *orbit,
+                  const double epoch);                  /* orb_func.cpp */
 double calc_obs_magnitude( const double obj_sun,
           const double obj_earth, const double earth_sun, double *phase_ang);
 int find_best_fit_planet( const double jd, const double *ivect,
@@ -2933,6 +2935,7 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
    bool do_full_improvement = false;
    double abs_mag = 10.;         /* default value for 'dummy' use */
 
+   assert( n_obs > 0);
    get_object_name( object_name, obs->packed_id);
    n_orbit_params = 6;
    if( state_vect_text)    /* state vect supplied on cmd line w/ '-v' */
@@ -3115,6 +3118,8 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
          *epoch_shown = find_epoch_shown( obs, n_obs);
       memcpy( saved_obs, obs, n_obs * sizeof( OBSERVE));
       filter_obs( obs, n_obs, automatic_outlier_rejection_limit, 0);
+      if( got_vectors)
+         attempt_extensions( obs, n_obs, orbit, *orbit_epoch);
       prev_score = evaluate_initial_orbit( obs, n_obs, orbit);
       for( pass = 0; pass < 2; pass++)
          {
