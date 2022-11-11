@@ -4297,7 +4297,6 @@ int extend_orbit_solution( OBSERVE FAR *obs, const int n_obs,
    double jd_low, jd_high;
    const double max_sigma = 2.;
 
-   assert( n_orbit_params == 6);
    exclude_unusable_observations( obs, n_obs);
    initial_count = count_observations_used( obs, n_obs);
    get_first_and_last_included_obs( obs, n_obs, &first_idx, &last_idx);
@@ -4476,7 +4475,6 @@ void attempt_extensions( OBSERVE *obs, const int n_obs, double *orbit,
    int best_available_sigmas;
    unsigned best_perturbers = perturbers;
 
-   assert( n_orbit_params == 6);
    if( !arc_limit_in_days)
       arc_limit_in_days = 3650;        /* Default to ten years at most */
    setting_outside_of_arc = 0;
