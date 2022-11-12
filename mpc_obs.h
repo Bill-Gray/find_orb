@@ -178,6 +178,7 @@ typedef uint64_t ephem_option_t;
    /* Following used for obs from spacecraft that lack offset data */
 #define OBS_NO_OFFSET      4
 #define OBS_IS_SELECTED    8
+#define OBS_NO_VELOCITY    0x10
 
    /* Following is used for newer NEODyS/AstDyS data for which */
    /* FCCT14 or VFCC17 over-observing correction has already been */

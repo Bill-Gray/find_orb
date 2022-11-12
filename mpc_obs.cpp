@@ -3392,45 +3392,6 @@ static inline int extract_ades_sigmas( const char *buff,
    return( rval);
 }
 
-/* For satellite observations (note2 = 's'),  we get a second line
-giving a position,  but no velocity.  To set that,  we look for
-the nearest observation in time (preceding or following) from
-the same satellite,  and assume linear motion in between. */
-
-static void set_satellite_velocities( OBSERVE FAR *obs, const int n_obs)
-{
-   int i;
-
-   for( i = 0; i < n_obs; i++)
-      if( is_satellite_obs( obs + i) && obs[i].second_line)
-         {
-         int a, b, j, k;
-
-         a = i - 1;
-         while( a >= 0 && (obs[i].jd == obs[a].jd || !obs[a].second_line
-                        || strcmp( obs[i].mpc_code, obs[a].mpc_code)))
-            a--;
-         b = i + 1;
-         while( b < n_obs && (obs[i].jd == obs[b].jd || !obs[b].second_line
-                        || strcmp( obs[i].mpc_code, obs[b].mpc_code)))
-            b++;
-         if( a >= 0 || b < n_obs)
-            {
-            double dt;
-
-            if( a < 0)
-               j = b;
-            else if( b >= n_obs)
-               j = a;
-            else
-               j = ((obs[b].jd - obs[i].jd < obs[i].jd - obs[a].jd) ? b : a);
-            dt = obs[j].jd - obs[i].jd;
-            for( k = 0; k < 3; k++)
-               obs[i].obs_vel[k] = (obs[j].obs_posn[k] - obs[i].obs_posn[k]) / dt;
-            }
-         }
-}
-
 /* If photometry is provided,  we count both comet and asteroid obs
 to decide if we ought to use a comet or asteroid magnitude formula.
 (If it's not provided,  a default judgment is made based on the desig.) */
@@ -3541,7 +3502,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
    char obj_name[80], curr_ades_ids[100];
    OBSERVE FAR *rval;
    bool including_obs = true;
-   int i = 0, n_fixes_made = 0, n_future_obs = 0;
+   int i, n_fixes_made = 0, n_future_obs = 0;
    unsigned line_no = 0;
    unsigned n_below_horizon = 0, n_in_sunlight = 0;
    unsigned lines_actually_read = 0;
@@ -3566,6 +3527,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
    bool is_fcct14_or_vfcc17_data = false;
    void *ades_context;
    int spacecraft_offset_reference = 399;    /* default is geocenter */
+   double spacecraft_vel[3];
    static int suppress_private_obs = -1;
    int insufficient_precision_warning_shown = 0;
 
@@ -3597,6 +3559,9 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
    ades_context = init_ades2mpc( );
    memset( buff, 0, 13);         /* suppress spurious Valgrind messages */
    *curr_ades_ids = '\0';
+   for( i = 0; i < 3; i++)
+      spacecraft_vel[i] = 0.;
+   i = 0;
    while( fgets_with_ades_xlation( buff, sizeof( buff), ades_context, ifile)
                   && i != n_obs)
       {
@@ -3678,8 +3643,15 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                   debug_printf( "Error code %d; offending line was:\n%s\n",
                      error_code, second_line);
                   }
+               if( !spacecraft_vel[0] && !spacecraft_vel[1]
+                              && !spacecraft_vel[2])
+                  rval[i].flags |= OBS_NO_VELOCITY;
                for( j = 0; j < 3; j++)
+                  {
                   rval[i].obs_posn[j] += vect[j];
+                  rval[i].obs_vel[j] += spacecraft_vel[j] * seconds_per_day / AU_IN_KM;
+                  spacecraft_vel[j] = 0.;
+                  }
                rval[i].second_line = (char *)malloc( 81);
                strcpy( rval[i].second_line, second_line);
                }
@@ -3973,6 +3945,14 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                ;     /* deliberately empty loop */
          else if( !memcmp( buff, "#Offset center ", 15))
             spacecraft_offset_reference = atoi( buff + 15);
+         else if( !memcmp( buff, "#Spacecraft vel ", 16))
+            {
+            int n_scanned = sscanf( buff + 16, "%lf %lf %lf", spacecraft_vel,
+                        spacecraft_vel + 1, spacecraft_vel + 2);
+
+            assert( 3 == n_scanned);
+            equatorial_to_ecliptic( spacecraft_vel);
+            }
          else if( !memcmp( buff, "#IDs ", 5))
             strlcpy_err( curr_ades_ids, buff + 5, sizeof( curr_ades_ids));
          }
@@ -4148,7 +4128,6 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
    if( n_obs > 1)
       {
       check_for_star( rval, n_obs);
-      set_satellite_velocities( rval, n_obs);
       for( i = 0; i < n_obs_actually_loaded; i++)
          if( rval[i].note2 == 'x')     /* check for deleted satellite observation */
             {
@@ -5226,7 +5205,10 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
                                         acose( cos_phase) * 180. / PI);
             format_motion( ra_motion_buff, m.ra_motion);
             format_motion( dec_motion_buff, m.dec_motion);
-            snprintf_append( buff, buffsize, "RA vel %s   decvel %s   dT=",
+            if( optr->flags & OBS_NO_VELOCITY)
+               strlcat_err( buff, "No velocity information", buffsize);
+            else
+               snprintf_append( buff, buffsize, "RA vel %s   decvel %s   dT=",
                                            ra_motion_buff, dec_motion_buff);
 
             if( show_alt_info)
@@ -5238,7 +5220,7 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
                snprintf_append( buff, buffsize, " %.3fx%.3f PA %.2f\n",
                          sig1, sig2, tilt * 180. / PI);
                }
-            else
+            else if( !(optr->flags & OBS_NO_VELOCITY))
                {
                if( fabs( m.time_residual) < .999)
                   {
@@ -5263,6 +5245,10 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
       case 1:
          if( optr->note2 == 'R')
             show_radar_info( buff, optr);
+         else if( optr->flags & OBS_NO_VELOCITY)
+            strlcpy_err( buff,
+                     "See https://www.projectpluto.com/no_vel.htm for info/fix",
+                     buffsize);
          else
             {
             MOTION_DETAILS m;
@@ -5273,6 +5259,7 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
             format_motion( tbuff, m.total_motion);
             snprintf_err( buff, buffsize, "ang vel %s at PA %.1f", tbuff,
                       m.position_angle_of_motion);
+
             snprintf_append( buff, buffsize, "   radial vel %.3f km/s  cross ",
                                       m.radial_vel);
             if( fabs( m.cross_residual) < 9.9)
