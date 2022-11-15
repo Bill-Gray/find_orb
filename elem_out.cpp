@@ -696,7 +696,7 @@ static int make_linkage_json( const int n_obs, const OBSERVE *obs, const ELEMENT
 
          if( desig_type != OBJ_DESIG_OTHER && desig_type != OBJ_DESIG_ARTSAT)
             {
-            strcpy( buff, packed_id2);
+            strlcpy_error( buff, packed_id2);
             text_search_and_replace( buff, " ", "");
             j++;
             fprintf( ofile, "        \"%s\"%s\n", buff, (j == n_designated ? "" : ","));
@@ -718,7 +718,7 @@ static int make_linkage_json( const int n_obs, const OBSERVE *obs, const ELEMENT
             {
             const double obs_utc_jd = utc_from_td( obs[idx[i]].jd, NULL);
 
-            strcpy( buff, packed_id2);
+            strlcpy_error( buff, packed_id2);
             text_search_and_replace( buff, " ", "");
             j++;
             fprintf( ofile, "        [\n");
@@ -905,7 +905,7 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
    fprintf( ofile, "      \"Find_Orb_version_iso\": \"%s\",\n", iso_time( buff, jd, 0));
    fprintf( ofile, "      \"elements\":\n      {\n");
    fprintf( ofile, "        \"central body\": \"%s\",\n", object_name( buff, elem->central_obj));
-   strcpy( buff, body_frame_note + 1);
+   strlcpy_error( buff, body_frame_note + 1);
    i = (int)strlen( buff);
    buff[i - 1] = '\0';    /* strip trailing paren */
    fprintf( ofile, "        \"frame\": \"%s\",\n", buff);
@@ -1459,7 +1459,7 @@ static void _store_extra_orbit_info( const char *packed_id,
       {
       char buff[200];
 
-      strcpy( buff, packed_id);
+      strlcpy_error( buff, packed_id);
       if( perturbers & ~0x7ff)
          snprintf_append( buff, sizeof( buff), " p=%x", perturbers);
       if( force_model)
@@ -1888,8 +1888,8 @@ int write_out_elements_to_file( const double *orbit,
              /* kg*AU^3 / (m^2*d^2),  from a private communication  */
              /* from Steve Chesley; see orb_func.cpp for details    */
 
-      strcpy( sigma_buff, "+/- ");
-      strcpy( buff, tptr);
+      strlcpy_error( sigma_buff, "+/- ");
+      strlcpy_error( buff, tptr);
       tt_ptr = strstr( buff, "TT") + 2;
       if( !memcmp( buff, "   Peri", 7))
          {
@@ -1920,7 +1920,7 @@ int write_out_elements_to_file( const double *orbit,
          if( showing_sigmas)
             if( !get_uncertainty( "sigma_Tp", sigma_buff + 4, false))
                {
-               strcat( sigma_buff, " TT");
+               strlcat_error( sigma_buff, " TT");
                text_search_and_replace( buff, "TT", sigma_buff);
                }
 
@@ -1937,11 +1937,11 @@ int write_out_elements_to_file( const double *orbit,
                {
                put_double_in_buff( tbuff0, orbit[j + 6]);
                text_search_and_replace( tbuff0, " ", "");
-               strcat( tbuff0, " ");
+               strlcat_error( tbuff0, " ");
                sprintf( sig_name, "Sigma_A%d:", j + 1);
                if( showing_sigmas)
                   if( !get_uncertainty( sig_name, sigma_buff + 4, false))
-                     strcat( tbuff0, sigma_buff);
+                     strlcat_error( tbuff0, sigma_buff);
 /*             snprintf_append( tt_ptr, 180, "A%d: %s", j + 1, tbuff0); */
                if( j == 3)
                   snprintf_append( buff, sizeof( buff), "DT: %s", tbuff0);
@@ -2017,11 +2017,11 @@ int write_out_elements_to_file( const double *orbit,
 
                   sprintf( addendum, "   %s: %.4f", moid_text[j], moid);
                   if( strlen( addendum) + strlen( buff) < 79)
-                     strcat( buff, addendum);
+                     strlcat_error( buff, addendum);
                   else
                      {
                      if( n_more_moids < 3)
-                        strcat( more_moids, addendum);
+                        strlcat_error( more_moids, addendum);
                      n_more_moids++;
                      }
                   if( !j && moid < .5)
@@ -2033,7 +2033,7 @@ int write_out_elements_to_file( const double *orbit,
       else if( *more_moids)
          {
          space_pad_buffer( buff, 33);
-         strcpy( buff + 33, more_moids);
+         strlcpy_err( buff + 33, more_moids, sizeof( buff) - 33);
          *more_moids = '\0';
          }
       else if( !reference_shown && *buff == 'M' && buff[1] != '(' &&
@@ -2084,7 +2084,7 @@ int write_out_elements_to_file( const double *orbit,
 
                if( zptr)
                   {
-                  strcpy( tbuff, zptr);
+                  strlcpy_error( tbuff, zptr);
                   consider_replacing( tbuff, "Q", "sigma_Q");
                   zptr[-1] = '\0';
                   }
@@ -2107,7 +2107,7 @@ int write_out_elements_to_file( const double *orbit,
                      phg_line[43] = '\0';
                      }
                   else
-                     strcpy( phg_line, buff);
+                     strlcpy_error( phg_line, buff);
 
                   fprintf( ofile, "%s", phg_line);
                   if( uncertainty_parameter < 90.)
@@ -2119,8 +2119,8 @@ int write_out_elements_to_file( const double *orbit,
                   fprintf( ofile, "\n");
                   memmove( buff, zptr, strlen( zptr) + 1);
                   consider_replacing( buff, "q", "sigma_q");
-                  strcat( buff, "    ");
-                  strcat( buff, tbuff);
+                  strlcat_error( buff, "    ");
+                  strlcat_error( buff, tbuff);
                   }
                }
                break;
@@ -2139,7 +2139,7 @@ int write_out_elements_to_file( const double *orbit,
             {
             while( j < 36)
                buff[j++] = ' ';
-            strcpy( buff + j, body_frame_note);
+            strlcpy_err( buff + j, body_frame_note, sizeof( buff) - j);
             body_frame_note_shown = true;
             }
          else
@@ -2155,7 +2155,7 @@ int write_out_elements_to_file( const double *orbit,
             else if( i > 5 && (j = strlen( buff)) < 58)
                {
                memset( buff + j, ' ', 58 - j);
-               strcpy( buff + 58, body_frame_note);
+               strlcpy_err( buff + 58, body_frame_note, sizeof( buff) - 58);
                body_frame_note_shown = true;
                }        /* above basically says,  "if we haven't gotten */
             }           /* the body frame note in the 'normal' places, try */
@@ -3774,11 +3774,11 @@ int set_language( const int language)
       static char month_names[12][17];
       char tbuff[100], *tptr;
 
-      strcpy( tbuff, get_find_orb_text( i + 1000));
+      strlcpy_error( tbuff, get_find_orb_text( i + 1000));
       tptr = (char *)find_nth_utf8_char( tbuff, 3);
       *tptr = '\0';        /* truncate month name at third char */
       assert( strlen( tbuff) < 16);
-      strcpy( month_names[i], tbuff);
+      strlcpy_error( month_names[i], tbuff);
       set_month_name( i + 1, month_names[i]);
       }
    return( 0);
@@ -4063,7 +4063,7 @@ MPC_STATION *find_mpc_color_codes( const int n_obs, const OBSERVE FAR *obs,
          memmove( rval + loc + 1, rval + loc,
                           (n_codes - loc) * sizeof( MPC_STATION));
                      /* ...so we can copy in the new code: */
-         strcpy( rval[loc].code, obs[i].mpc_code);
+         strlcpy_error( rval[loc].code, obs[i].mpc_code);
          n_codes++;
          }
    if( debug_level)
