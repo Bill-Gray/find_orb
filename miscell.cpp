@@ -622,6 +622,6 @@ const char *write_bit_string( char *ibuff, const uint64_t bits)
 const char *find_orb_version_jd( double *jd)
 {
     if( jd)
-      *jd = 2459878.5;
-    return( "2022 Oct 26");
+      *jd = 2459898.5;
+    return( "2022 Nov 15");
 }

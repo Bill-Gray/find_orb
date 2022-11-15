@@ -3716,12 +3716,15 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                const double rlon = atof( second_line + 34);
                const double rlat = atof( second_line + 45);
                const double ralt = atof( second_line + 56);
+               const double dist_tol = 0.0003;  /* 3e-4 degrees = about 30 meters */
                int idx = 0;
 
                lines_actually_read++;
                xref_designation( second_line);
-               while( idx < n_rovers && (rlon != rovers[idx].lon ||
-                           rlat != rovers[idx].lat || ralt != rovers[idx].alt))
+               while( idx < n_rovers &&
+                            (fabs( rlon - rovers[idx].lon) > dist_tol ||
+                            fabs( rlat - rovers[idx].lat) > dist_tol ||
+                            fabs( ralt - rovers[idx].alt) > 30.))
                   idx++;
                if( idx == n_rovers)    /* got a new rover */
                   {
