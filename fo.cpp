@@ -1044,11 +1044,10 @@ int main( int argc, const char **argv)
             }
          object_comment_text( tbuff, ids + i);
                   /* Abbreviate 'observations:' to 'obs:' */
-         text_search_and_replace( tbuff, "ervations", "");
+         text_search_and_replace( tbuff, "ervations",
+                                         (use_colors ? VT_CSI "0m" : ""));
          if( show_processing_steps)
             printf( "  %s\n", tbuff);
-         if( use_colors)
-            printf( VT_CSI "0m");
          }
    free( ids);
    if( summary_ofile)
