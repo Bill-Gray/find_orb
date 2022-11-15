@@ -1748,6 +1748,8 @@ void set_up_observation( OBSERVE FAR *obs)
          strlcat_err( tbuff, get_find_orb_text( text_to_add), sizeof( tbuff));
          generic_message_box( tbuff, "o");
          comment_observation( obs, "? NoCode");
+         obs->is_included = 0;
+         obs->flags |= OBS_DONT_USE;
          }
       observer_planet = 3;    /* default to geocentric */
       }
@@ -1755,7 +1757,7 @@ void set_up_observation( OBSERVE FAR *obs)
                && !memcmp( tbuff + 3, "                          ", 26))
       {
       obs->is_included = 0;
-      obs->flags |= OBS_NO_OFFSET;
+      obs->flags |= OBS_NO_OFFSET | OBS_DONT_USE;
       comment_observation( obs, "? offset");
       }
    if( observer_planet == -2)          /* satellite observation */
@@ -2983,6 +2985,49 @@ int compare_observations( const void *a, const void *b, void *context)
    return( rval);
 }
 
+/* If we have duplicate observations,  but their RA/decs are within
+(say) two arcseconds,  they may plausibly work for initial orbit
+determination.  Otherwise,  they'll probably just throw off IOD
+and should be marked as OBS_DONT_USE and excluded. */
+
+static void exclude_unusable_duplicate_obs( OBSERVE *obs, int n_obs)
+{
+   int i;
+
+   while( n_obs)
+      {
+      double min_ra = 0., max_ra = 0., min_dec = 0., max_dec = 0.;
+      const double tolerance = 2. * (PI / 180.) / 3600.;    /* two arcsec */
+      int j;
+
+      i = 1;
+      while( i < n_obs && obs[i].jd == obs->jd
+                        && !strcmp( obs[i].mpc_code, obs->mpc_code))
+         {
+         const double d_ra = centralize_ang( obs[i].ra - obs->ra);
+         const double d_dec = centralize_ang( obs[i].dec - obs->dec);
+
+         if( min_ra > d_ra)
+            min_ra = d_ra;
+         if( max_ra < d_ra)
+            max_ra = d_ra;
+         if( min_dec > d_dec)
+            min_dec = d_dec;
+         if( max_dec < d_dec)
+            max_dec = d_dec;
+         i++;
+         }
+      if( max_ra - min_ra > tolerance || max_dec - min_dec > tolerance)
+         for( j = 0; j < i; j++)
+            {
+            obs[j].flags |= OBS_DONT_USE;
+            obs[j].is_included = 0;
+            }
+      obs += i;
+      n_obs -= i;
+      }
+}
+
 /* Does what the function name suggests.  Return value is the number
 of observations left after duplicates have been removed.   */
 
@@ -3029,6 +3074,7 @@ int sort_obs_by_date_and_remove_duplicates( OBSERVE *obs, const int n_obs)
          }
       else
          comment_observation( obs + j - 1, "Duplicate");
+   exclude_unusable_duplicate_obs( obs, j);
    return( j);
 }
 
@@ -3638,6 +3684,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                if( error_code)
                   {
                   rval[i].flags |= OBS_DONT_USE;
+                  rval[i].is_included = 0;
                   comment_observation( rval + i, "?off");
                   n_bad_satellite_offsets++;
                   debug_printf( "Error code %d; offending line was:\n%s\n",
