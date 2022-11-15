@@ -665,8 +665,8 @@ rover is found with a different lat/lon,  it is assigned (24a).
 The 27th rover is assigned (24z).  Rovers 28 to 53 get codes
 (24A) to (24Z).  After that,  the second character runs from
 A to Z (for 247 codes) or a to z (270) codes,  and the third
-from 34 (ASCII ") to 126 (ASCII ~),  for an additional
-26*93 = 2418 codes.  2471 codes should be enough for anybody. */
+is a mutant hex (0...9, A-Z, a-z),  for an additional
+26*62 = 1612 codes.  1665 codes should be enough for anybody. */
 
 static int get_rover_index( const char *obscode)
 {
@@ -686,10 +686,10 @@ static int get_rover_index( const char *obscode)
    if( obscode[0] == '2' && isalpha( obscode[1]))
       {
       if( obscode[1] > 'Z')
-         rval = (obscode[1] - 'a') * 93;
+         rval = (obscode[1] - 'a') * 62;
       else
-         rval = (obscode[1] - 'A') * 93;
-      rval += 53 + obscode[2] - '"';
+         rval = (obscode[1] - 'A') * 62;
+      rval += 53 + mutant_hex_char_to_int( obscode[2]);
       }
    return( rval);
 }
@@ -3726,7 +3726,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                if( idx == n_rovers)    /* got a new rover */
                   {
                   n_rovers++;
-                  assert( idx < 2471);    /* can't handle more at the mo */
+                  assert( idx < 1665);    /* can't handle more at the mo */
                   rovers = (rover_t *)realloc( rovers, n_rovers * sizeof( rover_t));
                   rovers[idx].lat = rlat;
                   rovers[idx].lon = rlon;
@@ -3737,12 +3737,12 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                   if( idx >= 53)
                      {
                      idx -= 53;
-                     if( second_line[78] == '4')
-                        second_line[78] = 'A' + idx / 93;
-                     else        /* it's a (270) code */
-                        second_line[78] = 'a' + idx / 93;
+                     if( second_line[78] == '4')   /* it's a (247) code */
+                        second_line[78] = 'A' + idx / 62;
+                     else                          /* it's a (270) code */
+                        second_line[78] = 'a' + idx / 62;
                      rval[i].mpc_code[1] = second_line[78];
-                     second_line[79] = (char)( '"' + idx % 93);
+                     second_line[79] = int_to_mutant_hex_char( idx % 62);
                      }
                   else if( idx < 27)
                      second_line[79] = 'a' + idx - 1;
