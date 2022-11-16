@@ -241,9 +241,34 @@ int field_compare( const void *a, const void *b)
    return( aptr->jd > bptr->jd ? -1 : 1);
 }                 /* sort in _descending_ order by date */
 
+/*  (Copied from lunar/unpack.cpp.)
+   "Mutant hex" is frequently used by MPC.  It uses the usual hex digits
+   0123456789ABCDEF for numbers 0 to 15,  followed by G...Z for 16...35
+   and a...z for 36...61,  to encode numbers in base 62.  */
+
+int mutant_hex_char_to_int( const char c)
+{
+   int rval = -1;
+
+   if( c >= 'a')
+      {
+      if( c <= 'z')
+         rval = (int)c - 'a' + 36;
+      }
+   else if( c >= 'A')
+      {
+      if( c <= 'Z')
+         rval = (int)c - 'A' + 10;
+      }
+   else if( c >= '0' && c <= '9')
+      rval = (int)c - '0';
+   return( rval);
+}
+
 /*
 CSS field sizes,  from Eric Christensen,  2017 Mar.  Updated by
-Rob Seaman,  2017 Nov 04.
+Rob Seaman,  2017 Nov 04.  See essentially identical function
+in gps_ephem/list_gps.cpp.
 
 703 field size, 2003-2016: 2.85 x 2.85 deg.
 G96, 2004 - May 2016: 1.1 x 1.1 deg.
@@ -275,45 +300,46 @@ static void get_field_size( double *width, double *height, const double jd,
    const double may_26_2016 = 2457534.5;
    const double jun_24_2005 = 2453545.5;     /* see J95 */
    static char bad_code[10];
+   const int code = atoi( obs_code + 1) +
+               100 * mutant_hex_char_to_int( obs_code[0]);
 
    *height = 0.;
-   switch( *obs_code)
+   switch( code)
       {
-      case '5':         /* (566) Haleakala-NEAT/GEODSS  */
+      case 566:         /* (566) Haleakala-NEAT/GEODSS  */
          *width = 4096. * 1.43 / 3600.;
          break;
-      case '6':
-         if( obs_code[1] == '9')       /* (691) Spacewatch */
-            {
-            *width = 1.85;
-            *height = 1.73;
-            }
-         else            /* (644) NEAT at Palomar Sam'l Oschbin Schmidt */
-            *width = 4096. * 1.01 / 3600.;
+      case 691:         /* (691) Spacewatch */
+         *width = 1.85;
+         *height = 1.73;
          break;
-      case '7':         /* 703 */
+      case 644:         /* (644) NEAT at Palomar Sam'l Oschbin Schmidt */
+         *width = 4096. * 1.01 / 3600.;
+         break;
+      case 703:       /* (703) Catalina Sky Survey */
          *width = (jd < dec_02_2016 ? 2.85 : 4.4);
          break;
-      case 'G':         /* G96 */
+      case 1696:      /* (G96) Mt. Lemmon */
          *width = (jd < may_26_2016 ? 1.1 : 2.25);
          break;
-      case 'E':         /* E12 */
+      case 1412:        /* (E12) Siding Spring */
          *width = 2.05;
          break;
-      case 'I':         /* I52:  33' field of view;  some loss in corners */
+      case 1852:        /* I52:  33' field of view;  some loss in corners */
          *width = 33. / 60.;
          break;
-      case 'J':         /* J95:  25' to 2005 jun 22, 18' for 2005 jun 27 on */
+      case 1995:       /* J95:  25' to 2005 jun 22, 18' for 2005 jun 27 on */
          *width = (jd < jun_24_2005 ? 25. / 60. : 18. / 60.);
          break;
-      case 'T':         /* ATLAS (T05), (T08)   */
+      case 2905:         /* ATLAS (T05), (T08) : 7.4 degree FOV */
+      case 2908:
          *width = 7.4;
          break;
-      case 'V':
-         if( obs_code[2] == '0')       /* (V00) Bok */
-            *width = 1.16;
-         else           /* V06:  580" field of view */
-            *width = 580. / 3600.;
+      case 3100:         /* (V00) Bok */
+         *width = 1.16;
+         break;
+      case 3106:          /* (V06) */
+         *width = 580. / 3600.;
          break;
       default:
          *width = 0.;
