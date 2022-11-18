@@ -1446,19 +1446,16 @@ static void _store_extra_orbit_info( const char *packed_id,
    size_t n_lines;
    char **lines = load_file_into_memory( _extras_filename, &n_lines, true);
    FILE *ofile;
-   int i;
+   int i, line_no = -1;
+   char buff[200];
 
    assert( strlen( packed_id) == 12);
    assert( (force_model && n_extra_params) || (!force_model && !n_extra_params));
-   ofile = fopen_ext( _extras_filename, "fcw");
    for( i = 0; i < (int)n_lines; i++)
-      if( memcmp( lines[i], packed_id, 12))
-         fprintf( ofile, "%s\n", lines[i]);
-   free( lines);
+      if( !memcmp( lines[i], packed_id, 12))
+         line_no = i;
    if( (perturbers & ~0x7ff) || n_extra_params || *constraints)
       {
-      char buff[200];
-
       strlcpy_error( buff, packed_id);
       if( perturbers & ~0x7ff)
          snprintf_append( buff, sizeof( buff), " p=%x", perturbers);
@@ -1468,8 +1465,28 @@ static void _store_extra_orbit_info( const char *packed_id,
          snprintf_append( buff, sizeof( buff), " A%d=%e", i + 1, solar_pressure[i]);
       if( *constraints)
          snprintf_append( buff, sizeof( buff), " Constraint=%s", constraints);
-      fprintf( ofile, "%s\n", buff);
+      if( line_no >= 0 && !strcmp( buff, lines[line_no]))
+         {              /* already had this hint;  it didn't change; */
+         free( lines);           /* we can bug out early */
+         return;
+         }
       }
+   else
+      {
+      if( line_no == -1)      /* didn't have a hint before,  doesn't have */
+         {                    /* have one now;  we can bug out early */
+         free( lines);
+         return;
+         }
+      *buff = '\0';
+      }
+   ofile = fopen_ext( _extras_filename, "fcw");
+   for( i = 0; i < (int)n_lines; i++)
+      if( i != line_no)
+         fprintf( ofile, "%s\n", lines[i]);
+   if( *buff)
+      fprintf( ofile, "%s\n", buff);
+   free( lines);
    fclose( ofile);
 }
 
