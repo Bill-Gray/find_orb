@@ -309,7 +309,7 @@ FILE *fopen_ext( const char *filename, const char *permits)
       {
       char buff[300];
 
-      sprintf( buff, "Error opening %s: %s",
+      snprintf( buff, sizeof(buff), "Error opening %s: %s",
                  filename, strerror( errno));
       generic_message_box( buff, "o");
       exit( -1);

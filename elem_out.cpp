@@ -404,11 +404,11 @@ static void observation_summary_data( char *obuff, const OBSERVE FAR *obs,
    for( i = n_included = 0; i < n_obs; i++)
       n_included += obs[i].is_included;
    if( options == -1)      /* 'guide.txt' bare-bones format */
-      sprintf( obuff, "%d of %d", n_included, n_obs);
+      snprintf( obuff, sizeof(obuff), "%d of %d", n_included, n_obs);
    else if( (options & ELEM_OUT_ALTERNATIVE_FORMAT) && n_included != n_obs)
-      sprintf( obuff, get_find_orb_text( 15), n_included, n_obs);
+      snprintf( obuff, sizeof(obuff), get_find_orb_text( 15), n_included, n_obs);
    else
-      sprintf( obuff, get_find_orb_text( 16), n_included);
+      snprintf( obuff, sizeof(obuff), get_find_orb_text( 16), n_included);
    if( options != -1 && n_included)
       {
       const double rms = (options & ELEM_OUT_NORMALIZED_MEAN_RESID) ?
@@ -428,7 +428,7 @@ static void observation_summary_data( char *obuff, const OBSERVE FAR *obs,
          strlcat_err( rms_buff, " sigmas", sizeof( rms_buff));
       else
          text_search_and_replace( rms_buff, ".", "\".");
-      sprintf( obuff, get_find_orb_text( 17), rms_buff);
+      snprintf( obuff, sizeof(obuff), get_find_orb_text( 17), rms_buff);
       }                                 /* "; mean residual %s." */
 }
 
@@ -527,21 +527,21 @@ static int elements_in_mpcorb_format( char *buff, const char *packed_desig,
    char packed_desig2[40];
 
    packed_desig_minus_spaces( packed_desig2, packed_desig);
-   sprintf( buff, "%-8s%5.2f  %4.2f ", packed_desig2, elem->abs_mag,
+   snprintf( buff, sizeof(buff), "%-8s%5.2f  %4.2f ", packed_desig2, elem->abs_mag,
                            asteroid_magnitude_slope_param);
    day = (int)( decimal_day_to_dmy( elem->epoch, &year,
                               &month, CALENDAR_JULIAN_GREGORIAN) + .0001);
-   sprintf( buff + 20, "%c%02ld%X%c",
+   snprintf( buff + 20, sizeof(buff), "%c%02ld%X%c",
                   int_to_mutant_hex_char( year / 100),
                   year % 100L, month,
                   int_to_mutant_hex_char( day));
-   sprintf( buff + 25, "%10.5f%11.5f%11.5f%11.5f%11.7f",
+   snprintf( buff + 25, sizeof(buff), "%10.5f%11.5f%11.5f%11.5f%11.7f",
            centralize_ang( elem->mean_anomaly) * 180. / PI,
            centralize_ang( elem->arg_per) * 180. / PI,
            centralize_ang( elem->asc_node) * 180. / PI,
            centralize_ang( elem->incl) * 180. / PI,
            elem->ecc);
-   sprintf( buff + 79, "%12.8f%12.7f",
+   snprintf( buff + 79, sizeof(buff), "%12.8f%12.7f",
             (180 / PI) / elem->t0,        /* n */
             elem->major_axis);
    for( i = 0; i < n_obs; i++)
@@ -549,35 +549,35 @@ static int elements_in_mpcorb_format( char *buff, const char *packed_desig,
          n_included_obs++;
    day = (int)( decimal_day_to_dmy( current_jd( ),
                          &year, &month, CALENDAR_JULIAN_GREGORIAN) + .0001);
-   sprintf( buff + 103,
+   snprintf( buff + 103, sizeof(buff),
       "    FO %02d%02d%02d  %4d  %2d ****-**** ****         Find_Orb   %04x",
                   (int)( year % 100), month, (int)day,
                   n_included_obs, n_oppositions, hex_flags);
    get_first_and_last_included_obs( obs, n_obs, &first_idx, &last_idx);
    arc_length = obs[last_idx].jd - obs[first_idx].jd;
    if( arc_length < 99. / seconds_per_day)
-      sprintf( buff + 127, "%4.1f sec ", arc_length * seconds_per_day);
+      snprintf( buff + 127, sizeof(buff), "%4.1f sec ", arc_length * seconds_per_day);
    else if( arc_length < 99. / minutes_per_day)
-      sprintf( buff + 127, "%4.1f min ", arc_length * minutes_per_day);
+      snprintf( buff + 127, sizeof(buff), "%4.1f min ", arc_length * minutes_per_day);
    else if( arc_length < 2.)
-      sprintf( buff + 127, "%4.1f hrs ", arc_length * hours_per_day);
+      snprintf( buff + 127, sizeof(buff), "%4.1f hrs ", arc_length * hours_per_day);
    else if( arc_length < 600.)
-      sprintf( buff + 127, "%4d days", (int)arc_length + 1);
+      snprintf( buff + 127, sizeof(buff), "%4d days", (int)arc_length + 1);
    else
-      sprintf( buff + 127, "%4d-%4d",
+      snprintf( buff + 127, sizeof(buff), "%4d-%4d",
                 (int)JD_TO_YEAR( obs[first_idx].jd),
                 (int)JD_TO_YEAR( obs[last_idx].jd));
    buff[136] = ' ';
-   sprintf( buff + 165, " %-30s", full_desig);
+   snprintf( buff + 165, sizeof(buff), " %-30s", full_desig);
    day = (int)( decimal_day_to_dmy( obs[last_idx].jd, &year,
                        &month, CALENDAR_JULIAN_GREGORIAN) + .0001);
-   sprintf( buff + 194, "%04ld%02d%02d", year, month, day);
+   snprintf( buff + 194, sizeof(buff), "%04ld%02d%02d", year, month, day);
    if( rms_err < 9.9)
-      sprintf( buff + 137, "%4.2f", rms_err);
+      snprintf( buff + 137, sizeof(buff), "%4.2f", rms_err);
    else if( rms_err < 99.9)
-      sprintf( buff + 137, "%4.1f", rms_err);
+      snprintf( buff + 137, sizeof(buff), "%4.1f", rms_err);
    else if( rms_err < 9999.)
-      sprintf( buff + 137, "%4.0f", rms_err);
+      snprintf( buff + 137, sizeof(buff), "%4.0f", rms_err);
    buff[141] = ' ';
    if( (perturbers & 0x1fe) == 0x1fe)
       {    /* we have Mercury through Neptune,  at least */
@@ -797,7 +797,7 @@ static char *object_name( char *buff, const int obj_index)
    else if( obj_index > 0 && obj_index < 11) /* nine planets & moon */
       strcpy( buff, get_find_orb_text( 99107 + obj_index));
    else
-      sprintf( buff, "Object_%d\n", obj_index);
+      snprintf( buff, sizeof(buff), "Object_%d\n", obj_index);
    return( buff);
 }
 
@@ -1136,7 +1136,7 @@ static int elements_in_guide_format( char *buff, const ELEMENTS *elem,
    day = decimal_day_to_dmy( elem->perih_time, &year, &month,
                                               CALENDAR_JULIAN_GREGORIAN);
             /*      name day  mon yr MA      q      e */
-   sprintf( buff, "%-43s%8.5f%3d%5ld Find_Orb %14.7f%12.7f%11.6f%12.6f%12.6f",
+   snprintf( buff, sizeof(buff), "%-43s%8.5f%3d%5ld Find_Orb %14.7f%12.7f%11.6f%12.6f%12.6f",
             obj_name, day, month, year,
             elem->q, elem->ecc,
             centralize_ang( elem->incl) * 180. / PI,
@@ -1144,15 +1144,15 @@ static int elements_in_guide_format( char *buff, const ELEMENTS *elem,
             centralize_ang( elem->asc_node) * 180. / PI);
    if( elem->q < .01)
       {
-      sprintf( buff + 71, "%12.10f", elem->q);
+      snprintf( buff + 71, sizeof(buff), "%12.10f", elem->q);
       buff[71] = buff[83] = ' ';
       }
-   sprintf( buff + strlen( buff), " %9.1f%5.1f%5.1f %c",
+   snprintf( buff + strlen( buff), sizeof(buff), " %9.1f%5.1f%5.1f %c",
             elem->epoch, elem->abs_mag,
             elem->slope_param * (elem->is_asteroid ? 1. : 0.4),
             (elem->is_asteroid ? 'A' : ' '));
    if( elem->central_obj)
-      sprintf( buff + strlen( buff), "  Center: %d", elem->central_obj);
+      snprintf( buff + strlen( buff), sizeof(buff), "  Center: %d", elem->central_obj);
    strcat( buff, "  ");
    observation_summary_data( buff + strlen( buff), obs, n_obs, -1);
    return( 0);
@@ -1613,7 +1613,7 @@ void rotate_state_vector_to_current_frame( double *state_vect,
          if( !year)
              year = JD_TO_YEAR( epoch_shown);
          if( body_frame_note)
-            sprintf( body_frame_note, "(%s)", elem_epoch);
+            snprintf( body_frame_note,  sizeof(body_frame_note), "(%s)", elem_epoch);
          setup_ecliptic_precession( precession_matrix, 2000., year);
          precess_vector( precession_matrix, state_vect, state_vect);
          precess_vector( precession_matrix, state_vect + 3, state_vect + 3);
@@ -1752,6 +1752,7 @@ int write_out_elements_to_file( const double *orbit,
             const int options)
 {
    char object_name[80], buff[260], more_moids[80];
+   const size_t buff_size = 260;
    const char *file_permits = (append_elements_to_element_file ? "tfca" : "tfcw+");
    extern const char *elements_filename;
    FILE *ofile = fopen_ext( get_file_name( buff, elements_filename), file_permits);
@@ -1825,7 +1826,7 @@ int write_out_elements_to_file( const double *orbit,
    elem.epoch = epoch_shown;
    calc_classical_elements( &elem, rel_orbit, epoch_shown, 1);
    if( elem.ecc < .9)
-      sprintf( orbit_summary_text, "a=%.3f, ", elem.major_axis);
+      snprintf( orbit_summary_text,  sizeof(orbit_summary_text), "a=%.3f, ", elem.major_axis);
    else
       *orbit_summary_text = '\0';
    if( elem.ecc >= .9 || (orbit_summary_options & ORBIT_SUMMARY_Q))
@@ -1919,18 +1920,18 @@ int write_out_elements_to_file( const double *orbit,
 
                if( mass)
                   {
-                  sprintf( tt_ptr, "; %s=%.4g", constraints, *mass);
+                  snprintf( tt_ptr, sizeof(tt_ptr), "; %s=%.4g", constraints, *mass);
                   consider_replacing( buff, constraints, "Sigma_mass:");
                   clobber_leading_zeroes_in_exponent( buff);
                   }
                else
-                  sprintf( tt_ptr, "; bad '%s'", constraints);
+                  snprintf( tt_ptr, sizeof(tt_ptr), "; bad '%s'", constraints);
                }
             else
-               sprintf( tt_ptr, ";  Constraint: %s", constraints);
+               snprintf( tt_ptr, sizeof(tt_ptr), ";  Constraint: %s", constraints);
             }
          else if( n_monte_carlo_impactors && monte_carlo)
-            sprintf( tt_ptr, ";  %.2f%% impact (%d/%d)",
+            snprintf( tt_ptr, sizeof(tt_ptr), ";  %.2f%% impact (%d/%d)",
                 100. * (double)n_monte_carlo_impactors /
                        (double)monte_carlo_object_count,
                        n_monte_carlo_impactors, monte_carlo_object_count);
@@ -1955,7 +1956,7 @@ int write_out_elements_to_file( const double *orbit,
                put_double_in_buff( tbuff0, orbit[j + 6]);
                text_search_and_replace( tbuff0, " ", "");
                strlcat_error( tbuff0, " ");
-               sprintf( sig_name, "Sigma_A%d:", j + 1);
+               snprintf( sig_name, sizeof(sig_name), "Sigma_A%d:", j + 1);
                if( showing_sigmas)
                   if( !get_uncertainty( sig_name, sigma_buff + 4, false))
                      strlcat_error( tbuff0, sigma_buff);
@@ -1996,7 +1997,7 @@ int write_out_elements_to_file( const double *orbit,
 
          if( force_model == FORCE_MODEL_SRP)
             {
-            sprintf( tt_ptr, "; AMR %.5g",
+            snprintf( tt_ptr, sizeof(tt_ptr), "; AMR %.5g",
                                  orbit[6] * SOLAR_GM / SRP1AU);
             if( showing_sigmas)
                consider_replacing( tt_ptr, "AMR", "Sigma_AMR:");
@@ -2032,7 +2033,7 @@ int write_out_elements_to_file( const double *orbit,
                            "Ve", "Me", "Ma", "Sa", "Ur", "Ne",
                            "Ce", "Pa", "Vt", "(29)", "(16)", "(15)" };
 
-                  sprintf( addendum, "   %s: %.4f", moid_text[j], moid);
+                  snprintf( addendum, sizeof(addendum), "   %s: %.4f", moid_text[j], moid);
                   if( strlen( addendum) + strlen( buff) < 79)
                      strlcat_error( buff, addendum);
                   else
@@ -2063,7 +2064,7 @@ int write_out_elements_to_file( const double *orbit,
          if( !memcmp( buff + 31, " G ", 3) && uncertainty_parameter < 90.)
             {                       /* replace slope w/uncertainty */
 //          sprintf( buff + 32, "U%7.3f  ", uncertainty_parameter);
-            sprintf( buff + 32, "U%5.1f  ", uncertainty_parameter);
+            snprintf( buff + 32, buff_size - 32, "U%5.1f  ", uncertainty_parameter);
             buff[40] = ' ';
             }
       if( showing_sigmas)
@@ -2371,7 +2372,7 @@ int write_out_elements_to_file( const double *orbit,
                      /* "conventional" East/West 0-180 degree format:  */
          if( elem.central_obj == 3)
             {
-            sprintf( end_ptr, "%c%.5f",
+            snprintf( end_ptr, sizeof(end_ptr), "%c%.5f",
                   (lon < 180. ? 'E' : 'W'),
                   (lon < 180. ? lon : 360. - lon));
             fprintf( ofile, "%s at %s\n", (is_an_impact ? "IMPACT" : "LAUNCH"),
@@ -2379,7 +2380,7 @@ int write_out_elements_to_file( const double *orbit,
             }
                      /* Then show in 0-360 format,  for all other  */
                      /* planets, and for output to file:           */
-         sprintf( end_ptr, "%9.5f", lon);
+         snprintf( end_ptr, sizeof(end_ptr), "%9.5f", lon);
          if( elem.central_obj != 3)
             fprintf( ofile, "%s at %s\n", (is_an_impact ? "IMPACT" : "LAUNCH"),
                              impact_buff);
@@ -2405,32 +2406,32 @@ int write_out_elements_to_file( const double *orbit,
       char time_buff[40];
       bool nongrav_sigmas_found = false;
 
-      sprintf( tbuff, "#  $Name=%s", object_name);
+      snprintf( tbuff, sizeof(tbuff), "#  $Name=%s", object_name);
       text_search_and_replace( tbuff + 4, " ", "%20");
                /* Epoch has to be given in YYYYMMDD.DDDDD format: */
       full_ctime( time_buff, helio_elem.perih_time,
                FULL_CTIME_YMD | FULL_CTIME_MONTHS_AS_DIGITS
                | FULL_CTIME_MICRODAYS | FULL_CTIME_LEADING_ZEROES);
       time_buff[4] = time_buff[7] = '\0';
-      sprintf( tbuff + strlen( tbuff), "  $Ty=%s  $Tm=%s  $Td=%s",
+      snprintf( tbuff + strlen( tbuff), sizeof(tbuff), "  $Ty=%s  $Tm=%s  $Td=%s",
                time_buff, time_buff + 5, time_buff + 8);
-      sprintf( tbuff + strlen( tbuff), "  $MA=%.5f",
+      snprintf( tbuff + strlen( tbuff), sizeof(tbuff), "  $MA=%.5f",
                   centralize_ang( helio_elem.mean_anomaly) * 180. / PI);
       fprintf( ofile, "%s\n", tbuff);
 
-      sprintf( tbuff, "#  $ecc=%.7f  $Eqnx=2000.", helio_elem.ecc);
+      snprintf( tbuff, sizeof(tbuff), "#  $ecc=%.7f  $Eqnx=2000.", helio_elem.ecc);
       fprintf( ofile, "%s\n", tbuff);
 
-      sprintf( tbuff, "#  $a=%.7f  $Peri=%.5f  $Node=%.5f",
+      snprintf( tbuff, sizeof(tbuff), "#  $a=%.7f  $Peri=%.5f  $Node=%.5f",
                   helio_elem.major_axis,
                   centralize_ang( helio_elem.arg_per) * 180. / PI,
                   centralize_ang( helio_elem.asc_node) * 180. / PI);
-      sprintf( tbuff + strlen( tbuff), "  $Incl=%.5f",
+      snprintf( tbuff + strlen( tbuff), sizeof(tbuff), "  $Incl=%.5f",
                   helio_elem.incl * 180. / PI);
       fprintf( ofile, "%s\n", tbuff);
 
-      sprintf( tbuff, "#  $EpJD=%.3f  $q=%.6f", helio_elem.epoch, helio_elem.q);
-      sprintf( tbuff + strlen( tbuff), "  $T=%.6f  $H=%.1f",
+      snprintf( tbuff, sizeof(tbuff), "#  $EpJD=%.3f  $q=%.6f", helio_elem.epoch, helio_elem.q);
+      snprintf( tbuff + strlen( tbuff), sizeof(tbuff), "  $T=%.6f  $H=%.1f",
                helio_elem.perih_time, helio_elem.abs_mag);
       fprintf( ofile, "%s\n", tbuff);
       fprintf( ofile, "# Sigmas avail: %d\n", available_sigmas);
@@ -2438,7 +2439,7 @@ int write_out_elements_to_file( const double *orbit,
          {
          char key[20], obuff[50];
 
-         sprintf( key, "Sigma_A%d:", i);
+         snprintf( key, sizeof(key), "Sigma_A%d:", i);
          if( !get_uncertainty( key, obuff, false))
             {
             fprintf( ofile, (nongrav_sigmas_found ? "   %s %s" : "# %s %s"),
@@ -2484,9 +2485,9 @@ int write_out_elements_to_file( const double *orbit,
          element_filename = "mpcorb.dat";
       if( *impact_buff)
          n_monte_carlo_impactors++;
-      sprintf( name_buff, "%05d", n_clones_accepted);
+      snprintf( name_buff, sizeof(name_buff), "%05d", n_clones_accepted);
       packed_desig_minus_spaces( virtual_full_desig, obs->packed_id);
-      sprintf( virtual_full_desig + strlen( virtual_full_desig), " [%d]",
+      snprintf( virtual_full_desig + strlen( virtual_full_desig), sizeof(virtual_full_desig), " [%d]",
                                   monte_carlo_object_count);
       if( elem.central_obj || elem.ecc > .999999)
          {

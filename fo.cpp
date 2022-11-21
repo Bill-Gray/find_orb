@@ -119,7 +119,7 @@ int inquire( const char *prompt, char *buff, const int max_len,
 
 static void object_comment_text( char *buff, const OBJECT_INFO *id)
 {
-   sprintf( buff, "%d observations; ", id->n_obs);
+   snprintf( buff, sizeof(buff),"%d observations; ", id->n_obs);
    make_date_range_text( buff + strlen( buff), id->jd_start, id->jd_end);
 }
 

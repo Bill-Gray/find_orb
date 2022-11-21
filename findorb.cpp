@@ -3014,6 +3014,7 @@ static int user_select_file( char *filename, const char *title, const int flags)
 #ifndef __WATCOMC__
    const bool is_save_dlg = (flags & 1);
    char cmd[256];
+   const size_t cmd_size = 256;
    int rval;
    const bool x_is_running = (NULL != getenv( "DISPLAY"));
 
@@ -3050,7 +3051,7 @@ static int user_select_file( char *filename, const char *title, const int flags)
 
          /* dialog and Xdialog take the same options : */
    full_endwin( );
-   sprintf( strchr( cmd, '~'), "~ %d %d",
+   snprintf( strchr( cmd, '~'), cmd_size, "~ %d %d",
                           getmaxy( stdscr) - 15, getmaxx( stdscr) - 3);
    rval = try_a_file_dialog_program( filename, cmd + 1);
    restart_curses( );
@@ -3284,7 +3285,7 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
          err_msg = "Couldn't locate the file '%s'\n";
       else
          err_msg = "No objects found in file '%s'\n";
-      sprintf( err_buff, err_msg, ifilename);
+      snprintf( err_buff, sizeof(err_buff), err_msg, ifilename);
       if( ids)
          free( ids);
       ids = NULL;

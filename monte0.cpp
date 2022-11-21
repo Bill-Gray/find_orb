@@ -313,7 +313,7 @@ char *put_double_in_buff( char *buff, const double ival)
       {
       char *tptr;
 
-      sprintf( buff, format, ival);
+      snprintf( buff, sizeof(buff), format, ival);
       while( (tptr = strchr( buff, 'e')) != NULL
                      &&  tptr[2] == '0')
          {           /* remove a leading zero from exponent */
@@ -322,7 +322,7 @@ char *put_double_in_buff( char *buff, const double ival)
          }
       }
    else
-      sprintf( buff, "%*ld", precision + 7, (long)ival);
+      snprintf( buff, sizeof(buff), "%*ld", precision + 7, (long)ival);
    while( *buff == ' ')
       buff++;
    return( buff);
@@ -403,11 +403,11 @@ double dump_monte_data_to_file( FILE *ofile, const double *sigmas,
          {
          char zbuff[40];
 
-         sprintf( zbuff, "%.8f", sigmas[i]);
+         snprintf( zbuff, sizeof(zbuff), "%.8f", sigmas[i]);
          remove_insignificant_digits( zbuff);
          if( strlen( zbuff) == 10)   /* very low value */
             put_double_in_buff( zbuff, sigmas[i]);
-         sprintf( tbuff, "%10s", zbuff);
+         snprintf( tbuff, sizeof(tbuff), "%10s", zbuff);
          }
       else
          put_double_in_buff( tbuff, sigmas[i]);
