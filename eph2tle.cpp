@@ -696,7 +696,7 @@ int main( const int argc, const char **argv)
    if( fgets_trimmed( buff, sizeof( buff), ifile))
       {
       bool writing_data = false;
-      double mjdt;
+      double mjdt, mjdt_end;
       char *tptr = strstr( buff, "(500) Geocentric: ");
 
       while( *buff == ';')       /* skip leading comments,  if any */
@@ -721,10 +721,11 @@ int main( const int argc, const char **argv)
          ref_frame = 0;
          }
       mjdt = tdt - 2400000.5;
+      mjdt_end = mjdt + step * (double)( total_lines - total_lines % output_freq);
       if( tptr && !*obj_name)
          strcpy( obj_name, tptr + 18);
       fprintf( ofile, "# Ephem range: %f %f %f\n",
-            mjdt, mjdt + step * (double)total_lines, step * (double)output_freq);
+            mjdt, mjdt_end, step * (double)output_freq);
       while( fgets_trimmed( buff, sizeof( buff), ifile))
          {
          if( !memcmp( buff, "Created ", 8))
