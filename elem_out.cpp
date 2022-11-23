@@ -3207,6 +3207,17 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
          }
       free( saved_obs);
       }
+               /* if a stored solution failed (i.e.,  didn't get sigmas), */
+               /* we try again,  ignoring the stored solution.            */
+   if( got_vectors && available_sigmas == NO_SIGMAS_AVAILABLE && !ignore_prev_solns)
+      {
+      ignore_prev_solns = 1;
+      for( i = 0; i < n_obs; i++)
+         obs[i].is_included = !(obs[i].flags & OBS_DONT_USE);
+      got_vectors = fetch_previous_solution( obs, n_obs, orbit, orbit_epoch,
+                        epoch_shown, perturbers);
+      ignore_prev_solns = 0;
+      }
    return( got_vectors);
 }
 
