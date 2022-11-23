@@ -194,12 +194,15 @@ char *fgets_trimmed( char *buff, size_t max_bytes, FILE *ifile)
 void get_first_and_last_included_obs( const OBSERVE *obs,
               const int n_obs, int *first, int *last)       /* elem_out.c */
 {
+   int i = 0;
+
+   while( i < n_obs - 1 && !obs[i].is_included)
+      i++;
+
    if( first)
-      for( *first = 0; *first < n_obs - 1 && !obs[*first].is_included;
-                                    (*first)++)
-         ;
+      *first = i;
    if( last)
-      for( *last = n_obs - 1; *last && !obs[*last].is_included; (*last)--)
+      for( *last = n_obs - 1; *last > i && !obs[*last].is_included; (*last)--)
          ;
 }
 
@@ -385,7 +388,9 @@ const char *get_find_orb_text( const int index)
    for( i = 0; default_text[i]; i++)
       if( atoi( default_text[i]) == index)
          return( default_text[i] + 8);
-   assert( 1);             /* i.e.,  should never get here */
+   debug_printf( "Requested index %d in language %c not found\n",
+                     index, findorb_language);
+   assert( 0);             /* i.e.,  should never get here */
    return( NULL);
 }
 
