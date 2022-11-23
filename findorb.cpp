@@ -2271,7 +2271,7 @@ static void set_color_table( void);
 static void show_a_file( const char *filename, const int flags)
 {
    FILE *ifile = fopen_ext( filename, "tclrb");
-   char buff[260], err_text[100];
+   char buff[560], err_text[100];
    int line_no = 0, keep_going = 1;
    int n_lines = 0, msg_num = 0;
    bool search_text_found = true;
@@ -3050,7 +3050,7 @@ static int user_select_file( char *filename, const char *title, const int flags)
 
          /* dialog and Xdialog take the same options : */
    full_endwin( );
-   sprintf( strchr( cmd, '~'), "~ %d %d",
+   snprintf_err( strchr( cmd, '~'), 12, "~ %d %d",
                           getmaxy( stdscr) - 15, getmaxx( stdscr) - 3);
    rval = try_a_file_dialog_program( filename, cmd + 1);
    restart_curses( );
@@ -3142,6 +3142,7 @@ static bool filename_fits_current_os( const char *filename)
 }
 
 static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
+                    const size_t err_buff_size,
                     const bool drop_single_obs, const bool already_got_obs)
 {
    OBJECT_INFO *ids;
@@ -3253,8 +3254,9 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
    if( !*ifilename)
       {
       free( prev_files);
-      strcpy( err_buff, "'findorb' needs the name of an input file of MPC-formatted\n"
-               "astrometry as a command-line argument.\n");
+      strlcpy_err( err_buff,
+               "'findorb' needs the name of an input file of MPC-formatted\n"
+               "astrometry as a command-line argument.\n", err_buff_size);
       return( NULL);
       }
 
@@ -3284,7 +3286,7 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
          err_msg = "Couldn't locate the file '%s'\n";
       else
          err_msg = "No objects found in file '%s'\n";
-      sprintf( err_buff, err_msg, ifilename);
+      snprintf_err( err_buff, err_buff_size, err_msg, ifilename);
       if( ids)
          free( ids);
       ids = NULL;
@@ -3899,7 +3901,7 @@ int main( int argc, const char **argv)
             OBJECT_INFO *new_ids;
             int n_new_ids;
 
-            new_ids = load_file( ifilename, &n_new_ids, tbuff, drop_single_obs,
+            new_ids = load_file( ifilename, &n_new_ids, tbuff, 200, drop_single_obs,
                                      (ids ? true : false));
             if( !new_ids && !*tbuff && !ids)   /* at startup,  and hit Quit */
                goto Shutdown_program;
