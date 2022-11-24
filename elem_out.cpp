@@ -536,6 +536,9 @@ static int elements_in_mpcorb_format( char *buff, const char *packed_desig,
    double tval;
 
    packed_desig_minus_spaces( packed_desig2, packed_desig);
+   if( 12 == strlen( packed_desig2))  /* fix cases where number &  */
+      packed_desig2[5] = '\0';        /* provisional ID are both set; */
+   packed_desig2[8] = '\0';           /* prevent overrun otherwise */
    snprintf_err( buff, mpcorb_line_len, "%-8s%5.2f  %4.2f ", packed_desig2, elem->abs_mag,
                            asteroid_magnitude_slope_param);
    day = (int)( decimal_day_to_dmy( elem->epoch, &year,
