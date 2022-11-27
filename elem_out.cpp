@@ -594,7 +594,10 @@ static int elements_in_mpcorb_format( char *buff, const char *packed_desig,
                 (int)JD_TO_YEAR( obs[last_idx].jd));
    buff[136] = ' ';
    assert( 165 == strlen( buff));
-   snprintf_append( buff, mpcorb_line_len, " %-28s", full_desig);
+   if( strlen( full_desig) > 28)
+      strlcat( buff, full_desig, 195);
+   else
+      snprintf_append( buff, mpcorb_line_len, " %-28s", full_desig);
    day = (int)( decimal_day_to_dmy( obs[last_idx].jd, &year,
                        &month, CALENDAR_JULIAN_GREGORIAN) + .0001);
    assert( 194 == strlen( buff));
@@ -1156,26 +1159,34 @@ static int elements_in_guide_format( char *buff, const ELEMENTS *elem,
                      const char *obj_name, const OBSERVE *obs,
                      const unsigned n_obs)
 {
-   int month;
-   double day;
+   int month, q_prec = 10, e_prec = 8;
+   double day, tval;
    long year;
-   const size_t guide_line_len = 166;
+   const size_t guide_line_len = 170;
 
    day = decimal_day_to_dmy( elem->perih_time, &year, &month,
                                               CALENDAR_JULIAN_GREGORIAN);
             /*      name day  mon yr MA      q      e */
+   tval = elem->q;
+   while( tval > 9.999)
+      {
+      tval /= 10;
+      q_prec--;
+      }
+   tval = elem->ecc;
+   while( tval > 9.999)
+      {
+      tval /= 10;
+      e_prec--;
+      assert( e_prec);
+      }
    snprintf_err( buff, guide_line_len,
-            "%-43s%8.5f%3d%5ld Find_Orb %14.7f%12.7f%11.6f%12.6f%12.6f",
+            "%-43s%8.5f%3d%5ld Find_Orb    %12.*f %10.*f%11.6f %11.6f %11.6f",
             obj_name, day, month, year,
-            elem->q, elem->ecc,
+            q_prec, elem->q, e_prec, elem->ecc,
             centralize_ang( elem->incl) * 180. / PI,
             centralize_ang( elem->arg_per) * 180. / PI,
             centralize_ang( elem->asc_node) * 180. / PI);
-   if( elem->q < .01)
-      {
-      snprintf_err( buff + 71, 13, "%12.10f", elem->q);
-      buff[71] = buff[83] = ' ';
-      }
    snprintf_append( buff, guide_line_len,  " %9.1f%5.1f%5.1f %c",
             elem->epoch, elem->abs_mag,
             elem->slope_param * (elem->is_asteroid ? 1. : 0.4),
