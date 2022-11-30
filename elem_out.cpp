@@ -574,7 +574,7 @@ static int elements_in_mpcorb_format( char *buff, const char *packed_desig,
    day = (int)( decimal_day_to_dmy( current_jd( ),
                          &year, &month, CALENDAR_JULIAN_GREGORIAN) + .0001);
    snprintf_append( buff, mpcorb_line_len,
-      "    FO %02d%02d%02d  %4d  %2d ****-**** ****         Find_Orb   %04x",
+      "    FO %02d%02d%02d %5d %3d ****-**** ****         Find_Orb   %04x",
                   (int)( year % 100), month, (int)day,
                   n_included_obs, n_oppositions, hex_flags);
    get_first_and_last_included_obs( obs, n_obs, &first_idx, &last_idx);
