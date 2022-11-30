@@ -525,10 +525,6 @@ static int elements_in_mpcorb_format( char *buff, const char *packed_desig,
             /* signifying if the object is in any of various classes such  */
             /* as Aten,  scattered-disk object,  PHA,  Jupiter Trojan,     */
             /*  etc.  None of those flags are set yet.                     */
-   const int n_oppositions = 1;
-            /* The above needs some work.  Problem is,  what constitutes   */
-            /* an "opposition" for an NEO?  (It's more clearcut for MBOs.) */
-            /* For the nonce,  we'll just say "one opposition".            */
    double arc_length;
    char packed_desig2[40];
    const size_t mpcorb_line_len = 203;
@@ -576,7 +572,7 @@ static int elements_in_mpcorb_format( char *buff, const char *packed_desig,
    snprintf_append( buff, mpcorb_line_len,
       "    FO %02d%02d%02d %5d %3d ****-**** ****         Find_Orb   %04x",
                   (int)( year % 100), month, (int)day,
-                  n_included_obs, n_oppositions, hex_flags);
+                  n_included_obs, _n_oppositions( obs, n_obs), hex_flags);
    get_first_and_last_included_obs( obs, n_obs, &first_idx, &last_idx);
    arc_length = obs[last_idx].jd - obs[first_idx].jd;
    assert( strlen( buff) == 165);
