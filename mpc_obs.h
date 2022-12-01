@@ -477,9 +477,8 @@ Yarkovsky with A2 (both inverse-square and both one added parameter). */
 #define FORCE_MODEL_COMET_THREE_PARAM  0x03
 #define FORCE_MODEL_COMET_FOUR_PARAM   0x04
 
-/* Not used yet : for some rocks,  Yarkovsky can be modelled as an
-A2 (along-orbit) inverse square force.  This is currently handled by
-selecting a two-parameter SRP model and constraining A1=0.   */
+/* For some rocks,  Yarkovsky can be modelled as an A2 (along-orbit)
+inverse square force.  */
 
 #define FORCE_MODEL_YARKO_A2           0x111
 
