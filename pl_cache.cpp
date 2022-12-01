@@ -619,12 +619,13 @@ int format_jpl_ephemeris_info( char *buff)
 {
    int de_version;
    double jd_start, jd_end;
+   const size_t buff_size = 250;
 
    get_jpl_ephemeris_info( &de_version, &jd_start, &jd_end);
    if( !de_version && !jd_start && !jd_end)
-      strcpy( buff, get_find_orb_text( 2056));
+      strlcpy_err( buff, get_find_orb_text( 2056), buff_size);
    else
-      sprintf( buff,
+      snprintf_err( buff, buff_size,
             "\nUsing %s; covers years %.1f to %.1f\n",
             jpl_get_ephem_name( jpl_eph),
             (jd_start - J2000) / 365.25 + 2000.,
