@@ -468,7 +468,7 @@ int integrate_orbitl( long double *orbit, const long double t0, const long doubl
 
          if( runtime_message)
             move_add_nstr( 9, 10, runtime_message, -1);
-         sprintf( buff, "t = %.5f; %.5f to %.5f; step ",
+         snprintf_err( buff, sizeof( buff), "t = %.5f; %.5f to %.5f; step ",
                  (double)JD_TO_YEAR( t), (double)JD_TO_YEAR( t0), (double)JD_TO_YEAR( t1));
          if( fabsl( stepsize) > .1)
             snprintf_append( buff, sizeof( buff), "%.3f   ", (double)stepsize);
@@ -484,14 +484,14 @@ int integrate_orbitl( long double *orbit, const long double t0, const long doubl
          move_add_nstr( 10, 10, buff, -1);
          prev_n_steps = n_steps;
          real_time = time( NULL);
-         sprintf( buff, " %02d:%02d:%02d; %f; %d cached   ",
+         snprintf_err( buff, sizeof( buff), " %02d:%02d:%02d; %f; %d cached   ",
                      (int)( (real_time / 3600) % 24L),
                      (int)( (real_time / 60) % 60),
                      (int)( real_time % 60), (double)( t - prev_t),
                      n_posns_cached);
          prev_t = t;
          move_add_nstr( 11, 10, buff, -1);
-         sprintf( buff, "%d steps; %d rejected", n_steps, n_rejects);
+         snprintf_err( buff, sizeof( buff), "%d steps; %d rejected", n_steps, n_rejects);
          if( best_fit_planet_dist)
             {
             snprintf_append( buff, sizeof( buff), "; center %d, ",
@@ -499,31 +499,31 @@ int integrate_orbitl( long double *orbit, const long double t0, const long doubl
             format_dist_in_buff( buff + strlen( buff), best_fit_planet_dist);
             }
          if( planet_ns)
-            sprintf( buff + strlen( buff), "  tp:%ld.%09ld",
+            snprintf_append( buff, sizeof( buff), "  tp:%ld.%09ld",
                   (long)( planet_ns / (int64_t)1000000000),
                   (long)( planet_ns % (int64_t)1000000000));
-         strcat( buff, "  ");
+         strlcat_err( buff, "  ", sizeof( buff));
          move_add_nstr( 12, 10, buff, -1);
-         sprintf( buff, "last err: %.3e/%.3e  n changes: %d  ",
+         snprintf_err( buff, sizeof( buff), "last err: %.3e/%.3e  n changes: %d  ",
                         (double)last_err, (double)step_increase, n_changes);
          move_add_nstr( 13, 10, buff, -1);
          if( use_encke)
             {
-            sprintf( buff, "e = %.5f; q = ", ref_orbit.ecc);
+            snprintf_err( buff, sizeof( buff), "e = %.5f; q = ", ref_orbit.ecc);
             format_dist_in_buff( buff + strlen( buff), ref_orbit.q);
-            strcat( buff, "     ");
+            strlcat_error( buff, "     ");
             move_add_nstr( 18, 10, buff, -1);
             }
-         sprintf( buff, "Pos: %11.6f %11.6f %11.6f",
+         snprintf_err( buff, sizeof( buff), "Pos: %11.6f %11.6f %11.6f",
                      dorbit[0], dorbit[1], dorbit[2]);
          move_add_nstr( 14, 10, buff, -1);
-         sprintf( buff, "Vel: %11.6f %11.6f %11.6f",
+         snprintf_err( buff, sizeof( buff), "Vel: %11.6f %11.6f %11.6f",
                      dorbit[3], dorbit[4], dorbit[5]);
          move_add_nstr( 15, 10, buff, -1);
 #ifdef TEST_PLANET_CACHING_HASH_FUNCTION
          if( total_n_searches)
             {
-            sprintf( buff, "%ld searches; avg %.2f max %ld     ",
+            snprintf_err( buff, sizeof( buff), "%ld searches; avg %.2f max %ld     ",
                             total_n_searches,
                             (double)total_n_probes / (double)total_n_searches,
                             max_probes_required);
@@ -828,13 +828,13 @@ static int set_locs_extended( const double *orbit, const double epoch_jd,
                        OBSERVE FAR *obs, const int n_obs,
                        const double epoch2, double *orbit2)
 {
-   int i, pass, rval = 0;
+   int i, pass, rval = is_unreasonable_orbit( orbit);
 
-   if( is_unreasonable_orbit( orbit))
+   if( rval)
       {
       if( debug_level)
-         debug_printf( "Unreasonable orbit provided to set_locs_extended: %s\n",
-                        obs->packed_id);
+         debug_printf( "Unreasonable orbit (%d) provided to set_locs_extended: %s\n",
+                        rval, obs->packed_id);
       return( -9);
       }
 
@@ -1879,9 +1879,9 @@ int herget_method( OBSERVE FAR *obs, int n_obs, double r1, double r2,
    set_distance( &temp_obs2, r2);
    runtime_message = tstr;
    if( using_pseudo_vaisala)
-      sprintf( tstr, "Vaisala %f\n", obs->solar_r);
+      snprintf_err( tstr, sizeof( tstr), "Vaisala %f\n", obs->solar_r);
    else
-      strcpy( tstr, "H/xfer orbit (1)");
+      strlcpy_error( tstr, "H/xfer orbit (1)");
                /* Compute the trial orbit in the local orbit2 array.  That */
                /* way,  if we find it's completely stupid,  we've not      */
                /* done anything to the plain old 'orbit' vector,  which    */
@@ -1895,7 +1895,7 @@ int herget_method( OBSERVE FAR *obs, int n_obs, double r1, double r2,
                /* But now that we know it's a good result,  let's copy:     */
    memcpy( orbit, orbit2, 6 * sizeof( double));
    available_sigmas = NO_SIGMAS_AVAILABLE;
-   strcpy( tstr, using_pseudo_vaisala ? "Vaisala set_locs" : "H/set_locs (1)");
+   strlcpy_error( tstr, using_pseudo_vaisala ? "Vaisala set_locs" : "H/set_locs (1)");
    if( set_locs( orbit, temp_obs1.jd, obs, n_obs))
       {
       runtime_message = NULL;
@@ -2727,7 +2727,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
                /* We save the input orbit;  if there's an error,  we can */
                /* restore it:         */
    memcpy( original_orbit, orbit, n_orbit_params * sizeof( double));
-   sprintf( tstr, "full improvement: %f  ", JD_TO_YEAR( epoch));
+   snprintf_err( tstr, sizeof( tstr), "full improvement: %f  ", JD_TO_YEAR( epoch));
    runtime_message = tstr;
    for( i = 0; i < n_obs; i++)
       if( obs->note2 != 'R')
@@ -2769,7 +2769,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
          epoch2 = find_epoch_shown( obs, n_obs);
       }
 
-   sprintf( tstr, "fi/setting locs: %f  ", JD_TO_YEAR( epoch));
+   snprintf_err( tstr, sizeof( tstr), "fi/setting locs: %f  ", JD_TO_YEAR( epoch));
    fail_on_hitting_planet = true;
    set_locs_rval = set_locs_extended( orbit, epoch, obs, n_obs, epoch2, orbit2);
    fail_on_hitting_planet = saved_fail_on_hitting_planet;
@@ -2824,7 +2824,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
       constraint[n_constraints++] =
               r_mult * (dotted_dist( obs + n_obs - 1) - atof( limited_orbit + 2));
 
-   sprintf( tstr, "fi/locs set: %f  ", JD_TO_YEAR( epoch));
+   snprintf_err( tstr, sizeof( tstr), "fi/locs set: %f  ", JD_TO_YEAR( epoch));
    for( i = 0; i < n_obs; i++)
       get_residual_data( obs + i, xresids + i, yresids + i);
 
@@ -2845,7 +2845,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
    orig_obs = (OBSERVE *)calloc( n_obs, sizeof( OBSERVE));
    memcpy( orig_obs, obs, n_obs * sizeof( OBSERVE));
 
-   for( i = 0; i < n_params; i++)
+   for( i = 0; !err_code && i < n_params; i++)
       {
       const double min_change = 0.3, max_change = 3.0, optimal_change = 1.0;
       double low_delta = 0., high_delta = 0., low_change = 0., high_change = 0.;
@@ -2853,7 +2853,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
       const int max_iterations = 100;
       bool keep_iterating = true;
 
-      while( keep_iterating)
+      while( !err_code && keep_iterating)
          {
          double tweaked_orbit[MAX_N_PARAMS];
          const double original_asteroid_mass = (asteroid_mass ? *asteroid_mass : 0.);
@@ -2863,7 +2863,8 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
          double worst_error_squared = 0, rescale;
          double *slope_ptr;
          double rel_orbit[MAX_N_PARAMS];
-         bool trouble_happened = false;
+         int n_tweaks = 0;
+         const int max_n_tweaks = 30;
 
                   /* for asteroid mass computations,  on first pass, */
                   /* try to set a "reasonable" delta :   */
@@ -2876,7 +2877,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
                *asteroid_mass -= delta_val;
             else                    /* adjust position/velocity */
                tweaked_orbit[i] -= delta_val;
-            sprintf( tstr, "Evaluating %d of %d : iter %d   ", i + 1,
+            snprintf_err( tstr, sizeof( tstr), "Evaluating %d of %d : iter %d   ", i + 1,
                                     n_params, n_iterations);
             if( debug_level > 4)
                debug_printf( "About to set locs #2: delta_val %f\n", delta_val);
@@ -2906,10 +2907,20 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
                {                    /* with a smaller tweak */
                delta_val /= 2.;
                delta_vals[i] /= 2.;
-               trouble_happened = true;
+               n_tweaks++;
+               if( n_tweaks >= max_n_tweaks)
+                  err_code = -1;
                }
             }
-            while( set_locs_rval);
+            while( set_locs_rval && !err_code);
+         if( err_code)
+            {
+            memcpy( obs, orig_obs, n_obs * sizeof( OBSERVE));
+            free( orig_obs);
+            free( xresids);
+            memcpy( orbit, original_orbit, n_orbit_params * sizeof( double));
+            return( -8);
+            }
          slope_ptr = slopes + i;
          for( j = 0; j < n_obs; j++, slope_ptr += 2 * n_params)
             get_residual_data( obs + j, slope_ptr, slope_ptr + n_params);
@@ -3000,8 +3011,6 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
                            /* evades divide-by-zero/range errors below */
          if( worst_error_in_sigmas > min_change && worst_error_in_sigmas < max_change)
             keep_iterating = false;
-         if( trouble_happened && worst_error_in_sigmas < max_change)
-            keep_iterating = false;
          if( worst_error_in_sigmas <= optimal_change)
             {
             low_delta = delta_vals[i];
@@ -3027,14 +3036,19 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
             {
             debug_printf( "Ran over iteration limit! %s\n", obs->packed_id);
             debug_printf( "Worst err %f sigmas\n", worst_error_in_sigmas);
-            free( xresids);
-            memcpy( orbit, original_orbit, n_orbit_params * sizeof( double));
+            err_code = -3;
             runtime_message = NULL;
-            return( -4);
             }
          }
       }
+   memcpy( obs, orig_obs, n_obs * sizeof( OBSERVE));
    free( orig_obs);
+   if( err_code)
+      {
+      free( xresids);
+      memcpy( orbit, original_orbit, n_orbit_params * sizeof( double));
+      return( -1);
+      }
 
    lsquare = lsquare_init( n_params);
    assert( lsquare);
@@ -3148,7 +3162,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
                else        /* if( pass == 3) */
                   oval = eigenvectors[j + i * n_params];
                if( pass == 1 || pass == 3)      /* correlation or eigenvects */
-                  sprintf( tbuff, "%10.6f", oval);  /* values are -1 to 1 */
+                  snprintf_err( tbuff, sizeof( tbuff), "%10.6f", oval);  /* values are -1 to 1 */
                else                             /* covar/WtW values can be */
                   put_double_in_buff( tbuff, oval);   /* huge or tiny */
                fprintf( ofile, "%s", tbuff);
@@ -3176,7 +3190,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
                   for( k = 0; k < (unsigned)n_params; k++)
                      oval += matrix_ptr[i * n_params + k] * matrix_ptr[j * n_params + k];
                   if( pass == 3)      /* eigenvects are normalized; */
-                     sprintf( tbuff, "%10.6f", oval);  /* values are -1 to 1 */
+                     snprintf_err( tbuff, sizeof( tbuff), "%10.6f", oval);  /* values are -1 to 1 */
                   else                             /* covar/WtW values can be */
                      put_double_in_buff( tbuff, oval);   /* huge or tiny */
                   fprintf( ofile, "%s", tbuff);
@@ -3277,7 +3291,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
          else
             {           /* comet A1, A2, maybe A3 included */
             assert( n_params >= 7);
-            sprintf( title_text, "Sigma_A%d", i - 5);
+            snprintf_err( title_text, sizeof( title_text), "Sigma_A%d", i - 5);
             }
          fprintf( ofile, "\n%s: %s", title_text, tbuff);
          }
@@ -3329,7 +3343,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
                /* the original version:  */
    if( err_code || is_unreasonable_orbit( orbit))
       debug_printf( "Failed full step: %d: %s\n", err_code, obs->packed_id);
-   sprintf( tstr, "Final setting of orbit    ");
+   snprintf_err( tstr, sizeof( tstr), "Final setting of orbit    ");
    i = 6;      /* possibly try six half-steps */
    do
       {
@@ -3341,7 +3355,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
          {
          const double after_rms = compute_rms( obs, n_obs);
 
-         sprintf( tstr, "Half-stepping %d\n", 7 - i);
+         snprintf_err( tstr, sizeof( tstr), "Half-stepping %d\n", 7 - i);
          if( after_rms > before_rms * 1.5 && !limited_orbit)
             {
             for( j = 0; j < n_orbit_params; j++)
@@ -3702,7 +3716,7 @@ static double attempt_improvements( double *orbit, OBSERVE *obs, const int n_obs
             {
             char msg_buff[80];
 
-            sprintf( msg_buff, "%s step: radii %f, %f",
+            snprintf_err( msg_buff, sizeof( msg_buff), "%s step: radii %f, %f",
                         (method ? "full" : "Herget"),
                         obs[0].r, obs[n_obs - 1].r);
             move_add_nstr( 14, 10, msg_buff, -1);
@@ -4125,7 +4139,7 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
 #ifdef CONSOLE
                if( show_runtime_messages)
                   {
-                  sprintf( msg_buff, "Method %d, r=%.4f", i, pseudo_r);
+                  snprintf_err( msg_buff, sizeof( msg_buff), "Method %d, r=%.4f", i, pseudo_r);
                   move_add_nstr( 14, 10, msg_buff, -1);
                   }
 #endif
