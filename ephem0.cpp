@@ -203,7 +203,7 @@ static void show_dist_in_au( char *buff, const double dist_in_au)
    *buff = ' ';   /* remove leading zero for small amounts */
 }
 
-static const char *si_prefixes = "kMGTPEZYXWVUSRQONLJIHFDCBA";
+static const char *si_prefixes = "kMGTPEZYRQXWVUSONLJIHFDCBA";
 static bool use_au_only = false;
 
 /* Given a non-negative value,  this gives a four-character output
@@ -3779,9 +3779,9 @@ static void put_residual_into_text( char *text, const double resid,
    else if( (resid_format & RESIDUAL_FORMAT_OVERPRECISE) && zval < .00999)
       {          /* 'high-precision' residuals */
       unsigned i;
-      const char *lower_si_prefixes = " munpfazy ";
+      const char *lower_si_prefixes = " munpfazyrq ";
 
-      for( i = 0; zval < 0.99 && i < 9; i++)
+      for( i = 0; zval < 0.99 && i < 11; i++)
          zval *= 1000.;
       snprintf_err( text, 6, (zval < 9.9 ? "%4.1f%c" : "%4.0f%c"),
                      zval, lower_si_prefixes[i]);
