@@ -2330,7 +2330,6 @@ static bool get_neocp_data( char *buff, char *desig, char *mpc_code)
          obuff[80] = '\0';
          strcpy( obuff + 5, desig);
          memcpy( obuff + 15, buff, 10);     /* year, month, day */
-//       sprintf( obuff + 25, ".%05d", atoi( buff + 11) * 100000 / 24);
          if( mask == mask_if_hours)     /* ephem step size is in hours */
             minutes = atoi( buff + 11) * 60;
          else                       /* step size was in minutes */
@@ -4911,25 +4910,26 @@ result in a D or later half-month specification.  And it couldn't be 2012,
 because it would then have a B or A half-month specification.)   That's why
 the observation JD is passed in. */
 
-static void reference_to_text( char *obuff, const char *reference,
-                                            const double jd)
+static void reference_to_text( char *obuff, const size_t obuff_size,
+                                 const char *reference, const double jd)
 {
+   assert( 5 == strlen( reference));
    if( !strcmp( reference, "     "))       /* no reference given */
       *obuff = '\0';
    else if( !strcmp( reference, "neocp"))
       strcpy( obuff, "NEOCP");
    else if( *reference >= '0' && *reference <= '9')
-      sprintf( obuff, "MPC %s", reference);
+      snprintf_err( obuff, obuff_size, "MPC %s", reference);
    else if( *reference == '@')
-      sprintf( obuff, "MPC 10%s", reference + 1);
+      snprintf_err( obuff, obuff_size, "MPC 10%s", reference + 1);
    else if( *reference >= 'a' && *reference <= 'z')
-      sprintf( obuff, "MPS %d%s", *reference - 'a', reference + 1);
+      snprintf_err( obuff, obuff_size, "MPS %d%s", *reference - 'a', reference + 1);
    else if( *reference == 'E')
       {
       int obs_year, curr_year;
       char obs_letter, curr_letter;
 
-      sprintf( obuff, "MPEC ?  ?-%c%d", reference[1], atoi( reference + 2));
+      snprintf_err( obuff, obuff_size, "MPEC ?  ?-%c%d", reference[1], atoi( reference + 2));
       obuff[6] = obuff[7] = '?';    /* attempt to evade trigraph oddities */
       obs_year = get_year_and_mpc_half_month_letter( jd, &obs_letter);
       curr_year = get_year_and_mpc_half_month_letter( current_jd( ), &curr_letter);
@@ -4939,17 +4939,17 @@ static void reference_to_text( char *obuff, const char *reference,
          obs_year++;
       if( curr_year == obs_year)    /* this reference can only mean one year: */
          {
-         sprintf( obuff + 5, "%4d", curr_year);
+         snprintf_err( obuff + 5, obuff_size - 5, "%4d", curr_year);
          obuff[9] = '-';
          }
       }
    else if( *reference == 'D' && isdigit( reference[1]))
-      sprintf( obuff, "DASO %d", atoi( reference + 1));
+      snprintf_err( obuff, obuff_size, "DASO %d", atoi( reference + 1));
    else if( *reference == '~' || *reference == '#')   /* MPS or MPC number, */
       {                 /* packed as four "mutant hex" (base 62) digits */
       const unsigned number = get_mutant_hex_value( reference + 1, 4);
 
-      sprintf( obuff, "MP%c %u", ((*reference == '~') ? 'S' : 'C'),
+      snprintf_err( obuff, obuff_size, "MP%c %u", ((*reference == '~') ? 'S' : 'C'),
                         number + ((*reference == '~') ? 260000 : 110000));
       }
    else           /* just copy it in,  but add a space */
@@ -4959,7 +4959,7 @@ static void reference_to_text( char *obuff, const char *reference,
       *obuff++ = ' ';
       while( *reference == '0')
          reference++;
-      strcpy( obuff, reference);
+      strlcpy_err( obuff, reference, obuff_size);
       }
 }
 
@@ -5010,21 +5010,22 @@ static void format_motion( char *obuff, const double motion)
    static const char degree_symbol = (char)0xf8;
 #endif
    const double fabs_motion = fabs( motion);
+   const size_t obuff_size = 12;
 
    if( fabs_motion < 99.)
-      sprintf( obuff, "%5.2f'/hr", motion);
+      snprintf_err( obuff, obuff_size, "%5.2f'/hr", motion);
    else if( fabs_motion < 999.)
-      sprintf( obuff, "%5.1f'/hr", motion);
+      snprintf_err( obuff, obuff_size, "%5.1f'/hr", motion);
    else if( fabs_motion < 99999.)
-      sprintf( obuff, "%5.0f'/hr", motion);
+      snprintf_err( obuff, obuff_size, "%5.0f'/hr", motion);
    else if( fabs_motion < 99999. * 60.)
-      sprintf( obuff, "%5.0f%c/hr", motion / 60., degree_symbol);
+      snprintf_err( obuff, obuff_size, "%5.0f%c/hr", motion / 60., degree_symbol);
    else if( fabs_motion < 99999. * 3600.)
-      sprintf( obuff, "%5.0f%c/min", motion / 3600., degree_symbol);
+      snprintf_err( obuff, obuff_size, "%5.0f%c/min", motion / 3600., degree_symbol);
    else if( fabs_motion < 99999. * 216000.)
-      sprintf( obuff, "%5.0f%c/sec", motion / 216000., degree_symbol);
+      snprintf_err( obuff, obuff_size, "%5.0f%c/sec", motion / 216000., degree_symbol);
    else
-      strcpy( obuff, "!!!!!");
+      strlcpy_err( obuff, "!!!!!", obuff_size);
 }
 
 static double relative_velocity( const double *loc1, const double *vel1,
@@ -5133,7 +5134,7 @@ static void show_radar_info( char *buff, const OBSERVE *obs)
    RADAR_INFO rinfo;
 
    compute_radar_info( obs, &rinfo);
-   sprintf( buff, "RTDist (C) %.8fs = %.3f km; Dopp %.8f km/s = %.2f Hz",
+   snprintf_err( buff, 90, "RTDist (C) %.8fs = %.3f km; Dopp %.8f km/s = %.2f Hz",
                rinfo.rtt_comp, rinfo.rtt_comp * SPEED_OF_LIGHT,
                rinfo.doppler_comp * SPEED_OF_LIGHT / rinfo.freq_hz,
                rinfo.doppler_comp);
@@ -5313,11 +5314,11 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
             snprintf_append( buff, buffsize, "   radial vel %.3f km/s  cross ",
                                       m.radial_vel);
             if( fabs( m.cross_residual) < 9.9)
-               sprintf( tbuff, "%.2f", m.cross_residual);
+               snprintf_err( tbuff, sizeof( tbuff), "%.2f", m.cross_residual);
             else if( fabs( m.cross_residual) < 99.9)
-               sprintf( tbuff, "%4.1f", m.cross_residual);
+               snprintf_err( tbuff, sizeof( tbuff), "%4.1f", m.cross_residual);
             else if( fabs( m.cross_residual) < 9999.)
-               sprintf( tbuff, "%4d", (int)m.cross_residual);
+               snprintf_err( tbuff, sizeof( tbuff), "%4d", (int)m.cross_residual);
             else
                strlcpy_error( tbuff, "!!!!");
             strlcat_err( buff, tbuff, buffsize);
@@ -5391,7 +5392,7 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
                   snprintf_append( buff, buffsize, "%d ", tilt_angle);
                }
          end_ptr = buff + strlen( buff);
-         reference_to_text( end_ptr, optr->reference, optr->jd);
+         reference_to_text( end_ptr, 15, optr->reference, optr->jd);
          if( *end_ptr)
             strlcat_err( buff, "  ", buffsize);
          if( !get_obs_alt_azzes( optr, &sun_alt_az, &object_alt_az))
