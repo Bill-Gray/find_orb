@@ -428,7 +428,7 @@ int main( const int argc, const char **argv)
       {
       FILE *ifile;
 
-      sprintf( buff, "css%d.csv", file_number);
+      snprintf( buff, sizeof( buff), "css%d.csv", file_number);
       ifile = fopen( buff, "rb");
       if( ifile)
          {
@@ -437,7 +437,7 @@ int main( const int argc, const char **argv)
          int n_invalid_fields = 0;
          FILE *ofile;
 
-         sprintf( buff, "css_%d.csv", file_number);
+         snprintf( buff, sizeof( buff), "css_%d.csv", file_number);
          ofile = fopen( buff, "wb");
 
          printf( "%s opened;  reading fields\n", buff);

@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include <time.h>
 #include <string.h>
 #include <stdlib.h>
+#include "stringex.h"
 #include "watdefs.h"
 #include "lunar.h"
 #include "afuncs.h"
@@ -190,8 +191,8 @@ int create_b32_ephemeris( const char *filename, const double epoch,
 
    resolution = max_ordinate / 2.e+9;
    ofile = fopen( filename, "wb");
-   memset( tbuff, 0, 128);
-   sprintf( tbuff, hdr_fmt, 128, jpl_id,
+   memset( tbuff, 0, sizeof( tbuff));
+   snprintf_err( tbuff, sizeof( tbuff), hdr_fmt, jpl_id,
             jd_start, ephem_step, n_steps,
             best_interpolation_order( output_array, 2 * n_steps, &max_err),
             resolution, 32, 0);
@@ -206,7 +207,7 @@ int create_b32_ephemeris( const char *filename, const double epoch,
    free( output_array);
    add_ephemeris_details( ofile, jd_start, curr_jd);
    fclose( ofile);
-   sprintf( tbuff, "max err: %.3g\nEnd: ", max_err);
+   snprintf_err( tbuff, sizeof( tbuff), "max err: %.3g\nEnd: ", max_err);
    full_ctime( tbuff + strlen( tbuff), curr_jd, CALENDAR_JULIAN_GREGORIAN);
    generic_message_box( tbuff, "o");
    return( 0);
