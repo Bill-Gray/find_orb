@@ -173,7 +173,7 @@ BC405_ASTEROIDS=300
    ftp://ssd.jpl.nasa.gov/pub/xfr/gm_Horizons.pck.
 ASTEROID_PERT_LIST=
 
-   By default,  geoocentric elements are referred to the J2000 _equator_.
+   By default,  geocentric elements are referred to the J2000 _equator_.
    Everything else (heliocentric and other non-earth-centric) is referred
    to the J2000 _ecliptic_.  Set the following to be 1 to force all
    elements to be J2000 ecliptic (including geocentric ones),  or 2 to
