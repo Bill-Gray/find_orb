@@ -2362,47 +2362,31 @@ static bool get_neocp_data( char *buff, char *desig, char *mpc_code)
 
 static void inline reformat_rwo_designation_to_mpc( const char *buff, char *obuff)
 {
-   if( !isalpha( buff[6]))           /* numbered object */
-      {
-      const long ast_number = atoi( buff);
-      const long leading_digit = ast_number / 10000L;
+   size_t i = 1;
+   char obj_name[10], packed[13];
 
-      *obuff = int_to_mutant_hex_char( leading_digit);
-      if( !*obuff)      /* mutant hex fails past asteroid 619999 */
-         *obuff = '?';  /* ...just put _something_ there         */
-      sprintf( obuff + 1, "%04ld", ast_number % 10000L);
-      obuff[5] = ' ';
+   assert( ' ' == buff[0]);
+   while( isdigit( buff[i]))
+      i++;
+   assert( i < 10);
+   if( buff[i] == ' ')           /* numbered object */
+      {
+
+      snprintf_err( obj_name, sizeof( obj_name), "(%ld)", atol( buff));
+      create_mpc_packed_desig( packed, obj_name);
+      memcpy( obuff, packed, 6);
       }
    else                       /* provisional designation */
       {
-      obuff[5] = (char)( 'K' + (buff[1] - '2') * 10 + buff[2] - '0');
-                                    /* obuff[5] is century marker */
-      obuff[6] = buff[3];    /* decade */
-      obuff[7] = buff[4];    /* year */
-      obuff[8] = buff[5];    /* first letter */
-      obuff[11] = buff[6];    /* 2nd   letter */
-                  /* A provisional designation is a four-digit year, */
-                  /* plus two letters,  plus either no number,  or a */
-                  /* one, two,  or three-digit number. */
-      if( buff[7] == ' ')              /* No number: say,  '2004RW' */
-         obuff[9] = obuff[10] = '0';
-      else if( buff[8] == ' ')         /* One-digit #: say,  '2004RW1' */
-         {
-         obuff[9] = '0';
-         obuff[10] = buff[7];
-         }
-      else if( buff[9] == ' ')         /* 2-digit #: say,  '2004RW31' */
-         {
-         obuff[9] = buff[7];    /* 1st (tens) digit */
-         obuff[10] = buff[8];    /* 2nd (units) digit */
-         }
-      else                             /* 3-digit #: say,  '2004RW314' */
-         {
-         const int tens = buff[7] * 10 + buff[8] - '0' * 11;
-
-         obuff[9] = int_to_mutant_hex_char( tens);
-         obuff[10] = buff[9];    /* 3rd (units) digit */
-         }
+      assert( 5 == i);
+      assert( isalpha( buff[5]));
+      assert( isalpha( buff[6]));
+      while( buff[i] != ' ')
+         i++;
+      memcpy( obj_name, buff + 1, i - 1);
+      obj_name[i - 1] = '\0';
+      create_mpc_packed_desig( packed, obj_name);
+      memcpy( obuff, packed, 12);
       }
 }
 
