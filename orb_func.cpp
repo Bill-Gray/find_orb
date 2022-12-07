@@ -4452,11 +4452,11 @@ static int auto_reject_obs( OBSERVE *obs, int n_obs,
    return( rval);
 }
 
-/* We try rejecting outliers that are more than three sigmas from
-nominal.  99.9% of the time,  that works Just Fine,  possibly rejecting
-one or more outliers.  It may fail if most of the observations are
-outside three sigmas.  We keep trying with progressively larger
-limits.
+/* We try rejecting outliers that are more than (by default) three
+sigmas from nominal.  99.9% of the time,  that works Just Fine,
+possibly rejecting one or more outliers.  It may fail if most of
+the observations are outside three sigmas.  We keep trying with
+progressively larger limits.
 
    This can help when a few observations are so horrendously off
 that they drag all other observations in the other direction to compensate.
@@ -4467,7 +4467,8 @@ may look reasonable... but will then be subjected to a second,  or
 static int auto_reject_obs_within_arc( OBSERVE *obs, int n_obs)
 {
    int rval;
-   double reject_limit = 3.;   /* reject anything outside three sigmas */
+   extern double automatic_outlier_rejection_limit;
+   double reject_limit = automatic_outlier_rejection_limit;
 
    do
       {

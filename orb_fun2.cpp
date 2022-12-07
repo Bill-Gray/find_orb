@@ -861,7 +861,8 @@ int write_excluded_observations_file( const OBSERVE *obs, int n_obs)
    return( n_excluded);
 }
 
-double automatic_outlier_rejection_limit = 3.;
+double automatic_outlier_rejection_limit;
+double default_automatic_outlier_rejection_limit = 3.;
 
 int apply_excluded_observations_file( OBSERVE *obs, const int n_obs)
 {
@@ -869,7 +870,7 @@ int apply_excluded_observations_file( OBSERVE *obs, const int n_obs)
    FILE *ifile;
    int n_excluded = 0, i;
 
-   automatic_outlier_rejection_limit = 3.;
+   automatic_outlier_rejection_limit = default_automatic_outlier_rejection_limit;
    ifile = fopen_ext( excluded_filename, "crb");
    if( ifile)
       {

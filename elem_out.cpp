@@ -3870,6 +3870,8 @@ int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
    extern double maximum_observation_span;
    extern int use_config_directory;
    extern double *sr_orbits;
+   extern double automatic_outlier_rejection_limit;
+   extern double default_automatic_outlier_rejection_limit;
    extern unsigned max_n_sr_orbits;
    int use_sigmas_int;
    unsigned long obsolete_ephem_output_options;
@@ -3878,6 +3880,7 @@ int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
    const char *eop_filename = get_environment_ptr( "EOP_FILE");
    const char *albedo = get_environment_ptr( "OPTICAL_ALBEDO");
    const char *obs_range = get_environment_ptr( "OBSERVATION_DATE_RANGE");
+   const char *outlier_limit = get_environment_ptr( "OUTLIER_REJECTION_LIMIT");
 
 #if !defined( _WIN32) && !defined( __WATCOMC__)
    findorb_already_running = (check_for_other_processes( 1) != 0);
@@ -3967,6 +3970,9 @@ int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
       minimum_observation_jd = YEAR_TO_JD( minimum_observation_jd);
       maximum_observation_jd = YEAR_TO_JD( maximum_observation_jd);
       }
+   if( *outlier_limit)
+      default_automatic_outlier_rejection_limit = atof( outlier_limit);
+   automatic_outlier_rejection_limit = default_automatic_outlier_rejection_limit;
    return( 0);
 }
 
