@@ -2341,7 +2341,6 @@ static void show_a_file( const char *filename, const int flags)
       int top_line;
       int color_start = 18;      /* see 'command.txt' */
       short color_pair_idx = (short)color_start;
-      short color_idx = (short)color_start * 2;
       const bool color_visibility =
                   n_lines_to_show + color_start < COLORS;
 
@@ -2371,7 +2370,7 @@ static void show_a_file( const char *filename, const int flags)
          const int curr_line = top_line + i;
          int color_col[20], rgb[20], n_colored = 0, j;
 
-         if( i > 3 && flags && color_visibility)
+         if( i >= 3 && flags && color_visibility)
             {
             char *tptr = buff;
 
@@ -2395,14 +2394,11 @@ static void show_a_file( const char *filename, const int flags)
             const int text_color = find_rgb(
                               blue + red + green > 48 ? 0 : 0xffffff);
 
-            if( can_change_color( ))
-               {
-               init_color( color_idx, red * 999 / 31, green * 999 / 31, blue * 999 / 31);
-               init_pair( color_pair_idx, text_color, color_idx);
-               color_idx++;
-               }
-            else
-               init_pair( color_pair_idx, text_color, find_rgb( rgb[j]));
+#ifdef __PDCURSESMOD__
+            init_extended_pair( color_pair_idx, text_color, find_rgb( rgb[j]));
+#else
+            init_pair( color_pair_idx, text_color, find_rgb( rgb[j]));
+#endif
             mvchgat( i, color_col[j], 2, A_NORMAL, color_pair_idx, NULL);
             color_pair_idx++;
             }
@@ -2833,10 +2829,14 @@ static int find_rgb( const int irgb)
    rgb0[0] = (int)( irgb >> 16);
    rgb0[1] = (int)( (irgb >> 8) & 0xff);
    rgb0[2] = (int)( irgb & 0xff);
+#ifdef __PDCURSESMOD__
+   if( COLORS == 256 + (1 << 24))
+      return( 256 + rgb0[0] + (rgb0[1] << 8) + (rgb0[2] << 16));
+#endif
    if( COLORS <= 8 || force_eight_color_mode)
       return( (rgb0[0] > 127 ? 1 : 0) | (rgb0[1] > 127 ? 2 : 0)
                                       | (rgb0[2] > 127 ? 4 : 0));
-   if( !can_change_color( ) && COLORS >= 256)
+   if( COLORS >= 256)
       {
       const int r_idx = (rgb0[0] + 10) / 50;
       const int g_idx = (rgb0[1] + 10) / 50;
@@ -2894,7 +2894,11 @@ static void set_color_table( void)
          unsigned fore_rgb, back_rgb;
 
          if( 3 == sscanf( buff + 1, "%d %x %x", &idx, &fore_rgb, &back_rgb))
+#ifdef __PDCURSESMOD__
+            init_extended_pair( idx, find_rgb( fore_rgb), find_rgb( back_rgb));
+#else
             init_pair( idx, find_rgb( fore_rgb), find_rgb( back_rgb));
+#endif
          }
    fclose( ifile);
 }
