@@ -1176,13 +1176,16 @@ static int elements_in_guide_format( char *buff, const ELEMENTS *elem,
       e_prec--;
       assert( e_prec);
       }
-   snprintf_err( buff, guide_line_len,
-            "%-43s%8.5f%3d%5ld Find_Orb    %12.*f %10.*f%11.6f %11.6f %11.6f",
-            obj_name, day, month, year,
+   strlcpy( buff, obj_name, 43);
+   memset( buff + strlen( buff), ' ', 43);
+   snprintf_err( buff + 43, guide_line_len,
+            "%8.5f%3d%5ld Find_Orb    %12.*f %10.*f%11.6f %11.6f %11.6f",
+            day, month, year,
             q_prec, elem->q, e_prec, elem->ecc,
             centralize_ang( elem->incl) * 180. / PI,
             centralize_ang( elem->arg_per) * 180. / PI,
             centralize_ang( elem->asc_node) * 180. / PI);
+   assert( strlen( buff) == 130);
    snprintf_append( buff, guide_line_len,  " %9.1f%5.1f%5.1f %c",
             elem->epoch, elem->abs_mag,
             elem->slope_param * (elem->is_asteroid ? 1. : 0.4),
