@@ -3846,15 +3846,15 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
 //                insufficient_precision |= INSUFFICIENT_PRECISION_MAG;
                if( time_sigma * 1.1 > rval[i].time_sigma || !use_sigmas)
                   rval[i].time_sigma = time_sigma;
-               else
+               else if( rval[i].note2 != 'X')
                   insufficient_precision |= INSUFFICIENT_PRECISION_TIME;
                if( posn_sigma_1 * 1.1 > rval[i].posn_sigma_1 || !use_sigmas)
                   rval[i].posn_sigma_1 = posn_sigma_1;
-               else
+               else if( rval[i].note2 != 'X')
                   insufficient_precision |= INSUFFICIENT_PRECISION_POSN1;
                if( posn_sigma_2 * 1.1 > rval[i].posn_sigma_2 || !use_sigmas)
                   rval[i].posn_sigma_2 = posn_sigma_2;
-               else
+               else if( rval[i].note2 != 'X')
                   insufficient_precision |= INSUFFICIENT_PRECISION_POSN2;
                if( insufficient_precision && !insufficient_precision_warning_shown
                            && use_sigmas)
