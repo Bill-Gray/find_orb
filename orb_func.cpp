@@ -1856,7 +1856,7 @@ int herget_method( OBSERVE FAR *obs, int n_obs, double r1, double r2,
    i = n_obs - 1;
    while( i > 0 && obs[i].jd > end_jd)
       i--;
-   if( !i)
+   if( obs[i].jd == obs[0].jd)
       return( -1);
    temp_obs2 = obs[i];
    uncertainty_parameter = 99.;
