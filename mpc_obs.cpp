@@ -3978,9 +3978,9 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                ;     /* deliberately empty loop */
          else if( !memcmp( buff, "#Offset center ", 15))
             spacecraft_offset_reference = atoi( buff + 15);
-         else if( !memcmp( buff, "#Spacecraft vel ", 16))
+         else if( !memcmp( buff, "#vel (km/s) ", 12))
             {
-            int n_scanned = sscanf( buff + 16, "%lf %lf %lf", spacecraft_vel,
+            int n_scanned = sscanf( buff + 30, "%lf %lf %lf", spacecraft_vel,
                         spacecraft_vel + 1, spacecraft_vel + 2);
 
             assert( 3 == n_scanned);
