@@ -130,7 +130,7 @@ all: $(FO_EXE) $(FIND_ORB_EXE) fo_serve.cgi eph2tle$(EXE)
 CXXFLAGS+=-c -Wall -pedantic -Wextra -Werror $(ADDED_CXXFLAGS) -I $(INSTALL_DIR)/include
 
 ifdef DEBUG
-	CXXFLAGS += -g -O0
+	CXXFLAGS += -g -Og
 else
 	CXXFLAGS += -O3
 endif
