@@ -1815,6 +1815,29 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
    obs->ref_center = saved_obs.ref_center;
    obs->packed_id[12] = '\0';
    obj_desig_type = get_object_name( NULL, obs->packed_id);
+   if( obj_desig_type == OBJ_DESIG_OTHER)
+      {
+      size_t i = 7;
+
+      while( i < 12 && isalnum( buff[i]))
+         i++;
+      while( i < 12 && buff[i] == ' ')
+         i++;
+      if( i != 12)
+         {
+         static bool warning_not_yet_shown = true;
+
+         if( warning_not_yet_shown)
+            {
+            char tbuff[300];
+
+            warning_not_yet_shown = false;
+            snprintf_err( tbuff, sizeof( tbuff), get_find_orb_text( 2074),
+                        obs->packed_id);
+            generic_message_box( tbuff, "o");
+            }
+         }
+      }
    if( obj_desig_type == OBJ_DESIG_COMET_PROVISIONAL
          || obj_desig_type == OBJ_DESIG_COMET_NUMBERED)
       object_type = OBJECT_TYPE_COMET;

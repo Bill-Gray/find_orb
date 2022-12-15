@@ -391,3 +391,6 @@
 2072    https://www.projectpluto.com/errors.htm#precision
 2072    for further discussion.  Be warned that there may be other errors.
 2072    Find_Orb will only warn you about the first one it finds.
+
+2074    Temporary designations must include only alphanumeric characters.
+2074    The designation '%s' would be rejected by MPC.
