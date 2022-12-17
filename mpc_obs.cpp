@@ -260,7 +260,7 @@ Otherwise,  zero will be returned. */
 #define OBS_FORMAT_WRONG_DESIG_PLACEMENT        2
 #define OBS_FORMAT_INCORRECT                    4
 
-static int fix_up_mpc_observation( char *buff)
+static int fix_up_mpc_observation( char *buff, double *jd)
 {
    size_t len = strlen( buff);
    int rval = 0;
@@ -291,8 +291,15 @@ static int fix_up_mpc_observation( char *buff)
    else
       check_packed_desig_alignment( buff);
    buff[12] = tchar;
-   if( len == 80 && observation_jd( buff))      /* doesn't need fixing */
-      return( rval);
+   if( len == 80)
+      {
+      double temp_jd = observation_jd( buff);
+
+      if( jd)
+         *jd = temp_jd;
+      if( temp_jd)      /* doesn't need fixing */
+         return( rval);
+      }
 
    if( len < 90)     /* avoid buffer overruns */
       {
@@ -3643,7 +3650,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
             debug_printf( "Got .rwo data\n");
          }
       if( fixing_trailing_and_leading_spaces)
-         fixes_made = fix_up_mpc_observation( buff);
+         fixes_made = fix_up_mpc_observation( buff, NULL);
       original_packed_desig[12] = '\0';
       memcpy( original_packed_desig, buff, 12);
       xref_designation( buff);
@@ -4344,7 +4351,7 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
       {
       size_t iline_len = strlen( buff);
       bool is_neocp = false;
-      double jd;
+      double jd = 0.;
 
       if( debug_level > 8)
          debug_printf( "Input line len %d\n", (int)strlen( buff));
@@ -4361,10 +4368,11 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
       if( iline_len > MINIMUM_RWO_LENGTH)
          rwo_to_mpc( buff, NULL, NULL, NULL, NULL, NULL);
       if( fixing_trailing_and_leading_spaces)
-         fix_up_mpc_observation( buff);
+         fix_up_mpc_observation( buff, &jd);
       if( debug_level > 8)
          debug_printf( "After fixup: %d\n", (int)strlen( buff));
-      jd = observation_jd( buff);
+      if( !jd)
+         jd = observation_jd( buff);
       if( jd && *new_xdesig)   /* previous line was "COM = (xdesig)";   */
          {                    /* add a new cross-designation to the table */
          memcpy( new_xdesig, buff, 12);
