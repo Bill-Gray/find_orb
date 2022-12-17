@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "watdefs.h"
 #include "comets.h"
 #include "mpc_obs.h"
+#include "stringex.h"
 #include "afuncs.h"
 #include "monte0.h"
 
@@ -304,7 +305,7 @@ char *put_double_in_buff( char *buff, const double ival)
       if( !precision)
          precision = 3;
       assert( precision > 0 && precision < 20);
-      snprintf( format, sizeof( format), "%%%d.%dg", precision + 7, precision);
+      snprintf_err( format, sizeof( format), "%%%d.%dg", precision + 7, precision);
       }
    for( i = precision; i; i--)
       low_end *= 10.;
@@ -313,7 +314,7 @@ char *put_double_in_buff( char *buff, const double ival)
       {
       char *tptr;
 
-      sprintf( buff, format, ival);
+      snprintf_err( buff, 20, format, ival);
       while( (tptr = strchr( buff, 'e')) != NULL
                      &&  tptr[2] == '0')
          {           /* remove a leading zero from exponent */
@@ -322,7 +323,7 @@ char *put_double_in_buff( char *buff, const double ival)
          }
       }
    else
-      sprintf( buff, "%*ld", precision + 7, (long)ival);
+      snprintf_err( buff, 20, "%*ld", precision + 7, (long)ival);
    while( *buff == ' ')
       buff++;
    return( buff);
@@ -403,11 +404,11 @@ double dump_monte_data_to_file( FILE *ofile, const double *sigmas,
          {
          char zbuff[40];
 
-         sprintf( zbuff, "%.8f", sigmas[i]);
+         snprintf_err( zbuff, sizeof( zbuff), "%.8f", sigmas[i]);
          remove_insignificant_digits( zbuff);
          if( strlen( zbuff) == 10)   /* very low value */
             put_double_in_buff( zbuff, sigmas[i]);
-         sprintf( tbuff, "%10s", zbuff);
+         snprintf_err( tbuff, sizeof( tbuff), "%10s", zbuff);
          }
       else
          put_double_in_buff( tbuff, sigmas[i]);
