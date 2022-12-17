@@ -816,6 +816,15 @@ static char *_set_radio_button( char *text, const int option_num)
    return( line_ptr);
 }
 
+static void show_calendar( void)
+{
+   FILE *ifile = fopen_ext( "calend.txt", "clrb");
+
+   if( ifile)
+      fclose( ifile);
+   show_a_file( (ifile ? "calend.txt" : "calendar.txt"), SHOW_FILE_IS_CALENDAR);
+}
+
 /* Here's a simplified example of the use of the 'ephemeris_in_a_file'
    function... nothing fancy,  but it shows how it's used.  */
 
@@ -1108,7 +1117,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
          case 'b': case 'B':
             ephemeris_output_options ^= OPTION_PHASE_ANGLE_BISECTOR;
             break;
-         case 'c': case 'C':
+         case 'c':
             {
             strlcpy_error( buff, get_find_orb_text( 2064));
             _set_radio_button( buff, ephem_type);
@@ -1124,6 +1133,9 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                ephemeris_output_options |= i;
                }
             }
+            break;
+         case 'C':
+            show_calendar( );
             break;
          case 'd': case 'D':
             if( vect_frame  > -1)
@@ -3210,7 +3222,8 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
             }
       strlcat_err( buff, (already_got_obs ? "\nQ Cancel" : "\nQ Quit"), buffsize);
 
-      c = inquire( buff, NULL, 30, COLOR_DEFAULT_INQUIRY);
+      while( 'C' == (c = inquire( buff, NULL, 30, COLOR_DEFAULT_INQUIRY)))
+         show_calendar( );
       free( buff);
       if( c >= ' ' && c < 127)
          {
@@ -3228,7 +3241,7 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
          case 'F': case 'f': case KEY_F( 1):
             user_select_file( ifilename, "Open astrometry file", 0);
             break;
-         case 'C': case 'c': case KEY_F( 2):
+         case 'c': case KEY_F( 2):
             strcpy( ifilename, "c");
             break;
          case 'N': case 'n': case KEY_F( 3):
@@ -6147,13 +6160,7 @@ int main( int argc, const char **argv)
             }
             break;
          case 'c': case 'C':
-            {
-            FILE *ifile = fopen_ext( "calend.txt", "clrb");
-
-            if( ifile)
-               fclose( ifile);
-            show_a_file( (ifile ? "calend.txt" : "calendar.txt"), SHOW_FILE_IS_CALENDAR);
-            }
+            show_calendar( );
             break;
          case KEY_F( 15):        /* shift-f3 */
             show_splash_screen( );     /* just to test */
