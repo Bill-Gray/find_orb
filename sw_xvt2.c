@@ -112,7 +112,7 @@ static void add_half_exposure( char *obuff, const char *itime,
    const double seconds = get_base_sixty( itime) * 3600. + exposure_time / 2.;
    const int millisec = (int)( seconds * 1000. + .5);
 
-   sprintf( obuff, "%02d:%02d:%02d.%03d",
+   snprintf( obuff, 16, "%02d:%02d:%02d.%03d",
                   millisec / 3600000, (millisec / 60000) % 60,  /* HH MM */
                   (millisec / 1000) % 60, millisec % 1000);    /* SS.sss */
 }
