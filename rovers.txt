@@ -741,12 +741,17 @@ G34 !  13.701403     +50.860289      490.67    Oberfrauendorf
    is 155 metres above sea level;  the geoid height is about 46 metres.
    (J69) is one of five domes visible on G__gle Earth as part of the
    Hampshire Astronomical Group site.  The altitudes appear to be identical.
+   Further identification is given at https://hantsastro.org.uk/tour/index.php
+   (comments come from that page).
 
 J69 !  -1.0196556    +50.9390167     201       North Observatory, Clanfield
-Ha1 !  -1.019663     +50.939114      201       HAG about 10m north of (J69)
-Ha2 !  -1.019629     +50.938673      201       HAG about 40m south of (J69)
-Ha3 !  -1.019306     +50.938298      201       HAG smaller dome ~85m SSE of (J69)
-Ha3 !  -1.019140     +50.938284      201       HAG larger dome ~85m SSE of (J69)
+Cdi !  -1.019663     +50.939114      201       12" Dome, Clanfield
+   "This dome is privately owned... 12-inch f5.5 Newtonian... for imaging"
+J84 !  -1.019629     +50.938673      201       South Observatory, Clanfield
+C7i !  -1.019306     +50.938298      201       7" Dome,  Clanfield
+   "...the favourite amongst members for astronomical imaging"
+C5i !  -1.019140     +50.938284      201       5" Dome,  Clanfield
+   "The oldest of our telescopes are housed in this dome"
 
    Some telescopes at (711) McDonald Observatory in Texas,  sorted using the
    site map at http://www.as.utexas.edu/mcdonald/observers/mcd_site_map.pdf
@@ -1471,3 +1476,5 @@ Opt !   0.0000       0.00000   +0.00000    @3  Optimal topocentric location
 LC1 !   0.0000       0.00000   +0.00000    @3  Las Cumbres Observatory (1m)
 LC2 !   0.0000       0.00000   +0.00000    @3  Las Cumbres Observatory (2m)
 ATL !   0.0000       0.00000   +0.00000    @3  ATLAS (all scopes)
+
+RA2 !-110.847070   +32.581105        1190.     RAPTORS-2
