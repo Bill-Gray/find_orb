@@ -120,6 +120,7 @@
  Ory                                       <a href="https://en.wikipedia.org/wiki/Michel_Ory">Ory</a>
  P\'al                                     <a href="http://en.scientificcommons.org/andras_pal">P&aacute;l</a>
  Pallar\'es                                Pallar&eacute;s
+ Parrott                                   <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=200000&amp;view=OPD">Parrott</a>
  Pelle                                     <a href="http://chez.mana.pf/~jcpelle/">Pelle</a>
  Pettarin                                  <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=7258&amp;view=OPD">Pettarin</a>
  Piani                                     <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=10573&amp;view=OPD">Piani</a>
@@ -135,6 +136,7 @@
  Reddy                                     <a href='https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=8068&view=OPD'>Reddy</a>
  Rinner                                    <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=23999&amp;view=OPD">Rinner</a>
  Ritchey-Chretien                          Ritchey-Chr&eacute;tien
+ J. E. Rogers                              <a href="https://minorplanetcenter.net/db_search/show_object?object_id=5517">J. E. Rogers</a>
  W. H. Ryan                                <a href="http://infohost.nmt.edu/~bryan/">W. H. Ryan</a>
  Sarneczky                                 <a href="http://en.wikipedia.org/wiki/Kriszti%C3%A1n_S%C3%A1rneczky">S&aacute;rneczky</a>
  S\'arneczky                               <a href="http://en.wikipedia.org/wiki/Kriszti%C3%A1n_S%C3%A1rneczky">S&aacute;rneczky</a>
