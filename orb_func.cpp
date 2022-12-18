@@ -2693,6 +2693,16 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
    const bool saved_fail_on_hitting_planet =
                                      fail_on_hitting_planet;
 
+   if( !obs)
+      {
+      if( eigenvects)
+         {
+         free( eigenvects);
+         eigenvects = NULL;
+         }
+      *delta_vals = 0.;
+      return( 0);
+      }
    perturbers_automatically_found = always_included_perturbers;
    if( asteroid_mass)                    /* If computing an asteroid mass, */
       {                                  /* be very sure that asteroids are */
@@ -2707,16 +2717,6 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
       if( n_orbit_params == 10 && !orbit[6] && !orbit[7] && !orbit[8])
          n_params--;                /* don't try to solve for DT if we */
       }                             /* don't have approx A1, A2, A3 yet */
-   if( !obs)
-      {
-      if( eigenvects)
-         {
-         free( eigenvects);
-         eigenvects = NULL;
-         }
-      *delta_vals = 0.;
-      return( 0);
-      }
    if( get_idx1_and_idx2( n_obs, obs, &i, &j) < 3)
       return( -1);
    if( is_unreasonable_orbit( orbit))
