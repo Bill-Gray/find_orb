@@ -1577,6 +1577,36 @@ static bool _include_comment( const char *keyval)
    return( !strstr( get_environment_ptr( "COMMENT_SHUTOFF"), keyval));
 }
 
+
+static void format_value_with_sigma( char *obuff, const double value, const char *sigma_text)
+{
+   const char *eptr = strchr( sigma_text, 'e');
+
+   if( !eptr)
+      {
+      put_double_in_buff( obuff, value);
+      strlcat_err( obuff, " +/- ", 80);
+      strlcat_err( obuff, sigma_text, 80);
+      }
+   else
+      {
+      const char *decimal_ptr = strchr( sigma_text, '.');
+      const int exponent = atoi( eptr + 1);
+      int places = 0;
+      char format[20], output_value[30];
+
+      if( decimal_ptr)
+         places = (int)( eptr - decimal_ptr) - 1;
+      assert( places >= 0 && places < 10);
+      strlcpy_error( format, "(%.?f +/- %s)e%s");
+      format[3] = '0' + places;
+      memcpy( output_value, sigma_text, eptr - sigma_text);
+      output_value[eptr - sigma_text] = '\0';
+      snprintf_err( obuff, 80, format, value * pow( 0.1, (double)exponent),
+                                 output_value, eptr + 1);
+      }
+}
+
 /* From an e-mail from Alan Harris:
 
    "...the formula for encounter velocity (in FORTRAN), for a circular planet
@@ -1985,7 +2015,6 @@ int write_out_elements_to_file( const double *orbit,
 
          if( (n_orbit_params >= 8 && n_orbit_params <= 10) || force_model == FORCE_MODEL_YARKO_A2)
             {
-            char tbuff0[80], sig_name[20];
             int j = 0;
 
             if( !strcmp( constraints, "A=0") || !strcmp( constraints, "A1=0"))
@@ -1994,38 +2023,38 @@ int write_out_elements_to_file( const double *orbit,
             tt_ptr += strlen( tt_ptr);
             for( ; j < n_orbit_params - 6; j++)
                {
+               char addenda[50];
+               char tbuff0[80], sig_name[20];
+
                put_double_in_buff( tbuff0, orbit[j + 6]);
                text_search_and_replace( tbuff0, " ", "");
                strlcat_error( tbuff0, " ");
                snprintf_err( sig_name, sizeof( sig_name), "Sigma_A%d:", j + 1);
                if( showing_sigmas)
                   if( !get_uncertainty( sig_name, sigma_buff + 4, false))
-                     strlcat_error( tbuff0, sigma_buff);
-/*             snprintf_append( tt_ptr, 180, "A%d: %s", j + 1, tbuff0); */
+                     format_value_with_sigma( tbuff0, orbit[j + 6], sigma_buff + 4);
                if( j == 3)
-                  snprintf_append( buff, sizeof( buff), "DT: %s", tbuff0);
+                  snprintf_err( addenda, sizeof( addenda), "DT: %s", tbuff0);
                else
                   {
                   const int n_to_use = (force_model == FORCE_MODEL_YARKO_A2 ? 2 : j + 1);
 
-                  snprintf_append( buff, sizeof( buff), "A%d: %s", n_to_use, tbuff0);
+                  snprintf_err( addenda, sizeof( addenda), "A%d: %s", n_to_use, tbuff0);
                   if( j == n_orbit_params - 7 || j == 2)
                      {
-                     strcat( tt_ptr, " AU/day^2");
+                     strlcat_error( addenda, " AU/day^2");
                      if( is_inverse_square_force_model( ))
-                        strcat( tt_ptr, " [1/r^2]");
+                        strlcat_error( addenda, " [1/r^2]");
                      }
                   }
-               if( j < n_orbit_params - 7)
+               if( strlen( addenda) + strlen( tt_ptr) > 75)
                   {
-                  if( strlen( tt_ptr) > 50)
-                     {
-                     strlcat_err( tt_ptr, "\n", 80);
-                     tt_ptr += strlen( tt_ptr);
-                     }
-                  else
-                     strlcat_err( tt_ptr, "   ", 80);
+                  strlcat_err( tt_ptr, "\n", 79);
+                  tt_ptr += strlen( tt_ptr);
                   }
+               else if( *tt_ptr)
+                  strlcat_err( tt_ptr, "   ", 79);
+               strlcat_err( tt_ptr, addenda, 79);
                }
             }
          assert( strlen( buff) < sizeof( buff) - 1);
