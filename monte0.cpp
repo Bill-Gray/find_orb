@@ -299,6 +299,11 @@ char *put_double_in_buff( char *buff, const double ival)
    int i;
    double low_end = .999999;
 
+   if( isnan( ival))
+      {
+      strcpy( buff, "NaN");
+      return( buff);
+      }
    if( !precision)
       {
       precision = atoi( get_environment_ptr( "FULL_SIGMAS"));
