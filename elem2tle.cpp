@@ -100,9 +100,13 @@ int write_tle_from_vector( char *buff, const double *state_vect,
 {
    tle_t tle;
    int rval = 0;
+   double revs_per_day;
 
    memset( &tle, 0, sizeof( tle_t));
    rval = vector_to_tle( &tle, state_vect, epoch);
+   revs_per_day = tle.xno * minutes_per_day / (2. * PI);
+   if( revs_per_day > 50.)   /* meaningless suborbital TLE */
+      rval = -1;
    if( !rval)
       {
       if( norad_desig)
