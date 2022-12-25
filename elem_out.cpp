@@ -2254,11 +2254,11 @@ int write_out_elements_to_file( const double *orbit,
    observation_summary_data( tbuff, obs, n_obs, options);
    fprintf( ofile, "%s\n", tbuff);
    if( elem.central_obj == 3 && elem.ecc < .99 && _include_comment( "TLE"))
-      {
-      write_tle_from_vector( tbuff, rel_orbit, elem.epoch, NULL, NULL);
-      tbuff[69] = tbuff[140] = '\0';
-      fprintf( ofile, "# %s\n# %s\n", tbuff, tbuff + 71);
-      }
+      if( !write_tle_from_vector( tbuff, rel_orbit, elem.epoch, NULL, NULL))
+         {
+         tbuff[69] = tbuff[140] = '\0';
+         fprintf( ofile, "# %s\n# %s\n", tbuff, tbuff + 71);
+         }
    if( !(options & ELEM_OUT_NO_COMMENT_DATA))
       {
       double orb[6];
