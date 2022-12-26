@@ -3908,7 +3908,8 @@ int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
    const char *ephem_bitstring = get_environment_ptr( "EPHEM_OPTIONS");
    const char *eop_filename = get_environment_ptr( "EOP_FILE");
    const char *albedo = get_environment_ptr( "OPTICAL_ALBEDO");
-   const char *obs_range = get_environment_ptr( "OBSERVATION_DATE_RANGE");
+   extern double minimum_observation_jd;
+   extern double maximum_observation_jd;
    const char *outlier_limit = get_environment_ptr( "OUTLIER_REJECTION_LIMIT");
 
 #if !defined( _WIN32) && !defined( __WATCOMC__)
@@ -3987,12 +3988,14 @@ int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
    sscanf( get_environment_ptr( "PERTURBERS"), "%x", &always_included_perturbers);
    if( *albedo)
       optical_albedo = atof( albedo);
-   if( *obs_range)
+   if( !maximum_observation_jd)     /* hasn't already been set elsewhere */
       {
-      extern double minimum_observation_jd;  /* default 1100 Jan 1 */
-      extern double maximum_observation_jd;  /* default 2300 Jan 1 */
+      const char *obs_range = get_environment_ptr( "OBSERVATION_DATE_RANGE");
+      int n_found;
 
-      const int n_found = sscanf( obs_range, "%lf,%lf",
+      if( !*obs_range)
+         obs_range = "1100,2300";
+      n_found = sscanf( obs_range, "%lf,%lf",
                     &minimum_observation_jd,
                     &maximum_observation_jd);         /* see environ.def */
       assert( n_found == 2);

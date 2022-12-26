@@ -185,13 +185,12 @@ static void remove_html_tags( char *buff)
 }
 
 /* By default,  Find_Orb will ignore observations before 1100 AD or after
-2300 AD.  I've never seen data _nearly_ as far back as that,  and while
-people do test extrapolated observations,  I don't think anybody goes out
-past 2200 AD.  If they do,  both 'fo' and interactive Find_Orb provide
-command line switches to reset the following values.     */
+2300 AD.  This range can be reset at runtime (see the '-r' option in
+findorb.cpp) or as a configuration parameter (see OBSERVATION_DATE_RANGE
+in environ.dat).        */
 
-double minimum_observation_jd = 2122832.5;  /* 1100 Jan 1 */
-double maximum_observation_jd = 2561117.5;  /* 2300 Jan 1 */
+double minimum_observation_jd = 0.;
+double maximum_observation_jd = 0;
 
 static bool is_in_range( const double jd)
 {
