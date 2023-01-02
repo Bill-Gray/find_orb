@@ -1361,6 +1361,11 @@ OBS A. Valvasori, E. Guido
 COM Default details extracted from MPEC 2021-J28
 TEL 0.23-m f/5.2 reflector + CCD
 
+COD G19
+OBS I. Kuettner
+COM Default details extracted from MPEC 2022-W132
+TEL 0.23-m f/5.5 reflector + CCD
+
 COD G20
 OBS Y. Degot Longhi
 COM Default details extracted from MPEC 2021-B143
@@ -1801,6 +1806,11 @@ OBS L. Grimm
 COM Default details extracted from MPEC 2020-G44
 TEL 0.25-m f/4.8 Newtonian reflector + CCD
 
+COD K32
+OBS G. Locatelli
+COM Default details extracted from MPEC 2022-Y114
+TEL 0.25-m f/6.3 0.25 m. f/6.3 Schmidt-Cassegrain + CCD
+
 COD K38
 OBS G. Baj
 COM Default details extracted from MPEC 2021-B143
@@ -2064,6 +2074,11 @@ OBS G. Borisov
 COM Default details extracted from MPEC 2017-E42
 TEL 0.4-m f/2.3 astrograph + CCD
 
+COD L53
+OBS D. Agnetti
+COM Default details extracted from MPEC 2022-Y232
+TEL 0.28-m f7.7 S-C + CCD
+
 COD L54
 MEA A. Sonka
 OBS A. Sonka, A. Nedelcu
@@ -2255,11 +2270,24 @@ OBS F. Li, Y. Yuan, J. Chen, A. Zhu, Y. Fu
 MEA B. Li, H. B. Zhao
 TEL 0.8-m f/10 Ritchey-Chretien + 2048 CCD
 
+COD O51
+OBS T. Thaluang
+COM Default details extracted from MPEC 2022-Y232
+TEL 0.2-m f/4 reflector + CCD
+
 COD O75
 COM Find_Orb default details
 OBS T. Namkhai, S. Schmalz
 MEA S. Schmalz
 TEL 0.4-m f/2.3 reflector + CCD
+
+COD P07
+MEA M. Cornell, M. Kotson, R. Rios, J. Ruprecht, J. Vaillancourt, J. Varey
+MEA H. Viggh, D. Woods
+OBS M. Blythe, R. Brungard, P. Festler, T. McVey, J. Paige, G. Spitz
+OBS L. Banks
+COM Default details extracted from MPEC 2022-Y15
+TEL 3.5-m f/1.0 reflector + CCD
 
 COD P18
 OBS S. Zhang, H. Chen, X. Yin
@@ -2657,6 +2685,11 @@ OBS M. Mabson
 COM Default details extracted from MPEC 2022-O116
 TEL 0.28-m f/2.0 Schmidt-Cassegrain + CCD
 
+COD W59
+OBS T. Wildoner
+COM Default details extracted from MPEC 2022-Y15
+TEL 0.30-m f/6.3 SCT + CCD
+
 COD W62
 OBS J. Maikner
 COM Default details extracted from MPEC 2021-J28
@@ -2840,6 +2873,11 @@ COD Y90
 OBS E. F. Mananes
 COM Default details extracted from MPEC 2022-S297
 TEL 0.30-m f/5.96 QHY268M + RC304 + Reductor Focal 0.66 + CCD
+
+COD Y91
+OBS P. Benarque
+COM Default details extracted from MPEC 2022-Y232
+TEL 0.12-m f/8.3 refractor + CCD
 
 COD Z03
 OBS A. Garcia
