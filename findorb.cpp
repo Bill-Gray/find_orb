@@ -2335,7 +2335,7 @@ static void show_a_file( const char *filename, const int flags)
       day_to_dmy( jd, &day, &month, &year, CALENDAR_GREGORIAN);
       day0 = (int)( jd - (long)day + 2) % 7;
       day0 += day - 1;
-      calendar_line = ((year - calendar_year0) + month - 1);
+      calendar_line = ((year - calendar_year0) * 12 + month - 1);
       calendar_line *= calendar_cell_height * 5 + 5;
       calendar_line += ((day0 / 7) % 5) * calendar_cell_height + 6;
       calendar_col = (day0 % 7) * calendar_cell_width;
