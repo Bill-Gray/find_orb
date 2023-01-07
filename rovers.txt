@@ -1130,7 +1130,7 @@ OHe !+005.712389   +43.932077        780.      SATINO, Observatoire Haute-Proven
 
 576 !+000.374425   +50.995594         118.     Burwash
 984 !-002.739722   +50.922992         101.     Eastfield
-986 !+000.639444   +51.408888         115.     Ascot
+986 !-000.639444   +51.408888         115.     Ascot
 993 !+002.505833   +51.047117         136.     Woolston
 
    Peter's page at https://birtwhistle.org.uk/HistoryMillHill.htm
