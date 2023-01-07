@@ -2898,6 +2898,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
             if( set_locs_rval == INTEGRATION_TIMED_OUT)
                {
                free( xresids);
+               free( orig_obs);
                memcpy( orbit, original_orbit, n_orbit_params * sizeof( double));
                runtime_message = NULL;
                debug_printf( "Integration timeout\n");
