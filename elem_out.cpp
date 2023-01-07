@@ -1821,7 +1821,7 @@ int write_out_elements_to_file( const double *orbit,
             const int precision, const int monte_carlo,
             const int options)
 {
-   char object_name[80], buff[260], more_moids[80];
+   char object_name[80], buff[320], more_moids[80];
    const char *file_permits = (append_elements_to_element_file ? "tfca" : "tfcw+");
    extern const char *elements_filename;
    FILE *ofile = fopen_ext( get_file_name( buff, elements_filename), file_permits);
@@ -2023,7 +2023,7 @@ int write_out_elements_to_file( const double *orbit,
             tt_ptr += strlen( tt_ptr);
             for( ; j < n_orbit_params - 6; j++)
                {
-               char addenda[50];
+               char addenda[80];
                char tbuff0[80], sig_name[20];
 
                put_double_in_buff( tbuff0, orbit[j + 6]);
@@ -2047,7 +2047,7 @@ int write_out_elements_to_file( const double *orbit,
                         strlcat_error( addenda, " [1/r^2]");
                      }
                   }
-               if( strlen( addenda) + strlen( tt_ptr) > 75)
+               if( strlen( addenda) + strlen( tt_ptr) > 74)
                   {
                   strlcat_err( tt_ptr, "\n", 79);
                   tt_ptr += strlen( tt_ptr);

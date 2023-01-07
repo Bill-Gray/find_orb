@@ -375,7 +375,8 @@ MAG_DIGITS=1
    to +/- 0.3141592653 AU;  0.31 AU would suffice,  and many would
    argue for 0.3.  In some cases,  though,  you may want/need more
    digits.  Increment FULL_SIGMAS,  and you get an extra digit of
-   precision in both sigmas and in (most) 'covar.txt' values.
+   precision in both sigmas and in (most) 'covar.txt' values.  The
+   value set for FULL_SIGMAS must be at least 2 and no greater than 10.
 FULL_SIGMAS=3
 
    In computing SNRs in ephemerides,  Find_Orb defaults to assuming
