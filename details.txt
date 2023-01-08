@@ -275,11 +275,6 @@ OBS M. Tichy, J. Ticha
 COM Default details extracted from MPEC 2021-C313
 TEL 1.06-m f/2.7 reflector + 2048x2048 CCD
 
-COD 247
-OBS Observer K. Yoshimoto
-COM Default details extracted from MPEC 2021-B143
-TEL 0.20-m f/8.0 Ritchey-Chretien + CCD + f/5.4 focal reducer
-
 COD 260
 OBS Measurer R. Matson
 COM Default details extracted from MPEC 2020-W129
