@@ -1151,6 +1151,32 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
    return( 0);
 }
 
+/* First stab at writing out orbital elements in a form that can be
+readily imported to JPL Horizon's "plain text" format.  That format
+is noted as preliminary/in progress/unreliable,  so this may change. */
+
+static int write_horizons_elems( const char *filename, const ELEMENTS *elem, const double *orbit)
+{
+   FILE *ofile = fopen( filename, "wb");
+   extern int force_model;
+   int i;
+
+   assert( ofile);
+   fprintf( ofile, "Object: From_Find_Orb\n");
+   fprintf( ofile, "H= %.3f    G= %.2f\n", elem->abs_mag, elem->slope_param);
+   fprintf( ofile, "EPOCH= %.3f\n", elem->epoch);
+   fprintf( ofile, "EC= %.11f     QR= %.11f   TP= %.8f\n",
+                        elem->ecc, elem->q, elem->perih_time);
+   fprintf( ofile, "OM= %.7f     W= %.7f    IN= %.7f\n",
+                     elem->asc_node * 180. / PI,
+                     elem->arg_per * 180. / PI,
+                     elem->incl * 180. / PI);
+   for( i = 0; i < (force_model & 0xf); i++)
+      fprintf( ofile, "A%d= %.6e    ", i + 1, orbit[i + 6]);
+   fclose( ofile);
+   return 0;
+}
+
 static int elements_in_guide_format( char *buff, const ELEMENTS *elem,
                      const char *obj_name, const OBSERVE *obs,
                      const unsigned n_obs)
@@ -1848,6 +1874,7 @@ int write_out_elements_to_file( const double *orbit,
    const unsigned orbit_summary_options = atoi( get_environment_ptr( "ORBIT_SUMMARY_OPTIONS"));
    extern int is_interstellar;         /* orb_func.cpp */
    const size_t tbuff_size = 80 * 9;
+   const char *horizons_elems = get_environment_ptr( "HORIZONS_ELEMS");
 
    setvbuf( ofile, NULL, _IONBF, 0);
    if( default_comet_magnitude_type == 'N')
@@ -2544,6 +2571,8 @@ int write_out_elements_to_file( const double *orbit,
       fclose( ofile);
       }
 
+   if( *horizons_elems)
+      write_horizons_elems( horizons_elems, &helio_elem, orbit);
    if( monte_carlo)
       monte_carlo_object_count++;
    if( monte_carlo && rms_ok)
@@ -2566,6 +2595,7 @@ int write_out_elements_to_file( const double *orbit,
          fprintf( ofile, "%s%s\n", tbuff, impact_buff);
          fclose( ofile);
          }
+
 
       if( helio_elem.ecc < .999999)
          {
