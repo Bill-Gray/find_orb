@@ -16,7 +16,7 @@
 #define EARTH_RADIUS_IN_AU    (EARTH_RADIUS_IN_KM / AU_IN_KM)
 #define SUN_RADIUS_IN_AU      (SUN_RADIUS_IN_KM / AU_IN_KM)
 
-const double SRP1AU = 2.3e-7;
+const double SRP1AU = 2.27636e-7;
 
 /* "Solar radiation pressure at 1 AU",  in kg*AU^3 / (m^2*d^2),
 from a private communication from Steve Chesley.  This means
@@ -25,7 +25,7 @@ meter of surface area to the sun,  and it was one AU from the
 sun,  and it absorbed all the solar radiation (and re-radiated
 it isotropically;  i.e.,  the re-radiated photons didn't cause
 any net force),  then that object would accelerate away from
-the sun at 2.3e-7 AU/day^2 (a.k.a. 4.562e-6 m/s^2).
+the sun at 2.27636e-7 AU/day^2 (a.k.a. 4.562e-6 m/s^2).
 
   One can derive SRP1AU  from basic principles.   The 'solar
 constant' is C = 1367.6 AU^2*W/m^2; i.e.,  if you set up a
@@ -42,11 +42,9 @@ SRP1AU = C * d^2 / (meters_per_AU * c)
 
    The result indicates that if the solar panel in question
 had a mass of one kilogram,  it would accelerate away from the
-sun at 2.27636e-7 AU/day^2.  I think Steve rounded off with a
-one-percent error because that's a decent match to the accuracy
-you can expect with real-world objects that reflect and re-radiate
-photons,  instead of politely absorbing them and then re-radiating
-them isotropically.
+sun at 2.27636e-7 AU/day^2.  Reality will not be so precise;  real
+objects reflect and re-radiate photons,  instead of politely
+absorbing them and then re-radiating them isotropically.
 
   Interestingly,  this also means that an object with area/mass =
 1286 m^2/kg would have SRP balancing the sun's gravity.  Which
