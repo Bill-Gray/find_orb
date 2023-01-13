@@ -94,6 +94,7 @@ can turn it back to 'false'.
 int get_temp_dir( char *name, const size_t max_len);      /* miscell.cpp */
 #endif
 int fetch_astrometry_from_mpc( FILE *ofile, const char *desig);
+int download_a_file( const char *ofilename, const char *url);
 int generic_message_box( const char *message, const char *box_type);
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
@@ -455,6 +456,23 @@ int fetch_astrometry_from_mpc( FILE *ofile, const char *desig)
    return( bytes_written);
 }
 
+int download_a_file( const char *ofilename, const char *url)
+{
+   const char *grab_program = get_environment_ptr( "MPC_GRAB_PROGRAM");
+   char *tbuff;
+   size_t buffsize;
+   int err_code;
+
+   if( !*grab_program)
+      grab_program = "grab_mpc";
+   buffsize = strlen( grab_program) + strlen( ofilename) + strlen( url) + 4;
+   tbuff = (char *)malloc( buffsize);
+   snprintf_err( tbuff, (int)buffsize, "%s %s %s", grab_program, ofilename, url);
+   err_code = system( tbuff);
+   free( tbuff);
+   return( err_code);
+}
+
 /* Code to write a single valid,  but completely meaningless observation
 to a temporary file for a specified object.  This can then be read in
 and used to get around the fact that Find_Orb essentially assumes that
@@ -622,6 +640,6 @@ const char *write_bit_string( char *ibuff, const uint64_t bits)
 const char *find_orb_version_jd( double *jd)
 {
     if( jd)
-      *jd = 2459918.5;
-    return( "2022 Dec 05");
+      *jd = 2459955.5;
+    return( "2023 Jan 11");
 }
