@@ -2327,7 +2327,8 @@ static int evaluate_limited_orbit( const double *orbit,
                break;
             case 'T':
                {
-               const double tp = get_time_from_string( 0., tbuff, 0, NULL);
+               const double tp = get_time_from_string( 0., tbuff,
+                                          CALENDAR_JULIAN_GREGORIAN, NULL);
 
                if( tp)
                   constraints[rval++] = (tp - elem.perih_time) * 1e+5;

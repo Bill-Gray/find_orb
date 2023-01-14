@@ -2037,7 +2037,8 @@ static int get_ephem_times_from_file( const char *filename)
    while( fgets_trimmed( buff, sizeof( buff), ifile))
       if( *buff != '#')
          {
-         double jd = get_time_from_string( 0., buff + byte_offset, FULL_CTIME_YMD, NULL);
+         double jd = get_time_from_string( 0., buff + byte_offset,
+                         FULL_CTIME_YMD | CALENDAR_JULIAN_GREGORIAN, NULL);
 
          if( jd > 1.)
             {
@@ -4528,8 +4529,10 @@ static int get_observer_details( const char *observation_filename,
 
                assert( tptr);
                *tptr = '\0';
-               jd_start = get_time_from_string( 0., buff + 10, 0, NULL);
-               jd_end = get_time_from_string( 0., tptr + 1, 0, NULL);
+               jd_start = get_time_from_string( 0., buff + 10,
+                           CALENDAR_JULIAN_GREGORIAN, NULL);
+               jd_end = get_time_from_string( 0., tptr + 1,
+                           CALENDAR_JULIAN_GREGORIAN, NULL);
                assert( jd_start > 2000000. && jd_start < 3000000.);
                assert( jd_end > 2000000. && jd_end < 3000000.);
                use_lines = got_obs_in_range( obs, n_obs, jd_start, jd_end);

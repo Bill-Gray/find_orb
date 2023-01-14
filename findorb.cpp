@@ -5910,7 +5910,7 @@ int main( int argc, const char **argv)
                else
                   {
                   const double jd = get_time_from_string( obs[curr_obs].jd,
-                                 tbuff, 0, NULL);
+                                 tbuff, CALENDAR_JULIAN_GREGORIAN, NULL);
 
                   if( jd)
                      for( curr_obs = 0; curr_obs < n_obs &&

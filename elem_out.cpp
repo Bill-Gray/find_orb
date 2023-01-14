@@ -2933,7 +2933,7 @@ static double extract_state_vect_from_text( const char *text,
       {
       memcpy( tbuff, text, i);
       tbuff[i] = '\0';
-      epoch = get_time_from_string( 0., tbuff, 0, NULL);
+      epoch = get_time_from_string( 0., tbuff, CALENDAR_JULIAN_GREGORIAN, NULL);
       }
    if( epoch)
       {
