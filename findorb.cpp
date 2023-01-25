@@ -3279,7 +3279,13 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
 
    if( !strcmp( ifilename, "c") || !strcmp( ifilename, "c+"))
       {
-      clipboard_to_file( temp_obs_filename, ifilename[1] == '+');
+      const int err_code = clipboard_to_file( temp_obs_filename, ifilename[1] == '+');
+
+#ifndef _WIN32
+      if( err_code)
+         inquire( get_find_orb_text( 2039), NULL, 0,
+                                    COLOR_MESSAGE_TO_USER);
+#endif
       strcpy( ifilename, temp_obs_filename);
       }
 
