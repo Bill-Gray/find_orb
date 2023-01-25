@@ -2109,6 +2109,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
    double curr_jd = jd_start, real_jd_start = jd_start;
    const bool fake_astrometry = ((options & 7) == OPTION_FAKE_ASTROMETRY);
    const char *group_data;
+   int n_mag_places = atoi( get_environment_ptr( "MAG_DIGITS"));
 
    snprintf( buff, sizeof( buff), "GROUP_%.3s", note_text + 1);
    group_data = get_environment_ptr( buff);
@@ -2171,6 +2172,8 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
       }
    if( cinfo->planet < 0 && cinfo->planet != -2)      /* bad observatory code */
       return( -3);
+   if( n_mag_places < 1)
+      n_mag_places = 1;
    if( !abs_mag)
       abs_mag = atof( get_environment_ptr( "ABS_MAG"));
    if( ephem_type != OPTION_OBSERVABLES || !(options & OPTION_SHOW_SIGMAS))
@@ -2281,7 +2284,11 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
       if( options & OPTION_ORBIT_PLANE_ANGLE)
          snprintf_append( buff, sizeof( buff), "-PlAng- ");
       if( abs_mag)
+         {
          snprintf_append( buff, sizeof( buff), " mag");
+         for( i = n_mag_places - 1; i; i--)
+            strlcat_error( buff, " ");
+         }
 
       if( options & OPTION_LUNAR_ELONGATION)
          snprintf_append( buff, sizeof( buff), "  LuElo");
@@ -3184,19 +3191,21 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                strlcat_error( alt_buff, tbuff);
                if( abs_mag)           /* don't show a mag if you dunno how bright */
                   {                   /* the object really is! */
-                  const bool two_place_mags =
-                                   (*get_environment_ptr( "MAG_DIGITS") == '2');
-
-                  if( two_place_mags)
+                  if( n_mag_places > 1)
                      {
-                     const char *fmt = (curr_mag > 99.8 ? " %5.1f" : " %5.2f");
+                     char format[7];
 
-                     snprintf_append( buff, sizeof( buff), fmt, curr_mag + .005);
+                     strlcpy_error( format, " %n.nf");
+                     format[2] = '3' + n_mag_places;
+                     format[4] = '0' + n_mag_places;
+                     if( curr_mag > 99.8)
+                        format[4]--;
+                     snprintf_append( buff, sizeof( buff), format, curr_mag);
                      }
                   else if( fraction_illum == 0.)
                      strlcat_error( buff, " Sha ");
                   else if( curr_mag < 99 && curr_mag > -9.9)
-                     snprintf_append( buff, sizeof( buff), " %4.1f", curr_mag + .05);
+                     snprintf_append( buff, sizeof( buff), " %4.1f", curr_mag);
                   else
                      snprintf_append( buff, sizeof( buff), " %3d ", (int)( curr_mag + .5));
                   if( phase_ang > PI * 2. / 3.)    /* over 120 degrees */
@@ -3209,7 +3218,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                         if( endptr[-2] == '.')
                            endptr[-2] = '?';
                         }
-                  snprintf_append( alt_buff, sizeof( alt_buff), " %6.3f", curr_mag + .0005);
+                  snprintf_append( alt_buff, sizeof( alt_buff), " %6.3f", curr_mag);
                   }
 
                if( options & OPTION_LUNAR_ELONGATION)
