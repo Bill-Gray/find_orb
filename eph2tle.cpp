@@ -995,11 +995,16 @@ int main( const int argc, const char **argv)
                     FULL_CTIME_YMD | FULL_CTIME_FORMAT_HH_MM);
 //    if( !failure)
          {
+         const double revs_per_day = tle_to_output.xno * minutes_per_day / (2. * PI);
+
 //       if( tle.ephemeris_type != EPHEM_TYPE_HIGH)
             fprintf( ofile, "\n# Worst residual: %.2f km\n",
                           worst_resid);
 //       else
 //          fprintf( ofile, "\n");
+
+         assert( tle.ephemeris_type == EPHEM_TYPE_HIGH
+                  || revs_per_day < 20.);  /* allows some margin for suborbital TLEs */
          write_elements_in_tle_format( obuff, &tle_to_output);
          if( verbose)
             {
