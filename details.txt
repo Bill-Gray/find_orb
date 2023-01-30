@@ -2019,6 +2019,11 @@ OBS G. Lehmann
 COM Default details extracted from MPEC 2019-P11
 TEL 0.4-m f/3.6 reflector + CCD
 
+COD L30
+OBS T. Zilch
+COM Default details extracted from MPEC 2023-B57
+TEL 0.3-m f/4 reflector + CCD
+
 COD L32
 OBS Y. JeongAhn
 COM Default details extracted from MPEC 2019-Y97
