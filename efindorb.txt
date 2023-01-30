@@ -265,8 +265,9 @@
 2030    https://www.projectpluto.com/find_orb.htm#de_eph for more info.
 
 2031    F Select file containing astrometry
-2031    C Copy astrometry from clipboard
 2031    N Give object name and get data from MPC
+2031    C Copy astrometry from clipboard
+2031    S Copy astrometry from selection
 
 2033    Use arrow keys to select object,  then hit the space bar or Enter (or use mouse)
 
@@ -394,3 +395,5 @@
 
 2074    Temporary designations must include only alphanumeric characters.
 2074    The designation '%s' would be rejected by MPC.
+
+2076    Clipboard is empty!

@@ -18,13 +18,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301, USA.    */
 
 #include <stdio.h>
-
-#ifdef _WIN32
-#include <windows.h>
+#include "watdefs.h"
 
 int copy_buffer_to_clipboard( const char *contents, const long length);
 int copy_file_to_clipboard( const char *filename);    /* clipfunc.cpp */
-int clipboard_to_file( const char *filename, const int append); /* clipfunc.cpp */
+int clipboard_to_file( const char *filename, const int append,
+                           const bool use_selection); /* clipfunc.cpp */
+
+#ifdef _WIN32
+#include <windows.h>
 
       /* Following is copied shamelessly from pdcclip.c from PDCurses. */
       /* With one strange addition:  "solo" line feeds are expanded to */
@@ -109,10 +111,13 @@ int copy_file_to_clipboard( const char *filename)
    return( rval);
 }
 
-int clipboard_to_file( const char *filename, const int append)
+int clipboard_to_file( const char *filename, const int append,
+                                          const bool use_selection)
 {
     int rval;
 
+            /* sadly,  we can't get at the selected text in MSWin */
+    INTENTIONALLY_UNUSED_PARAMETER( use_selection);
     if( !OpenClipboard(NULL))
         rval =  -1;
     else
@@ -143,12 +148,14 @@ int clipboard_to_file( const char *filename, const int append)
 #include <stdlib.h>
 #include "curses.h"
 
-int clipboard_to_file( const char *filename, const int append)
+int clipboard_to_file( const char *filename, const int append,
+                                          const bool use_selection)
 {
    long size = -99;
    char *contents;
    int err_code;
 
+   INTENTIONALLY_UNUSED_PARAMETER( use_selection);
    err_code = PDC_getclipboard( &contents, &size);
    if( err_code == PDC_CLIP_SUCCESS)
       {
@@ -191,11 +198,14 @@ int copy_file_to_clipboard( const char *filename)
 #else    /* non-PDCurses, non-Windows:  use xclip */
 #include <stdlib.h>
 
-int clipboard_to_file( const char *filename, const int append)
+int clipboard_to_file( const char *filename, const int append,
+                                          const bool use_selection)
 {
    char cmd[80];
 
-   snprintf( cmd, sizeof( cmd), "xclip -o >%c %s", (append ? '>' : ' '), filename);
+   snprintf( cmd, sizeof( cmd), "xclip -o %s >%c %s",
+            (use_selection ? "" : "-se c"),
+            (append ? '>' : ' '), filename);
    return( system( cmd));
 }
 

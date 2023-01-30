@@ -384,7 +384,8 @@ static void restore_screen( const int *screen)
       mvaddchnstr( y, 0, cptr, n_out);
 }
 
-int clipboard_to_file( const char *filename, const int append); /* clipfunc.cpp */
+int clipboard_to_file( const char *filename, const int append,
+                           const bool use_selection); /* clipfunc.cpp */
 int copy_file_to_clipboard( const char *filename);    /* clipfunc.cpp */
 
 static bool curses_running = false;
@@ -3166,6 +3167,7 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
    size_t n_lines, i;
    const char *prev_fn = "previous.txt";
    char **prev_files = load_file_into_memory( prev_fn, &n_lines, false);
+   bool is_temp_file = false;
 
    if( !prev_files)
       prev_files = load_file_into_memory( "previous.def", &n_lines, true);
@@ -3189,11 +3191,11 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
       {
       const size_t buffsize = 8000;
       char *buff = (char *)malloc( buffsize);
-      int c, base_key = (int)KEY_F( 4);
+      int c, base_key = (int)KEY_F( 5);
       size_t n_prev = 0, prev_idx[60];
       struct stat file_info;
       FILE *ifile;
-      const char *hotkeys = "0123456789abdeghijklmoprstuvwxyz;',./=-[]()*&^%$#@!:<>", *tptr;
+      const char *hotkeys = "0123456789abdeghijklmoprtuvwxyz;',./=-[]()*&^%$#@!:<>", *tptr;
 
       help_file_name = "openfile.txt";
       clear( );
@@ -3204,6 +3206,15 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
       fclose( ifile);
 
       strlcpy_err( buff, get_find_orb_text( 2031), buffsize);
+#ifdef _WIN32
+         {
+         char *sel_ptr = strstr( buff, "S ");
+
+         assert( sel_ptr);          /* remove 'selection' option; */
+         sel_ptr[-1] = '\0';        /* it doesn't work in Windows */
+         base_key--;
+         }
+#endif
       for( i = n_lines - 1; i && hotkeys[n_prev]
                                      && n_prev + 12 < (size_t)getmaxy( stdscr); i--)
          if( prev_files[i][0] != '#' && filename_fits_current_os( prev_files[i]))
@@ -3241,10 +3252,7 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
          case 'F': case 'f': case KEY_F( 1):
             user_select_file( ifilename, "Open astrometry file", 0);
             break;
-         case 'c': case KEY_F( 2):
-            strcpy( ifilename, "c");
-            break;
-         case 'N': case 'n': case KEY_F( 3):
+         case 'N': case 'n': case KEY_F( 2):
             {
             char object_name[83];
 
@@ -3261,6 +3269,14 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
                }
             }
             break;
+         case 'c': case KEY_F( 3):
+            strcpy( ifilename, "c");
+            break;
+#ifndef _WIN32
+         case 's': case KEY_F( 4):
+            strcpy( ifilename, "s");
+            break;
+#endif
          case 'q': case 'Q': case 27:
             free( prev_files);
             *err_buff = '\0';    /* signals 'cancel' */
@@ -3277,16 +3293,22 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
       return( NULL);
       }
 
-   if( !strcmp( ifilename, "c") || !strcmp( ifilename, "c+"))
+   if( !strcmp( ifilename, "c") || !strcmp( ifilename, "c+")
+          || !strcmp( ifilename, "s") || !strcmp( ifilename, "s+"))
       {
-      const int err_code = clipboard_to_file( temp_obs_filename, ifilename[1] == '+');
+      const int err_code = clipboard_to_file( temp_obs_filename, ifilename[1] == '+',
+                              *ifilename == 's');
 
-#ifndef _WIN32
       if( err_code)
-         inquire( get_find_orb_text( 2039), NULL, 0,
-                                    COLOR_MESSAGE_TO_USER);
+         inquire( get_find_orb_text(
+#ifdef _WIN32
+                        2076  /* "Clipboard is empty" */
+#else
+                        2039  /* "You need xclip to get at the clipboard" */
 #endif
+                                    ), NULL, 0, COLOR_MESSAGE_TO_USER);
       strcpy( ifilename, temp_obs_filename);
+      is_temp_file = true;
       }
 
    ids = find_objects_in_file( ifilename, n_ids, NULL);
@@ -3314,7 +3336,7 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
          free( ids);
       ids = NULL;
       }
-   else
+   else if( !is_temp_file)
       {
       FILE *ofile = fopen_ext( prev_fn, "fcw");
 #if defined( _WIN32)
