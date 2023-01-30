@@ -170,7 +170,7 @@ static FILE *fopen_tilde( const char *filename, const char *permits)
 #ifdef _WIN32
    return( fopen( filename, permits));
 #else
-   if( *filename != '~' && filename[1] != '/')
+   if( *filename != '~' || filename[1] != '/')
       return( fopen( filename, permits));
    else
       {
@@ -640,6 +640,6 @@ const char *write_bit_string( char *ibuff, const uint64_t bits)
 const char *find_orb_version_jd( double *jd)
 {
     if( jd)
-      *jd = 2459955.5;
-    return( "2023 Jan 11");
+      *jd = 2459974.5;
+    return( "2023 Jan 30");
 }
