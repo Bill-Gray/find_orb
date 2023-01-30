@@ -131,7 +131,7 @@ Obj: 4001 # Phobos (s)
    r=13.0,11.4,9.1
    a0 = 317.67071657 -0.10844326T -1.78428399 sin M1 +0.02212824 sin M2
    d0 =  52.88627266 -0.06134706T -1.07516537 cos M1 +0.00668626 cos M2
-   W  =  34.9964842535 +1128.84475928d + 12.72192797 T2 + 1.42421769 sin M1 - 0.02273783 sin M2 + 1.145 sin M5
+   W  =  35.18774440 +1128.84475928d + 12.72192797 T2 + 1.42421769 sin M1 - 0.02273783 sin M2 - 1.145 sin M5
 
 Obj: 4002 # Deimos (s)
    r=7.8,6.0,5.1
@@ -788,3 +788,8 @@ alternative (orientations from DE-4xx) would be overkill.
 
    (2022 Feb 02) Added some planetary radii,  for future use.
    (2022 Oct 06) Added still more planetary radii.
+
+   (2023 Jan 24) Two corrections for the equation for W for Phobos,  from
+_Celestial Mechanics & Dynamical Astronomy_, 131, 12.
+
+   https://rdcu.be/b32WL     doi: 10.1007/s10569-019-9925-1
