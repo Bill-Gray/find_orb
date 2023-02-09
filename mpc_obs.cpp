@@ -1418,15 +1418,21 @@ int get_object_name( char *obuff, const char *packed_desig)
          }
       if( rval == OBJ_DESIG_ASTEROID_NUMBERED)
          {
-         char *info = find_numbered_mp_info( atoi( obuff + 1));
+         const int number = atoi( obuff + 1);
+         char *info = find_numbered_mp_info( number);
 
+         snprintf_err( obuff, 11, "(%d)", number);
          obuff += strlen( obuff);
          if( info)
             {
+            if( info[29] != ' ')        /* prov ID */
+               {
+               strlcpy( obuff, " =", 3);
+               strlcpy( obuff + 2, info + 28, 12);
+               remove_trailing_cr_lf( obuff);
+               }
             if( info[9] != ' ')              /* append name */
-               strlcpy( obuff, info + 8, 19);
-            else if( info[29] != ' ')        /* prov ID */
-               strlcpy( obuff, info + 28, 12);
+               strlcpy( obuff + strlen( obuff), info + 8, 19);
             remove_trailing_cr_lf( obuff);
             }
          }
