@@ -3205,12 +3205,6 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
       *orbit_epoch = initial_orbit( obs, n_obs, orbit);
       if( force_final_full_improvement)
          do_full_improvement = true;
-      for( i = 0; i < n_obs; i++)
-         if( obs[i].note2 == 'R')      /* radar observations require an */
-            {                          /* added full step */
-            do_full_improvement = true;
-            break;
-            }
       }
    else if( n_obs == 1 && !strcmp( obs->reference, "Dummy"))
       {
@@ -3224,6 +3218,9 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
       obs->obs_mag = floor( obs->obs_mag * 10. + .5) * .1;
       obs->mag_precision = 1;         /* start out assuming mag to .1 mag */
       }
+   for( i = 0; i < n_obs; i++)
+      if( obs[i].note2 == 'R')
+         do_full_improvement = true;
    *epoch_shown = *orbit_epoch;
    if( do_full_improvement || available_sigmas == NO_SIGMAS_AVAILABLE)
       {
@@ -3236,6 +3233,9 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
          *epoch_shown = find_epoch_shown( obs, n_obs);
       memcpy( saved_obs, obs, n_obs * sizeof( OBSERVE));
       filter_obs( obs, n_obs, automatic_outlier_rejection_limit, 0);
+      for( i = 0; i < n_obs; i++)
+         if( obs[i].note2 == 'R')
+            obs[i].is_included = 1;
       if( got_vectors)
          attempt_extensions( obs, n_obs, orbit, *orbit_epoch);
       prev_score = evaluate_initial_orbit( obs, n_obs, orbit);
