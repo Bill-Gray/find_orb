@@ -1873,10 +1873,7 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
    obs->note1 = buff[13];
    obs->note2 = buff[14];
    if( is_radar_obs || buff[14] == 's' || buff[14] == 'v')
-      {     /* radar data and "second lines" have no RA/dec: */
-      obs->ra = obs->dec = 0.;
-      obs->flags |= OBS_DONT_USE;
-      }
+      obs->ra = obs->dec = 0.;  /* radar data and "second lines" have no RA/dec */
    else
       {
       const int rval = get_ra_dec_from_mpc_report( buff,
