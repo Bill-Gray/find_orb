@@ -966,7 +966,7 @@ inline double get_satellite_coordinate( const char *iptr, int *decimal_loc)
       int n_bytes_read;
 
       if( sscanf( tbuff + 1, "%lf%n", &rval, &n_bytes_read) != 1
-                     || n_bytes_read < 7)
+                     || n_bytes_read < 10)
          *decimal_loc = -2;
       else if( (tptr = strchr( tbuff, '.')) == NULL)
          *decimal_loc = -3;
@@ -983,8 +983,8 @@ inline double get_satellite_coordinate( const char *iptr, int *decimal_loc)
 
 int get_satellite_offset( const char *iline, double *xyz)
 {
-   unsigned i;
-   int error_code = 0, decimal_loc;
+   size_t i;
+   int error_code = 0;
    const int observation_units = (int)iline[32] - '0';
 
    for( i = 0; i < 3; i++)    /* in case of error,  use 0 offsets */
@@ -992,13 +992,14 @@ int get_satellite_offset( const char *iline, double *xyz)
    iline += 34;      /* this is where the offsets start */
    for( i = 0; !error_code && i < 3; i++, iline += 12)
       {
+      int decimal_loc;
+
       xyz[i] = get_satellite_coordinate( iline, &decimal_loc);
       if( observation_units == 1)         /* offset given in km */
          {
          xyz[i] /= AU_IN_KM;
-         if( strict_sat_xyz_format)    /* offset must be < 10 million km */
-            if( decimal_loc < 6 || decimal_loc > 8)
-               error_code = -1;
+         if( strict_sat_xyz_format && decimal_loc != 6 && decimal_loc != 7)
+            error_code = -1;
          }
       else if( observation_units == 2)          /* offset in AU */
          {                         /* offset must be less than 100 AU */
