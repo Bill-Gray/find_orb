@@ -723,7 +723,7 @@ double improve_along_lov( double *orbit, const double epoch, const double *lov,
    assert( x);
    score = x + n_divs;
    for( i = 0; i < n_obs; i++)
-      if( obs[i].is_included)
+      if( obs[i].is_included && obs[i].note2 != 'R')
          {
          double sigma = hypot( obs[i].posn_sigma_1, obs[i].posn_sigma_2)
                                  * 180. * 3600. / PI;
