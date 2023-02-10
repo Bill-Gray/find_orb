@@ -2634,21 +2634,25 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
 
                   if( *offset_dir)
                      {
-                     char date_buff[80];
-                     static bool path_already_made = false;
+                     char date_buff[80], packed_buff[20];
 
                      strlcpy_error( tbuff, offset_dir);
-                     strlcat_error( tbuff, "/");
-                     if( !path_already_made)
-                        make_path_available( tbuff);
-                     path_already_made = true;
+                     text_search_and_replace( tbuff, "%p",
+                                 real_packed_desig( packed_buff, obs->packed_id));
+                     text_search_and_replace( tbuff, "%c", cinfo->code);
                      full_ctime( date_buff, curr_jd,
                            FULL_CTIME_FORMAT_HH_MM | FULL_CTIME_YMD
                          | FULL_CTIME_MONTHS_AS_DIGITS | FULL_CTIME_NO_SPACES
                          | FULL_CTIME_NO_COLONS | FULL_CTIME_LEADING_ZEROES);
-                     strlcat_error( tbuff, date_buff);
-                     strlcat_error( tbuff, ".off");
+                     text_search_and_replace( tbuff, "%t", date_buff);
                      offset_ofile = fopen( tbuff, "wb");
+                     if( !offset_ofile)
+                        {
+                        make_path_available( tbuff);
+                        offset_ofile = fopen( tbuff, "wb");
+                        }
+                     if( !offset_ofile)
+                        debug_printf( "Couldn't open '%s'\n", tbuff);
                      assert( offset_ofile);
                      full_ctime( date_buff, curr_jd,
                             FULL_CTIME_FORMAT_HH_MM | FULL_CTIME_YMD);
