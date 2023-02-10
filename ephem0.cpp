@@ -1550,6 +1550,9 @@ FILE *open_json_file( char *filename, const char *env_ptr, const char *default_n
 #else
    env_ptr = get_environment_ptr( env_ptr);
 #endif
+
+   if( !strcmp( env_ptr, "none"))
+      return( NULL);
    if( !*env_ptr)
       {
       get_file_name( filename, default_name);
@@ -1586,6 +1589,8 @@ static int combine_json_elems_and_ephems( const char *packed_desig, FILE *ephem_
    bool in_ephemerides = false;
 
    ofile = open_json_file( buff, "JSON_COMBINED_NAME", "combined.json", packed_desig, "wb");
+   if( !ofile)
+      return( -1);
    elem_file = open_json_file( buff, "JSON_ELEMENTS_NAME", "elements.json", packed_desig, "rb");
    while( !obs_end_found && fgets( buff, sizeof( buff), elem_file))
       {

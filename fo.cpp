@@ -414,14 +414,16 @@ static int add_json_data( const char *ofilename, const bool have_json_ephem,
             const char *packed_desig, const bool is_last_call)
 {
    char buff[200];
-   FILE *ofile = fopen_ext( get_file_name( buff, ofilename), "tfcab");
-   FILE *ifile;
+   FILE *ifile, *ofile;
    bool found_start = false, found_end = false;
 
    if( have_json_ephem)
       ifile = open_json_file( buff, "JSON_COMBINED_NAME", "combined.json", packed_desig, "rb");
    else
       ifile = open_json_file( buff, "JSON_ELEMENTS_NAME", "elements.json", packed_desig, "rb");
+   if( !ifile)
+      return( -1);
+   ofile = fopen_ext( get_file_name( buff, ofilename), "tfcab");
    while( !found_start && fgets_trimmed( buff, sizeof( buff), ifile))
       if( !strcmp( buff, "  {"))
          found_start = true;
