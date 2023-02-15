@@ -1171,7 +1171,7 @@ double shadow_check( const double *planet_loc,
    r = sqrt( r2);
    angular_sep = acos( (dot - r2) / (d * r));
    ang_size_sun = SUN_RADIUS_IN_AU / r;
-   ang_size_planet = planet_radius_in_au / d;
+   ang_size_planet = asin( planet_radius_in_au / d);
    if( ang_size_sun + ang_size_planet < angular_sep)
       return( 1.);         /* no overlap */
    else if( ang_size_planet > ang_size_sun + angular_sep)
