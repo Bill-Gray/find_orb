@@ -83,89 +83,53 @@
 # is probably quite a bit better than the above .1 second.
 #
 #    SOHO and STEREO,  though,  were not intended to do astrometry and
-# produce noisy data.  "Program code" A = SOHO C2; B = SOHO C3;
-# G = STEREO/SECCHI HI1-A; H = COR2-A (both for code C49);  and
-# O = STEREO/SECCHI HI1-B; H = COR2-B (both for code C50).  SOHO
-# uncertainties as a function of magnitude and camera are from
-# an e-mail from Karl Battams,  2019 Nov 1.
+# produce noisy data.  "Program codes" A and 2 = SOHO C2; B and 3=
+# SOHO C3.
+#    For SOHO,  we check for "program codes" A or 2,  meaning C2
+# was used.  Everything else from (249) is assumed to use the
+# lower-accuracy C3.  (People sometimes mangle the codes;  we
+# want to default to the lower accuracy in such cases.)
  249 A                         8.7      36                SOHO
- 249 A                         8.2  8.8 24                SOHO
- 249 A                         7.2  8.2 12                SOHO
- 249 A                         4.2  7.2  6                SOHO
- 249 A                         2.7  4.2 12                SOHO
- 249 A                         1.7  2.7 18                SOHO
- 249 A                         0.2  1.7 24                SOHO
- 249 A                        -1.8  0.2 36                SOHO
- 249 A                             -1.8 48                SOHO
- 249 B                         9.7      280               SOHO
- 249 B                         9.2  9.7 224               SOHO
- 249 B                         7.7  9.2 168               SOHO
- 249 B                         7.2  7.7 112               SOHO
- 249 B                         6.7  7.2 84                SOHO
- 249 B                         5.7  6.7 56                SOHO
- 249 B                         2.7  5.7 28                SOHO
- 249 B                         1.2  2.7 56                SOHO
- 249 B                        -0.2  1.2 84                SOHO
- 249 B                        -1.2 -0.2 112               SOHO
- 249 B                             -1.2 168               SOHO
-
-# Older SOHO astrometry uses "program code" 2 for SOHO C2 (instead
-# of the A used more recently) and 3 for SOHO C3 (instead of B).  Makes
-# sense to me;  dunno why they changed... it does mean the above
-# SOHO uncertainties have to be duplicated redundantly.
  249 2                         8.7      36                SOHO
+ 249 A                         8.2  8.8 24                SOHO
  249 2                         8.2  8.8 24                SOHO
+ 249 A                         7.2  8.2 12                SOHO
  249 2                         7.2  8.2 12                SOHO
+ 249 A                         4.2  7.2  6                SOHO
  249 2                         4.2  7.2  6                SOHO
+ 249 A                         2.7  4.2 12                SOHO
  249 2                         2.7  4.2 12                SOHO
+ 249 A                         1.7  2.7 18                SOHO
  249 2                         1.7  2.7 18                SOHO
+ 249 A                         0.2  1.7 24                SOHO
  249 2                         0.2  1.7 24                SOHO
+ 249 A                        -1.8  0.2 36                SOHO
  249 2                        -1.8  0.2 36                SOHO
+ 249 A                             -1.8 48                SOHO
  249 2                             -1.8 48                SOHO
- 249 3                         9.7      280               SOHO
- 249 3                         9.2  9.7 224               SOHO
- 249 3                         7.7  9.2 168               SOHO
- 249 3                         7.2  7.7 112               SOHO
- 249 3                         6.7  7.2 84                SOHO
- 249 3                         5.7  6.7 56                SOHO
- 249 3                         2.7  5.7 28                SOHO
- 249 3                         1.2  2.7 56                SOHO
- 249 3                        -0.2  1.2 84                SOHO
- 249 3                        -1.2 -0.2 112               SOHO
- 249 3                             -1.2 168               SOHO
+ 249                           9.7      280               SOHO
+ 249                           9.2  9.7 224               SOHO
+ 249                           7.7  9.2 168               SOHO
+ 249                           7.2  7.7 112               SOHO
+ 249                           6.7  7.2 84                SOHO
+ 249                           5.7  6.7 56                SOHO
+ 249                           2.7  5.7 28                SOHO
+ 249                           1.2  2.7 56                SOHO
+ 249                          -0.2  1.2 84                SOHO
+ 249                          -1.2 -0.2 112               SOHO
+ 249                               -1.2 168               SOHO
+
 # Karl also guesstimates sigmas for HI-1 to be pretty bad,  maybe
 # two 70" pixels.  COR-2 is much better by comparison,  10".
- C49 G                                  140               STEREO-A
+# G or 4 = STEREO/SECCHI HI1-A; H or 5 = COR2-A (for code C49);
+# O or 4 = STEREO/SECCHI HI1-B; P or 5 = COR2-B (for code C50).
+# These are also from an e-mail from Karl Battams,  2019 Nov 1.
  C49 H                                  10                STEREO-A
- C50 O                                  140               STEREO-B
- C50 P                                  10                STEREO-B
-# Repetition of above (249) SOHO and (C49), (C50) STEREO-A, B records.
-# Pre-2013 observations used 2 and 3 instead of A and B (SOHO) and
-# 4, 5 instead of G, H and O, P (STEREO).
- 249 2                         8.7      36                SOHO
- 249 2                         8.2  8.8 24                SOHO
- 249 2                         7.2  8.2 12                SOHO
- 249 2                         4.2  7.2  6                SOHO
- 249 2                         2.7  4.2 12                SOHO
- 249 2                         1.7  2.7 18                SOHO
- 249 2                         0.2  1.7 24                SOHO
- 249 2                        -1.8  0.2 36                SOHO
- 249 2                             -1.8 48                SOHO
- 249 3                         9.7      280               SOHO
- 249 3                         9.2  9.7 224               SOHO
- 249 3                         7.7  9.2 168               SOHO
- 249 3                         7.2  7.7 112               SOHO
- 249 3                         6.7  7.2 84                SOHO
- 249 3                         5.7  6.7 56                SOHO
- 249 3                         2.7  5.7 28                SOHO
- 249 3                         1.2  2.7 56                SOHO
- 249 3                        -0.2  1.2 84                SOHO
- 249 3                        -1.2 -0.2 112               SOHO
- 249 3                             -1.2 168               SOHO
- C49 4                                  140               STEREO-A
- C49 4                                  10                STEREO-A
- C50 4                                  140               STEREO-B
+ C49 5                                  10                STEREO-A
+ C49                                    140               STEREO-A
+ C50 P                                  10                STEREO-A
  C50 5                                  10                STEREO-B
+ C50                                    140               STEREO-B
 # Still puzzling out how Solar Orbiter astrometry should be handled.
 # Based on exactly one object,  let's say 20".
  SoO                                    20                Solar Orbiter
