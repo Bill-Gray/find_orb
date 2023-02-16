@@ -185,6 +185,8 @@ int add_line_to_observation_details( void *obs_details, const char *iline)
 
    if( !memcmp( iline, "COM Sigmas", 10))    /* skip ADES comment lines */
       return( OBS_DETAILS_IRRELEVANT_LINE);
+   if( !memcmp( iline, "COM vel (km/s)", 14))    /* skip spacecraft velocity lines */
+      return( OBS_DETAILS_IRRELEVANT_LINE);
    while( len && (iline[len - 1] == 10 || iline[len - 1] == 13))
       len--;               /* drop trailing carriage returns/line feeds */
    if( !memcmp( iline, "COD ", 4))
