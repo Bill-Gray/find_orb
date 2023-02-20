@@ -2848,7 +2848,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
 
    for( i = 0; !err_code && i < n_params; i++)
       {
-      const double min_change = 0.3, max_change = 3.0, optimal_change = 1.0;
+      const double min_change = 0.03, max_change = 3.0, optimal_change = 1.0;
       double low_delta = 0., high_delta = 0., low_change = 0., high_change = 0.;
       int n_iterations = 0;
       const int max_iterations = 100;
@@ -3890,6 +3890,25 @@ static double only_one_position_available( OBSERVE FAR *obs,
    return( epoch);
 }
 
+/* Initial orbit determination and 'extending' the orbit currently
+don't use radar data,  and don't use observations marked as OBS_DONT_USE.
+The simplest way to force this is to temporarily sort such observations
+to the end of the array,  and temporarily decrease the number of
+observations accordingly. */
+
+static int sort_unused_obs_to_end( OBSERVE *obs, int n_obs)
+{
+   int sort_radar_last = SORT_OBS_RADAR_LAST, n_radar_obs = 0;
+
+   shellsort_r( obs, n_obs, sizeof( OBSERVE), compare_observations, &sort_radar_last);
+   while( n_obs && (obs[n_obs - 1].note2 == 'R' || (obs[n_obs - 1].flags & OBS_DONT_USE)))
+      {
+      n_obs--;                   /* temporarily remove radar obs */
+      n_radar_obs++;
+      }
+   return( n_radar_obs);
+}
+
 #define INITIAL_ORBIT_NOT_YET_FOUND       -2
 #define INITIAL_ORBIT_FAILED              -1
 #define INITIAL_ORBIT_FOUND                0
@@ -3905,8 +3924,7 @@ unsigned max_n_sr_orbits;
 double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
 {
    int i;
-   int start = 0, n_radar_obs = 0;
-   int sort_radar_last = SORT_OBS_RADAR_LAST;
+   int start = 0, n_radar_obs;
    bool dawn_based_observations = false;
    double arclen;
 #ifdef CONSOLE
@@ -4000,12 +4018,8 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
       return( obs[0].jd);
       }
 
-   shellsort_r( obs, n_obs, sizeof( OBSERVE), compare_observations, &sort_radar_last);
-   while( n_obs && (obs[n_obs - 1].note2 == 'R' || (obs[n_obs - 1].flags & OBS_DONT_USE)))
-      {
-      n_obs--;                   /* temporarily remove radar obs */
-      n_radar_obs++;
-      }
+   n_radar_obs = sort_unused_obs_to_end( obs, n_obs);
+   n_obs -= n_radar_obs;
    while( best_score > acceptable_score_limit)
       {
       int end, n_subarc_obs, n_geocentric_obs = 0;
@@ -4480,7 +4494,7 @@ static int auto_reject_obs_within_arc( OBSERVE *obs, int n_obs)
    return( rval);
 }
 
-void attempt_extensions( OBSERVE *obs, const int n_obs, double *orbit,
+void attempt_extensions( OBSERVE *obs, int n_obs, double *orbit,
                                     const double epoch)
 {
    double best_orbit[6];
@@ -4491,7 +4505,9 @@ void attempt_extensions( OBSERVE *obs, const int n_obs, double *orbit,
    const int stored_setting_outside_of_arc = setting_outside_of_arc;
    int best_available_sigmas;
    unsigned best_perturbers = perturbers;
+   const int n_radar_obs = sort_unused_obs_to_end( obs, n_obs);
 
+   n_obs -= n_radar_obs;
    if( !arc_limit_in_days)
       arc_limit_in_days = 3650;        /* Default to ten years at most */
    setting_outside_of_arc = 0;
@@ -4619,6 +4635,11 @@ void attempt_extensions( OBSERVE *obs, const int n_obs, double *orbit,
          adjust_herget_results( obs, n_obs, orbit);
          integrate_orbit( orbit, obs[j].jd, epoch);
          }
+      }
+   if( n_radar_obs)
+      {
+      n_obs += n_radar_obs;
+      shellsort_r( obs, n_obs, sizeof( OBSERVE), compare_observations, NULL);
       }
    set_locs( orbit, epoch, obs, n_obs);
 }
