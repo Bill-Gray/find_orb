@@ -36,21 +36,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "pl_cache.h"
 #include "constant.h"
 
-#ifndef _MSC_VER
-         /* All non-Microsoft builds are for the console */
-   #define CONSOLE
-#endif
-
 #ifndef _WIN32
    #include <unistd.h>
-#endif
-
-#ifdef CONSOLE
-      /* In the console version of Find_Orb,  the following two functions */
-      /* get remapped to Curses functions.  In the non-interactive one,   */
-      /* they're mapped to 'do-nothings'.  See fo.cpp & find_orb.cpp.     */
-   void refresh_console( void);
-   void move_add_nstr( const int col, const int row, const char *msg, const int n_bytes);
 #endif
 
 /* MS only got around to adding 'isfinite' in VS2013 : */
@@ -398,10 +385,8 @@ int integrate_orbitl( long double *orbit, const long double t0, const long doubl
                  / powl( STEP_INCREMENT, (integration_method ? 9. : 5.));
    static int use_encke = -1;
    long double t = t0;
-#ifdef CONSOLE
    static time_t real_time = (time_t)0;
    long double prev_t = t, last_err = 0.;
-#endif
    int n_rejects = 0, rval;
    unsigned saved_perturbers = perturbers;
    int n_steps = 0, prev_n_steps = 0;
@@ -455,7 +440,6 @@ int integrate_orbitl( long double *orbit, const long double t0, const long doubl
             reset_of_elements_needed = 0;
             }
       n_steps++;
-#ifdef CONSOLE
       if( !(n_steps % 500) && show_runtime_messages && time( NULL) != real_time)
          {
          char buff[80];
@@ -532,7 +516,6 @@ int integrate_orbitl( long double *orbit, const long double t0, const long doubl
 #endif
          refresh_console( );
          }
-#endif
 
                /* Make sure we don't step completely past */
                /* the time t1 we want to stop at!         */
@@ -584,9 +567,7 @@ int integrate_orbitl( long double *orbit, const long double t0, const long doubl
                stepsize /= STEP_INCREMENT;
                reset_of_elements_needed = 1;
                }
-#ifdef CONSOLE
             last_err = err;
-#endif
             }
             break;
          }
@@ -3688,10 +3669,8 @@ static double attempt_improvements( double *orbit, OBSERVE *obs, const int n_obs
    OBSERVE *best_obs = (OBSERVE *)calloc( n_obs, sizeof( OBSERVE));
    double temp_orbit[6];
 
-#ifdef CONSOLE
    if( show_runtime_messages)
       move_add_nstr( 14, 10, "Improving solution...        ", -1);
-#endif
    if( set_locs( orbit, obs[0].jd, obs, n_obs))
       {
       debug_printf( "Set loc fail 17\n");
@@ -3713,7 +3692,6 @@ static double attempt_improvements( double *orbit, OBSERVE *obs, const int n_obs
          {
          double score;
 
-#ifdef CONSOLE
          if( show_runtime_messages)
             {
             char msg_buff[80];
@@ -3723,7 +3701,6 @@ static double attempt_improvements( double *orbit, OBSERVE *obs, const int n_obs
                         obs[0].r, obs[n_obs - 1].r);
             move_add_nstr( 14, 10, msg_buff, -1);
             }
-#endif
          if( !method)         /* doing an Herget step */
             {
             double r1 = obs[0].r, r2 = obs[n_obs - 1].r;
@@ -3927,9 +3904,7 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
    int start = 0, n_radar_obs;
    bool dawn_based_observations = false;
    double arclen;
-#ifdef CONSOLE
    char msg_buff[80];
-#endif
    const double acceptable_score_limit = 5.;
    double best_score = 1e+50;
    double best_orbit[6], orbit_epoch;
@@ -4053,10 +4028,8 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
       fail_on_hitting_planet = true;
       if( n_subarc_obs >= 3)     /* at least three observations;  try Gauss */
          {
-#ifdef CONSOLE
          if( show_runtime_messages)
             move_add_nstr( 14, 10, "In Gauss solution", -1);
-#endif
          for( i = 0; i < 3; i++)
             {
             double epoch =
@@ -4097,10 +4070,8 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
                i = 3;
             }
          }           /* end of trying Gauss */
-#ifdef CONSOLE
       if( show_runtime_messages)
          move_add_nstr( 14, 10, "Gauss done", -1);
-#endif
       if( arclen < max_arg_length_for_vaisala)
          for( i = 0; i < 2; i++)
             {
@@ -4152,13 +4123,11 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
                   best_score = score;
                   memcpy( best_orbit, orbit, 6 * sizeof( double));
                   }
-#ifdef CONSOLE
                if( show_runtime_messages)
                   {
                   snprintf_err( msg_buff, sizeof( msg_buff), "Method %d, r=%.4f", i, pseudo_r);
                   move_add_nstr( 14, 10, msg_buff, -1);
                   }
-#endif
                if( score > 5e+4)   /* usually means eccentricity > 100! */
                   {
                   orbit_looks_reasonable = 0;      /* should stop looking */

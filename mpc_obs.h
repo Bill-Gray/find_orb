@@ -487,3 +487,13 @@ extern int force_model;
 bool is_inverse_square_force_model( void);
 
 const char *find_orb_version_jd( double *jd);
+
+      /* In the console version of Find_Orb,  the following two functions */
+      /* get remapped to Curses functions.  In the non-interactive one,   */
+      /* they're mapped to 'do-nothings'.  See fo.cpp & find_orb.cpp.     */
+void refresh_console( void);
+void move_add_nstr( const int col, const int row, const char *msg, const int n_bytes);
+
+#define COLOR_DEFAULT_INQUIRY       12
+int inquire( const char *prompt, char *buff, const int max_len,
+                     const int color);
