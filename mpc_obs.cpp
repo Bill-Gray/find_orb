@@ -398,26 +398,6 @@ static int fix_up_mpc_observation( char *buff, double *jd)
    return( rval);
 }
 
-
-#ifndef _MSC_VER
-         /* All non-Microsoft builds are for the console */
-   #define CONSOLE
-#endif
-
-#ifdef CONSOLE
-      /* In the console version of Find_Orb,  the following two functions */
-      /* get remapped to Curses functions.  In the non-interactive one,   */
-      /* they're mapped to 'do-nothings'.  See fo.cpp & find_orb.cpp.     */
-   void refresh_console( void);
-   void move_add_nstr( const int col, const int row, const char *msg, const int n_bytes);
-#endif
-
-#ifdef CONSOLE
-#define COLOR_DEFAULT_INQUIRY       9
-int inquire( const char *prompt, char *buff, const int max_len,
-                     const int color);
-#endif
-
 int set_tholen_style_sigmas( OBSERVE *obs, const char *buff)
 {
    const int n_scanned = sscanf( buff, "%lf%lf%lf",
@@ -436,16 +416,8 @@ int generic_message_box( const char *message, const char *box_type)
 {
    int rval;
 
-#ifdef CONSOLE
    INTENTIONALLY_UNUSED_PARAMETER( box_type);
    rval = inquire( message, NULL, 30, COLOR_DEFAULT_INQUIRY);
-#else
-   int box_flags = MB_YESNO;
-
-   if( !strcmp( box_type, "o"))
-      box_flags = MB_OK;
-   rval = MessageBox( NULL, message, "Find_Orb", box_flags);
-#endif
    debug_printf( "%s", message);
    return( rval);
 }
@@ -3593,10 +3565,8 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
    static int suppress_private_obs = -1;
    int insufficient_precision_warning_shown = 0;
 
-#ifdef CONSOLE
    move_add_nstr( 1, 2, "Loading observations", -1);
    refresh_console( );
-#endif
    *desig_from_neocp = '\0';
    strcpy( mpc_code_from_neocp, "500");   /* default is geocenter */
    neocp_file_type = NEOCP_FILE_TYPE_UNKNOWN;
@@ -4215,11 +4185,9 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
       reset_object_type( rval, n_obs_actually_loaded);
       apply_excluded_observations_file( rval, n_obs_actually_loaded);
       }
-#ifdef CONSOLE
    snprintf_err( buff, sizeof( buff), "%d observations actually loaded", n_obs_actually_loaded);
    move_add_nstr( 1, 2, buff, -1);
    refresh_console( );
-#endif
    return( rval);
 }
 
@@ -4314,11 +4282,9 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
                *get_environment_ptr( "FIX_OBSERVATIONS");
    char buff[550], mpc_code_from_neocp[4], desig_from_neocp[15];
    void *ades_context;
-#ifdef CONSOLE
    const clock_t t0 = clock( );
    int next_output = 2000, n_obs_read = 0;
    long filesize;
-#endif
 
    if( obj_name_stack)
       {
@@ -4335,11 +4301,9 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
          *n_found = -1;
       return( NULL);
       }
-#ifdef CONSOLE
    fseek( ifile, 0L, SEEK_END);
    filesize = ftell( ifile);
    fseek( ifile, 0L, SEEK_SET);
-#endif
    *mpc_code_from_neocp = '\0';
    *desig_from_neocp = '\0';
    *new_xdesig = *new_name = '\0';
@@ -4466,7 +4430,6 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
                n_alloced = new_size;
                prev_loc = -1;
                }
-#ifdef CONSOLE
             n_obs_read++;
             if( n_obs_read == next_output)
                {
@@ -4489,7 +4452,6 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
                move_add_nstr( 4, 3, msg_buff, -1);
                refresh_console( );
                }
-#endif
             }
       if( *buff == '#')
          {
