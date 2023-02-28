@@ -1220,22 +1220,22 @@ char *find_numbered_mp_info( const int number)
 }
 
 /* An object with a name such as 1989-013A is probably an artsat,  and
-probably has a NORAD designation,  name,  and other info in 'satcat.txt',
+probably has a NORAD designation,  name,  and other info in 'satcat.html',
 a master list of artsats available at
 
-http://planet4589.org/space/log/satcat.txt
+https://planet4589.org/space/gcat/data/cat/satcat.html
 
    The following code can turn,  for example,  '1966-092A' into
 '1966-092A = NORAD 02501 = Molniya-1'.       */
 
 static bool try_artsat_xdesig( char *name)
 {
-   FILE *ifile = fopen_ext( "satcat.txt", "crb");
+   FILE *ifile = fopen_ext( "satcat.html", "crb");
    bool found_a_match = false;
 
    if( ifile)
       {
-      char tbuff[250];
+      char tbuff[500];
       size_t slen;
       size_t max_out = 80;    /* max len of 'name' will be 80 bytes */
 
@@ -1248,11 +1248,11 @@ static bool try_artsat_xdesig( char *name)
       slen = strlen( name);
       if( max_out > slen)
          while( !found_a_match && fgets( tbuff, sizeof( tbuff), ifile))
-            if( !memcmp( tbuff + 8, name, slen) && tbuff[slen + 8] == ' ')
+            if( !memcmp( tbuff + 20, name, slen) && tbuff[slen + 20] == ' ')
                {
                found_a_match = true;
-               snprintf_append( name, max_out - slen, " = NORAD %.5s = %.31s",
-                        tbuff + 2, tbuff + 23);
+               snprintf_append( name, max_out - slen, " = NORAD %.5s = %.28s",
+                        tbuff + 1, tbuff + 48);
                remove_trailing_cr_lf( name);
                }
       fclose( ifile);
