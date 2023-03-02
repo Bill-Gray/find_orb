@@ -229,6 +229,7 @@ static int find_filter( expcalc_internals_t *e, char filter)
          e->extinction = filters[i].extinction;
          return( 0);
          }
+   assert( 0);       /* we _have_ to find a filter */
    return( -1);
 }
 
@@ -236,6 +237,12 @@ static int set_internals( expcalc_internals_t *e, const expcalc_config_t *c)
 {
    if( find_filter( e, c->filter))
       return( EXPCALC_UNKNOWN_FILTER);
+   assert( c->aperture > 0.1 && c->aperture < 100.);
+   assert( c->pixel_size > 0.01 && c->pixel_size < 100.);
+   assert( c->readnoise > 0.);
+   assert( c->primary_diam > 1.0 && c->primary_diam < 3100.);
+   assert( c->obstruction_diam >= 0.0 && c->obstruction_diam < c->primary_diam);
+   assert( c->qe > 0.01 && c->qe <= 1.0);
    e->n_pixels_in_aperture = pi * c->aperture * c->aperture
                   / (c->pixel_size * c->pixel_size);
    e->noise2 = c->readnoise * c->readnoise;
