@@ -1480,7 +1480,7 @@ that a directory exists for it.  For example,   given a filename
 
    it'll mkdir( "/home"), mkdir ("/home/joe"),  ... "/home/joe/z/k32/hi_there". */
 
-static void make_path_available( const char *filename)
+void make_path_available( const char *filename)
 {
    char path[PATH_MAX];
    int i;

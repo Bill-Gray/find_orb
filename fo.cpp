@@ -62,6 +62,7 @@ for Windows and other non-*nix systems. */
 extern int debug_level;
 
 void ensure_config_directory_exists(); /* miscell.c */
+void make_path_available( const char *filename);      /* ephem0.cpp */
 
    /* MSVC/C++ lacks snprintf.  See 'ephem0.cpp' for details. */
 #if defined(_MSC_VER) && _MSC_VER < 1900
@@ -970,6 +971,7 @@ int main( int argc, const char **argv)
                         real_packed_desig( packed_desig, obs->packed_id);
                         text_search_and_replace( ephem_filename, "%p", packed_desig);
                         ephemeris_filename = ephem_filename;
+                        make_path_available( ephem_filename);
                         }
                      if( !ephemeris_in_a_file_from_mpc_code( ephemeris_filename,
                               orbits_to_use, obs, n_obs_actually_loaded,
