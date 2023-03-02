@@ -466,7 +466,7 @@ static const char *get_arg( const int argc, const char **argv, const int idx)
 
 int main( int argc, const char **argv)
 {
-   char tbuff[300], mpc_codes[200];
+   char tbuff[300], *mpc_codes = (char *)malloc( 1);
    char **summary_lines = NULL;
    const char *separate_residual_file_name = NULL;
    const char *mpec_path = NULL;
@@ -531,9 +531,11 @@ int main( int argc, const char **argv)
                }
                break;
             case 'C':
+               mpc_codes = (char *)realloc( mpc_codes,
+                                strlen( mpc_codes) + strlen( arg) + 2);
                if( *mpc_codes)
-                  strlcat_err( mpc_codes, " ", sizeof( mpc_codes));
-               strlcat_err( mpc_codes, arg, sizeof( mpc_codes));
+                  strcat( mpc_codes, " ");
+               strcat( mpc_codes, arg);
                break;
             case 'd':
                debug_level = atoi( arg);
@@ -1052,6 +1054,7 @@ int main( int argc, const char **argv)
             printf( "  %s\n", tbuff);
          }
    free( ids);
+   free( mpc_codes);
    if( summary_ofile)
       {
       int pass;
