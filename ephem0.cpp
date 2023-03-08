@@ -1319,7 +1319,7 @@ inline void calc_sr_dist_and_posn_ang( const DPT *ra_decs, const unsigned n_obje
    z2 = c / z1;
    *dist = sqrt( z1);
    assert( z1 > z2);    /* z1 should be the _major_ axis */
-   *posn_ang = atan2( sum_xy, sum_x2 - z2);
+   *posn_ang = atan2( sum_x2 - z2, sum_xy);
     if( *posn_ang < 0.)
       *posn_ang += PI;
 #ifdef ENABLE_SCATTERPLOTS
