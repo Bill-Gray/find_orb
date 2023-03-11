@@ -151,6 +151,7 @@ int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid);
 int put_elements_into_sof( char *obuff, const char *templat,
          const ELEMENTS *elem, const double *nongravs,
          const int n_obs, const OBSERVE *obs);                /* elem_ou2.cpp */
+int qsort_strcmp( const void *a, const void *b, void *ignored_context);
 uint64_t parse_bit_string( const char *istr);                /* miscell.cpp */
 const char *write_bit_string( char *ibuff, const uint64_t bits);
 double generate_mc_variant_from_covariance( double *var_orbit,
@@ -2662,8 +2663,6 @@ int string_compare_for_sort( const void *a, const void *b, void *context)
    return( strcmp( a1[0] + *sort_column, b1[0] + *sort_column));
 }
 
-static const char *vector_data_file = "vectors.dat";
-
 /* For each object,  we'd like to know if a solution has already been
 computed for it and stored as a state vector in 'vectors.dat'.  We
 do this by digging through the file and looking for lines with a
@@ -2678,39 +2677,49 @@ for that object.   */
 
 void set_solutions_found( OBJECT_INFO *ids, const int n_ids)
 {
-   size_t n_lines;
-   char **ilines = load_file_into_memory( vector_data_file, &n_lines, false);
-   int i, n_objs, sort_column = -1;
+   size_t n_lines, name_len = 0, i;
+   char **ilines = load_file_into_memory( "orbits.sof", &n_lines, false);
+   int sort_column = 0;
 
-   for( i = 0; i < n_ids; i++)
+   for( i = 0; i < (size_t)n_ids; i++)
       ids[i].solution_exists = 0;
    if( !ilines)
       return;
-   for( i = n_objs = 0; (size_t)i < n_lines; i++)
-      if( ilines[i][0] == ' ' && isdigit( ilines[i][1]))
-         {
-         const char *space = strchr( ilines[i] + 1, ' ');
-
-         assert( space);     /* object name starts after a space */
-         memmove( ilines[i], space + 1, strlen( space));
-         ilines[n_objs++] = ilines[i];
-         }
-   shellsort_r( ilines, n_objs, sizeof( char *),
+   while( ilines[0][name_len] && ilines[0][name_len] != '|')
+      name_len++;
+   assert( ilines[0][name_len] == '|');
+   for( i = 0; i < (size_t)n_lines; i++)
+      {
+      ilines[i][name_len] = '\0';
+      remove_trailing_cr_lf( ilines[i]);
+      if( strlen( ilines[i]) == 12)    /* combined perm & provisional ID */
+         ilines[i][5] = '\0';
+      }
+   shellsort_r( ilines, n_lines, sizeof( char *),
                            string_compare_for_sort, &sort_column);
-   for( i = 0; i < n_ids; i++)
+   for( i = 0; i < (size_t)n_lines; i++)
+      debug_printf( "(%d) '%s'\n", (int)i, ilines[i]);
+   for( i = 0; i < (size_t)n_ids; i++)
       {
       size_t loc = 0, loc1, step;
+      char tname[15];
 
+      assert( strlen( ids[i].packed_desig) == 12);
+      strcpy( tname, ids[i].packed_desig);
+      text_search_and_replace( tname, " ", "");
+      if( strlen( tname) == 12)    /* combined perm & provisional ID */
+         tname[5] = '\0';
       for( step = 0x80000000; step; step >>= 1)
-         if( (loc1 = loc + step) < (size_t)n_objs)
+         if( (loc1 = loc + step) < n_lines)
             {
-            const int compare = names_compare( ilines[loc1], ids[i].obj_name);
+            const int compare = strcmp( ilines[loc1], tname);
 
             if( compare < 0)
                loc = loc1;
             if( !compare)
                ids[i].solution_exists = 1;
             }
+      debug_printf( "Looked for '%s'; %d\n", tname, (int)loc);
       }
    free( ilines);
 }
@@ -3046,7 +3055,6 @@ int n_extra_full_steps = 0;
 static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit,
                double *orbit_epoch, double *epoch_shown, unsigned *perturbers)
 {
-   FILE *ifile = NULL;
    int got_vectors = 0, i;
    extern int n_orbit_params;
    char object_name[80];
@@ -3061,108 +3069,6 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
       *orbit_epoch = extract_state_vect_from_text(
                   state_vect_text, orbit, &abs_mag);
       got_vectors = (*orbit_epoch != 0.);
-      }
-   if( !got_vectors)
-      ifile = (ignore_prev_solns ? NULL : fopen_ext( vector_data_file, "crb"));
-   if( ifile)
-      {
-      char buff[120];
-      double jd1 = 0., jd2 = 0.;
-      double residual_filter_threshhold = 0.;
-
-      while( fgets_trimmed( buff, sizeof( buff), ifile))
-         {
-         i = 1;
-         while( buff[i] && buff[i] != ' ')
-            i++;
-         assert( buff[i] == ' ');
-         if( !names_compare( object_name, buff + i + 1) || (take_first_soln && !got_vectors))
-            {
-            int n_read, center = 0, is_equatorial = 0;
-            char *tptr;
-            double dist_units = 1., time_units = .001;
-
-            got_vectors = 1;
-            *orbit_epoch = atof( buff);
-            *perturbers = 0;
-            fgets_trimmed( buff, sizeof( buff), ifile);
-            tptr = strchr( buff, '#');
-            if( tptr)
-               {
-               char *tptr2;
-
-               *tptr++ = '\0';
-               tptr2 = strstr( tptr, "Ctr");
-               if( tptr2)
-                  center = atoi( tptr2 + 3);
-               if( strstr( tptr, "km"))
-                  dist_units = AU_IN_KM;
-               if( strstr( tptr, "eq"))
-                  is_equatorial = 1;
-               if( strstr( tptr, "sec"))
-                  time_units = seconds_per_day;
-               }
-            for( i = 6; i < MAX_N_PARAMS; i++)
-                orbit[i] = 0.;
-            n_read = sscanf( buff, "%lf%lf%lf%x%lf %lf %lf",
-                          &orbit[0], &orbit[1], &orbit[2], perturbers,
-                          orbit + 6, orbit + 7, orbit + 8);
-            assert( n_read >= 3 && n_read < 8);
-            n_orbit_params = n_read + 2;
-            if( n_orbit_params <= 6)
-               {
-               n_orbit_params = 6;
-               force_model = 0;
-               }
-            else
-               force_model = ((n_orbit_params - 6) | 0x10);  /* assume inv square for the nonce */
-            fgets_trimmed( buff, sizeof( buff), ifile);
-            sscanf( buff, "%lf%lf%lf%lf%lf%lf",
-                          orbit + 3, orbit + 4, orbit + 5,
-                          &residual_filter_threshhold, &jd1, &jd2);
-            for( i = 3; i < 6; i++)
-               orbit[i] /= dist_units / time_units;
-            for( i = 0; i < 3; i++)
-               orbit[i] /= dist_units;
-            if( is_equatorial)
-               {
-               equatorial_to_ecliptic( orbit);
-               equatorial_to_ecliptic( orbit + 3);
-               }
-            if( center)
-               {
-               double vect[3];
-
-               compute_observer_loc( *orbit_epoch, center, 0., 0., 0., vect);
-               for( i = 0; i < 3; i++)
-                  orbit[i] += vect[i];
-               compute_observer_vel( *orbit_epoch, center, 0., 0., 0., vect);
-               for( i = 0; i < 3; i++)
-                  orbit[i + 3] += vect[i];
-               }
-            for( i = 0; i < n_obs; i++)
-               {
-               obs[i].computed_ra  = obs[i].ra;
-               obs[i].computed_dec = obs[i].dec;
-               }
-            }
-         }
-      if( got_vectors)
-         {
-         set_locs( orbit, *orbit_epoch, obs, n_obs);
-         if( jd2)
-            {
-            for( i = 0; i < n_obs; i++)
-               if( obs[i].jd < jd1 - .00001 || obs[i].jd > jd2 + .00001)
-                  obs[i].is_included = 0;
-               else
-                  if( residual_filter_threshhold &&
-                        observation_rms( obs + i) > residual_filter_threshhold)
-                     obs[i].is_included = 0;
-            }
-         do_full_improvement = true;
-         }
-      fclose( ifile);
       }
    if( !got_vectors && !ignore_prev_solns)
       {
@@ -3180,6 +3086,8 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
          {
          int n_extra_params = 0;
 
+         move_add_nstr( 2, 2, "Stored soln loaded", -1);
+         refresh_console( );
          *orbit_epoch = elems.epoch;
          if( got_vectors == 1)
             *perturbers = 0x7fe;    /* Merc-Pluto plus moon */
@@ -3498,39 +3406,6 @@ OBSERVE FAR *load_object( FILE *ifile, OBJECT_INFO *id,
       *epoch_shown = *curr_epoch = 0.;
    return( obs);
 }
-
-int store_solution( const OBSERVE *obs, const int n_obs, const double *orbit,
-       const double orbit_epoch, const int perturbers)
-{
-   FILE *ofile = fopen_ext( vector_data_file, "fcab");
-
-   if( ofile)
-      {
-      char buff[80];
-      int i, j;
-
-      get_object_name( buff, obs->packed_id);
-      fprintf( ofile, "%10.1f %s\n", orbit_epoch, buff);
-      for( i = 0; i < 3; i++)
-         fprintf( ofile, "%21.16f", orbit[i]);
-      if( perturbers)
-         {
-         extern int n_orbit_params;
-
-         fprintf( ofile, " %04x", perturbers);
-         for( i = 6; i < n_orbit_params; i++)
-            fprintf( ofile, " %.9g", orbit[i + 6]);
-         }
-      get_first_and_last_included_obs( obs, n_obs, &i, &j);
-      fprintf( ofile, "\n%21.16f%21.16f%21.16f %.3f %.5f %.5f\n",
-              orbit[3] * 1000., orbit[4] * 1000., orbit[5] * 1000.,
-              get_max_included_resid( obs, n_obs) + 0.001,
-              obs[i].jd, obs[j].jd);
-      fclose( ofile);
-      }
-   return( ofile ? 0 : -1);
-}
-
 
 #define LOG_10 2.3025850929940456840179914546843642076011014886287729760333279009675726
 

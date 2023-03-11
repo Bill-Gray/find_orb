@@ -4944,7 +4944,6 @@ int main( int argc, const char **argv)
 //             const double mid_epoch = curr_epoch;
 //             const double mid_epoch = epoch_shown;
 
-//             debug_printf( "From %.7f to %.7f\n", curr_epoch, mid_epoch);
                memcpy( saved_orbit, orbit, n_orbit_params * sizeof( double));
                integrate_orbit( orbit, curr_epoch, mid_epoch);
                         /* Only request sigmas for i=1 (last pass... */
@@ -5343,8 +5342,6 @@ int main( int argc, const char **argv)
 //                               orbit2[0], orbit2[1], orbit2[2]);
 //             debug_printf( "%20.14f %20.14f %20.14f\n",
 //                               orbit2[3], orbit2[4], orbit2[5]);
-               store_solution( obs, n_obs, orbit2, epoch_shown,
-                                          perturbers);
                }
             }
             break;
@@ -5760,6 +5757,8 @@ int main( int argc, const char **argv)
                         "EOPs run from %s to %s\n(%s with extrapolation)\n",
                                  date_buff[0], date_buff[2], date_buff[1]);
                }
+            else
+               strlcat_error( tbuff, "No EOPs available\n");
             if( debias_version > 2000)
                {
                const char *ver = "?unknown?\n";
@@ -5897,8 +5896,6 @@ int main( int argc, const char **argv)
 
             memcpy( orbit2, orbit, n_orbit_params * sizeof( double));
             integrate_orbit( orbit2, curr_epoch, epoch_shown);
-            store_solution( obs, n_obs, orbit2, epoch_shown,
-                                          perturbers);
             create_obs_file( obs, n_obs, 0, residual_format);
 #ifdef _WIN32                /* MS is different. */
             _unlink( get_file_name( tbuff, ephemeris_filename));
