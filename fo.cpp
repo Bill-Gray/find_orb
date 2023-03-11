@@ -89,7 +89,6 @@ int inquire( const char *prompt, char *buff, const int max_len,
 void refresh_console( void);                          /* fo.cpp */
 void move_add_nstr( const int col, const int row, const char *msg,
                      const int n_bytes);              /* fo.cpp */
-double current_jd( void);                       /* elem_out.cpp */
 char *fgets_trimmed( char *buff, size_t max_bytes, FILE *ifile); /*elem_out.c*/
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 int make_pseudo_mpec( const char *mpec_filename, const char *obj_name);

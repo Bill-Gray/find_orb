@@ -107,7 +107,6 @@ int get_idx1_and_idx2( const int n_obs, const OBSERVE FAR *obs,
 double mag_band_shift( const char mag_band, int *err_code);   /* elem_out.c */
 int get_jpl_ephemeris_info( int *de_version, double *jd_start, double *jd_end);
 double *get_asteroid_mass( const int astnum);   /* bc405.cpp */
-double current_jd( void);                       /* elem_out.cpp */
 double centralize_ang( double ang);             /* elem_out.cpp */
 char *get_file_name( char *filename, const char *template_file_name);
 void get_relative_vector( const double jd, const double *ivect,
@@ -460,15 +459,6 @@ static void packed_desig_minus_spaces( char *obuff, const char *ibuff)
    while( *ibuff && *ibuff != ' ')
       *obuff++ = *ibuff++;
    *obuff = '\0';
-}
-
-double current_jd( void)
-{
-   static const double jan_1970 = 2440587.5;
-   const double jd = jan_1970 +
-                  (double)nanoseconds_since_1970( ) * 1e-9 / seconds_per_day;
-
-   return( jd);
 }
 
 /* For some time,  I only had second-hand info on MPC's definition of

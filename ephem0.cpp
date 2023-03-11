@@ -90,7 +90,6 @@ int calc_derivatives( const double jd, const double *ival, double *oval,
 char *iso_time( char *buff, const double jd, const int precision);   /* elem_out.c */
 double mag_band_shift( const char mag_band, int *err_code);   /* elem_out.c */
 char *get_file_name( char *filename, const char *template_file_name);
-double current_jd( void);                       /* elem_out.cpp */
 double utc_from_td( const double jdt, double *delta_t);     /* ephem0.cpp */
 double diameter_from_abs_mag( const double abs_mag,      /* ephem0.cpp */
                                      const double optical_albedo);

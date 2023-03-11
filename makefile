@@ -129,6 +129,10 @@ all: $(FO_EXE) $(FIND_ORB_EXE) fo_serve.cgi eph2tle$(EXE)
 
 CXXFLAGS+=-c -Wall -pedantic -Wextra -Werror $(ADDED_CXXFLAGS) -I $(INSTALL_DIR)/include
 
+ifdef UCHAR
+	CXXFLAGS += -funsigned-char
+endif
+
 ifdef DEBUG
 	CXXFLAGS += -g -Og
 else
@@ -138,7 +142,7 @@ endif
 OBJS=ades_out.o b32_eph.o bc405.o bias.o collide.o conv_ele.o details.o eigen.o \
 	elem2tle.o elem_out.o elem_ou2.o ephem0.o errors.o expcalc.o gauss.o \
 	geo_pot.o healpix.o lsquare.o miscell.o         monte0.o \
-	mpc_obs.o nanosecs.o orb_func.o orb_fun2.o pl_cache.o roots.o  \
+	mpc_obs.o orb_func.o orb_fun2.o pl_cache.o roots.o  \
 	runge.o shellsor.o sigma.o simplex.o sm_vsop.o sr.o stackall.o
 
 miscell.o: prefix.h
