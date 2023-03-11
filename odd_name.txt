@@ -139,6 +139,22 @@ S051S        Saturn LI = Greip = S/2006 S 4
 S052S        Saturn LII = Tarqeq = S/2007 S 1
 ; Satellite 53 is an inner object:
 S053S        Saturn LIII = Aegaeon = S/2008 S 1
+
+; Approved 2022 Aug 24 :
+S054S        Saturn LIV = Gridr = S/2004 S 20
+S055S        Saturn LV = Angrboda = S/2004 S 22
+S056S        Saturn LVI = Skrymir S/2004 S 23
+S057S        Saturn LVII = Gerd = S/2004 S 25
+S058S        Saturn LVIII = S/2004 S 26
+S059S        Saturn LIX = Eggther = S/2004 S 27
+S060S        Saturn LX = S/2004 S 29
+S061S        Saturn LXI = Beli = S/2004 S 30
+S062S        Saturn LXII = Gunnlod = S/2004 S 32
+S063S        Saturn LXIII = Thiazzi = S/2004 S 33
+S064S        Saturn LXIV = S/2004 S 34
+S065S        Saturn LXV = Alvaldi = S/2004 S 35
+S066S        Saturn LXVI = Geirrod S/2004 S 38
+
 U001S        Uranus I = Ariel
 U002S        Uranus II = Umbriel
 U003S        Uranus III = Titania
