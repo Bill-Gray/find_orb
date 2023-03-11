@@ -3120,6 +3120,7 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
       if( obs[i].note2 == 'R')
          do_full_improvement = true;
    *epoch_shown = *orbit_epoch;
+   assert( n_obs > 0 && n_obs < 100000);
    if( do_full_improvement || available_sigmas == NO_SIGMAS_AVAILABLE)
       {
       extern double automatic_outlier_rejection_limit;
