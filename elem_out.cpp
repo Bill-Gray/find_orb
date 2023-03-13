@@ -2687,8 +2687,6 @@ void set_solutions_found( OBJECT_INFO *ids, const int n_ids)
       }
    shellsort_r( ilines, n_lines, sizeof( char *),
                            string_compare_for_sort, &sort_column);
-   for( i = 0; i < (size_t)n_lines; i++)
-      debug_printf( "(%d) '%s'\n", (int)i, ilines[i]);
    for( i = 0; i < (size_t)n_ids; i++)
       {
       size_t loc = 0, loc1, step;
@@ -2709,7 +2707,6 @@ void set_solutions_found( OBJECT_INFO *ids, const int n_ids)
             if( !compare)
                ids[i].solution_exists = 1;
             }
-      debug_printf( "Looked for '%s'; %d\n", tname, (int)loc);
       }
    free( ilines);
 }
