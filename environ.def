@@ -491,3 +491,9 @@ GROUP_LC1=V37 W85 K91 Q63 Z31 097
    to be included no matter how bad they are.  (Not something I recommend,  but
    you can do it.)
 OUTLIER_REJECTION_LIMIT=3
+
+   By default,  MOIDs will be shown for eight planets,  if they are low enough
+   to be "interesting".  Set N_MOIDS=14,  and six asteroid MOIDs will also be
+   shown (again,  only if they're low enough).  Don't set it to a higher value.
+   At least at present,  those added six are all we've got.
+N_MOIDS=8

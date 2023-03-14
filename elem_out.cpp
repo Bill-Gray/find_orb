@@ -1818,11 +1818,11 @@ periapsis uncertainty.  And we retain the "from x to y" line.
 matches the number of digits in the quantity itself.
 
    The program is theoretically capable of computing MOIDs relative to
-N_MOIDS objects (currently 14:  eight planets,  six asteroids). However,
-N_MOIDS_TO_SHOW = 8 at present (we only show planetary MOIDs.) */
+N_MOIDS objects (currently 14:  eight planets,  six asteroids).  We
+default to 8 (planetary MOIDs only),  but can add six asteroid MOIDS
+by setting N_MOIDS=14 in 'environ.dat'.  */
 
 #define N_MOIDS           14
-#define N_MOIDS_TO_SHOW    8
 
 double comet_total_magnitude = 0.;          /* a.k.a. "M1" */
 double comet_nuclear_magnitude = 0.;        /* a.k.a. "M2" */
@@ -2082,7 +2082,10 @@ int write_out_elements_to_file( const double *orbit,
          {
          int j;
          const double SRP1AU = 2.3e-7;
+         int n_moids_to_show = atoi( get_environment_ptr( "N_MOIDS"));
 
+         if( !n_moids_to_show)      /* by default,  just show */
+            n_moids_to_show = 8;    /* planetary MOIDs */
          if( force_model == FORCE_MODEL_SRP)
             {
             snprintf_err( tt_ptr, 80, "; AMR %.5g",
@@ -2092,7 +2095,7 @@ int write_out_elements_to_file( const double *orbit,
             strlcat_err( tt_ptr, " m^2/kg", 80);
             }
          if( !planet_orbiting)
-            for( j = 0; j < N_MOIDS_TO_SHOW; j++)
+            for( j = 0; j < n_moids_to_show; j++)
                {
                static const char moid_idx[N_MOIDS] = { 3, 5, 2, 1, 4, 6, 7, 8,
                                        10, 11, 12, 13, 14, 15 };
