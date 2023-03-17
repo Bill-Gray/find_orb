@@ -119,6 +119,7 @@ void ensure_config_directory_exists()
 // Going forward it'd be good to reqork Find_Orb to search for data in
 // default directories if local copies don't exist
 #include "prefix.h"
+static char PREFIX_STATIC[500] = PREFIX;
 void ensure_config_directory_exists()
 {
    if (!use_config_directory)
@@ -127,7 +128,9 @@ void ensure_config_directory_exists()
    // The c_str() magic in the next line allows conda-build's prefix
    // replacer to work as expected.
    // See https://github.com/conda/conda-build/issues/1674 for details.
-   std::string prefix = std::string(PREFIX).c_str();
+   // Modified on 2023-03-17 to add PREFIX_STATIC as compilers have
+   // gotten too clever & the existing workaround stopped working.
+   std::string prefix = std::string(PREFIX_STATIC).c_str();
 
    if (prefix == "~") {
       // backwards compatibility; do nothing.
