@@ -194,8 +194,8 @@ findorb.o:         findorb.cpp
 clipfunc.o:        clipfunc.cpp
 	$(CXX) $(CXXFLAGS) $(CURSES_FLAGS) $<
 
-getstrex.o:        getstrex.c
-	$(CC) $(CXXFLAGS) $(CURSES_FLAGS) $<
+getstrex.o:        getstrex.cpp
+	$(CXX) $(CXXFLAGS) $(CURSES_FLAGS) $<
 
 $(FO_EXE):          fo.o $(OBJS) $(RES_FILENAME)
 	$(CXX) -o $(FO_EXE) fo.o $(OBJS) $(LIBS) $(RES_FILENAME) $(LDFLAGS)
