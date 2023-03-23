@@ -640,6 +640,6 @@ const char *write_bit_string( char *ibuff, const uint64_t bits)
 const char *find_orb_version_jd( double *jd)
 {
     if( jd)
-      *jd = 2460000.5;
-    return( "2023 Feb 25");
+      *jd = 2460026.5;
+    return( "2023 Mar 23");
 }

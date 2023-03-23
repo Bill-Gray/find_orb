@@ -325,11 +325,21 @@ static void get_field_size( double *width, double *height, const double jd,
       case 1412:        /* (E12) Siding Spring */
          *width = 2.05;
          break;
+      case 1551:        /* (F51) PanSTARRS 1 */
+      case 1552:        /* (F52) PanSTARRS 2 */
+         *width = 3.2;
+         break;
       case 1852:        /* I52:  33' field of view;  some loss in corners */
          *width = 33. / 60.;
          break;
+      case 1904:       /* J04 */
+         *width = 1.122;      /* not sure of this... Marco Micheli says 44'? */
+         break;
       case 1995:       /* J95:  25' to 2005 jun 22, 18' for 2005 jun 27 on */
          *width = (jd < jun_24_2005 ? 25. / 60. : 18. / 60.);
+         break;
+      case 2222:          /* (M22) ATLAS South Africa */
+         *width = 7.354;
          break;
       case 2905:         /* ATLAS (T05), (T08) : 7.4 degree FOV */
       case 2908:
@@ -340,6 +350,9 @@ static void get_field_size( double *width, double *height, const double jd,
          break;
       case 3106:          /* (V06) */
          *width = 580. / 3600.;
+         break;
+      case 3268:          /* (W68) ATLAS Chile */
+         *width = 7.354;
          break;
       default:
          *width = 0.;
