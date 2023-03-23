@@ -2897,7 +2897,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                   snprintf_append( fake_line, sizeof( fake_line),
                            "|%18.14f|%+18.14f", ra * 15, dec);
                   }
-               snprintf( alt_buff, sizeof( alt_buff), "%18.10f ", curr_jd);
+               snprintf( alt_buff, sizeof( alt_buff), "%17.9f ", curr_jd);
                if( computer_friendly)
                   strlcpy( buff, alt_buff, sizeof( buff));
                else
