@@ -59,6 +59,7 @@ bool findorb_already_running = false;
 static const char *_extras_filename = "hints.txt";
 extern int available_sigmas;
 extern double optical_albedo;
+extern unsigned perturbers;
 
 #ifdef NOT_CURRENTLY_IN_USE
 #define ssnprintf_append( obuff, ...) snprintf_append( obuff, sizeof( obuff), __VA_ARGS__)
@@ -117,7 +118,7 @@ double get_planet_mass( const int planet_idx);                /* orb_func.c */
 double observation_rms( const OBSERVE FAR *obs);            /* elem_out.cpp */
 double find_epoch_shown( const OBSERVE *obs, const int n_obs); /* elem_out */
 double evaluate_initial_orbit( const OBSERVE FAR *obs,      /* orb_func.c */
-                              const int n_obs, const double *orbit);
+               const int n_obs, const double *orbit, const double epoch);
 double diameter_from_abs_mag( const double abs_mag,      /* ephem0.cpp */
                                      const double optical_albedo);
 char **load_file_into_memory( const char *filename, size_t *n_lines,
@@ -507,7 +508,6 @@ static int elements_in_mpcorb_format( char *buff, const char *packed_desig,
                 const char *full_desig, const ELEMENTS *elem,
                 const OBSERVE FAR *obs, const int n_obs)   /* orb_func.c */
 {
-   extern unsigned perturbers;
    int month, day, i, first_idx, last_idx, n_included_obs = 0;
    long year;
    const double rms_err = compute_rms( obs, n_obs);
@@ -1850,7 +1850,6 @@ int write_out_elements_to_file( const double *orbit,
    int n_more_moids = 0;
    int output_format = (precision | SHOWELEM_PERIH_TIME_MASK);
    extern int n_orbit_params;
-   extern unsigned perturbers;
    int reference_shown = 0;
    double moids[N_MOIDS + 1];
    double j2000_ecliptic_rel_orbit[MAX_N_PARAMS];
@@ -2428,7 +2427,7 @@ int write_out_elements_to_file( const double *orbit,
          }
 
       if( _include_comment( "Sco"))
-         fprintf( ofile, "# Score: %f\n", evaluate_initial_orbit( obs, n_obs, orbit));
+         fprintf( ofile, "# Score: %f\n", evaluate_initial_orbit( obs, n_obs, orbit, curr_epoch));
       }
 
    *impact_buff = '\0';
@@ -3043,7 +3042,7 @@ bool take_first_soln = false, force_final_full_improvement = false;
 int n_extra_full_steps = 0;
 
 static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit,
-               double *orbit_epoch, double *epoch_shown, unsigned *perturbers)
+               double *orbit_epoch, double *epoch_shown)
 {
    int got_vectors = 0, i;
    extern int n_orbit_params;
@@ -3080,8 +3079,8 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
          refresh_console( );
          *orbit_epoch = elems.epoch;
          if( got_vectors == 1)
-            *perturbers = 0x7fe;    /* Merc-Pluto plus moon */
-         if( _get_extra_orbit_info( obs->packed_id, perturbers, &n_extra_params,
+            perturbers = 0x7fe;    /* Merc-Pluto plus moon */
+         if( _get_extra_orbit_info( obs->packed_id, &perturbers, &n_extra_params,
                      orbit + 6, NULL))
             got_vectors = 0;
          else
@@ -3090,7 +3089,7 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
             if( n_obs > 1)
                {
                set_locs( orbit, *orbit_epoch, obs, n_obs);
-               filter_obs( obs, n_obs, rms_resid * 3., 1);
+/*             filter_obs( obs, n_obs, rms_resid * 3., 1);     */
                do_full_improvement = true;
                }
             abs_mag = elems.abs_mag;
@@ -3099,7 +3098,7 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
       }
    if( !got_vectors)
       {
-      *perturbers = 0;
+      perturbers = 0;
       *orbit_epoch = initial_orbit( obs, n_obs, orbit);
       if( force_final_full_improvement)
          do_full_improvement = true;
@@ -3107,7 +3106,7 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
    else if( n_obs == 1 && !strcmp( obs->reference, "Dummy"))
       {
       obs->jd = *orbit_epoch + td_minus_ut( *orbit_epoch) / seconds_per_day;
-      *perturbers = 0x7fe;    /* Merc-Pluto plus moon */
+      perturbers = 0x7fe;    /* Merc-Pluto plus moon */
       set_locs( orbit, *orbit_epoch, obs, n_obs);
       obs->ra = obs->computed_ra;
       obs->dec = obs->computed_dec;
@@ -3137,7 +3136,6 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
             obs[i].is_included = 1;
       if( got_vectors)
          attempt_extensions( obs, n_obs, orbit, *orbit_epoch);
-      prev_score = evaluate_initial_orbit( obs, n_obs, orbit);
       for( pass = 0; pass < 2; pass++)
          {
          const int64_t t0 = nanoseconds_since_1970( );
@@ -3147,6 +3145,8 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
          push_orbit( *orbit_epoch, orbit);
          integrate_orbit( orbit, *orbit_epoch, mid_epoch);
          *orbit_epoch = mid_epoch;
+         if( !pass)
+            prev_score = evaluate_initial_orbit( obs, n_obs, orbit, *orbit_epoch);
          for( i = 0; i < 4 && (nanoseconds_since_1970( ) - t0) < QUARTER_SECOND; i++)
             {
             if( i)
@@ -3165,7 +3165,7 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
                               ORBIT_SIGMAS_REQUESTED, *epoch_shown);
 
                }
-         if( prev_score < evaluate_initial_orbit( obs, n_obs, orbit) - .001)
+         if( prev_score < evaluate_initial_orbit( obs, n_obs, orbit, *orbit_epoch) - .001)
             {
             pop_orbit( orbit_epoch, orbit);    /* we were better off with the old orbit */
             memcpy( obs, saved_obs, n_obs * sizeof( OBSERVE));
@@ -3182,13 +3182,14 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
                /* we try again,  ignoring the stored solution.            */
    if( got_vectors && available_sigmas == NO_SIGMAS_AVAILABLE && !ignore_prev_solns)
       {
+      move_add_nstr( 3, 2, "Stored soln FAILED", -1);
       ignore_prev_solns = 1;
       n_orbit_params = 6;
       force_model = 0;
       for( i = 0; i < n_obs; i++)
          obs[i].is_included = !(obs[i].flags & OBS_DONT_USE);
       got_vectors = fetch_previous_solution( obs, n_obs, orbit, orbit_epoch,
-                        epoch_shown, perturbers);
+                        epoch_shown);
       ignore_prev_solns = 0;
       }
    return( got_vectors);
@@ -3363,7 +3364,6 @@ OBSERVE FAR *load_object( FILE *ifile, OBJECT_INFO *id,
 {
    extern int n_obs_actually_loaded;
    extern int debug_level;
-   extern unsigned perturbers;
    extern int excluded_asteroid_number;
    OBSERVE FAR *obs = load_observations( ifile, id->packed_desig,
                                                 id->n_obs);
@@ -3387,7 +3387,7 @@ OBSERVE FAR *load_object( FILE *ifile, OBJECT_INFO *id,
    if( n_obs_actually_loaded > 0)
       {
       const int got_vector = fetch_previous_solution( obs, id->n_obs, orbit,
-                            curr_epoch, epoch_shown, &perturbers);
+                            curr_epoch, epoch_shown);
 
       if( got_vector <= 0)
          *epoch_shown = find_epoch_shown( obs, id->n_obs);

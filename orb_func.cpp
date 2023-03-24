@@ -125,7 +125,7 @@ int compute_available_sigmas_hash( const OBSERVE FAR *obs, const int n_obs,
 double vector3_dist( const double *a, const double *b);     /* orb_func.c */
 double euler_function( const OBSERVE FAR *obs1, const OBSERVE FAR *obs2);
 double evaluate_initial_orbit( const OBSERVE FAR *obs,      /* orb_func.c */
-                              const int n_obs, const double *orbit);
+               const int n_obs, const double *orbit, const double epoch);
 static int find_transfer_orbit( double *orbit, OBSERVE FAR *obs1,
                 OBSERVE FAR *obs2,
                 const int already_have_approximate_orbit);
@@ -1695,7 +1695,7 @@ int get_sr_orbits( double *orbits, OBSERVE FAR *obs,
       if( !find_nth_sr_orbit( tptr, obs, n_obs, i + starting_orbit)
                    && (n_obs == 2 || !adjust_herget_results( obs, n_obs, tptr)))
          {
-         tptr[6] = evaluate_initial_orbit( obs, n_obs, tptr);
+         tptr[6] = evaluate_initial_orbit( obs, n_obs, tptr, obs[0].jd);
          rval++;
          tptr += 7;
          }
@@ -2165,7 +2165,7 @@ double evaluate_for_simplex_method( const OBSERVE FAR *obs,
                     const int planet_orbiting,
                     const char *limited_orbit)
 {
-   double rval = evaluate_initial_orbit( obs, n_obs, orbit);
+   double rval = evaluate_initial_orbit( obs, n_obs, orbit, obs[0].jd);
 
    if( limited_orbit && *limited_orbit)
       {
@@ -3612,21 +3612,21 @@ double distance_to_shadow( const OBSERVE FAR *obs)
 int is_interstellar = 0;
 
 double evaluate_initial_orbit( const OBSERVE FAR *obs,
-                              const int n_obs, const double *orbit)
+               const int n_obs, const double *orbit, const double epoch)
 {
    const double rms_err = compute_weighted_rms( obs, n_obs, NULL);
    double rval, rel_orbit[MAX_N_PARAMS], planet_radius_in_au;
    ELEMENTS elem;
-   int planet_orbiting = find_best_fit_planet( obs->jd,
+   int planet_orbiting = find_best_fit_planet( epoch,
                                   orbit, rel_orbit);
 
    elem.gm = get_planet_mass( planet_orbiting);
-   calc_classical_elements( &elem, rel_orbit, obs[0].jd, 1);
+   calc_classical_elements( &elem, rel_orbit, epoch, 1);
    if( planet_orbiting && elem.ecc > 1.01)
       {        /* it's flying past a planet:  re-evaluate as an */
       planet_orbiting = 0;               /* heliocentric object */
       elem.gm = get_planet_mass( 0);
-      calc_classical_elements( &elem, orbit, obs[0].jd, 1);
+      calc_classical_elements( &elem, orbit, epoch, 1);
       }
    planet_radius_in_au =
           planet_radius_in_meters( planet_orbiting) / AU_IN_METERS;
@@ -3657,8 +3657,9 @@ double evaluate_initial_orbit( const OBSERVE FAR *obs,
    if( elem.ecc < 1. && elem.q < planet_radius_in_au)
       rval += 10000.;
    if( debug_level > 4)
-      debug_printf( "Orbit with a=%f, q=%f, e=%f, i=%f: %f\n",
-            elem.major_axis, elem.q, elem.ecc, elem.incl * 180. / PI, rval);
+      debug_printf( "Orbit around %d with a=%f, q=%f, e=%f, i=%f: %f\n",
+            planet_orbiting, elem.major_axis, elem.q,
+            elem.ecc, elem.incl * 180. / PI, rval);
    return( rval);
 }
 
@@ -3678,7 +3679,7 @@ static double attempt_improvements( double *orbit, OBSERVE *obs, const int n_obs
 
    assert( n_orbit_params == 6);
    memcpy( temp_orbit, orbit, 6 * sizeof( double));
-   curr_score = evaluate_initial_orbit( obs, n_obs, orbit);
+   curr_score = evaluate_initial_orbit( obs, n_obs, orbit, obs->jd);
    memcpy( best_obs, obs, n_obs * sizeof( OBSERVE));
    for( method = 0; method < 2; method++)
       {
@@ -3731,7 +3732,7 @@ static double attempt_improvements( double *orbit, OBSERVE *obs, const int n_obs
             {
             const double full_step_advantage = .3;
 
-            score = evaluate_initial_orbit( obs, n_obs, temp_orbit);
+            score = evaluate_initial_orbit( obs, n_obs, temp_orbit, obs->jd);
             if( method)    /* for a full-improvement step,  make the score */
                score -= full_step_advantage;         /* just a hair better */
             if( debug_level > 2)
@@ -4043,7 +4044,7 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
 
                if( !set_locs( orbit, epoch, obs + start, n_subarc_obs))
                   {
-                  score = evaluate_initial_orbit( obs + start, n_subarc_obs, orbit);
+                  score = evaluate_initial_orbit( obs + start, n_subarc_obs, orbit, epoch);
                   if( debug_level > 2)
                      debug_printf( "Locations set; score %f (%d)\n", score, i);
                   if( score < 1000. &&
@@ -4111,7 +4112,7 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
                else
                   {
                   adjust_herget_results( obs + start, n_subarc_obs, orbit);
-                  score = evaluate_initial_orbit( obs + start, n_subarc_obs, orbit);
+                  score = evaluate_initial_orbit( obs + start, n_subarc_obs, orbit, obs[start].jd);
                   }
                if( debug_level > 2)
                   debug_printf( "%d, pseudo-r %f: score %f, herget rval %d\n",
@@ -4143,7 +4144,7 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
 
          memcpy( orbit, best_orbit, 6 * sizeof( double));
          attempt_improvements( orbit, obs + start, n_subarc_obs);
-         score = evaluate_initial_orbit( obs + start, n_subarc_obs, orbit);
+         score = evaluate_initial_orbit( obs + start, n_subarc_obs, orbit, obs[start].jd);
          if( debug_level > 2)
             debug_printf( "After attempted improvements: score %f\n", score);
          if( score < best_score)       /* call it a success: */
@@ -4542,7 +4543,7 @@ void attempt_extensions( OBSERVE *obs, int n_obs, double *orbit,
                if( debug_level > 2)
                   debug_printf( "fully improved : rms %f\n",
                                compute_rms( obs, n_obs));
-               score[i] = evaluate_initial_orbit( obs, n_obs, orbit);
+               score[i] = evaluate_initial_orbit( obs, n_obs, orbit, epoch);
                if( i && score[i - 1] < score[i] + .1)      /* no real improvement... */
                   result = 1;                               /* we must have converged */
                if( score[i] > 10000.)      /* clearly blowing up */
