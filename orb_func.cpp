@@ -2969,7 +2969,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
 
                slope_ptr[0] -= xresidual;
                slope_ptr[n_params] -= yresidual;
-/*             if( obs[j].note2 != 'R')   */
+               if( obs[j].note2 != 'R')
                   {
                   const double error_squared = slope_ptr[0] * slope_ptr[0]
                            + slope_ptr[n_params] * slope_ptr[n_params];
