@@ -138,6 +138,7 @@
  Rinner                                    <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=23999&amp;view=OPD">Rinner</a>
  Ritchey-Chretien                          Ritchey-Chr&eacute;tien
  J. E. Rogers                              <a href="https://minorplanetcenter.net/db_search/show_object?object_id=5517">J. E. Rogers</a>
+ Romanov                                   <a href='https://twitter.com/romanov_filipp'>Romanov</a>
  W. H. Ryan                                <a href="http://infohost.nmt.edu/~bryan/">W. H. Ryan</a>
  Sarneczky                                 <a href="http://en.wikipedia.org/wiki/Kriszti%C3%A1n_S%C3%A1rneczky">S&aacute;rneczky</a>
  S\'arneczky                               <a href="http://en.wikipedia.org/wiki/Kriszti%C3%A1n_S%C3%A1rneczky">S&aacute;rneczky</a>

@@ -4826,13 +4826,13 @@ void remove_trailing_cr_lf( char *buff)
 /* MPC frowns upon redistribution of NEOCP astrometry.  So if an input
 line is from NEOCP,  it's blacked out,  _unless_ it's from a station
 that has given permission for republication.  Those stations are listed
-in the GREENLIT and GREENLIT2 lines in 'environ.dat';  you can add your
-own if desired.
+in the GREENLIT, GREENLIT2, ...GREENLITn lines in 'environ.dat';  you
+can add your own if desired.
 
 In some cases,  only heliocentric observations have gotten the green light.
-Those codes are followed by an asterisk in the GREENLIT/GREENLIT2 lines.
+Those codes are followed by an asterisk in the GREENLIT* lines.
 
-For private use,  you can turn NEOCP redaction off... just be sure that
+For private use,  you can turn NEOCP redaction off.  Just be sure that
 if you do that,  you don't redistribute anything.        */
 
 bool neocp_redaction_turned_on = true;
@@ -4866,12 +4866,25 @@ static bool line_must_be_redacted( const char *mpc_line,
 {
    if( is_neocp_line( mpc_line) && neocp_redaction_turned_on)
       {
-      const char *to_check[4] = { "GREENLIT", "GREENLIT2", "GREENLIT3", "GREENLIT4" };
       size_t i;
 
-      for( i = 0; i < 4; i++)
-         if( _is_greenlit( get_environment_ptr( to_check[i]), mpc_line, is_heliocentric))
+      for( i = 0; i < 10; i++)
+         {
+         char env_buff[10];
+         const char *env_ptr;
+
+         strlcpy_error( env_buff, "GREENLIT");
+         if( i)
+            {
+            env_buff[8] = (char)( '1' + i);
+            env_buff[9] = '\0';
+            }
+         env_ptr = get_environment_ptr( env_buff);
+         if( _is_greenlit( env_ptr,  mpc_line, is_heliocentric))
             return( false);
+         if( !*env_ptr)
+            break;
+         }
       return( true);
       }
    else
