@@ -147,6 +147,8 @@ int get_planet_posn_vel( const double jd, const int planet_no,
 void compute_variant_orbit( double *variant, const double *ref_orbit,
                      const double n_sigmas);       /* orb_func.cpp */
 char *make_config_dir_name( char *oname, const char *iname);  /* miscell.cpp */
+int earth_lunar_posn( const double jd, double FAR *earth_loc, double FAR *lunar_loc);
+double vect_diff2( const double *a, const double *b);
 int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid);
 int put_elements_into_sof( char *obuff, const char *templat,
          const ELEMENTS *elem, const double *nongravs,
@@ -2093,30 +2095,48 @@ int write_out_elements_to_file( const double *orbit,
                consider_replacing( tt_ptr, "AMR", "Sigma_AMR:");
             strlcat_err( tt_ptr, " m^2/kg", 80);
             }
-         if( !planet_orbiting)
-            for( j = 0; j < n_moids_to_show; j++)
-               {
-               static const char moid_idx[N_MOIDS] = { 3, 5, 2, 1, 4, 6, 7, 8,
+         for( j = 0; j < n_moids_to_show; j++)
+            {
+            static const char moid_idx[N_MOIDS] = { 3, 5, 2, 1, 4, 6, 7, 8,
                                        10, 11, 12, 13, 14, 15 };
+            const int planet = moid_idx[j];
+
+            if( !planet_orbiting || planet_orbiting == planet)
+               {
                moid_data_t mdata;
                double moid, moid_limit = .1;
                ELEMENTS planet_elem;
                const int forced_moid =
                    (atoi( get_environment_ptr( "MOIDS")) >> j) & 1;
 
-               setup_planet_elem( &planet_elem, moid_idx[j],
+               setup_planet_elem( &planet_elem, planet,
                                 (epoch_shown - J2000) / 36525.);
                moid = find_moid_full( &planet_elem, &helio_elem, &mdata);
                if( !j)     /* only get Barbee speed for the earth */
-                  barbee_style_delta_v = mdata.barbee_speed * AU_IN_KM / seconds_per_day;
+                  {
+                  double lunar_loc[3], earth_loc[3], lunar_r, earth_r;
+                  double v2;
+
+                  earth_lunar_posn( epoch_shown, earth_loc, lunar_loc);
+                  lunar_r = sqrt( vect_diff2( orbit2, lunar_loc));
+                  earth_r = sqrt( vect_diff2( orbit2, earth_loc));
+                  v2 = mdata.barbee_speed * mdata.barbee_speed
+                                    - 2. * get_planet_mass( 3) / earth_r
+                                    - 2. * get_planet_mass( 10) / lunar_r;
+                  if( v2 > 0.)
+                     barbee_style_delta_v = sqrt( v2);
+                  else
+                     barbee_style_delta_v = -sqrt( -v2);
+                  barbee_style_delta_v *= AU_IN_KM / seconds_per_day;
+                  }
                if( j < 2)        /* Earth or Jupiter */
                   moid_limit = 1.;
                else if( j > 7)            /* asteroid */
                   moid_limit = .1;
                else if( j > 4)          /* Saturn,  Uranus,  Neptune */
                   moid_limit = 1.;
-               moids[(int)moid_idx[j]] = moid;
-               if( forced_moid || moid < moid_limit)
+               moids[planet] = moid;
+               if( !planet_orbiting && (forced_moid || moid < moid_limit))
                   {
                   char addendum[30];
                   static const char *moid_text[N_MOIDS] = { "Earth MOID", "Ju",
@@ -2138,6 +2158,7 @@ int write_out_elements_to_file( const double *orbit,
                            sizeof( orbit_summary_text), " MOID %.3f", moid);
                   }
                }
+            }
          }
       else if( *more_moids)
          {
