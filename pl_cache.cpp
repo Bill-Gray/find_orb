@@ -472,9 +472,9 @@ int planet_posn( const int planet_no, const double jd, double *vect_2000)
          rval = planet_posn( 10 + vel_offset, jd, moon_loc);    /* lunar offset vect  */
       if( !rval)
          {
-         unsigned i;
+         size_t i;
          const double EARTH_MOON_BARYCENTER_FACTOR = 82.300679;
-         const double factor = (planet_no == PLANET_POSN_EARTH ?
+         const double factor = (planet_no % PLANET_POSN_VELOCITY_OFFSET == PLANET_POSN_EARTH ?
                      -1. / EARTH_MOON_BARYCENTER_FACTOR :
                  1. - 1. / EARTH_MOON_BARYCENTER_FACTOR);
 
