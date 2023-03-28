@@ -1433,25 +1433,12 @@ void update_environ_dot_dat( void);                        /* mpc_obs.cpp */
 static int earth_lunar_posn_vel( const double jd, double FAR *earth_loc,
                              double FAR *lunar_loc, const int is_vel)
 {
-   double t_earth[3], t_lunar[3];
-   int i;
+   const int vel_offset = (is_vel ? PLANET_POSN_VELOCITY_OFFSET : 0);
 
-   planet_posn( 3 + (is_vel ? PLANET_POSN_VELOCITY_OFFSET : 0), jd, t_earth);
-   planet_posn( 10 + (is_vel ? PLANET_POSN_VELOCITY_OFFSET : 0), jd, t_lunar);
-                     /* earth_loc is the E-M barycenter,  and lunar_loc */
-                     /* is geocentric.  Modify earth_loc to be the earth */
-                     /* geocenter loc,  and lunar_loc to be heliocentric: */
-   for( i = 0; i < 3; i++)
-      {
-      const double earth_moon_barycenter_factor = 82.300679;
-
-      t_earth[i] -= t_lunar[i] / earth_moon_barycenter_factor;
-      t_lunar[i] += t_earth[i];
-      if( earth_loc)
-         earth_loc[i] = t_earth[i];
-      if( lunar_loc)
-         lunar_loc[i] = t_lunar[i];
-      }
+   if( earth_loc)
+      planet_posn( PLANET_POSN_EARTH + vel_offset, jd, earth_loc);
+   if( lunar_loc)
+      planet_posn( PLANET_POSN_MOON  + vel_offset, jd, lunar_loc);
    return( 0);
 }
 
