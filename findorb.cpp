@@ -5207,12 +5207,18 @@ int main( int argc, const char **argv)
          case ALT_F:
             {
             extern double **eigenvects;
-            const double n_sigmas = improve_along_lov( orbit, curr_epoch,
+
+            if( eigenvects && eigenvects[0])
+               {
+               const double n_sigmas = improve_along_lov( orbit, curr_epoch,
                      eigenvects[0], n_orbit_params, n_obs, obs);
 
-            snprintf( message_to_user, sizeof( message_to_user),
+               snprintf( message_to_user, sizeof( message_to_user),
                                        "Adjusted by %f sigmas", n_sigmas);
-            update_element_display = 1;
+               update_element_display = 1;
+               }
+            else
+               strlcpy_error( message_to_user, "No LOV along which to improve");
             }
             break;
          case CTRL( 'D'):
