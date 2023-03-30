@@ -2586,7 +2586,7 @@ int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid)
    return( n_residuals);
 }
 
-static double vect_diff2( const double *a, const double *b)
+double vect_diff2( const double *a, const double *b)
 {
    size_t i;
    double rval = 0, delta;
@@ -3887,6 +3887,53 @@ static int sort_unused_obs_to_end( OBSERVE *obs, int n_obs)
    return( n_radar_obs);
 }
 
+static int compare_doubles( const void *aptr, const void *bptr, void *unused_context)
+{
+   const double a = *(double *)aptr, b = *(double *)bptr;
+
+   INTENTIONALLY_UNUSED_PARAMETER( unused_context);
+   return( a > b ? 1 : -1);
+}
+
+/* Of the 'acceptable' variant orbits,  we'd like to have the nominal
+one be a 'median' one.  So we look through the variant state vectors
+and determine the median x, y, and z values at epoch.  Then we look for
+the orbit closest to that point,  and make that the nominal one.  */
+
+static void find_median_orbit( double *sr_orbits, const unsigned n_sr_orbits)
+{
+   unsigned i, j, best_idx = 0;
+   double median[3], *temp_array = (double *)calloc( n_sr_orbits, sizeof( double));
+   double best_dist2;
+
+   for( i = 0; i < 3; i++)
+      {
+      for( j = 0; j < n_sr_orbits; j++)
+         temp_array[j] = sr_orbits[j * 6 + i];
+      shellsort_r( temp_array, n_sr_orbits, sizeof( double), compare_doubles, NULL);
+      median[i] = temp_array[n_sr_orbits / 2];
+      }
+   free( temp_array);
+   for( i = 0; i < n_sr_orbits; i++)
+      {
+      const double dist2 = vect_diff2( median, sr_orbits + i * 6);
+
+      if( !i || best_dist2 > dist2)
+         {
+         best_dist2 = dist2;
+         best_idx = i;
+         }
+      }
+   for( i = 0; i < 6; i++)
+      {
+      const double swap_val = sr_orbits[i];
+
+      sr_orbits[i] = sr_orbits[i + best_idx * 6];
+      sr_orbits[i + best_idx * 6] = swap_val;
+      }
+}
+
+
 #define INITIAL_ORBIT_NOT_YET_FOUND       -2
 #define INITIAL_ORBIT_FAILED              -1
 #define INITIAL_ORBIT_FOUND                0
@@ -3985,6 +4032,7 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
               /* SR orbits are stored in seven doubles,  including a score. */
       for( i = 1; i < (int)n_sr_orbits; i++)  /* Shift 'em to remove the score. */
          memmove( sr_orbits + i * 6, sr_orbits + i * 7, 6 * sizeof( double));
+      find_median_orbit( sr_orbits, n_sr_orbits);
       memcpy( orbit, sr_orbits, 6 * sizeof( double));
       compute_sr_sigmas( sr_orbits, n_sr_orbits, obs[0].jd, epoch_shown);
       available_sigmas_hash = compute_available_sigmas_hash( obs, n_obs,
