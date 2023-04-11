@@ -1979,7 +1979,7 @@ int write_out_elements_to_file( const double *orbit,
    helio_elem.gm = SOLAR_GM;
    calc_classical_elements( &helio_elem, orbit2, epoch_shown, 1);
    tbuff = (char *)malloc( tbuff_size);
-   n_lines = elements_in_mpc_format( tbuff, &elem, object_name,
+   n_lines = elements_in_mpc_format( tbuff, tbuff_size, &elem, object_name,
                is_cometary( constraints) && fabs( elem.ecc - 1.) < 1.e-6,
                output_format);
    fprintf( ofile, "%s\n", tbuff);
@@ -3145,7 +3145,7 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
       {
       extern double automatic_outlier_rejection_limit;
       OBSERVE *saved_obs = (OBSERVE *)calloc( n_obs, sizeof( OBSERVE));
-      double prev_score;
+      double prev_score = 0.;
       int pass;
 
       if( !*get_environment_ptr( "KEEP_PREVIOUS_EPOCH") && !got_vectors)
