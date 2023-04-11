@@ -1409,9 +1409,10 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
          const double *orbits_to_use = orbit;
          extern const char *ephemeris_filename;
          unsigned n_orbits = 1;
+         const bool is_observables =
+                  ((ephemeris_output_options & 7) == OPTION_OBSERVABLES);
 
-         if( (ephemeris_output_options & 7) == OPTION_OBSERVABLES &&
-                     (ephemeris_output_options & OPTION_SHOW_SIGMAS))
+         if( is_observables && (ephemeris_output_options & OPTION_SHOW_SIGMAS))
             orbits_to_use = set_up_alt_orbits( orbit, &n_orbits);
          if( ephemeris_in_a_file_from_mpc_code(
                get_file_name( buff, ephemeris_filename),
@@ -1423,7 +1424,8 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                               COLOR_MESSAGE_TO_USER);
          else
             {
-            show_a_file( get_file_name( buff, ephemeris_filename), SHOW_FILE_IS_EPHEM);
+            show_a_file( get_file_name( buff, ephemeris_filename),
+                           (is_observables? SHOW_FILE_IS_EPHEM : 0));
             create_resid_file( obs, n_obs, input_filename, residual_format);
             make_pseudo_mpec( get_file_name( buff, "mpec.htm"), obj_name);
             if( ephemeris_output_options
