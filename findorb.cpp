@@ -2853,11 +2853,17 @@ static int find_rgb( const int irgb)
                                       | (rgb0[2] > 127 ? 4 : 0));
    if( COLORS >= 256)
       {
-      const int r_idx = (rgb0[0] + 10) / 50;
-      const int g_idx = (rgb0[1] + 10) / 50;
-      const int b_idx = (rgb0[2] + 10) / 50;
+      if( rgb0[0] == rgb0[1] && rgb0[0] == rgb0[2]    /* gray-scale */
+                                 && rgb0[0] > 4 && rgb0[0] < 247)
+         return( 232 + (rgb0[0] - 4) / 10);
+      else
+         {
+         const int r_idx = (rgb0[0] + 10) / 50;
+         const int g_idx = (rgb0[1] + 10) / 50;
+         const int b_idx = (rgb0[2] + 10) / 50;
 
-      return( 16 + b_idx + 6 * g_idx + 36 * r_idx);
+         return( 16 + b_idx + 6 * g_idx + 36 * r_idx);
+         }
       }
    for( i = 0; i < 3; i++)
       rgb0[i] = rgb0[i] * 200 / 51;
