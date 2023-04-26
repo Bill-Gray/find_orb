@@ -909,9 +909,14 @@ static int get_observer_data_latlon( const char FAR *mpc_code,
 /* the instrument,  so I'm letting "short" records slide if they're     */
 /* only lacking three or fewer places.)                                 */
 
-#define SATELL_COORD_BAD_SIGN       -1
-#define SATELL_COORD_BAD_NUMBER     -2
-#define SATELL_COORD_NO_DECIMAL     -3
+#define SATELL_COORD_ERR_NO_ERROR            0
+#define SATELL_COORD_ERR_BAD_SIGN           -1
+#define SATELL_COORD_ERR_BAD_NUMBER         -2
+#define SATELL_COORD_ERR_NO_DECIMAL         -3
+#define SATELL_COORD_ERR_DECIMAL_MISPLACED  -4
+#define SATELL_COORD_ERR_UNKNOWN_OFFSET     -5
+#define SATELL_COORD_ERR_EXACTLY_ZERO       -6
+#define SATELL_COORD_ERR_INSIDE_EARTH       -7
 
 static bool strict_sat_xyz_format = true;
 
@@ -931,17 +936,17 @@ inline double get_satellite_coordinate( const char *iptr, int *decimal_loc)
       *decimal_loc = 0;
       }
    else if( sign_byte != '+' && sign_byte != '-')
-      *decimal_loc = -1;         /* signal bad sign */
+      *decimal_loc = SATELL_COORD_ERR_BAD_SIGN;
    else
       {
       char *tptr;
       int n_bytes_read;
 
       if( sscanf( tbuff + 1, "%lf%n", &rval, &n_bytes_read) != 1
-                     || n_bytes_read < 10)
-         *decimal_loc = -2;
+                     || n_bytes_read < 7)
+         *decimal_loc = SATELL_COORD_ERR_BAD_NUMBER;
       else if( (tptr = strchr( tbuff, '.')) == NULL)
-         *decimal_loc = -3;
+         *decimal_loc = SATELL_COORD_ERR_NO_DECIMAL;
       else
          *decimal_loc = (int)( tptr - tbuff);
       if( sign_byte == '-')
@@ -958,32 +963,39 @@ int get_satellite_offset( const char *iline, double *xyz)
    size_t i;
    int error_code = 0;
    const int observation_units = (int)iline[32] - '0';
+   double r2 = 0.;
 
    for( i = 0; i < 3; i++)    /* in case of error,  use 0 offsets */
       xyz[i] = 0.;
    iline += 34;      /* this is where the offsets start */
-   for( i = 0; !error_code && i < 3; i++, iline += 12)
+   for( i = 0; i < 3; i++, iline += 12)
       {
       int decimal_loc;
 
       xyz[i] = get_satellite_coordinate( iline, &decimal_loc);
+      if( decimal_loc < 0 && !error_code)
+         error_code = decimal_loc;
       if( observation_units == 1)         /* offset given in km */
          {
          xyz[i] /= AU_IN_KM;
-         if( strict_sat_xyz_format)
+         if( strict_sat_xyz_format && !error_code)
             if( decimal_loc < 6 || decimal_loc > 8)
-               error_code = -1;
+               error_code = SATELL_COORD_ERR_DECIMAL_MISPLACED;
          }
       else if( observation_units == 2)          /* offset in AU */
          {                         /* offset must be less than 100 AU */
-         if( strict_sat_xyz_format && decimal_loc != 2 && decimal_loc != 3)
-            error_code = -2;
+         if( strict_sat_xyz_format && !error_code)
+            if( decimal_loc != 2 && decimal_loc != 3)
+               error_code = SATELL_COORD_ERR_DECIMAL_MISPLACED;
          }
-      else      /* don't know about this sort of offset */
-         error_code = -3;
+      else if( !error_code)      /* don't know about this sort of offset */
+         error_code = SATELL_COORD_ERR_UNKNOWN_OFFSET;
       if( !error_code && xyz[i] == 0.)
-         error_code = -4;
+         error_code = SATELL_COORD_ERR_EXACTLY_ZERO;
+      r2 += xyz[i] * xyz[i];
       }
+   if( !error_code && r2 < EARTH_RADIUS_IN_AU * EARTH_RADIUS_IN_AU)
+      error_code = SATELL_COORD_ERR_INSIDE_EARTH;
    equatorial_to_ecliptic( xyz);
    return( error_code);
 }
@@ -3657,9 +3669,13 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                error_code = get_satellite_offset( second_line, vect);
                if( error_code)
                   {
+                  char tbuff[8];
+
                   rval[i].flags |= OBS_DONT_USE;
                   rval[i].is_included = 0;
-                  comment_observation( rval + i, "?off");
+                  strcpy( tbuff, "?off ");
+                  tbuff[4] = (char)( '0' - error_code);
+                  comment_observation( rval + i, tbuff);
                   n_bad_satellite_offsets++;
                   debug_printf( "Error code %d; offending line was:\n%s\n",
                      error_code, second_line);
