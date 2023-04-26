@@ -640,9 +640,27 @@ const char *write_bit_string( char *ibuff, const uint64_t bits)
    return( ibuff);
 }
 
+bool pattern_match(const char* pattern, const char* string)
+{
+   while( pattern[0])
+      if( pattern[0] == '*')
+            return pattern_match(pattern+1, string)
+                     || (string[0] && pattern_match(pattern, string+1));
+      else
+         {
+         if( pattern[0] == '?' && !string[0])
+            return 0;
+         if( pattern[0] != '?' && pattern[0] != string[0])
+            return 0;
+         pattern++;
+         string++;
+         }
+   return !string[0];
+}
+
 const char *find_orb_version_jd( double *jd)
 {
     if( jd)
-      *jd = 2460045.5;
-    return( "2023 Apr 11");
+      *jd = 2460060.5;
+    return( "2023 Apr 26");
 }
