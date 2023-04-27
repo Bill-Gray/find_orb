@@ -591,6 +591,13 @@ int main( int argc, const char **argv)
             case 'n':
                starting_object = atoi( arg);
                break;
+            case 'N':
+               {
+               extern const char *desig_pattern;
+
+               desig_pattern = arg;
+               }
+               break;
             case 'O':          /* write output files to specified dir */
                {
                extern const char *output_directory;
