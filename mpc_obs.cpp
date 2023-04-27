@@ -48,6 +48,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "pl_cache.h"
 #include "constant.h"
 
+bool pattern_match(const char* pattern, const char* string);   /* miscell.c */
+int text_search_and_replace( char FAR *str, const char *oldstr,
+                                     const char *newstr);   /* ephem0.cpp */
 double utc_from_td( const double jdt, double *delta_t);     /* ephem0.cpp */
 int apply_excluded_observations_file( OBSERVE *obs, const int n_obs);
 void set_up_observation( OBSERVE FAR *obs);                 /* mpc_obs.c */
@@ -4257,6 +4260,37 @@ void sort_object_info( OBJECT_INFO *ids, const int n_ids,
                                     &object_info_compare_method);
 }
 
+const char *desig_pattern = NULL;
+
+/* One can specify,  e.g.,  '-N C314159,K22Ea4C' to process only
+those two objects.  I may eventually implement something more
+regular expression-ish. */
+
+static bool desig_pattern_matched( OBJECT_INFO *id, const char *pattern)
+{
+   char packed_desig[13];
+   size_t i = 0, j;
+
+   strlcpy_error( packed_desig, id->packed_desig);
+   text_search_and_replace( packed_desig, " ", "");
+   while( pattern[i])
+      {
+      char tpattern[30];
+
+      j = i;
+      while( pattern[j] != ',' && pattern[j])
+         j++;
+      assert( j - i < sizeof( tpattern) - 1);
+      strlcpy( tpattern, pattern + i, j - i + 1);
+      if( pattern_match( tpattern, packed_desig))
+         return( true);
+      i = j;
+      if( pattern[i] == ',')
+         i++;
+      }
+   return( false);
+}
+
 /* find_objects_in_file( ) reads through the file of MPC astrometric data
    specified by 'filename',  and figures out which objects appear in that
    file.  Those objects can then be listed on the console (findorb) or
@@ -4500,6 +4534,19 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
       if( rval[i].packed_desig[0])
          rval[n++] = rval[i];
    assert( n == *n_found);
+   if( desig_pattern)
+      {
+      i = 0;
+      while( i < n)
+         if( !desig_pattern_matched( rval + i, desig_pattern))
+            {
+            memmove( rval+ i, rval + i + 1, (n - i - 1) * sizeof( OBJECT_INFO));
+            n--;
+            }
+         else
+            i++;
+      }
+   *n_found = n;
    rval = (OBJECT_INFO *)realloc( rval, n * sizeof( OBJECT_INFO));
            /* Only now do we set the 'full' object names,  because  */
            /* some may have been added mid-file using COM fullname. */
