@@ -1475,3 +1475,4 @@ LC2 !   0.0000       0.00000   +0.00000    @3  Las Cumbres Observatory (2m)
 ATL !   0.0000       0.00000   +0.00000    @3  ATLAS (all scopes)
 
 RA2 !-110.847070   +32.581105        1190.     RAPTORS-2
+RMI !+145.061634   -37.680589         160.4    RMIT Robotic Optical Observatory
