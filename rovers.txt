@@ -276,16 +276,13 @@ Vk2 ! 134.2803       +47.6698          0   @4  Viking 2
 Be2 !  90.43         +11.53            0   @4  Beagle 2
 ExM ! 353.79         -02.07            0   @4  ExoMars Schiaparelli
 Per !  77.45088572   +18.44462715      0   @4  Perseverance, Mars
-Ti1 ! 110.318        +24.748           0   @4  Tianwen-1 lander, Mars
 ExM ! 335.45         +18.20            0   @4  ExoMars 2022
 MPL ! 195.3          -76.1             0   @4  Mars Polar Lander
 Ma6 !  19.42         -23.9             0   @4  Mars 6 site
 Ma3 ! 202.           -45.              0   @4  Mars 3 site
 Ma2 !  47.           -45.              0   @4  Mars 2 site
 
-   Following position, measured from an HiRISE image,  is from
-   https://space.stackexchange.com/questions/53586/whats-the-exact-location-lat-lon-of-zhurong
-Zhu ! 109.9249       +25.0644          0   @4  Zhurong landing site
+Zhu ! 109.925        +25.066       -4099.4 @4  Zhurong landing site
 
    In some cases,  viewpoints from the Moon may be useful.
 Ch4 ! 177.589        -45.457           0   @10 Chang'e 4 lander
