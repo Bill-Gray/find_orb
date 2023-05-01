@@ -83,6 +83,10 @@ int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
          __attribute__ (( format( printf, 1, 2)))
 #endif
 ;
+char *make_config_dir_name( char *oname, const char *iname);  /* miscell.cpp */
+int download_a_file( const char *ofilename, const char *url);
+const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
+void set_environment_ptr( const char *env_ptr, const char *new_value);
 char **load_file_into_memory( const char *filename, size_t *n_lines,
                         const bool fail_if_not_found);      /* mpc_obs.cpp */
 void shellsort_r( void *base, const size_t n_elements, const size_t esize,
@@ -108,6 +112,10 @@ double n_nearby_obs( const OBSERVE FAR *obs, const unsigned n_obs,
 void convert_ades_sigmas_to_error_ellipse( const double sig_ra,
          const double sig_dec, const double correl, double *major,
          double *minor, double *angle);                      /* errors.cpp */
+
+#ifndef PATH_MAX
+   #define PATH_MAX 256
+#endif
 
 static void *_ades_ids_stack = NULL;
 
@@ -864,7 +872,28 @@ int get_observer_data( const char FAR *mpc_code, char *buff, mpc_code_t *cinfo)
       }
    if( !curr_station)
       {
+      const char *envar = "UPDATE_OBSCODES_HTML";
+      const double curr_t = current_jd( );
+      double last_t = 0., delay = 0.1;
+
+      sscanf( get_environment_ptr( envar), "%lf %lf", &last_t, &delay);
       debug_printf( "Couldn't find MPC station '%s'\n", mpc_code);
+      debug_printf( "Curr t %f; last t %f; delay %f\n",
+                  curr_t, last_t, delay);
+      if( curr_t > last_t + delay)
+         {
+         char path[PATH_MAX];
+
+         snprintf( path, sizeof( path), "%f %f", curr_t, delay);
+         set_environment_ptr( envar, path);
+         make_config_dir_name( path, "ObsCodes.htm");
+         if( !download_a_file( path,
+                  "http://www.minorplanetcenter.org/iau/lists/ObsCodes.html"))
+            {
+            get_observer_data( NULL, NULL, NULL);
+            return( get_observer_data( mpc_code, buff, cinfo));
+            }
+         }
       if( buff)
          {
          strcpy( buff, blank_line);
@@ -1440,8 +1469,6 @@ void set_obs_vect( OBSERVE FAR *obs)
    the following code computes that planet's J2000 equatorial coordinates
    using the PS1996 theory (or,  for the moon,  ELP82). */
 
-const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
-void set_environment_ptr( const char *env_ptr, const char *new_value);
 int load_environment_file( const char *filename);          /* mpc_obs.cpp */
 static int load_default_environment_file( void);           /* mpc_obs.cpp */
 void update_environ_dot_dat( void);                        /* mpc_obs.cpp */
