@@ -385,14 +385,6 @@
 2070    3 ( ) Times in MJD DDDDD.DDDDDD
 2070    Cancel
 
-2072    At least one observation,  made at %s from (%s),
-2072    has an uncertainty in %s that is less than its precision.
-2072    This doesn't make sense, and indicates something's wrong with
-2072    the data or with its uncertainty.  See
-2072    https://www.projectpluto.com/errors.htm#precision
-2072    for further discussion.  Be warned that there may be other errors.
-2072    Find_Orb will only warn you about the first one it finds.
-
 2074    Temporary designations must include only alphanumeric characters.
 2074    The designation '%s' would be rejected by MPC.
 

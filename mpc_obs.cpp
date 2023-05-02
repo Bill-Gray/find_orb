@@ -3506,23 +3506,6 @@ bool nighttime_only( const char *mpc_code)
 #define INSUFFICIENT_PRECISION_POSN1    4
 #define INSUFFICIENT_PRECISION_POSN2    8
 
-static void warn_about_insufficient_precision( const OBSERVE *obs, const int flags)
-{
-   char buff[90], msg[500];
-   const char *quantity;
-
-   full_ctime( buff, utc_from_td( obs->jd, NULL), FULL_CTIME_YMD);
-   if( flags & INSUFFICIENT_PRECISION_MAG)
-      quantity = "magnitude";
-   else if( flags & INSUFFICIENT_PRECISION_TIME)
-      quantity = "time";
-   else
-      quantity = "RA/dec";
-   snprintf_err( msg, sizeof( msg), get_find_orb_text( 2072),
-             buff, obs->mpc_code, quantity);
-   generic_message_box( msg, "o");
-}
-
 static bool _is_synthetic_obs( const OBSERVE *obs)
 {
    return( !strcmp( obs->reference, "Synth")
@@ -3593,7 +3576,6 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
    int spacecraft_offset_reference = 399;    /* default is geocenter */
    double spacecraft_vel[3];
    static int suppress_private_obs = -1;
-   int insufficient_precision_warning_shown = 0;
 
    move_add_nstr( 1, 2, "Loading observations", -1);
    refresh_console( );
@@ -3893,12 +3875,6 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                   rval[i].posn_sigma_2 = posn_sigma_2;
                else if( rval[i].note2 != 'X')
                   insufficient_precision |= INSUFFICIENT_PRECISION_POSN2;
-               if( insufficient_precision && !insufficient_precision_warning_shown
-                           && use_sigmas)
-                  {
-                  warn_about_insufficient_precision( rval + i, insufficient_precision);
-                  insufficient_precision_warning_shown = 1;
-                  }
                rval[i].posn_sigma_theta = posn_sigma_theta;
                if( !including_obs)
                   rval[i].is_included = 0;
