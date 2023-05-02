@@ -3514,7 +3514,7 @@ static void warn_about_insufficient_precision( const OBSERVE *obs, const int fla
    full_ctime( buff, utc_from_td( obs->jd, NULL), FULL_CTIME_YMD);
    if( flags & INSUFFICIENT_PRECISION_MAG)
       quantity = "magnitude";
-   else if( flags & INSUFFICIENT_PRECISION_MAG)
+   else if( flags & INSUFFICIENT_PRECISION_TIME)
       quantity = "time";
    else
       quantity = "RA/dec";
