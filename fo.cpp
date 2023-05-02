@@ -593,9 +593,9 @@ int main( int argc, const char **argv)
                break;
             case 'N':
                {
-               extern const char *desig_pattern;
+               extern const char *fullname_pattern;
 
-               desig_pattern = arg;
+               fullname_pattern = arg;
                }
                break;
             case 'O':          /* write output files to specified dir */
@@ -607,6 +607,13 @@ int main( int argc, const char **argv)
                break;
             case 'o':            /* obj designation / ephemeris from orbital */
                break;            /* elems:  fall through, handle below */
+            case 'P':
+               {
+               extern const char *desig_pattern;
+
+               desig_pattern = arg;
+               }
+               break;
             case 'p':
                {
                FILE *ifile = fopen_ext( "dummy.txt", "tfcw");

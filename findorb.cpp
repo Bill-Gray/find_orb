@@ -3801,6 +3801,13 @@ int main( int argc, const char **argv)
             case 'n':
                max_mpc_color_codes = atoi( arg);
                break;
+            case 'N':
+               {
+               extern const char *fullname_pattern;
+
+               fullname_pattern = arg;
+               }
+               break;
             case 'O':          /* write output files to specified dir */
                {
                extern const char *output_directory;
@@ -3815,6 +3822,13 @@ int main( int argc, const char **argv)
                extern int process_count;
 
                process_count = atoi( arg);
+               }
+               break;
+            case 'P':
+               {
+               extern const char *desig_pattern;
+
+               desig_pattern = arg;
                }
                break;
             case 'q':

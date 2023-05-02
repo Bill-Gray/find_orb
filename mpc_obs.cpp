@@ -4287,7 +4287,7 @@ void sort_object_info( OBJECT_INFO *ids, const int n_ids,
                                     &object_info_compare_method);
 }
 
-const char *desig_pattern = NULL;
+const char *desig_pattern = NULL, *fullname_pattern = NULL;
 
 /* One can specify,  e.g.,  '-N C314159,K22Ea4C' to process only
 those two objects.  I may eventually implement something more
@@ -4310,6 +4310,28 @@ static bool desig_pattern_matched( OBJECT_INFO *id, const char *pattern)
       assert( j - i < sizeof( tpattern) - 1);
       strlcpy( tpattern, pattern + i, j - i + 1);
       if( pattern_match( tpattern, packed_desig))
+         return( true);
+      i = j;
+      if( pattern[i] == ',')
+         i++;
+      }
+   return( false);
+}
+
+static bool fullname_pattern_matched( const char *full_name, const char *pattern)
+{
+   size_t i = 0, j;
+
+   while( pattern[i])
+      {
+      char tpattern[80];
+
+      j = i;
+      while( pattern[j] != ',' && pattern[j])
+         j++;
+      assert( j - i < sizeof( tpattern) - 1);
+      strlcpy( tpattern, pattern + i, j - i + 1);
+      if( pattern_match( tpattern, full_name))
          return( true);
       i = j;
       if( pattern[i] == ',')
@@ -4567,22 +4589,31 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
       while( i < n)
          if( !desig_pattern_matched( rval + i, desig_pattern))
             {
-            memmove( rval+ i, rval + i + 1, (n - i - 1) * sizeof( OBJECT_INFO));
+            memmove( rval + i, rval + i + 1, (n - i - 1) * sizeof( OBJECT_INFO));
             n--;
             }
          else
             i++;
       }
-   *n_found = n;
    rval = (OBJECT_INFO *)realloc( rval, n * sizeof( OBJECT_INFO));
            /* Only now do we set the 'full' object names,  because  */
            /* some may have been added mid-file using COM fullname. */
    for( i = 0; i < n; i++)
       {
       get_object_name( buff, rval[i].packed_desig);
-      rval[i].obj_name = (char *)stack_alloc( obj_name_stack, strlen( buff) + 1);
-      strcpy( rval[i].obj_name, buff);
+      if( fullname_pattern && !fullname_pattern_matched( buff, fullname_pattern))
+         {
+         memmove( rval + i, rval + i + 1, (n - i - 1) * sizeof( OBJECT_INFO));
+         n--;
+         i--;
+         }
+      else
+         {
+         rval[i].obj_name = (char *)stack_alloc( obj_name_stack, strlen( buff) + 1);
+         strcpy( rval[i].obj_name, buff);
+         }
       }
+   *n_found = n;
    sort_object_info( rval, n, OBJECT_INFO_COMPARE_PACKED);
    return( rval);
 }
