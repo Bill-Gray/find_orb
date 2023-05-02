@@ -956,13 +956,11 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                   (ephemeris_output_options & OPTION_RADIAL_VEL_OUTPUT) ? '*' : ' ');
          snprintf_append( buff, sizeof( buff), "P [%c] Phase angle\n",
                   (ephemeris_output_options & OPTION_PHASE_ANGLE_OUTPUT) ? '*' : ' ');
+         snprintf_append( buff, sizeof( buff), "V [%c] Visibility indicator\n",
+               (ephemeris_output_options & OPTION_VISIBILITY) ? '*' : ' ');
          if( is_topocentric)
-            {
-            snprintf_append( buff, sizeof( buff), "V [%c] Visibility indicator\n",
-                  (ephemeris_output_options & OPTION_VISIBILITY) ? '*' : ' ');
             snprintf_append( buff, sizeof( buff), "U [%c] Suppress unobservables\n",
                   (ephemeris_output_options & OPTION_SUPPRESS_UNOBSERVABLE) ? '*' : ' ');
-            }
          snprintf_append( buff, sizeof( buff), "F Suppress when fainter than mag: %.1f\n",
                   ephemeris_mag_limit);
          snprintf_append( buff, sizeof( buff), "D [%c] Positional sigmas\n",

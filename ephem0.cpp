@@ -2120,7 +2120,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
    if( (!cinfo->rho_cos_phi && !cinfo->rho_sin_phi && !use_observation_times && !show_geo_quantities
                && !*group_data
                && memcmp( note_text, "(Opt)", 5)) || ephem_type != OPTION_OBSERVABLES)
-      options &= ~(OPTION_ALT_AZ_OUTPUT | OPTION_VISIBILITY | OPTION_MOON_ALT
+      options &= ~(OPTION_ALT_AZ_OUTPUT | OPTION_MOON_ALT
                      | OPTION_MOON_AZ | OPTION_SUN_ALT | OPTION_SUN_AZ
                      | OPTION_SNR | OPTION_EXPOSURE_TIME
                      | OPTION_SKY_BRIGHTNESS | OPTION_SUPPRESS_UNOBSERVABLE);
