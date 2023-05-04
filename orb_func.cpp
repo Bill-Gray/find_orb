@@ -3546,7 +3546,7 @@ static double adjustment_for_orbit_likelihood( const double semimajor_axis,
       }
    else
       rval = 0.;
-   return( rval * .01);
+   return( rval * .005);
 }
 
 static int generate_orthonormal_basis( double *x, double *y, double *z, const double *ivect)
