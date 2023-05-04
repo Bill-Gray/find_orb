@@ -3681,12 +3681,13 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                error_code = get_satellite_offset( second_line, vect);
                if( error_code)
                   {
-                  char tbuff[8];
+                  char tbuff[6];
 
                   rval[i].flags |= OBS_DONT_USE;
                   rval[i].is_included = 0;
                   strcpy( tbuff, "?off ");
                   tbuff[4] = (char)( '0' - error_code);
+                  tbuff[5] = '\0';
                   comment_observation( rval + i, tbuff);
                   n_bad_satellite_offsets++;
                   debug_printf( "Error code %d; offending line was:\n%s\n",
