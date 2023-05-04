@@ -3779,7 +3779,6 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                observation_is_good = false;
             if( observation_is_good)
                {
-               int insufficient_precision = 0;
                const double radians_per_arcsec = PI / (180. * 3600.);
                double mag_sigma = 0., time_sigma = 0.;
                double posn_sigma_1, posn_sigma_2;
@@ -3866,16 +3865,16 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
 //                insufficient_precision |= INSUFFICIENT_PRECISION_MAG;
                if( time_sigma * 1.1 > rval[i].time_sigma || !use_sigmas)
                   rval[i].time_sigma = time_sigma;
-               else if( rval[i].note2 != 'X')
-                  insufficient_precision |= INSUFFICIENT_PRECISION_TIME;
+//             else if( rval[i].note2 != 'X')
+//                insufficient_precision |= INSUFFICIENT_PRECISION_TIME;
                if( posn_sigma_1 * 1.1 > rval[i].posn_sigma_1 || !use_sigmas)
                   rval[i].posn_sigma_1 = posn_sigma_1;
-               else if( rval[i].note2 != 'X')
-                  insufficient_precision |= INSUFFICIENT_PRECISION_POSN1;
+//             else if( rval[i].note2 != 'X')
+//                insufficient_precision |= INSUFFICIENT_PRECISION_POSN1;
                if( posn_sigma_2 * 1.1 > rval[i].posn_sigma_2 || !use_sigmas)
                   rval[i].posn_sigma_2 = posn_sigma_2;
-               else if( rval[i].note2 != 'X')
-                  insufficient_precision |= INSUFFICIENT_PRECISION_POSN2;
+//             else if( rval[i].note2 != 'X')
+//                insufficient_precision |= INSUFFICIENT_PRECISION_POSN2;
                rval[i].posn_sigma_theta = posn_sigma_theta;
                if( !including_obs)
                   rval[i].is_included = 0;
