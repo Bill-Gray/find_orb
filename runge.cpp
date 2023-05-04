@@ -1202,6 +1202,7 @@ int calc_derivatives( const double jd, const double *ival, double *oval,
    ldouble ival1[MAX_N_PARAMS], oval1[MAX_N_PARAMS];
 
    assert( fabs( (double)jd) < 1e+9);
+   assert( n_orbit_params >= 6);
    for( i = 0; i < (size_t)n_orbit_params; i++)
       ival1[i] = (ldouble)ival[i];
    rval = calc_derivativesl( (ldouble)jd, ival1, oval1, reference_planet);
