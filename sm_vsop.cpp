@@ -22,9 +22,19 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "watdefs.h"
 #include "afuncs.h"     /* for vector3_length() proto */
 
-/* Following are the first few terms of the VSOP87 Cartesian coordinate
+/* Following are the first few terms of the VSOP87A Cartesian coordinate
    series for each planet (Mercury through Neptune;  VSOP doesn't do
-   Pluto).  The 'axis' is 1 for x, 2 for y, 3 for z.
+   Pluto).  Data can be found at https://cdsarc.cds.unistra.fr/viz-bin/cat/VI/81.
+
+Planetary Theories in rectangular and spherical variables: VSOP87 solution.
+     Bretagnon P., Francou G.
+    <Astron. Astrophys. 202, 309 (1988)> =1988A&A...202..309B
+
+Theorie du mouvement de l'ensemble des planetes (VSOP82).
+     Bretagnon P.
+    <Astron. Astrophys. 114, 278 (1982)> =1982A&A...114..278B
+
+   The 'axis' is 1 for x, 2 for y, 3 for z.
 
    The position is computed as the sum of terms of the form
 
