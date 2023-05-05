@@ -505,4 +505,4 @@ N_MOIDS=8
    observations should be used.  PRIVATE_OBS=0 will skip the question and
    cause those observations to be included.  PRIVATE_OBS=1 will skip the
    question and cause those observations to be ignored.
-PRIVATE_OBS=0
+PRIVATE_OBS=
