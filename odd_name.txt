@@ -83,6 +83,7 @@ J069S        Jupiter LXIX = S/2017 J 8
 J070S        Jupiter LXX  = S/2017 J 9
 J071S        Jupiter LXXI = S/2018 J 2 = Ersa
 J072S        Jupiter LXXII = S/2011 J 1
+S001S        Saturn I = Mimas
 S002S        Saturn II = Enceladus
 S003S        Saturn III = Tethys
 S004S        Saturn IV = Dione
