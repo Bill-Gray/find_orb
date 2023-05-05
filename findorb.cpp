@@ -236,6 +236,7 @@ int orbital_monte_carlo( const double *orbit, OBSERVE *obs, const int n_obs,
 char *make_config_dir_name( char *oname, const char *iname);    /* miscell.cpp */
 int reset_astrometry_filename( int *argc, const char **argv);
 int set_language( const int language);                      /* elem_out.cpp */
+static void show_splash_screen( void);
 void shellsort_r( void *base, const size_t n_elements, const size_t esize,
          int (*compare)(const void *, const void *, void *), void *context);
 static int count_wide_chars_in_utf8_string( const char *iptr, const char *endptr);
@@ -3317,6 +3318,7 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
       is_temp_file = true;
       }
 
+   show_splash_screen( );
    ids = find_objects_in_file( ifilename, n_ids, NULL);
    if( *n_ids > 0 && drop_single_obs)
       {
