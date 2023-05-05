@@ -3768,12 +3768,19 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                }
             if( rval[i].reference[0] == '!' && suppress_private_obs == -1)
                {
-               const int c = generic_message_box( get_find_orb_text( 2052), "o");
+               const char *suppression = get_environment_ptr( "PRIVATE_OBS");
 
-               if( c == 'y' || c == 'Y')     /* first time we see 'private' obs, */
-                  suppress_private_obs = 0;  /* ask if user wants them included */
+               if( *suppression)
+                  suppress_private_obs = atoi( suppression);
                else
-                  suppress_private_obs = 1;
+                  {
+                  const int c = generic_message_box( get_find_orb_text( 2052), "o");
+
+                  if( c == 'y' || c == 'Y')     /* first time we see 'private' obs, */
+                     suppress_private_obs = 0;  /* ask if user wants them included */
+                  else
+                     suppress_private_obs = 1;
+                  }
                }
             if( rval[i].reference[0] == '!' && suppress_private_obs)
                observation_is_good = false;

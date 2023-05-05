@@ -498,3 +498,11 @@ OUTLIER_REJECTION_LIMIT=3
    shown (again,  only if they're low enough).  Don't set it to a higher value.
    At least at present,  those added six are all we've got.
 N_MOIDS=8
+
+   As a Find_Orb extension,  observations that are not to be distributed are
+   marked with a '!' character in column 73.  If PRIVATE_OBS is left unset and
+   you load up such observations,  Find_Orb will inquire as to whether those
+   observations should be used.  PRIVATE_OBS=0 will skip the question and
+   cause those observations to be included.  PRIVATE_OBS=1 will skip the
+   question and cause those observations to be ignored.
+PRIVATE_OBS=0
