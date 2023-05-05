@@ -4036,6 +4036,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
       while( rval[i - 1].jd - rval[j].jd > maximum_observation_span * days_per_year)
          j++;
       i -= j;
+      n_obs_actually_loaded -= j;
       memmove( rval, rval + j, i * sizeof( OBSERVE));
       }
 
