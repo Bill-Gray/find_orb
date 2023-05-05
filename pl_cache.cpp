@@ -628,7 +628,6 @@ int format_jpl_ephemeris_info( char *buff)
       snprintf_err( buff, buff_size,
             "\nUsing %s; covers years %.1f to %.1f\n",
             jpl_get_ephem_name( jpl_eph),
-            (jd_start - J2000) / 365.25 + 2000.,
-            (jd_end   - J2000) / 365.25 + 2000.);
+            JD_TO_YEAR( jd_start), JD_TO_YEAR( jd_end));
    return( de_version);
 }
