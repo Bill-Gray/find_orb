@@ -10,6 +10,7 @@
  Bacci                                     <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=108205&amp;view=OPD">Bacci</a>
  Bamberger                                 <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=128345&amp;view=OPD">Bamberger</a>
  Bedient                                   <a href="http://www.ifa.hawaii.edu/tops/bedient.html">Bedient</a>
+ Balam                                     <a href='https://en.wikipedia.org/wiki/David_D._Balam'>Balam</a>
  Bauer                                     <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=19494&amp;view=OPD">Bauer</a>
  Bell                                      <a href="http://www.corvus.com/adastra2002/bell.htm">Bell</a>
  Beresford                                 <a href="http://www.adam.com.au/dberesford/">Beresford</a>
@@ -27,6 +28,8 @@
  Busch                                     <a href="http://www.easysky.de/eng/author/index.htm">Busch</a>
  Buzzi                                     <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=6517&amp;view=OPD">Buzzi</a>
  Cikota                                    <a href="http://dalje.com/en-croatia/asteroid-named-after-croatian-capital-zagreb/250877">Cikota</a>
+ Chambers                                  <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=547345&amp;view=OPD">Chambers</a>
+ Chastel                                   <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=301622&amp;view=OPD">Chastel</a>
  Crni Vrh                                  &#x10c;rni Vrh
  Christensen                               <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=13858&amp;view=OPD">Christensen</a>
  Cremaschini                               <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=14062&amp;view=OPD">Cremaschini</a>
@@ -34,12 +37,14 @@
  Concari                                   <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=6671&amp;view=OPD">Concari</a>
  Cutri                                     <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=241529&amp;view=OPD">Cutri</a>
  Dailey                                    <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=249522&amp;view=OPD">Dailey</a>
+ de Boer                                   <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=343412&amp;view=OPD">de Boer</a>
  Delbo                                     <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=16250&amp;view=OPD">Delb&oacute;</a>
  Demeautis                                 <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=14141&amp;view=OPD">Demeautis</a>
  Denisenko                                 <a href="https://en.wikipedia.org/wiki/Denis_Denisenko">Denisenko</a>
  Denneau                                   <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=12267&amp;view=OPD">Denneau</a>
  Ernst                                     <a href="http://www.starkenburg-sternwarte.de/asteroiden/namen/7686.htm">Ernst</a>
  Fagioli                                   <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=27959&amp;view=OPD">Fagioli</a>
+ Fairlamb                                  <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=353429&amp;view=OPD">Fairlamb</a>
  Fitzsimmons                               <a href="https://alanfitzsimmons.wordpress.com/">Fitzsimmons</a>
  Flewelling                                <a href="https://twitter.com/heatherflew">Flewelling</a>
  Flynn                                     <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=Randyflynn&amp;view=OPD">Flynn</a>
@@ -56,6 +61,7 @@
  Gorbovskoy                                <a href="http://www.researchgate.net/profile/E_Gorbovskoy/citations">Gorbovskoy</a>
  Grauer                                    <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=18871&amp;view=OPD">Grauer</a>
  Grav                                      <a href="http://web.mac.com/tgrav/iWeb/Family/Welcome.html">Grav</a>
+ Green                                     <a href='https://minorplanetcenter.net/db_search/show_object?object_id=2068'>Green</a>
  Groeller                                  <a href="https://www.lpl.arizona.edu/research-scientists/hannes-gr%C3%B6ller">Gr&ouml;ller</a>
  Guido                                     <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=120361&amp;view=OPD">Guido</a>
  Haleakala                                 Haleakal&#x101;
@@ -65,8 +71,10 @@
  Hill                                      <a href="http://www.lpl.arizona.edu/~rhill/">Hill</a>
  Hoenig                                    <a href="http://www.mpifr-bonn.mpg.de/staff/shoenig/">H&ouml;nig</a>
  Holman                                    <a href="http://en.wikipedia.org/wiki/3666_Holman">Holman</a>
+ Holmes                                    <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=5477&amp;view=OPD">Holmes</a>
  Holvorcem                                 <a href="http://sites.mpc.com.br/holvorcem/">Holvorcem</a>
  Hormuth                                   <a href="http://sternwarte-weinheim.de/widm.html#felix">Hormuth</a>
+ Huber                                     <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=321673&amp;view=OPD">Huber</a>
  Hui                                       <a href="http://comethunter.lamost.org/">Hui</a>
  Hurtado                                   <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=362911&amp;view=OPD">Hurtado</a>
  Jahn                                      <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=10340&amp;view=OPD">Jahn</a>
@@ -77,11 +85,13 @@
  Kilmartin                                 <a href="http://www.phys.canterbury.ac.nz/people/kilmartin.shtml">Kilmartin</a>
  Klet                                      <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=2199&amp;view=OPD">Kle&#357;</a>
  Kn\"ofel                                  <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=16438&amp;view=OPD">Kn&ouml;fel</a>
+ B. Koch                                   <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=191494&amp;view=OPD">B. Koch</a>
  Korlevic                                  <a href="https://en.wikipedia.org/wiki/Korado_Korlevi%C4%87">Korlevi&#263;</a>
  Koschny                                   <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=21686&amp;view=OPD">Koschny</a>
  Kowalski                                  <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=7392&amp;view=OPD">Kowalski</a>
  Kniazev                                   <a href="http://www.mathpubs.com/author/Alexei+Yu.+Kniazev">Kniazev</a>
  Kubanek                                   Kub&aacute;nek
+ Kugel                                     <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=120375&amp;view=OPD">Kugel</a>
  Kurti                                     <a href="https://www.skaw.sk">K&uuml;rti</a>
  Kusiak                                    <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=376574&amp;view=OPD">Kusiak</a>
  Kusnirak                                  <a href="http://en.wikipedia.org/wiki/Peter_Ku%C5%A1nir%C3%A1k">Ku&#353;nir&aacute;k</a>
@@ -90,12 +100,13 @@
  Lazzaro                                   <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=3602&amp;view=OPD">Lazzaro</a>
  La Canada                                 La Ca&ntilde;ada
  Leonard                                   <a href="https://catalina.lpl.arizona.edu/about/staff/greg-leonard">Leonard</a>
- Linder                                    <a href='https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=4933&view=OPD'>Linder</a>
+ Linder                                    <a href='https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=4933&amp;view=OPD'>Linder</a>
  Lipunov                                   <a href="http://xray.sai.msu.su/~lipunov/">Lipunov</a>
  Lovejoy                                   <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=61342&amp;view=OPD">Lovejoy</a>
  Lowe                                      <a href="http://members.shaw.ca/andrewlowe/">Lowe</a>
  Lutkenhoner                               L&uuml;tkenh&ouml;ner
  Mainzer                                   <a href="http://science.jpl.nasa.gov/people/Mainzer/">Mainzer</a>
+ Magnier                                   <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=343440&amp;view=OPD">Magnier</a>
  Manca                                     <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=15460&amp;view=OPD">Manca</a>
  Marinello                                 <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=229836&amp;view=OPD">Marinello</a>
  Masci                                     <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=438973&amp;view=OPD">Masci</a>
@@ -133,8 +144,10 @@
  Puckett                                   <a href="http://facstaff.columbusstate.edu/puckett_andrew/orbitmaster.html">Puckett</a>
  Pravec                                    <a href="http://en.wikipedia.org/wiki/Petr_Pravec">Pravec</a>
  Primak                                    <a href="http://www.facebook.com/people/Natalia-Primak/1198556290">Primak</a>
+ E. Prosperi                               <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=33010&amp;view=OPD">E. Prosperi</a>
+ Ramanjooloo                               <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=41458&amp;view=OPD">Ramanjooloo</a>
  Rankin                                    <a href="http://rankinstudio.com/">Rankin</a>
- Reddy                                     <a href='https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=8068&view=OPD'>Reddy</a>
+ Reddy                                     <a href='https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=8068&amp;view=OPD'>Reddy</a>
  Rinner                                    <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=23999&amp;view=OPD">Rinner</a>
  Ritchey-Chretien                          Ritchey-Chr&eacute;tien
  J. E. Rogers                              <a href="https://minorplanetcenter.net/db_search/show_object?object_id=5517">J. E. Rogers</a>
@@ -154,6 +167,7 @@
  Skvarc                                    <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=89818&amp;view=OPD">Skvar&#269;</a>
  Sonnett                                   <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=8796&amp;view=OPD">Sonnett</a>
  Sostero                                   <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=9878&amp;view=OPD">Sostero</a>
+ Spratt                                    <a href='https://minorplanetcenter.net/db_search/show_object?object_id=4789&btnG=MPC+Database+Search'>Spratt</a>
  Stecklum                                  <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=69295&amp;view=OPD">Stecklum</a>
  Stoss                                     <a href="http://www.starkenburg-sternwarte.de/asteroiden/namen/7689.htm">Stoss</a>
  Tancredi                                  <a href="http://www.anii.org.uy/cvuy/SNI2008/Ciencias%20Naturales%20y%20Exactas/Ciencias%20F%C3%ADsicas/Gonzalo%20TANCREDI%20Machado.pdf">Tancredi</a>
@@ -167,6 +181,7 @@
  Tombaugh                                  <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=1604&amp;view=OPD">Tombaugh</a>
  Tombelli                                  <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=9904&amp;view=OPD">Tombelli</a>
  Tonry                                     <a href="http://www.ifa.hawaii.edu/~jt/">Tonry</a>
+ Vaduvescu                                 <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=36340&amp;view=OPD">Vaduvescu</a>
  Veran                                     V&eacute;ran
  Veres                                     <a href="https://scienceandtechnology.jpl.nasa.gov/people/P_Veres">Vere&#x161;</a>
  Veillet                                   <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=16984&amp;view=OPD">Veillet</a>
@@ -178,6 +193,7 @@
  Weryk                                     <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=9281&amp;view=OPD">Weryk</a>
  Wierzchos                                 <a href="https://twitter.com/WierzchosKacper">Wierzcho&#347;</a>
  Wiggins                                   <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=4099&amp;view=OPD">Wiggins</a>
+ Willman                                   <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=22498&amp;view=OPD">Willman</a>
  Q.-Z. Ye                                  <a href="http://yeqzids.github.io/">Q.-Z. Ye</a>
  Zolnowski                                 <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=384815&amp;view=OPD">&#379;o&#322;nowski</a>
  Zoltowski                                 <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=18292&amp;view=OPD">Zoltowski</a>
