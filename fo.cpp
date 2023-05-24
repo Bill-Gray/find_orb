@@ -466,7 +466,7 @@ static const char *get_arg( const int argc, const char **argv, const int idx)
 
 int main( int argc, const char **argv)
 {
-   char tbuff[300], *mpc_codes = (char *)malloc( 1);
+   char tbuff[300], *mpc_codes = (char *)malloc( 20);
    char **summary_lines = NULL;
    const char *separate_residual_file_name = NULL;
    const char *mpec_path = NULL;
@@ -966,12 +966,12 @@ int main( int argc, const char **argv)
                      }
                   while( *mpc_code_tptr)
                      {
-                     char mpc_code[10], ephem_filename[200];
+                     char mpc_code[20], ephem_filename[200];
 
                      j = 0;
-                     while( j < 9 && *mpc_code_tptr > ' ' && *mpc_code_tptr != ',')
+                     while( j < sizeof( mpc_code) && *mpc_code_tptr > ' ' && *mpc_code_tptr != ',')
                         mpc_code[j++] = *mpc_code_tptr++;
-                     assert( j < 9);
+                     assert( j < sizeof( mpc_code));
                      mpc_code[j] = '\0';
                      while( *mpc_code_tptr == ' ' || *mpc_code_tptr == ',')
                         mpc_code_tptr++;
