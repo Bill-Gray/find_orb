@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include <math.h>
 #include <assert.h>
 #include "watdefs.h"
+#include "constant.h"
 #include "comets.h"
 #include "afuncs.h"
 
@@ -50,7 +51,7 @@ int detect_perturbers( const double jd, const double * __restrict xyz,
 double *get_asteroid_mass( const int astnum);   /* bc405.cpp */
 int generic_message_box( const char *message, const char *box_type);
 int asteroid_position_raw( const int astnum, const double jd,
-                              double *posn);       /* bc405.cpp */
+                              double *posn, double *vel);      /* bc405.cpp */
 int planet_posn( const int planet_no, const double jd, double *vect_2000);
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
@@ -354,7 +355,7 @@ static double *load_asteroid_masses( void)
 }
 
 int asteroid_position_raw( const int astnum, const double jd,
-                              double *posn)
+                              double *posn, double *vel)
 {
    ELEMENTS elem;
    int chunk;
@@ -366,7 +367,7 @@ int asteroid_position_raw( const int astnum, const double jd,
    else if( chunk >= n_bc405_chunks - 1)
       chunk = n_bc405_chunks - 1;
    grab_cached_elems( &elem, chunk, astnum);
-   comet_posn( &elem, jd, posn);
+   comet_posn_and_vel( &elem, jd, posn, vel);
    return( 0);
 }
 
@@ -531,10 +532,9 @@ int detect_perturbers( const double jd, const double * __restrict xyz,
                if( dist2 < .05 * 0.05)
                   {
                   FILE *debug_file = fopen( "astpert.txt", "ab");
-                  const double j2000 = 2451545.;
 
                   fprintf( debug_file, "%.5f: %3d, %f: mass %g\n",
-                           (jd - j2000) / 365.25 + 2000.,
+                           JD_TO_YEAR( jd),
                            asteroid_numbers[i], sqrt( dist2) * AU_IN_KM, masses[i]);
                   fclose( debug_file);
                   }

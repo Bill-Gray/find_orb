@@ -62,7 +62,7 @@ int generic_message_box( const char *message, const char *box_type);
 int compute_rough_planet_loc( const double t_cen, const int planet_idx,
                                           double *vect);    /* sm_vsop.cpp */
 int asteroid_position_raw( const int astnum, const double jd,
-                              double *posn);       /* bc405.cpp */
+                              double *posn, double *vel);      /* bc405.cpp */
 int64_t nanoseconds_since_1970( void);                      /* mpc_obs.c */
 int format_jpl_ephemeris_info( char *buff);                 /* pl_cache.c */
 
@@ -93,7 +93,9 @@ static int planet_posn_raw( int planet_no, const double jd,
       {
       double temp_loc[4];
 
-      rval = asteroid_position_raw( planet_no - bc405_start, jd, temp_loc);
+      rval = asteroid_position_raw( planet_no - bc405_start, jd,
+               (calc_vel ? NULL : temp_loc),
+               (calc_vel ? temp_loc : NULL));
       if( debug_level > 8)
          debug_printf( "JD %f, minor planet %d: (%f %f %f)\n",
                      jd, planet_no, temp_loc[0], temp_loc[1], temp_loc[2]);
