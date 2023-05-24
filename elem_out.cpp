@@ -1853,7 +1853,7 @@ int write_out_elements_to_file( const double *orbit,
    int output_format = (precision | SHOWELEM_PERIH_TIME_MASK);
    extern int n_orbit_params;
    int reference_shown = 0;
-   double moids[N_MOIDS + 1];
+   double moids[N_MOIDS + 3];
    double j2000_ecliptic_rel_orbit[MAX_N_PARAMS];
    double barbee_style_delta_v = 0.;   /* see 'moid4.cpp' */
    const char *monte_carlo_permits;
@@ -1867,6 +1867,10 @@ int write_out_elements_to_file( const double *orbit,
    extern int is_interstellar;         /* orb_func.cpp */
    const size_t tbuff_size = 80 * 9;
    const char *horizons_elems = get_environment_ptr( "HORIZONS_ELEMS");
+   static const char *moid_text[N_MOIDS] = { "Earth MOID", "Ju",
+                           "Ve", "Me", "Ma", "Sa", "Ur", "Ne",
+                           "Ce", "Pa", "Vt", "(29)", "(16)", "(15)" };
+
 
    setvbuf( ofile, NULL, _IONBF, 0);
    if( default_comet_magnitude_type == 'N')
@@ -1985,7 +1989,7 @@ int write_out_elements_to_file( const double *orbit,
    fprintf( ofile, "%s\n", tbuff);
    tptr = tbuff + strlen( tbuff) + 1;
    *more_moids = '\0';
-   for( i = 0; i < 9; i++)
+   for( i = 0; (size_t)i < sizeof( moids) / sizeof( moids[0]); i++)
       moids[i] = 0.;
    for( i = 1; i < n_lines && *tptr; i++)
       {
@@ -2139,10 +2143,6 @@ int write_out_elements_to_file( const double *orbit,
                if( !planet_orbiting && (forced_moid || moid < moid_limit))
                   {
                   char addendum[30];
-                  static const char *moid_text[N_MOIDS] = { "Earth MOID", "Ju",
-                           "Ve", "Me", "Ma", "Sa", "Ur", "Ne",
-                           "Ce", "Pa", "Vt", "(29)", "(16)", "(15)" };
-
                   snprintf_err( addendum, sizeof( addendum),
                                  "   %s: %.4f", moid_text[j], moid);
                   if( strlen( addendum) + strlen( buff) < 79)
@@ -2337,6 +2337,13 @@ int write_out_elements_to_file( const double *orbit,
                   moids[1], moids[2], moids[3], moids[4]);
          fprintf( ofile, "# MOIDs: Ju%10.6f Sa%10.6f Ur%10.6f Ne%10.6f\n",
                   moids[5], moids[6], moids[7], moids[8]);
+         if( moids[10])
+            {
+            fprintf( ofile, "# MOIDs:");
+            for( i = 8; i < N_MOIDS && moids[i + 2]; i++)
+               fprintf( ofile, " %s%10.6f", moid_text[i], moids[i + 2]);
+            fprintf( ofile, "\n");
+            }
          }
 
       if( !planet_orbiting && _include_comment( "OPP"))
