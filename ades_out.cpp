@@ -53,6 +53,7 @@ sungrazer spacecraft all have identical headers,  fortunately.)  */
 
 char *get_file_name( char *filename, const char *template_file_name);
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
+double utc_from_td( const double jdt, double *delta_t);     /* ephem0.cpp */
 char *iso_time( char *buff, const double jd, const int precision);   /* elem_out.c */
 int get_satellite_offset( const char *iline, double *xyz);  /* mpc_obs.cpp */
 int text_search_and_replace( char FAR *str, const char *oldstr,
@@ -177,7 +178,7 @@ static void create_ades_file_for_one_code( FILE *ofile,
 //       if( progcode != ' ')
 //          fprintf( ofile, "        <prog>%c</prog>\n", progcode);
          fprintf( ofile, "        <obsTime>%s</obsTime>\n",
-                  iso_time( buff, obs->jd, 3));         /* elem_out.cpp */
+                  iso_time( buff, utc_from_td( obs->jd, NULL), 3));
          fprintf( ofile, "        <ra>%.11f</ra>\n", obs->ra * 180. / PI);
          fprintf( ofile, "        <dec>%.11f</dec>\n", obs->dec * 180. / PI);
          fprintf( ofile, "        <rmsRA>%.4f</rmsRA>\n", obs->posn_sigma_1);
