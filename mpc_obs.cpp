@@ -1965,7 +1965,11 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
       }
    if( isdigit( buff[66]) && obs->note2 != 'R' &&
                (buff[67] == '.' || buff[67] == ' '))
+      {
       obs->obs_mag = atof( buff + 65);
+      if( obs->mag_band == ' ' && strstr( "249 C49 C50", obs->mpc_code))
+         obs->mag_band = 'T';   /* Sungrazer obs usually have a blank mag */
+      }                         /* band, but are really 'total' magnitudes */
    else
       obs->obs_mag = BLANK_MAG;
    FMEMCPY( obs->reference, buff + 72, 5);
@@ -3478,13 +3482,6 @@ static void reset_object_type( const OBSERVE *obs, const int n_obs)
       object_type = OBJECT_TYPE_COMET;
    else if( n_asteroid)
       object_type = OBJECT_TYPE_ASTEROID;
-                 /* if all observations are from SOHO and STEREO-A & B, */
-                 /* the object is almost certainly a comet */
-   i = 0;
-   while( i < n_obs && strstr( "249 C49 C50", obs[i].mpc_code))
-      i++;
-   if( i == n_obs)
-      object_type = OBJECT_TYPE_COMET;
    if( object_type == OBJECT_TYPE_COMET)
       {
       extern char default_comet_magnitude_type;
