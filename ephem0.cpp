@@ -4597,14 +4597,16 @@ static void get_observer_details_from_obs( const OBSERVE *obs,
 
 static void observer_link_substitutions( char *buff)
 {
-   FILE *ifile = fopen_ext( "observer.txt", "fcrb");
+   FILE *ifile = fopen_ext( "observer.txt", "crb");
 
+   if( !ifile)
+      ifile = fopen_ext( "observer.htm", "fcrb");
    if( ifile)
       {
       char line[200], *loc;
 
       while( fgets_trimmed( line, sizeof( line), ifile))
-         if( *line != ';' && *line != '#')
+         if( *line == ' ')
             {
             line[REPLACEMENT_COLUMN - 1] = '\0';
             remove_trailing_cr_lf( line);
