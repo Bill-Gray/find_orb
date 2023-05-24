@@ -1,3 +1,13 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<HTML>
+<HEAD>
+   <TITLE> Observer links </TITLE>
+   <link REL="icon" HREF="favicon.ico" TYPE="image/x-icon">
+   <META http-equiv=Content-Type content="text/html; charset=utf-8">
+   <META NAME="Author" CONTENT="Bill Gray">
+</head>
+<body>
+<pre>
 ; This file is used in generating pseudo-MPECs.  Text from the 'stations'
 ; part of the MPEC is searched and substrings replaced.  This allows
 ; proper diacritical marks to be inserted,  and links generated
@@ -7,6 +17,7 @@
 ; a citation describing the honoree is usually included.
 ;
  Africano                                  <a href="https://catalina.lpl.arizona.edu/about/staff/brian-africano">Africano</a>
+ Attard                                    <a href='https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=37865&amp;view=OPD'>Attard</a>
  Bacci                                     <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=108205&amp;view=OPD">Bacci</a>
  Bamberger                                 <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=128345&amp;view=OPD">Bamberger</a>
  Bedient                                   <a href="http://www.ifa.hawaii.edu/tops/bedient.html">Bedient</a>
@@ -42,6 +53,7 @@
  Demeautis                                 <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=14141&amp;view=OPD">Demeautis</a>
  Denisenko                                 <a href="https://en.wikipedia.org/wiki/Denis_Denisenko">Denisenko</a>
  Denneau                                   <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=12267&amp;view=OPD">Denneau</a>
+ Durig                                     <a href='https://new.sewanee.edu/programs-of-study/physics-astronomy/faculty-staff/douglas-t-durig/'>Durig</a>
  Ernst                                     <a href="http://www.starkenburg-sternwarte.de/asteroiden/namen/7686.htm">Ernst</a>
  Fagioli                                   <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=27959&amp;view=OPD">Fagioli</a>
  Fairlamb                                  <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=353429&amp;view=OPD">Fairlamb</a>
@@ -54,7 +66,7 @@
  Galad                                     <a href="http://en.wikipedia.org/wiki/Adri%C3%A1n_Gal%C3%A1d">Gal&aacute;d</a>
  Galli                                     <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=6515&amp;view=OPD">Galli</a>
  Garradd                                   <a href="http://members.ozemail.com.au/~loomberah/">Garradd</a>
- Gasparovic                                <a href="https://ssd.jpl.nasa.gov/sbdb.cgi?orb=1;sstr=gasparovic">Ga&#x161;parovi&#x107;</a>
+ Gasparovic                                <a href='https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=P%2F2017%20K3'>Ga&#x161;parovi&#x107;</a>
  Geffert                                   <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=17855&amp;view=OPD">Geffert</a>
  Gibbs                                     <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=14220&amp;view=OPD">Gibbs</a>
  Gilmore                                   <a href="http://www.phys.canterbury.ac.nz/people/gilmore.shtml">Gilmore</a>
@@ -64,6 +76,7 @@
  Green                                     <a href='https://minorplanetcenter.net/db_search/show_object?object_id=2068'>Green</a>
  Groeller                                  <a href="https://www.lpl.arizona.edu/research-scientists/hannes-gr%C3%B6ller">Gr&ouml;ller</a>
  Guido                                     <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=120361&amp;view=OPD">Guido</a>
+ A. Hale                                   <a href='https://minorplanetcenter.net/db_search/show_object?object_id=4151&amp;btnG=MPC+Database+Search'>A. Hale</a>
  Haleakala                                 Haleakal&#x101;
  Hammergren                                <a href="http://www.eccentrix.com/members/ssp2k/ppl/profiles/drhammer.html">Hammergren</a>
  Healy                                     <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=66479&amp;view=OPD">Healy</a>
@@ -77,6 +90,7 @@
  Huber                                     <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=321673&amp;view=OPD">Huber</a>
  Hui                                       <a href="http://comethunter.lamost.org/">Hui</a>
  Hurtado                                   <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=362911&amp;view=OPD">Hurtado</a>
+ Ikemura                                   <a href='https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=6661&amp;view=OPD'>Ikemura</a>
  Jahn                                      <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=10340&amp;view=OPD">Jahn</a>
  N. James                                  <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=8914&amp;view=OPD">N. James</a>
  Jelinek                                   Jel&iacute;nek
@@ -102,6 +116,7 @@
  Leonard                                   <a href="https://catalina.lpl.arizona.edu/about/staff/greg-leonard">Leonard</a>
  Linder                                    <a href='https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=4933&amp;view=OPD'>Linder</a>
  Lipunov                                   <a href="http://xray.sai.msu.su/~lipunov/">Lipunov</a>
+ Losse                                     <a href='https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=340579&amp;view=OPD'>Losse</a>
  Lovejoy                                   <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=61342&amp;view=OPD">Lovejoy</a>
  Lowe                                      <a href="http://members.shaw.ca/andrewlowe/">Lowe</a>
  Lutkenhoner                               L&uuml;tkenh&ouml;ner
@@ -114,6 +129,7 @@
  Masiero                                   <a href="http://twitter.com/joemasiero">Masiero</a>
  Matson                                    <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=73491&amp;view=OPD">Matson</a>
  Mattiazzo                                 <a href="https://www.researchgate.net/scientific-contributions/2004893480_M_Mattiazzo">Mattiazzo</a>
+ Maury                                     <a href='https://minorplanetcenter.net/db_search/show_object?object_id=3780&amp;btnG=MPC+Database+Search'>Maury</a>
  Micheli                                   <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=10277&amp;view=OPD">Micheli</a>
  Mikuz                                     Miku&#382;
  McGaha                                    <a href="http://www.3towers.com/s3towers/AboutUs.asp?section=AboutUs">McGaha</a>
@@ -123,7 +139,8 @@
  Merida                                    M&eacute;rida
  Nomen                                     <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=56561&amp;view=OPD">Nomen</a>
  Nugent                                    <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=8801&amp;view=OPD">Nugent</a>
- Oca\~na                                   Oca&ntilde;a
+ Ocana                                     <a href='https://www.cosmos.esa.int/web/cesar/francisco-ocana'>Oca&ntilde;a</a>
+ Oca\~na                                   <a href='https://www.cosmos.esa.int/web/cesar/francisco-ocana'>Oca&ntilde;a</a>
  Oksanen                                   <a href="http://twitter.com/#!/oksanen">Oksanen</a>
  Ondrejov                                  <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=56561&amp;view=OPD">Ond&#345;ejov</a>
  Sanchez-Ortiz                             <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=257336&amp;view=OPD">S&aacute;nchez-Ortiz</a>
@@ -164,10 +181,11 @@
  Shelly                                    <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=17280&amp;view=OPD">Shelly</a>
  Sherrod                                   <a href="http://www.arksky.org/pubs.htm">Sherrod</a>
  Shurpakov                                 <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=279274&amp;view=OPD">Shurpakov</a>
+ Sicoli                                    <a href='https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=7866&amp;view=OPD'>Sicoli</a>
  Skvarc                                    <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=89818&amp;view=OPD">Skvar&#269;</a>
  Sonnett                                   <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=8796&amp;view=OPD">Sonnett</a>
  Sostero                                   <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=9878&amp;view=OPD">Sostero</a>
- Spratt                                    <a href='https://minorplanetcenter.net/db_search/show_object?object_id=4789&btnG=MPC+Database+Search'>Spratt</a>
+ Spratt                                    <a href='https://minorplanetcenter.net/db_search/show_object?object_id=4789&amp;btnG=MPC+Database+Search'>Spratt</a>
  Stecklum                                  <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=69295&amp;view=OPD">Stecklum</a>
  Stoss                                     <a href="http://www.starkenburg-sternwarte.de/asteroiden/namen/7689.htm">Stoss</a>
  Tancredi                                  <a href="http://www.anii.org.uy/cvuy/SNI2008/Ciencias%20Naturales%20y%20Exactas/Ciencias%20F%C3%ADsicas/Gonzalo%20TANCREDI%20Machado.pdf">Tancredi</a>
@@ -194,6 +212,9 @@
  Wierzchos                                 <a href="https://twitter.com/WierzchosKacper">Wierzcho&#347;</a>
  Wiggins                                   <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=4099&amp;view=OPD">Wiggins</a>
  Willman                                   <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=22498&amp;view=OPD">Willman</a>
- Q.-Z. Ye                                  <a href="http://yeqzids.github.io/">Q.-Z. Ye</a>
+ Q.-Z. Ye                                  <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=10280&amp;view=OPD">Q.-Z. Ye</a>
  Zolnowski                                 <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=384815&amp;view=OPD">&#379;o&#322;nowski</a>
  Zoltowski                                 <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=18292&amp;view=OPD">Zoltowski</a>
+</pre>
+</body>
+</html>
