@@ -1025,22 +1025,18 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
 
             if( i == IDX_JUPITER)
                {
+               memcpy( jupiter_loc, planet_loc + 12, 3 * sizeof( double));
                if( r < GALILEAN_LIMIT)
-                  {
-                  memcpy( jupiter_loc, planet_loc + 12, 3 * sizeof( double));
                   local_perturbers |= (15 << 11);
-                  }
                else     /* "throw" Galileans into Jupiter: */
                   mass_to_use = MASS_JUPITER_SYSTEM;
                }
 
             if( i == IDX_SATURN)
                {
+               memcpy( saturn_loc, planet_loc + 12, 3 * sizeof( double));
                if( r < TITAN_LIMIT)
-                  {
-                  memcpy( saturn_loc, planet_loc + 12, 3 * sizeof( double));
                   local_perturbers |= (31 << 15);
-                  }
                else        /* "throw" saturn's satellites into the primary: */
                   mass_to_use = MASS_SATURN_SYSTEM;
                }
@@ -1776,6 +1772,8 @@ int symplectic_6( double jd, ELEMENTS *ref_orbit, double *vect,
       if( i != 7)
          {
          assert( fabs( jd) < 1e+9);
+         for( j = 3; j < 6; j++)
+            vect[j] = 0.;
          calc_derivatives( jd, vect, deriv, ref_orbit->central_obj);
          for( j = 3; j < 6; j++)
             vect[j] += dt * d6[i] * deriv[j];
