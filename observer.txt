@@ -62,7 +62,7 @@
  Flynn                                     <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=Randyflynn&amp;view=OPD">Flynn</a>
  F\"ohring                                 F&ouml;hring
  Foglia                                    <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=13147&amp;view=OPD">Foglia</a>
- Fuls                                      <a href="https://catalina.lpl.arizona.edu/person/carson-fuls">Fuls</a>
+ Fuls                                      <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=22963&amp;view=OPD">Fuls</a>
  Galad                                     <a href="http://en.wikipedia.org/wiki/Adri%C3%A1n_Gal%C3%A1d">Gal&aacute;d</a>
  Galli                                     <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=6515&amp;view=OPD">Galli</a>
  Garradd                                   <a href="http://members.ozemail.com.au/~loomberah/">Garradd</a>
