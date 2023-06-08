@@ -13,6 +13,8 @@
        #if defined(__has_include)
            #if __has_include( <ncursesw/cursesw.h>)
                #include <ncursesw/cursesw.h>
+           #elif __has_include( <cursesw.h>)
+               #include <cursesw.h>
            #else
                #include <curses.h>
            #endif
