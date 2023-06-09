@@ -44,10 +44,12 @@ idea for nearly-singular matrices.  */
       112 bits of precision.  Either is better than "ordinary" doubles
       with a mere 52 bits of precision.   */
 
-#if ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406 && !defined( __arm__)
-#define ldouble    __float128
+#if defined( __aarch64__)
+   #define ldouble _Float128
+#elif ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406 && !defined( __arm__)
+   #define ldouble    __float128
 #else
-#define ldouble    long double
+   #define ldouble    long double
 #endif
 
 #define LSQUARE struct lsquare
