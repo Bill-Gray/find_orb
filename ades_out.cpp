@@ -39,20 +39,9 @@ have to wait for another day.       */
 #include "details.h"
 #include "afuncs.h"
 
-/* Enables some graceless hacks needed by me (Bill Gray) to deal with
-~2000 sungrazing comets.  The files lack contact data (should be me) and
-mag band data (should be V).  And some sungrazers have data from up to
-three places, but only one header.
-
- If the following is defined,  the contact name and mag band will be in
-the ADES output,  even if absent in the input data.  And if one or more
-places lack headers,  we fill in from the first available header (the
-sungrazer spacecraft all have identical headers,  fortunately.)  */
-
-/* #define FOR_SUNGRAZER_PROJECT       1     */
-
 char *get_file_name( char *filename, const char *template_file_name);
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
+char *fgets_trimmed( char *buff, size_t max_bytes, FILE *ifile); /*elem_out.c*/
 double utc_from_td( const double jdt, double *delta_t);     /* ephem0.cpp */
 char *iso_time( char *buff, const double jd, const int precision);   /* elem_out.c */
 int get_satellite_offset( const char *iline, double *xyz);  /* mpc_obs.cpp */
@@ -60,46 +49,6 @@ int text_search_and_replace( char FAR *str, const char *oldstr,
                                      const char *newstr);   /* ephem0.cpp */
 
 #define PI 3.1415926535897932384626433832795028841971693993751058209749445923
-
-static const char **fallback_obs_details = NULL;
-
-static void output_names( FILE *ofile, const OBSERVE FAR *obs, const char *target)
-{
-   int i, n_found = 0;
-   const size_t tlen = strlen( target);
-   const char *tptr, *tptr2;
-   const char **obs_details = obs->obs_details;
-
-   if( !obs_details)
-      obs_details = fallback_obs_details;
-   if( obs_details)
-      for( i = 0; (tptr = obs_details[i]) != NULL; i++)
-         if( !strncmp( tptr, target, tlen))
-            {
-            tptr += tlen;
-            while( tptr && *tptr)
-               {
-               size_t name_len;
-
-               if( *tptr == ',')
-                  tptr++;
-               while( *tptr == ' ')
-                  tptr++;
-               tptr2 = strchr( tptr, ',');
-               name_len = (tptr2 ? tptr2 - tptr : strlen( tptr));
-               if( name_len)
-                  {
-                  fprintf( ofile, "        <name>%.*s</name>\n", (int)name_len, tptr);
-                  n_found++;
-                  }
-               tptr = tptr2;
-               }
-            }
-#ifdef FOR_SUNGRAZER_PROJECT
-   if( !n_found)
-      fprintf( ofile, "        <name>W. Gray</name>\n");
-#endif
-}
 
 /* Column 14 ('note 1') of punched-card astrometry contains either an
 alphabetical note (see https://minorplanetcenter.net/iau/info/ObsNote.html
@@ -113,6 +62,89 @@ static char program_code( const OBSERVE *obs)
    return( isalpha( obs->note1) ? ' ' : obs->note1);
 }
 
+/* Given a line such as 'OBS E. E. Barnard, M. Wolf',  this will write out
+
+        <name>E. E. Barnard</name>
+        <name>M. Wolf</name>
+
+   i.e.,  it 'ADES-izes' old-style observer details. */
+
+static int dump_one_line_of_names( FILE *ofile, const char *line)
+{
+   int n_found = 0;
+
+   if( !memcmp( line, "TEL ", 4))         /* telescope lines are 'special' */
+      {
+      const char *tptr = strstr( line, "coronagraph");
+
+      if( tptr)      /* handling for sungrazers */
+         {           /* these details come from 'details.txt' */
+         size_t i = 0;
+
+         line += 4;
+         fprintf( ofile, "        <design>Coronagraph</design>\n");
+         while( line[i] && line[i] != '-')
+            i++;
+         assert( line[i] == '-');
+         fprintf( ofile, "        <aperture>%.*s</aperture>\n", (int)i, line);
+         fprintf( ofile, "        <detector>CCD</detector>\n");
+         fprintf( ofile, "        <name>%s</name>\n", tptr + 12);
+         n_found = 1;
+         }
+      return( n_found);
+      }
+
+   while( *line > ' ')
+      line++;
+   while( *line >= ' ')
+      {
+      size_t len = 0;
+
+      while( *line == ' ')
+         line++;
+      while( line[len] != ',' && line[len] >= ' ')
+         len++;
+      if( len > 3 && line[1] == '.' && line[2] == ' ')
+         {           /* very incomplete verification that it's really a name */
+         fprintf( ofile, "        <name>%.*s</name>\n", (int)len, line);
+         n_found++;
+         }
+      line += len;
+      if( *line == ',')
+         line++;
+      }
+   return( n_found);
+}
+
+static void output_names( FILE *ofile, const OBSERVE FAR *obs, const char *target)
+{
+   int i, n_found = 0;
+   const size_t tlen = strlen( target);
+   const char *tptr;
+   const char **obs_details = obs->obs_details;
+
+   if( obs_details)
+      for( i = 0; (tptr = obs_details[i]) != NULL; i++)
+         if( !strncmp( tptr, target, tlen))
+            n_found += dump_one_line_of_names( ofile, tptr);
+
+   if( !n_found)
+      {
+      FILE *ifile = fopen_ext( "details.txt", "fcrb");
+      char buff[200];
+      int got_it = 0;
+
+      while( !got_it && fgets( buff, sizeof( buff), ifile))
+         got_it = (!memcmp( buff, "COD ", 4) && !memcmp( buff + 4, obs->mpc_code, 3)
+                  && (buff[7] != ' ' || buff[8] == program_code( obs)));
+      if( got_it)
+         while( fgets_trimmed( buff, sizeof( buff), ifile) && memcmp( buff, "COD ", 4))
+            if( !strncmp( buff, target, tlen))
+               n_found += dump_one_line_of_names( ofile, buff);
+      fclose( ifile);
+      }
+}
+
 /* Outputs _only_ those observations from the station and program code
 specified by the first observation.      */
 
@@ -122,6 +154,7 @@ static void create_ades_file_for_one_code( FILE *ofile,
    char buff[200];
    const char *code = obs->mpc_code;
    const char progcode = program_code( obs);
+   const bool is_sungrazer = (strstr( "249 C49 C50", code) != NULL);
 
    fprintf( ofile, "  <obsBlock>\n");
    fprintf( ofile, "    <obsContext>\n");
@@ -138,10 +171,7 @@ static void create_ades_file_for_one_code( FILE *ofile,
    output_names( ofile, obs, "MEA ");
    fprintf( ofile, "      </measurers>\n");
    fprintf( ofile, "      <telescope>\n");
-   fprintf( ofile, "        <design>Coronagraph</design>\n");
-   fprintf( ofile, "        <aperture>0.11</aperture>\n");
-   fprintf( ofile, "        <detector>CCD</detector>\n");
-   fprintf( ofile, "        <name>C2</name>\n");
+   output_names( ofile, obs, "TEL ");
    fprintf( ofile, "      </telescope>\n");
    fprintf( ofile, "    </obsContext>\n");
    fprintf( ofile, "    <obsData>\n");
@@ -196,10 +226,8 @@ static void create_ades_file_for_one_code( FILE *ofile,
 
             fprintf( ofile, "        <mag>%.*f</mag>\n",
                                     obs->mag_precision, obs->obs_mag);
-#ifdef FOR_SUNGRAZER_PROJECT
-            if( mag_band == ' ')
+            if( is_sungrazer && mag_band == ' ')
                mag_band = 'V';
-#endif
             fprintf( ofile, "        <band>%c</band>\n", mag_band);
             }
          fprintf( ofile, "      </optical>\n");
@@ -229,11 +257,6 @@ void create_ades_file( const char *filename, const OBSERVE FAR *obs,
    setbuf( ofile, NULL);
    fprintf( ofile, "<?xml version=\"1.0\" ?>\n");
    fprintf( ofile, "<ades version=\"2017\">\n");
-#ifdef FOR_SUNGRAZER_PROJECT
-   for( i = 0; i < n_obs; i++)
-      if( obs[i].obs_details)
-         fallback_obs_details = obs[i].obs_details;
-#endif
    for( i = 0; i < n_obs; i++)
       {
       char new_search[5];
