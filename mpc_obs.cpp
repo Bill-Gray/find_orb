@@ -1968,8 +1968,8 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
       {
       obs->obs_mag = atof( buff + 65);
       if( obs->mag_band == ' ' && strstr( "249 C49 C50", obs->mpc_code))
-         obs->mag_band = 'T';   /* Sungrazer obs usually have a blank mag */
-      }                         /* band, but are really 'total' magnitudes */
+         obs->mag_band = 'V';   /* Sungrazer obs usually have a blank mag */
+      }                         /* band, but are basically V */
    else
       obs->obs_mag = BLANK_MAG;
    FMEMCPY( obs->reference, buff + 72, 5);
