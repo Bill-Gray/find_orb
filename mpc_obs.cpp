@@ -3549,7 +3549,6 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
    int i, n_fixes_made = 0, n_future_obs = 0;
    unsigned line_no = 0;
    unsigned n_below_horizon = 0, n_in_sunlight = 0;
-   unsigned lines_actually_read = 0;
    unsigned n_spurious_matches = 0;
    unsigned n_sat_obs_without_offsets = 0;
    double override_posn_sigma_1 = 0., ades_posn_sigma_1 = 0.;  /* in arcsec */
@@ -3612,7 +3611,6 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
       double jd;
 
       line_no++;
-      lines_actually_read++;
       if( *buff == '<')
          remove_html_tags( buff);
       if( !strncmp( buff, "errmod  = 'fcct14'", 18))
@@ -3673,7 +3671,6 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                double vect[3];
                int j, error_code;
 
-               lines_actually_read++;
                rval[i].satellite_obs = (char)(second_line[32] - '0');
                error_code = get_satellite_offset( second_line, vect);
                if( error_code)
@@ -3704,7 +3701,6 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                }
             else if( buff[14] == 'R' && observation_is_good)
                {      /* we did find the "matching" line: */
-               lines_actually_read++;
 //             fix_radar_time( buff);
                rval[i].second_line = (char *)malloc( 81 * 2);
                strcpy( rval[i].second_line, second_line);
@@ -3719,7 +3715,6 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                const double dist_tol = 0.0003;  /* 3e-4 degrees = about 30 meters */
                int idx = 0;
 
-               lines_actually_read++;
                xref_designation( second_line);
                while( idx < n_rovers &&
                             (fabs( rlon - rovers[idx].lon) > dist_tol ||
@@ -4810,7 +4805,6 @@ int load_environment_file( const char *filename)
 {
    FILE *ifile = fopen_ext( filename, (is_default_environment ? "crb" : "rb"));
    char buff[300], *tptr;
-   int n_lines = 0, n_set = 0;
 
    if( !ifile)
       return( -1);
@@ -4841,10 +4835,7 @@ int load_environment_file( const char *filename)
          {
          *tptr = '\0';
          set_environment_ptr( buff, tptr + 1);
-         n_set++;
          }
-      else
-         n_lines++;
    fclose( ifile);
    return( 0);
 }

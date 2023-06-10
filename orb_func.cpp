@@ -1417,7 +1417,7 @@ int search_for_trial_orbit( double *orbit, OBSERVE FAR *obs, int n_obs,
                  const double r1, double *angle_param)
 {
    int rval = 0;
-   unsigned i, n_minima = 0;
+   unsigned i;
    const unsigned n_divisions = 10;
    double best_found = 0., best_rms_found = 0.;
    double rms[3];
@@ -1469,7 +1469,6 @@ int search_for_trial_orbit( double *orbit, OBSERVE FAR *obs, int n_obs,
                }
             debug_printf( "Iteration %u: x=%f, rms %f\n", iteration, new_x, new_rms);
             }
-         n_minima++;
          }
       }
    find_trial_orbit( orbit, obs, n_obs, r1, best_found);

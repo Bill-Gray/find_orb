@@ -533,7 +533,7 @@ int main( const int argc, const char **argv)
 {
    FILE *ifile = fopen_from_findorb_dir( "eph2tle.txt", "rb");
    FILE *ofile = stdout;
-   int i, j, count = 0, output_freq = 10, line = 0;
+   int i, j, output_freq = 10, line = 0;
    int tles_written = 0;
    int n_params = 6, n_iterations = 15;
    const int max_n_params = 8;
@@ -1036,9 +1036,7 @@ int main( const int argc, const char **argv)
 //    else
 //       fprintf( ofile, "FAILED (%d) for JD %.2f = %s\n", failure,
 //                      jd_utc, buff);
-      count = -1;
       tles_written++;
-      count++;
       line++;
       if( ofile != stdout && !(line % progress_bar_freq))
          {
