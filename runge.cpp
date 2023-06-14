@@ -1773,7 +1773,7 @@ int symplectic_6( double jd, ELEMENTS *ref_orbit, double *vect,
          {
          assert( fabs( jd) < 1e+9);
          for( j = 3; j < 6; j++)
-            vect[j] = 0.;
+            deriv[j] = 0.;
          calc_derivatives( jd, vect, deriv, ref_orbit->central_obj);
          for( j = 3; j < 6; j++)
             vect[j] += dt * d6[i] * deriv[j];
