@@ -1018,6 +1018,8 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                   (ephemeris_output_options & OPTION_EXPOSURE_TIME) ? '*' : ' ');
             snprintf_append( buff, sizeof( buff), "= [%c] Constellation\n",
                   (ephemeris_output_options & OPTION_CONSTELLATION) ? '*' : ' ');
+            snprintf_append( buff, sizeof( buff), "$ [%c] RVel, delta sigmas\n",
+                  (ephemeris_output_options & OPTION_RV_AND_DELTA_SIGMAS) ? '*' : ' ');
             }
          }
       for( i = n_lines = 0; buff[i]; i++)
@@ -1362,6 +1364,9 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             break;
          case '=':
             ephemeris_output_options ^= OPTION_CONSTELLATION;
+            break;
+         case '$':
+            ephemeris_output_options ^= OPTION_RV_AND_DELTA_SIGMAS;
             break;
          case 'q': case 'Q':
          case 27:

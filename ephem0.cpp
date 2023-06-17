@@ -2256,7 +2256,11 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
          snprintf_append( buff, sizeof( buff), "-RA%s   -Dec%s  ",
                                     added_prec_text_ra + 3, added_prec_text_dec + 4);
       if( !(options & OPTION_SUPPRESS_DELTA))
+         {
          snprintf_append( buff, sizeof( buff), "-delta ");
+         if( options & OPTION_RV_AND_DELTA_SIGMAS)
+            snprintf_append( buff, sizeof( buff), "-sgDel ");
+         }
       if( !(options & OPTION_SUPPRESS_SOLAR_R))
          snprintf_append( buff, sizeof( buff), "-r---- ");
       if( !(options & OPTION_SUPPRESS_ELONG))
@@ -2312,7 +2316,11 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
       if( options & OPTION_MOON_AZ)
          snprintf_append( buff, sizeof( buff), " Maz");
       if( options & OPTION_RADIAL_VEL_OUTPUT)
+         {
          snprintf_append( buff, sizeof( buff), "  rvel-");
+         if( options & OPTION_RV_AND_DELTA_SIGMAS)
+            snprintf_append( buff, sizeof( buff), "  sigRV");
+         }
       if( options & OPTION_SPACE_VEL_OUTPUT)
          snprintf_append( buff, sizeof( buff), "  svel-");
       if( show_radar_data)
@@ -2377,6 +2385,8 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
       double geo_posn[3], geo_vel[3];
       double delta_t;
       long rgb = 0;
+      double sum_r = 0., sum_r2 = 0.;     /* for uncertainty in r */
+      double sum_rv = 0., sum_rv2 = 0.;   /* for uncertainty in rvel */
 
       if( use_observation_times)
          {
@@ -2431,6 +2441,8 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
          double orbi_after_light_lag[MAX_N_PARAMS];
          OBSERVE temp_obs;
          int j;
+         const char *sigma_delta_placeholder = "!sigma_delta!";
+         const char *sigma_rvel_placeholder = "!sigma_rv!";
 
          integrate_orbit( orbi, prev_ephem_t, ephemeris_t);
          for( j = 0; j < 3; j++)
@@ -2498,6 +2510,10 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
             v_dot_r += topo[j] * topo_vel[j];
          r = vector3_length( topo);
          radial_vel = v_dot_r / r;
+         sum_r += r;
+         sum_r2 += r * r;
+         sum_rv += radial_vel;
+         sum_rv2 += radial_vel * radial_vel;
          if( *stepsize == 'a')
             max_auto_step = fabs( atof( stepsize + 1)) * r / vector3_length( topo_vel);
          if( (ephem_type == OPTION_STATE_VECTOR_OUTPUT ||
@@ -2670,6 +2686,48 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                strlcat_error( buff, tbuff);
                snprintf_append( alt_buff, sizeof( alt_buff), " %8.3f %3d",
                                     dist * 3600. * 180. / PI, int_pa);
+               if( !(options & OPTION_SUPPRESS_DELTA) &&
+                    (options & OPTION_RV_AND_DELTA_SIGMAS))
+                  {
+                  double sigma_r;
+                  char sigma_buff[20];
+
+                  sum_r /= (double)n_objects;
+                  sum_r2 /= (double)n_objects;
+                  sigma_r = sqrt( sum_r2 - sum_r * sum_r);
+                  alt_tptr = alt_buff + strlen( alt_buff);
+                  snprintf_err( sigma_buff, sizeof( sigma_buff), " %17.12f", sigma_r);
+                  text_search_and_replace( alt_buff, sigma_delta_placeholder,
+                                 sigma_buff);
+                  if( !computer_friendly)
+                     {
+
+                     use_au_only = (show_radar_data || (r > 999999. / AU_IN_KM));
+                     format_dist_in_buff( sigma_buff, sigma_r);
+                     use_au_only = false;
+                     }
+                  text_search_and_replace( buff, sigma_delta_placeholder,
+                                 sigma_buff);
+                  }
+               if( (options & OPTION_RADIAL_VEL_OUTPUT) &&
+                    (options & OPTION_RV_AND_DELTA_SIGMAS))
+                  {
+                  double sigma_rv;
+                  char sigma_buff[20];
+
+                  sum_rv /= (double)n_objects;
+                  sum_rv2 /= (double)n_objects;
+                  sigma_rv = sqrt( sum_rv2 - sum_rv * sum_rv);
+                  sigma_rv *= AU_IN_KM / seconds_per_day;
+
+                  snprintf_err( sigma_buff, sizeof( sigma_buff),
+                                      " %11.6f", sigma_rv);
+                  text_search_and_replace( alt_buff, sigma_rvel_placeholder,
+                                 sigma_buff);
+                  format_velocity_in_buff( sigma_buff, sigma_rv);
+                  text_search_and_replace( buff, sigma_rvel_placeholder,
+                                 sigma_buff);
+                  }
                }
             if( !obj_n)
                {
@@ -2937,6 +2995,11 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                      use_au_only = show_radar_data;
                      format_dist_in_buff( buff + strlen( buff), r);
                      use_au_only = false;
+                     }
+                  if( options & OPTION_RV_AND_DELTA_SIGMAS)
+                     {
+                     strlcat_error( buff, sigma_delta_placeholder);
+                     strlcat_error( alt_buff, sigma_delta_placeholder);
                      }
                   }
                if( !(options & OPTION_SUPPRESS_SOLAR_R))
@@ -3318,6 +3381,11 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                   snprintf_append( alt_buff, sizeof( alt_buff),
                                       " %11.6f", rvel_in_km_per_sec);
                   format_velocity_in_buff( end_ptr, rvel_in_km_per_sec);
+                  if( options & OPTION_RV_AND_DELTA_SIGMAS)
+                     {
+                     strlcat_error( buff, sigma_rvel_placeholder);
+                     strlcat_error( alt_buff, sigma_rvel_placeholder);
+                     }
                   }
                if( options & OPTION_SPACE_VEL_OUTPUT)
                   {

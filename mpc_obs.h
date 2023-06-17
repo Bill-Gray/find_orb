@@ -167,6 +167,7 @@ typedef uint64_t ephem_option_t;
 #define OPTION_EXPOSURE_TIME            EPHEM_OPTION_BIT( 36)
 #define OPTION_EXPLANATIONS             EPHEM_OPTION_BIT( 37)
 #define OPTION_CONSTELLATION            EPHEM_OPTION_BIT( 38)
+#define OPTION_RV_AND_DELTA_SIGMAS      EPHEM_OPTION_BIT( 39)
 
 #define ORBIT_SIGMAS_REQUESTED         1
 #define NO_ORBIT_SIGMAS_REQUESTED    (-1)
