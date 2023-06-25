@@ -1392,6 +1392,16 @@ static int create_json_ephemeris( FILE *ofile, FILE *ifile, char *header,
          const char *preceder = (line_no ? ",\n" : "");
          const int step_number = (step ? (int)(( atof( buff) - jd_start) / step + .5) : line_no);
 
+         if( step_number < 0)
+            {
+            FILE *debug_file = fopen_ext( "ephem.err", "tfcwb");
+
+            fseek( ifile, 0L, SEEK_SET);
+            while( fgets_trimmed( buff, sizeof( buff), ifile))
+               fprintf( debug_file, "%s\n", buff);
+            fclose( debug_file);
+            return( -1);
+            }
          fprintf( ofile, "%s      \"%d\": {", preceder, step_number);
          while( *hptr && *bptr)
             {
