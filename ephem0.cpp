@@ -3075,7 +3075,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                      mags_per_arcsec2 = 99.99;
                   snprintf( tbuff, sizeof( tbuff), " %5.2f", mags_per_arcsec2);
                   strlcat_error( alt_buff,
-                           (mags_per_arcsec2 > 99.9) ? " null" : tbuff);
+                           (mags_per_arcsec2 > 99.9) ? "  null" : tbuff);
                   snprintf_append( alt_buff, sizeof( alt_buff), " %06lx", rgb);
                   if( mags_per_arcsec2 > 99.9 && !computer_friendly)
                      strlcpy_error( tbuff, " --.--");
