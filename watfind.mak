@@ -1,14 +1,17 @@
 # Make file for find_orb with the Watcom C/C++ compiler.
 # Version using PDCurses.
 
-LINK_OPTS=l find_orb.lib l ..\jpl_eph\WJPLEPH.LIB l ..\lunar\WAFUNCS.LIB l ..\PDCurs~1\dos\PDCURSES.LIB l ..\sat_code\WSATLIB.LIB
+PDC_DIR=..\PDCurs~1
+PDC_LIB=$(PDC_DIR)\dosvga\PDCURSES.LIB
+LIB_DIR=..\watlib
+LINK_OPTS=l find_orb.lib l $(LIB_DIR)\WJPLEPH.LIB l $(LIB_DIR)\WAFUNCS.LIB l $(PDC_LIB) l $(LIB_DIR)\WSATLIB.LIB
 # LINK_OPTS=l wafuncs.lib l wjpleph.lib l wsatlib.lib l find_orb.lib l pdcurses.lib f clipfunc.obj
 CURSES_OBJ=clipfunc.obj getstrex.obj
 CURSES_OBJ_COMMAS=clipfunc.obj, getstrex.obj
 
 all: find_orb.exe fo.exe fo_serve.exe
 
-LINKOPTS=option stub=dos32a option map=find_orb.map option stack=20000 f ..\PDCursesMod\dos\PDCURSES.LIB
+LINKOPTS=option stub=dos32a option map=find_orb.map option stack=20000 f $(PDC_LIB)
 
 OBJS=ades_out.obj b32_eph.obj bc405.obj bias.obj collide.obj conv_ele.obj &
   details.obj eigen.obj elem2tle.obj elem_out.obj elem_ou2.obj ephem0.obj &
@@ -17,7 +20,7 @@ OBJS=ades_out.obj b32_eph.obj bc405.obj bias.obj collide.obj conv_ele.obj &
 !ifeq DOS Y
   $(CURSES_OBJ) &
 !endif
-  nanosecs.obj orb_func.obj orb_fun2.obj pl_cache.obj roots.obj &
+  orb_func.obj orb_fun2.obj pl_cache.obj roots.obj &
   runge.obj simplex.obj sm_vsop.obj sr.obj shellsor.obj sigma.obj stackall.obj
 
 find_orb.lib: $(OBJS)
@@ -65,8 +68,8 @@ CFLAGS=/Ox /W3 /4r /s /j /zq -i=..\include
    wpp386 $(CFLAGS) $<
 
 findorb.obj : findorb.cpp
-   wpp386 $(CFLAGS) -i=..\PDCursesMod $<
+   wpp386 $(CFLAGS) -i=$(PDC_DIR) $<
 
-getstrex.obj : getstrex.c
-   wcc386 $(CFLAGS) -i=..\PDCursesMod $<
+getstrex.obj : getstrex.cpp
+   wpp386 $(CFLAGS) -i=$(PDC_DIR) $<
 

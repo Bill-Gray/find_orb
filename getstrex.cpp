@@ -2,7 +2,7 @@
 
 #define PDC_NCMOUSE
 
-#if defined( VT) || defined( XCURSES) || defined( _WIN32)
+#if defined( VT) || defined( XCURSES) || defined( _WIN32) || defined( __WATCOMC__)
    #define PDC_FORCE_UTF8
    #include <curses.h>
 #else

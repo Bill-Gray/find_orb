@@ -19,9 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 
 #define _XOPEN_SOURCE_EXTENDED   1
 #define PDC_NCMOUSE
-#ifndef __WATCOMC__
-   #define PDC_FORCE_UTF8
-#endif
+#define PDC_FORCE_UTF8
 #define MOUSE_MOVEMENT_EVENTS_ENABLED
 
 #ifdef _WIN32
@@ -350,9 +348,9 @@ is commented out by default. */
 #ifdef __WATCOMC__
 #undef endwin
 extern "C" {
-PDCEX  int     endwin_x64_4302(void);
+PDCEX  int     endwin_u64_4302(void);
 }
-#define endwin endwin_x64_4302
+#define endwin endwin_u64_4302
 #endif
 
 static int full_endwin( void)
