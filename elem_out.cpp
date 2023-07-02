@@ -523,12 +523,17 @@ static int elements_in_mpcorb_format( char *buff, const char *packed_desig,
    const size_t mpcorb_line_len = 203;
    int precision = 7;
    double tval;
+   double abs_mag = elem->abs_mag;
 
    packed_desig_minus_spaces( packed_desig2, packed_desig);
    if( 12 == strlen( packed_desig2))  /* fix cases where number &  */
       packed_desig2[5] = '\0';        /* provisional ID are both set; */
    packed_desig2[8] = '\0';           /* prevent overrun otherwise */
-   snprintf_err( buff, mpcorb_line_len, "%-8s%5.2f %5.2f ", packed_desig2, elem->abs_mag,
+   if( abs_mag > 99.9)
+      abs_mag = 99.9;
+   if( abs_mag < -9.9)
+      abs_mag = -9.9;
+   snprintf_err( buff, mpcorb_line_len, "%-8s%5.2f %5.2f ", packed_desig2, abs_mag,
                            asteroid_magnitude_slope_param);
    day = (int)( decimal_day_to_dmy( elem->epoch, &year,
                               &month, CALENDAR_JULIAN_GREGORIAN) + .0001);
