@@ -642,7 +642,7 @@ const char *write_bit_string( char *ibuff, const uint64_t bits)
 
 /* Very simple pattern matcher,  using ? and * only */
 
-bool pattern_match(const char* pattern, const char* string)
+int pattern_match(const char* pattern, const char* string)
 {
    while( pattern[0])
       if( pattern[0] == '*')
@@ -663,6 +663,6 @@ bool pattern_match(const char* pattern, const char* string)
 const char *find_orb_version_jd( double *jd)
 {
     if( jd)
-      *jd = 2460121.5;
-    return( "2023 Jun 26");
+      *jd = 2460123.5;
+    return( "2023 Jun 28");
 }
