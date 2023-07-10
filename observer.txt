@@ -60,13 +60,15 @@
  Fitzsimmons                               <a href="https://alanfitzsimmons.wordpress.com/">Fitzsimmons</a>
  Flewelling                                <a href="https://twitter.com/heatherflew">Flewelling</a>
  Flynn                                     <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=Randyflynn&amp;view=OPD">Flynn</a>
- F\"ohring                                 F&ouml;hring
+ Fohring                                   <a href='https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=Randyflynn&amp;view=OPD'>F&ouml;hring</a>
+ F\"ohring                                 <a href='https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=Randyflynn&amp;view=OPD'>F&ouml;hring</a>
  Foglia                                    <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=13147&amp;view=OPD">Foglia</a>
  Fuls                                      <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=22963&amp;view=OPD">Fuls</a>
  Galad                                     <a href="http://en.wikipedia.org/wiki/Adri%C3%A1n_Gal%C3%A1d">Gal&aacute;d</a>
  Galli                                     <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=6515&amp;view=OPD">Galli</a>
  Garradd                                   <a href="http://members.ozemail.com.au/~loomberah/">Garradd</a>
  Gasparovic                                <a href='https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=P%2F2017%20K3'>Ga&#x161;parovi&#x107;</a>
+ Gedek                                     <a href='https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=580123&amp;view=OPD'>Gedek</a>
  Geffert                                   <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=17855&amp;view=OPD">Geffert</a>
  Gibbs                                     <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=14220&amp;view=OPD">Gibbs</a>
  Gilmore                                   <a href="http://www.phys.canterbury.ac.nz/people/gilmore.shtml">Gilmore</a>
@@ -141,6 +143,7 @@
  Nugent                                    <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=8801&amp;view=OPD">Nugent</a>
  Ocana                                     <a href='https://www.cosmos.esa.int/web/cesar/francisco-ocana'>Oca&ntilde;a</a>
  Oca\~na                                   <a href='https://www.cosmos.esa.int/web/cesar/francisco-ocana'>Oca&ntilde;a</a>
+ Odeh                                      <a href='https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=34786&amp;view=OPD'>Odeh</a>
  Oksanen                                   <a href="http://twitter.com/#!/oksanen">Oksanen</a>
  Ondrejov                                  <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=56561&amp;view=OPD">Ond&#345;ejov</a>
  Sanchez-Ortiz                             <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=257336&amp;view=OPD">S&aacute;nchez-Ortiz</a>
@@ -165,11 +168,13 @@
  Ramanjooloo                               <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=41458&amp;view=OPD">Ramanjooloo</a>
  Rankin                                    <a href="http://rankinstudio.com/">Rankin</a>
  Reddy                                     <a href='https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=8068&amp;view=OPD'>Reddy</a>
+ Reszelewski                               <a href='https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=576853&amp;view=OPD'>Reszelewski</a>
  Rinner                                    <a href="https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=23999&amp;view=OPD">Rinner</a>
  Ritchey-Chretien                          Ritchey-Chr&eacute;tien
  J. E. Rogers                              <a href="https://minorplanetcenter.net/db_search/show_object?object_id=5517">J. E. Rogers</a>
  Romanov                                   <a href='https://twitter.com/romanov_filipp'>Romanov</a>
  W. H. Ryan                                <a href="http://infohost.nmt.edu/~bryan/">W. H. Ryan</a>
+ Santana-Ros                               <a href='https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html#/?sstr=10472&amp;view=OPD'>Santana-Ros</a>
  Sarneczky                                 <a href="http://en.wikipedia.org/wiki/Kriszti%C3%A1n_S%C3%A1rneczky">S&aacute;rneczky</a>
  S\'arneczky                               <a href="http://en.wikipedia.org/wiki/Kriszti%C3%A1n_S%C3%A1rneczky">S&aacute;rneczky</a>
  Sarounova                                 &#352;arounov&aacute;
