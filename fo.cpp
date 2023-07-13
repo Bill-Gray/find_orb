@@ -479,9 +479,9 @@ int main( int argc, const char **argv)
    int n_lines_written = 0;
    FILE *summary_ofile = NULL;
    extern int forced_central_body;
+   int override_forced_central_body = 0;     /* by default,  all orbits are heliocentric */
    extern int use_config_directory;          /* miscell.c */
    int element_precision = 5;
-   bool all_heliocentric = true;
    bool use_colors = true;
    bool show_processing_steps = true;
    ephem_option_t ephemeris_output_options
@@ -564,7 +564,10 @@ int main( int argc, const char **argv)
                computed_obs_filename = arg;
                break;
             case 'h':                     /* show planet-centric orbits */
-               all_heliocentric = false;
+               if( !*arg)
+                  override_forced_central_body = ORBIT_CENTER_AUTO;
+               else
+                  override_forced_central_body = atoi( arg);
                break;
 #ifdef FORKING
             case 'k':
@@ -767,7 +770,7 @@ int main( int argc, const char **argv)
          }
       }
 
-   forced_central_body = (all_heliocentric ? 0 : ORBIT_CENTER_AUTO);
+   forced_central_body = override_forced_central_body;
    if( ephem_option_string)
       ephemeris_output_options = parse_bit_string( ephem_option_string);
 
