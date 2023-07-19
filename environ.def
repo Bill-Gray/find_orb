@@ -68,13 +68,15 @@ OBSERVATION_DATE_RANGE=1100,2300
    "unredacted" form.  (Contact me if you're willing to be added to this
    list.)  An asterisk indicates that observations of geocentric objects
    should remain redacted.
-       In some cases,  a specific program code is greenlit.  'J13:#',  for
+       In some cases,  specific program code(s) are greenlit.  'J13:#',  for
    example,  means that NEOCP observations from (J13) with program code '#'
-   will be shown unredacted.
-GREENLIT=033 291 568 595 670 671 691 703 718 970 B72 C95 G58 G96 H01 H41 H43
-GREENLIT2=H45 I41 I52 I81 I93 J69 J95 K80 L65 T05* T08*
-GREENLIT3=U52 U94:5 V00 V03 V06 V11 X07:1 Y00
-GREENLIT4=Z37 Z48 Z80 851:0 H06:q I22:2 I89:; J13:# U69:| Q62:d
+   will be shown unredacted. 'Z84:1567' means (Z84) data from program codes
+   1, 5, 6, and 7 are greenlit.
+GREENLIT=033 291 568 595 670 671 691 703 718 851:0 970 B72
+GREENLIT2=C95 G58 G96 H01 H06:q H41 H43 H45 I22:2 I41 I52
+GREENLIT3=I81 I89:; I93 J04:12345!$ J13:# J69 J95 K80 L65
+GREENLIT4=Q62:d T05* T08* U52 U69:| U94:5 V00 V03 V06
+GREENLIT5=V11 W57 X07:1 Y00 Z37 Z48 Z58 Z80 Z84:1567
 
    We default to assuming that no object will have an observed arc greater
    than 200 years,  and that if it _is_ longer than that,  it's a mistake.
@@ -506,3 +508,11 @@ N_MOIDS=8
    cause those observations to be included.  PRIVATE_OBS=1 will skip the
    question and cause those observations to be ignored.
 PRIVATE_OBS=
+
+    By default,  motion units in ephemerides are in arcminutes per hour (or,
+    equivalently,  arcseconds per minute).  One can set the units with the
+    following parameter.  The first character must be ", ', or d.  The
+    second must be /.  The third must be s(econds), m(inutes), h(ours), or
+    d(ays).  Requests for other units (milliradians,  etc.) will be
+    entertained.
+MOTION_UNITS="/min

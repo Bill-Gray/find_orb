@@ -2124,6 +2124,26 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
    const bool fake_astrometry = ((options & 7) == OPTION_FAKE_ASTROMETRY);
    const char *group_data;
    int n_mag_places = atoi( get_environment_ptr( "MAG_DIGITS"));
+   char motion_unit_text[7];
+   double motion_units = 1.;
+
+   strlcpy_error( motion_unit_text, get_environment_ptr( "MOTION_UNITS"));
+   if( !*motion_unit_text)
+      strlcpy_error( motion_unit_text, "'/hr");
+   else
+      {
+      if( *motion_unit_text == '"')
+         motion_units = 60.;
+      else if( *motion_unit_text == 'd')
+         motion_units = 1. / 60.;
+      if( strstr( motion_unit_text, "/m"))
+         motion_units /= 60.;
+      else if( strstr( motion_unit_text, "/s"))
+         motion_units /= 3600.;
+      else if( strstr( motion_unit_text, "/d"))
+         motion_units *= 24.;
+      }
+   strlcat( motion_unit_text, "----", sizeof( motion_unit_text));
 
    snprintf( buff, sizeof( buff), "GROUP_%.3s", note_text + 1);
    group_data = get_environment_ptr( buff);
@@ -2311,9 +2331,9 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
       if( options & OPTION_LUNAR_ELONGATION)
          snprintf_append( buff, sizeof( buff), "  LuElo");
       if( options & OPTION_MOTION_OUTPUT)
-         snprintf_append( buff, sizeof( buff), " -'/hr-- --PA--");
+         snprintf_append( buff, sizeof( buff), " -%s --PA--", motion_unit_text);
       if( options & OPTION_SEPARATE_MOTIONS)
-         snprintf_append( buff, sizeof( buff), " -RA--'/hr--dec-");
+         snprintf_append( buff, sizeof( buff), " -RA--%sdec-", motion_unit_text);
 
       if( options & OPTION_ALT_AZ_OUTPUT)
          snprintf_append( buff, sizeof( buff), " alt -az");
@@ -3319,7 +3339,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                   compute_observation_motion_details( &temp_obs, &m);
                   if( options & OPTION_MOTION_OUTPUT)
                      {
-                     format_motion( end_ptr + 1, m.total_motion);
+                     format_motion( end_ptr + 1, m.total_motion * motion_units);
                      snprintf( end_ptr + 9, 7, "%5.1f ",
                                      m.position_angle_of_motion);
                      end_ptr[8] = end_ptr[0] = ' ';
@@ -3332,8 +3352,8 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                      }
                   if( options & OPTION_SEPARATE_MOTIONS)
                      {
-                     format_motion( end_ptr + 1, m.ra_motion);
-                     format_motion( end_ptr + 9, m.dec_motion);
+                     format_motion( end_ptr + 1, m.ra_motion * motion_units);
+                     format_motion( end_ptr + 9, m.dec_motion * motion_units);
                      end_ptr[8] = end_ptr[0] = ' ';
                      snprintf_append( alt_buff, sizeof( alt_buff),
                                  " %f %f", m.ra_motion, m.dec_motion);
@@ -4173,17 +4193,20 @@ void format_observation( const OBSERVE FAR *obs, char *text,
                      (int)( abs_time_resid * 100. + .5));
       else if( abs_time_resid < 9.9)             /* show as " -4.7s " */
          snprintf( xresid, sizeof( xresid), " %+4.1fs", m.time_residual);
-      else if( abs_time_resid < 999.)            /* show as " -217s " */
-         snprintf( xresid, sizeof( xresid), " %c%03ds", sign,
-                     (int)( abs_time_resid + .5));
-      else if( abs_time_resid / 60. < 999.)      /* show as " +133m " */
-         snprintf( xresid, sizeof( xresid), " %c%03dm", sign,
-                     (int)( abs_time_resid / 60. + .5));
-      else if( abs_time_resid / 3600. < 9999.)   /* show as " +027h " */
-         snprintf( xresid, sizeof( xresid), " %c%03dh", sign,
-                     (int)( abs_time_resid / 3600. + .5));
-      else                                   /* Give up after 1000 hours; */
-         strcpy( xresid, " !!!! ");          /* show "it's a long time"   */
+      else
+          {
+          strcpy( xresid, " !!!! ");          /* show "it's a long time"   */
+          for( i = 0; xresid[1] == '!' && i < 4; i++)
+              {
+              static const double divisors[4] = { 1., 60., 3600., 86400. };
+              static const char *units = "smhd";
+              const double scaled = abs_time_resid / divisors[i];
+
+              if( scaled < 999.)
+                  snprintf_err( xresid, sizeof( xresid), " %c%03d%c", sign,
+                        (int)( scaled + 0.5), units[i]);
+              }
+           }
       put_residual_into_text( yresid, m.cross_residual, resid_format);
       }
    else
@@ -4923,19 +4946,28 @@ static bool is_neocp_line( const char *mpc_line)
 static bool _is_greenlit( const char *env_line, const char *mpc_line,
                                                 const bool is_heliocentric)
 {
-   while( NULL != (env_line = strstr( env_line, mpc_line + 77)))
-      {
-      env_line += 3;
-      if( *env_line == ':')      /* specific program code */
+   const char *tptr = env_line;
+
+   while( NULL != (tptr = strstr( tptr, mpc_line + 77)))
+      if( tptr != env_line && tptr[-1] != ' ')
+         tptr += 3;     /* didn't actually find the code */
+      else
          {
-         if( env_line[1] == mpc_line[13])      /* yup,  right program code */
-            if( is_heliocentric || env_line[2] != '*')
-               return( true);
-         }
-      else                 /* anything from this obscode */
-         if( is_heliocentric || *env_line != '*')
+         tptr += 3;
+         if( *tptr == '*' && !is_heliocentric)
+            return( false);   /* geocentric objects aren't greenlit for this code */
+         if( *tptr <= ' ')      /* anything from this obscode is greenlit */
             return( true);
-      }
+         assert( *tptr == ':' || *tptr == '*');
+         tptr++;
+         while( *tptr > ' ')
+            {
+            if( *tptr == mpc_line[13])      /* yup,  right program code */
+               return( true);
+            tptr++;
+            }
+         return( false);      /* didn't find that program code */
+         }
    return( false);
 }
 
