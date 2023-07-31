@@ -4570,17 +4570,23 @@ void attempt_extensions( OBSERVE *obs, int n_obs, double *orbit,
                          compute_rms( obs, n_obs));
             if( available_sigmas == COVARIANCE_AVAILABLE)
                {
-               double lov_sigmas;
+               double lov_sigmas, rms = compute_weighted_rms( obs, n_obs, NULL);
+               double prev_rms = 1e+70;
+               int j;
 
-               if( debug_level > 2)
-                  debug_printf( "  Got a covariance,  setting %d obs\n", n_obs);
-               set_locs( orbit, epoch, obs, n_obs);
-               if( debug_level > 2)
-                  debug_printf( "  Seeking minimum along LOV\n");
-               lov_sigmas = improve_along_lov( orbit, epoch, eigenvects[0],
-                                            n_orbit_params, n_obs, obs);
-               if( debug_level > 2)
-                  debug_printf( "  Minimum at %f sigmas\n", lov_sigmas);
+               for( j = 0; j < 5 && rms > 2. &&
+                                     (rms > 2000. || prev_rms > rms + 0.1); j++)
+                  {
+                  prev_rms = rms;
+                  set_locs( orbit, epoch, obs, n_obs);
+                  lov_sigmas = improve_along_lov( orbit, epoch, eigenvects[0],
+                                               n_orbit_params, n_obs, obs);
+
+                  rms = compute_weighted_rms( obs, n_obs, NULL);
+                  if( debug_level > 2)
+                     debug_printf( "  iter %d; %d obs; minimum at %f sigmas; weighted RMS %f\n",
+                                          j, n_obs, lov_sigmas, rms);
+                  }
                }
             if( full_improvement( obs, n_obs, orbit, epoch, NULL,
                            NO_ORBIT_SIGMAS_REQUESTED, epoch))
