@@ -953,6 +953,8 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
             oval[i + 3] += g * ival[8] * out_of_plane[i] / dot_prod;
          }
       }
+   for( i = 0; i < 3; i++)       /* redundant initialization */
+      jupiter_loc[i] = 0.;       /* to avoid gcc-13 warning  */
 
    if( perturbers)
       for( i = 1; i < N_PERTURB + 1; i++)
