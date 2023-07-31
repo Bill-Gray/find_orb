@@ -4720,6 +4720,8 @@ char *find_numbered_mp_info( const int number);    /* mpc_obs.cpp */
 int check_for_other_processes( const int locking);    /* elem_out.cpp */
 int get_temp_dir( char *name, const size_t max_len);   /* miscell.cpp */
 #endif
+int detect_perturbers( const double jd, const double * __restrict xyz,
+                       double *accel);
 
 int clean_up_find_orb_memory( void)
 {
@@ -4746,6 +4748,7 @@ int clean_up_find_orb_memory( void)
    pop_all_orbits( );
    galactic_confusion( -99., 0.);
    find_numbered_mp_info( 0);
+   detect_perturbers( 0, NULL, NULL);
 #if !defined( _WIN32) && !defined( __WATCOMC__)
    if( check_for_other_processes( 0))
       {
