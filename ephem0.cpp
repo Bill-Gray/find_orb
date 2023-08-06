@@ -2363,10 +2363,16 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
          snprintf_append( buff, sizeof( buff), " \"-sig-PA");
       if( ephem_type == OPTION_OBSERVABLES)
          {
+         const char *alt_file_name = get_environment_ptr( "ALT_EPHEM_FILENAME");
+
          header = (char *)malloc( 1024);
          assert( header);
          strlcpy_err( header, buff, 1024);
-         computer_friendly_ofile = tmpfile( );
+         if( alt_file_name)
+            computer_friendly_ofile = fopen_ext( alt_file_name,
+                                          is_default_ephem ? "tfcw+" : "fw+");
+         else
+            computer_friendly_ofile = tmpfile( );
          assert( computer_friendly_ofile);
          }
       if( show_radar_data)
