@@ -2126,6 +2126,12 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
    int n_mag_places = atoi( get_environment_ptr( "MAG_DIGITS"));
    char motion_unit_text[7];
    double motion_units = 1.;
+   const bool showing_rvel_sigmas = (options & OPTION_RADIAL_VEL_OUTPUT)
+                                 && (options & OPTION_RV_AND_DELTA_SIGMAS)
+                                 && n_objects > 1;
+   const bool showing_delta_sigmas = !(options & OPTION_SUPPRESS_DELTA)
+                                 && (options & OPTION_RV_AND_DELTA_SIGMAS)
+                                 && n_objects > 1;
 
    strlcpy_error( motion_unit_text, get_environment_ptr( "MOTION_UNITS"));
    if( !*motion_unit_text)
@@ -2286,11 +2292,9 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
          snprintf_append( buff, sizeof( buff), "-RA%s   -Dec%s  ",
                                     added_prec_text_ra + 3, added_prec_text_dec + 4);
       if( !(options & OPTION_SUPPRESS_DELTA))
-         {
          snprintf_append( buff, sizeof( buff), "-delta ");
-         if( options & OPTION_RV_AND_DELTA_SIGMAS)
-            snprintf_append( buff, sizeof( buff), "-sgDel ");
-         }
+      if( showing_delta_sigmas)
+         snprintf_append( buff, sizeof( buff), "-sgDel ");
       if( !(options & OPTION_SUPPRESS_SOLAR_R))
          snprintf_append( buff, sizeof( buff), "-r---- ");
       if( !(options & OPTION_SUPPRESS_ELONG))
@@ -2346,11 +2350,9 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
       if( options & OPTION_MOON_AZ)
          snprintf_append( buff, sizeof( buff), " Maz");
       if( options & OPTION_RADIAL_VEL_OUTPUT)
-         {
          snprintf_append( buff, sizeof( buff), "  rvel-");
-         if( options & OPTION_RV_AND_DELTA_SIGMAS)
-            snprintf_append( buff, sizeof( buff), "  sigRV");
-         }
+      if( showing_rvel_sigmas)
+         snprintf_append( buff, sizeof( buff), "  sigRV");
       if( options & OPTION_SPACE_VEL_OUTPUT)
          snprintf_append( buff, sizeof( buff), "  svel-");
       if( show_radar_data)
@@ -2720,8 +2722,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                strlcat_error( buff, tbuff);
                snprintf_append( alt_buff, sizeof( alt_buff), " %8.3f %3d",
                                     dist * 3600. * 180. / PI, int_pa);
-               if( !(options & OPTION_SUPPRESS_DELTA) &&
-                    (options & OPTION_RV_AND_DELTA_SIGMAS))
+               if( showing_delta_sigmas)
                   {
                   double sigma_r;
                   char sigma_buff[20];
@@ -2743,8 +2744,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                   text_search_and_replace( buff, sigma_delta_placeholder,
                                  sigma_buff);
                   }
-               if( (options & OPTION_RADIAL_VEL_OUTPUT) &&
-                    (options & OPTION_RV_AND_DELTA_SIGMAS))
+               if( showing_rvel_sigmas)
                   {
                   double sigma_rv;
                   char sigma_buff[20];
@@ -3030,7 +3030,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                      format_dist_in_buff( buff + strlen( buff), r);
                      use_au_only = false;
                      }
-                  if( options & OPTION_RV_AND_DELTA_SIGMAS)
+                  if( showing_delta_sigmas)
                      {
                      strlcat_error( buff, sigma_delta_placeholder);
                      strlcat_error( alt_buff, sigma_delta_placeholder);
@@ -3415,7 +3415,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                   snprintf_append( alt_buff, sizeof( alt_buff),
                                       " %11.6f", rvel_in_km_per_sec);
                   format_velocity_in_buff( end_ptr, rvel_in_km_per_sec);
-                  if( options & OPTION_RV_AND_DELTA_SIGMAS)
+                  if( showing_rvel_sigmas)
                      {
                      strlcat_error( buff, sigma_rvel_placeholder);
                      strlcat_error( alt_buff, sigma_rvel_placeholder);
