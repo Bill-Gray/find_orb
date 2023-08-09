@@ -91,9 +91,9 @@ reposition the cursor using the mouse.
       outside the text area,  that key is returned.  The calling routine
       can then handle that key/click and re-start this function if desired.
 
-   -- Unfortunately,  there's no way to tell if echo,  cbreak,  or nodelay
-      have been called without getting into Curses internals.  So these are
-      only restored in PDCurses.
+   -- Unfortunately,  there's no way to tell if echo() or cbreak() have
+      been called without getting into Curses internals.  So these are only
+      restored in PDCursesMod.
 
    -- Currently in wide-char form only.  That's the only one I actually use.
 
@@ -106,11 +106,11 @@ int wgetn_wstr_ex(WINDOW *win, wint_t *wstr, int *loc, const int maxlen, const i
 {
     int i, x, y, offset = 0, initial_cursor_state;
     int rval = -1;
-#ifdef __PDCURSES__
+#ifdef __PDCURSESMOD__
     const bool oldcbreak = PDC_getcbreak( ); /* remember states */
     const bool oldecho = PDC_getecho( );
-    const bool oldnodelay = win->_nodelay;
 #endif
+    const bool oldnodelay = is_nodelay( win);
 
     assert( win);
     assert( wstr);
@@ -292,11 +292,12 @@ int wgetn_wstr_ex(WINDOW *win, wint_t *wstr, int *loc, const int maxlen, const i
                    break;
             }
     }
-#ifdef __PDCURSES__
+#ifdef __PDCURSESMOD__
     oldcbreak ? cbreak( ) : nocbreak( );     /* restore states */
     oldecho ? echo( ) : noecho( );
-    win->_nodelay = oldnodelay;
 #endif
+    if( oldnodelay)
+       nodelay( win, TRUE);
     curs_set( initial_cursor_state);
     return rval;
 }
