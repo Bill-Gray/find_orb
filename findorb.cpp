@@ -841,6 +841,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
    char buff[2000];
    double jd_start = 0., jd_end = 0., step = 0.;
    bool show_advanced_options = false;
+   int offset_line = 0;
 
    while( c > 0)
       {
@@ -852,6 +853,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
       bool reset_vect_units = false;
       extern double ephemeris_mag_limit;
       const char *tptr, *err_msg = NULL;
+      char *end_of_location_text;
       char vect_epoch[9];
       const bool is_topocentric =
                is_topocentric_mpc_code( mpc_code);
@@ -886,6 +888,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
       snprintf_append( buff, sizeof( buff), "L  Location: (%s) ", mpc_code);
       put_observer_data_in_text( mpc_code, buff + strlen( buff));
       strcat( buff, "\n");
+      end_of_location_text = buff + strlen( buff);
       if( ephem_type == OPTION_STATE_VECTOR_OUTPUT
                    || ephem_type == OPTION_POSITION_OUTPUT)
          {
@@ -1022,11 +1025,38 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
          }
       for( i = n_lines = 0; buff[i]; i++)
          if( buff[i] == '\n')
-            {
             n_lines++;
-            if( n_lines + 4 == (unsigned)LINES)
-               buff[i + 1] = '\0';
+      if( n_lines > (unsigned)LINES - 3)
+         {
+         char *tptr1, *tptr = end_of_location_text;
+
+         if( offset_line < 0)
+            offset_line = 0;
+         if( offset_line > (int)n_lines - (LINES - 4))
+            offset_line = (int)n_lines - ( LINES - 4);
+
+         for( i = 0; i < (unsigned)offset_line; i++)
+            {
+            tptr = strchr( tptr, '\n');
+            assert( tptr);
+            tptr++;
             }
+         tptr1 = tptr;
+         for( i = 0; i < (unsigned)( LINES - 10); i++)
+            {
+            tptr1 = strchr( tptr1, '\n');
+            if( !tptr1)
+               fprintf( stderr, "\ni %u offset_line %u n_lines %u LINES %d\n",
+                           i, offset_line, n_lines, LINES);
+            assert( tptr1);
+            tptr1++;
+            if( !*tptr1)
+               break;
+            }
+         *tptr1 = '\0';
+         memmove( end_of_location_text, tptr, tptr1 - tptr + 1);
+         strlcat_error( buff, "Up/down arrows for other options\n");
+         }
       tptr = get_find_orb_text( 2064);
       i = ephem_type;
       while( i && *tptr)
@@ -1375,6 +1405,12 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             exit( 0);
             break;
 #endif
+         case KEY_UP:
+            offset_line--;
+            break;
+         case KEY_DOWN:
+            offset_line++;
+            break;
          default:
          case '\'': case '"': case '<':
          case ',': case '.': case '>':
