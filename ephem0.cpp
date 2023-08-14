@@ -2370,7 +2370,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
          header = (char *)malloc( 1024);
          assert( header);
          strlcpy_err( header, buff, 1024);
-         if( alt_file_name)
+         if( *alt_file_name)
             computer_friendly_ofile = fopen_ext( alt_file_name,
                                           is_default_ephem ? "tfcw+" : "fw+");
          else
