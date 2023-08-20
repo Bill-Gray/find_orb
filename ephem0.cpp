@@ -2136,19 +2136,16 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
    strlcpy_error( motion_unit_text, get_environment_ptr( "MOTION_UNITS"));
    if( !*motion_unit_text)
       strlcpy_error( motion_unit_text, "'/hr");
-   else
-      {
-      if( *motion_unit_text == '"')
-         motion_units = 60.;
-      else if( *motion_unit_text == 'd')
-         motion_units = 1. / 60.;
-      if( strstr( motion_unit_text, "/m"))
-         motion_units /= 60.;
-      else if( strstr( motion_unit_text, "/s"))
-         motion_units /= 3600.;
-      else if( strstr( motion_unit_text, "/d"))
-         motion_units *= 24.;
-      }
+   if( *motion_unit_text == '"')
+      motion_units = 60.;
+   else if( *motion_unit_text == 'd')
+      motion_units = 1. / 60.;
+   if( strstr( motion_unit_text, "/m"))
+      motion_units /= 60.;
+   else if( strstr( motion_unit_text, "/s"))
+      motion_units /= 3600.;
+   else if( strstr( motion_unit_text, "/d"))
+      motion_units *= 24.;
    strlcat( motion_unit_text, "----", sizeof( motion_unit_text));
 
    snprintf( buff, sizeof( buff), "GROUP_%.3s", note_text + 1);

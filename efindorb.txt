@@ -389,3 +389,10 @@
 2074    The designation '%s' would be rejected by MPC.
 
 2076    Clipboard is empty!
+
+2078    0 ( ) "/min = '/hr
+2078    1 ( ) "/sec = '/min = deg/hour
+2078    2 ( ) '/sec = deg/min
+2078    3 ( ) '/day
+2078    4 ( ) d/day
+2078    Cancel

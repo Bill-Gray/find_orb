@@ -785,7 +785,7 @@ static void set_ra_dec_format( void)
    buff[len] = '\0';
    help_file_name = "radecfmt.txt";
    c = inquire( buff, NULL, 0, COLOR_DEFAULT_INQUIRY);
-   if( c >= '1' && c < '1' + (int)n_lines)
+   if( c >= '0' && c < '1' + (int)n_lines)
       c += KEY_F( 1) - '1';
    if( c >= KEY_F( 1) && c <= (int)KEY_F( n_lines))
       {
@@ -797,6 +797,50 @@ static void set_ra_dec_format( void)
       memcpy( buff, tptr, tptr2 - tptr);
       buff[tptr2 - tptr] = '\0';
       set_environment_ptr( ra_dec_fmt, buff);
+      }
+}
+
+static void select_angular_motion_units( void)
+{
+   char buff[1000], *tptr = buff, curr_units[4];
+   int c;
+
+   strlcpy( curr_units, get_environment_ptr( "MOTION_UNITS"),
+                     sizeof( curr_units));
+   if( !*curr_units)
+      strlcpy( curr_units, "'/h", sizeof( curr_units));
+   strlcpy_error( buff, get_find_orb_text( 2078));
+   if( (tptr = strstr( buff, curr_units)) != NULL)
+      {                    /* mark currently selected units */
+      while( *tptr != '(')
+         tptr--;
+      tptr[1] = 'o';
+      }
+   c = inquire( buff, NULL, 0, COLOR_DEFAULT_INQUIRY);
+   if( c >= '0' && c < '9')
+      c += KEY_F( 1) - '1';
+   c -= KEY_F( 0);
+   if( c >= 0)
+      {
+      tptr = buff;
+      while( *tptr && c)
+         {
+         while( *tptr && *tptr != '\n')
+            tptr++;
+         if( *tptr == '\n')
+            tptr++;
+         c--;
+         }
+      if( *tptr)
+         {
+         size_t i = 0;
+
+         tptr += 6;
+         while( tptr[i] > ' ')
+            i++;
+         tptr[i] = '\0';
+         set_environment_ptr( "MOTION_UNITS", tptr);
+         }
       }
 }
 
@@ -1287,6 +1331,8 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             break;
          case 'o': case 'O':
             ephemeris_output_options ^= OPTION_SEPARATE_MOTIONS;
+            if( ephemeris_output_options & OPTION_SEPARATE_MOTIONS)
+               select_angular_motion_units( );
             break;
          case 'p': case 'P':
             if( vect_frame > -1)
@@ -1386,6 +1432,8 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             break;
          case 'z': case 'Z':
             ephemeris_output_options ^= OPTION_MOTION_OUTPUT;
+            if( ephemeris_output_options & OPTION_MOTION_OUTPUT)
+               select_angular_motion_units( );
             break;
          case '#':
             ephemeris_output_options ^= OPTION_MOIDS;
@@ -3998,6 +4046,7 @@ int main( int argc, const char **argv)
    while( !quit)
       {
       int line_no = 0, mouse_wheel_motion;
+      extern bool saving_elements_for_reuse;
 
       prev_getch = c;
       while( get_new_file || get_new_object)
@@ -4148,6 +4197,7 @@ int main( int argc, const char **argv)
          bad_elements = write_out_elements_to_file( orbit, curr_epoch, epoch_shown,
              obs, n_obs, orbit_constraints, element_precision,
              is_monte_orbit, element_format);
+      saving_elements_for_reuse = false;
       is_monte_orbit = false;
       if( debug_level > 2)
          debug_printf( "elements written\n");
@@ -6199,11 +6249,9 @@ int main( int argc, const char **argv)
             break;
          case CTRL( 'X'):
             {
-            extern bool saving_elements_for_reuse;
-
-            saving_elements_for_reuse ^= 1;
-            strlcpy_error( message_to_user, "Saving elements for re-use is");
-            add_off_on = saving_elements_for_reuse;
+            saving_elements_for_reuse = true;
+            strlcpy_error( message_to_user, "Elements saved for re-use");
+            update_element_display = 1;
             }
             break;
          case CTRL( 'Y'):
