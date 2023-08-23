@@ -4840,9 +4840,11 @@ int main( int argc, const char **argv)
             add_off_on = use_sigmas;
             }
             break;
-         case KEY_F(1):      /* turn on/off all obs prior to curr one */
-         case ALT_U:         /* Used because F1 doesn't work in X     */
-         case CTRL( 'W'):    /* Used because Alt-U doesn't work on Macs */
+#ifdef __PDCURSES__
+         case KEY_SUP:
+#else
+         case KEY_SR:
+#endif
             obs[curr_obs].is_included ^= 1;
             for( i = 0; i < curr_obs; i++)
                obs[i].is_included = obs[curr_obs].is_included;
@@ -4872,7 +4874,11 @@ int main( int argc, const char **argv)
                clear( );
                }
             break;
-         case KEY_F(2):          /* turn on/off all obs after curr one */
+#ifdef __PDCURSES__
+         case KEY_SDOWN:         /* turn on/off all obs after curr one */
+#else
+         case KEY_SF:
+#endif
             obs[curr_obs].is_included ^= 1;
             for( i = curr_obs; i < n_obs; i++)
                obs[i].is_included = obs[curr_obs].is_included;
@@ -6319,11 +6325,14 @@ int main( int argc, const char **argv)
          case 'O':
          case ';': case ']':
          case CTRL( 'E'): case CTRL( 'J'): case CTRL( 'L'):
-         case CTRL( 'N'): case CTRL( 'O'): case CTRL( 'T'):
-         case CTRL( 'V'):
+         case CTRL( 'N'): case CTRL( 'O'): case CTRL( 'Q'):
+         case CTRL( 'S'): case CTRL( 'T'): case CTRL( 'U'):
+         case CTRL( 'V'): case CTRL( 'W'): case CTRL( 'Z'):
          case CTRL( '_'): case CTRL( ']'):
          case ALT_Y:
          case CTL_LEFT: case CTL_RIGHT:
+         case KEY_F( 1):
+         case KEY_F( 2):
          case KEY_F( 13):        /* shift-f1 */
          case KEY_F( 14):        /* shift-f2 */
          case KEY_F( 24):        /* shift-f12 */
@@ -6334,6 +6343,7 @@ int main( int argc, const char **argv)
          case KEY_ENTER:         /* on numeric keypad */
          case ALT_UP:
          case ALT_LEFT: case ALT_RIGHT:
+         case KEY_SRIGHT: case KEY_SLEFT:
 #ifdef __PDCURSES__
          case PADPLUS: case PADMINUS: case PADSLASH:
          case ALT_DOWN:          /* PDCurses uses this #define... */
