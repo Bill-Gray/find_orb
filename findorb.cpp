@@ -2171,15 +2171,23 @@ static void show_right_hand_scroll_bar( const int line_start,
          {
          int color = COLOR_SCROLL_BAR;
          const char *text = "|";
+         const char *end_text = "-";
 
-         if( !i || i == lines_to_show - 1)
+         if( !i)
             {
             color = COLOR_OBS_INFO;
-            text = (i ? "v" : "^");
+            text = (first_line ? "^" : end_text);
+            }
+         else if( i == lines_to_show - 1)
+            {
+            color = COLOR_OBS_INFO;
+            text = (first_line + lines_to_show == n_lines ? end_text : "v");
             }
          else
             if( i >= scroll0 && i <= scroll1)
                color = COLOR_HIGHLIT_BUTTON;
+         if( text == end_text)
+            color = COLOR_MENU;
          put_colored_text( text, i + line_start, getmaxx( stdscr) - 1, -1,
                               color);
          }
@@ -2295,14 +2303,14 @@ static void show_one_observation( OBSERVE obs, const int line,
 }
 
 static void show_observations( const OBSERVE *obs, const int first_obs_idx,
-                int line_no, const int residual_format, const int n_obs_shown)
+                int line_no, const int residual_format, const int n_obs_shown,
+                const int n_obs)
 {
    int i;
-   const int underline_freq = atoi( get_environment_ptr( "UNDERLINE_OBS"));
 
    for( i = first_obs_idx; i < first_obs_idx + n_obs_shown; i++)
       show_one_observation( obs[i], line_no++, residual_format,
-            underline_freq && i % underline_freq == underline_freq - 1);
+            i == n_obs - 1);
 }
 
 static void show_final_line( const int n_obs,
@@ -4400,7 +4408,7 @@ int main( int argc, const char **argv)
          for( i = 0; i < n_mpc_codes; i++)
             mpc_color_codes[i].score = 0;
          show_observations( obs, top_obs_shown, top_line_residuals,
-                                 residual_format, n_obs_shown);
+                                 residual_format, n_obs_shown, n_obs);
          show_station_info( obs, n_obs,
                      line_no, curr_obs, list_codes);
 
