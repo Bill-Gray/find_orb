@@ -12,10 +12,10 @@ ______________________
   |                    /      Version $v
   |     ______________/       https://www.projectpluto.com/find_orb.htm
   |    |
+  |    |                      $e1
+  |    |                      $e2
   |    |
-  |    |
-  |    |
-  |    |
+  |    |                      $d
   |    |                 /|
   |    |________________/ |
  /                        |
@@ -32,9 +32,9 @@ ______________
  |  |               Version $v
  |  |               https://www.projectpluto.com/find_orb.htm
  |  |
- |  |          /|
- |  +---------/ |
-/_______________|
+ |  |          /|   $e1
+ |  +---------/ |   $e2
+/_______________|   $d
 10 45
 __________
 \  ______ \
@@ -44,5 +44,5 @@ __________
  | _______/    Find_Orb orbit determination software
  | |           Version $v
  | |           www.projectpluto.com/find_orb.htm
- | |_______/|
-/___________|
+ | |_______/|  $e1
+/___________|  $e2

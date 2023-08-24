@@ -3626,15 +3626,62 @@ static void setup_elements_dialog( char *buff, const char *constraints)
    fclose( ifile);
 }
 
+static void eop_info_text( char *buff, const size_t buffsize)
+{
+   int eop_range[3];
+
+   load_earth_orientation_params( NULL, eop_range);
+   if( eop_range[0])
+      {
+      char date_buff[3][50];
+      size_t i;
+
+      for( i = 0; i < 3; i++)
+         full_ctime( date_buff[i], 2400000.5 + (double)eop_range[i],
+               FULL_CTIME_DATE_ONLY | FULL_CTIME_YMD);
+      snprintf_err( buff, (int)buffsize,
+               "EOPs run from %s to %s\n(%s with extrapolation)\n",
+                        date_buff[0], date_buff[2], date_buff[1]);
+      }
+   else
+      strlcpy_err( buff, "No EOPs available\n", buffsize);
+}
+
+static void debias_info_text( char *buff, const size_t buffsize)
+{
+   const int debias_version = find_fcct_biases( 1., 1., 0,
+                           0., NULL, NULL);
+
+   if( debias_version > 2000)
+      {
+      const char *ver = "?unknown?\n";
+
+      strlcpy_err( buff, "Astrometric debiasing version ", buffsize);
+      if( debias_version == 2018)
+         ver = "EFCC18\n";
+      else if( debias_version == 2014)
+         ver = "FCCT14\n";
+      strlcat_err( buff, ver, buffsize);
+      }
+   else
+      strlcpy_err( buff, "No astrometric debiasing applied\n", buffsize);
+}
+
 static void show_splash_screen( void)
 {
    FILE *ifile = fopen_ext( "splash.txt", "crb");
 
    if( ifile)
       {
-      char buff[200];
+      char buff[200], eop_line_1[200], *eop_line_2;
+      char debias_text[100];
       bool show_it = false;
 
+      debias_info_text( debias_text, sizeof( debias_text));
+      eop_info_text( eop_line_1, sizeof( eop_line_1));
+      eop_line_2 = strchr( eop_line_1, '\n');
+      if( eop_line_2)
+         *eop_line_2++ = '\0';
       clear( );
       while( !show_it && fgets( buff, sizeof( buff), ifile))
          {
@@ -3646,6 +3693,9 @@ static void show_splash_screen( void)
             if( show_it)
                {
                text_search_and_replace( buff, "$v", find_orb_version_jd( NULL));
+               text_search_and_replace( buff, "$d", debias_text);
+               text_search_and_replace( buff, "$e1", eop_line_1);
+               text_search_and_replace( buff, "$e2", (eop_line_2 ? eop_line_2 : ""));
                put_colored_text( buff, (LINES - lines) / 2 + i, 0, -1, COLOR_BACKGROUND);
                }
          }
@@ -5863,10 +5913,6 @@ int main( int argc, const char **argv)
             break;
          case '.':
             {
-            int eop_range[3];
-            const int debias_version = find_fcct_biases( 1., 1., 0,
-                           0., NULL, NULL);
-
             snprintf_err( tbuff, sizeof( tbuff), "%s\n%s\n%s\n",
                                  longname( ), termname( ), curses_version( ));
             snprintf_append( tbuff, sizeof( tbuff),
@@ -5876,33 +5922,6 @@ int main( int argc, const char **argv)
             snprintf_append( tbuff, sizeof( tbuff), "Find_Orb version %s\n",
                              find_orb_version_jd( NULL));
             format_jpl_ephemeris_info( tbuff + strlen( tbuff) - 1);
-            load_earth_orientation_params( NULL, eop_range);
-            if( eop_range[0])
-               {
-               char date_buff[3][50];
-
-               for( i = 0; i < 3; i++)
-                  full_ctime( date_buff[i], 2400000.5 + (double)eop_range[i],
-                        FULL_CTIME_DATE_ONLY | FULL_CTIME_YMD);
-               snprintf_append( tbuff, sizeof( tbuff),
-                        "EOPs run from %s to %s\n(%s with extrapolation)\n",
-                                 date_buff[0], date_buff[2], date_buff[1]);
-               }
-            else
-               strlcat_error( tbuff, "No EOPs available\n");
-            if( debias_version > 2000)
-               {
-               const char *ver = "?unknown?\n";
-
-               strlcat_error( tbuff, "Astrometric debiasing version ");
-               if( debias_version == 2018)
-                  ver = "EFCC18\n";
-               else if( debias_version == 2014)
-                  ver = "FCCT14\n";
-               strlcat_error( tbuff, ver);
-               }
-            else
-               strlcat_error( tbuff, "No astrometric debiasing applied\n");
             inquire( tbuff, NULL, 0, COLOR_DEFAULT_INQUIRY);
             }
             break;
