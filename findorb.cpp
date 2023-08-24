@@ -6190,9 +6190,23 @@ int main( int argc, const char **argv)
             {
             extern int sigmas_in_columns_57_to_65;
 
-            sigmas_in_columns_57_to_65 ^= 1;
             strlcpy_error( message_to_user, "Sigma display");
-            add_off_on = sigmas_in_columns_57_to_65;
+            if( residual_format & RESIDUAL_FORMAT_SHOW_DESIGS)
+               {
+               residual_format ^= RESIDUAL_FORMAT_SHOW_DESIGS;
+               sigmas_in_columns_57_to_65 = 0;
+               }
+            else
+               {
+               sigmas_in_columns_57_to_65 ^= 1;
+               if( !sigmas_in_columns_57_to_65)
+                  {
+                  residual_format |= RESIDUAL_FORMAT_SHOW_DESIGS;
+                  strlcpy_error( message_to_user, "Showing packed desigs in obs area");
+                  }
+               }
+            if( message_to_user[1] == 'i')
+               add_off_on = sigmas_in_columns_57_to_65;
             }
             break;
          case ALT_Q:
@@ -6210,9 +6224,6 @@ int main( int argc, const char **argv)
             sort_obs_by_code = !sort_obs_by_code;
             strlcpy_error( message_to_user, sort_obs_by_code ?
                      "Obs sorted by MPC code" : "Obs sorted by date");
-            break;
-         case ALT_A:
-            residual_format ^= RESIDUAL_FORMAT_SHOW_DESIGS;
             break;
          case ALT_R:
             if( !inquire( get_find_orb_text( 2038),
@@ -6329,7 +6340,7 @@ int main( int argc, const char **argv)
          case CTRL( 'S'): case CTRL( 'T'): case CTRL( 'U'):
          case CTRL( 'V'): case CTRL( 'W'): case CTRL( 'Z'):
          case CTRL( '_'): case CTRL( ']'):
-         case ALT_Y:
+         case ALT_A: case ALT_Y:
          case CTL_LEFT: case CTL_RIGHT:
          case KEY_F( 1):
          case KEY_F( 2):

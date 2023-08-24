@@ -111,8 +111,9 @@ j      Toggles the two lines showing which perturbers are included,  R1 and R2,
          just data for the observatory for the currently-selected observation;
          use about a third of the observation area for observatory data;
          or use most of that area for observatory data.
-Alt-K  Toggle display of observational uncertainties in columns 57 to 65 of
-         the MPC 80-column format.  Those columns usually go unused.
+Alt-K  Cycles display of columns 57 to 65 of the MPC 80-column format through
+         three options : show what's there from the original data (usually
+         nothing);  show uncertainties;  show the packed designation.
 &      Select format for observation RA/decs (minutes/seconds or decimal
          degrees).  You can also get this by clicking on "RA (J2000)  dec"
          on the black-on-cyan observation legend line.
