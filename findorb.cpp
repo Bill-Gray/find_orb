@@ -571,7 +571,11 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
                y -= line - n_lines;
                if( mpc_code_select && x > real_width - 3)
                   x = -1;        /* ignore some of the right margin */
-               if( y >= 0 && y < n_lines && x >= 0 && x < real_width)
+               if( button & BUTTON4_PRESSED)   /* actually 'wheel up' */
+                  rval = KEY_UP;
+               else if( button5_pressed)       /* actually 'wheel down' */
+                  rval = KEY_DOWN;
+               else if( y >= 0 && y < n_lines && x >= 0 && x < real_width)
                   {
                   if( mpc_code_select)
                      rval = KEY_F( 1 + x / 4 + y * (box_size / 4));
@@ -1101,7 +1105,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
             }
          *tptr1 = '\0';
          memmove( end_of_location_text, tptr, tptr1 - tptr + 1);
-         strlcat_error( buff, "Up/down arrows for other options\n");
+         strlcat_error( buff, "Up/down arrows or mouse wheel for other options\n");
          }
       tptr = get_find_orb_text( 2064);
       i = ephem_type;
