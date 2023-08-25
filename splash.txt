@@ -16,33 +16,33 @@ ______________________
   |    |                      $e2
   |    |
   |    |                      $d
-  |    |                 /|
+  |    |                 /|   $j
   |    |________________/ |
  /                        |
 /_________________________|
 14 62
 ______________
 \             \
- |  +-------\  \
- |  |        \  \
- |  |         )  )  Project Pluto
- |  |        /  /   Software for the discriminating astronomer
- |  +-------/  /
- |  __________/     Find_Orb orbit determination software
- |  |               Version $v
- |  |               https://www.projectpluto.com/find_orb.htm
+ |  +-------\  \    Project Pluto
+ |  |        \  \   Software for the discriminating astronomer
+ |  |         )  )
+ |  |        /  /   Find_Orb orbit determination software
+ |  +-------/  /    Version $v
+ |  __________/     https://www.projectpluto.com/find_orb.htm
  |  |
- |  |          /|   $e1
- |  +---------/ |   $e2
-/_______________|   $d
+ |  |               $e1
+ |  |               $e2
+ |  |          /|   $d
+ |  +---------/ |   $j
+/_______________|
 10 45
 __________
-\  ______ \
+\  ______ \    Project Pluto
  | |     \ \
- | |      ) )  Project Pluto
- | |_____/ /
- | _______/    Find_Orb orbit determination software
- | |           Version $v
- | |           www.projectpluto.com/find_orb.htm
- | |_______/|  $e1
-/___________|  $e2
+ | |      ) )  Find_Orb orbit determination software
+ | |_____/ /   Version $v
+ | _______/    www.projectpluto.com/find_orb.htm
+ | |           $e1
+ | |           $e2
+ | |_______/|  $d
+/___________|  $j

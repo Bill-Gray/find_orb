@@ -1931,6 +1931,29 @@ static int get_character_code( const char *buff)
       rval = atoi( buff + 2);
    else if( !memcmp( buff, "Ctrl-", 5))
       rval = buff[5] - 64;
+   else if( !memcmp( buff, "Shift-", 6))
+      {
+      if( !memcmp( buff + 6, "Up", 2))
+#ifdef __PDCURSES__
+         rval = KEY_SUP;
+#else
+         rval = KEY_SR;
+#endif
+      else if( !memcmp( buff + 6, "Dn", 2))
+#ifdef __PDCURSES__
+         rval = KEY_SDOWN;
+#else
+         rval = KEY_SF;
+#endif
+      else if( buff[6] == 'F')
+         rval = KEY_F( 12 + atoi( buff + 7));
+      else        /* shouldn't happen */
+         {
+         rval = 0;
+         fprintf( stderr, "Buff '%s'\n", buff);
+         assert( 0);
+         }
+      }
    else
       rval = *buff;
    return( rval);
@@ -3674,7 +3697,7 @@ static void show_splash_screen( void)
    if( ifile)
       {
       char buff[200], eop_line_1[200], *eop_line_2;
-      char debias_text[100];
+      char debias_text[100], jpl_ephem_text[250];
       bool show_it = false;
 
       debias_info_text( debias_text, sizeof( debias_text));
@@ -3682,6 +3705,8 @@ static void show_splash_screen( void)
       eop_line_2 = strchr( eop_line_1, '\n');
       if( eop_line_2)
          *eop_line_2++ = '\0';
+      if( !format_jpl_ephemeris_info( jpl_ephem_text))
+         strlcpy_error( jpl_ephem_text, " No JPL DE ephemeris set up");
       clear( );
       while( !show_it && fgets( buff, sizeof( buff), ifile))
          {
@@ -3696,6 +3721,7 @@ static void show_splash_screen( void)
                text_search_and_replace( buff, "$d", debias_text);
                text_search_and_replace( buff, "$e1", eop_line_1);
                text_search_and_replace( buff, "$e2", (eop_line_2 ? eop_line_2 : ""));
+               text_search_and_replace( buff, "$j", jpl_ephem_text + 1);
                put_colored_text( buff, (LINES - lines) / 2 + i, 0, -1, COLOR_BACKGROUND);
                }
          }
@@ -3766,10 +3792,19 @@ static int show_hint( const unsigned mouse_x, const unsigned mouse_y, size_t *in
                   && memcmp( buff, "Start h", 7))
          ;   /* just skip lines until we get to the section we want */
       while( !got_it && fgets_trimmed( buff, sizeof( buff), ifile))
-         got_it = (get_character_code( buff) == cmd);
+         if( *buff > ' ')
+            got_it = (get_character_code( buff) == cmd);
       fclose( ifile);
       if( got_it)
+         {
+         char hotkey[15];
+
+         memcpy( hotkey, buff, 15);
+         *strchr( hotkey, ' ') = '\0';
          memmove( buff, buff + 15, strlen( buff + 14));
+         if( hotkey[1] != '+')      /* skip the U+nnnn cases */
+            snprintf_append( buff, sizeof( buff), "\nHotkey for this is %s", hotkey);
+         }
       else
          *buff = '\0';
       if( *buff)      /* yes,  we have a hint to show */
@@ -5911,7 +5946,7 @@ int main( int argc, const char **argv)
          case ',':
             show_a_file( "debug.txt", 0);
             break;
-         case '.':
+         case KEY_F( 15):        /* shift-f3 : show Curses info */
             {
             snprintf_err( tbuff, sizeof( tbuff), "%s\n%s\n%s\n",
                                  longname( ), termname( ), curses_version( ));
@@ -5919,9 +5954,6 @@ int main( int argc, const char **argv)
                         "%d pairs of %d colors\n", COLOR_PAIRS, COLORS);
             if( can_change_color( ))
                strlcat_error( tbuff, "Colors are changeable\n");
-            snprintf_append( tbuff, sizeof( tbuff), "Find_Orb version %s\n",
-                             find_orb_version_jd( NULL));
-            format_jpl_ephemeris_info( tbuff + strlen( tbuff) - 1);
             inquire( tbuff, NULL, 0, COLOR_DEFAULT_INQUIRY);
             }
             break;
@@ -6346,7 +6378,7 @@ int main( int argc, const char **argv)
          case 'c': case 'C':
             show_calendar( );
             break;
-         case KEY_F( 15):        /* shift-f3 */
+         case '.':
             show_splash_screen( );     /* just to test */
             extended_getch( );
             break;

@@ -25,8 +25,8 @@ w              Worst
 |              MonteCarlo
 [              CovarData
 `              CmtMags
-Ctrl-W         ToggUp
-F2             ToggDn
+Shift-Up       ToggUp
+Shift-Dn       ToggDn
 Ctrl-Y         BanObs
 Ctrl-X         SaveOrbs
 )              ReadFile
@@ -88,7 +88,7 @@ r              Enter dist to object at start and end of arc
 q              Quit Find_Orb
 o              Open a file of astrometry
 n              Select a different object from the file
-F16 (shift-F4) Add astrometry for a different object
+Shift-F4       Add astrometry for a different object
 m              Generate ephemerides
 f              Do a full least-squares improvement of the orbit
 h              Compute an orbit using the method of Herget
