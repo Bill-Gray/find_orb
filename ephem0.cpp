@@ -1368,12 +1368,35 @@ static inline void clean_up_json_number( char *out_text)
       memmove( out_text, out_text + 1, strlen( out_text));
 }
 
+static double get_motion_unit_text( char *obuff)
+{
+   double motion_units = 1.;
+
+   strlcpy_error( obuff, get_environment_ptr( "MOTION_UNITS"));
+   if( !*obuff)
+      strlcpy_error( obuff, "'/hr");
+   if( *obuff == '"')
+      motion_units = 60.;
+   else if( *obuff == 'd')
+      motion_units = 1. / 60.;
+   if( strstr( obuff, "/m"))
+      motion_units /= 60.;
+   else if( strstr( obuff, "/s"))
+      motion_units /= 3600.;
+   else if( strstr( obuff, "/d"))
+      motion_units *= 24.;
+   return( motion_units);
+}
+
+
 static int create_json_ephemeris( FILE *ofile, FILE *ifile, char *header,
                      const double jd_start, const double step)
 {
    char buff[1024];
    int line_no = 0;
 
+   get_motion_unit_text( buff);
+   text_search_and_replace( header, buff, "'/hr");
    text_search_and_replace( header, "-", "");
    text_search_and_replace( header, " RA ", " RA RA60 ");
    text_search_and_replace( header, " Dec ", " Dec Dec60 ");
@@ -2125,7 +2148,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
    const char *group_data;
    int n_mag_places = atoi( get_environment_ptr( "MAG_DIGITS"));
    char motion_unit_text[7];
-   double motion_units = 1.;
+   double motion_units;
    const bool showing_rvel_sigmas = (options & OPTION_RADIAL_VEL_OUTPUT)
                                  && (options & OPTION_RV_AND_DELTA_SIGMAS)
                                  && n_objects > 1;
@@ -2133,19 +2156,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                                  && (options & OPTION_RV_AND_DELTA_SIGMAS)
                                  && n_objects > 1;
 
-   strlcpy_error( motion_unit_text, get_environment_ptr( "MOTION_UNITS"));
-   if( !*motion_unit_text)
-      strlcpy_error( motion_unit_text, "'/hr");
-   if( *motion_unit_text == '"')
-      motion_units = 60.;
-   else if( *motion_unit_text == 'd')
-      motion_units = 1. / 60.;
-   if( strstr( motion_unit_text, "/m"))
-      motion_units /= 60.;
-   else if( strstr( motion_unit_text, "/s"))
-      motion_units /= 3600.;
-   else if( strstr( motion_unit_text, "/d"))
-      motion_units *= 24.;
+   motion_units = get_motion_unit_text( motion_unit_text);
    strlcat( motion_unit_text, "----", sizeof( motion_unit_text));
 
    snprintf( buff, sizeof( buff), "GROUP_%.3s", note_text + 1);
