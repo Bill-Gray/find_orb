@@ -110,9 +110,11 @@ int debug_level = 0;
 
 extern unsigned perturbers;
 
-#define AUTO_REPEATING         31002
-#define KEY_ADD_MENU_LINE      31004
-#define KEY_REMOVE_MENU_LINE   31005
+#define AUTO_REPEATING                31002
+#define KEY_ADD_MENU_LINE             31004
+#define KEY_REMOVE_MENU_LINE          31005
+#define KEY_CYCLE_RESID_DISPLAY_UP    31006
+#define KEY_CYCLE_RESID_DISPLAY_DN    31007
 
 /* You can cycle between showing only the station data for the currently
 selected observation;  or the "normal" having,  at most,  a third of
@@ -4627,6 +4629,9 @@ int main( int argc, const char **argv)
          c = find_command_area( mouse_x, mouse_y, NULL);
          if( c == ALT_X && mouse_wheel_motion)
             c = (mouse_wheel_motion < 0 ? KEY_F( 4) : KEY_F( 5));
+         if( c == 't' && mouse_wheel_motion)
+            c = (mouse_wheel_motion < 0 ? KEY_CYCLE_RESID_DISPLAY_UP
+                                        : KEY_CYCLE_RESID_DISPLAY_DN);
          if( c < 0)      /* informational hint text; no command */
             c = KEY_MOUSE;
          }
@@ -5565,6 +5570,24 @@ int main( int argc, const char **argv)
             residual_format = resid_format_menu( message_to_user, residual_format);
             if( *message_to_user)
                update_element_display = 1;
+            break;
+         case KEY_CYCLE_RESID_DISPLAY_UP:
+            if( residual_format & RESIDUAL_FORMAT_NORMALIZED)
+                residual_format ^= RESIDUAL_FORMAT_NORMALIZED;
+            else if( residual_format & RESIDUAL_FORMAT_TIME_RESIDS)
+                residual_format ^= (RESIDUAL_FORMAT_NORMALIZED | RESIDUAL_FORMAT_TIME_RESIDS);
+            else
+                residual_format ^= RESIDUAL_FORMAT_TIME_RESIDS;
+            update_element_display = 1;
+            break;
+         case KEY_CYCLE_RESID_DISPLAY_DN:
+            if( residual_format & RESIDUAL_FORMAT_NORMALIZED)
+                residual_format ^= (RESIDUAL_FORMAT_NORMALIZED | RESIDUAL_FORMAT_TIME_RESIDS);
+            else if( residual_format & RESIDUAL_FORMAT_TIME_RESIDS)
+                residual_format ^= RESIDUAL_FORMAT_TIME_RESIDS;
+            else
+                residual_format ^= RESIDUAL_FORMAT_NORMALIZED;
+            update_element_display = 1;
             break;
          case 127:           /* backspace takes on different values */
          case KEY_BACKSPACE: /* on PDCurses,  ncurses,  etc.        */
