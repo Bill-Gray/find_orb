@@ -1,4 +1,4 @@
-Downloaded 2023 Mar 28 from
+Downloaded 2023 Aug 30 from
 
 https://minorplanetcenter.net/iau/lists/ProgramCodes.txt
 
@@ -158,14 +158,12 @@ COD 095 1
 OBS Y. N. Krugly
 
 COD 095 2
-OBS V. Rumyantsev
 OBS V. V. Rumyantsev
 
 COD 095 3
 OBS S. Nazarov
 
 COD 095 4
-OBS G. Borisov
 OBS G. V. Borisov
 
 COD 095 5
@@ -586,10 +584,12 @@ OBS A. H. Parker
 
 COD 266 3
 OBS J. J. Kavelaars
-OBS J. Kavelaars
 
 COD 266 4
 OBS S. B. Porter
+
+COD 266 5
+OBS F. Yoshida
 
 COD 267 1
 OBS M. W. Buie
@@ -599,7 +599,6 @@ OBS A. H. Parker
 
 COD 267 3
 OBS J. J. Kavelaars
-OBS J. Kavelaars
 
 COD 268 1
 OBS M. W. Buie
@@ -630,6 +629,9 @@ OBS D. Souami
 
 COD 274 0
 OBS M. Micheli
+
+COD 274 1
+OBS H. B. Akins
 
 COD 290 1
 OBS M. Holman
@@ -808,7 +810,7 @@ OBS J. Watanabe
 OBS T. Fuse
 
 COD 568 1
-OBS D. Jewitt
+OBS D. C. Jewitt
 
 COD 568 2
 OBS D. J. Tholen
@@ -2418,6 +2420,12 @@ OBS W. Cuppens
 COD E10 ,
 OBS M. Trueblood
 
+COD E10 -
+OBS P. Breitenstein
+
+COD E10 .
+OBS F. Ocana
+
 COD E26 1
 OBS U. Wolff
 
@@ -2581,6 +2589,9 @@ OBS P. Breitenstein
 COD F65 [
 OBS L. Sanjuan
 
+COD F65 \
+OBS J. M. Perez
+
 COD G37 1
 OBS L. H. Wasserman
 
@@ -2730,6 +2741,9 @@ OBS E. Ejarque
 
 COD G40 }
 OBS C. A. Botha
+
+COD G40 ~
+OBS N. Paul
 
 COD G73 1
 OBS K. Manno
@@ -3239,6 +3253,9 @@ OBS M. G. J. Breukers
 COD I89 B
 OBS M. R. Thompson
 
+COD I89 C
+OBS T. Thaluang
+
 COD J04 1
 OBS D. Koschny
 
@@ -3353,6 +3370,9 @@ OBS F. Ocana
 COD K91 4
 OBS P. Breitenstein
 
+COD K91 5
+OBS A. Hale
+
 COD K92 0
 OBS M. Micheli
 
@@ -3362,6 +3382,12 @@ OBS R. Mendez
 COD K92 2
 OBS T. Lister
 
+COD K92 3
+OBS J. D. Armstrong
+
+COD K92 4
+OBS A. Hale
+
 COD K93 0
 OBS M. Micheli
 
@@ -3370,6 +3396,9 @@ OBS R. Mendez
 
 COD K93 2
 OBS J. D. Armstrong
+
+COD K93 3
+OBS A. Hale
 
 COD K99 1
 OBS V. I. Kudak
@@ -3433,6 +3462,18 @@ OBS A. Pearce
 
 COD L81 %
 OBS M. Jaeger
+
+COD L81 &
+OBS P. VanWylen
+
+COD L81 '
+OBS J. Jahn
+
+COD M49 0
+OBS D. Husar
+
+COD M49 1
+OBS M. Junius
 
 COD N50 1
 OBS M. Micheli
@@ -3712,6 +3753,12 @@ OBS M. Micheli
 COD Q63 1
 OBS R. Mendez
 
+COD Q63 2
+OBS J. D. Armstrong
+
+COD Q63 3
+OBS J. M. Perez
+
 COD Q64 0
 OBS M. Micheli
 
@@ -3720,6 +3767,15 @@ OBS R. Mendez
 
 COD Q64 2
 OBS W. Thuillot
+
+COD Q64 3
+OBS P. Breitenstein
+
+COD Q64 4
+OBS J. M. Perez
+
+COD Q64 5
+OBS A. Hale
 
 COD T09 0
 OBS D. J. Tholen
@@ -3732,6 +3788,9 @@ OBS K. Ly
 
 COD T09 3
 OBS J. Kleyna
+
+COD T09 4
+OBS S. Urakawa
 
 COD T12 0
 OBS D. J. Tholen
@@ -3769,6 +3828,9 @@ OBS K. Ly
 COD T14 7
 OBS M. Micheli
 
+COD T14 8
+OBS C. Crowder
+
 COD T15 0
 OBS E. J. Christensen
 
@@ -3780,6 +3842,9 @@ OBS S. Deen
 
 COD T15 3
 OBS M. J. Brucker
+
+COD T15 4
+OBS M. Micheli
 
 COD U65 1
 OBS C. Fallscheer
@@ -3943,6 +4008,21 @@ OBS M. Suzuki
 COD U94 5
 OBS F. D. Romanov
 
+COD U94 6
+OBS K. Yoshimoto
+
+COD U94 7
+OBS N. Falla
+
+COD U94 8
+OBS M. Mattiazzo
+
+COD U94 9
+OBS G. Gasparovic
+
+COD U94 !
+OBS A. Pearce
+
 COD V07 1
 OBS M. Rudenko
 
@@ -4005,6 +4085,9 @@ OBS M. Micheli
 
 COD W57 1
 OBS F. Ocana
+
+COD W57 2
+OBS R. Kresken
 
 COD W76 1
 OBS E. Bryssinck
@@ -4090,7 +4173,6 @@ OBS F. Valdes
 
 COD W84 "
 OBS J. Pena
-OBS J. Pena Z.
 
 COD W84 #
 OBS R. S. McMillan
@@ -4164,6 +4246,9 @@ OBS T. Linder
 COD W84 :
 OBS S. Kurti
 
+COD W84 ;
+OBS P. VanWylen
+
 COD W85 0
 OBS M. Micheli
 
@@ -4194,11 +4279,23 @@ OBS T. Lister
 COD W86 3
 OBS J. D. Armstrong
 
+COD W86 4
+OBS W. Thuillot
+
+COD W86 5
+OBS K. Ly
+
 COD W87 0
 OBS M. Micheli
 
 COD W87 1
 OBS J. D. Armstrong
+
+COD W87 2
+OBS T. Lister
+
+COD W87 3
+OBS R. Mendez
 
 COD W88 1
 OBS A. J. Evans
@@ -4304,6 +4401,24 @@ OBS H. Sato
 
 COD X07 1
 OBS F. D. Romanov
+
+COD X07 2
+OBS M. Suzuki
+
+COD X07 3
+OBS T. Prystavski
+
+COD X07 4
+OBS N. Falla
+
+COD X07 5
+OBS D. Ruhela
+
+COD X07 6
+OBS W. Clark
+
+COD X07 7
+OBS G. Gasparovic
 
 COD Z18 1
 OBS M. Micheli
