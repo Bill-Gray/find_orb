@@ -569,7 +569,7 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
                curr_line = y;
                x -= col;
                y -= line - n_lines;
-               if( mpc_code_select && x > real_width - 3)
+               if( mpc_code_select && x > real_width - 4)
                   x = -1;        /* ignore some of the right margin */
                if( button & BUTTON4_PRESSED)   /* actually 'wheel up' */
                   rval = KEY_UP;
@@ -594,7 +594,7 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
                         {
                         const attr_t attr = (pass ? A_REVERSE : A_NORMAL);
 
-                        if( mpc_code_select)
+                        if( mpc_code_select && highlit_line < line - 1)
                            mvchgat( highlit_line, col + highlit_x - highlit_x % 4,
                                                5, attr, color, NULL);
                         else
@@ -662,8 +662,9 @@ static int select_mpc_code( const OBSERVE *obs, const int n_obs, int curr_obs)
          if( nx * nx < n_codes)
             nx++;
          }
-   for( i = nx; i <= n_codes; i += nx)
+   for( i = nx; i < n_codes; i += nx)
       buff[i * 4 - 1] = '\n';
+   strcat( buff, "\nCancel");
    mpc_code_select = true;
    c = inquire( buff, NULL, 0, COLOR_DEFAULT_INQUIRY);
    mpc_code_select = false;
