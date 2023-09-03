@@ -4557,7 +4557,12 @@ int main( int argc, const char **argv)
                {
                c = extended_getch( );
                if( c == KEY_MOUSE)
+                  {
                   get_mouse_data( (int *)&mouse_x, (int *)&mouse_y, (int *)&mouse_z, &button);
+                  if( (button & BUTTON4_PRESSED) || button5_pressed)  /* 'wheel up'/'dn' */
+                     if( curses_kbhit( ) == KEY_MOUSE)
+                        c = 0;      /* avoid duplicated wheel mouse events */
+                  }
                }
             else
                {
