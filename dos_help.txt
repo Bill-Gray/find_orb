@@ -1,4 +1,4 @@
-   Version date: 2023 Aug 23
+   Version date: 2023 Sep 04
 
    The parameters shown in this software are basically the same as those
 shown in the Windows software,  as described at
@@ -10,6 +10,8 @@ you can do a fair bit with the mouse;  see end of this text.)  You can also
 click on menu items on the top line (click [+] to get more menu items).
 
 ?      (Or any other unrecognized key) Shows this file (dos_help.txt).
+.      Show version of Find_Orb,  ephems,  etc.  (splash screen)
+c      Show calendar with lunar phases
 
    ORBIT-FITTING COMMANDS:
 
@@ -87,6 +89,8 @@ Ctrl-Dn   Find the first observation of the next opposition
 Alt-X   Gets you a list of all MPC codes for the current object;  click on
             one,  and the next observation from that code will be found
             (you can click on 'Obs' in the observation legend to get this)
+T       Select all observations in the current tracklet.
+X       Toggle all observations in the current tracklet.
 
             ON-SCREEN DISPLAY:
 
@@ -102,11 +106,7 @@ Shift-F7    Toggle between the 'pure' MPC-formatted eight-line elements,  with
          a particular central object (which can be the barycenter of the
          solar system).
          of residuals are shown.
-j      Toggles the two lines showing which perturbers are included,  R1 and R2,
-         orbital restrictions,  and the step size.  When shut off,  two
-         more lines of residuals are shown.
-;      Toggles display of the "residual legend",  which explains what the
-         assorted data in the residual area mean.
+i      Show 'alternative' information about the currently selected observation
 -      Cycles display of the list of observatories among three options:
          just data for the observatory for the currently-selected observation;
          use about a third of the observation area for observatory data;
@@ -218,7 +218,6 @@ z      Integrate current orbit forward,  then back,  a certain number of
 "      Shows details of Curses mouse commands (these differ from one platform
          to the next,  and I needed a way to puzzle them out),  and info on
          the DE file currently in use.
-.      Show flavor of Curses,  DE and Find_Orb version info in use.
 ,      Show 'debug.txt' (log of debug messages).
 \      Shift all observations from a given observatory by a given time offset.
          Used when I was trying to puzzle out some timing errors from a
