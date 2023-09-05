@@ -248,6 +248,7 @@ void size_from_h_text( const double abs_mag, char *obuff,
                                  const int obuff_size);  /* ephem0.c */
 int find_fcct_biases( const double ra, const double dec, const char catalog,
                  const double jd, double *bias_ra, double *bias_dec);
+int select_tracklet( OBSERVE *obs, const int n_obs, const int idx);
 
 #ifdef __cplusplus
 extern "C" {
@@ -5576,10 +5577,15 @@ int main( int argc, const char **argv)
                }
             }
             break;
-         case 't': case 'T':
+         case 't':
             residual_format = resid_format_menu( message_to_user, residual_format);
             if( *message_to_user)
                update_element_display = 1;
+            break;
+         case 'T':
+            snprintf_err( message_to_user, sizeof( message_to_user),
+                                       "%u observation(s) in tracklet",
+                      select_tracklet( obs, n_obs, curr_obs));  /* orb_func.cpp */
             break;
          case KEY_CYCLE_RESID_DISPLAY_UP:
             if( residual_format & RESIDUAL_FORMAT_NORMALIZED)
@@ -5743,13 +5749,29 @@ int main( int argc, const char **argv)
             strlcpy_error( message_to_user, "Worst observation found");
             }
             break;
-         case 'x': case 'X':
+         case 'X':         /* toggle tracklet */
+            for( i = 0; i < n_obs; i++)
+               if( obs[i].flags & OBS_IS_SELECTED)
+                  obs[i].flags |= OBS_TEMP_USE_FLAG;
+               else
+                  obs[i].flags &= ~OBS_TEMP_USE_FLAG;
+            select_tracklet( obs, n_obs, curr_obs);  /* orb_func.cpp */
+                     /* FALLTHRU */
+         case 'x':
             {
             unsigned n_found;
 
             add_off_on = toggle_selected_observations( obs, n_obs, &n_found);
             snprintf_err( message_to_user, sizeof( message_to_user),
                                        "%u observation(s) toggled", n_found);
+            if( c == 'X')     /* restore original selection */
+               for( i = 0; i < n_obs; i++)
+                  {
+                  if( obs[i].flags & OBS_TEMP_USE_FLAG)
+                     obs[i].flags |= OBS_IS_SELECTED;
+                  else
+                     obs[i].flags &= ~OBS_IS_SELECTED;
+                  }
             }
             break;
          case 'y': case 'Y':

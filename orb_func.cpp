@@ -4667,6 +4667,34 @@ void attempt_extensions( OBSERVE *obs, int n_obs, double *orbit,
    set_locs( orbit, epoch, obs, n_obs);
 }
 
+#define is_power_of_two( X)   (!((X) & ((X) - 1)))
+
+int select_tracklet( OBSERVE *obs, const int n_obs, const int idx)
+{
+   int i, rval = 0;
+   const double tracklet_span = 30. / minutes_per_day;
+   double jd = obs[idx].jd;
+
+   for( i = 0; i < n_obs; i++)
+      obs[i].flags &= ~OBS_IS_SELECTED;
+   for( i = idx - 1; i >= 0 && jd - obs[i].jd < tracklet_span; i--)
+      if( !strcmp( obs[i].mpc_code, obs[idx].mpc_code))
+         {
+         jd = obs[i].jd;
+         obs[i].flags |= OBS_IS_SELECTED;
+         rval++;
+         }
+   jd = obs[idx].jd;
+   for( i = idx; i < n_obs && obs[i].jd - jd < tracklet_span; i++)
+      if( !strcmp( obs[i].mpc_code, obs[idx].mpc_code))
+         {
+         jd = obs[i].jd;
+         obs[i].flags |= OBS_IS_SELECTED;
+         rval++;
+         }
+   return( rval);
+}
+
 int metropolis_search( OBSERVE *obs, const int n_obs, double *orbit,
                const double epoch, int n_iterations, double scale)
 {
