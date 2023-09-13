@@ -516,3 +516,10 @@ PRIVATE_OBS=
     d(ays).  Requests for other units (milliradians,  etc.) will be
     entertained.
 MOTION_UNITS="/min
+
+   By default,  'temporary' files such as ephemerides,  astrometry reformatted
+   to ADES,  debugging files,  orbital elements and ephemerides in text and JSON
+   formats and more are written to the configuration directory ~/.find_orb (Linux)
+   or to the current directory (Windows).  You can specify a directory explicitly
+   with the following parameter,  and 'temporary' files will be put there instead.
+OUTPUT_DIR=

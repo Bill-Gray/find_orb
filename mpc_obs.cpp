@@ -122,7 +122,7 @@ static void *_ades_ids_stack = NULL;
 int debug_printf( const char *format, ...)
 {
    const char *debug_file_name = "debug.txt";
-   FILE *ofile = fopen_ext( debug_file_name, "tca");
+   FILE *ofile = fopen_ext( debug_file_name, "ca");
 
    if( ofile)
       {
@@ -4863,7 +4863,7 @@ void update_environ_dot_dat( void)
 
       if( !text)
          text = load_file_into_memory( "environ.def", NULL, true);
-      ofile = fopen_ext( environ_dot_dat, "tfcwb");
+      ofile = fopen_ext( environ_dot_dat, "fcwb");
       assert( ofile);
       for( i = 0; text[i]; i++)
          {

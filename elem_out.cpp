@@ -685,7 +685,7 @@ static int make_linkage_json( const int n_obs, const OBSERVE *obs, const ELEMENT
    ifile = fopen_ext( "link_hdr.json", "cr");
    if( !ifile)   /* no user-modified header; fall back to default hdr */
       ifile = fopen_ext( "link_def.json", "fcr");
-   ofile = fopen_ext( (elem->central_obj == 3) ? "artsat.json" : "linkage.json", "fcw");
+   ofile = fopen_ext( (elem->central_obj == 3) ? "artsat.json" : "linkage.json", "tfcw");
    while( fgets( buff, sizeof( buff), ifile))
       if( *buff != '#')
          {
@@ -3382,7 +3382,7 @@ static void _log_problems( const OBJECT_INFO *id, const OBSERVE FAR *obs)
                " rms=%f", rms_err);
    if( *error_message)
       {
-      FILE *ofile = fopen_ext( "errors.txt", "tca");
+      FILE *ofile = fopen_ext( "errors.txt", "ca");
 
       if( ofile)
          {
@@ -3842,7 +3842,11 @@ int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
    extern double minimum_observation_jd;
    extern double maximum_observation_jd;
    const char *outlier_limit = get_environment_ptr( "OUTLIER_REJECTION_LIMIT");
+   const char *output_dir = get_environment_ptr( "OUTPUT_DIR");
+   extern const char *output_directory;
 
+   if( !output_directory && *output_dir)
+      output_directory = output_dir;
 #if !defined( _WIN32) && !defined( __WATCOMC__)
    findorb_already_running = (check_for_other_processes( 1) != 0);
 #endif
