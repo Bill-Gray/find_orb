@@ -159,7 +159,6 @@ clean_temp:
 	$(RM) $(IDIR)/elem_short.json
 	$(RM) $(IDIR)/ephemeri.txt
 	$(RM) $(IDIR)/ephemeri.json
-	$(RM) $(IDIR)/eph_json.txt
 	$(RM) $(IDIR)/gauss.out
 	$(RM) $(IDIR)/guide.txt
 	$(RM) $(IDIR)/guide?.txt

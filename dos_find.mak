@@ -77,7 +77,6 @@ clean_temp:
    $(RM) elem_short.json
    $(RM) ephemeri.txt
    $(RM) ephemeri.json
-   $(RM) eph_json.txt
    $(RM) gauss.out
    $(RM) guide.txt
    $(RM) linkage.json
