@@ -63,7 +63,6 @@
 #Obs P  <--start-> <--end -->           Pos   Mag  Time
 #COD C  yyyy mm dd yyyy mm dd mag1 mag2 sig   sig  sig    Comment
  689                                    .1                Flagstaff
- 673                                    .1                Table Mountain
  422                                    .3                Loomberah
  413    1993 01 01                      .3                Siding Spring
  E12                                    .25               Siding Spring #2
