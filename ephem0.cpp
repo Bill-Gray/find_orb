@@ -2383,6 +2383,11 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                                           is_default_ephem ? "tfcw+" : "fw+");
          else
             computer_friendly_ofile = tmpfile( );
+#ifdef _WIN32
+         if( !computer_friendly_ofile)  /* can fail on Windoze */
+            computer_friendly_ofile = fopen_ext( "alt_eph.txt",
+                                          is_default_ephem ? "tfcw+" : "fw+");
+#endif
          assert( computer_friendly_ofile);
          }
       if( show_radar_data)
