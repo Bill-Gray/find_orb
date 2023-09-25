@@ -396,3 +396,7 @@
 2078    3 ( ) '/day
 2078    4 ( ) d/day
 2078    Cancel
+
+2080    No MPC astrometry found for object '%s'.  This may be
+2080    an unused or incorrectly formatted designation,  or MPC
+2080    may simply not have data for it.

@@ -399,9 +399,11 @@ files to provide NEOCP astrometry nor 'grab_mpc',  which will cause
 this code to always return 0 (i.e.,  no astrometry fetched.)
 */
 
+#define ERR_CODE_NO_DATA_AVAILABLE  (int)0xd100
+
 int fetch_astrometry_from_mpc( FILE *ofile, const char *desig)
 {
-   char tbuff[100];
+   char tbuff[300];
    int bytes_written = 0, pass;
    const char *grab_program = get_environment_ptr( "MPC_GRAB_PROGRAM");
 
@@ -448,6 +450,11 @@ int fetch_astrometry_from_mpc( FILE *ofile, const char *desig)
          while( fgets( tbuff, sizeof( tbuff), ifile))
             bytes_written += (int)fwrite( tbuff, 1, strlen( tbuff), ofile);
          fclose( ifile);
+         }
+      else if( err_code == ERR_CODE_NO_DATA_AVAILABLE)
+         {
+         snprintf_err( tbuff, sizeof( tbuff), get_find_orb_text( 2080), desig);
+         generic_message_box( tbuff, "o");
          }
       else
          {
@@ -663,6 +670,6 @@ int pattern_match(const char* pattern, const char* string)
 const char *find_orb_version_jd( double *jd)
 {
     if( jd)
-      *jd = 2460190.5;
-    return( "2023 Sep 03");
+      *jd = 2460204.5;
+    return( "2023 Sep 17");
 }
