@@ -74,6 +74,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    #define MOUSE_WHEEL_SCROLL 0
 #endif
 
+#define CSI "\x1b["
+#define OSC "\x1b]"
+
 #define default_mouse_events (BUTTON1_CLICKED | BUTTON1_DOUBLE_CLICKED \
                             | BUTTON2_CLICKED | BUTTON2_DOUBLE_CLICKED \
                             | BUTTON3_CLICKED | BUTTON3_DOUBLE_CLICKED \
@@ -343,8 +346,8 @@ the mouse on or off.  This is still getting some testing,  and
 is commented out by default. */
 
 #ifdef MOUSE_MOVEMENT_EVENTS_ENABLED
-   #define VT_IGNORE_ALL_MOUSE      "\033\133?1003l\n"
-   #define VT_RECEIVE_ALL_MOUSE     "\033\133?1003h\n"
+   #define VT_IGNORE_ALL_MOUSE      CSI "?1003l\n"
+   #define VT_RECEIVE_ALL_MOUSE     CSI "?1003h\n"
 #endif
 #endif
 
@@ -3021,7 +3024,7 @@ static int find_rgb( const int irgb)
       /* hope it works (it usually will)                          */
 static void PDC_set_title( const char *title)
 {
-   printf( "\033\x5d\x32;%s\a", title);
+   printf( OSC "\x32;%s\a", title);
    fflush( stdout);
 }
 #endif
