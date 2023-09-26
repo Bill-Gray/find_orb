@@ -1155,7 +1155,7 @@ OHe !+005.712389   +43.932077        780.      SATINO, Observatoire Haute-Proven
    Lowell Observatory scopes.  24m subtracted for geoid height.
    The NPOI location is that at the center of the three 'arms'.  Some IDs
    made using https://lowell.edu/history/the-mars-hill-campus/ .
-Per !-111.536786   +35.097069        2178.     Perkins 1.8-m, Lowell Observatory
+Pek !-111.536786   +35.097069        2178.     Perkins 1.8-m, Lowell Observatory
 Hal !-111.536335   +35.096740        2177.     Hall 1.1-m, Lowell Observatory
 699 !-111.536703   +35.095857        2177.     Lowell Observatory-LONEOS
 NPO !-111.533918   +35.095946        2180.     Navy Precision Optical Interferometer
@@ -1476,3 +1476,18 @@ ATL !   0.0000       0.00000   +0.00000    @3  ATLAS (all scopes)
 
 RA2 !-110.847070   +32.581105        1190.     RAPTORS-2
 RMI !+145.061634   -37.680589         160.4    RMIT Robotic Optical Observatory
+
+TCO !-156.44052777 +20.7097222         59.0    Tennis Court Observatory, Maui
+
+   Identified some Perth Observatory scopes from an annotated map at
+   http://www.phys.ttu.edu/~ozprof/pobs.htm ,  which also describes some of
+   the scopes at this facility.  Perth has three official MPC codes,  (319),
+   (322),  and (323).  I don't know to which telescopes those last two refer.
+
+Pe1 !+116.13545    -32.00773          355.0    UWA 16" telescope
+319 !+116.13645    -32.00690          355.0    Perth Observatory, Perth-Lowell Telescope
+Pe2 !+116.13607    -32.00710          355.0    Perth Observatory Transit Telescope
+Pe3 !+116.13648    -32.00777          355.0    Perth Observatory 13" Astrograph
+Pe4 !+116.13648    -32.00742          355.0    Perth Observatory unidentified 1
+Pe5 !+116.13663    -32.00716          355.0    Perth Observatory unidentified 2
+Pe6 !+116.13645    -32.00729          355.0    Perth Observatory roll-off roof?
