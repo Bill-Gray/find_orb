@@ -1423,14 +1423,14 @@ static int add_sof_to_file( const char *filename,
       obj_name++;
    get_file_name( output_filename, filename);
    forking = strcmp( output_filename, filename);
-   fp = fopen_ext( output_filename, "cr+b");
+   fp = fopen_ext( output_filename, (forking ? "tr+b" : "cr+b"));
    if( !fp && fallback_filename)
       {
       fp = fopen_ext( fallback_filename, "fcr+b");
       if( !fgets( templat, sizeof( templat), fp))
          assert( 1);          /* should never happen */
       fclose( fp);
-      fp = fopen_ext( output_filename, "fcw+b");
+      fp = fopen_ext( output_filename, (forking ? "tfw+b" : "fcw+b"));
       fputs( templat, fp);
       }
    assert( fp);
