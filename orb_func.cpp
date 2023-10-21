@@ -4669,14 +4669,55 @@ void attempt_extensions( OBSERVE *obs, int n_obs, double *orbit,
 
 #define is_power_of_two( X)   (!((X) & ((X) - 1)))
 
+/* If the input data is ADES and has the trkID set,  then select_tracklet()
+simply selects observations with a matching trkID.
+
+   If we can't do that,  then defining a 'tracklet' is difficult,  since
+observatories vary in cadence.  Here,  we attempt to estimate the cadence by
+starting from the 'idx' observation and finding the nearest (previous or
+next) observation in time from that observatory.  We then say that as long
+as observations are within twice that amount,  they'll be considered to be
+part of the tracklet (or if they're within 30 minutes of each other).  This
+is all quite ad hoc,  but appears to produce 'reasonable' results.  */
+
 int select_tracklet( OBSERVE *obs, const int n_obs, const int idx)
 {
    int i, rval = 0;
-   const double tracklet_span = 30. / minutes_per_day;
+   double tracklet_span = 0.;
+   const double min_tracklet_span = 30. / minutes_per_day;
    double jd = obs[idx].jd;
+   char *tptr = (obs[idx].ades_ids ? strstr( obs[idx].ades_ids, "trkID") : NULL);
 
    for( i = 0; i < n_obs; i++)
       obs[i].flags &= ~OBS_IS_SELECTED;
+   if( tptr)
+      {
+      char trk_id[40];
+
+      sscanf( tptr, "%39s", trk_id);
+      for( i = 0; i < n_obs; i++)
+         if( obs[i].ades_ids && strstr( obs[i].ades_ids, trk_id))
+            {
+            obs[i].flags |= OBS_IS_SELECTED;
+            rval++;
+            }
+      return rval;
+      }
+   for( i = idx - 1; i >= 0 && jd - obs[i].jd < 1; i--)
+      if( !strcmp( obs[i].mpc_code, obs[idx].mpc_code))
+         {
+         tracklet_span = jd - obs[i].jd;
+         break;
+         }
+   for( i = idx + 1; i < n_obs && obs[i].jd - jd < tracklet_span; i++)
+      if( !strcmp( obs[i].mpc_code, obs[idx].mpc_code))
+         {
+         tracklet_span = obs[i].jd - jd;
+         break;
+         }
+   tracklet_span *= 2.;
+   if( tracklet_span < min_tracklet_span)
+      tracklet_span = min_tracklet_span;
    for( i = idx - 1; i >= 0 && jd - obs[i].jd < tracklet_span; i--)
       if( !strcmp( obs[i].mpc_code, obs[idx].mpc_code))
          {
