@@ -2950,13 +2950,22 @@ specify a TDB epoch.
    To do : revise to allow barycentric and other-planet-centric
 (and selenocentric) vectors,  and vectors in the body plane. */
 
+#define FOUND_ECCENTRICITY     1
+#define FOUND_TPERIH           2
+#define FOUND_Q                4
+#define FOUND_A                8
+#define FOUND_MEAN_ANOMALY    16
+
 static double extract_state_vect_from_text( const char *text,
             double *orbit, double *abs_mag)
 {
    char tbuff[81];
    size_t i = 0;
    double epoch = 0., coord_epoch = 2000.;
-   int bytes_read, central_object = 0;
+   double dist_units = 1., time_units = 1.;
+   int bytes_read, central_object = 0, quantities_found = 0;
+   bool is_state_vector, is_ecliptic = true;
+   ELEMENTS elem;
 
    while( text[i] && text[i] != ',' && i < 80)
       i++;
@@ -2966,28 +2975,59 @@ static double extract_state_vect_from_text( const char *text,
       tbuff[i] = '\0';
       epoch = get_time_from_string( 0., tbuff, CALENDAR_JULIAN_GREGORIAN, NULL);
       }
-   if( epoch)
-      {
-      text += i + 1;
-      for( i = 0; i < 6 && sscanf( text, "%lf%n", orbit + i, &bytes_read) == 1; i++)
-         text += bytes_read + 1;
-      if( i != 6)       /* didn't read a whole state vect */
-         epoch = 0.;
-      }
    assert( epoch);
+   text += i + 1;
+   for( i = 0; i < 6 && sscanf( text, "%lf%n", orbit + i, &bytes_read) == 1; i++)
+      text += bytes_read + 1;
+   assert( i == 6 || i == 0);
+   is_state_vector = (i == 6);
+   memset( &elem, 0, sizeof( ELEMENTS));
    *abs_mag = 18.;
    while( *text)
       {
       if( !memcmp( text, "eq", 2))
-         {
-         equatorial_to_ecliptic( orbit);
-         equatorial_to_ecliptic( orbit + 3);
-         text += 2;
-         }
+         is_ecliptic = false;
       else if( !memcmp( text, "ep=", 3))
          coord_epoch = atof( text + 3);
       else if( !memcmp( text, "H=", 2))
          *abs_mag = atof( text + 2);
+      else if( !memcmp( text, "Om=", 3))
+         elem.asc_node = atof( text + 3) * PI / 180.;
+      else if( !memcmp( text, "om=", 3))
+         elem.arg_per = atof( text + 3) * PI / 180.;
+      else if( !memcmp( text, "i=", 2))
+         elem.incl = atof( text + 2) * PI / 180.;
+      else if( !memcmp( text, "Tp=", 3))
+         {
+         i = 3;
+         while( i < 70 && text[i] != ',' && text[i])
+            i++;
+         assert( i < 70);
+         memcpy( tbuff, text + 3, i - 3);
+         tbuff[i - 3] = '\0';
+         elem.perih_time = get_time_from_string( 0., tbuff, CALENDAR_JULIAN_GREGORIAN, NULL);
+         quantities_found |= FOUND_TPERIH;
+         }
+      else if( !memcmp( text, "M=", 2))
+         {
+         elem.mean_anomaly = atof( text + 2) * PI / 180.;
+         quantities_found |= FOUND_MEAN_ANOMALY;
+         }
+      else if( !memcmp( text, "a=", 2))
+         {
+         elem.major_axis = atof( text + 2);
+         quantities_found |= FOUND_A;
+         }
+      else if( !memcmp( text, "q=", 2))
+         {
+         elem.q = atof( text + 2);
+         quantities_found |= FOUND_Q;
+         }
+      else if( !memcmp( text, "e=", 2))
+         {
+         elem.ecc = atof( text + 2);
+         quantities_found |= FOUND_ECCENTRICITY;
+         }
       else if( !_memicmp( text, "UTC", 3))
          epoch = utc_from_td( epoch, NULL);
       else if( !_memicmp( text, "TDB", 3))
@@ -2997,16 +3037,13 @@ static double extract_state_vect_from_text( const char *text,
          epoch -= tdb_minus_tdt( t_cen) / seconds_per_day;
          }
       else if( !memcmp( text, "km", 2))
-         for( i = 0; i < 6; i++)
-            orbit[i] /= AU_IN_KM;
+         dist_units = AU_IN_KM;
       else if( *text == 'm')
-         for( i = 0; i < 6; i++)
-            orbit[i] /= AU_IN_METERS;
+         dist_units = AU_IN_METERS;
       else if( *text == 'g')
          central_object = 3;
       else if( *text == 's')
-         for( i = 3; i < 6; i++)
-            orbit[i] *= seconds_per_day;
+         time_units = seconds_per_day;
       else if( *text == 'A' && text[1] >= '1' && text[1] <= '3'
                   && text[2] == '=')
          {
@@ -3020,6 +3057,33 @@ static double extract_state_vect_from_text( const char *text,
          text++;
       if( *text == ',')
          text++;
+      }
+   if( !is_state_vector)
+      {
+      elem.epoch = epoch;
+      if( !(quantities_found & FOUND_TPERIH))
+         elem.perih_time = elem.epoch;
+      if( quantities_found & FOUND_A)
+         elem.q = elem.major_axis * (1. - elem.ecc);
+      elem.q /= dist_units;
+      elem.gm = get_planet_mass( central_object);
+      derive_quantities( &elem, elem.gm);
+      if( quantities_found & FOUND_MEAN_ANOMALY)
+         elem.perih_time = elem.epoch - elem.mean_anomaly * elem.t0;
+      comet_posn_and_vel( &elem, elem.epoch, orbit, orbit + 3);
+      }
+   else
+      {
+      for( i = 0; i < 6; i++)
+         orbit[i] /= dist_units;
+      for( i = 3; i < 6; i++)
+         orbit[i] *= time_units;
+      }
+   if( !is_ecliptic)
+      {
+      equatorial_to_ecliptic( orbit);
+      equatorial_to_ecliptic( orbit + 3);
+      text += 2;
       }
    if( coord_epoch != 2000.)
       {
