@@ -1129,7 +1129,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
          tptr = (char *)"Unknown";
          i = 7;
          }
-      snprintf_append( buff, sizeof( buff), "C  %.*s\n", i, tptr);
+      snprintf_append( buff, sizeof( buff), "C  Ephemeris type : %.*s\n", i, tptr);
       snprintf_append( buff, sizeof( buff), "M  Make ephemeris\n");
       snprintf_append( buff, sizeof( buff), "Q  Return to main display");
       n_lines += 4;
@@ -1146,7 +1146,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
          for( i = 0; buff[i] && n; i++)
             if( buff[i] == '\n')
                n--;
-         c = buff[i];
+         c = tolower( buff[i]);
          }
       if( c >= ALT_0 && c <= ALT_7)
          {
