@@ -683,8 +683,8 @@ static int is_unreasonable_orbitl( const long double *orbit)
 /* See Explanatory Supplement,  3.26, p. 135, "Gravitational Light
 Bending."  For our purposes,  what matters is the difference between
 how much the object's light is bent and how much the light of
-background stars is bent.  So we compute phi1 = angle between
-observer,  sun,  and 'result';  and phi2 = angle between observer,
+background stars is bent.  So we compute psi1 = angle between
+observer,  sun,  and 'result';  and psi2 = angle between observer,
 sun,  and background stars = 180 minus elongation of the object as
 seen by 'observer'.
 
@@ -709,7 +709,7 @@ static void light_bending( const double *observer, double *result)
    double p[3], plen, xprod[3], dir[3], dlen;
    const double olen = vector3_length( observer);
    const double rlen = vector3_length( result);
-   double phi1, phi2, bending;
+   double psi1, psi2, bending;
 
    for( i = 0; i < 3; i++)
       p[i] = result[i] - observer[i];
@@ -717,7 +717,7 @@ static void light_bending( const double *observer, double *result)
    if( plen < 1e-10)  /* don't do light-bending over really */
       return;         /* short/meaningless distances */
    vector_cross_product( xprod, observer, result);
-   vector_cross_product( dir, xprod, p);
+   vector_cross_product( dir, p, xprod);
    dlen = vector3_length( dir);
    if( !dlen)
       return;
@@ -725,9 +725,9 @@ static void light_bending( const double *observer, double *result)
       dir[i] /= dlen;
      /* "dir" is now a unit vector perpendicular to p,  aimed away */
      /* from the sun */
-   phi1 = acose( dot_product( result, observer) / (rlen * olen));
-   phi2 = acose( dot_product( p, observer) / (plen * olen));
-   bending = bend_factor * (tan( phi2 / 2.) - tan( phi1 / 2.));
+   psi1 = acose( dot_product( result, observer) / (rlen * olen));
+   psi2 = acose( dot_product( p, observer) / (plen * olen));
+   bending = bend_factor * (tan( psi2 / 2.) - tan( psi1 / 2.));
    bending *= plen;
    for( i = 0; i < 3; i++)
       result[i] += bending * dir[i];
