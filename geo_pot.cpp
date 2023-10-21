@@ -64,8 +64,7 @@ convenient C array below.  Note that data in the same format is available
 for the Moon,  Mars,  and Venus;  it should be quite easy to add them to
 Find_Orb in the same way,  if we ever decide that would matter.   */
 
-   static long double ggm03c_terms[] = {
-//      1.000000000000E+00,  0.000000000000E+00,   /* 0 0 */
+   static long double ggm03c_terms[] = {           /* l m   (l=degree,  m=order) */
         0.000000000000E+00,  0.000000000000E+00,   /* 0 0 */
 
         0.000000000000E+00,  0.000000000000E+00,   /* 1 0 */
@@ -1526,13 +1525,7 @@ static void renormalize_terms( void)
    int l, m;
    long double *geo_tptr = ggm03c_terms;
 
-                        /* Find_Orb already handles J2 and "J0": */
-#ifndef TEST_MAIN
-//   ggm03c_terms[0] = ggm03c_terms[6] = 0.;
-#else
-// ggm03c_terms[0] =                   0.;
-#endif
-   for( l = 0; l < N_TERMS - 1; l++)       /* skip l=0 & l=1 */
+   for( l = 0; l <= N_TERMS; l++)
       {
       long double factor = sqrtl( (long double)( l + l + 1));
       const long double sqrt_2 =
@@ -1586,6 +1579,15 @@ P  (x) = 0
   l
 */
 
+/* For the 'geo_max' program,  we may be interested in the sum of only
+some higher-degree terms.  In that case,  we reset _starting_term. */
+
+#ifdef FIND_MAX
+   int _starting_term;
+#else
+   #define _starting_term 0
+#endif
+
 /* For geo_potential,  xyz are in units of the earth's radius.  The
 return value is 1 at the earth's radius.  Both facts are a bit of
 a pain,  which is why geo_potential_in_au() gives values in AUs and
@@ -1609,8 +1611,8 @@ long double geo_potential( const long double x, const long double y,
    static bool renormalized = false;
 
    assert( n_terms < 800);       /* see above comments on limits */
-   if( n_terms > N_TERMS - 1)
-      n_terms = N_TERMS - 1;
+   if( n_terms > N_TERMS)
+      n_terms = N_TERMS;
    if( renormalized == false)
       {
       renormalize_terms( );
@@ -1621,13 +1623,13 @@ long double geo_potential( const long double x, const long double y,
    cos_mtheta[0] = 1.;
    sin_mtheta[1] = y / r_cyl;
    cos_mtheta[1] = x / r_cyl;
-   for( m = 1; m < n_terms; m++)
+   for( m = 1; m < n_terms - 1; m++)
       {
       sin_mtheta[m + 1] = sin_mtheta[m] * cos_mtheta[1] + cos_mtheta[m] * sin_mtheta[1];
       cos_mtheta[m + 1] = cos_mtheta[m] * cos_mtheta[1] - sin_mtheta[m] * sin_mtheta[1];
       }
    p[0][0] = 1.;
-   for( m = 0; m < n_terms; m++)
+   for( m = 0; m < n_terms - 1; m++)
       {
       const long double tval = (long double)( 2 * m + 1) * p[m][m];
 
@@ -1650,6 +1652,8 @@ long double geo_potential( const long double x, const long double y,
 //    printf( "r = %.5Le; rpow = %.5Le\n", r, rpow);
       if( l == 1)       /* terms are all zero;  skip 'em */
          geo_tptr += 4;
+      else if( l < _starting_term)
+         geo_tptr += (l + 1) * 2;
       else for( m = 0; m <= l; m++, geo_tptr += 2)
          {
          const long double dp_dphi =
@@ -1674,10 +1678,13 @@ long double geo_potential( const long double x, const long double y,
                      printf( "%d: %Le\n", l, diff);
                      }
 #endif
-      rval += contrib_this_l * rpow;
-      drval_dtheta -= contrib_drval_dtheta * rpow;
-      drval_dphi += contrib_drval_dphi * rpow;
-      drval_dr += (long double)( l + 1) * contrib_this_l * rpow / r;
+      if( l >= _starting_term)
+         {
+         rval += contrib_this_l * rpow;
+         drval_dtheta -= contrib_drval_dtheta * rpow;
+         drval_dphi += contrib_drval_dphi * rpow;
+         drval_dr += (long double)( l + 1) * contrib_this_l * rpow / r;
+         }
       }
    *derivs++ = drval_dr;
    *derivs++ = drval_dtheta;
@@ -1755,8 +1762,6 @@ static double jn_potential( const double x, const double y, const double z,
    return( (j2 * p2 + j3 * p3 / r + j4 * p4 / r2) / (r * r2));
 // return( (          j3 * p3 / r + j4 * p4 / r2) / (r * r2));
 }
-
-#include <stdio.h>
 
 #define EARTH_R2 (EARTH_R * EARTH_R)
 #define EARTH_R3 (EARTH_R * EARTH_R2)
