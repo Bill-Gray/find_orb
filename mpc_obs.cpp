@@ -3906,7 +3906,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                }
             }
          }
-      if( is_in_range( jd))     /* Sigmas from ADES or Dave Tholen apply to only */
+      if( is_in_range( jd) && buff[14] != 'S')     /* Sigmas from ADES or Dave Tholen apply to only */
          {                 /* one observation.  Zero 'em out after that use : */
          ades_posn_sigma_1 = ades_posn_sigma_2 = ades_mag_sigma = 0.;
          ades_posn_sigma_theta = ades_time_sigma = 0.;
