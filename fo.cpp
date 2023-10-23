@@ -316,9 +316,10 @@ static void get_summary_info( char *buff, const char *mpec_filename)
    FILE *ifile = fopen_ext( mpec_filename, "frb");
    char ibuff[400], *tptr;
    unsigned i;
+   bool is_geocentric = false;
 
-   memset( buff, ' ', 80);
-   buff[80] = '\0';
+   memset( buff, ' ', 81);
+   buff[81] = '\0';
    while( fgets( ibuff, sizeof( ibuff), ifile))
       {
       if( (tptr = strstr( ibuff, "Pseudo-MPEC for")) != NULL)
@@ -335,7 +336,11 @@ static void get_summary_info( char *buff, const char *mpec_filename)
          extract_value( buff + 51, tptr + 5, 1);
       else if( (tptr = strstr( ibuff, " Ea ")) != NULL)
          memcpy( buff + 68, tptr + 4, 7);
+      else if( !memcmp( ibuff, "   Perigee", 10))
+         is_geocentric = true;
       }
+   if( is_geocentric)
+      memcpy( buff + 76, "(geo)", 5);
    fclose( ifile);
 }
 
@@ -1024,7 +1029,7 @@ int main( int argc, const char **argv)
                               if( j == 4)
                                  {
                                  tbuff[23] = tbuff[39] = tbuff[73] = '\0';
-                                 snprintf_append( new_line, sizeof( new_line), "  %s  %s  %s",
+                                 snprintf_append( new_line, sizeof( new_line), " %s  %s  %s",
                                           tbuff + 15, tbuff + 30, tbuff + 57);
                                                 /* now add sigma from end of ephem: */
                                  while( fgets_trimmed( tbuff, sizeof( tbuff), ephemeris_ifile))
