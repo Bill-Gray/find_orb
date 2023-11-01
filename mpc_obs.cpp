@@ -133,7 +133,7 @@ int debug_printf( const char *format, ...)
       if( ftell( ofile) > max_debug_file_size)
          {
          fclose( ofile);
-         ofile = fopen_ext( debug_file_name, "tcw");
+         ofile = fopen_ext( debug_file_name, "cw");
          }
       fprintf( ofile, "%02d:%02d:%02d ",
                ((int)t0 / 3600) % 24, ((int)t0 / 60) % 60, (int)t0 % 60);
