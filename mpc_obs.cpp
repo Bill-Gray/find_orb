@@ -530,7 +530,10 @@ static int extract_mpc_station_data( const char *buff, mpc_code_t *cinfo)
              cinfo->lon -= PI + PI;
          }
       else
+         {
          memset( cinfo, 0, sizeof( mpc_code_t));
+         cinfo->planet = rval;
+         }
       }
    return( rval);
 }
