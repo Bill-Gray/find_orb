@@ -4003,6 +4003,16 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
             }
          else if( !memcmp( buff, "#IDs ", 5))
             strlcpy_err( curr_ades_ids, buff + 5, sizeof( curr_ades_ids));
+         else if( !memcmp( buff, "#'getradar' version", 19))
+            {
+            int j = 0;  /* we're replacing/updating the radar observations */
+                        /* using JPL data.  So remove the old MPC radar. */
+            while( j < i)
+               if( rval[j].note2 == 'R')
+                  rval[j] = rval[--i];    /* remove the radar observation */
+               else
+                  j++;
+            }
          }
       }
    free_ades2mpc_context( ades_context);
