@@ -1419,7 +1419,7 @@ St50!+149.007461   -35.320406         786.     50-in reflector, Mt Stromlo
 
 ET2 !-070.73904    -29.25522         2359.     ESA Test-Bed Telescope 2, La Silla
 
-SSA !+114.0899     -21.8957            40.     Space Surveillance Telescope, Exmouth
+P07 !+114.0899     -21.8957            40.     Space Surveillance Telescope, HEH Station
 SOR !-106.463864   +34.9642312       1892.     Starfire Optical Range,  Albuqueque
 
    Private communication from Francois Kugel,  2021 Oct 18 : N 43 59' 59.26",
@@ -1475,9 +1475,11 @@ UAZ !-110.947361   +32.232722         100.000  University of Arizona 24"
 
 d47 ! 149.5501388  -30.3128846       236.87    DSS 47
 
-   (Opt) is a 'floating' location.  It should be the best topocentric location
-   for observing an object at a given time,  and therefore moves around as the
-   Earth rotates and the object moves around in the sky.
+   (Opt) is a 'floating' location,  used internally in Find_Orb.  It is the
+   'best' topocentric location for observing an object at a given time (puts
+   the object well above the horizon and the sun well below it),  and
+   therefore moves around as the Earth rotates and the object moves around
+   in the sky.
 
 Opt !   0.0000       0.00000   +0.00000    @3  Optimal topocentric location
 
@@ -1507,3 +1509,38 @@ Pe3 !+116.13648    -32.00777          355.0    Perth Observatory 13" Astrograph
 Pe4 !+116.13648    -32.00742          355.0    Perth Observatory unidentified 1
 Pe5 !+116.13663    -32.00716          355.0    Perth Observatory unidentified 2
 Pe6 !+116.13645    -32.00729          355.0    Perth Observatory roll-off roof?
+
+   The MPC location for (662) Lick is about 200 meters east-southeast of the
+   nearest telescope (36" refractor).  I don't know which telescope(s) really
+   corresponds to (662);  I am putting it at the location for the 36"
+   refractor,  which is at least an improvement by ~200 meters.  Site map is
+   https://mthamilton.ucolick.org/techdocs/practical_info/lick_map.html
+   32 meters subtracted for geoid height.
+
+662 !-121.643015   +37.341081        1273.0    Lick Observatory, 36" refractor
+662a!-121.642877   +37.341707        1264.0    Lick Observatory, 40" reflector
+662b!-121.640246   +37.341893        1241.0    Lick Observatory, 22" Touchmann reflector
+662c!-121.638793   +37.342747        1252.0    Lick Observatory, Crocker dome
+662d!-121.638222   +37.342536        1250.0    Lick Observatory, Automatic Planet Finder scope
+662e!-121.638003   +37.342617        1251.0    Lick Observatory, Double Astrograph
+662f!-121.637157   +37.342842        1245.0    Lick Observatory, Coude' Auxiliary telescope
+662g!-121.637209   +37.343034        1246.0    Lick Observatory, 120" Shane telescope
+662h!-121.634823   +37.343376        1265.0    Lick Observatory, Katzman Automatic Imaging telescope
+
+   (672) Mount Wilson scopes identified via
+   https://www.mtwilson.edu/wp-content/uploads/2023/05/MWO-Campus-Map-Printable.pdf
+   The MPC position is at least in the right ballpark,  such that I don't
+   know which way to move it (again,  I don't know which of the following was
+   the "real" (672).)  I've omitted (G73),  the 24" scope used for TIE (Telescopes
+   In Education).  It was moved from Mount Wilson in 2007.  I don't know where it
+   was when it was in use,  but the MPC position is probably about 1.3 km south of
+   reality;  it's way out in the woods.  33 meters subtracted for geoid height.
+
+672a!-118.057487   +34.224572        1695.0    Mount Wilson, 60"
+672b!-118.057186   +34.225873        1690.0    Mount Wilson, 100" Hooker
+672c!-118.057053   +34.224403        1696.0    Mount Wilson, CHARA S1
+672d!-118.057110   +34.224699        1699.0    Mount Wilson, CHARA S2
+672e!-118.058963   +34.226347        1683.0    Mount Wilson, CHARA W1
+672f!-118.057823   +34.226189        1685.0    Mount Wilson, CHARA W2
+672g!-118.055694   +34.227149        1660.0    Mount Wilson, CHARA E1
+672h!-118.056292   +34.226829        1674.0    Mount Wilson, CHARA E2
