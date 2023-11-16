@@ -770,12 +770,11 @@ int get_observer_data( const char FAR *mpc_code, char *buff, mpc_code_t *cinfo)
             if( (!pass && !memcmp( buff, station_data[i] + 30, strlen( buff)))
                      || (pass && strstr( station_data[i] + 30, buff)))
                {
-               strlcpy_err( buff, station_data[i], buffsize);
+               strlcpy( buff, station_data[i], buffsize);
                return( 0);
                }
       return( -1);
       }
-
 
    if( !get_lat_lon_from_header( &lat0, &lon0, &alt0, mpc_code,
                                              &override_observatory_name))
@@ -794,43 +793,13 @@ int get_observer_data( const char FAR *mpc_code, char *buff, mpc_code_t *cinfo)
       override_observatory_name = "Roving observer";
       }
 
-   if( strchr( "nsew", tolower( mpc_code[0])))
+   if( !get_lat_lon_info( cinfo, mpc_code))
       {
-      int got_em = 0;
-      size_t j;
-
-      for( i = 0; mpc_code[i]; i++)
-         {
-         const int c = tolower( mpc_code[i]);
-
-         j = i + 1;
-         while( mpc_code[j] == ' ')
-            j++;
-         if( !strncasecmp( mpc_code + i, "alt", 3))
-            alt0 = atof( mpc_code + i + 3);
-         if( isdigit( mpc_code[j]))
-            {
-            if( c == 'n' || c == 's')
-               {
-               lat0 = atof( mpc_code + i + 1);
-               if( c == 's')
-                  lat0 = -lat0;
-               got_em ^= 1;
-               }
-            if( c == 'e' || c == 'w')
-               {
-               lon0 = atof( mpc_code + i + 1);
-               if( c == 'w')
-                  lon0 = -lon0;
-               got_em ^= 2;
-               }
-            }
-         }
-      if( got_em == 3)
-         {
-         mpc_code = "zzzz";
-         override_observatory_name = "User-supplied observer";
-         }
+      mpc_code = "zzzz";
+      lat0 = cinfo->lat * 180. / PI;
+      lon0 = cinfo->lon * 180. / PI;
+      alt0 = cinfo->alt;
+      override_observatory_name = "User-supplied observer";
       }
 
    if( override_observatory_name)
@@ -4634,13 +4603,16 @@ void put_observer_data_in_text( const char FAR *mpc_code, char *buff)
       memmove( buff, name, strlen( name) + 1);
       if( lon || lat)
          {
-         const char *output_format = "  (%c%.6f %c%.6f)";
-
          lon *= 180. / PI;
          lat *= 180. / PI;
-         snprintf_append( buff, buffsize, output_format,
+         if( memcmp( name, "User-supplied", 13))
+            {
+            const char *output_format = "  (%c%.6f %c%.6f)";
+
+            snprintf_append( buff, buffsize, output_format,
                            (lat > 0. ? 'N' : 'S'), fabs( lat),
                            (lon > 0. ? 'E' : 'W'), fabs( lon));
+            }
          if( planet_idx == 3)
             {
             FILE *ifile = fopen_ext( "geo_rect.txt", "fcrb");
