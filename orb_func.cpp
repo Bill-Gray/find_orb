@@ -2671,6 +2671,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
    const double r_mult = 1e+2;
    double orbit2[MAX_N_PARAMS];
    int set_locs_rval;
+   extern double levenberg_marquardt_lambda;
    const bool saved_fail_on_hitting_planet =
                                      fail_on_hitting_planet;
 
@@ -3354,6 +3355,10 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
 
    if( debug_level > 1)
       debug_printf( "full_improve done\n");
+
+   if( levenberg_marquardt_lambda)
+      levenberg_marquardt_lambda *=
+             (compute_rms( obs, n_obs) < before_rms ? 0.5 : 2.0);
    runtime_message = NULL;
    return( err_code);
 }
