@@ -1372,9 +1372,9 @@ static double get_motion_unit_text( char *obuff)
 {
    double motion_units = 1.;
 
-   strlcpy_error( obuff, get_environment_ptr( "MOTION_UNITS"));
+   strlcpy_err( obuff, get_environment_ptr( "MOTION_UNITS"), 6);
    if( !*obuff)
-      strlcpy_error( obuff, "'/hr");
+      strlcpy_err( obuff, "'/hr", 6);
    if( *obuff == '"')
       motion_units = 60.;
    else if( *obuff == 'd')
