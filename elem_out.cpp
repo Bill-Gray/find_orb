@@ -4123,16 +4123,17 @@ static void improve_mpc_colors( const int n_obs, const OBSERVE FAR *obs,
                   }
                }
          for( j = 0; j < max_n_colors; j++)
-            if( counts[j] < counts[color])
+            if( counts[j] < counts[color] ||
+                     (counts[j] == counts[color] && !(rand( ) % 3)))
                {
+               if( counts[j] < counts[color])
+                  changes_made = 1;
                color = j;
                sdata[i].color = (char)color;
-               changes_made = 1;
                }
          assert( color >=0 && color < max_n_colors);
          }
       n_iterations++;
-      assert( n_iterations < 10);
       }
 }
 
