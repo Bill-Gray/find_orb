@@ -1294,14 +1294,20 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                {
                if( strlen( buff) < 3)
                   err_msg = "MPC codes must be at least three characters long";
-               else if( strlen( buff) < 5 || !memcmp( buff, "Ast", 3))
+               else if( strlen( buff) < 5 || !memcmp( buff, "Ast", 3)
+                           || !get_lat_lon_info( NULL, buff))
                   strlcpy_error( mpc_code, buff);
-               else if( strlen( buff) > 4 && !get_observer_data( buff, buff, NULL))
+               else if( strlen( buff) > 4)
                   {
-                  buff[4] = '\0';
-                  if( buff[3] == ' ')
-                     buff[3] = '\0';
-                  strlcpy_error( mpc_code, buff);
+                  if( !get_observer_data( buff, buff, NULL))
+                     {
+                     buff[4] = '\0';
+                     if( buff[3] == ' ')
+                        buff[3] = '\0';
+                     strlcpy_error( mpc_code, buff);
+                     }
+                  else
+                     err_msg = "Didn't understand that observatory code";
                   }
                }
             break;
