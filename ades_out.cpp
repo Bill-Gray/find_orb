@@ -52,8 +52,16 @@ int text_search_and_replace( char FAR *str, const char *oldstr,
 
 /* Column 14 ('note 1') of punched-card astrometry contains either an
 alphabetical note (see https://minorplanetcenter.net/iau/info/ObsNote.html
-for their meanings) or a program code (was on the MPC site,  not
-currently available).         */
+for their meanings) or a program code :
+
+https://minorplanetcenter.net//iau/lists/ProgramCodes.txt
+
+We do have the problem that many program codes are now letters.  If column
+14 contains a letter,  and that letter is in use as a program code,  we
+can't tell if the letter means "program code" or "note".  For my current
+problem -- sungrazing astrometry -- column 14 will always indicate the
+instrument used (see bottom of 'ObsNotes.html'), but that will not work
+reliably with other obscodes.  */
 
 static char program_code( const OBSERVE *obs)
 {
@@ -82,13 +90,17 @@ static int dump_one_line_of_names( FILE *ofile, const char *line)
          size_t i = 0;
 
          line += 4;
-         fprintf( ofile, "        <design>Coronagraph</design>\n");
+         if( ofile)
+            fprintf( ofile, "        <design>Coronagraph</design>\n");
          while( line[i] && line[i] != '-')
             i++;
          assert( line[i] == '-');
-         fprintf( ofile, "        <aperture>%.*s</aperture>\n", (int)i, line);
-         fprintf( ofile, "        <detector>CCD</detector>\n");
-         fprintf( ofile, "        <name>%s</name>\n", tptr + 12);
+         if( ofile)
+            {
+            fprintf( ofile, "        <aperture>%.*s</aperture>\n", (int)i, line);
+            fprintf( ofile, "        <detector>CCD</detector>\n");
+            fprintf( ofile, "        <name>%s</name>\n", tptr + 12);
+            }
          n_found = 1;
          }
       return( n_found);
@@ -106,7 +118,8 @@ static int dump_one_line_of_names( FILE *ofile, const char *line)
          len++;
       if( len > 3 && line[1] == '.' && line[2] == ' ')
          {           /* very incomplete verification that it's really a name */
-         fprintf( ofile, "        <name>%.*s</name>\n", (int)len, line);
+         if( ofile)
+            fprintf( ofile, "        <name>%.*s</name>\n", (int)len, line);
          n_found++;
          }
       line += len;
@@ -116,7 +129,7 @@ static int dump_one_line_of_names( FILE *ofile, const char *line)
    return( n_found);
 }
 
-static void output_names( FILE *ofile, const OBSERVE FAR *obs, const char *target)
+static int output_names( FILE *ofile, const OBSERVE FAR *obs, const char *target)
 {
    int i, n_found = 0;
    const size_t tlen = strlen( target);
@@ -143,6 +156,7 @@ static void output_names( FILE *ofile, const OBSERVE FAR *obs, const char *targe
                n_found += dump_one_line_of_names( ofile, buff);
       fclose( ifile);
       }
+   return( n_found);
 }
 
 /* Outputs _only_ those observations from the station and program code
@@ -161,18 +175,32 @@ static void create_ades_file_for_one_code( FILE *ofile,
    fprintf( ofile, "      <observatory>\n");
    fprintf( ofile, "        <mpcCode>%s</mpcCode>\n", obs->mpc_code);
    fprintf( ofile, "      </observatory>\n");
-   fprintf( ofile, "      <submitter>\n");
-   output_names( ofile, obs, "CON ");
-   fprintf( ofile, "      </submitter>\n");
-   fprintf( ofile, "      <observers>\n");
-   output_names( ofile, obs, "OBS ");
-   fprintf( ofile, "      </observers>\n");
-   fprintf( ofile, "      <measurers>\n");
-   output_names( ofile, obs, "MEA ");
-   fprintf( ofile, "      </measurers>\n");
-   fprintf( ofile, "      <telescope>\n");
-   output_names( ofile, obs, "TEL ");
-   fprintf( ofile, "      </telescope>\n");
+   if( output_names( NULL, obs, "CON ") || is_sungrazer)
+      {
+      fprintf( ofile, "      <submitter>\n");
+               /* Workaround for sungrazers without contact info */
+      if( !output_names( ofile, obs, "CON ") && is_sungrazer)
+         fprintf( ofile, "        <name>W. Gray</name>\n");
+      fprintf( ofile, "      </submitter>\n");
+      }
+   if( output_names( NULL, obs, "OBS "))
+      {
+      fprintf( ofile, "      <observers>\n");
+      output_names( ofile, obs, "OBS ");
+      fprintf( ofile, "      </observers>\n");
+      }
+   if( output_names( NULL, obs, "MEA "))
+      {
+      fprintf( ofile, "      <measurers>\n");
+      output_names( ofile, obs, "MEA ");
+      fprintf( ofile, "      </measurers>\n");
+      }
+   if( output_names( NULL, obs, "TEL "))
+      {
+      fprintf( ofile, "      <telescope>\n");
+      output_names( ofile, obs, "TEL ");
+      fprintf( ofile, "      </telescope>\n");
+      }
    fprintf( ofile, "    </obsContext>\n");
    fprintf( ofile, "    <obsData>\n");
    while( n_obs--)
@@ -230,6 +258,8 @@ static void create_ades_file_for_one_code( FILE *ofile,
                mag_band = 'V';
             fprintf( ofile, "        <band>%c</band>\n", mag_band);
             }
+         if( is_sungrazer)   /* for these,  the 'note' is always a 'program code' */
+            fprintf( ofile, "        <notes>%c</notes>\n", progcode);
          fprintf( ofile, "      </optical>\n");
          }
       obs++;
