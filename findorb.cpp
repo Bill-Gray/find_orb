@@ -1294,11 +1294,13 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                {
                if( strlen( buff) < 3)
                   err_msg = "MPC codes must be at least three characters long";
-               else if( strlen( buff) < 50 || !memcmp( buff, "Ast", 3))
+               else if( strlen( buff) < 5 || !memcmp( buff, "Ast", 3))
                   strlcpy_error( mpc_code, buff);
-               else if( !get_observer_data( buff, buff, NULL))
+               else if( strlen( buff) > 4 && !get_observer_data( buff, buff, NULL))
                   {
-                  buff[3] = '\0';
+                  buff[4] = '\0';
+                  if( buff[3] == ' ')
+                     buff[3] = '\0';
                   strlcpy_error( mpc_code, buff);
                   }
                }
@@ -4587,6 +4589,7 @@ int main( int argc, const char **argv)
                   {
                   size_t index;
                   const int cmd = show_hint( mouse_x, mouse_y, &index);
+                  int col1 = 0, col2 = 0;
 
                   if( cmd == -1)
                      {
@@ -4610,15 +4613,54 @@ int main( int argc, const char **argv)
                            buff[4] = '\0';
                            make_observatory_info_text( tbuff, sizeof( tbuff),
                                                        obs, n_obs, buff + 1);
+                           col2 = 5;
                            }
                         }
-#ifdef NOT_USED_YET                       /* To Do: show some info about this */
-                     else if( i >= 0)     /* observation.  Dunno what yet.    */
-                        snprintf_err( tbuff, 80, "line %d, obs %d",
-                                       i, i + top_obs_shown);
-#endif
+                     else if( i >= 0)
+                        {
+                        i += top_obs_shown;
+                        if( mouse_x < 3)
+                           *tbuff = '\0';       /* nothing to do */
+                        else if( mouse_x < 20)
+                           {
+                           const double dt = current_jd( ) - obs[i].jd;
+
+                           full_ctime( tbuff, obs[i].jd, CALENDAR_JULIAN_GREGORIAN
+                                      | FULL_CTIME_YMD | FULL_CTIME_LEADING_ZEROES
+                                      | FULL_CTIME_MICRODAYS);
+                           strcat( tbuff, " = ");
+                           full_ctime( tbuff + strlen( tbuff), obs[i].jd, FULL_CTIME_TIME_ONLY);
+                           if( dt < 1.)
+                              snprintf_append( tbuff, sizeof( tbuff), "\n%.2f hours ago", dt * 24.);
+                           else if( dt < 7.)
+                              snprintf_append( tbuff, sizeof( tbuff), "\n%.2f days ago", dt);
+                           col1 = 3;
+                           col2 = 20;
+                           }
+                        else if( mouse_x < 42)
+                           {
+                           char formatted[82];
+
+                           recreate_observation_line( formatted, obs + i, 3 << 14);   /* HH MM SS.s */
+                           formatted[56] = '\0';
+                           strlcpy_error( tbuff, formatted + 32);
+                           strlcat_error( tbuff, "\n");
+                           recreate_observation_line( formatted, obs + i, 1 << 14);   /* decimal degrees */
+                           formatted[56] = '\0';
+                           strlcat_error( tbuff, formatted + 32);
+                           col1 = 20;
+                           col2 = 44;
+                           }
+                        if( mouse_x >= 53 && mouse_x < 59 && obs[i].computed_mag != BLANK_MAG)
+                           {
+                           snprintf_err( tbuff, sizeof( tbuff), "computed mag %.2f",
+                                                            obs[i].computed_mag);
+                           col1 = 53;
+                           col2 = 59;
+                           }
+                        }
                      if( *tbuff)
-                        show_hint_text( mouse_x, mouse_y, 0, 0, 0, tbuff);
+                        show_hint_text( mouse_x, mouse_y, mouse_y, col1, col2 - col1, tbuff);
                      }
                   }
                }
@@ -5804,6 +5846,8 @@ int main( int argc, const char **argv)
                               sqrt( delta_squared) * AU_IN_KM,
                               (unsigned long)( t0 / one_billion),
                               (unsigned long)( t0 % one_billion));
+            snprintf_append( message_to_user, sizeof( message_to_user),
+                     " JD %.4f to %.4f", curr_epoch, curr_epoch + atof( tbuff));
             }
             break;
          case ALT_D:
