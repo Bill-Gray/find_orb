@@ -196,6 +196,7 @@ int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
 int text_search_and_replace( char FAR *str, const char *oldstr,
                                      const char *newstr);   /* ephem0.cpp */
 int sort_obs_by_date_and_remove_duplicates( OBSERVE *obs, const int n_obs);
+double utc_from_td( const double jdt, double *delta_t);     /* ephem0.cpp */
 int create_b32_ephemeris( const char *filename, const double epoch,
                 const double *orbit, const int n_steps,         /* b32_eph.c */
                 const double ephem_step, const double jd_start);
@@ -4629,13 +4630,16 @@ int main( int argc, const char **argv)
                            *tbuff = '\0';       /* nothing to do */
                         else if( mouse_x < 20)
                            {
-                           const double dt = current_jd( ) - obs[i].jd;
+                           double dt, utc;
 
-                           full_ctime( tbuff, obs[i].jd, CALENDAR_JULIAN_GREGORIAN
+                           utc = utc_from_td( obs[i].jd, NULL);
+                           dt = current_jd( ) - utc;
+
+                           full_ctime( tbuff, utc, CALENDAR_JULIAN_GREGORIAN
                                       | FULL_CTIME_YMD | FULL_CTIME_LEADING_ZEROES
                                       | FULL_CTIME_MICRODAYS);
                            strcat( tbuff, " = ");
-                           full_ctime( tbuff + strlen( tbuff), obs[i].jd, FULL_CTIME_TIME_ONLY);
+                           full_ctime( tbuff + strlen( tbuff), utc, FULL_CTIME_TIME_ONLY);
                            if( dt < 1.)
                               snprintf_append( tbuff, sizeof( tbuff), "\n%.2f hours ago", dt * 24.);
                            else if( dt < 7.)
