@@ -4944,16 +4944,18 @@ void remove_trailing_cr_lf( char *buff)
    buff[i] = '\0';
 }
 
-/* MPC frowns upon redistribution of NEOCP astrometry.  So if an input
-line is from NEOCP,  it's blacked out,  _unless_ it's from a station
-that has given permission for republication.  Those stations are listed
-in the GREENLIT, GREENLIT2, ...GREENLITn lines in 'environ.dat';  you
-can add your own if desired.
+/* Until late 2023,  MPC frowned upon redistribution of NEOCP astrometry.
+ So if an input line was from NEOCP,  it was blacked out,  _unless_ it
+was from a station that had given permission for republication.
+'is_greenlit()' would determine if an observation could be distributed;
+if not,  the observation would be shown redacted.
 
-In some cases,  only heliocentric observations have gotten the green light.
-Those codes are followed by an asterisk in the GREENLIT* lines.
+   Post-2023,  the logic is different.  I sometimes receive data from
+people who say : feel free to distribute ephems based on this,  but we
+aren't ready to make the data public.  (Not often,  but it does happen.)
+Others will say : don't make data on artificial satellites public.
 
-For private use,  you can turn NEOCP redaction off.  Just be sure that
+For private use,  you can turn redaction off.  Just be sure that
 if you do that,  you don't redistribute anything.        */
 
 bool neocp_redaction_turned_on = true;
@@ -4963,7 +4965,7 @@ static bool is_neocp_line( const char *mpc_line)
    return( strlen( mpc_line) == 80 && !memcmp( mpc_line + 72, "NEOCP", 5));
 }
 
-static bool _is_greenlit( const char *env_line, const char *mpc_line,
+static bool _is_redacted( const char *env_line, const char *mpc_line,
                                                 const bool is_heliocentric)
 {
    const char *tptr = env_line;
@@ -4975,8 +4977,8 @@ static bool _is_greenlit( const char *env_line, const char *mpc_line,
          {
          tptr += 3;
          if( *tptr == '*' && !is_heliocentric)
-            return( false);   /* geocentric objects aren't greenlit for this code */
-         if( *tptr <= ' ')      /* anything from this obscode is greenlit */
+            return( true);   /* only geocentric objects are redacted for this code */
+         if( *tptr <= ' ')      /* anything from this obscode is redacted */
             return( true);
          assert( *tptr == ':' || *tptr == '*');
          tptr++;
@@ -4994,31 +4996,31 @@ static bool _is_greenlit( const char *env_line, const char *mpc_line,
 static bool line_must_be_redacted( const char *mpc_line,
                                                 const bool is_heliocentric)
 {
-   if( is_neocp_line( mpc_line) && neocp_redaction_turned_on)
+   if( neocp_redaction_turned_on)
       {
       size_t i;
 
+      if( mpc_line[72] == '!')      /* line is marked as 'private communication' */
+         return( true);
       for( i = 0; i < 10; i++)
          {
          char env_buff[10];
          const char *env_ptr;
 
-         strlcpy_error( env_buff, "GREENLIT");
+         strlcpy_error( env_buff, "REDACTED");
          if( i)
             {
             env_buff[8] = (char)( '1' + i);
             env_buff[9] = '\0';
             }
          env_ptr = get_environment_ptr( env_buff);
-         if( _is_greenlit( env_ptr,  mpc_line, is_heliocentric))
-            return( false);
+         if( _is_redacted( env_ptr,  mpc_line, is_heliocentric))
+            return( true);
          if( !*env_ptr)
             break;
          }
-      return( true);
       }
-   else
-      return( false);
+   return( false);
 }
 
 int text_search_and_replace( char FAR *str, const char *oldstr,
