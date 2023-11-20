@@ -2080,7 +2080,7 @@ static int get_ephem_times_from_file( const char *filename)
          if( jd > 1.)
             {
             if( time_system)   /* Input times are in TD;  cvt to UTC */
-               jd = utc_from_td( jd, NULL) / seconds_per_day;
+               jd = utc_from_td( jd, NULL);
             list_of_ephem_times[n_times++] = jd;
             }
          else if( !memcmp( buff, "OPTION ", 7))
