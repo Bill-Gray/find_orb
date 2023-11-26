@@ -1484,8 +1484,8 @@ static inline int compute_topocentric_offset( const double ut,
    spin_matrix( precess_matrix, precess_matrix + 3, lon);
    for( i = 0; i < 3; i++)
       {
-      const double omega = 2. * PI * 360.9856235 / 360.;
-                   /* earth's rotation rate,  in radians/day */
+      const double omega = planet_rotation_rate( planet_no, 0) * PI / 180.;
+                   /* planet rotation rate,  in radians/day */
 
       if( offset)
          offset[i] = (rho_cos_phi * precess_matrix[i]
