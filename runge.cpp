@@ -586,15 +586,8 @@ of the planet's pole doesn't change much over that time scale,
 and we don't want to do a lot of expensive recomputes of planet orientation
 that won't have any noticeable effect.  (It's particularly expensive for
 the earth,  where we do a full-meal-deal precession and nutation matrix.)
-
-   For the earth,  we then rotate the planet to the time jd.  This will be
-needed for handling non-zonal (tesseral) harmonics.  For the other planets,
-we are (at least thus far) just dealing with the zonal terms J2, J3, J4,
-which are spherically symmetrical around the planet's poles;  we just need
-the polar orientation and can ignore rotation.  Though this may not be
-true forever... at some point,  I may want to add tesseral harmonics for,
-say,  the Moon or Mars.  If that happens,  this code will need revising,
-perhaps with a table of omega values. */
+We then rotate the planet from the cached time to the input time jde (again,
+less than half a day).        */
 
 void calc_approx_planet_orientation( const int planet,
          const int system_number, const double jde, double *matrix)
@@ -604,6 +597,7 @@ void calc_approx_planet_orientation( const int planet,
    static int cached_planet = -1;
    const double range = 1.;
    const double new_jde = floor( jde / range + .5) * range;
+   const double omega = planet_rotation_rate( planet, system_number);
 
    if( cached_planet != planet || new_jde != cached_jde)
       {
@@ -614,13 +608,7 @@ void calc_approx_planet_orientation( const int planet,
       cached_jde = new_jde;
       }
    memcpy( matrix, cached_matrix, 9 * sizeof( double));
-   if( planet == 3)        /* rotate matrix */
-      {
-      const double omega = 360.9856235 * PI / 180.;
-      const double theta = omega * (jde - cached_jde);
-
-      spin_matrix( matrix, matrix + 3, theta);
-      }
+   spin_matrix( matrix, matrix + 3, omega * (jde - cached_jde));
 }
 
 /* The idea of the following is as follows.  If our distance from the sun
