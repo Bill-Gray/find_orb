@@ -100,6 +100,8 @@ int get_object_name( char *obuff, const char *packed_desig);   /* mpc_obs.c */
 int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid);
 int setup_planet_elem( ELEMENTS *elem, const int planet_idx,
                                           const double t_cen);   /* moid4.c */
+void calc_approx_planet_orientation( const int planet,        /* runge.cpp */
+         const int system_number, const double jde, double *matrix);
 char *mpc_station_name( char *station_data);       /* mpc_obs.cpp */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 int remove_rgb_code( char *buff);                              /* ephem0.cpp */
@@ -336,6 +338,22 @@ static void format_velocity_in_buff( char *buff, double vel)
          format =  " !!!!!!";
       }
    snprintf( buff, 8, format, vel);
+}
+
+static void ra_dec_to_alt_az_2( const int planet, const DPT *ra_dec, DPT *alt_az,
+                              const DPT *latlon, const double jd_utc, double *hour_angle)
+{
+   double matrix[9], vect[3], vect_out[3];
+
+   polar3_to_cartesian( vect, -ra_dec->x, ra_dec->y);
+   calc_planet_orientation( planet, 0, jd_utc, matrix);
+   spin_matrix( matrix, matrix + 3, latlon->x);
+   if( hour_angle)
+      *hour_angle = atan2( -dot_product( vect, matrix + 3), dot_product( vect, matrix));
+   spin_matrix( matrix, matrix + 6, PI / 2. - latlon->y);
+   precess_vector( matrix, vect, vect_out);
+   alt_az->x = atan2( vect_out[1], vect_out[0]);
+   alt_az->y = asine( vect_out[2]);
 }
 
 /* Rob Matson asked about having the program produce ECF (Earth-Centered
@@ -2899,10 +2917,10 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                      }
                   temp_latlon.x = cinfo->lon;
                   temp_latlon.y = cinfo->lat;
-                  full_ra_dec_to_alt_az( &obj_ra_dec, &alt_az[j], NULL,
-                                 &temp_latlon, utc, &hour_angle[j]);
-                  full_ra_dec_to_alt_az( &obj_ra_dec, &best_alt_az[j], NULL,
-                                 &best_latlon, utc, NULL);
+                  ra_dec_to_alt_az_2( cinfo->planet, &obj_ra_dec, &alt_az[j], &temp_latlon,
+                                utc, &hour_angle[j]);
+                  ra_dec_to_alt_az_2( cinfo->planet, &obj_ra_dec, &best_alt_az[j], &best_latlon,
+                                utc, NULL);
                   alt_az[j].x = centralize_ang( alt_az[j].x + PI);
                   best_alt_az[j].x = centralize_ang( best_alt_az[j].x + PI);
                   }
