@@ -264,18 +264,19 @@ Daw !   0.0000       0.00000   +0.00000    @10 Dawn spacecraft
    Updated 2020 Mar 12 using data from the Mars24 clock program,
    https://www.giss.nasa.gov/tools/mars24/ .  Note that it gives remarks
    about significant disagreements in positions between sources.  East
-   longitudes are positive,  as on Earth.
-Spi ! 175.47848      -14.571892        0   @4  Spirit
-Opp ! 354.47417      -01.9483          0   @4  Opportunity
-MSL ! 137.441635     -04.589465        0   @4  MSL (Curiosity)
-InS ! 135.623447     +04.502384        0   @4  Mars InSight
-Pho ! 234.24845      +68.21878         0   @4  Phoenix lander, Mars
-Pat ! 326.74576      +19.09985         0   @4  Mars Pathfinder
-Vk1 ! 312.04863      +22.2715          0   @4  Viking 1
-Vk2 ! 134.2803       +47.6698          0   @4  Viking 2
+   longitudes are positive,  as on Earth.  Positions given with altitudes
+   are from JPL _Horizons_ (entered 2023 Nov 26).
+Spi !-184.5271       -14.5691999   -2647.5 @4  Spirit
+Opp ! 354.6427098    -02.2554835   -2104.2 @4  Opportunity
+MSL !-222.5583       -04.5894999   -4501.  @4  MSL (Curiosity)
+InS !-224.3765531    +04.5023842   -2613.4 @4  Mars InSight
+Pho !-125.752        +68.219       -4100.  @4  Phoenix lander, Mars
+Pat !-033.2542969    +19.3115308   -4190.7 @4  Mars Pathfinder
+Vk1 !-047.95137      +22.5093139   -3941.7 @4  Viking 1
+Vk2 !-225.719635     +48.0061408   -3365.8 @4  Viking 2
 Be2 !  90.43         +11.53            0   @4  Beagle 2
 ExM ! 353.79         -02.07            0   @4  ExoMars Schiaparelli
-Per !  77.45088572   +18.44462715      0   @4  Perseverance, Mars
+Per !-282.5491       +18.4446      -2567.  @4  Perseverance, Mars
 ExM ! 335.45         +18.20            0   @4  ExoMars 2022
 MPL ! 195.3          -76.1             0   @4  Mars Polar Lander
 Ma6 !  19.42         -23.9             0   @4  Mars 6 site
@@ -287,6 +288,10 @@ Zhu ! 109.925        +25.066       -4099.4 @4  Zhurong landing site
    In some cases,  viewpoints from the Moon may be useful.
 Ch4 ! 177.589        -45.457           0   @10 Chang'e 4 lander
 Ch3 ! -19.5116       +44.1214          0   @10 Chang'e 3 lander
+11a !  23.47307      +00.67344989  -1927.6 @10 Apollo 11 LRRR
+LHD !  62.2129       +12.7142001   -3670.0 @10 Luna-24 landing site
+Su7 ! 348.4873       -40.9811999      81.0 @10 Surveyor 7 landing site
+Cd3 !  32.319        -69.3729998     492.0 @10 Chandrayaan-3 Vikram site
 
 LNA ! -45.896527     -22.01097      1000       LNA (Laboratorio Nacional de Astrofisica)
 
