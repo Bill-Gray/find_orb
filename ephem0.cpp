@@ -4968,7 +4968,11 @@ int write_residuals_to_file( const char *filename, const char *ast_filename,
             OBSERVE FAR *obs = ((OBSERVE FAR *)obs_data) + num;
 
             if( num < n_obs)
+               {
                format_observation( obs, buff, resid_format);
+               if( obs->reference[0] == '!' && obs->reference[1] == '!')
+                  memcpy( buff, "------ --- ----- -----", 22);
+               }
             else
                *buff = '\0';
             fprintf( ofile, "%s%s", buff, (i % 3 == 2) ? "\n" : "   ");
@@ -5405,19 +5409,26 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
 //          else
                {
                char mpc_code[8];
+               const bool omitted = (buff[72] == '!' && buff[73] == '!');
                const bool redacted = line_must_be_redacted( buff,
                                              orbit_is_heliocentric);
 
-               strlcpy_error( mpc_code, buff + 77);
+               if( omitted)
+                  strcpy( mpc_code, "   ");
+               else
+                  strlcpy_error( mpc_code, buff + 77);
                buff[77] = '\0';
                if( buff[14] != 's' && buff[14] != 'v' && buff[14] != 'r')
                   total_lines++;
-               fprintf( ofile, "<a name=\"o%s%03d\"></a><a href=\"#r%s%03d\">%.12s</a>",
+               if( omitted)
+                  fprintf( ofile, "            ");
+               else
+                  fprintf( ofile, "<a name=\"o%s%03d\"></a><a href=\"#r%s%03d\">%.12s</a>",
                         mpec_buff, total_lines, mpec_buff, total_lines, buff);
                if( redacted)
                   {
                   int i;
-                  const size_t start_of_redacted_text = 25;
+                  const size_t start_of_redacted_text = (omitted ? 12 : 25);
                   const size_t length_of_redacted_text = 77 - start_of_redacted_text;
                   char *tptr = buff + start_of_redacted_text;
 
