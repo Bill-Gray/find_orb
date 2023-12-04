@@ -73,6 +73,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name);
 int earth_lunar_posn( const double jd, double FAR *earth_loc,
                                        double FAR *lunar_loc);
 bool nighttime_only( const char *mpc_code);                 /* mpc_obs.cpp */
+double get_planet_mass( const int planet_idx);                /* orb_func.c */
 void remove_trailing_cr_lf( char *buff);      /* ephem0.cpp */
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 void set_environment_ptr( const char *env_ptr, const char *new_value);
@@ -1712,6 +1713,66 @@ static double find_closest_approach( const double *input_orbit, double jde,
       *dist = sqrt( r2);
       }
    return( jde);
+}
+
+double get_approach_info( const double *orbit, double epoch,
+                            const int planet_no, double *dist)
+{
+   double step = 0., torbit[MAX_N_PARAMS];
+   double t_neg = 0., t_pos = 0.;
+   const double tolerance = 1e-5;
+   size_t n_iterations = 0;
+   const size_t max_iter = 30;
+
+   memcpy( torbit, orbit, n_orbit_params * sizeof( double));
+   do
+      {
+      double planet_state[6], rel_state[6], r2, v_dot_r, new_epoch;
+      size_t i;
+
+      compute_observer_loc( epoch, planet_no, 0., 0., 0., planet_state);
+      compute_observer_vel( epoch, planet_no, 0., 0., 0., planet_state + 3);
+      for( i = 0; i < 6; i++)
+         rel_state[i] = torbit[i] - planet_state[i];
+//    step2 = step;
+      r2 = dot_product( rel_state, rel_state);
+      v_dot_r = dot_product( rel_state, rel_state + 3);
+      if( v_dot_r < 0.)
+         t_neg = epoch;
+      else
+         t_pos = epoch;
+      if( r2 > 0.005 * 0.005)
+         step = -dot_product( rel_state, rel_state + 3)
+                / dot_product( rel_state + 3, rel_state + 3);
+      else
+         {
+         ELEMENTS elem;
+
+         elem.gm = get_planet_mass( planet_no);
+         elem.central_obj = planet_no;
+         calc_classical_elements( &elem, rel_state, epoch, 1);
+         step = elem.perih_time - epoch;
+         }
+      if( dist)
+         *dist = sqrt( r2);
+//    if( n_iterations % 3 == 2)      /* use Aitken delta-squared iteration */
+//        elem.perih_time = epoch - step2 - step2 * step2 / (step - step2);
+      new_epoch = epoch + step;
+      if( t_neg && t_pos)
+         if( (new_epoch - t_neg) * (new_epoch - t_pos) > 0. || n_iterations % 7 == 0)
+            {
+            debug_printf( "Outside brackets\n");
+            new_epoch = (t_neg + t_pos) / 2.;
+            }
+      integrate_orbit( torbit, epoch, new_epoch);
+      debug_printf( " %d : Integrated %f to %f -> step %f\n", (int)n_iterations, epoch,
+                                     new_epoch, step);
+      epoch = new_epoch;
+      n_iterations++;
+      assert( n_iterations < max_iter);
+      }
+      while( fabs( step) > tolerance);
+   return( epoch);
 }
 
 static void add_lon_lat_to_ephem( char *buff, const size_t buflen,
