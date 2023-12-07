@@ -194,10 +194,7 @@
 
 2009    %u observations were duplicates.  They have been removed.
 
-2010    %u satellite observations had incorrect offset data.  The file
-2010    'debug.txt' may have further information.  These observations
-2010    have been excluded.  See https://www.projectpluto.com/sc_obs.htm
-2010    for more information.
+2010    See https://www.projectpluto.com/sc_obs.htm FMI.
 
 2011    %u observations were incorrectly formatted.  These observations
 2011    will be ignored.
@@ -400,3 +397,12 @@
 2080    No MPC astrometry found for object '%s'.  This may be
 2080    an unused or incorrectly formatted designation,  or MPC
 2080    may simply not have data for it.
+
+2090    %d satellite offsets had no errors\n
+2091    %d satellite offsets had incorrect signs\n
+2092    %d had no number(s) or garbled number(s)\n
+2093    %d satellite offsets had no decimal point\n
+2094    %d satellite offsets had a misplaced decimal point\n
+2095    %d satellite offsets had undeciphered offsets\n
+2096    %d satellite offsets were at the geocenter\n
+2097    %d satellite offsets were inside the earth\n

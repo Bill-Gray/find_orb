@@ -922,6 +922,8 @@ static int get_observer_data_latlon( const char FAR *mpc_code,
 #define SATELL_COORD_ERR_EXACTLY_ZERO       -6
 #define SATELL_COORD_ERR_INSIDE_EARTH       -7
 
+#define N_SATELL_COORD_ERRORS                8
+
 static bool strict_sat_xyz_format = true;
 
 inline double get_satellite_coordinate( const char *iptr, int *decimal_loc)
@@ -3544,7 +3546,9 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
    int spacecraft_offset_reference = 399;    /* default is geocenter */
    double spacecraft_vel[3];
    static int suppress_private_obs = -1;
+   int count_satellite_coord_errors[N_SATELL_COORD_ERRORS];
 
+   memset( count_satellite_coord_errors, 0, sizeof( count_satellite_coord_errors));
    move_add_nstr( 1, 2, "Loading observations", -1);
    refresh_console( );
    *desig_from_neocp = '\0';
@@ -3645,6 +3649,8 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
 
                rval[i].satellite_obs = (char)(second_line[32] - '0');
                error_code = get_satellite_offset( second_line, vect);
+               assert( error_code <= 0 && error_code > -N_SATELL_COORD_ERRORS);
+               count_satellite_coord_errors[-error_code]++;
                if( error_code)
                   {
                   char tbuff[6];
@@ -4036,9 +4042,12 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
       }
    if( n_bad_satellite_offsets)
       {
-      debug_printf( "%u bad sat offsets\n", n_bad_satellite_offsets);
-      snprintf_err( buff, sizeof( buff), get_find_orb_text( 2010),
-                     n_bad_satellite_offsets);
+      *buff = '\0';
+      for( i = 0; i < N_SATELL_COORD_ERRORS; i++)
+         if( count_satellite_coord_errors[i])
+            snprintf_append( buff, sizeof( buff), get_find_orb_text( i + 2090),
+                                   count_satellite_coord_errors[i]);
+      strlcat_error( buff, get_find_orb_text( 2010));
       generic_message_box( buff, "o");
       }
 
