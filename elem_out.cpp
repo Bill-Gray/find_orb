@@ -3702,6 +3702,19 @@ double calc_absolute_magnitude( OBSERVE FAR *obs, const int n_obs)
       for( obs_no = 0; obs_no < n_obs; obs_no++)
          temp_obs[obs_no].is_included = 1;
       rval = _calc_absolute_magnitude_internal( temp_obs, n_obs);
+      if( !rval && object_type == OBJECT_TYPE_COMET)
+         {
+         obs_no = 0;
+         while( obs_no < n_obs && obs[obs_no].mag_band != 'T'
+                           && obs[obs_no].mag_band != 'N')
+            obs_no++;
+         if( obs_no == n_obs)    /* ah,  no obs have a 'comet' mag */
+            {
+            for( obs_no = 0; obs_no < n_obs; obs_no++)
+               temp_obs[obs_no].mag_band = default_comet_magnitude_type;
+            rval = calc_absolute_magnitude( temp_obs, n_obs);
+            }
+         }
       if( !rval && default_v_mag)   /* see 'environ.def' for an explanation of this */
          {
          for( obs_no = 0; obs_no < n_obs; obs_no++)
