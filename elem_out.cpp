@@ -2806,6 +2806,7 @@ static int get_orbit_from_mpcorb_sof( const char *filename,
    if( ifile)
       {
       char buff[300], header[300], tname[15];
+      int n_extra_params = 0;
 
       if( !fgets_trimmed( header, sizeof( header), ifile))
          {
@@ -2823,21 +2824,32 @@ static int get_orbit_from_mpcorb_sof( const char *filename,
       else
          snprintf( tname, sizeof( tname), "%-12.12s", object_name);
       while( !got_vectors && fgets_trimmed( buff, sizeof( buff), ifile))
-         if( !memcmp( tname, buff, 12))
+         if( !memcmp( tname, buff, 12) && !_get_extra_orbit_info(
+                       tname, &perturbers, &n_extra_params,
+                       orbit + 6, NULL))
             {
             double extra_info[10];
+            extern int n_orbit_params, force_model;
 
             extract_sof_data_ex( elems, buff, header, extra_info);
             if( elems->epoch < 2400000.)
                printf( "JD %f\n", elems->epoch);
             assert( elems->epoch > 2400000.);
+            perturbers = 0x7fe;    /* Merc-Pluto plus moon */
+            n_orbit_params = n_extra_params + 6;
+            compute_two_body_state_vect( elems, orbit, elems->epoch);
+            push_orbit( elems->epoch, orbit);
             if( extra_info[1] - extra_info[0] > full_arc_len / 2.)
                {
-               compute_two_body_state_vect( elems, orbit, elems->epoch);
                got_vectors = 1;
                if( elems->ecc == 1.)     /* indicate parabolic-constraint orbit */
                   got_vectors = 2;
                *max_resid = extra_info[3];
+               }
+            else
+               {
+               force_model = 0;
+               n_orbit_params = 6;
                }
             }
       fclose( ifile);
@@ -3189,27 +3201,17 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
                              object_name, orbit, &elems, full_arc_len, &rms_resid);
       if( got_vectors)
          {
-         int n_extra_params = 0;
-
          move_add_nstr( 2, 2, "Stored soln loaded", -1);
          refresh_console( );
          *orbit_epoch = elems.epoch;
          if( got_vectors == 1)
             perturbers = 0x7fe;    /* Merc-Pluto plus moon */
-         if( _get_extra_orbit_info( obs->packed_id, &perturbers, &n_extra_params,
-                     orbit + 6, NULL))
-            got_vectors = 0;
-         else
+         if( n_obs > 1)
             {
-            n_orbit_params = n_extra_params + 6;
-            if( n_obs > 1)
-               {
-               set_locs( orbit, *orbit_epoch, obs, n_obs);
-/*             filter_obs( obs, n_obs, rms_resid * 3., 1);     */
-               do_full_improvement = true;
-               }
-            abs_mag = elems.abs_mag;
+            set_locs( orbit, *orbit_epoch, obs, n_obs);
+            do_full_improvement = true;
             }
+         abs_mag = elems.abs_mag;
          }
       }
    if( !got_vectors)
