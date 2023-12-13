@@ -77,6 +77,7 @@ int get_satellite_offset( const char *iline, double *xyz);  /* mpc_obs.cpp */
 int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid);
 bool nighttime_only( const char *mpc_code);                 /* mpc_obs.cpp */
 char *find_numbered_mp_info( const int number);             /* mpc_obs.cpp */
+bool is_sungrazing_comet( const OBSERVE *obs, const int n_obs);  /* orb_func.c */
 static int xref_designation( char *desig);
 int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
 #ifdef __GNUC__
@@ -3453,6 +3454,8 @@ static void reset_object_type( const OBSERVE *obs, const int n_obs)
             n_asteroid++;
          }
    if( n_total + n_nuclear > n_asteroid)
+      object_type = OBJECT_TYPE_COMET;
+   else if( is_sungrazing_comet( obs, n_obs))
       object_type = OBJECT_TYPE_COMET;
    else if( n_asteroid)
       object_type = OBJECT_TYPE_ASTEROID;
