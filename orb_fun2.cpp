@@ -236,7 +236,10 @@ static STORED_ORBIT
    double epoch;
    double orbit[MAX_N_PARAMS];
    int n_orbit_params, force_model;
+   unsigned perturbers;
    } *stored = NULL;
+
+extern unsigned perturbers;
 
 void push_orbit( const double epoch, const double *orbit)
 {
@@ -250,6 +253,7 @@ void push_orbit( const double epoch, const double *orbit)
       memcpy( head->orbit, orbit, n_orbit_params * sizeof( double));
       head->n_orbit_params = n_orbit_params;
       head->force_model = force_model;
+      head->perturbers = perturbers;
       stored = head;
       }
 }
@@ -267,6 +271,7 @@ int pop_orbit( double *epoch, double *orbit)
          *epoch = stored->epoch;
          n_orbit_params = stored->n_orbit_params;
          force_model = stored->force_model;
+         perturbers = stored->perturbers;
          memcpy( orbit, stored->orbit, n_orbit_params * sizeof( double));
          available_sigmas = NO_SIGMAS_AVAILABLE;
          }
