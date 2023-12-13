@@ -139,3 +139,4 @@ F2             Toggle observations below the currently selected one
 Ctrl-X         Save orbits for re-use
 Ctrl-Y         Write excluded observations to be 'banned'
 Ctrl-G         Set magnitude slope parameter (G)
+U+31008        Left-click to select tracklet, right to toggle it

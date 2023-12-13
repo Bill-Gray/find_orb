@@ -118,6 +118,7 @@ extern unsigned perturbers;
 #define KEY_REMOVE_MENU_LINE          31005
 #define KEY_CYCLE_RESID_DISPLAY_UP    31006
 #define KEY_CYCLE_RESID_DISPLAY_DN    31007
+#define KEY_OBSCODE_CLICKED           31008
 
 /* You can cycle between showing only the station data for the currently
 selected observation;  or the "normal" having,  at most,  a third of
@@ -2352,8 +2353,11 @@ static void show_observations( const OBSERVE *obs, const int first_obs_idx,
    int i;
 
    for( i = first_obs_idx; i < first_obs_idx + n_obs_shown; i++)
+      {
       show_one_observation( obs[i], line_no++, residual_format,
             i == n_obs - 1);
+      add_cmd_area( KEY_OBSCODE_CLICKED, line_no, 65, 3);
+      }
 }
 
 static void show_final_line( const int n_obs,
@@ -4693,6 +4697,11 @@ int main( int argc, const char **argv)
       if( c == KEY_MOUSE && !(button & REPORT_MOUSE_POSITION))
          {
          c = find_command_area( mouse_x, mouse_y, NULL);
+         if( c == KEY_OBSCODE_CLICKED)
+            {
+            curr_obs = top_obs_shown + (mouse_y - top_line_residuals);
+            c = ( button & (BUTTON1_RELEASED | BUTTON1_CLICKED) ? 'T' : 'X');
+            }
          if( c == ALT_X && mouse_wheel_motion)
             c = (mouse_wheel_motion < 0 ? KEY_F( 4) : KEY_F( 5));
          if( c == 't' && mouse_wheel_motion)
