@@ -129,6 +129,7 @@ double evaluate_initial_orbit( const OBSERVE FAR *obs,      /* orb_func.c */
 static int find_transfer_orbit( double *orbit, OBSERVE FAR *obs1,
                 OBSERVE FAR *obs2,
                 const int already_have_approximate_orbit);
+bool is_sungrazing_comet( const OBSERVE *obs, const int n_obs);  /* orb_func.c */
 double observation_rms( const OBSERVE FAR *obs);            /* elem_out.cpp */
 double compute_weighted_rms( const OBSERVE FAR *obs, const int n_obs,
                            int *n_resids);                  /* orb_func.cpp */
@@ -3775,10 +3776,15 @@ static void exclude_unusable_observations( OBSERVE *obs, int n_obs)
       }
 }
 
-static inline bool is_solar_observatory( const char *mpc_code)
+bool is_sungrazing_comet( const OBSERVE *obs, const int n_obs)
 {
-   return( !strcmp( mpc_code, "249") || !strcmp( mpc_code, "C49")
-                                     || !strcmp( mpc_code, "C50"));
+   int i = 0;
+
+   while( i < n_obs && ( !strcmp( obs[i].mpc_code, "249")
+                      || !strcmp( obs[i].mpc_code, "C49")
+                      || !strcmp( obs[i].mpc_code, "C50")))
+      i++;
+   return( i == n_obs);    /* all obs are from SOHO or STEREOs */
 }
 
 static double find_sungrazer_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
@@ -3993,9 +3999,7 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
    full_improvement( NULL, 0, NULL, 0., NULL, 0, 0.);
    for( i = 0; i < n_obs; i++)      /* solely to ensure a non-zero r */
       obs[i].r = 1.;
-   for( i = 0; i < n_obs && is_solar_observatory( obs[i].mpc_code); i++)
-      ;
-   if( i == n_obs)      /* all obs are from SOHO or STEREOs */
+   if( is_sungrazing_comet( obs, n_obs))
       return( find_sungrazer_orbit( obs, n_obs, orbit));
 
    perturbers = AUTOMATIC_PERTURBERS | always_included_perturbers;
