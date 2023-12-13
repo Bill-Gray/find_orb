@@ -1553,6 +1553,25 @@ static void _store_extra_orbit_info( const char *packed_id,
    fclose( ofile);
 }
 
+/* Packed designations may be (frequently are) misaligned.  This will
+compare them 'accurately' even if the alignments are different,  ignoring
+the different numbers of leading spaces. */
+
+static int _compare_misaligned_packed_desigs( const char *desig1,
+                  const char *desig2)
+{
+   while( *desig1 == ' ')
+      desig1++;
+   while( *desig2 == ' ')
+      desig2++;
+   while( *desig1 && *desig1 != ' ' && *desig1 == *desig2)
+      {
+      desig1++;
+      desig2++;
+      }
+   return( (int)*desig1 - (int)*desig2);
+}
+
 static int _get_extra_orbit_info( const char *packed_id,
                 unsigned *perturbers, int *n_extra_params,
                 double *solar_pressure, char *constraints)
@@ -1564,7 +1583,7 @@ static int _get_extra_orbit_info( const char *packed_id,
 
    assert( strlen( packed_id) == 12);
    for( i = 0; i < (int)n_lines; i++)
-      if( !memcmp( lines[i], packed_id, 12))
+      if( !_compare_misaligned_packed_desigs( lines[i], packed_id))
          {
          const char *tptr;
 
