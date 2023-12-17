@@ -2354,9 +2354,9 @@ static void show_observations( const OBSERVE *obs, const int first_obs_idx,
 
    for( i = first_obs_idx; i < first_obs_idx + n_obs_shown; i++)
       {
+      add_cmd_area( KEY_OBSCODE_CLICKED, line_no, 65, 3);
       show_one_observation( obs[i], line_no++, residual_format,
             i == n_obs - 1);
-      add_cmd_area( KEY_OBSCODE_CLICKED, line_no, 65, 3);
       }
 }
 
