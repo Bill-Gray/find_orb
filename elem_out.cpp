@@ -1184,6 +1184,8 @@ static int elements_in_guide_format( char *buff, const ELEMENTS *elem,
    long year;
    const size_t guide_line_len = 170;
 
+   if( elem->q > 1e+10 || elem->ecc > 1e+8)
+      return( -1);            /* can't format it;  bogus elems */
    day = decimal_day_to_dmy( elem->perih_time, &year, &month,
                                               CALENDAR_JULIAN_GREGORIAN);
             /*      name day  mon yr MA      q      e */
@@ -2634,12 +2636,12 @@ int write_out_elements_to_file( const double *orbit,
       snprintf_append( virtual_full_desig, sizeof( virtual_full_desig), " [%d]",
                                   monte_carlo_object_count);
       if( elem.central_obj || elem.ecc > .999999)
-         {
-         ofile = fopen_ext( get_file_name( tbuff, "virtual.txt"), monte_carlo_permits);
-         elements_in_guide_format( tbuff, &elem, virtual_full_desig, obs, n_obs);
-         fprintf( ofile, "%s%s\n", tbuff, impact_buff);
-         fclose( ofile);
-         }
+         if( !elements_in_guide_format( tbuff, &elem, virtual_full_desig, obs, n_obs))
+            {
+            ofile = fopen_ext( get_file_name( tbuff, "virtual.txt"), monte_carlo_permits);
+            fprintf( ofile, "%s%s\n", tbuff, impact_buff);
+            fclose( ofile);
+            }
 
 
       if( helio_elem.ecc < .999999)
@@ -2669,9 +2671,9 @@ int write_out_elements_to_file( const double *orbit,
 //       set_statistical_ranging( 1);
       }
 
-   if( (ofile = fopen_ext( get_file_name( tbuff, "guide.txt"), "tfcwb")) != NULL)
+   if( !elements_in_guide_format( tbuff, &elem, object_name, obs, n_obs)
+         && (ofile = fopen_ext( get_file_name( tbuff, "guide.txt"), "tfcwb")) != NULL)
       {
-      elements_in_guide_format( tbuff, &elem, object_name, obs, n_obs);
       fprintf( ofile, "%s%s\n", tbuff, impact_buff);
       fclose( ofile);
       }
