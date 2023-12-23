@@ -56,6 +56,12 @@
 # these TLEs.  (Sat_ID and all programs by me,  Bill Gray,  will use these
 # TLEs correctly.  But I may be the only one doing that.)
 #
+#    If you're stuck with software that can't handle these TLEs,  please
+# let me know.  I can probably provide "traditional" SDP4-fitted TLEs for
+# the object in question.  They will be less precise,  but possibly good
+# enough for your use case (and,  as with all the TLEs I produce,  the error
+# will be a known quantity).
+#
 ;        (End SGP4-only section)
 #    Also,  if you use a TLE outside the "correct" time range (between
 # its MJD and that of the next TLE),  all bets are off.  I've carefully
