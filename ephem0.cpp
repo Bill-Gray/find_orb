@@ -3980,9 +3980,9 @@ static void put_residual_into_text( char *text, const double resid,
       strlcpy_err( text, " Err!", 6);
    else if( zval > 59940.0)             /* >999': show integer degrees */
       snprintf_err( text, 6, "%4.0fd", zval / 3600.);
-   else if( zval > 9999.9)              /* 999' > x > 9999": show ###' arcmin */
+   else if( zval > 9999.)              /* 999' > x > 9999": show ###' arcmin */
       snprintf_err( text, 6, "%4.0f'", zval / 60.);
-   else if( zval > 99.9)
+   else if( zval > 99.)
       snprintf_err( text, 6, "%5.0f", zval);
    else if( zval > .99 && zval < 9.99 && precise)
       snprintf_err( text, 6, "%5.2f", zval);
