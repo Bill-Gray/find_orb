@@ -104,6 +104,12 @@ void shellsort_r( void *base, const size_t n_elements, const size_t elem_size,
          int (*compare)(const void *, const void *, void *), void *context);
 void shellsort( void *base, const size_t n_elements, const size_t elem_size,
          int (*compare)(const void *, const void *));    /* shellsor.cpp */
+void *bsearch_ext_r( const void *key, const void *base0, size_t nmemb,
+      const size_t size, int (*compar)(const void *, const void *, void *),
+      void *arg, bool *found);                           /* shellsor.cpp */
+void *bsearch_ext( const void *key, const void *base0,
+      size_t nmemb, const size_t size,                   /* shellsor.cpp */
+      int (*compar)(const void *, const void *), bool *found);
 
 void shellsort_r( void *base, const size_t n_elements, const size_t elem_size,
          int (*compare)(const void *, const void *, void *), void *context)
@@ -170,3 +176,69 @@ void shellsort( void *base, const size_t n_elements, const size_t elem_size,
                (int (*)(const void *, const void *, void *))compare, NULL);
 }
 #endif
+
+/* bsearch() doesn't take a 'context' pointer,  and therefore can't use
+the above sort of re-entrant comparison function.  'bsearch_r()' is
+available on some more modern GCCs.  Code for bsearch_r() is at
+
+https://gnu.googlesource.com/gcc/+/refs/heads/master/libiberty/bsearch_r.c
+
+   The following is based loosely on that code,  and 'extended' (hence the
+_ext in the name) in two ways :
+
+   -- It returns the first matching record.  (The original would return
+_a_ matching record,  not necessarily the first.)
+
+   -- If the additional parameter 'found' is non-NULL,  then the return
+value indicates the location of the first record matching the key if such
+a record exists, and *found is set to true.  If no matching record is
+found,  then the return value indicates the slot where the record would
+be inserted, and *found is set to false.  This allows one to find
+"nearby" records and/or to know there a new key would be inserted.
+
+   If 'found' is NULL,  the return value points to the first matching
+record,  or NULL if no match is found.       */
+
+void *bsearch_ext_r( const void *key, const void *base0, size_t nmemb,
+      const size_t size, int (*compar)(const void *, const void *, void *),
+      void *arg, bool *found)
+{
+   const char *base = (const char *) base0;
+   bool found_it = false;
+
+   while( nmemb)
+      {
+      const void *p = base + (nmemb >> 1) * size;
+      const int cmp = (*compar)(key, p, arg);
+
+      if( !cmp)
+         found_it = true;
+      if (cmp > 0)  /* key > p: move right */
+         {
+         base = (const char *)p + size;
+         nmemb--;
+         } /* else move left */
+      nmemb >>= 1;
+      }
+   if( !found && !found_it)
+      base = NULL;
+   else if( found)
+      *found = found_it;
+   return( (void *)base);
+}
+
+/* See comments above on shellsort() : because the context pointer is
+the last argument,  we can omit it safely and use just the above
+function both for contextual and non-contextual comparison functions.
+Note that an ugly and nominally dangerous cast is required.   */
+
+void *bsearch_ext( const void *key, const void *base0,
+      size_t nmemb, const size_t size,
+      int (*compar)(const void *, const void *), bool *found)
+{
+   void *p = (void *)compar;
+
+   return( bsearch_ext_r( key, base0, nmemb, size,
+               (int (*)( const void *, const void *, void *))p,
+               NULL, found));
+}
