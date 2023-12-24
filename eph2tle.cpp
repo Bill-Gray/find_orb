@@ -272,10 +272,10 @@ static char *fgets_trimmed( char *buff, const size_t buffsize, FILE *ifile)
 
    if( rval)
       {
-      size_t i = 0;
+      size_t i = strlen( rval);
 
-      while( rval[i] != 10 && rval[i] != 13 && rval[i])
-         i++;
+      while( i && rval[i - 1] <= ' ')
+         i--;
       rval[i] = '\0';
       }
    return( rval);
@@ -731,7 +731,7 @@ int main( const int argc, const char **argv)
          if( !memcmp( buff, "Created ", 8))
             writing_data = true;
          if( writing_data && *buff != '#')
-            fprintf( ofile, "# %s\n", buff);
+            fprintf( ofile, (*buff ? "# %s\n" : "#%s\n"), buff);
          if( !memcmp( buff, "Orbital elements: ", 18) && !*obj_name)
             strcpy( obj_name, buff + 19);
          if( !memcmp( buff, "Ephemeris", 9))
