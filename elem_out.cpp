@@ -161,6 +161,9 @@ double generate_mc_variant_from_covariance( double *var_orbit,
 void rotate_state_vector_to_current_frame( double *state_vect,
                   const double epoch_shown, const int planet_orbiting,
                   char *body_frame_note);               /* elem_out.cpp */
+void *bsearch_ext_r( const void *key, const void *base0, size_t nmemb,
+      const size_t size, int (*compar)(const void *, const void *, void *),
+      void *arg, bool *found);                           /* shellsor.cpp */
 
 int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
 #ifdef __GNUC__
@@ -2745,24 +2748,16 @@ void set_solutions_found( OBJECT_INFO *ids, const int n_ids)
                            string_compare_for_sort, &sort_column);
    for( i = 0; i < (size_t)n_ids; i++)
       {
-      size_t loc = 0, loc1, step;
-      char tname[15];
+      char tname[15], *tptr = tname;
 
       assert( strlen( ids[i].packed_desig) == 12);
       strcpy( tname, ids[i].packed_desig);
       text_search_and_replace( tname, " ", "");
       if( strlen( tname) == 12)    /* combined perm & provisional ID */
          tname[5] = '\0';
-      for( step = 0x80000000; step; step >>= 1)
-         if( (loc1 = loc + step) < n_lines)
-            {
-            const int compare = strcmp( ilines[loc1], tname);
-
-            if( compare < 0)
-               loc = loc1;
-            if( !compare)
-               ids[i].solution_exists = 1;
-            }
+      if( bsearch_ext_r( &tptr, ilines, n_lines, sizeof( char *),
+                        string_compare_for_sort, &sort_column, NULL))
+         ids[i].solution_exists = 1;
       }
    free( ilines);
 }

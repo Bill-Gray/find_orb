@@ -92,6 +92,9 @@ char **load_file_into_memory( const char *filename, size_t *n_lines,
                         const bool fail_if_not_found);      /* mpc_obs.cpp */
 void shellsort_r( void *base, const size_t n_elements, const size_t esize,
          int (*compare)(const void *, const void *, void *), void *context);
+void *bsearch_ext( const void *key, const void *base0,
+      size_t nmemb, const size_t size,                   /* shellsor.cpp */
+      int (*compar)(const void *, const void *), bool *found);
 int string_compare_for_sort( const void *a, const void *b, void *context);
 const char *get_find_orb_text( const int index);      /* elem_out.cpp */
 static void reduce_designation( char *desig, const char *idesig);
@@ -639,18 +642,12 @@ char *mpc_station_name( char *station_data)
    return( station_data + (station_data[4] == '!' ? 47 : 30));
 }
 
-static int mpc_code_cmp( const char *ptr1, const char *ptr2)
+static int mpc_code_cmp( const void *ptr1, const void *ptr2)
 {
-   int rval = memcmp( ptr1, ptr2, 3);
+   const char **p1 = (const char **)ptr1;
+   const char **p2 = (const char **)ptr2;
 
-   if( !rval)
-      {
-      const char c1 = (ptr1[3] == ' ' ? '\0' : ptr1[3]);
-      const char c2 = (ptr2[3] == ' ' ? '\0' : ptr2[3]);
-
-      rval = c1 - c2;
-      }
-   return( rval);
+   return( memcmp( *p1, *p2, 4));
 }
 
 /* The first (247) roving observer retains that code.  If another
@@ -726,7 +723,7 @@ int get_observer_data( const char FAR *mpc_code, char *buff, mpc_code_t *cinfo)
    size_t i;
    const char *override_observatory_name = NULL;
    double lat0 = 0., lon0 = 0., alt0 = 0.;
-   char temp_code[4];
+   char temp_code[5];
    const size_t buffsize = 81;
 
    if( !mpc_code)    /* freeing up resources */
@@ -739,12 +736,11 @@ int get_observer_data( const char FAR *mpc_code, char *buff, mpc_code_t *cinfo)
       return( 0);
       }
 
-   if( strlen( mpc_code) > 6 && mpc_code[3] == '-')
-      {        /* CSS-style extended codes,  such as 807-100 or 807-061a */
-      memcpy( temp_code, mpc_code, 3);
-      temp_code[3] = '\0';
-      mpc_code = temp_code;
-      }
+   memcpy( temp_code, mpc_code, 4);
+   if( 4 != strlen( mpc_code))
+      temp_code[3] = ' ';
+   temp_code[4] = '\0';
+   mpc_code = temp_code;
 
    if( !n_stations)
       {
@@ -827,22 +823,9 @@ int get_observer_data( const char FAR *mpc_code, char *buff, mpc_code_t *cinfo)
       return( rval);
       }
 
-   if( !curr_station || mpc_code_cmp( curr_station, mpc_code))
-      {
-      int step, loc = -1, loc1;
-
-      curr_station = NULL;
-      for( step = 0x8000; step; step >>= 1)
-         if( (loc1 = loc + step) < n_stations)
-            {
-            const int compare = mpc_code_cmp( station_data[loc1], mpc_code);
-
-            if( compare <= 0)
-               loc = loc1;
-            if( !compare)
-               curr_station = station_data[loc];
-            }
-      }
+   if( !curr_station || mpc_code_cmp( &curr_station, &mpc_code))
+      curr_station = *(char **)bsearch_ext( &mpc_code, station_data, n_stations,
+                  sizeof( char *), mpc_code_cmp, NULL);
    if( !curr_station)
       {
       const char *envar = "UPDATE_OBSCODES_HTML";
