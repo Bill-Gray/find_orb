@@ -5269,9 +5269,9 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
 
                   /* Count number of redacted and (current) NEOCP lines : */
    while( fgets_trimmed( buff, sizeof( buff), observations_ifile))
-      if( is_neocp_line( buff))
+      if( memcmp( buff, "COM ", 4))      /* skip comment/'sigma' lines */
          {
-         if( memcmp( buff + 56, "Removed", 7))
+         if( is_neocp_line( buff) && memcmp( buff + 56, "Removed", 7))
             n_neocp_lines++;
          if( line_must_be_redacted( buff, orbit_is_heliocentric))
             n_redacted_lines++;
