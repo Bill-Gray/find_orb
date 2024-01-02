@@ -1549,3 +1549,7 @@ Pe6 !+116.13645    -32.00729          355.0    Perth Observatory roll-off roof?
 672f!-118.057823   +34.226189        1685.0    Mount Wilson, CHARA W2
 672g!-118.055694   +34.227149        1660.0    Mount Wilson, CHARA E1
 672h!-118.056292   +34.226829        1674.0    Mount Wilson, CHARA E2
+
+   Private communication from Gary Hug.  32m subtracted for geoid height.
+
+H36 !-095.706554   +38.797700         322.0    Sandlot Observatory, Scranton
