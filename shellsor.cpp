@@ -163,23 +163,26 @@ sort can be (and,  in glibc,  is) implemented just by using the recursive
 version.  The last "context" parameter is simply ignored on all
 architectures of which the author was aware.
 
-   It seems like an excellent idea.  But it's a weird cast that produces a
-warning in GCC 8,  and I'm not actually calling the non-recursive sort
-anyway;  it's completely untested.  Hence the above #ifdef to remove both
-usused code and the warning. If I someday decide I need a non-recursive
-sort,  I'll deal with it all then. */
+   It seems like an excellent idea.  The weird cast is essentially the one
+used for bsearch_ext() (see below),  and I am reasonably confident the
+following would work.  However,  I've not needed it yet and it is therefore
+untested and #ifdeffed out.  If I someday decide I need a non-recursive
+sort,  I'll test it then. */
 
 void shellsort( void *base, const size_t n_elements, const size_t elem_size,
          int (*compare)(const void *, const void *))
 {
+   void (*p)() = (void (*)())compare;
+
    shellsort_r( base, n_elements, elem_size,
-               (int (*)(const void *, const void *, void *))compare, NULL);
+               (int (*)( const void *, const void *, void *))p, NULL);
 }
 #endif
 
 /* bsearch() doesn't take a 'context' pointer,  and therefore can't use
 the above sort of re-entrant comparison function.  'bsearch_r()' is
-available on some more modern GCCs.  Code for bsearch_r() is at
+available on some more modern GCCs (but not older ones and not on
+Microsoft C/C++.)  Code for bsearch_r() is at
 
 https://gnu.googlesource.com/gcc/+/refs/heads/master/libiberty/bsearch_r.c
 
@@ -236,7 +239,7 @@ void *bsearch_ext( const void *key, const void *base0,
       size_t nmemb, const size_t size,
       int (*compar)(const void *, const void *), bool *found)
 {
-   void *p = (void *)compar;
+   void (*p)() = (void (*)())compar;
 
    return( bsearch_ext_r( key, base0, nmemb, size,
                (int (*)( const void *, const void *, void *))p,
