@@ -824,8 +824,12 @@ int get_observer_data( const char FAR *mpc_code, char *buff, mpc_code_t *cinfo)
       }
 
    if( !curr_station || mpc_code_cmp( &curr_station, &mpc_code))
-      curr_station = *(char **)bsearch_ext( &mpc_code, station_data, n_stations,
+      {
+      char **search = (char **)bsearch_ext( &mpc_code, station_data, n_stations,
                   sizeof( char *), mpc_code_cmp, NULL);
+
+      curr_station = (search ? *search : NULL);
+      }
    if( !curr_station)
       {
       const char *envar = "UPDATE_OBSCODES_HTML";
