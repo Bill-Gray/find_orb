@@ -479,7 +479,7 @@ SIGMAS_FILE=
    Note that these 'MPC codes' also have lines in rovers.txt (q.v.).
 GROUP_ATL=M22 T05 T08 W68
 GROUP_LC2=E10 F65
-GROUP_LC1=V37 W85 K91 Q63 Z31 097
+GROUP_LC1=V37 W85 K91 Q63 Z31 097 T04
 
    By default,  astrometric outliers by three sigmas will be rejected.  That's
    set by the following variable.  Set it to 9999999 to cause all observations
