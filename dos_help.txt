@@ -1,4 +1,4 @@
-   Version date: 2023 Sep 04
+   Version date: 2024 Jan 08
 
    The parameters shown in this software are basically the same as those
 shown in the Windows software,  as described at
@@ -29,6 +29,7 @@ e      Reset the epoch.  Results in being prompted to enter a new epoch.
 v      Find Va'isa'la' orbit.  You'll be prompted to enter a perihelion
          (or aphelion) distance;  it will then find a 'best fit' orbit with
          that apsis distance at the center of the arc.
+V      Find Va'isa'la' orbit, without linearizing.
 l      Set a Limited orbit (e.g,  "e=.1",  "q=12.4",  "a=2.3,e=.15").
 h      Take one step using the method of Herget.
 f      Take one "full step" using the method of least squares.
@@ -38,6 +39,12 @@ g      Determine orbit with method of Gauss.  (There may be alternative
          generating variants until you hit another key to stop it.  Observe
          the changes in the orbital elements,  and you get an idea of the
          level of uncertainty.  (Elements will also be stored in 'mpcorb.dat'.)
+Alt-G  Generate a MC orbital (elements stored in mpc_sr.txt for 
+       mpcorb formt i.e. 1-line)
+Ctrl-D Generate a number of statistical ranging virtual asteroid variant orbits. 
+         (Elements will also be stored in 'mpcorb.dat'.)
+Ctrl-R Reset R1 and R2, for use in the Statistical Ranging method.
+Alt-M  Metropolis-Hastings method.  
 :      'Linearizes' the orbit,  as described at:
          https://www.projectpluto.com/vaisala.htm#linearized
 #      Uses a downhill simplex method,  as described at
@@ -49,7 +56,8 @@ F12    Find a circular orbit connecting the first and last positions.  Hit
          solutions.  If the arc is long enough,  there may be multiple-orbit
          solutions,  including many spurious retrograde ones.  (Or there may
          be no circular orbits at all.)
-
+Alt-F  For orbit extension, improve along the line of variations
+         
    INTEGRATION MODEL COMMANDS (perturbers, non-grav effects):
 
 1...9  Toggle inclusion of Mercury...Pluto as a perturbing object.
@@ -62,6 +70,11 @@ a      Toggle inclusion of up to 300 asteroids.  (See documentation for
 *      Non-grav model selection.  You can choose among various non-grav
          models for solar radiation pressure,  comet outgassing models,  or
          Yarkovsky.  Click on the [?] shown in the menu for details.
+Alt-P Reset r0, m, n, and k 'comet constants' of the non-gravtational force g(r). 
+         Default are for water sublimation, see'environ.def' comments for 
+         COMET_CONSTRAINTS. 
+Alt-Z Integration method selection. Cycles between Runge-Kutta-Fehlber 'RKF' or
+         Dormand-Prince 8(9) 'RD89'.
 
       OBSERVATION TOGGLING/WEIGHTING/SEARCHING:
 
@@ -91,6 +104,7 @@ Alt-X   Gets you a list of all MPC codes for the current object;  click on
             (you can click on 'Obs' in the observation legend to get this)
 T       Select all observations in the current tracklet.
 X       Toggle all observations in the current tracklet.
+Alt-W   Toggle (on/off) the use of weighting of posns/mags/times
 
             ON-SCREEN DISPLAY:
 
