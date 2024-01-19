@@ -4063,6 +4063,8 @@ int main( int argc, const char **argv)
                      maximum_observation_jd =
                           get_time_from_string( 0., comma + 1,
                           FULL_CTIME_YMD | CALENDAR_JULIAN_GREGORIAN, NULL);
+                  else
+                     maximum_observation_jd = 1e+9;
                   }
                }
                break;
