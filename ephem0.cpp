@@ -4795,10 +4795,10 @@ static void get_observer_details_from_obs( const OBSERVE *obs,
 
 static void observer_link_substitutions( char *buff)
 {
-   FILE *ifile = fopen_ext( "observer.txt", "crb");
+   FILE *ifile = fopen_ext( "observer.htm", "crb");
 
    if( !ifile)
-      ifile = fopen_ext( "observer.htm", "fcrb");
+      ifile = fopen_ext( "observer.txt", "fcrb");
    if( ifile)
       {
       char line[200], *loc;
