@@ -163,7 +163,9 @@ SJ5 !   0    5 0.5 -0.8660254            @9015 Sun-Jupiter L5
    large and (b) you can only go just so far into the future before
    they may not be entirely accurate.  Should you want ephems for
    objects as seen from these spacecraft,  or any other spacecraft
-   listed on JPL's Horizons system,  contact me.
+   listed on JPL's Horizons system,  contact me.  (I may set this up
+   so that Find_Orb just looks for the relevant ephems on Horizons,
+   as you need them.)
 
 Luc !   0.0000       0.00000   +0.00000    @-2 Lucy
 SoO !   0.0000       0.00000   +0.00000    @-2 Solar Orbiter
@@ -363,9 +365,9 @@ d66 ! 3554454.89654  +402547.90955   849.87404 DSS 66 Madrid 26-meter
    https://arxiv.org/abs/1210.1616 , Table 6.  Note that some positions
    given here don't match those given by MPC's ObsCodes.html.  In
    particular,  the location for (I33) given by MPC is about half a
-   kilometer west of reality (compared to the above reference,  and
-   the map at http://www.ctio.noao.edu/soar/content/location , and
-   inspection on G__gle Maps).  I am reasonably sure that (I02) 2MASS,
+   kilometer west of reality (compared to the above reference,  and the
+   map and lat/lon given at https://noirlab.edu/science/images/soar-map,
+   and inspection on G__gle Maps).  I am reasonably sure that (I02) 2MASS,
    and five LCO telescopes are among those listed below,  but matching
    up the telescopes listed below to their MPC codes is difficult;
    the area is a packed array of domes,  and the MPC coordinates are
@@ -524,13 +526,16 @@ H01 !-1071121.6      +335905.4      3227       Magdalena Ridge Observatory, Soco
 
    https://spacewatch.lpl.arizona.edu/telescopes
 
-   with 30 meters subtracted for geoid height.
+   with 30 meters subtracted for geoid height.  (695) corresponds to
+   the 0.7-m Solar Vacuum Telescope and should probably be moved,  but
+   I don't know where.
 
 291 !-111.599905     +31.961669     2045.      LPL/Spacewatch II
 
    Other scopes measured while looking at Kitt Peak in Google Earth.
-   https://www.noao.edu/kpno/usrhnbk/mtn.gif used to ID most telescopes.
-   30m subtracted to get ellipsoidal altitudes.
+   https://www-kpno.kpno.noirlab.edu/usrhnbk/mtn.gif used to ID most
+   scopes.  30m subtracted to get ellipsoidal altitudes.  I omitted the 2.3-m
+   Bok telescope,  because it has code (V00) and is fairly well placed.
 
 May !-111.599895     +31.964027     2051.      Mayall telescope,  Kitt Peak
 1.3 !-111.598406     +31.959634     2042.      1.3-m RCT telescope, Kitt Peak
@@ -549,12 +554,10 @@ Unk3!-111.602183     +31.958133     2058.      Roll-off roof W of WIYN,  Kitt Pe
 12m !-1113653.475    +315712.0      1884.      ARO 12 Meter Telescope
 
    The MDM Observatory at Kitt Peak has the 1.3-m McGraw-Hill Telescope and
-   the 2.4-m Hiltner Telescope,  separated by roughly 60 meters. The MPC
-   coordinates for (697) appear to come from
-   http://mdm.kpno.noao.edu/13_manual/mgh03.html , and are given to arcminute
-   precision,  about 1.5 km from the positions below. I've measured both scopes
-   on Google Maps;  Eric Galayda provided altitudes and IDs as to which scope was
-   which (not really apparent otherwise). As with other Kitt Peak scopes, 30
+   the 2.4-m Hiltner Telescope,  separated by roughly 60 meters.
+   I've measured both scopes on Google Maps;  Eric Galayda provided
+   altitudes and IDs as to which scope was which (not really apparent
+   from just looking at Google Maps). As with other Kitt Peak scopes, 30
    meters is subtracted from the geoid heights to get ellipsoidal heights.
 
 Hil !-111.615864     +31.951503     1908.5     Kitt Peak, Hiltner
@@ -736,8 +739,9 @@ Nar !  98.4856944    +18.589972     2559       NARIT, Chiangmai
    used to report (204) data,  but has been discontinued.  Luca tells me
    (Sc3),  a smaller dome between the two,  houses a C14 that will be
    remotely controlled in early 2021 (hasn't actually submitted any data).
+   The MPC position is ~90m east-southeast of the (204) position below.
 
-204 !   8.76993      +45.86833      1278       Schiaparelli Observatory, 0.85-m scope
+204 !   8.76976      +45.86833      1278       Schiaparelli Observatory, 0.85-m scope
 Sc2 !   8.77061      +45.86845      1278       Schiaparelli Observatory, 0.60-m scope
 Sc3 !   8.77027      +45.86853      1278       Schiaparelli Observatory, C14
 
@@ -1459,11 +1463,22 @@ P5m !-116.86503    +33.35627         1662.     Palomar 5m
    Coords from Andrea Mattei.
 L78 !+014.780211   +40.6826087        134.     San Marco Observatory, Salerno
 
-   The MPC coordinates for Bucharest are in a pond.  I'm pretty sure one of
+   The MPC coordinates for Bucharest were in a pond.  I thought that one of
    these two domes,  about 60m apart from each other and ~300m south-southwest
-   of the MPC coordinates,  are the "right" place. 37m added for geoid height.
-073 !+026.09487    +44.41095          124.     Bucharest
-073a!+026.09485    +44.41038          134.     Bucharest (southern dome)
+   of the MPC coordinates,  was the "right" place. 37m added for geoid height.
+073a!+026.09487    +44.41095          124.     Bucharest (northern dome)
+073b!+026.09485    +44.41038          134.     Bucharest (southern dome)
+
+   About 180 meters NW of the above pair is a pair of smaller domes,  about
+   20m from each other :
+
+073c!+026.09378    +44.41224          134.     Bucharest (small NE dome)
+073d!+026.09362    +44.41207          134.     Bucharest (small SW dome)
+
+   However,  Adrian Sonka tells me the actual location is none of these;
+   it is a roll-off roof observatory a little southeast of the above pair.
+   (MPC has since 'moved' (073) to these coordinates.)
+073 !+026.09391    +44.41197          134.     Bucharest
 
    The MPC coordinates for Geneva are about 190m north-northeast of the dome
    as seen on G__gle Maps.  50m added for geoid height.
@@ -1559,3 +1574,5 @@ Pe6 !+116.13645    -32.00729          355.0    Perth Observatory roll-off roof?
    Private communication from Gary Hug.  32m subtracted for geoid height.
 
 H36 !-095.706554   +38.797700         322.0    Sandlot Observatory, Scranton
+
+SQO !-086.5263889  +38.97702778       153.0    Star Quarry Observatory
