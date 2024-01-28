@@ -57,6 +57,7 @@ bool findorb_already_running = false;
 #endif
 
 static const char *_extras_filename = "hints.txt";
+static const char *_default_extras_filename = "hints.def";
 extern int available_sigmas;
 extern double optical_albedo;
 extern unsigned perturbers;
@@ -1512,11 +1513,13 @@ static void _store_extra_orbit_info( const char *packed_id,
 {
    extern int force_model;
    size_t n_lines;
-   char **lines = load_file_into_memory( _extras_filename, &n_lines, true);
+   char **lines = load_file_into_memory( _extras_filename, &n_lines, false);
    FILE *ofile;
    int i, line_no = -1;
    char buff[200];
 
+   if( !lines)
+      lines = load_file_into_memory( _default_extras_filename, &n_lines, true);
    assert( strlen( packed_id) == 12);
    assert( (force_model && n_extra_params) || (!force_model && !n_extra_params));
    for( i = 0; i < (int)n_lines; i++)
@@ -1583,9 +1586,11 @@ static int _get_extra_orbit_info( const char *packed_id,
 {
    extern int force_model;
    size_t n_lines;
-   char **lines = load_file_into_memory( _extras_filename, &n_lines, true);
+   char **lines = load_file_into_memory( _extras_filename, &n_lines, false);
    int i, j, rval = 0;
 
+   if( !lines)
+      lines = load_file_into_memory( _default_extras_filename, &n_lines, true);
    assert( strlen( packed_id) == 12);
    for( i = 0; i < (int)n_lines; i++)
       if( !_compare_misaligned_packed_desigs( lines[i], packed_id))
