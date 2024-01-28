@@ -440,15 +440,6 @@ GALACTIC_ADDENDUM=
    "it's really small".  Obviously,  if possible,  supply photometry.
 DEFAULT_V_MAG=
 
-   The entries below tell us that,  for example,  the Earth-Moon L1 point
-   is 84.906572% of the way to the moon from earth,  and so on for L2 and L3,
-   with similar L1/2/3 distances for the Sun-Earth and Sun-Jupiter collinear
-   Lagrange points.  These values can be computed -- see /junk/lagrange.c --
-   but it's simpler just to store these precomputed values.
-LAGRANGE_003010=0.84906572, 1.16783275, -0.99291206
-LAGRANGE_000003=0.98998902, 1.01007824, -0.99999823
-LAGRANGE_000005=0.93331933, 1.06978454, -0.99944357
-
    The 'elements.txt' file created by Find_Orb has some 'comment' data not
    shown by default.  You can toggle to it by clicking on the orbital elements
    shown on-screen,  and some people just look at the 'elements.txt' file

@@ -132,24 +132,30 @@ Lun !   0.0000       0.00000   +0.00000    @10 Luna
    at fractions based on the relative masses of the objects. L4 and L5
    are at equilateral triangle points. Perturbations are ignored.  I
    don't expect observations to be made from these points;  this is
-   really so you can compute ephemerides from these locations.  See
-   'environ.dat' for info on how to set up L points for other systems.
+   really so you can compute ephemerides from these locations.  For
+   each point,  the indices for the primary and secondary object are
+   given (moon=10);  then fraction of distance from primary to secondary,
+   and then fraction "along orbit" (non-zero for L4 and L5,  where the
+   value is +/- sqrt(.75) to make the equilateral triangle.)  For
+   example,  EM1 is 84.906% of the way from the earth to the moon.  See
+   'lagrange.c' in the 'junk' repository for mathematical details and
+   code to generate these values for other systems.
 
-SE1 !   0.0000       0.00000   +0.00 @90000031 Sun-Earth L1
-SE2 !   0.0000       0.00000   +0.00 @90000032 Sun-Earth L2
-SE3 !   0.0000       0.00000   +0.00 @90000033 Sun-Earth L3
-SE4 !   0.0000       0.00000   +0.00 @90000034 Sun-Earth L4
-SE5 !   0.0000       0.00000   +0.00 @90000035 Sun-Earth L5
-EM1 !   0.0000       0.00000   +0.00 @90030101 Earth-Moon L1
-EM2 !   0.0000       0.00000   +0.00 @90030102 Earth-Moon L2
-EM3 !   0.0000       0.00000   +0.00 @90030103 Earth-Moon L3
-EM4 !   0.0000       0.00000   +0.00 @90030104 Earth-Moon L4
-EM5 !   0.0000       0.00000   +0.00 @90030105 Earth-Moon L5
-SJ1 !   0.0000       0.00000   +0.00 @90000051 Sun-Jupiter L1
-SJ2 !   0.0000       0.00000   +0.00 @90000052 Sun-Jupiter L2
-SJ3 !   0.0000       0.00000   +0.00 @90000053 Sun-Jupiter L3
-SJ4 !   0.0000       0.00000   +0.00 @90000054 Sun-Jupiter L4
-SJ5 !   0.0000       0.00000   +0.00 @90000055 Sun-Jupiter L5
+SE1 !   0    3 0.98998902 0              @9001 Sun-Earth L1
+SE2 !   0    3 1.01007824 0              @9002 Sun-Earth L2
+SE3 !   0    3 -0.99999823 0             @9003 Sun-Earth L3
+SE4 !   0    3 0.5  0.8660254            @9004 Sun-Earth L4
+SE5 !   0    3 0.5 -0.8660254            @9005 Sun-Earth L5
+EM1 !   3   10 0.84906572  0             @9006 Earth-Moon L1
+EM2 !   3   10 1.16783275  0             @9007 Earth-Moon L2
+EM3 !   3   10 -0.99291206 0             @9008 Earth-Moon L3
+EM4 !   3   10 0.5  0.8660254            @9009 Earth-Moon L4
+EM5 !   3   10 0.5 -0.8660254            @9010 Earth-Moon L5
+SJ1 !   0    5 0.93331933 0              @9011 Sun-Jupiter L1
+SJ2 !   0    5 1.06978454 0              @9012 Sun-Jupiter L2
+SJ3 !   0    5 -0.99944357 0             @9013 Sun-Jupiter L3
+SJ4 !   0    5 0.5  0.8660254            @9014 Sun-Jupiter L4
+SJ5 !   0    5 0.5 -0.8660254            @9015 Sun-Jupiter L5
 
    Note that ephems generated from these spacecraft require auxiliary
    files saying where the spacecraft were at a given time.  I don't

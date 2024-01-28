@@ -736,12 +736,6 @@ int get_observer_data( const char FAR *mpc_code, char *buff, mpc_code_t *cinfo)
       return( 0);
       }
 
-   memcpy( temp_code, mpc_code, 4);
-   if( 4 != strlen( mpc_code))
-      temp_code[3] = ' ';
-   temp_code[4] = '\0';
-   mpc_code = temp_code;
-
    if( !n_stations)
       {
       int sort_column = 0;
@@ -758,6 +752,24 @@ int get_observer_data( const char FAR *mpc_code, char *buff, mpc_code_t *cinfo)
                station_data[i] = station_data[i - 1];
             }
       }
+   if( !memcmp( mpc_code, "@90", 3))      /* looking for dynamical point info */
+      {
+      for( i = 1; i < (size_t)n_stations; i++)
+         if( !memcmp( station_data[i] + 41, mpc_code, 5))
+            {
+            strcpy( buff, station_data[i]);
+            return( 0);
+            }
+      assert( 0);          /* should never get here */
+      return( -1);
+      }
+
+   memcpy( temp_code, mpc_code, 4);
+   if( 4 != strlen( mpc_code))
+      temp_code[3] = ' ';
+   temp_code[4] = '\0';
+   mpc_code = temp_code;
+
    if( !cinfo)   /* attempting to look up an MPC code from the station name */
       {
       int pass;
@@ -1527,39 +1539,31 @@ static int _compute_lagrange_point( double *vect, const int point_number,
 {
    static double state[6], cached_jde;
    static double multiplier;
-   static int cached_point_number;
+   static int cached_point_number = -1, obj1 = 0, obj2 = 0;
    int i;
 
-   if( cached_point_number != point_number || cached_jde != jde)
+   if( cached_point_number != point_number)
       {
-      int obj1 = (point_number / 10000) % 1000;
-      int obj2 = (point_number / 10) % 1000;
-      const int lpoint = point_number % 10;
-      double state1[6], state2[6];
+      char buff[100], mpc_code[7];
 
-      if( cached_point_number != point_number
-                     && lpoint >= 1 && lpoint <= 3)  /* collinear cases */
-         {
-         char buff[30];
-         const char *multipliers;
-
-         snprintf_err( buff, sizeof( buff), "LAGRANGE_%03d%03d", obj1, obj2);
-         multipliers = get_environment_ptr( buff);
-         if( *multipliers)
-            {
-            double mults[3];
-
-            i = sscanf( multipliers, "%lf,%lf,%lf",
-                        mults, mults + 1, mults + 2);
-            assert( i == 3);
-            multiplier = mults[lpoint - 1];
-            }
-         }
+      snprintf_err( mpc_code, sizeof( mpc_code), "@%d", point_number);
+      get_observer_data( mpc_code, buff, NULL);
+      i = sscanf( buff + 5, "%d %d %lf", &obj1, &obj2, &multiplier);
+      assert( i == 3);
+      assert( obj1 >= 0 && obj1 <= 10);
+      assert( obj2 >= 0 && obj2 <= 10);
       if( obj1 == 3 && obj2 == 10)     /* Earth-Moon case */
          {
          obj1 = PLANET_POSN_EARTH;     /* see 'pl_cache.h' */
          obj2 = PLANET_POSN_MOON;
          }
+      cached_point_number = point_number;
+      }
+   if( cached_jde != jde)
+      {
+      const int lpoint = (point_number - 1) % 5 + 1;
+      double state1[6], state2[6];
+
       planet_posn( obj1, jde, state1);
       planet_posn( obj1 + PLANET_POSN_VELOCITY_OFFSET, jde, state1 + 3);
       planet_posn( obj2, jde, state2);
@@ -1577,7 +1581,6 @@ static int _compute_lagrange_point( double *vect, const int point_number,
          for( i = 0; i < 6; i++)
             state[i] = state1[i] + state2[i];
          }
-      cached_point_number = point_number;
       cached_jde = jde;
       }
    for( i = 0; i < 3; i++)
@@ -1593,7 +1596,7 @@ int compute_observer_loc( const double jde, const int planet_no,
    if( planet_no == -2)
       return( get_canned_object_posn_vel( offset, NULL, jde));
 
-   if( planet_no > 90000000)
+   if( planet_no > 9000)
       _compute_lagrange_point( offset, planet_no, jde, false);
    else if( planet_no != 3 && planet_no != 10)
       planet_posn( planet_no >= 0 ? planet_no : 12, jde, offset);
@@ -1608,6 +1611,7 @@ int compute_observer_loc( const double jde, const int planet_no,
       double geo_offset[3];
       int i;
 
+      assert( planet_no < 9000);
       compute_topocentric_offset( ut, planet_no, rho_cos_phi, rho_sin_phi,
                                         lon, geo_offset, NULL);
       equatorial_to_ecliptic( geo_offset);
@@ -1625,7 +1629,7 @@ int compute_observer_vel( const double jde, const int planet_no,
 
    if( planet_no == -2)    /* spacecraft-based observation */
       return( get_canned_object_posn_vel( NULL, vel, jde));
-   if( planet_no > 90000000)
+   if( planet_no > 9000)
       _compute_lagrange_point( vel, planet_no, jde, true);
    else if( planet_no != 3 && planet_no != 10)
       planet_posn( (planet_no >= 0 ? planet_no : 12) + PLANET_POSN_VELOCITY_OFFSET,
