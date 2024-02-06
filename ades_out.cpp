@@ -233,6 +233,21 @@ static void create_ades_file_for_one_code( FILE *ofile,
                fprintf( ofile, "        <pos%d>%.*f</pos%d>\n",
                         i + 1, (is_au ? 13 : 4), posn[i] * (is_au ? 1. : AU_IN_KM), i + 1);
             }
+         else if( obs->note2 == 'V')
+            {
+            int i;
+
+            fprintf( ofile, "        <sys>WGS84</sys>\n");
+            fprintf( ofile, "        <ctr>399</ctr>\n");
+            for( i = 0; i < 3; i++)
+               {
+               memcpy( buff, obs->second_line + i * 11 + 34, 10);
+               buff[i == 2 ? 5 : 10] = '\0';
+               text_search_and_replace( buff, " ", "");
+               fprintf( ofile, "        <pos%d>%s</pos%d>\n",
+                        i + 1, buff, i + 1);
+               }
+            }
 //       if( progcode != ' ')
 //          fprintf( ofile, "        <prog>%c</prog>\n", progcode);
          fprintf( ofile, "        <obsTime>%s</obsTime>\n",
