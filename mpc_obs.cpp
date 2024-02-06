@@ -969,8 +969,13 @@ int get_satellite_offset( const char *iline, double *xyz)
    size_t i;
    int error_code = 0;
    const int observation_units = (int)iline[32] - '0';
-   double r2 = 0.;
+   double r2 = 0., min_radius;
 
+   assert( 80 == strlen( iline));
+   if( !strcmp( iline + 77, "275"))   /* geocentric occultation observations */
+      min_radius = 0.;       /* can have offsets inside the earth; */
+   else                      /* others should be outside the atmosphere */
+      min_radius = 1.01 * EARTH_RADIUS_IN_AU;
    for( i = 0; i < 3; i++)    /* in case of error,  use 0 offsets */
       xyz[i] = 0.;
    iline += 34;      /* this is where the offsets start */
@@ -1000,7 +1005,7 @@ int get_satellite_offset( const char *iline, double *xyz)
          error_code = SATELL_COORD_ERR_EXACTLY_ZERO;
       r2 += xyz[i] * xyz[i];
       }
-   if( !error_code && r2 < EARTH_RADIUS_IN_AU * EARTH_RADIUS_IN_AU)
+   if( !error_code && r2 < min_radius * min_radius)
       error_code = SATELL_COORD_ERR_INSIDE_EARTH;
    equatorial_to_ecliptic( xyz);
    return( error_code);
