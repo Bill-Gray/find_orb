@@ -646,11 +646,13 @@ int inquire( const char *prompt, char *buff, const int max_len,
 
 static int select_mpc_code( const OBSERVE *obs, const int n_obs, int curr_obs)
 {
-   char *buff = (char *)malloc( 1000);
+   const int max_n_codes = 500;
+   const int buffsize = max_n_codes * 4 + 70;
+   char *buff = (char *)malloc( buffsize);
    int n_codes = 0, i, nx = 0, c;
 
    *buff = '\0';
-   for( i = 0; i < n_obs; i++)
+   for( i = 0; i < n_obs && n_codes < max_n_codes; i++)
       if( !strstr( buff, obs[i].mpc_code))
          {
          int j = 0;
@@ -665,12 +667,12 @@ static int select_mpc_code( const OBSERVE *obs, const int n_obs, int curr_obs)
          memcpy( tptr, obs[i].mpc_code, 3);
          tptr[3] = ' ';
          n_codes++;
-         if( nx * nx < n_codes)
+         if( nx * nx < n_codes && (nx + 1) * 4 < COLS - 3)
             nx++;
          }
    for( i = nx; i < n_codes; i += nx)
       buff[i * 4 - 1] = '\n';
-   strcat( buff, "\nCancel");
+   strlcat_err( buff, "\nCancel", buffsize);
    mpc_code_select = true;
    c = inquire( buff, NULL, 0, COLOR_DEFAULT_INQUIRY);
    mpc_code_select = false;
