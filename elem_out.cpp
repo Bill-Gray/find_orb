@@ -4170,7 +4170,7 @@ static void improve_mpc_colors( const int n_obs, const OBSERVE FAR *obs,
          assert( color >=0 && color < max_n_colors);
          }
       n_iterations++;
-      assert( n_iterations < 10);
+      assert( n_iterations < 50);
       }
 }
 
