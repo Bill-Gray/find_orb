@@ -82,15 +82,14 @@ static void add_half_exposure( char *obuff, const char *itime,
 
 int main( const int argc, const char **argv)
 {
-   const char *filename = "../temp/cleaned_0_9_meter_2018_2023.txt";
+   const char *filename = (argc == 1 ? "cleaned_0.9_MR-condensed_2023_cleaned.txt" : argv[1]);
    FILE *ifile = fopen( filename, "rb");
    char buff[200];
+   const char *mpc_code = NULL;
    double curr_exposure = 0.;
    const double min_exposure = 0.1;
              /* accept all exposures,  including very short focussing ones */
 
-   INTENTIONALLY_UNUSED_PARAMETER( argv);
-   INTENTIONALLY_UNUSED_PARAMETER( argc);
    assert( ifile);
    if( !fgets( buff, sizeof( buff), ifile))
       {
@@ -106,30 +105,57 @@ int main( const int argc, const char **argv)
    printf( "# Input file '%s'\n", filename);
    while( fgets( buff, sizeof( buff), ifile))
       {
-      char filename[100], date[50], time_text[50];
-      char exposure[40], ra_text[40], dec_text[40];
-      int len;
+      char *fields[7], time_text[20];
+      int i, n_fields;
 
-      assert( !memcmp( buff, "Mosaic_Recovery_0.9m/20", 23));
-      if( 6 == sscanf( buff, "%s %s %s %s %s %s%n", filename, date,
-                 time_text, exposure, ra_text, dec_text, &len))
-         {
-         assert( buff[len] == 10 || buff[len] == 13);
-         assert( *dec_text == '+' || *dec_text == '-');
-
-         if( curr_exposure != atof( exposure))
+      for( i = n_fields = 0; buff[i] && n_fields < 6; i++)
+         if( buff[i] == '\t')
             {
-            curr_exposure = atof( exposure);
+            buff[i] = '\0';
+            fields[n_fields++] = buff + i + 1;
+            }
+         else if( buff[i] < ' ')
+            buff[i] = '\0';         /* remove trailing CR/LF */
+      assert( n_fields == 5);
+      if( !mpc_code)
+         {
+         if( !memcmp( buff, "Mosaic_Recovery_0.9m", 20))
+            mpc_code = "691";
+         else if( !memcmp( buff, "Finger_Lakes_1.8m", 17))
+            mpc_code = "291";
+         else if( !memcmp( buff, "SW_Cassegrain_Camera_2.3m", 24))
+            mpc_code = "V00";
+         if( !mpc_code)
+            {
+            fprintf( stderr, "No MPC code\n%s", buff);
+            return( -1);
+            }
+         }
+      assert( mpc_code);
+      assert( strlen( fields[1]) < 16);      /* if HH:MM:SS.ssssss */
+      strcpy( time_text, fields[1]);
+      if( 8 == strlen( time_text))        /* some times lack milliseconds */
+         strcat( time_text, ".000");
+      if( strlen( time_text) > 11 && time_text[2] == ':'
+                          && time_text[5] == ':' && time_text[8] == '.')
+         {
+         char midtime[20];
+
+         assert( fields[4][0] == '+' || fields[4][0] == '-');
+         if( *fields[2]  && curr_exposure != atof( fields[2]))
+            {
+            curr_exposure = atof( fields[2]);
             printf( "# Exposure: %.0f s\n", curr_exposure);
             assert( curr_exposure > min_exposure);
             }
-         printf( "%.4f,%c%.4f,%sT", get_base_sixty( ra_text) * 15, *dec_text,
-                                get_base_sixty( dec_text + 1), date);
-         add_half_exposure( buff, time_text, curr_exposure);
-         printf( "%s,691,%s\n", buff, filename + 21);
+         printf( "%.4f,%c%.4f,%sT", get_base_sixty( fields[3]) * 15, fields[4][0],
+                                get_base_sixty( fields[4] + 1), fields[0]);
+         time_text[12] = '\0';   /* truncate to milliseconds */
+         add_half_exposure( midtime, time_text, curr_exposure);
+         printf( "%s,%s,%s\n", midtime, mpc_code, buff);
          }
       else
-         printf( "# Malformed %s", buff);
+         printf( "# Malformed '%s', %s", time_text, buff);
       }
    fclose( ifile);
    return( 0);
