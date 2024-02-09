@@ -233,7 +233,7 @@ static void create_ades_file_for_one_code( FILE *ofile,
             fprintf( ofile, "        <ctr>399</ctr>\n");
             for( i = 0; i < 3; i++)
                fprintf( ofile, "        <pos%d>%.*f</pos%d>\n",
-                        i + 1, (is_au ? 13 : 4), posn[i] * (is_au ? 1. : AU_IN_KM), i + 1);
+                        i + 1, (is_au ? 9 : 4), posn[i] * (is_au ? 1. : AU_IN_KM), i + 1);
             }
          else if( obs->note2 == 'V')
             {
