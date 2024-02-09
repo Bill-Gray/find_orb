@@ -47,6 +47,8 @@ char *iso_time( char *buff, const double jd, const int precision);   /* elem_out
 int get_satellite_offset( const char *iline, double *xyz);  /* mpc_obs.cpp */
 int text_search_and_replace( char FAR *str, const char *oldstr,
                                      const char *newstr);   /* ephem0.cpp */
+double original_observed_ra( const OBSERVE *obs);     /* ephem0.cpp */
+double original_observed_dec( const OBSERVE *obs);    /* ephem0.cpp */
 
 #define PI 3.1415926535897932384626433832795028841971693993751058209749445923
 
@@ -252,10 +254,12 @@ static void create_ades_file_for_one_code( FILE *ofile,
 //          fprintf( ofile, "        <prog>%c</prog>\n", progcode);
          fprintf( ofile, "        <obsTime>%s</obsTime>\n",
                   iso_time( buff, utc_from_td( obs->jd, NULL), 3));
-         fprintf( ofile, "        <ra>%.11f</ra>\n", obs->ra * 180. / PI);
-         fprintf( ofile, "        <dec>%.11f</dec>\n", obs->dec * 180. / PI);
-         fprintf( ofile, "        <rmsRA>%.4f</rmsRA>\n", obs->posn_sigma_1);
-         fprintf( ofile, "        <rmsDec>%.4f</rmsDec>\n", obs->posn_sigma_2);
+         fprintf( ofile, "        <ra>%.9f</ra>\n",
+                                    original_observed_ra( obs) * 180. / PI);
+         fprintf( ofile, "        <dec>%.9f</dec>\n",
+                                    original_observed_dec( obs) * 180. / PI);
+         fprintf( ofile, "        <rmsRA>%.3f</rmsRA>\n", obs->posn_sigma_1);
+         fprintf( ofile, "        <rmsDec>%.3f</rmsDec>\n", obs->posn_sigma_2);
          fprintf( ofile, "        <rmsCorr>%.4f</rmsCorr>\n", correlation);
          if( !catalogue)
             catalogue = "UNK";
@@ -301,7 +305,7 @@ void create_ades_file( const char *filename, const OBSERVE FAR *obs,
    *codes = '\0';
    setbuf( ofile, NULL);
    fprintf( ofile, "<?xml version=\"1.0\" ?>\n");
-   fprintf( ofile, "<ades version=\"2017\">\n");
+   fprintf( ofile, "<ades version=\"2022\">\n");
    for( i = 0; i < n_obs; i++)
       {
       char new_search[5];
