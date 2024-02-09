@@ -29,6 +29,7 @@ have to wait for another day.       */
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
+#include <stringex.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <math.h>
@@ -51,6 +52,19 @@ double original_observed_ra( const OBSERVE *obs);     /* ephem0.cpp */
 double original_observed_dec( const OBSERVE *obs);    /* ephem0.cpp */
 
 #define PI 3.1415926535897932384626433832795028841971693993751058209749445923
+
+static const char *_skip_number( const char *tptr)
+{
+   while( isdigit( *tptr))
+      tptr++;
+   if( *tptr == '.')
+      {
+      tptr++;
+      while( isdigit( *tptr))
+         tptr++;
+      }
+   return( tptr);
+}
 
 /* Column 14 ('note 1') of punched-card astrometry contains either an
 alphabetical note (see https://minorplanetcenter.net/iau/info/ObsNote.html
@@ -85,23 +99,47 @@ static int dump_one_line_of_names( FILE *ofile, const char *line)
 
    if( !memcmp( line, "TEL ", 4))         /* telescope lines are 'special' */
       {
-      const char *tptr = strstr( line, "coronagraph");
+      const char *tptr = _skip_number( line + 4);
 
-      if( tptr)      /* handling for sungrazers */
-         {           /* these details come from 'details.txt' */
-         size_t i = 0;
+      if( tptr != line + 4 && *tptr == '-' && tptr[1] == 'm' && tptr[2] == ' ')
+         {
+         char aperture[9], f_ratio[9];
+         const size_t aperture_len = tptr - (line + 4);
 
-         line += 4;
-         if( ofile)
-            fprintf( ofile, "        <design>Coronagraph</design>\n");
-         while( line[i] && line[i] != '-')
-            i++;
-         assert( line[i] == '-');
+         assert( aperture_len < 7);
+         strlcpy( aperture, line + 4, aperture_len + 1);
+         tptr += 3;
+         *f_ratio = '\0';
+         if( tptr[0] == 'f' && tptr[1] == '/')
+            {
+            if( tptr[2] == '?')
+               tptr += 4;
+            else
+               {
+               const char *f_ratio_ptr = tptr + 2;
+               tptr = _skip_number( f_ratio_ptr);
+               assert( tptr > f_ratio_ptr);
+               assert( tptr - f_ratio_ptr < 7);
+               strlcpy( f_ratio, f_ratio_ptr, tptr - f_ratio_ptr + 1);
+               tptr++;
+               }
+            }
          if( ofile)
             {
-            fprintf( ofile, "        <aperture>%.*s</aperture>\n", (int)i, line);
+            int len = 0;
+
+            while( tptr[len] && tptr[len + 1] != '+')
+               len++;
+            fprintf( ofile, "        <aperture>%s</aperture>\n", aperture);
+            if( *f_ratio)
+               fprintf( ofile, "        <fRatio>%s</fRatio>\n", f_ratio);
             fprintf( ofile, "        <detector>CCD</detector>\n");
-            fprintf( ofile, "        <name>%s</name>\n", tptr + 12);
+            if( !memcmp( tptr, "coronagraph", 11))
+               {
+               fprintf( ofile, "        <name>%s</name>\n", tptr + 12);
+               len = 11;
+               }
+            fprintf( ofile, "        <design>%.*s</design>\n", len, tptr);
             }
          n_found = 1;
          }
