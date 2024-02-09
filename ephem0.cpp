@@ -4102,6 +4102,34 @@ double utc_from_td( const double jdt, double *delta_t)
    return( utc);
 }
 
+/* The following two functions are used to get the 'original' RA/decs,
+i.e.,  those without debiasing applied,  as seen in the original ADES
+or 80-column data.   */
+
+double original_observed_ra( const OBSERVE *obs)
+{
+   extern int apply_debiasing;
+   double rval = obs->ra;
+
+   if( apply_debiasing)
+      rval += obs->ra_bias * PI / (180. * 3600. * cos( obs->dec));
+   if( rval < 0.)
+      rval += PI + PI;
+   if( rval > PI + PI)
+      rval -= PI + PI;
+   return( rval);
+}
+
+double original_observed_dec( const OBSERVE *obs)
+{
+   extern int apply_debiasing;
+   double rval = obs->dec;
+
+   if( apply_debiasing)
+      rval += obs->dec_bias * PI / (180. * 3600.);
+   return( rval);
+}
+
 /* format_observation( ) takes an observation and produces text for it,
    suitable for display on a console (findorb) or in a Windoze scroll
    box (FIND_ORB),  or for writing to a file.  */
@@ -4112,7 +4140,6 @@ void format_observation( const OBSERVE FAR *obs, char *text,
    double angle;
    char xresid[30], yresid[30];
    int i;
-   extern int apply_debiasing;
    const int base_format = (resid_format & 3);
    const int base_time_format = obs->time_precision / 10;
    const int n_time_digits = obs->time_precision % 10;
@@ -4206,11 +4233,7 @@ void format_observation( const OBSERVE FAR *obs, char *text,
             text[i] = ' ';
       snprintf_append( text, 40, "\t%c\t%s\t",
                    (obs->is_included ? ' ' : 'X'), obs->mpc_code);
-      angle = obs->ra * 12. / PI;
-      if( apply_debiasing)
-         angle += obs->ra_bias / (3600. * 15. * cos( obs->dec));
-      angle = fmod( angle, 24.);
-      if( angle < 0.) angle += 24.;
+      angle = original_observed_ra( obs) * 12. / PI;
       output_angle_to_buff( text + strlen( text), angle, obs->ra_precision);
       strcat( text, (base_format == RESIDUAL_FORMAT_FULL_WITH_TABS) ?
                               "\t" : "\t ");
@@ -4325,9 +4348,7 @@ void format_observation( const OBSERVE FAR *obs, char *text,
       const char *tab_separator =
              ((base_format == RESIDUAL_FORMAT_FULL_WITH_TABS) ? "\t" : "");
 
-      angle = obs->dec * 180. / PI;
-      if( apply_debiasing)
-         angle += obs->dec_bias / 3600.;
+      angle = original_observed_dec( obs) * 180. / PI;
       if( angle < 0.)
          {
          angle = -angle;
