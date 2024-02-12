@@ -739,9 +739,8 @@ Nar !  98.4856944    +18.589972     2559       NARIT, Chiangmai
    used to report (204) data,  but has been discontinued.  Luca tells me
    (Sc3),  a smaller dome between the two,  houses a C14 that will be
    remotely controlled in early 2021 (hasn't actually submitted any data).
-   The MPC position is ~90m east-southeast of the (204) position below.
+   MPC corrected their position for (204) in early 2024.
 
-204 !   8.76976      +45.86833      1278       Schiaparelli Observatory, 0.85-m scope
 Sc2 !   8.77061      +45.86845      1278       Schiaparelli Observatory, 0.60-m scope
 Sc3 !   8.77027      +45.86853      1278       Schiaparelli Observatory, C14
 
