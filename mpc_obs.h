@@ -496,5 +496,7 @@ void refresh_console( void);
 void move_add_nstr( const int col, const int row, const char *msg, const int n_bytes);
 
 #define COLOR_DEFAULT_INQUIRY       12
+#define COLOR_ATTENTION             13
+
 int inquire( const char *prompt, char *buff, const int max_len,
                      const int color);

@@ -429,10 +429,9 @@ int set_tholen_style_sigmas( OBSERVE *obs, const char *buff)
 
 int generic_message_box( const char *message, const char *box_type)
 {
-   int rval;
+   int rval, color = (*box_type == '!' ? COLOR_ATTENTION : COLOR_DEFAULT_INQUIRY);
 
-   INTENTIONALLY_UNUSED_PARAMETER( box_type);
-   rval = inquire( message, NULL, 30, COLOR_DEFAULT_INQUIRY);
+   rval = inquire( message, NULL, 30, color);
    debug_printf( "%s", message);
    return( rval);
 }
@@ -487,7 +486,7 @@ static inline int get_lat_lon_from_header( double *lat,
          warning_shown = true;      /* just do this once */
          snprintf_err( tbuff, sizeof( tbuff),   /* see efindorb.txt */
                   get_find_orb_text( 2000), mpc_code);
-         generic_message_box( tbuff, "o");
+         generic_message_box( tbuff, "!");
          }
       else if( !rval)
          {
@@ -1732,7 +1731,7 @@ void set_up_observation( OBSERVE FAR *obs)
          else                     /* possible error messages.  */
             text_to_add = 2004;
          strlcat_err( tbuff, get_find_orb_text( text_to_add), sizeof( tbuff));
-         generic_message_box( tbuff, "o");
+         generic_message_box( tbuff, "!");
          comment_observation( obs, "? NoCode");
          obs->is_included = 0;
          obs->flags |= OBS_DONT_USE;
@@ -1820,7 +1819,7 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
             warning_not_yet_shown = false;
             snprintf_err( tbuff, sizeof( tbuff), get_find_orb_text( 2074),
                         obs->packed_id);
-            generic_message_box( tbuff, "o");
+            generic_message_box( tbuff, "!");
             }
          }
       }
@@ -1952,7 +1951,7 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
       {        /* i.e.,  we tried to get FCCT14 debiasing and failed */
       if( !fcct_error_message_shown && apply_debiasing)
          {
-         generic_message_box( get_find_orb_text( 2005), "o");
+         generic_message_box( get_find_orb_text( 2005), "!");
          fcct_error_message_shown = true;   /* see efindorb.txt */
          }
       }
@@ -2314,7 +2313,7 @@ static bool get_neocp_data( char *buff, char *desig, char *mpc_code)
       if( !already_warned)
          {                             /* warn about geocentric ephems */
          already_warned = 1;           /* see 'efindorb.txt' for details */
-         generic_message_box( get_find_orb_text( 2006), "o");
+         generic_message_box( get_find_orb_text( 2006), "!");
          }
       }
    else if( (tptr = strstr( buff, " observatory code ")) != NULL)
@@ -3379,7 +3378,7 @@ static inline void check_for_star( const OBSERVE *obs, const int n_obs)
          max_dec = obs[i].dec;
       }
    if( max_ra - min_ra < tolerance && max_dec - min_dec < tolerance)
-      generic_message_box( get_find_orb_text( 2001), "o");
+      generic_message_box( get_find_orb_text( 2001), "!");
 }
 
 /* ADES sigmas are converted into a punched-card compatible format such as
@@ -4011,7 +4010,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
       snprintf_err( buff, sizeof( buff), get_find_orb_text( 2007),
                      (rval[i - 1].jd - rval[0].jd) /  days_per_year,
                      maximum_observation_span);
-      generic_message_box( buff, "o");
+      generic_message_box( buff, "!");
       while( rval[i - 1].jd - rval[j].jd > maximum_observation_span * days_per_year)
          j++;
       i -= j;
@@ -4025,19 +4024,19 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
    monte_carlo_object_count = 0;
    n_monte_carlo_impactors = 0;
    if( look_for_matching_line( NULL, buff, sizeof( buff)))
-      generic_message_box( buff, "o");
+      generic_message_box( buff, "!");
    if( n_fixes_made)
       {
       snprintf_err( buff, sizeof( buff), get_find_orb_text( 2028),
                      n_fixes_made);
-      generic_message_box( buff, "o");
+      generic_message_box( buff, "!");
       }
    if( n_duplicate_obs_found)
       {
       snprintf_err( buff, sizeof( buff), get_find_orb_text( 2009),
                      n_duplicate_obs_found);
       debug_printf( "%s:\n", rval->packed_id);
-      generic_message_box( buff, "o");
+      generic_message_box( buff, "!");
       }
    if( n_bad_satellite_offsets)
       {
@@ -4047,7 +4046,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
             snprintf_append( buff, sizeof( buff), get_find_orb_text( i + 2090),
                                    count_satellite_coord_errors[i]);
       strlcat_error( buff, get_find_orb_text( 2010));
-      generic_message_box( buff, "o");
+      generic_message_box( buff, "!");
       }
 
    if( n_parse_failures)
@@ -4055,7 +4054,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
       snprintf_err( buff, sizeof( buff), get_find_orb_text( 2011),
                      n_parse_failures);
       debug_printf( "%s:\n", rval->packed_id);
-      generic_message_box( buff, "o");
+      generic_message_box( buff, "!");
       }
 
    if( sanity_check_observations)
@@ -4098,7 +4097,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                         n_in_sunlight);
       strlcat_error( buff, get_find_orb_text( 2014));
       debug_printf( "%s:\n", rval->packed_id);
-      generic_message_box( buff, "o");
+      generic_message_box( buff, "!");
       }
    for( i = 1; i < n_obs_actually_loaded; i++)
       if( rval[i].jd == rval[i - 1].jd && !strcmp( rval[i].mpc_code, rval[i - 1].mpc_code))
@@ -4121,14 +4120,14 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
       snprintf_err( buff, sizeof( buff), get_find_orb_text( 2015),
                n_spurious_matches);
       debug_printf( "%s:\n", rval->packed_id);
-      generic_message_box( buff, "o");
+      generic_message_box( buff, "!");
       }
    if( n_almost_duplicates_found)
       {
       snprintf_err( buff, sizeof( buff), get_find_orb_text( 2016),
                n_almost_duplicates_found);
       debug_printf( "%s:\n", rval->packed_id);
-      generic_message_box( buff, "o");
+      generic_message_box( buff, "!");
       }
    for( i = 0; i < n_obs_actually_loaded; i++)
       if( rval[i].flags & OBS_NO_OFFSET)
@@ -4138,7 +4137,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
       {
       snprintf_err( buff, sizeof( buff), get_find_orb_text( 2017),
                         n_sat_obs_without_offsets);
-      generic_message_box( buff, "o");
+      generic_message_box( buff, "!");
       }
    i = n_obs_actually_loaded;
    while( i-- >= 0 && rval[i].jd > current_jd( ))
@@ -4148,7 +4147,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
       {
       snprintf_err( buff, sizeof( buff), get_find_orb_text( 2018),
                      n_future_obs);
-      generic_message_box( buff, "o");
+      generic_message_box( buff, "!");
       }
 
 #ifdef FUTURE_SATELLITE_OBS_CHECKING
