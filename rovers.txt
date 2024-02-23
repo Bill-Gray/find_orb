@@ -1575,3 +1575,16 @@ Pe6 !+116.13645    -32.00729          355.0    Perth Observatory roll-off roof?
 H36 !-095.706554   +38.797700         322.0    Sandlot Observatory, Scranton
 
 SQO !-086.5263889  +38.97702778       153.0    Star Quarry Observatory
+
+   https://en.wikipedia.org/wiki/Vassar_College_Observatory provides the
+   following position for (794),  and explains that it is the 'historic'
+   observatory.  Positions from (794) in MPC data are all quite old and
+   would have come from this location,  which is about 300 meters west
+   of the MPC coordinates for it.  The new observatory has three domes
+   visible on G__gle Maps;  see
+   https://en.wikipedia.org/wiki/Class_of_1951_Observatory .
+
+794 !-073.89331    +41.68829           55.0    Vassar College Observatory, Poughkeepsie
+VCe !-073.89045    +41.68295           55.0    Vassar College (since 1997), larger east dome
+VCw !-073.89063    +41.68295           55.0    Vassar College (since 1997), larger west dome
+VCn !-073.89054    +41.68323           55.0    Vassar College (since 1997), small north dome
