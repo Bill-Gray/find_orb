@@ -635,7 +635,7 @@ static ldouble include_thrown_in_planets( const ldouble r)
          if( r > radii[i] * (1. + fraction))
             rval += planet_mass[i];
          else
-            rval += planet_mass[i] * ((1. + fraction) - r / radii[i]) / fraction;
+            rval += planet_mass[i] * (r / radii[i] - 1.) / fraction;
          }
    return( rval);
 }
