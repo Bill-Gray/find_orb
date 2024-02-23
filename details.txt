@@ -695,12 +695,10 @@ TEL 0.59-m LONEOS Schmidt + CCD
    else as "measurers",  but we don't really know who that one person was.
 COD 703
 COM Find_Orb default details
-COM Valid: 2003 jan 1 - 2100
-TEL 0.68 m Schmidt
 COM Valid: 2003 jan 1 - 2016 Dec 02
-TEL  + 4K CCD
+TEL 0.68 m Schmidt + 4K CCD
 COM Valid: 2016 Dec 02 - 2100
-TEL  + 10K CCD
+TEL 0.68 m Schmidt + 10K CCD
 
 COD 704
 COM Find_Orb default details
@@ -743,7 +741,7 @@ OBS G. Hug
 MEA G. Hug
 NET USNO-SA2.0
 COM Valid: 1900 - 2010
-TEL .3 meter s-c + CCD
+TEL 0.3-m Schmidt-Cassegrain + CCD
 COM Valid: 2010 - 2100
 TEL 0.69-m reflector + CCD
 
@@ -754,7 +752,7 @@ OBS A. Cruz, L. Casady, J. Dellinger, W. G. Dillon, T. Hiserodt
 MEA J. Dellinger, W. G. Dillon
 NET GSC-ACT
 BND R
-TEL 0.46m f/4.5 Newtonian + CCD
+TEL 0.46-m f/4.5 Newtonian + CCD
 
 COD 750
 OBS N. Moritz
@@ -3017,6 +3015,12 @@ COD X07
 OBS H. Sato
 COM Default details extracted from MPEC 2023-L26
 TEL 0.51-m f/6.8 astrograph + CCD
+
+COD X09
+OBS A. Schnabel, D. Ruhela
+MEA S. Deen
+COM Default details extracted from MPEC 2024-C67
+TEL 0.43-m reflector + CMOS
 
 COD X10
 MEA A. Maury, G. Attard, D. Parrott
