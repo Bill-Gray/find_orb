@@ -1774,7 +1774,7 @@ static OBSERVE *get_real_arc( OBSERVE *obs, int *n_obs,
 
 int adjust_herget_results( OBSERVE FAR *obs, int n_obs, double *orbit)
 {
-   int n_found, rval = 0;
+   int n_found, rval;
 
    obs = get_real_arc( obs, &n_obs, &n_found);
    if( n_found < 2)   /* must have at least two obs */
@@ -1782,12 +1782,10 @@ int adjust_herget_results( OBSERVE FAR *obs, int n_obs, double *orbit)
    else if( is_unreasonable_orbit( orbit))
       rval = -3;
    else
-      {
       rval = extended_orbit_fit( orbit, obs, n_obs,
                      FIT_FIXED_DISTANCES, obs->jd);
-      if( !rval)
-         rval = set_locs( orbit, obs->jd, obs, n_obs);
-      }
+   if( !rval)
+      rval = set_locs( orbit, obs->jd, obs, n_obs);
    return( rval);
 }
 
