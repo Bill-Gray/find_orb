@@ -1217,7 +1217,7 @@ int extended_orbit_fit( double *orbit, OBSERVE *obs, int n_obs,
    int i, j, rval = 0, n_resids;
    int n_selected;
    const int n_params = (int)( fit_type & 0xf);
-   double orbit_at_epoch[MAX_N_PARAMS];
+   double orbit_at_epoch[MAX_N_PARAMS], torbit[MAX_N_PARAMS];
    void *lsquare;
    double *resids, *slopes;
    double params[MAX_N_PARAMS];
@@ -1248,18 +1248,19 @@ int extended_orbit_fit( double *orbit, OBSERVE *obs, int n_obs,
       obs1 = obs[0];
       obs2 = obs[n_obs - 1];
       }
-   integrate_orbit( orbit, epoch, obs1.jd);
+   memcpy( torbit, orbit, n_orbit_params * sizeof( double));
+   integrate_orbit( torbit, epoch, obs1.jd);
    for( i = -1; i < n_params; i++)
       {
       for( j = 0; j < n_params; j++)
          params[j] = 0.;
       if( i >= 0)
          params[i] = -delta_val;
-      rval = find_parameterized_orbit( orbit, params, obs1, obs2,
+      rval = find_parameterized_orbit( torbit, params, obs1, obs2,
                      fit_type, 0);
       if( rval)
          return( rval);
-      set_locs_extended( orbit, obs1.jd, obs, n_obs, epoch, orbit_at_epoch);
+      set_locs_extended( torbit, obs1.jd, obs, n_obs, epoch, orbit_at_epoch);
       for( j = 0; j < n_obs; j++)
          if( obs[j].is_included)
             {
@@ -1308,14 +1309,15 @@ int extended_orbit_fit( double *orbit, OBSERVE *obs, int n_obs,
       for( i = 0; i < n_params; i++)
          params[i] /= rescale_adjustment;
       }
-   rval = find_parameterized_orbit( orbit, params, obs1, obs2,
+   rval = find_parameterized_orbit( torbit, params, obs1, obs2,
                      fit_type, 0);
    if( rval)
       return( rval);
-   set_locs_extended( orbit, obs1.jd, obs, n_obs, epoch, orbit_at_epoch);
+   set_locs_extended( torbit, obs1.jd, obs, n_obs, epoch, orbit_at_epoch);
             /* Except we really want to return the orbit at epoch : */
-   memcpy( orbit_at_epoch, orbit, n_orbit_params * sizeof( double));
-   integrate_orbit( orbit, obs1.jd, epoch);
+   memcpy( orbit_at_epoch, torbit, n_orbit_params * sizeof( double));
+   integrate_orbit( torbit, obs1.jd, epoch);
+   memcpy( orbit, torbit, n_orbit_params * sizeof( double));
    return( rval);
 }
 
