@@ -1079,7 +1079,7 @@ static int find_transfer_orbit( double *orbit, OBSERVE FAR *obs1,
                   (i || already_have_approximate_orbit) ? "" : " Using new method");
       }
 
-   while( diff_squared > target_diff * target_diff && max_iterations--)
+   while( diff_squared > target_diff * target_diff && --max_iterations)
       {
       double delta[4][3], discr;
       unsigned pass;
