@@ -1257,6 +1257,8 @@ int extended_orbit_fit( double *orbit, OBSERVE *obs, int n_obs,
          params[i] = -delta_val;
       rval = find_parameterized_orbit( orbit, params, obs1, obs2,
                      fit_type, 0);
+      if( rval)
+         return( rval);
       set_locs_extended( orbit, obs1.jd, obs, n_obs, epoch, orbit_at_epoch);
       for( j = 0; j < n_obs; j++)
          if( obs[j].is_included)
@@ -1308,6 +1310,8 @@ int extended_orbit_fit( double *orbit, OBSERVE *obs, int n_obs,
       }
    rval = find_parameterized_orbit( orbit, params, obs1, obs2,
                      fit_type, 0);
+   if( rval)
+      return( rval);
    set_locs_extended( orbit, obs1.jd, obs, n_obs, epoch, orbit_at_epoch);
             /* Except we really want to return the orbit at epoch : */
    memcpy( orbit_at_epoch, orbit, n_orbit_params * sizeof( double));
@@ -3716,8 +3720,9 @@ static double attempt_improvements( double *orbit, OBSERVE *obs, const int n_obs
                {
                r1 += d_r1;
                r2 += d_r2;
-               herget_method( obs, n_obs, r1, r2, temp_orbit, NULL, NULL, NULL);
-               if( adjust_herget_results( obs, n_obs, temp_orbit))
+               if( herget_method( obs, n_obs, r1, r2, temp_orbit, NULL, NULL, NULL))
+                  error_occurred = true;
+               else if( adjust_herget_results( obs, n_obs, temp_orbit))
                   error_occurred = true;
                }
             if( debug_level > 3)
@@ -4165,8 +4170,10 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
                   score = 9e+5;                 /* but we should keep trying */
                else
                   {
-                  adjust_herget_results( obs + start, n_subarc_obs, orbit);
-                  score = evaluate_initial_orbit( obs + start, n_subarc_obs, orbit, obs[start].jd);
+                  if( adjust_herget_results( obs + start, n_subarc_obs, orbit))
+                     score = 1.e+7;
+                  else
+                     score = evaluate_initial_orbit( obs + start, n_subarc_obs, orbit, obs[start].jd);
                   }
                if( debug_level > 2)
                   debug_printf( "%d, pseudo-r %f: score %f, herget rval %d\n",
