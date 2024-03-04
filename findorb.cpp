@@ -281,10 +281,10 @@ extern double maximum_jd, minimum_jd;        /* orb_func.cpp */
 #define COLOR_RESIDUAL_LEGEND       9
 #define COLOR_MENU                 10
 #define COLOR_SCROLL_BAR           11
-#define COLOR_DEFAULT_INQUIRY      12
-#define COLOR_ATTENTION            13
+/* #define COLOR_DEFAULT_INQUIRY      12   Defined in 'mpc_obs.h' */
+/* #define COLOR_ATTENTION            13   Defined in 'mpc_obs.h' */
 #define COLOR_MPC_CODES            14
-#define COLOR_HINT_TEXT            18
+/* colors 15, 16, 17, and 18 also used for MPC codes;  see 'command.txt' */
 
 #define SHOW_FILE_IS_EPHEM          1
 #define SHOW_FILE_IS_CALENDAR       2
@@ -641,6 +641,16 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
 int inquire( const char *prompt, char *buff, const int max_len,
                      const int color)
 {
+   extern char *mpec_error_message;
+
+   assert( prompt);
+   if( !mpec_error_message && color == COLOR_ATTENTION)
+      {
+      const size_t len = strlen( prompt) + 1;
+
+      mpec_error_message = (char *)malloc( len);
+      strlcpy_err( mpec_error_message, prompt, len);
+      }
    return( full_inquire( prompt, buff, max_len, color, -1, -1));
 }
 
