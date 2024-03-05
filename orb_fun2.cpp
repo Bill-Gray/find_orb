@@ -80,9 +80,11 @@ static double simplex_scoring( void *icontext, const double *ivect)
 
    if( context->n_params == 2)
       {
-      herget_method( context->obs, context->n_obs, ivect[0], ivect[1],
-                           context->orbit, NULL, NULL, NULL);
-      adjust_herget_results( context->obs, context->n_obs, context->orbit);
+      if( herget_method( context->obs, context->n_obs, ivect[0], ivect[1],
+                           context->orbit, NULL, NULL, NULL))
+         return( 1e+30);
+      if( adjust_herget_results( context->obs, context->n_obs, context->orbit))
+         return( 1e+30);
       }
    else
       {
