@@ -5068,6 +5068,44 @@ static inline void redacted_locations( const char *terms[],
          y[i] = -9;
 }
 
+/* The following will look through text and add HTML tags for HTTP and
+HTTPS links.  For example,  if the input buffer is
+
+Go to https://example.com/z.htm for details
+
+   the output will be
+
+Go to <a href='https://example.com/z.htm'>https://example.com/z.htm</a> for details
+*/
+
+static void _insert_links( char *buff, size_t buffsize)
+{
+   while( buffsize && *buff)
+      {
+      if( memcmp( buff, "http", 4))
+         {
+         buff++;
+         buffsize--;
+         }
+      else
+         {
+         size_t len = 0, slen = strlen( buff);
+
+         while( len < buffsize && buff[len] >= ' ' && buff[len] != '<')
+            len++;
+         assert( slen + 15 + len < buffsize);
+         memmove( buff + 15 + len, buff, slen + 1);
+         memcpy( buff + len + 11, buff, len);
+         memmove( buff + 9, buff, len);
+         memcpy( buff, "<a href='", 9);
+         memcpy( buff + len + 9, "'>", 2);
+         memcpy( buff + len * 2 + 11, "</A>", 4);
+         buff += 15 + len * 2;
+         buffsize -= 15 + len * 2;
+         }
+      }
+}
+
 char *mpec_error_message = NULL;
 
 void size_from_h_text( const double abs_mag, char *obuff, const int obuff_size)
@@ -5166,6 +5204,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
                   strlcpy_error( buff, "<p> <b>");
                   strlcat_error( buff, mpec_error_message);
                   strlcat_error( buff, "</b> </p>");
+                  _insert_links( buff, sizeof( buff));
                   }
                }
             while( (tptr = strchr( buff, '$')) != NULL && found_replacement_text)
