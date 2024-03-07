@@ -85,8 +85,6 @@ FILE *open_json_file( char *filename, const char *env_ptr, const char *default_n
 int find_worst_observation( const OBSERVE FAR *obs, const int n_obs);
 double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit);
 int set_locs( const double *orbit, double t0, OBSERVE FAR *obs, int n_obs);
-int text_search_and_replace( char FAR *str, const char *oldstr,
-                                     const char *newstr);   /* ephem0.cpp */
 void attempt_extensions( OBSERVE *obs, const int n_obs, double *orbit,
                   const double epoch);                  /* orb_func.cpp */
 double calc_obs_magnitude( const double obj_sun,
@@ -95,6 +93,8 @@ int find_best_fit_planet( const double jd, const double *ivect,
                                  double *rel_vect);         /* runge.cpp */
 void find_relative_state_vect( const double jd, const double *ivect,
                double *ovect, const int ref_planet);        /* runge.cpp */
+int get_orbit_from_mpcorb_sof( const char *object_name, double *orbit,
+             ELEMENTS *elems, const double full_arc_len, double *max_resid);
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 void remove_trailing_cr_lf( char *buff);      /* ephem0.cpp */
 int write_tle_from_vector( char *buff, const double *state_vect,
@@ -2796,10 +2796,9 @@ static void compute_two_body_state_vect( ELEMENTS *elems, double *orbit, const d
 ELEMENTS.COMET,  Find_Orb can sometimes flounder about a bit in its
 efforts to determine an orbit. */
 
-static int get_orbit_from_mpcorb_sof( const char *filename,
+static int get_orbit_from_sof( const char *filename,
                  const char *object_name, double *orbit, ELEMENTS *elems,
                  const double full_arc_len, double *max_resid)
-
 {
    FILE *ifile = fopen_ext( filename, "crb");
    int got_vectors = 0;
@@ -3154,6 +3153,18 @@ int find_first_and_last_obs_idx( const OBSERVE *obs, const int n_obs,
    return( i);
 }
 
+int get_orbit_from_mpcorb_sof( const char *object_name, double *orbit,
+             ELEMENTS *elems, const double full_arc_len, double *max_resid)
+{
+   const char *mpcorb_dot_sof_filename = get_environment_ptr( "MPCORB_SOF_FILENAME");
+   int rval = 0;
+
+   if( *mpcorb_dot_sof_filename)
+      rval = get_orbit_from_sof( mpcorb_dot_sof_filename,
+                             object_name, orbit, elems, full_arc_len, max_resid);
+   return( rval);
+}
+
 /* When doing (for example) a full six-parameter fit to an orbit,  it can
 be helpful to use an epoch that is at the mid-point of the arc of
 observations that is being fitted.  This improves stability.  */
@@ -3192,15 +3203,16 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
    if( !got_vectors && !ignore_prev_solns)
       {
       ELEMENTS elems;
-      const char *mpcorb_dot_sof_filename = get_environment_ptr( "MPCORB_SOF_FILENAME");
       const double full_arc_len = obs[n_obs - 1].jd - obs[0].jd;
       double rms_resid;
 
-      got_vectors = get_orbit_from_mpcorb_sof( "orbits.sof", obs->packed_id,
+      got_vectors = get_orbit_from_sof( "orbits.sof", obs->packed_id,
                                           orbit, &elems, full_arc_len, &rms_resid);
-      if( !got_vectors && *mpcorb_dot_sof_filename)
-         got_vectors = get_orbit_from_mpcorb_sof( mpcorb_dot_sof_filename,
-                             object_name, orbit, &elems, full_arc_len, &rms_resid);
+#ifdef FALLING_BACK_ON_MPCORB          /* MPCORB isn't entirely reliable */
+      if( !got_vectors)
+         got_vectors = get_orbit_from_mpcorb_sof( object_name, orbit, &elems,
+                                  full_arc_len, &rms_resid);
+#endif
       if( got_vectors)
          {
          move_add_nstr( 2, 2, "Stored soln loaded", -1);

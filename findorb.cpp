@@ -254,6 +254,8 @@ void size_from_h_text( const double abs_mag, char *obuff,
 int find_fcct_biases( const double ra, const double dec, const char catalog,
                  const double jd, double *bias_ra, double *bias_dec);
 int select_tracklet( OBSERVE *obs, const int n_obs, const int idx);
+int get_orbit_from_mpcorb_sof( const char *object_name, double *orbit,
+             ELEMENTS *elems, const double full_arc_len, double *max_resid);
 
 #ifdef __cplusplus
 extern "C" {
@@ -6517,6 +6519,26 @@ int main( int argc, const char **argv)
             show_splash_screen( );     /* just to test */
             extended_getch( );
             break;
+         case ALT_Y:
+            {
+            char object_name[80];
+            double unused_max_resid;
+            ELEMENTS elems;
+
+            get_object_name( object_name, obs->packed_id);
+            if( get_orbit_from_mpcorb_sof( object_name, orbit,
+                               &elems, 0.1, &unused_max_resid))
+               {
+               curr_epoch = epoch_shown = elems.epoch;
+               update_element_display = 1;
+               set_locs( orbit, curr_epoch, obs, n_obs);
+               strlcpy_error( message_to_user, "Elements copied from 'mpcorb.sof'");
+               }
+            else
+               snprintf_err( message_to_user, sizeof( message_to_user),
+                       "Didn't find elems for '%s' in 'mpcorb.sof'", object_name);
+            }
+            break;
          case '\\':
          case 'j': case 'J':
          case 'O':
@@ -6526,7 +6548,7 @@ int main( int argc, const char **argv)
          case CTRL( 'S'): case CTRL( 'T'): case CTRL( 'U'):
          case CTRL( 'V'): case CTRL( 'W'): case CTRL( 'Z'):
          case CTRL( '_'): case CTRL( ']'):
-         case ALT_A: case ALT_Y:
+         case ALT_A:
          case CTL_LEFT: case CTL_RIGHT:
          case KEY_F( 1):
          case KEY_F( 2):
