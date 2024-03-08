@@ -1588,3 +1588,9 @@ SQO !-086.5263889  +38.97702778       153.0    Star Quarry Observatory
 VCe !-073.89045    +41.68295           55.0    Vassar College (since 1997), larger east dome
 VCw !-073.89063    +41.68295           55.0    Vassar College (since 1997), larger west dome
 VCn !-073.89054    +41.68323           55.0    Vassar College (since 1997), small north dome
+
+   This is a new telescope near (071),  described at
+   https://www.ta3.sk/caosp/Eedition/Abstracts/2024/Vol_54/No_2/pp15-21_abstract.html
+   Coordinates are via a private communication from Rositsa Miteva.
+
+Roz !+024.73833    +41.69694         1762.0    1.5-m NAO Rozhen, Smolyan
