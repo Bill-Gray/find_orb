@@ -1577,6 +1577,8 @@ static int _compare_misaligned_packed_desigs( const char *desig1,
       desig1++;
       desig2++;
       }
+   if( !*desig1 || *desig1 == ' ')
+      return( 0);
    return( (int)*desig1 - (int)*desig2);
 }
 
