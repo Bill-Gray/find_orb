@@ -3006,7 +3006,7 @@ static int find_rgb( const int irgb)
    if( COLORS <= 8 || force_eight_color_mode)
       return( (rgb0[0] > 127 ? 1 : 0) | (rgb0[1] > 127 ? 2 : 0)
                                       | (rgb0[2] > 127 ? 4 : 0));
-   if( COLORS >= 256 && !can_change_color( ))
+   if( COLORS >= 256)
       {
       if( rgb0[0] == rgb0[1] && rgb0[0] == rgb0[2]    /* gray-scale */
                                  && rgb0[0] > 4 && rgb0[0] < 247)
