@@ -2648,7 +2648,7 @@ int write_out_elements_to_file( const double *orbit,
       if( elem.central_obj || elem.ecc > .999999)
          if( !elements_in_guide_format( tbuff, &elem, virtual_full_desig, obs, n_obs))
             {
-            ofile = fopen_ext( get_file_name( tbuff, "virtual.txt"), monte_carlo_permits);
+            ofile = fopen_ext( get_file_name( buff, "virtual.txt"), monte_carlo_permits);
             fprintf( ofile, "%s%s\n", tbuff, impact_buff);
             fclose( ofile);
             }
@@ -2682,7 +2682,7 @@ int write_out_elements_to_file( const double *orbit,
       }
 
    if( !elements_in_guide_format( tbuff, &elem, object_name, obs, n_obs)
-         && (ofile = fopen_ext( get_file_name( tbuff, "guide.txt"), "tfcwb")) != NULL)
+         && (ofile = fopen_ext( get_file_name( buff, "guide.txt"), "tfcwb")) != NULL)
       {
       fprintf( ofile, "%s%s\n", tbuff, impact_buff);
       fclose( ofile);
