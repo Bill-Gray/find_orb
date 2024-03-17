@@ -1146,7 +1146,7 @@ and planet.  We can then use the above 'sunlight_visible' function
 to determine the fraction of the sun that is visible (not blocked),
 almost always 100% (you don't spend much time in the earth's shadow).
 
-   See http://www.minorplanet.info/MPB/issues/MPB_45-3.pdf for a discussion
+   See https://mpbulletin.org/issues/MPB_45-3.pdf for a discussion
 of two instances where this matters.  2008 TC3 and 2018 LA,  impactors,
 are other examples of objects passing through earth's shadow,  as are
 numerous artsats.
