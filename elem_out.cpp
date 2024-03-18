@@ -1898,7 +1898,7 @@ int write_out_elements_to_file( const double *orbit,
    int geocentric_score = -1;
    char body_frame_note[30];
    bool body_frame_note_shown = false;
-   int showing_sigmas = available_sigmas;
+   int showing_sigmas, saved_available_sigmas = available_sigmas;
    const unsigned orbit_summary_options = atoi( get_environment_ptr( "ORBIT_SUMMARY_OPTIONS"));
    extern int is_interstellar;         /* orb_func.cpp */
    const size_t tbuff_size = 80 * 9;
@@ -1939,16 +1939,18 @@ int write_out_elements_to_file( const double *orbit,
    rotate_state_vector_to_current_frame( rel_orbit, epoch_shown, planet_orbiting,
                        body_frame_note);
 
-   if( !(options & ELEM_OUT_ALTERNATIVE_FORMAT))
-      showing_sigmas = 0;
-   if( showing_sigmas == COVARIANCE_AVAILABLE)
+   if( available_sigmas == COVARIANCE_AVAILABLE)
       {
       extern int available_sigmas_hash;
 
       if( available_sigmas_hash != compute_available_sigmas_hash( obs, n_obs,
                   epoch_shown, perturbers, planet_orbiting))
-         showing_sigmas = 0;
+         available_sigmas = 0;
       }
+   if( !(options & ELEM_OUT_ALTERNATIVE_FORMAT))
+      showing_sigmas = 0;
+   else
+      showing_sigmas = available_sigmas;
 
    elem.central_obj = planet_orbiting;
    elem.gm = get_planet_mass( planet_orbiting);
@@ -2702,6 +2704,7 @@ int write_out_elements_to_file( const double *orbit,
    fclose( ofile);
    make_linkage_json( n_obs, obs, &elem);
    free( tbuff);
+   available_sigmas = saved_available_sigmas;
    return( bad_elements);
 }
 
