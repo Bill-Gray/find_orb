@@ -3066,7 +3066,7 @@ static double extract_state_vect_from_text( const char *text,
          quantities_found |= FOUND_ECCENTRICITY;
          }
       else if( !_memicmp( text, "UTC", 3))
-         epoch = utc_from_td( epoch, NULL);
+         epoch += td_minus_utc( epoch) / seconds_per_day;
       else if( !_memicmp( text, "TDB", 3))
          {
          const double t_cen = (epoch - J2000) / 36525.;
