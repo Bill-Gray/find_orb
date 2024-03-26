@@ -4,7 +4,7 @@
 # Every now and then,  an MPC code is added for which no
 # rectangle exists;  I then have to add a rectangle or two.
 # 2023 Aug 21 version.
-   6.61665  32.28687   2.38989  37.29359  Algeria
+   7.4      23.0      -0.9      37.29359  Algeria
  303.64175 -38.50229 302.15234 -35.24411  Argentina
  300.93768 -34.54863 301.45872 -34.35379  Argentina
  301.02672 -38.17328 290.50902 -32.37026  Argentina
