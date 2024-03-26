@@ -73,6 +73,16 @@ int wget_wch(WINDOW *win, wint_t *wch)
 /* At least for the nonce,  the cursor will be 'normal' in overwrite mode
 and 'very visible' in insert mode.     */
 
+#ifdef __PDCURSESMOD__
+   #define _HAVE_OPAQUE_SCREEN_FUNCS
+#endif
+
+#ifdef NCURSES_VERSION_PATCH
+   #if NCURSES_VERSION_PATCH >= 20230812
+      #define _HAVE_OPAQUE_SCREEN_FUNCS
+   #endif
+#endif
+
 #define CURSOR_INSERT      2
 #define CURSOR_OVERWRITE   1
 
@@ -106,9 +116,9 @@ int wgetn_wstr_ex(WINDOW *win, wint_t *wstr, int *loc, const int maxlen, const i
 {
     int i, x, y, offset = 0, initial_cursor_state;
     int rval = -1;
-#ifdef __PDCURSESMOD__
-    const bool oldcbreak = PDC_getcbreak( ); /* remember states */
-    const bool oldecho = PDC_getecho( );
+#ifdef _HAVE_OPAQUE_SCREEN_FUNCS
+    const int oldcbreak = is_cbreak( ); /* remember states */
+    const int oldecho   = is_echo( );
 #endif
     const bool oldnodelay = is_nodelay( win);
 
@@ -292,7 +302,7 @@ int wgetn_wstr_ex(WINDOW *win, wint_t *wstr, int *loc, const int maxlen, const i
                    break;
             }
     }
-#ifdef __PDCURSESMOD__
+#ifdef _HAVE_OPAQUE_SCREEN_FUNCS
     oldcbreak ? cbreak( ) : nocbreak( );     /* restore states */
     oldecho ? echo( ) : noecho( );
 #endif
