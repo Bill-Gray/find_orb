@@ -16,7 +16,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301, USA. */
 
 #include <stdlib.h>
-#include <stdio.h>
 #include <stdbool.h>
 #include <assert.h>
 #include <math.h>
@@ -28,9 +27,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    #define isnan _isnan
 #endif
 
-long double geo_potential( const long double x, const long double y,
-                                  const long double z, long double *derivs,
-                                  int n_terms);   /* geo_pot.c */
 double geo_potential_in_au( const double x, const double y, const double z,
                  double *derivs, const int n_terms);    /* geo_pot.c */
 
@@ -65,7 +61,7 @@ for the Moon,  Mars,  and Venus;  it should be quite easy to add them to
 Find_Orb in the same way,  if we ever decide that would matter.   */
 
    static long double ggm03c_terms[] = {           /* l m   (l=degree,  m=order) */
-        0.000000000000E+00,  0.000000000000E+00,   /* 0 0 */
+        1.000000000000E+00,  0.000000000000E+00,   /* 0 0 */
 
         0.000000000000E+00,  0.000000000000E+00,   /* 1 0 */
         0.000000000000E+00,  0.000000000000E+00,   /* 1 1 */
@@ -1580,20 +1576,17 @@ P  (x) = 0
 */
 
 /* For the 'geo_max' program,  we may be interested in the sum of only
-some higher-degree terms.  In that case,  we reset _starting_term. */
+some higher-degree terms.  The 'test' program includes term 0 (the 1/r
+potential one).  In those cases,  we reset _starting_term. */
 
-#ifdef FIND_MAX
-   int _starting_term;
-#else
-   #define _starting_term 0
-#endif
+int _starting_term = 1;
 
 /* For geo_potential,  xyz are in units of the earth's radius.  The
 return value is 1 at the earth's radius.  Both facts are a bit of
 a pain,  which is why geo_potential_in_au() gives values in AUs and
-days.  See the 'test_main' code for conversions to MKS. */
+days.  See the 'geo_test.cpp' code for conversions to MKS. */
 
-long double geo_potential( const long double x, const long double y,
+static long double geo_potential( const long double x, const long double y,
                            const long double z, long double *derivs,
                            int n_terms)
 {
@@ -1745,133 +1738,3 @@ double geo_potential_in_au( const double x, const double y, const double z,
       }
    return( rval);
 }
-
-#ifdef TEST_MAIN
-
-static double jn_potential( const double x, const double y, const double z,
-                         const double j2,  const double j3, const double j4)
-{
-   const double r2 = x * x + y * y + z * z;
-   const double r = sqrt( r2);
-   const double mu = z / r;
-   const double mu2 = mu * mu;
-   const double p3 = mu * (2.5 * mu2 - 1.5);
-   const double p4 = (35. * mu2 * mu2 - 30. * mu2 + 3.) / 8.;
-   const double p2 = 1.5 * mu2 - .5;     /* Danby, p. 115 */
-
-   return( (j2 * p2 + j3 * p3 / r + j4 * p4 / r2) / (r * r2));
-// return( (          j3 * p3 / r + j4 * p4 / r2) / (r * r2));
-}
-
-#define EARTH_R2 (EARTH_R * EARTH_R)
-#define EARTH_R3 (EARTH_R * EARTH_R2)
-#define J2_IN_EARTH_UNITS (1.0826355254e-3)
-#define J3_IN_EARTH_UNITS (-2.5325505977e-6)
-#define J4_IN_EARTH_UNITS (-1.62870177e-6)
-#define EARTH_J2 (J2_IN_EARTH_UNITS * EARTH_R2)
-#define EARTH_J3 (J3_IN_EARTH_UNITS * EARTH_R3)
-#define EARTH_J4 (J4_IN_EARTH_UNITS * EARTH_R3 * EARTH_R)
-
-#include <stdlib.h>
-
-int main( const int argc, const char **argv)
-{
-   const double lat = atof( argv[1]) * PI / 180.;
-   const double lon = atof( argv[2]) * PI / 180.;
-   int n_terms = N_TERMS - 1;
-#ifdef GEOID_HEIGHT
-   double oval;
-   long double loc[3], derivs[3];
-
-   const double earth_gm = 0.3986004415E+15;   /* GGM03 value, in m^3/s^2 */
-   const double omega = 7292115e-11;           /* in radians/second */
-   const double earth_minor_axis = 6356755.;    /* polar radius */
-   const double centrifugal_pot_at_equator =
-         EARTH_MAJOR_AXIS * EARTH_MAJOR_AXIS * EARTH_MAJOR_AXIS * omega * omega / earth_gm;
-
-   if( argc > 3)
-      n_terms = atoi( argv[3]);
-   loc[0] = (long double)( cos( lon) * cos( lat));
-   loc[1] = (long double)( sin( lon) * cos( lat));
-   loc[2] = (long double)( sin( lat) * earth_minor_axis / EARTH_MAJOR_AXIS);
-   ggm03c_terms[0] = 1.;      /* include "J0" term    */
-   oval = 1. - (double)geo_potential( loc[0], loc[1], loc[2], derivs, n_terms);
-   oval -= centrifugal_pot_at_equator * cos( lat) * cos( lat) / 2.;
-   printf( "%e  (geoid height %f meters)\n", oval,
-                 -14497.68 - oval * EARTH_MAJOR_AXIS);
-#else
-                     /* cvt radius from units of earth radii to AU: */
-   const double r = atof( argv[3]) * EARTH_MAJOR_AXIS / AU_IN_METERS;
-   const double delta = r * .0001;
-   const double x = r * cos( lon) * cos( lat);
-   const double y = r * sin( lon) * cos( lat);
-   const double z = r *             sin( lat);
-   double derivs[3], dpot;
-
-   if( argc > 4)
-      n_terms = atoi( argv[4]);
-   printf( "  %e\n", jn_potential( x * AU_IN_METERS / EARTH_MAJOR_AXIS,
-                                   y * AU_IN_METERS / EARTH_MAJOR_AXIS,
-                                   z * AU_IN_METERS / EARTH_MAJOR_AXIS,
-                                   EARTH_J2, EARTH_J3, EARTH_J4));
-   printf( "  %e\n",
-              geo_potential_in_au( x, y, z, derivs, n_terms));
-   printf( "  Derivs: %.10e %.10e %.10e (analytical)\n", derivs[0], derivs[1], derivs[2]);
-   for( size_t i = 0; i < 3; i++)
-      derivs[i] *= AU_IN_METERS / (seconds_per_day * seconds_per_day);
-   printf( "  Derivs: %.10e %.10e %.10e (analytical, m/s^2)\n", derivs[0], derivs[1], derivs[2]);
-
-   dpot = geo_potential_in_au( x + delta, y, z, NULL, n_terms)
-        - geo_potential_in_au( x - delta, y, z, NULL, n_terms);
-   derivs[0] = .5 * dpot / delta;
-   dpot = geo_potential_in_au( x, y + delta, z, NULL, n_terms)
-        - geo_potential_in_au( x, y - delta, z, NULL, n_terms);
-   derivs[1] = .5 * dpot / delta;
-   dpot = geo_potential_in_au( x, y, z + delta, NULL, n_terms)
-        - geo_potential_in_au( x, y, z - delta, NULL, n_terms);
-   derivs[2] = .5 * dpot / delta;
-   printf( "  Derivs: %.10e %.10e %.10e (numerical, AU/day^2)\n", derivs[0], derivs[1], derivs[2]);
-#endif
-   printf( "Lat %c%f Long %c%f\n",
-         (lat > 0. ? 'N' : 'S'), fabs( lat) * 180. / PI,
-         (lon > 0. ? 'E' : 'W'), fabs( lon) * 180. / PI);
-   return( 0);
-}
-#endif          // #ifdef TEST_MAIN
-
-/*
-   Comparisons made to
-
-http://geographiclib.sourceforge.net/cgi-bin/GeoidEval?input=44+-69.9&option=Submit
-
-0 0:       17.226  16.927145
-45 0:      46.767  47.289086
-90 0:      14.898  14.898461
-0 120:     59.82   58.211502
-0 100:     -6.92   -6.904056
-0 80:    -102.59 -102.701770
-0 60:     -62.59  -62.740079
-10 125:    63.91   64.616471
-44 -69.9: -26.70  -26.649304
--10 -125: -10.25  -10.678747
-lat lon
-         online   geo_pot.c
-
-   Note that rearrangement of the order of computation has changed the results
-by a millimeter or so...
-
-phred@phred:~/find_orb$ ./geo_pot 0 0 1 19
-  -2.085725e-05
-  Derivs: 4.8973461530e-01 2.3583555353e-06 -5.7623158275e-06 (analytical)
-  Derivs: 9.8142864339e+00 4.7261467768e-05 -1.1547686499e-04 (analytical, m/s^2)
-  Derivs: 4.8973462022e-01 2.3583549381e-06 -5.7623145439e-06 (numerical, AU/day^2)
-phred@phred:~/find_orb$ ./geo_pot 31.4 159 1 19
-  -2.084797e-05
-  Derivs: -3.8937807981e-01 1.4946019510e-01 2.5541973048e-01 (analytical)
-  Derivs: -7.8031404906e+00 2.9951837573e+00 5.1186138726e+00 (analytical, m/s^2)
-  Derivs: -3.8937808013e-01 1.4946019321e-01 2.5541972839e-01 (numerical, AU/day^2)
-phred@phred:~/find_orb$ ./geo_pot 31.4 159 .8 19
-  -2.606101e-05
-  Derivs: -6.0807926146e-01 2.3343379352e-01 3.9961972747e-01 (analytical)
-  Derivs: -1.2185914289e+01 4.6780154831e+00 8.0083832089e+00 (analytical, m/s^2)
-  Derivs: -6.0807926193e-01 2.3343379057e-01 3.9961972424e-01 (numerical, AU/day^2) */
