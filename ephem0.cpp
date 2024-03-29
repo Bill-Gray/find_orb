@@ -2451,17 +2451,10 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
          header = (char *)malloc( 1024);
          assert( header);
          strlcpy_err( header, buff, 1024);
-         if( *alt_file_name)
-            computer_friendly_ofile = fopen_ext( alt_file_name,
+         if( !*alt_file_name)
+            alt_file_name = "alt_eph.txt";
+         computer_friendly_ofile = fopen_ext( alt_file_name,
                                           is_default_ephem ? "tfcw+" : "fw+");
-         else
-            computer_friendly_ofile = tmpfile( );
-#ifdef _WIN32
-         if( !computer_friendly_ofile)  /* can fail on Windoze */
-            computer_friendly_ofile = fopen_ext( "alt_eph.txt",
-                                          is_default_ephem ? "tfcw+" : "fw+");
-#endif
-         assert( computer_friendly_ofile);
          }
       if( show_radar_data)
          exposure_config.min_alt = rdata.altitude_limit * 180. / PI;
