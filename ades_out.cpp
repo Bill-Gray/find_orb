@@ -127,13 +127,21 @@ static int dump_one_line_of_names( FILE *ofile, const char *line)
          if( ofile)
             {
             int len = 0;
+            const char *detector = "UNK";   /* default assumption */
 
             while( tptr[len] && tptr[len + 1] != '+')
                len++;
             fprintf( ofile, "        <aperture>%s</aperture>\n", aperture);
             if( *f_ratio)
                fprintf( ofile, "        <fRatio>%s</fRatio>\n", f_ratio);
-            fprintf( ofile, "        <detector>CCD</detector>\n");
+            if( tptr[len] && tptr[len + 1] == '+')
+               {
+               if( strstr( tptr + len, "CCD"))
+                  detector = "CCD";
+               else if( strstr( tptr + len, "CMO"))
+                  detector = "CMO";
+               }
+            fprintf( ofile, "        <detector>%s</detector>\n", detector);
             if( !memcmp( tptr, "coronagraph", 11))
                {
                fprintf( ofile, "        <name>%s</name>\n", tptr + 12);
@@ -175,11 +183,16 @@ static int output_names( FILE *ofile, const OBSERVE FAR *obs, const char *target
    const size_t tlen = strlen( target);
    const char *tptr;
    const char **obs_details = obs->obs_details;
+   const bool only_one_line = (!strcmp( target, "TEL ") || !ofile);
 
    if( obs_details)
       for( i = 0; (tptr = obs_details[i]) != NULL; i++)
          if( !strncmp( tptr, target, tlen))
+            {
             n_found += dump_one_line_of_names( ofile, tptr);
+            if( only_one_line)
+               break;
+            }
 
    if( !n_found)
       {
@@ -193,7 +206,22 @@ static int output_names( FILE *ofile, const OBSERVE FAR *obs, const char *target
       if( got_it)
          while( fgets_trimmed( buff, sizeof( buff), ifile) && memcmp( buff, "COD ", 4))
             if( !strncmp( buff, target, tlen))
+               {
                n_found += dump_one_line_of_names( ofile, buff);
+               if( only_one_line)
+                  break;
+               }
+
+      if( !n_found)     /* look for 'default' details */
+         {
+         while( fgets( buff, sizeof( buff), ifile))
+            if( !memcmp( buff, "COD Def", 7))
+               {
+               while( fgets_trimmed( buff, sizeof( buff), ifile))
+                  if( !strncmp( buff, target, tlen))
+                     n_found += dump_one_line_of_names( ofile, buff);
+               }
+         }
       fclose( ifile);
       }
    return( n_found);
