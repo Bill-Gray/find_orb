@@ -4342,6 +4342,7 @@ int main( int argc, const char **argv)
       line_no = n_command_lines + 1;
          {
          char *tptr = tbuff;
+         FILE *ofile = fopen_ext( "comments.txt", "tfcw");
 
          clock_line = 0;
          if( sort_obs_by_code)
@@ -4370,12 +4371,14 @@ int main( int argc, const char **argv)
                add_cmd_area( '%', line_no, (unsigned)( tptr2 - tptr), 5);
             put_colored_text( tptr, line_no++, 0, -1,
                      (tptr[i + 1] ? COLOR_OBS_INFO : COLOR_OBS_INFO | A_UNDERLINE));
+            fprintf( ofile, "%s\n", tptr);
             tptr += i + 1;
             while( *tptr == 10 || *tptr == 13)
                tptr++;
             if( i < 72 && !clock_line)
                clock_line = line_no - 1;
             }
+         fclose( ofile);
          if( debug_level)
             refresh( );
          top_line_orbital_elements = line_no;
