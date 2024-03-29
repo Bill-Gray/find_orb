@@ -206,31 +206,37 @@ clipfunc.o:        clipfunc.cpp
 getstrex.o:        getstrex.cpp
 	$(CXX) $(CXXFLAGS) $(CURSES_FLAGS) $<
 
-$(FO_EXE):          fo.o $(OBJS) $(RES_FILENAME)
+$(FO_EXE):           fo.o $(OBJS) $(RES_FILENAME)
 	$(CXX) -o $(FO_EXE) fo.o $(OBJS) $(LIBS) $(RES_FILENAME) $(LDFLAGS)
 
 eph2tle$(EXE):          eph2tle.o conv_ele.o elem2tle.o simplex.o lsquare.o
 	$(CXX) -o eph2tle$(EXE) eph2tle.o conv_ele.o elem2tle.o simplex.o lsquare.o $(LIBS)
 
-cssfield$(EXE):          cssfield.o
+cssfield$(EXE):           cssfield.o
 	$(CXX) -o cssfield$(EXE) cssfield.o $(LIBS)
 
 expcalc$(EXE):          expcalc.cpp
 	$(CXX) -o expcalc$(EXE) -Wall -Wextra -pedantic -DTEST_CODE expcalc.cpp
 
-roottest$(EXE):          roottest.o
+geo_max$(EXE):           geo_max.o geo_pot.o
+	$(CXX) -o geo_max$(EXE) geo_max.o geo_pot.o
+
+geo_test$(EXE):           geo_test.o geo_pot.o
+	$(CXX) -o geo_test$(EXE) geo_test.o geo_pot.o
+
+roottest$(EXE):           roottest.o roots.o
 	$(CXX) -o roottest$(EXE) roottest.o roots.o
 
-neat_xvt$(EXE):          neat_xvt.o
+neat_xvt$(EXE):           neat_xvt.o
 	$(CXX) -o neat_xvt$(EXE) neat_xvt.o
 
-fo_serve.cgi:          fo_serve.o $(OBJS)
+fo_serve.cgi:           fo_serve.o $(OBJS)
 	$(CXX) -o fo_serve.cgi fo_serve.o $(OBJS) $(LIBS)
 
-cvt_elem.cgi:	         cvt_elem.o
+cvt_elem.cgi:	          cvt_elem.o
 	$(CXX) -o cvt_elem.cgi cvt_elem.o $(LIBS)
 
-cvt_elem.o:         conv_ele.cpp
+cvt_elem.o:            conv_ele.cpp
 	$(CXX) $(CXXFLAGS) -o cvt_elem.o -DCGI_VERSION $<
 
 IDIR=$(PREFIX)/share/findorb/data
@@ -244,6 +250,7 @@ clean:
 	$(RM) fo_serve.cgi eph2tle.o eph2tle$(EXE) cssfield$(EXE)
 	$(RM) $(FIND_ORB_OBJS) cssfield.o neat_xvt.o neat_xvt$(EXE)
 	$(RM) prefix.h PREFIX
+	$(RM) geo_test.o geo_test geo_max.o geo_max
 ifdef RES_FILENAME
 	$(RM) $(RES_FILENAME)
 
