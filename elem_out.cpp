@@ -3204,6 +3204,8 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
       *orbit_epoch = extract_state_vect_from_text(
                   state_vect_text, orbit, &abs_mag);
       got_vectors = (*orbit_epoch != 0.);
+      if( got_vectors)
+         push_orbit( *orbit_epoch, orbit);
       }
    if( !got_vectors && !ignore_prev_solns)
       {
