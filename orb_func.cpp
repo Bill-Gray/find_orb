@@ -154,6 +154,7 @@ int orbital_monte_carlo( const double *orbit, OBSERVE *obs, const int n_obs,
          const double curr_epoch, const double epoch_shown);   /* orb_func.cpp */
 void shellsort_r( void *base, const size_t n_elements, const size_t esize,
          int (*compare)(const void *, const void *, void *), void *context);
+int curses_kbhit( );
 
 void set_distance( OBSERVE FAR *obs, double r)
 {
@@ -361,6 +362,7 @@ clock_t integration_timeout = (clock_t)0;
 #define STEP_INCREMENT 2
 #define INTEGRATION_TIMED_OUT       -3
 #define HIT_A_PLANET                -4
+#define USER_INTERRUPTED            -5
 
 static void double_to_ldouble( long double *ovals, const double *ivals,
                                           size_t n)
@@ -516,6 +518,8 @@ int integrate_orbitl( long double *orbit, const long double t0, const long doubl
             }
 #endif
          refresh_console( );
+         if( curses_kbhit( ) > 0)
+            return( USER_INTERRUPTED);
          }
 
                /* Make sure we don't step completely past */
@@ -1249,7 +1253,9 @@ int extended_orbit_fit( double *orbit, OBSERVE *obs, int n_obs,
       obs2 = obs[n_obs - 1];
       }
    memcpy( torbit, orbit, n_orbit_params * sizeof( double));
-   integrate_orbit( torbit, epoch, obs1.jd);
+   rval = integrate_orbit( torbit, epoch, obs1.jd);
+   if( rval)
+      return( rval);
    for( i = -1; i < n_params; i++)
       {
       for( j = 0; j < n_params; j++)
@@ -1258,9 +1264,10 @@ int extended_orbit_fit( double *orbit, OBSERVE *obs, int n_obs,
          params[i] = -delta_val;
       rval = find_parameterized_orbit( torbit, params, obs1, obs2,
                      fit_type, 0);
+      if( !rval)
+         rval = set_locs_extended( torbit, obs1.jd, obs, n_obs, epoch, orbit_at_epoch);
       if( rval)
          return( rval);
-      set_locs_extended( torbit, obs1.jd, obs, n_obs, epoch, orbit_at_epoch);
       for( j = 0; j < n_obs; j++)
          if( obs[j].is_included)
             {
@@ -1311,12 +1318,13 @@ int extended_orbit_fit( double *orbit, OBSERVE *obs, int n_obs,
       }
    rval = find_parameterized_orbit( torbit, params, obs1, obs2,
                      fit_type, 0);
+   if( !rval)
+      set_locs_extended( torbit, obs1.jd, obs, n_obs, epoch, orbit_at_epoch);
    if( rval)
       return( rval);
-   set_locs_extended( torbit, obs1.jd, obs, n_obs, epoch, orbit_at_epoch);
             /* Except we really want to return the orbit at epoch : */
    memcpy( orbit_at_epoch, torbit, n_orbit_params * sizeof( double));
-   integrate_orbit( torbit, obs1.jd, epoch);
+   rval = integrate_orbit( torbit, obs1.jd, epoch);
    memcpy( orbit, torbit, n_orbit_params * sizeof( double));
    return( rval);
 }
@@ -2882,15 +2890,10 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
                }
             if( debug_level > 4)
                debug_printf( "Second set done: %d\n", set_locs_rval);
-            if( set_locs_rval == INTEGRATION_TIMED_OUT)
-               {
-               free( xresids);
-               free( orig_obs);
-               memcpy( orbit, original_orbit, n_orbit_params * sizeof( double));
-               runtime_message = NULL;
-               debug_printf( "Integration timeout\n");
-               return( -4);
-               }
+            if( set_locs_rval == INTEGRATION_TIMED_OUT
+                          || set_locs_rval == USER_INTERRUPTED)
+
+               err_code = set_locs_rval;
             if( set_locs_rval)      /* gonna have to try again, */
                {                    /* with a smaller tweak */
                delta_val /= 2.;
@@ -2955,6 +2958,15 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
             memcpy( tstr, "Reverse   ", 10);
             fail_on_hitting_planet = true;
             set_locs_rval = set_locs( tweaked_orbit, epoch, obs, n_obs);
+            if( set_locs_rval == USER_INTERRUPTED)
+               {
+               free( xresids);
+               free( orig_obs);
+               memcpy( orbit, original_orbit, n_orbit_params * sizeof( double));
+               runtime_message = NULL;
+               debug_printf( "Interrupted full step\n");
+               return( -4);
+               }
             if( set_locs_rval)      /* fall back on simple, asymmetric method */
                {
                debug_printf( "Symmetric fail : %d\n", set_locs_rval);
@@ -3336,9 +3348,9 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
    do
       {
       if( setting_outside_of_arc)
-         set_locs( orbit, epoch, obs - n_skipped_obs, n_total_obs);
+         err_code = set_locs( orbit, epoch, obs - n_skipped_obs, n_total_obs);
       else
-         set_locs( orbit, epoch, obs, n_obs);
+         err_code = set_locs( orbit, epoch, obs, n_obs);
       if( *get_environment_ptr( "HALF_STEPS"))
          {
          const double after_rms = compute_rms( obs, n_obs);
@@ -3356,7 +3368,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
       else
          i = 0;
       }
-      while( i);
+      while( !err_code && i);
 
    if( debug_level > 1)
       debug_printf( "full_improve done\n");

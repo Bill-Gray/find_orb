@@ -291,7 +291,7 @@ extern double maximum_jd, minimum_jd;        /* orb_func.cpp */
 #define SHOW_FILE_IS_EPHEM          1
 #define SHOW_FILE_IS_CALENDAR       2
 
-static int curses_kbhit( )
+int curses_kbhit( )
 {
    int c;
 
@@ -5327,6 +5327,11 @@ int main( int argc, const char **argv)
                {
                strlcpy_error( message_to_user,
                                (err ? "Full step FAILED" : "Full step taken"));
+               if( curses_kbhit( ) > 0)
+                  {
+                  extended_getch( );
+                  strlcpy_error( message_to_user, "User interrupted step");
+                  }
                snprintf_append( message_to_user, sizeof( message_to_user), "(%.5f s)",
                       (double)( clock( ) - t0) / (double)CLOCKS_PER_SEC);
                }

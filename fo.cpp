@@ -124,8 +124,9 @@ static void object_comment_text( char *buff, const OBJECT_INFO *id)
 }
 
 /* In the (interactive) console Find_Orb,  these allow some functions in
-orb_func.cpp to show info as orbits are being computed.  In this
-non-interactive code,  they're mapped to do nothing. */
+orb_func.cpp to show info as orbits are being computed,  or to let you
+abort processing by hitting a key.  In this non-interactive code,
+they're mapped to do nothing. */
 
 void refresh_console( void)
 {
@@ -137,6 +138,11 @@ void move_add_nstr( const int col, const int row, const char *msg, const int n_b
    INTENTIONALLY_UNUSED_PARAMETER( row);
    INTENTIONALLY_UNUSED_PARAMETER( msg);
    INTENTIONALLY_UNUSED_PARAMETER( n_bytes);
+}
+
+int curses_kbhit( )
+{
+   return( 0);
 }
 
 static double curr_jd( void)
