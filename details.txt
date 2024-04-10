@@ -888,6 +888,10 @@ TEL 0.41-m f/3.75 astrograph + CCD
 NET UCAC-3
 ACK Batch 160511b.txt (926) - NEOCP follow-up
 
+COD 932
+OBS M. Robson
+TEL 0.4-m f/7.5 Schmidt-Cassegrain + CCD
+
 COD 938
 COM Find_Orb default details
 OBS R. Goncalves
@@ -2970,6 +2974,11 @@ OBS J. Purcell
 COM Default details extracted from MPEC 2021-W138
 TEL 0.13-m refractor + CCD
 
+COD W13
+OBS C. J. Horowitz
+COM Default details extracted from MPEC 2024-F101
+TEL 0.20-m f/2 Schmidt-Cassegrain + CMO
+
 COD W16
 OBS M. Holbrook
 COM Default details extracted from MPEC 2021-C121
@@ -2995,6 +3004,11 @@ TEL 0.36-m f/1.9 Schmidt-Cassegrain + CCD
 COM Aplanatic Schmidt-Cassegrain
 COM Photo/astrometry Astrometrica 4.12.0.488
 COM (Default details from R. L. Flynn,  2019 Sep 4)
+
+COD W42
+OBS J. T. Grage
+COM Default details extracted from MPEC 2024-G74
+TEL 0.30-m f/3.3 SCT + CMO
 
 COD W46
 OBS J. Haidet
