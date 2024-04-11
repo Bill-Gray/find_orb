@@ -154,7 +154,7 @@ int orbital_monte_carlo( const double *orbit, OBSERVE *obs, const int n_obs,
          const double curr_epoch, const double epoch_shown);   /* orb_func.cpp */
 void shellsort_r( void *base, const size_t n_elements, const size_t esize,
          int (*compare)(const void *, const void *, void *), void *context);
-int curses_kbhit( );
+int curses_kbhit_without_mouse( );
 
 void set_distance( OBSERVE FAR *obs, double r)
 {
@@ -518,7 +518,7 @@ int integrate_orbitl( long double *orbit, const long double t0, const long doubl
             }
 #endif
          refresh_console( );
-         if( curses_kbhit( ) > 0)
+         if( curses_kbhit_without_mouse( ) > 0)
             return( USER_INTERRUPTED);
          }
 

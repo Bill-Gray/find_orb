@@ -112,7 +112,7 @@ void move_add_nstr( const int col, const int row, const char *msg, const int n_b
    INTENTIONALLY_UNUSED_PARAMETER( n_bytes);
 }
 
-int curses_kbhit( )
+int curses_kbhit_without_mouse( )
 {
    return( 0);
 }

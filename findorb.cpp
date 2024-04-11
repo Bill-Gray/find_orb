@@ -303,6 +303,13 @@ int curses_kbhit( )
    return( c);
 }
 
+int curses_kbhit_without_mouse( )
+{
+   const int rval = curses_kbhit( );
+
+   return( rval != KEY_MOUSE ? rval : 0);
+}
+
 static int extended_getch( void)
 {
 #ifdef _WIN32
@@ -5327,7 +5334,7 @@ int main( int argc, const char **argv)
                {
                strlcpy_error( message_to_user,
                                (err ? "Full step FAILED" : "Full step taken"));
-               if( curses_kbhit( ) > 0)
+               if( curses_kbhit_without_mouse( ) > 0)
                   {
                   extended_getch( );
                   strlcpy_error( message_to_user, "User interrupted step");
