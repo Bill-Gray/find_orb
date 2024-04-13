@@ -1235,6 +1235,8 @@ int extended_orbit_fit( double *orbit, OBSERVE *obs, int n_obs,
    for( i = n_selected = 0; i < n_obs; i++)
       if( obs[i].flags & OBS_IS_SELECTED)
          n_selected++;
+   obs1 = obs[0];
+   obs2 = obs[n_obs - 1];
    if( n_selected == 2)
       {
       for( i = n_selected = 0; i < n_obs; i++)
@@ -1246,11 +1248,6 @@ int extended_orbit_fit( double *orbit, OBSERVE *obs, int n_obs,
                obs2 = obs[i];
             n_selected++;
             }
-      }
-   else
-      {
-      obs1 = obs[0];
-      obs2 = obs[n_obs - 1];
       }
    memcpy( torbit, orbit, n_orbit_params * sizeof( double));
    rval = integrate_orbit( torbit, epoch, obs1.jd);
