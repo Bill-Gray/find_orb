@@ -6554,8 +6554,34 @@ int main( int argc, const char **argv)
                        "Didn't find elems for '%s' in 'mpcorb.sof'", object_name);
             }
             break;
-         case '\\':
          case 'j': case 'J':
+            {
+            extern int object_type;
+            const char *text;
+
+            if( object_type == OBJECT_TYPE_ASTEROID)
+               {
+               object_type = OBJECT_TYPE_COMET;
+               default_comet_magnitude_type = 'T';
+               text = "comet total";
+               }
+            else if( default_comet_magnitude_type == 'T')
+               {
+               default_comet_magnitude_type = 'N';
+               text = "comet nuclear";
+               }
+            else
+               {
+               object_type = OBJECT_TYPE_ASTEROID;
+               text = "asteroid";
+               }
+            calc_absolute_magnitude( obs, n_obs);
+            snprintf_err( message_to_user, sizeof( message_to_user),
+                       "Using %s mag model", text);
+            update_element_display = 1;
+            }
+            break;
+         case '\\':
          case 'O':
          case ';': case ']':
          case CTRL( 'E'): case CTRL( 'J'): case CTRL( 'L'):
