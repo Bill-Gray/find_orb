@@ -74,6 +74,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    #define MOUSE_WHEEL_SCROLL 0
 #endif
 
+#if !defined( ALT_DN)
+   #define ALT_DN                 ALT_DOWN
+#endif         /* PDCurses defines ALT_DOWN;  ncurses defines ALT_DN  */
+
 #define CSI "\x1b["
 #define OSC "\x1b]"
 
@@ -1962,7 +1966,11 @@ static int get_character_code( const char *buff)
 
    if( !memcmp( buff, "Alt-", 4))
       {
-      if( buff[4] >= 'A' && buff[4] <= 'Z')
+      if( !memcmp( buff + 4, "Up", 2))
+         rval = ALT_UP;
+      else if( !memcmp( buff + 4, "Dn", 2))
+         rval = ALT_DN;
+      else if( buff[4] >= 'A' && buff[4] <= 'Z')
          rval = ALT_A + buff[4] - 'A';
       else
          rval = ALT_0 + buff[4] - '0';
@@ -6617,10 +6625,8 @@ int main( int argc, const char **argv)
          case KEY_SRIGHT: case KEY_SLEFT:
 #ifdef __PDCURSES__
          case PADPLUS: case PADMINUS: case PADSLASH:
-         case ALT_DOWN:          /* PDCurses uses this #define... */
-#else
-         case ALT_DN:            /* ...and ncurses uses this one */
 #endif
+         case ALT_DN:
          default:
             debug_printf( "Key %d hit\n", c);
             show_a_file( "dos_help.txt", 0);
