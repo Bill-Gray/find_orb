@@ -1,4 +1,5 @@
 q              Quit
+.              About
 o              Open...
 n              NewObj
 F16 (shift-f4) AddObj

@@ -6534,7 +6534,16 @@ int main( int argc, const char **argv)
             break;
          case '.':
             show_splash_screen( );     /* just to test */
-            extended_getch( );
+            do
+               {
+               c = extended_getch( );
+               if( c == KEY_MOUSE)
+                  {
+                  get_mouse_data( (int *)&mouse_x, (int *)&mouse_y, (int *)&mouse_z, &button);
+                  if( button & REPORT_MOUSE_POSITION)
+                     c = 0;         /* ignore mouse moves */
+                  }
+               } while( !c);
             break;
          case ALT_Y:
             {
