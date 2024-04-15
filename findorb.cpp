@@ -3095,6 +3095,27 @@ static void set_color_table( void)
    fclose( ifile);
 }
 
+static int *get_key_remap_table( void)
+{
+   FILE *ifile = fopen_ext( "command.txt", "fcrb");
+   char buff[90];
+   int *rval = (int *)calloc( 200, sizeof( int)), from, to;
+   size_t i = 0;
+
+   while( fgets( buff, sizeof( buff), ifile) && memcmp( buff, "Start re", 8))
+      ;
+   while( fgets( buff, sizeof( buff), ifile))
+      if( (from = get_character_code( buff)) > 0
+                  && (to = get_character_code( buff + 15)) > 0)
+         {
+         rval[i++] = from;
+         rval[i++] = to;
+         }
+   rval = (int *)realloc( rval, (i + 2) * sizeof( int));
+   fclose( ifile);
+   return( rval);
+}
+
 static SCREEN *screen_ptr;
 
 static inline int initialize_curses( const int argc, const char **argv)
@@ -3930,7 +3951,7 @@ int main( int argc, const char **argv)
    double max_residual_for_filtering = 2.5;
    bool show_commented_elements = false;
    bool drop_single_obs = true;
-   int sort_obs_by_code = 0;
+   int sort_obs_by_code = 0, *key_remaps;
    int n_stations_shown = 0, top_obs_shown = 0, n_obs_shown = 0;
    bool single_obs_selected = false;
    extern unsigned random_seed;
@@ -4188,7 +4209,7 @@ int main( int argc, const char **argv)
 
    if( debug_level)
       debug_printf( "%d sigma recs read\n", i);
-
+   key_remaps = get_key_remap_table( );
 
    initialize_curses( argc, argv);
 
@@ -4719,7 +4740,9 @@ int main( int argc, const char **argv)
             }
          auto_repeat_full_improvement = 0;
          }
-
+      for( i = 0; key_remaps[i]; i += 2)
+         if( c == key_remaps[i])
+            c = key_remaps[i + 1];
       if( (button & BUTTON4_PRESSED) || button5_pressed)  /* 'wheel up'/'dn' */
          {
          mouse_wheel_motion = ((button & BUTTON_CTRL) ? 5 : 1);
@@ -6665,6 +6688,7 @@ Shutdown_program:
    if( mpc_color_codes)
       free( mpc_color_codes);
    free( command_areas);
+   free( key_remaps);
    clean_up_find_orb_memory( );
    return( 0);
 }

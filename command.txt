@@ -141,3 +141,9 @@ Ctrl-X         Save orbits for re-use
 Ctrl-Y         Write excluded observations to be 'banned'
 Ctrl-G         Set magnitude slope parameter (G)
 U+31008        Left-click to select tracklet, right to toggle it
+
+Start remaps :
+    ; PuTTY doesn't recognize Shift-Up or Shift-Dn.  You can use Ctrl-U(p) or
+    ; Ctrl-E(nd) instead.  Other key remaps may be added here as needed...
+Ctrl-U         Shift-Up
+Ctrl-E         Shift-Dn
