@@ -2234,6 +2234,8 @@ int write_out_elements_to_file( const double *orbit,
                consider_replacing( buff, "a", "sigma_a:");
             else if( *buff == 'n')
                consider_replacing( buff, "n", "sigma_n:");
+            else if( *buff == 'z')
+               consider_replacing( buff, "z", "sigma_1/a");
             }
          switch( buff[0])
             {
