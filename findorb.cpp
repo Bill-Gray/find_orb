@@ -2027,35 +2027,36 @@ static unsigned show_basic_info( const OBSERVE FAR *obs, const int n_obs,
       {
       while( fgets_trimmed( buff, sizeof( buff), ifile)
                      && memcmp( buff, "End", 3))
-         {
-         const unsigned len = (unsigned)strlen( buff + 15);
-         unsigned max_column_this_line = max_column, key;
-
-         if( line == 1)
-            max_column_this_line -= (max_lines_to_show > 1 ? 12 : 8);
-         if( column + len >= max_column_this_line)
+         if( *buff != ' ')
             {
-            if( line == max_lines_to_show)
+            const unsigned len = (unsigned)strlen( buff + 15);
+            unsigned max_column_this_line = max_column, key;
+
+            if( line == 1)
+               max_column_this_line -= (max_lines_to_show > 1 ? 12 : 8);
+            if( column + len >= max_column_this_line)
                {
-               fclose( ifile);
-               add_cmd_area( KEY_ADD_MENU_LINE, 0, max_column - 8, 3);
-               put_colored_text( "[+]", 0, max_column - 8, 3, COLOR_MENU);
-               return( line);
+               if( line == max_lines_to_show)
+                  {
+                  fclose( ifile);
+                  add_cmd_area( KEY_ADD_MENU_LINE, 0, max_column - 8, 3);
+                  put_colored_text( "[+]", 0, max_column - 8, 3, COLOR_MENU);
+                  return( line);
+                  }
+               if( line == 1)        /* we could subtract lines */
+                  {
+                  add_cmd_area( KEY_REMOVE_MENU_LINE, 0, max_column - 12, 3);
+                  put_colored_text( "[-]", 0, max_column - 12, 3, COLOR_MENU);
+                  }
+               column = 0;
+               line++;
+               put_colored_text( "", line - 1, column, -1, COLOR_BACKGROUND);
                }
-            if( line == 1)        /* we could subtract lines */
-               {
-               add_cmd_area( KEY_REMOVE_MENU_LINE, 0, max_column - 12, 3);
-               put_colored_text( "[-]", 0, max_column - 12, 3, COLOR_MENU);
-               }
-            column = 0;
-            line++;
-            put_colored_text( "", line - 1, column, -1, COLOR_BACKGROUND);
+            key = get_character_code( buff);
+            add_cmd_area( key, line - 1, column, len);
+            put_colored_text( buff + 15, line - 1, column, len, COLOR_MENU);
+            column += len + 1;
             }
-         key = get_character_code( buff);
-         add_cmd_area( key, line - 1, column, len);
-         put_colored_text( buff + 15, line - 1, column, len, COLOR_MENU);
-         column += len + 1;
-         }
       fclose( ifile);
       }
    if( line != 1)
@@ -3836,7 +3837,8 @@ static int show_hint( const unsigned mouse_x, const unsigned mouse_y, size_t *in
       while( fgets_trimmed( buff, sizeof( buff), ifile)
                   && memcmp( buff, "Start h", 7))
          ;   /* just skip lines until we get to the section we want */
-      while( !got_it && fgets_trimmed( buff, sizeof( buff), ifile))
+      while( !got_it && fgets_trimmed( buff, sizeof( buff), ifile)
+                         && memcmp( buff, "Start re", 8))
          if( *buff > ' ')
             got_it = (get_character_code( buff) == cmd);
       fclose( ifile);
