@@ -1148,6 +1148,9 @@ TEL 10-m Keck II reflector
 COD G83
 TEL 8.4-m reflector + CCD
 
+COD T11
+TEL 3.8-m Cassegrain reflector
+
 COD Q62
 TEL 0.50-m f/6.8 astrograph + CCD + focal reducer, 0.70-m f/6.6 astrograph + CCD
 
