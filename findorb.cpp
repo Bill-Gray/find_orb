@@ -74,10 +74,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    #define MOUSE_WHEEL_SCROLL 0
 #endif
 
-#if !defined( ALT_DN)
-   #define ALT_DN                 ALT_DOWN
-#endif         /* PDCurses defines ALT_DOWN;  ncurses defines ALT_DN  */
-
 #define CSI "\x1b["
 #define OSC "\x1b]"
 
@@ -1980,21 +1976,20 @@ static int get_character_code( const char *buff)
    else if( *buff == 'U' && buff[1] == '+')
       rval = atoi( buff + 2);
    else if( !memcmp( buff, "Ctrl-", 5))
-      rval = buff[5] - 64;
+      {
+      if( !memcmp( buff + 4, "Up", 2))
+         rval = CTL_UP;
+      else if( !memcmp( buff + 4, "Dn", 2))
+         rval = CTL_DN;
+      else
+         rval = buff[5] - 64;
+      }
    else if( !memcmp( buff, "Shift-", 6))
       {
       if( !memcmp( buff + 6, "Up", 2))
-#ifdef __PDCURSES__
-         rval = KEY_SUP;
-#else
          rval = KEY_SR;
-#endif
       else if( !memcmp( buff + 6, "Dn", 2))
-#ifdef __PDCURSES__
-         rval = KEY_SDOWN;
-#else
          rval = KEY_SF;
-#endif
       else if( buff[6] == 'F')
          rval = KEY_F( 12 + atoi( buff + 7));
       else        /* shouldn't happen */
@@ -5064,11 +5059,7 @@ int main( int argc, const char **argv)
             add_off_on = use_sigmas;
             }
             break;
-#ifdef __PDCURSES__
-         case KEY_SUP:
-#else
          case KEY_SR:
-#endif
             obs[curr_obs].is_included ^= 1;
             for( i = 0; i < curr_obs; i++)
                obs[i].is_included = obs[curr_obs].is_included;
@@ -5098,11 +5089,7 @@ int main( int argc, const char **argv)
                clear( );
                }
             break;
-#ifdef __PDCURSES__
-         case KEY_SDOWN:         /* turn on/off all obs after curr one */
-#else
-         case KEY_SF:
-#endif
+         case KEY_SF:            /* turn on/off all obs after curr one */
             obs[curr_obs].is_included ^= 1;
             for( i = curr_obs; i < n_obs; i++)
                obs[i].is_included = obs[curr_obs].is_included;
