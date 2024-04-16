@@ -1960,7 +1960,15 @@ static int get_character_code( const char *buff)
 {
    int rval;
 
-   if( !memcmp( buff, "Alt-", 4))
+   if( !memcmp( buff, "Lt", 2))
+      rval = KEY_LEFT;
+   else if( !memcmp( buff, "Rt", 2))
+      rval = KEY_RIGHT;
+   else if( !memcmp( buff, "Up", 2))
+      rval = KEY_UP;
+   else if( !memcmp( buff, "Dn", 2))
+      rval = KEY_DOWN;
+   else if( !memcmp( buff, "Alt-", 4))
       {
       if( !memcmp( buff + 4, "Up", 2))
          rval = ALT_UP;
@@ -1990,6 +1998,10 @@ static int get_character_code( const char *buff)
          rval = KEY_SR;
       else if( !memcmp( buff + 6, "Dn", 2))
          rval = KEY_SF;
+      else if( !memcmp( buff + 6, "Lf", 2))
+         rval = KEY_SLEFT;
+      else if( !memcmp( buff + 6, "Rt", 2))
+         rval = KEY_SRIGHT;
       else if( buff[6] == 'F')
          rval = KEY_F( 12 + atoi( buff + 7));
       else        /* shouldn't happen */
