@@ -300,6 +300,18 @@ static void create_ades_file_for_one_code( FILE *ofile,
             for( i = 0; i < 3; i++)
                fprintf( ofile, "        <pos%d>%.*f</pos%d>\n",
                         i + 1, (is_au ? 9 : 4), posn[i] * (is_au ? 1. : AU_IN_KM), i + 1);
+            if( !(obs->flags & OBS_NO_VELOCITY))
+               {
+               double vel[3];
+
+               compute_observer_vel( obs->jd, 3, 0., 0., 0., vel);
+               for( i = 0; i < 3; i++)
+                  vel[i] = obs->obs_vel[i] - vel[i]; /* make a geocentric velocity vector */
+               ecliptic_to_equatorial( vel);
+               for( i = 0; i < 3; i++)
+                  fprintf( ofile, "        <vel%d>%.8f</vel%d>\n", i + 1,
+                        vel[i] * (is_au ? 1. : AU_IN_KM / seconds_per_day), i + 1);
+               }
             }
          else if( obs->note2 == 'V')
             {
