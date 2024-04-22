@@ -173,6 +173,7 @@ PSP !   0.0000       0.00000   +0.00000    @-2 Parker Space Probe
 Cas !   0.0000       0.00000   +0.00000    @-2 Cassini
 JWT !   0.0000       0.00000   +0.00000    @-2 James Webb Space Telescope
 MEx !   0.0000       0.00000   +0.00000    @-2 Mars Express
+NeS !   0.0000       0.00000   +0.00000    @-2 NEO Surveyor
 
 Met !   7.212778     +51.520802       54       Bernd Brinkmann meteor site
 JSt !   8.32         +52.02          300       Joerg Strunk meteor site
