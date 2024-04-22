@@ -1973,7 +1973,7 @@ static int get_character_code( const char *buff)
       if( !memcmp( buff + 4, "Up", 2))
          rval = ALT_UP;
       else if( !memcmp( buff + 4, "Dn", 2))
-         rval = ALT_DN;
+         rval = ALT_DOWN;
       else if( buff[4] >= 'A' && buff[4] <= 'Z')
          rval = ALT_A + buff[4] - 'A';
       else
@@ -6648,7 +6648,7 @@ int main( int argc, const char **argv)
 #ifdef __PDCURSES__
          case PADPLUS: case PADMINUS: case PADSLASH:
 #endif
-         case ALT_DN:
+         case ALT_DOWN:
          default:
             debug_printf( "Key %d hit\n", c);
             show_a_file( "dos_help.txt", 0);

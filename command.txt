@@ -143,7 +143,12 @@ Ctrl-G         Set magnitude slope parameter (G)
 U+31008        Left-click to select tracklet, right to toggle it
 
 Start remaps :
-    ; PuTTY doesn't recognize Shift-Up or Shift-Dn.  You can use Ctrl-U(p) or
-    ; Ctrl-E(nd) instead.  Other key remaps may be added here as needed...
-Ctrl-U         Shift-Up
-Ctrl-E         Shift-Dn
+    ; PuTTY doesn't recognize Shift-Up or Shift-Dn (just returns the same key
+    ; codes as Up and Down).  For Alt-Dn,  Alt-Up,  Alt-Lt, Alt-Rt,  it returns
+    ; codes 4354 to 4357.  The following remaps Alt-Dn (for PuTTY) to Shift-Dn,
+    ; and Alt-Up to Shift-Up,  and will toggle observations below/above the
+    ; currently selected one.  Other key remaps may be added here as needed...
+U+4354         Shift-Dn
+U+4355         Shift-Up
+  U+4356         Alt-Lt    (not currently used)
+  U+4357         Alt-Rt    (not currently used)

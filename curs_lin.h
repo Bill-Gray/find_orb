@@ -70,7 +70,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #define ALT_RIGHT     0x22d
 #define ALT_LEFT      0x21e
 #define ALT_UP        0x233
-#define ALT_DN        0x20a
+#define ALT_DOWN      0x20a
 // #define CTL_LEFT      (ALT_BASE + 257)
 // #define CTL_RIGHT     (ALT_BASE + 258)
 // #define CTL_PGUP      (ALT_BASE + 259)
@@ -105,7 +105,7 @@ something I've just not figured out yet.      */
 #define ALT_RIGHT     0x22e
 #define ALT_LEFT      0x21f
 #define ALT_UP        0x234
-#define ALT_DN        0x20b
+#define ALT_DOWN      0x20b
 
 #define ALT_DEL       0x205
 #define ALT_INS       0x21a
