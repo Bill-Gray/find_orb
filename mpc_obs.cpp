@@ -2970,6 +2970,8 @@ int compare_observations( const void *a, const void *b, void *context)
       rval = 1;
    if( !rval)
       rval = obs1->note1 - obs2->note1;
+   if( !rval)
+      rval = strcmp( obs1->reference, obs2->reference);
    if( !rval && obs1->ra != obs2->ra)
       rval = (obs1->ra > obs2->ra ? 1 : -1);
    if( !rval && obs1->dec != obs2->dec)
@@ -3635,7 +3637,12 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                   observation_is_good = false;
                if( observation_is_good)
                   {
+                  char center_buff[9];
+
                   rval[i].ref_center = spacecraft_offset_reference;
+                  memcpy( center_buff, second_line + 69, 8);
+                  center_buff[8] = '\0';
+                  sscanf( center_buff, "%d", &rval[i].ref_center);
                   parse_observation( rval + i, buff);
                   }
                }
