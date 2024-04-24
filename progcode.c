@@ -50,11 +50,23 @@ static int correct_line( char *buff)
                "267 3 J. Kavelaars",
                "568 1 D. Jewitt",
                "658 4 JJ Kavelaars",
+               "703 1 E. J. Christensen",
                "G40 9 B. Luetkenhoener",
+               "G96 1 E. J. Christensen",
                "Q62 } S. K\\\"urti",
                "U69 # B. Luetkenhoener",
                "W84 \" J. Pena Z.",
                NULL };
+   const char *replacers[] = {
+            "JJ Kavelaars\n",     "J. J. Kavelaars\n",
+#ifdef LATEXIZE_NAMES
+            "F. Ocana\n",         "F. Oca\\~na\n",
+            "B. Lutkenhoner\n",   "B. L\\\"utkenh\\\"oner\n",
+            "S. Kurti\n",         "S. K\\\"urti",
+            "M. Juric\n",         "M. Juri\\'c",
+#endif
+            "D, C. Jewitt\n",     "D. C. Jewitt\n",
+            };
 
    while( i && buff[i - 1] <= ' ')
       i--;
@@ -64,8 +76,9 @@ static int correct_line( char *buff)
    for( i = 0; removers[i]; i++)
       if( strstr( buff, removers[i]))
          return( -1);
-   if( strstr( buff, "D, C. Jewitt"))
-      buff[7] = '.';
+   for( i = 0; replacers[i]; i += 2)
+      if( !strcmp( buff + 6, replacers[i]))
+         strcpy( buff + 6, replacers[i + 1]);
    return( 0);
 }
 
