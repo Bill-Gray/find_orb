@@ -798,13 +798,19 @@ static double lagged_dist( const ldouble *state_vect, const ldouble jd,
 {
    double svect[6], outvect[9], rval;
    size_t i;
-   ELEMENTS elem;
 
    for( i = 0; i < 6; i++)
       svect[i] = (double)state_vect[i];
-   find_relative_orbit( (double)jd, svect, &elem, 0);
-   compute_ref_state( &elem, outvect, (double)( jd - lag));
-   rval = vector3_length( outvect);
+   if( !lag)      /* usually the case */
+      rval = vector3_length( svect);
+   else
+      {
+      ELEMENTS elem;
+
+      find_relative_orbit( (double)jd, svect, &elem, 0);
+      compute_ref_state( &elem, outvect, (double)( jd - lag));
+      rval = vector3_length( outvect);
+      }
    return( rval);
 }
 
