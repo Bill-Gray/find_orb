@@ -478,7 +478,7 @@ static void setup_obj_loc( obj_location_t *p, double *orbit,
       p[i].dec = asin( topo[2] / p[i].r);
       p[i].sun_earth = vector3_length( obs_posn);
       p[i].sun_obj = vector3_length( orbit);
-      orbit += 6;
+      orbit += n_orbit_params;
       }
 }
 
