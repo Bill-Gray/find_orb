@@ -102,7 +102,8 @@ TI(r0) = 2pi \  (a0 * mu + a1 * mu2 + a2 * mu^3 + ...) dmu
 
    which is trivially integrable analytically.  In the following function,
 the 2pi factor is ignored;  all we really care about is the fractional
-intensity (0 if no disk visible,  1 if r=R.  I0 = TI(1) / 2pi.)     */
+intensity (0 if no disk visible,  1 if r=R : the 'normalized' intensity
+I(r) = TI(r) / TI(r0).)     */
 
 #include <math.h>
 
