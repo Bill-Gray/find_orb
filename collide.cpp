@@ -1,4 +1,4 @@
-/* orb_func.cpp: computes when/where an object hits a planet or moon
+/* collide.cpp: computes when/where an object hits a planet or moon
 
 Copyright (C) 2010, Project Pluto
 
