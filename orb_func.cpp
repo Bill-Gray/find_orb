@@ -3090,8 +3090,65 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
          debug_printf( "Failure in lsquare_solve: %d\n", err_code);
       }
 
+   for( i = 0; !err_code && i < 6 && i < n_params; i++)
+      for( j = 0; j < 6; j++)
+         {
+         double max_difference = obs->r * .7, ratio;
+
+         if( j > 2)     /* velocity component */
+            max_difference /= (obs[n_obs - 1].jd - obs[0].jd) * .5;
+         if( i == j)
+            ratio = fabs( differences[i] / max_difference);
+         else
+            ratio = 0.;
+         if( ratio > scale_factor)
+            scale_factor = ratio;
+         }
    if( debug_level > 1)
-      debug_printf( "Making covar file\n");
+      debug_printf( "lsquare computed\n");
+   memcpy( orbit2, orbit, 6 * sizeof( double));
+   for( i = 0; i < n_params && !err_code; i++)
+      {
+      if( i == 6 && asteroid_mass)
+         *asteroid_mass += differences[i] / scale_factor;
+      else
+         orbit[i] += differences[i] / scale_factor;
+      if( i == 5)    /* is our new 'orbit' state vector reasonable?  */
+         err_code = is_unreasonable_orbit( orbit);
+      }
+               /* If the orbit "blew up" or otherwise failed,  restore */
+               /* the original version:  */
+   if( err_code || is_unreasonable_orbit( orbit))
+      debug_printf( "Failed full step: %d: %s\n", err_code, obs->packed_id);
+   snprintf_err( tstr, sizeof( tstr), "Final setting of orbit    ");
+   i = 6;      /* possibly try six half-steps */
+   do
+      {
+      if( setting_outside_of_arc)
+         err_code = set_locs( orbit, epoch, obs - n_skipped_obs, n_total_obs);
+      else
+         err_code = set_locs( orbit, epoch, obs, n_obs);
+      if( *get_environment_ptr( "HALF_STEPS"))
+         {
+         const double after_rms = compute_rms( obs, n_obs);
+
+         snprintf_err( tstr, sizeof( tstr), "Half-stepping %d\n", 7 - i);
+         if( after_rms > before_rms * 1.5 && !limited_orbit)
+            {
+            for( j = 0; j < n_orbit_params; j++)
+               orbit[j] = (orbit[j] + orbit2[j]) * .5;
+            i--;
+            }
+         else
+            i = 0;
+         }
+      else
+         i = 0;
+      }
+      while( !err_code && i);
+
+   if( debug_level > 1)
+      debug_printf( "full_improve done\n");
    if( !err_code && *covariance_filename)
       {
       char tbuff[200];
@@ -3310,65 +3367,6 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
       }
    FFREE( xresids);
    lsquare_free( lsquare);
-   for( i = 0; !err_code && i < 6 && i < n_params; i++)
-      for( j = 0; j < 6; j++)
-         {
-         double max_difference = obs->r * .7, ratio;
-
-         if( j > 2)     /* velocity component */
-            max_difference /= (obs[n_obs - 1].jd - obs[0].jd) * .5;
-         if( i == j)
-            ratio = fabs( differences[i] / max_difference);
-         else
-            ratio = 0.;
-         if( ratio > scale_factor)
-            scale_factor = ratio;
-         }
-   if( debug_level > 1)
-      debug_printf( "lsquare computed\n");
-   memcpy( orbit2, orbit, 6 * sizeof( double));
-   for( i = 0; i < n_params && !err_code; i++)
-      {
-      if( i == 6 && asteroid_mass)
-         *asteroid_mass += differences[i] / scale_factor;
-      else
-         orbit[i] += differences[i] / scale_factor;
-      if( i == 5)    /* is our new 'orbit' state vector reasonable?  */
-         err_code = is_unreasonable_orbit( orbit);
-      }
-               /* If the orbit "blew up" or otherwise failed,  restore */
-               /* the original version:  */
-   if( err_code || is_unreasonable_orbit( orbit))
-      debug_printf( "Failed full step: %d: %s\n", err_code, obs->packed_id);
-   snprintf_err( tstr, sizeof( tstr), "Final setting of orbit    ");
-   i = 6;      /* possibly try six half-steps */
-   do
-      {
-      if( setting_outside_of_arc)
-         err_code = set_locs( orbit, epoch, obs - n_skipped_obs, n_total_obs);
-      else
-         err_code = set_locs( orbit, epoch, obs, n_obs);
-      if( *get_environment_ptr( "HALF_STEPS"))
-         {
-         const double after_rms = compute_rms( obs, n_obs);
-
-         snprintf_err( tstr, sizeof( tstr), "Half-stepping %d\n", 7 - i);
-         if( after_rms > before_rms * 1.5 && !limited_orbit)
-            {
-            for( j = 0; j < n_orbit_params; j++)
-               orbit[j] = (orbit[j] + orbit2[j]) * .5;
-            i--;
-            }
-         else
-            i = 0;
-         }
-      else
-         i = 0;
-      }
-      while( !err_code && i);
-
-   if( debug_level > 1)
-      debug_printf( "full_improve done\n");
 
    if( levenberg_marquardt_lambda)
       levenberg_marquardt_lambda *=
