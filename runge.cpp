@@ -597,7 +597,7 @@ void calc_approx_planet_orientation( const int planet,
    static int cached_planet = -1;
    const double range = 1.;
    const double new_jde = floor( jde / range + .5) * range;
-   const double omega = planet_rotation_rate( planet, system_number);
+   const double omega = planet_rotation_rate( planet, system_number) * PI / 180.;
 
    if( cached_planet != planet || new_jde != cached_jde)
       {
