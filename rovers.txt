@@ -173,12 +173,6 @@ PSP !   0.0000       0.00000   +0.00000    @-2 Parker Space Probe
 Cas !   0.0000       0.00000   +0.00000    @-2 Cassini
 JWT !   0.0000       0.00000   +0.00000    @-2 James Webb Space Telescope
 MEx !   0.0000       0.00000   +0.00000    @-2 Mars Express
-NeS !   0.0000       0.00000   +0.00000    @-2 NEO Surveyor
-
-   (The above (NeS) code was added to support simulated observations;
-   the spacecraft,  as of early 2024,  has not been launched.  I gather
-   that the code (C58) is being held for NEO Surveyor.  But it's a
-   somewhat informal sort of hold,  and I've been warned against using it.)
 
 Met !   7.212778     +51.520802       54       Bernd Brinkmann meteor site
 JSt !   8.32         +52.02          300       Joerg Strunk meteor site
