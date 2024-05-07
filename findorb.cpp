@@ -5071,6 +5071,9 @@ int main( int argc, const char **argv)
             add_off_on = use_sigmas;
             }
             break;
+#ifdef KEY_SUP
+         case KEY_SUP:
+#endif
          case KEY_SR:
             obs[curr_obs].is_included ^= 1;
             for( i = 0; i < curr_obs; i++)
@@ -5101,6 +5104,9 @@ int main( int argc, const char **argv)
                clear( );
                }
             break;
+#ifdef KEY_SDOWN
+         case KEY_SDOWN:
+#endif
          case KEY_SF:            /* turn on/off all obs after curr one */
             obs[curr_obs].is_included ^= 1;
             for( i = curr_obs; i < n_obs; i++)
