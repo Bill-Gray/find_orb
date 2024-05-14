@@ -1594,3 +1594,8 @@ VCn !-073.89054    +41.68323           55.0    Vassar College (since 1997), smal
    Coordinates are via a private communication from Rositsa Miteva.
 
 Roz !+024.73833    +41.69694         1762.0    1.5-m NAO Rozhen, Smolyan
+
+   Gael Musquet supplied the coordinates for the following two telescopes.
+
+VO1 !+001.49914017 +49.103662056      169.222  Vernon Observatory CB
+VO2 !+001.49767872 +49.107084983      170.486  Vernon Observatory L1
