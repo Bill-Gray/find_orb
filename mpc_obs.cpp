@@ -1663,6 +1663,7 @@ int compute_observer_vel( const double jde, const int planet_no,
 
 static double input_coordinate_epoch = 2000.;
 static double override_time = 0., override_ra = -100., override_dec = -100.;
+static double override_mag = -100.;
       /* 'override_time' allows one to set the observation time with the */
       /* #time keyword (see below) or with certain keywords.  Similarly  */
       /* for override_ra and override_dec,  primarily used for ADES  */
@@ -1937,6 +1938,11 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
                (buff[67] == '.' || buff[67] == ' '))
       {
       obs->obs_mag = atof( buff + 65);
+      if( override_mag >= -95.)
+         {
+         obs->obs_mag = override_mag;
+         override_mag = -100.;
+         }
       if( obs->mag_band == ' ' && strstr( "249 C49 C50", obs->mpc_code))
          obs->mag_band = 'V';   /* Sungrazer obs usually have a blank mag */
       }                         /* band, but are basically V */
@@ -3890,7 +3896,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
          ades_posn_sigma_theta = ades_time_sigma = 0.;
          }
       override_time = 0.;
-      override_ra = override_dec = -100.;
+      override_ra = override_dec = override_mag = -100.;
       convert_com_to_pound_sign( buff);
                /* For backwards compatibility,  we'll handle both 'weight' */
                /* and 'sigma' keywords,  with the former considered to     */
@@ -3919,6 +3925,8 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                                     &override_dec, &override_time))
                override_time += J2000;
             }
+         else if( !memcmp( buff, "#full mag ", 9))
+            override_mag = atof( buff + 9);
          else if( !memcmp( buff, "#Sigmas ", 8))
             extract_ades_sigmas( buff + 8, &ades_posn_sigma_1,
                         &ades_posn_sigma_2,
@@ -5785,7 +5793,7 @@ int sanity_test_observations( const char *filename)
                   n_problems_found++;
                   }
             override_time = 0.;
-            override_ra = override_dec = -100.;
+            override_ra = override_dec = override_mag = -100.;
             }
       }
    fclose( ifile);
