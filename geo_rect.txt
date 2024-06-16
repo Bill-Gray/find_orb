@@ -3,7 +3,7 @@
 # if an MPC code is within that rectangle,  we can ID it.
 # Every now and then,  an MPC code is added for which no
 # rectangle exists;  I then have to add a rectangle or two.
-# 2023 Aug 21 version.
+# 2024 Jun 07 version.
    7.4      23.0      -0.9      37.29359  Algeria
  303.64175 -38.50229 302.15234 -35.24411  Argentina
  300.93768 -34.54863 301.45872 -34.35379  Argentina
@@ -331,9 +331,9 @@
  264.71141  37.02656 265.34441  39.13161  US/Kansas
  275.35419  38.80459 275.53264  39.05982  US/Kentucky
  266.77794  28.37703 269.79065  30.93144  US/Louisiana
- 286.74501  42.08170 287.90030  42.68512  US/Massachusetts
- 290.01801  42.07212 288.79462  41.71572  US/Massachusetts
- 289.41961  42.07267 287.86394  42.69641  US/Massachusetts
+ 286.74501  42.05    287.90030  42.71     US/Massachusetts
+ 290.2      42.1     288.78     41.7      US/Massachusetts
+ 289.41961  42.04    287.86394  42.69     US/Massachusetts
  290.16019  41.19328 288.96360  41.73186  US/Massachusetts
  288.97082  41.72306 288.88003  41.51031  US/Massachusetts
  279.2      39.7     280.21083  38.41186  US/West Virginia
@@ -355,7 +355,7 @@
  283.87672  36.44960 279.19530  35.05624  US/North Carolina
  256.01000  46.01000 262.94274  47.94690  US/North Dakota
  263.21675  42.64064 258.01327  40.07413  US/Nebraska
- 288.86824  42.90658 287.71823  43.72684  US/New Hampshire
+ 289.01     42.88    287.71823  43.72684  US/New Hampshire
  287.55183  42.95032 288.67638  42.72690  US/New Hampshire
  286.03993  40.05112 285.26323  40.40047  US/New Jersey
  286.02081  39.51938 285.09411  40.08385  US/New Jersey
@@ -384,7 +384,7 @@
  282.36194  41.40296 284.73003  39.92457  US/Pennsylvania
  284.05076  41.35314 284.62669  41.89344  US/Pennsylvania
  294.41706  17.79858 292.66117  18.71838  US/Puerto Rico
- 288.57593  41.28832 288.21614  42.00158  US/Rhode Island
+ 288.57593  41.1     288.21614  42.00158  US/Rhode Island
  288.69987  41.76081 288.70101  41.76237  US/Rhode Island
  278.45121  33.18432 280.21837  34.75049  US/South Carolina
  256.02582  43.03508 262.94006  45.87507  US/South Dakota
@@ -543,3 +543,4 @@
   18.90274  48.29     20.29     49.16     Slovakia
    4.19987  51.18504   3.99925  51.23037  Belgium
  120.02     49.24008 129.58     42.58966  China
+ 287.1      40.57199 288.2      41.2      US/New York
