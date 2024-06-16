@@ -2985,6 +2985,24 @@ int compare_observations( const void *a, const void *b, void *context)
    return( rval);
 }
 
+/* If two observations are within a threshhold of each other in time,
+they may be duplicates,  with one (say) recorded to five places and
+the other to six.  Or one in decimal days (80-column format) and
+the other in seconds (ADES).
+
+The threshhold may depend on the type of observation.  Video,  for
+example,  may provide a slew of observations within 1/30 second of
+each other.  Such nuances aren't currently implemented,  but they
+are why pointers to the full observation data are passed,  instead
+of just the observed times. */
+
+static bool times_very_close( OBSERVE *obs1, OBSERVE *obs2)
+{
+   const double threshhold = 3. / seconds_per_day;
+
+   return( fabs( obs1->jd - obs2->jd) < threshhold);
+}
+
 /* If we have duplicate observations,  but their RA/decs are within
 (say) two arcseconds,  they may plausibly work for initial orbit
 determination.  Otherwise,  they'll probably just throw off IOD
@@ -3001,7 +3019,7 @@ static void exclude_unusable_duplicate_obs( OBSERVE *obs, int n_obs)
       int j;
 
       i = 1;
-      while( i < n_obs && obs[i].jd == obs->jd
+      while( i < n_obs && times_very_close( obs, obs + i)
                         && !strcmp( obs[i].mpc_code, obs->mpc_code))
          {
          const double d_ra = centralize_ang( obs[i].ra - obs->ra);
@@ -3041,7 +3059,7 @@ int sort_obs_by_date_and_remove_duplicates( OBSERVE *obs, const int n_obs)
    if( debug_level)
       debug_printf( "%d obs sorted by date\n", n_obs);
    for( i = j = 1; i < n_obs; i++)
-      if( obs[i].jd != obs[i - 1].jd || strcmp( obs[i].mpc_code,
+      if( !times_very_close( obs + i, obs + i - 1) || strcmp( obs[i].mpc_code,
                                                 obs[i - 1].mpc_code))
          obs[j++] = obs[i];
       else if( memcmp( obs + i, obs + i - 1, sizeof( OBSERVE)))
@@ -4110,7 +4128,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
       generic_message_box( buff, "!");
       }
    for( i = 1; i < n_obs_actually_loaded; i++)
-      if( rval[i].jd == rval[i - 1].jd && !strcmp( rval[i].mpc_code, rval[i - 1].mpc_code))
+      if( times_very_close( rval + i, rval + i - 1) && !strcmp( rval[i].mpc_code, rval[i - 1].mpc_code))
          if( toupper( rval[i].note2) != 'X' && toupper( rval[i - 1].note2) != 'X')
             if( !spacewatch_duplication( rval + i - 1))
                {
@@ -4177,12 +4195,11 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
          if( rval[i].note2 == 'x')     /* check for deleted satellite observation */
             {
             int j = -1;
-            const double thresh = 1.1e-5;    /* allow for roundoff */
 
-            if( i > 0 && rval[i].jd - rval[i-1].jd < thresh
+            if( i > 0 && times_very_close( rval + i, rval + i - 1)
                        && !strcmp( rval[i].mpc_code, rval[i - 1].mpc_code))
                j = i-1;
-            if( i < n_obs_actually_loaded - 1 && rval[i+1].jd - rval[i].jd < thresh
+            if( i < n_obs_actually_loaded - 1 && times_very_close( rval + i + 1, rval + i)
                        && !strcmp( rval[i].mpc_code, rval[i + 1].mpc_code))
                j = i+1;
             if( j >= 0)
