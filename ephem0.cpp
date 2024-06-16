@@ -5620,10 +5620,12 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
                format = "<a class=\"whtext\" style=\"background-color:#%06x;\">";
             else           /* bright color:  normal (black) text  */
                format = "<a style=\"background-color:#%06x;\">";
-            memmove( color + 1, color + 7, strlen( color + 6));  /* remove RGB */
-            memmove( color + 8, color + 4, strlen( color + 9));
+            color[1] = color[7];       /* move the visibility indicator */
+            color[2] = color[8];
+            color[3] = color[9];
             memcpy( color + 4, "</a>", 4);                 /* insert end tag */
-            snprintf( replace, sizeof( replace), format, rgb);
+            memmove( color + 8, color + 10, strlen( color + 9));
+            snprintf_err( replace, sizeof( replace), format, rgb);
             text_search_and_replace( color, "$", replace);
             }
          fputs( buff, ofile);
@@ -5637,4 +5639,3 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
    fclose( ofile);
    return( rval);
 }
-
