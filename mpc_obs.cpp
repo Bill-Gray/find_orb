@@ -783,6 +783,8 @@ int get_observer_data( const char FAR *mpc_code, char *buff, mpc_code_t *cinfo)
                }
       return( -1);
       }
+   memset( cinfo, 0, sizeof( mpc_code_t));
+   cinfo->planet = 3;         /* default to geocentric */
 
    if( !get_lat_lon_from_header( &lat0, &lon0, &alt0, mpc_code,
                                              &override_observatory_name))
