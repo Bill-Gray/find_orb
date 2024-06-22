@@ -67,7 +67,6 @@ int write_residuals_to_file( const char *filename, const char *ast_filename,
           const int n_obs, const OBSERVE FAR *obs_data, const int format);
 void light_time_lag( const double jde, const double *orbit,       /* orb_func.c */
              const double *observer, double *result, const int is_heliocentric);
-void put_observer_data_in_text( const char FAR *mpc_code, char *buff);
 int make_pseudo_mpec( const char *mpec_filename, const char *obj_name);
                                               /* ephem0.cpp */
 int earth_lunar_posn( const double jd, double FAR *earth_loc,

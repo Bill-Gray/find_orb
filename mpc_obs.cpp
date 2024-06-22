@@ -4618,7 +4618,7 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
    In Find_Orb, these details are shown for the station that made
    the currently-selected observation. */
 
-void put_observer_data_in_text( const char FAR *mpc_code, char *buff)
+int put_observer_data_in_text( const char FAR *mpc_code, char *buff)
 {
    double lon, lat, alt_in_meters;
    const int planet_idx = get_observer_data_latlon( mpc_code, buff,
@@ -4662,6 +4662,7 @@ void put_observer_data_in_text( const char FAR *mpc_code, char *buff)
             }
          }
       }
+   return( planet_idx);
 }
 
 static const char *environ_dot_dat = "environ.dat";

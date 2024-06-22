@@ -201,7 +201,6 @@ double utc_from_td( const double jdt, double *delta_t);     /* ephem0.cpp */
 int create_b32_ephemeris( const char *filename, const double epoch,
                 const double *orbit, const int n_steps,         /* b32_eph.c */
                 const double ephem_step, const double jd_start);
-void put_observer_data_in_text( const char FAR *mpc_code, char *buff);
 void fix_home_dir( char *filename);                /* ephem0.cpp */
 int write_environment_pointers( void);             /* mpc_obs.cpp */
 int add_ephemeris_details( FILE *ofile, const double start_jd,  /* b32_eph.c */
@@ -925,7 +924,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
       {
       int format_start;
       unsigned i, n_lines;
-      int vect_frame = -1;
+      int vect_frame = -1, planet_idx;
       double vect_dist_units = 0., vect_time_units = 0.;
       const int ephem_type = (int)(ephemeris_output_options & 7);
       bool reset_vect_units = false;
@@ -964,7 +963,7 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                                         n_ephemeris_steps);
       snprintf_append( buff, sizeof( buff) , "S  Step size: %.60s\n", ephemeris_step_size);
       snprintf_append( buff, sizeof( buff), "L  Location: (%s) ", mpc_code);
-      put_observer_data_in_text( mpc_code, buff + strlen( buff));
+      planet_idx = put_observer_data_in_text( mpc_code, buff + strlen( buff));
       strcat( buff, "\n");
       end_of_location_text = buff + strlen( buff);
       if( ephem_type == OPTION_STATE_VECTOR_OUTPUT
@@ -1362,6 +1361,8 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
                err_msg = "You need to set the number of ephemeris steps!";
             else if( !step && *ephemeris_step_size != 'a')
                err_msg = "You need to set a valid step size!";
+            else if( planet_idx == -1)
+               err_msg = "You need to set a valid observer location!";
             else                 /* yes,  we can make an ephemeris */
                c = -2;
             }

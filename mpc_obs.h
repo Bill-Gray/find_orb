@@ -221,7 +221,7 @@ int get_object_name( char *obuff, const char *packed_desig);
 int get_observer_data( const char FAR *mpc_code, char *buff, mpc_code_t *cinfo);
 void recreate_observation_line( char *obuff, const OBSERVE FAR *obs,
                            const int residual_format);   /* ephem0.cpp */
-void put_observer_data_in_text( const char FAR *mpc_code, char *buff);
+int put_observer_data_in_text( const char FAR *mpc_code, char *buff);
 
 void create_obs_file( const OBSERVE FAR *obs, int n_obs, const int append,
                   const int resid_format);            /* ephem0.cpp */
