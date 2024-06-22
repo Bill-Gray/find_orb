@@ -2461,6 +2461,16 @@ static void show_residual_legend( const int line_no, const int residual_format)
 static int find_rgb( const int irgb);
 static void set_color_table( void);
 
+static void drop_starting_columns( char *buff, const int start_column)
+{
+   const size_t len = strlen( buff);
+
+   if( len > (size_t)start_column)
+      memmove( buff, buff + start_column, len + 1 - (size_t)start_column);
+   else
+      *buff = '\0';
+}
+
 static void show_a_file( const char *filename, const int flags)
 {
    FILE *ifile = fopen_ext( filename, "tclrb");
@@ -2473,6 +2483,7 @@ static void show_a_file( const char *filename, const int flags)
    char search_text[100];
    int calendar_line = -99, calendar_col = -1;
    int calendar_cell_width, calendar_cell_height;
+   int start_column = 0;
 
    if( !ifile)
       ifile = fopen_ext( filename, "clrb");
@@ -2553,6 +2564,7 @@ static void show_a_file( const char *filename, const int flags)
          for( i = 0; i < 3; i++)
             {
             fgets_trimmed( buff, sizeof( buff), ifile);
+            drop_starting_columns( buff, start_column);
             put_colored_text( buff, i, 0, -1, COLOR_BACKGROUND);
             }
          }
@@ -2563,6 +2575,7 @@ static void show_a_file( const char *filename, const int flags)
          const int curr_line = top_line + i;
          int color_col[20], rgb[20], n_colored = 0, j;
 
+         drop_starting_columns( buff, start_column);
          if( i >= 3 && flags && color_visibility)
             {
             char *tptr = buff;
@@ -2685,6 +2698,13 @@ static void show_a_file( const char *filename, const int flags)
          case KEY_C1:
          case KEY_END:
             line_no = n_lines - 1;
+            break;
+         case 9:     /* tab */
+            start_column += 8;
+            break;
+         case KEY_BTAB:
+            if( start_column)
+               start_column -= 8;
             break;
          case KEY_A1:
          case KEY_HOME:
