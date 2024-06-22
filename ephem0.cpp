@@ -768,7 +768,6 @@ static int find_precovery_plates( OBSERVE *obs, const int n_obs,
                   && (prob = precovery_in_field( &field, p3, n_orbits, 0.)) > .1)
                {
                char time_buff[40], buff[200];
-               int i;
                bool matches_an_observation = false;
                bool show_it = true;
                double obj_ra = p3->ra, obj_dec = p3->dec;
@@ -1199,10 +1198,10 @@ double shadow_check( const double *planet_loc,
       for( i = 0; i <= n_splits; i++)
          {
          const double area = r0 * r0 + (1. - r0 * r0) * (double)i / (double)n_splits;
-         const double r = sqrt( area);
-         const double intensity = solar_disc_intensity( r);
+         const double r1 = sqrt( area);
+         const double intensity = solar_disc_intensity( r1);
          const double fraction =
-                sunlight_visible( ang_size_sun * r, ang_size_planet, angular_sep) * r * r;
+                sunlight_visible( ang_size_sun * r1, ang_size_planet, angular_sep) * area;
 
          rval += (intensity - prev_intensity) * (fraction - prev_fraction)
                         / (area - prev_area);
@@ -5433,7 +5432,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
 
 /*          if( compare)         */
                {
-               char text_to_find[50], *tptr;
+               char text_to_find[50], *break_ptr;
 
                snprintf_err( text_to_find, sizeof( text_to_find),
                                   "></a> %.3s  <", buff + 1);
@@ -5442,9 +5441,9 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
                while( (compare = memcmp( url + 13, text_to_find, 12)) != 0 &&
                                  fgets_trimmed( url, sizeof( url), obslinks_file))
                   ;
-               tptr = strstr( url, "<br>");
-               if( tptr)
-                  *tptr = '\0';
+               break_ptr = strstr( url, "<br>");
+               if( break_ptr)
+                  *break_ptr = '\0';
                url_index = 23;   /* if there is a link,  it starts in byte 23 */
                }
             if( compare)   /* still don't have URL;  try ObsLinks.html */
