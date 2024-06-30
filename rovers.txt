@@ -311,40 +311,54 @@ LNA ! -45.896527     -22.01097      1000       LNA (Laboratorio Nacional de Astr
 
 Jah ! 008.351507     +54.652323       10       Jost Jahn's home observatory
 
-   Coordinates for DSN Stations,  added 2016 Sep 27,  from
+   Coordinates for DSN stations,  added from
+   https://ssd.jpl.nasa.gov/ftp/eph/planets/stations/dsn.itrf93/dsn.itrf93_cartesian_19oct2020.txt
+   and converted from Cartesian coordinates to lat/lon/alt.
+
+d12 !-116.80548923 +35.29993708      962.1551  DSS 12 Goldstone Echo 34-meter
+d13 !-116.79445900 +35.24716424     1070.4438  DSS 13 Goldstone Venus 34-meter
+d14 !-116.88953821 +35.42590087     1001.3206  DSS 14 Goldstone 70-meter
+d15 !-116.88719510 +35.42185328      973.1963  DSS 15 Goldstone 34-meter
+d16 !-116.87364975 +35.34153939      943.9776  DSS 16 Goldstone 26-meter
+d17 !-116.87350536 +35.34217657      936.9160  DSS 17 Goldstone 9-meter
+d24 !-116.87479439 +35.33989280      951.5116  DSS 24 Goldstone 34-meter
+d25 !-116.87536320 +35.33761197      959.6343  DSS 25 Goldstone 34-meter
+d26 !-116.87301642 +35.33568918      968.6932  DSS 26 Goldstone 34-meter
+d27 !-116.77665045 +35.23827178     1052.4689  DSS 27 Goldstone 34-meter
+d28 !-116.77889117 +35.23827202     1064.6481  DSS 28 Goldstone 34-meter
+d34 ! 148.98196443 -35.39847884      692.0204  DSS 34 Canberra 34-meter
+d35 ! 148.98145576 -35.39579552      694.8893  DSS 35 Canberra 34-meter
+d36 ! 148.97854426 -35.39510176      685.5055  DSS 36 Canberra 34-meter
+d42 ! 148.98126740 -35.40067464      674.6155  DSS 42 Canberra 34-meter
+d43 ! 148.98126731 -35.40242423      688.7973  DSS 43 Tidbinbilla 70-meter
+d45 ! 148.97768563 -35.39845769      674.3329  DSS 45 Canberra 34-meter
+d46 ! 148.98308169 -35.40501064      676.8121  DSS 46 Canberra 26-meter
+d49 ! 148.26351559 -32.99839901      414.8151  DSS 49 Parkes
+d54 !  -4.25409682 +40.42562168      837.0518  DSS 54 Madrid 34-meter
+d56 !  -4.25206069 +40.42596469      835.7366  DSS 56 Madrid 34-meter
+d55 !  -4.25263330 +40.42429590      819.0613  DSS 55 Madrid 34-meter
+d61 !  -4.24902224 +40.42873917      840.4264  DSS 61 Robledo 34-meter
+d63 !  -4.24800854 +40.43120975      864.7465  DSS 63 Robledo 70-meter
+d65 !  -4.25069890 +40.42720636      833.8398  DSS 65 Madrid 34-meter
+
+   From the same file : these three radiotelescopes were moved or raised,
+   and the previous positions are given below.
+
+d1b !-116.80548923 +35.29993708      959.1071  DSS 12 Goldstone Echo 26-meter (before Oct 1978)
+d6a !  -4.24902224 +40.42873917      837.3783  DSS 61 Robledo 26-meter (before August 1979)
+d6e !  -4.25141796 +40.42718512      833.8158  DSS 65 Madrid 34-meter (before March 2005)
+
+
+   Coordinates for these four DSN Stations were given in
    ftp://ssd.jpl.nasa.gov/pub/eph/planets/stations/dsn.itrf93/dsn.itrf93_geodetic_19sep2016.txt
-   Similar degree/minute/second formatting as with (273) EISCAT above.
+   but apparently dropped in the above 2020 version.  Similar
+   degree/minute/second formatting as with (273) EISCAT above.
 
         longitude    latitude       height
       DDDmmss.sssss   DDmmss.sssss       (m)
-d12 ! 2431140.23879  +351759.77350   962.15503 DSS 12 Goldstone Echo 34-meter
-d13 ! 2431219.94762  +351449.79132  1070.44450 DSS 13 Goldstone Venus 34-meter
-d14 ! 2430637.66245  +352533.24313  1001.39054 DSS 14 Goldstone 70-meter
-d15 ! 2430646.09763  +352518.67180   973.21110 DSS 15 Goldstone 34-meter
-d16 ! 2430734.86091  +352029.54181   943.97719 DSS 16 Goldstone 26-meter
-d17 ! 2430735.38070  +352031.83568   936.91591 DSS 17 Goldstone 9-meter
 d23 ! 2430737.69313  +352022.38127   945.35142 DSS 23 Goldstone 11-meter
-d24 ! 2430730.74021  +352023.61408   951.51136 DSS 24 Goldstone 34-meter
-d25 ! 2430728.69246  +352015.40307   959.63401 DSS 25 Goldstone 34-meter
-d26 ! 2430737.14089  +352008.48104   968.69315 DSS 26 Goldstone 34-meter
-d27 ! 2431324.05839  +351417.77841  1052.46882 DSS 27 Goldstone 34-meter
-d28 ! 2431315.99178  +351417.77927  1064.64775 DSS 28 Goldstone 34-meter
 d33 ! 1485859.13040  -352401.74505   684.09999 DSS 33 Canberra 11-meter
-d34 ! 1485855.07192  -352354.52383   692.02036 DSS 34 Canberra 34-meter
-d35 ! 1485853.24074  -352344.86387   694.88925 DSS 35 Canberra 34-meter
-d36 ! 1485842.75932  -352342.36634   685.50534 DSS 36 Canberra 34-meter
-d42 ! 1485852.56264  -352402.42868   674.61529 DSS 42 Canberra 34-meter
-d43 ! 1485852.56232  -352408.72724   688.86727 DSS 43 Tidbinbilla 70-meter
-d45 ! 1485839.66828  -352354.44767   674.34745 DSS 45 Canberra 34-meter
-d46 ! 1485859.09407  -352418.03830   676.81253 DSS 46 Canberra 26-meter
-d49 ! 1481548.65612  -325954.23645   414.81554 DSS 49 Parkes
 d53 ! 3554501.25220  +402538.48625   826.79158 DSS 53 Madrid 11-meter
-d54 ! 3554445.25142  +402532.23806   837.05188 DSS 54 Madrid 34-meter
-d55 ! 3554450.52012  +402527.46526   819.06158 DSS 55 Madrid 34-meter
-d56 ! 3554452.58152  +402533.48293   835.86840 DSS 56 Madrid 34-meter
-d61 ! 3554503.51994  +402543.46101   840.42622 DSS 61 Robledo 34-meter
-d63 ! 3554507.16925  +402552.35510   864.81685 DSS 63 Robledo 70-meter
-d65 ! 3554457.48397  +402537.94289   833.85442 DSS 65 Madrid 34-meter
 d66 ! 3554454.89654  +402547.90955   849.87404 DSS 66 Madrid 26-meter
 
    The coordinates supplied for these stations by the MPC are
@@ -1599,3 +1613,5 @@ Roz !+024.73833    +41.69694         1762.0    1.5-m NAO Rozhen, Smolyan
 
 VO1 !+001.49914017 +49.103662056      169.222  Vernon Observatory CB
 VO2 !+001.49767872 +49.107084983      170.486  Vernon Observatory L1
+BoR !+007.192566   +51.426990         159.65   Bochum radio observatory
+Cha !+016.11250    -23.290000        1182.0    Chamaeleon Observatory
