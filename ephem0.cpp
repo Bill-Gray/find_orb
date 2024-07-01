@@ -2499,6 +2499,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
       long rgb = 0;
       double sum_r = 0., sum_r2 = 0.;     /* for uncertainty in r */
       double sum_rv = 0., sum_rv2 = 0.;   /* for uncertainty in rvel */
+      double nominal_r, nominal_rv;
 
       if( use_observation_times)
          {
@@ -2622,10 +2623,15 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
             v_dot_r += topo[j] * topo_vel[j];
          r = vector3_length( topo);
          radial_vel = v_dot_r / r;
-         sum_r += r;
-         sum_r2 += r * r;
-         sum_rv += radial_vel;
-         sum_rv2 += radial_vel * radial_vel;
+         if( !obj_n)
+            {
+            nominal_r = r;
+            nominal_rv = radial_vel;
+            }
+         sum_r += r - nominal_r;
+         sum_r2 += (r - nominal_r) * (r - nominal_r);
+         sum_rv += radial_vel - nominal_rv;
+         sum_rv2 += (radial_vel - nominal_rv) * (radial_vel - nominal_rv);
          if( *stepsize == 'a')
             max_auto_step = fabs( atof( stepsize + 1)) * r / vector3_length( topo_vel);
          if( (ephem_type == OPTION_STATE_VECTOR_OUTPUT ||
