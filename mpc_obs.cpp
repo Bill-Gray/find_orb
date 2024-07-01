@@ -767,7 +767,6 @@ int get_observer_data( const char FAR *mpc_code, char *buff, mpc_code_t *cinfo)
    if( 4 != strlen( mpc_code))
       temp_code[3] = ' ';
    temp_code[4] = '\0';
-   mpc_code = temp_code;
 
    if( !cinfo)   /* attempting to look up an MPC code from the station name */
       {
@@ -786,12 +785,12 @@ int get_observer_data( const char FAR *mpc_code, char *buff, mpc_code_t *cinfo)
    memset( cinfo, 0, sizeof( mpc_code_t));
    cinfo->planet = 3;         /* default to geocentric */
 
-   if( !get_lat_lon_from_header( &lat0, &lon0, &alt0, mpc_code,
+   if( !get_lat_lon_from_header( &lat0, &lon0, &alt0, temp_code,
                                              &override_observatory_name))
       if( !override_observatory_name)
          override_observatory_name = "Temporary MPC code";
 
-   rover_idx = get_rover_index( mpc_code);
+   rover_idx = get_rover_index( temp_code);
    if( rover_idx >= 0)
       {
       if( rover_idx < n_rovers)
@@ -836,6 +835,7 @@ int get_observer_data( const char FAR *mpc_code, char *buff, mpc_code_t *cinfo)
       return( rval);
       }
 
+   mpc_code = temp_code;
    if( !curr_station || mpc_code_cmp( &curr_station, &mpc_code))
       {
       char **search = (char **)bsearch_ext( &mpc_code, station_data, n_stations,
