@@ -102,7 +102,6 @@ void calc_approx_planet_orientation( const int planet,        /* runge.cpp */
          const int system_number, const double jde, double *matrix);
 char *mpc_station_name( char *station_data);       /* mpc_obs.cpp */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
-int remove_rgb_code( char *buff);                              /* ephem0.cpp */
 static void put_residual_into_text( char *text, const double resid,
                                  const int resid_format);    /* ephem0.cpp */
 FILE *open_json_file( char *filename, const char *env_ptr, const char *default_name,
@@ -3677,19 +3676,6 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
       list_of_ephem_times = NULL;
       }
    return( 0);
-}
-/* The above ephemeris code may insert a six-character hexadecimal
-color,  computed using sky background brightness data,  prefaced by
-'$'.  This should be removed before the line is shown to a user.
-The RGB value is returned,  and may (or may not) be made use of. */
-
-int remove_rgb_code( char *buff)
-{
-   unsigned rval = (unsigned)-1;
-
-   while( (buff = strchr( buff, '$')) && sscanf( buff + 1, "%06x", &rval) == 1)
-      memmove( buff, buff + 7, strlen( buff + 6));
-   return( (int)rval);
 }
 
 /* "is_topocentric_mpc_code( )" is taken to mean "can you compute alt/az

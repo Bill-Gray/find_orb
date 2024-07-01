@@ -227,7 +227,6 @@ int metropolis_search( OBSERVE *obs, const int n_obs, double *orbit,
 const char *get_find_orb_text( const int index);
 int set_tholen_style_sigmas( OBSERVE *obs, const char *buff);  /* mpc_obs.c */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
-int remove_rgb_code( char *buff);                              /* ephem.cpp */
 int find_vaisala_orbit( double *orbit, const OBSERVE *obs1,   /* orb_func.c */
                      const OBSERVE *obs2, const double solar_r);
 int extended_orbit_fit( double *orbit, OBSERVE *obs, int n_obs,
@@ -2472,6 +2471,25 @@ static void drop_starting_columns( char *buff, const int start_column)
       *buff = '\0';
 }
 
+/* Ephemeris files may contain a six-character hexadecimal color,
+computed using sky background brightness data,  prefaced by
+'$'.  This should be removed before the line is shown to a user.
+The RGB value is returned,  and may (or may not) be made use of. */
+
+static int remove_rgb_code( char *buff, int *offset)
+{
+   unsigned rval = (unsigned)-1;
+   char *loc = strchr( buff, '$');
+
+   if( loc && sscanf( loc + 1, "%06x", &rval) == 1)
+      {
+      if( offset)
+         *offset = (int)( loc - buff);
+      memmove( loc, loc + 7, strlen( loc + 6));
+      }
+   return( (int)rval);
+}
+
 static void show_a_file( const char *filename, const int flags)
 {
    FILE *ifile = fopen_ext( filename, "tclrb");
@@ -2576,39 +2594,32 @@ static void show_a_file( const char *filename, const int flags)
          const int curr_line = top_line + i;
          int color_col[20], rgb[20], n_colored = 0, j;
 
-         drop_starting_columns( buff, start_column);
-         if( i >= 3 && flags && color_visibility)
-            {
-            char *tptr = buff;
-
-            while( (tptr = strchr( tptr, '$')) != NULL)
-               {
-               color_col[n_colored] = (int)(tptr - buff) - 7 * n_colored;
-               tptr++;
-               sscanf( tptr, "%6x", (unsigned *)rgb + n_colored);
+         if( i >= 3 && flags)
+            while( (rgb[n_colored] = remove_rgb_code( buff, color_col + n_colored)) >= 0)
                n_colored++;
-               }
-            }
-         remove_rgb_code( buff);
+         drop_starting_columns( buff, start_column);
          if( i >= 3 || !is_ephem)
             put_colored_text( buff, i, 0, -1,
                (line_no == curr_line ? COLOR_ORBITAL_ELEMENTS : COLOR_BACKGROUND));
-         for( j = 0; j < n_colored; j++)
-            {
-            const int blue =  ((rgb[j] >> 3) & 0x1f);
-            const int green = ((rgb[j] >> 11) & 0x1f);
-            const int red =   ((rgb[j] >> 19) & 0x1f);
-            const int text_color = find_rgb(
-                              blue + red + green > 48 ? 0 : 0xffffff);
+         assert( n_colored < 2);
+         if( color_visibility)
+            for( j = 0; j < n_colored; j++)
+               if( color_col[j] >= start_column)
+                  {
+                  const int blue =  ((rgb[j] >> 3) & 0x1f);
+                  const int green = ((rgb[j] >> 11) & 0x1f);
+                  const int red =   ((rgb[j] >> 19) & 0x1f);
+                  const int text_color = find_rgb(
+                                    blue + red + green > 48 ? 0 : 0xffffff);
 
 #ifdef __PDCURSESMOD__
-            init_extended_pair( color_pair_idx, text_color, find_rgb( rgb[j]));
+                  init_extended_pair( color_pair_idx, text_color, find_rgb( rgb[j]));
 #else
-            init_pair( color_pair_idx, text_color, find_rgb( rgb[j]));
+                  init_pair( color_pair_idx, text_color, find_rgb( rgb[j]));
 #endif
-            mvchgat( i, color_col[j], 2, A_NORMAL, color_pair_idx, NULL);
-            color_pair_idx++;
-            }
+                  mvchgat( i, color_col[j] - start_column, 2, A_NORMAL, color_pair_idx, NULL);
+                  color_pair_idx++;
+                  }
          if( calendar_col >= 0 && curr_line > calendar_line - 2
                    && curr_line < calendar_line + calendar_cell_height - 2)
             mvchgat( i, calendar_col + 1, calendar_cell_width - 1, 0, COLOR_OBS_INFO, NULL);
@@ -2772,7 +2783,7 @@ static void show_a_file( const char *filename, const int flags)
                   fseek( ifile, 0L, SEEK_SET);
                   while( fgets( tbuff, sizeof( tbuff), ifile))
                      {
-                     remove_rgb_code( tbuff);
+                     remove_rgb_code( tbuff, NULL);
                      fputs( tbuff, ofile);
                      }
                   fclose( ofile);
