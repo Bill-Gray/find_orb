@@ -546,7 +546,7 @@ int main( const int argc, const char **argv)
    int ephem, progress_bar_freq = 2, ref_frame = -1;
    int epoch_index = -1;
    tle_t tle;
-   const time_t t0 = time( NULL);
+   const time_t curr_t = time( NULL);
    bool use_precession = true, archival = false;
    double step;
    unsigned n_steps, total_lines;
@@ -565,7 +565,7 @@ int main( const int argc, const char **argv)
    memset( &tle, 0, sizeof( tle_t));
    tle.classification = 'U';
    tle.ephemeris_type = EPHEM_TYPE_DEFAULT;
-   tle.bulletin_number = (int)( t0 / seconds_per_day - BULLETIN_EPOCH);
+   tle.bulletin_number = (int)( curr_t / seconds_per_day - BULLETIN_EPOCH);
    *obj_name = '\0';
    for( i = 1; i < argc; i++)
       if( argv[i][0] == '-')
@@ -669,7 +669,7 @@ int main( const int argc, const char **argv)
       error_exit( -4);
       }
    fprintf( ofile, "# Made by eph2tle, compiled " __DATE__ " " __TIME__ "\n");
-   fprintf( ofile, "# Run at %s#\n", ctime( &t0));
+   fprintf( ofile, "# Run at %s#\n", ctime( &curr_t));
    if( archival)
       fprintf( ofile, "# No updates     (archival TLEs)\n");
    if( search_dist)
@@ -788,9 +788,8 @@ int main( const int argc, const char **argv)
       for( i = 0; i < output_freq && fgets( buff, sizeof( buff), ifile);
                                                       i++, sptr += 6)
          {
-         double jdt, jd_utc;
+         double jdt, utc;
          double precession_matrix[9], ivect[6];
-         size_t j;
 
          if( sscanf( buff, "%lf%lf%lf%lf%lf%lf%lf", &jdt,
                         ivect, ivect + 1, ivect + 2,
@@ -806,7 +805,7 @@ int main( const int argc, const char **argv)
             fprintf( stderr, "JDT %f is outside the valid range\n", jdt);
             return( -3);
             }
-         jd_utc = jdt - td_minus_utc( jdt) / seconds_per_day;
+         utc = jdt - td_minus_utc( jdt) / seconds_per_day;
          for( j = 0; j < 6; j++)
             ivect[j] /= dist_units;
          for( j = 3; j < 6; j++)
@@ -818,7 +817,7 @@ int main( const int argc, const char **argv)
             }
          if( use_precession)
             setup_precession( precession_matrix, 2000.,
-                                      2000. + (jd_utc - 2451545.) / 365.25);
+                                      2000. + (utc - 2451545.) / 365.25);
          else
             set_identity_matrix( precession_matrix);
          precess_vector( precession_matrix, ivect, sptr);
