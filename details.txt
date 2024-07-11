@@ -980,6 +980,11 @@ COM Find_Orb default details
 OBS H. Denzau
 TEL 0.36-m Schmidt-Cassegrain f/5.5 + CCD
 
+COD A41
+OBS R. Palcic
+COM Default details extracted from MPEC 2024-J304
+TEL 0.60-m f/5.2 reflector + CMO
+
 COD A44
 OBS W. Ries
 COM Default details extracted from MPEC 2020-S38
@@ -1099,6 +1104,11 @@ COD B50
 OBS J. Linder
 COM Default details extracted from MPEC 2021-A190
 TEL 0.20-m f/5.8 Schmidt-Cassegrain + CCD
+
+COD B53
+OBS D. Pivato
+COM Default details extracted from MPEC 2024-G193
+TEL 0.25-m  f/5.0 reflector + CCD
 
 COD B54
 OBS J. Bel
@@ -1324,6 +1334,12 @@ OBS T. Santana-Ros, B. Gendre
 MEA M. Micheli
 TEL 1.0-m reflector + CCD
 
+COD D23
+MEA J. M. Perez-Redondo
+OBS J. M. Perez-Redondo, D. Rodriguez
+COM Default details extracted from MPEC 2024-L77
+TEL 0.20-m f/10.0 sc + CCD
+
 COD D28
 OBS J. Solaz
 COM Default details extracted from MPEC 2024-A150
@@ -1351,12 +1367,44 @@ COM Default details extracted from MPEC 2021-L04
 MEA Z.-Y. Lin
 TEL 0.4-m f/8.4 Ritchey-Chretien + CCD
 
+COD D38
+OBS A. Pearce
+COM Default details extracted from MPEC 2024-L77
+TEL 0.23-m f/4 Reflector + CCD
+TEL 0.30-m f/5.5 Reflector + CCD
+TEL 0.30-m f/5.5 reflector + CCD
+
+COD D40
+OBS D. Pica
+COM Default details extracted from MPEC 2024-H91
+TEL 0.23-m f/6 Schmidt-Cassegrain + CMO
+
+COD D47
+OBS D. Pivato
+COM Default details extracted from MPEC 2024-L77
+TEL 0.25-m f/5.0 Baker Ritchey Chretien + CCD
+
+COD D48
+OBS W. Wiedemann
+COM Default details extracted from MPEC 2024-M118
+TEL 0.28-m f/4.3 Schmidt- Cassegrain + CCD
+
+COD D49
+OBS J. Camarasa
+COM Default details extracted from MPEC 2024-N80
+TEL 0.07-m f/5.8 refractor + CCD
+
 COD D54
 OBS Y. Kechin, V. Lipunov, E. Gorbovskoy, N. Tiurina, P. Balanutsa
 OBS V. Kornilov, A. Kuznetsov, D. Zimnukhov, O. Gress, A. Tlatov, V. Senik
 OBS D. Dormidontov, A. Parkhomenko
 COM Default details extracted from MPEC 2024-D126
 TEL 0.4-m f/2.5 reflector + CCD
+
+COD D64
+OBS M. F. Caramanico
+COM Default details extracted from MPEC 2024-H91
+TEL 0.25-m f/4.0 0.25m Newton + CMOS + CMO
 
 COD D78
 OBS T. Tanaka
@@ -2092,6 +2140,11 @@ OBS A. Brosio, A. De Pieri
 COM Default details extracted from MPEC 2020-K194
 TEL 0.5-m f/8.0 Ritchey-Chretien + CCD
 
+COD K97
+OBS P. Ditz
+COM Default details extracted from MPEC 2024-N80
+TEL 0.54-m f/3.75 reflector + CCD
+
 COD K98
 COM Default details from http://www.6roads.com.pl/
 TEL 0.40-m f/3.8 Newtonian + CCD
@@ -2117,6 +2170,11 @@ OBS L. Hudin
 COM Default details extracted from MPEC 2021-A190
 TEL 0.3-m f/5 reflector + CCD
 TEL 0.1-m f/9 refractor + CCD
+
+COD L05
+OBS C. Ghidetti
+COM Default details extracted from MPEC 2024-J122
+TEL 0.25-m f/0.2 Newtonian reflector + CCD
 
 COD L06
 MEA G. Ventre, P. Sicoli
@@ -2374,6 +2432,11 @@ OBS S. Fritsche
 COM Default details extracted from MPEC 2022-C56
 TEL 0.10-m f/5.8 refractor
 
+COD M19
+OBS Z. Orbanic
+COM Default details extracted from MPEC 2024-J304
+TEL 0.25-m f/3.8 reflector + CCD
+
 COD M21
 MEA L. Buzzi
 OBS A. Aletti, F. Bellini, L. Buzzi, G. Galli
@@ -2386,6 +2449,11 @@ MEA R. Siverd, J. Tonry, H. Weiland
 OBS L. Denneau, R. Siverd, J. Tonry, H. Weiland
 COM Default details extracted from MPEC 2022-C56
 TEL 0.5-m reflector + CCD
+
+COD M24
+OBS B. Monteleone
+COM Default details extracted from MPEC 2024-J304
+TEL 0.25-m f/8.0 reflector + CMO
 
 COD M26
 MEA M. Lombardo
@@ -2456,6 +2524,12 @@ COD M52
 OBS M. Dionisi
 COM Default details extracted from MPEC 2023-J95
 TEL 0.25-m f/5 reflector + CMOS + CCD
+
+COD M54
+MEA J.-M. Mari
+OBS J.-M. Mari, C. Jasicki
+COM Default details extracted from MPEC 2024-K130
+TEL 0.25-m f/4.5 reflector + CMO
 
 COD M57
 OBS A. Nastasi
@@ -2588,6 +2662,11 @@ OBS Z. Wang, B. Liu
 MEA Z. Wang
 TEL 0.28-m f/2.2 reflector + CMO
 
+COD P14
+OBS A. Pearce
+COM Default details extracted from MPEC 2024-N80
+TEL 0.05-m f/5 Apochromatic Refractor + CCD
+
 COD P18
 OBS S. Zhang, H. Chen, X. Yin
 COM Default details extracted from MPEC 2021-F20
@@ -2631,6 +2710,11 @@ OBS K. Sugawara
 COM Default details extracted from MPEC 2024-D126
 TEL 0.2-m f/4.0 BKP200/800OTA + CCD
 
+COD Q20
+OBS J. Jahn
+COM Default details extracted from MPEC 2024-G15
+TEL 0.30-m f/3.8 reflector + CMO
+
 COD Q21
 OBS H. Nohara
 COM Default details extracted from MPEC 2021-B143
@@ -2655,6 +2739,11 @@ MEA T. Prystavski
 OBS M. Petkovic, T. Preston, P. Tisserand, P. Oates, C. Vest, G. Bloxham
 COM Default details extracted from MPEC 2022-L66
 TEL 1.35-m Cassegrain + CCD
+
+COD Q56
+OBS P.-J. Dekelver
+COM Default details extracted from MPEC 2024-L140
+TEL 0.14-m f/4.8 refractor + CMO
 
 COD Q57
 COM Find_Orb default details
@@ -2810,6 +2899,11 @@ NET Gaia-DR1
 COM Valid: 2018 mar 1-2100
 NET Gaia-DR2
 
+COD T11
+MEA S. Deen
+COM Default details extracted from MPEC 2024-G193
+TEL 3.8-m Cassegrain reflector
+
 COD T12
 COM Find_Orb default details
 CON D. J. Tholen, Institute for Astronomy, 2680 Woodlawn Drive, Honolulu, HI 96822
@@ -2951,6 +3045,12 @@ OBS B. K. Kendrick
 COM Default details extracted from MPEC 2022-B138
 TEL 0.25-m f/6 reflector + CCD
 
+COD V28
+OBS R. Reszelewski, M. Zolnowski, M. Gedek, K. Zukowski, P. Baginska
+MEA R. Reszelewski
+COM Default details extracted from MPEC 2024-N62
+TEL 0.28-m f/2.2 reflector + CMOS
+
 COD V37
 MEA M. Wawerzonnek
 OBS P. Breitenstein
@@ -3014,6 +3114,11 @@ COD W46
 OBS J. Haidet
 COM Default details extracted from MPEC 2021-B143
 TEL 0.36-m f/6.3 Ritchey-Chretien + CCD
+
+COD W50
+OBS M. A. Phillips
+COM Default details extracted from MPEC 2024-L77
+TEL 0.36-m f/4.5 reflector + CCD
 
 COD W53
 OBS R. Jennings
@@ -3310,6 +3415,17 @@ COM Default details extracted from MPEC 2024-D123
 MEA M. Hierro
 TEL 0.80-m f/4.38 reflector + CMO
 
+COD Y83
+OBS O. Canales
+COM Default details extracted from MPEC 2024-J122
+TEL 0.28-m f:5.6 SC + CMO
+
+COD Y84
+MEA F. Spingler
+OBS F. Spingler, L. Spingler
+COM Default details extracted from MPEC 2024-J304
+TEL 0.20-m f/4 reflector + CMO
+
 COD Y87
 OBS J.-G. Bosch
 COM Default details extracted from MPEC 2024-E49
@@ -3476,6 +3592,12 @@ COM Valid: 2018 Jun 4 - 2018 Jun 12
 NET UCAC-4
 COM Valid: 2018 Jun 12 - 2100
 NET Gaia-DR2
+
+COD Z53
+MEA M. Micheli, E. Jehin
+OBS E. Jehin
+COM Default details extracted from MPEC 2024-L77
+TEL 0.60-m f/8 reflector + CCD
 
 COD Z55
 OBS R. Farfan
