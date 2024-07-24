@@ -2124,7 +2124,6 @@ int write_out_elements_to_file( const double *orbit,
       else if( !memcmp( buff, "Epoch", 5))
          {
          int j;
-         const double SRP1AU = 2.3e-7;
          int n_moids_to_show = atoi( get_environment_ptr( "N_MOIDS"));
 
          if( !n_moids_to_show)      /* by default,  just show */

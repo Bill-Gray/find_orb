@@ -1083,7 +1083,6 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
                if( i == IDX_EARTH && r < ATMOSPHERIC_LIMIT && n_orbit_params == 7
                            && *get_environment_ptr( "DRAG_SHUTOFF") != '1')
                   {
-                  const double SRP1AU = 2.3e-7;   /* kg*AU^3 / (m^2*d^2) */
                   const double amr_drag = ival[6] * SOLAR_GM / SRP1AU;
                   const double rho_cos_phi =
                           hypot( delta_planet[0], delta_planet[1]) / EARTH_RADIUS_IN_AU;

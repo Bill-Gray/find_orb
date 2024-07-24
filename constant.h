@@ -3,6 +3,7 @@
 #define J2000 2451545.
 #define JD_TO_YEAR( jd)  (2000. + ((jd) - J2000) / 365.25)
 #define YEAR_TO_JD( year) (J2000 + (year - 2000.) * 365.25)
+#define METERS_PER_KM      1000.
 
 #define PI 3.1415926535897932384626433832795028841971693993751058209749445923078
 
@@ -16,7 +17,13 @@
 #define EARTH_RADIUS_IN_AU    (EARTH_RADIUS_IN_KM / AU_IN_KM)
 #define SUN_RADIUS_IN_AU      (SUN_RADIUS_IN_KM / AU_IN_KM)
 
-const double SRP1AU = 2.27636e-7;
+/* "Solar constant" : at one AU from the sun,  a square meter
+collects 1361 watts (total solar irradiance at all wavelengths). */
+
+#define SOLAR_CONSTANT     1361.       /* W/m^2 */
+
+const double SRP1AU = SOLAR_CONSTANT * seconds_per_day * seconds_per_day
+                            / (AU_IN_METERS * SPEED_OF_LIGHT * METERS_PER_KM);
 
 /* "Solar radiation pressure at 1 AU",  in kg*AU^3 / (m^2*d^2),
 from a private communication from Steve Chesley.  This means
@@ -25,30 +32,11 @@ meter of surface area to the sun,  and it was one AU from the
 sun,  and it absorbed all the solar radiation (and re-radiated
 it isotropically;  i.e.,  the re-radiated photons didn't cause
 any net force),  then that object would accelerate away from
-the sun at 2.27636e-7 AU/day^2 (a.k.a. 4.562e-6 m/s^2).
+the sun at about 2.3e-7 AU/day^2 (a.k.a. 4.6e-6 m/s^2).
 
-  One can derive SRP1AU  from basic principles.   The 'solar
-constant' is C = 1367.6 AU^2*W/m^2; i.e.,  if you set up a
-one square meter solar panel with 100% efficiency one AU from
-the Sun, pointed straight at the sun, it would generate
-1367.6 watts. To get the above number, one uses
-
-SRP1AU = C * d^2 / (meters_per_AU * c)
-
-   C = 1367.6 AU^2*W/m^2 = 1367.6 AU^2*kg/s^3
-   d = 86400 seconds/day
-   meters_per_AU = 1495978707 m/AU
-   c = 299792458 m/s
-
-   The result indicates that if the solar panel in question
-had a mass of one kilogram,  it would accelerate away from the
-sun at 2.27636e-7 AU/day^2.  Reality will not be so precise;  real
-objects reflect and re-radiate photons,  instead of politely
-absorbing them and then re-radiating them isotropically.
-
-  Interestingly,  this also means that an object with area/mass =
-1286 m^2/kg would have SRP balancing the sun's gravity.  Which
-would make it big and light.  Solar sails aren't easy.
+   Reality will not be so precise;  real objects reflect and
+re-radiate photons,  instead of politely absorbing them and
+then re-radiating them isotropically.
 
     A final comment : non-gravs of the A1, A2, A3 form give the
 acceleration the object would have at one AU from the sun,  in

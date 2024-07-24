@@ -23,9 +23,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include <math.h>
 #include <assert.h>
 #include "watdefs.h"
-#include "constant.h"
 #include "comets.h"
 #include "afuncs.h"
+#include "constant.h"
 
 /* BC-405 gives orbital elements for 300 large asteroids at 40-day intervals,
 running from JD 2378495.0 = 1799 Dec 30.5 to JD 2524615.0 = 2200 Jan 22.5.
@@ -140,9 +140,6 @@ static FILE *open_bc405_file( const bool shutting_down)
       }
    return( ifile);
 }
-
-#define GAUSS_K .01720209895
-#define SOLAR_GM (GAUSS_K * GAUSS_K)
 
 static void grab_elems( ELEMENTS *elems, FILE *fp, const int chunk_number)
 {
