@@ -423,7 +423,7 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
 
    while( rval < 0)
       {
-      int i, j, n_lines = 1, line_start = 0, box_size = (buff ? 14 : 0);
+      int i, j, n_lines = 1, box_size = (buff ? 14 : 0);
       const int side_borders = 1;   /* leave a blank on either side */
       int real_width, line = line0, col = col0;
       char tbuff[200];
@@ -431,20 +431,27 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
       int x, y, z;
       mmask_t button;
 
-      for( i = 0; prompt[i]; i++)
-         if( prompt[i] == '\n' || !prompt[i + 1])
-            {
-            int new_size = count_wide_chars_in_utf8_string(
-                        prompt + line_start, prompt + i);
+      i = 0;
+      while( prompt[i])
+         {
+         int new_size;
 
-            if( help_file_name && !line_start)
-               new_size += 4;       /* ensure room on top line for [?] */
-            if( box_size < new_size)
-               box_size = new_size;
-            line_start = i;
-            if( prompt[i + 1])   /* ignore trailing '\n's */
-               n_lines++;
+         j = i;
+         while( prompt[j] && prompt[j] != '\n')
+            j++;
+         new_size = count_wide_chars_in_utf8_string(
+                        prompt + i, prompt + j);
+         if( help_file_name && !i)
+            new_size += 4;       /* ensure room on top line for [?] */
+         if( box_size < new_size)
+            box_size = new_size;
+         i = j;
+         if( prompt[i])   /* skip trailing '\n's */
+            {
+            n_lines++;
+            i++;
             }
+         }
       if( box_size > getmaxx( stdscr) - 2)
          box_size = getmaxx( stdscr) - 2;
 
@@ -3352,7 +3359,14 @@ extern const char *elements_filename;
 static int count_wide_chars_in_utf8_string( const char *iptr, const char *endptr)
 {
    int rval = 0;
+   char tbuff[200];
 
+   assert( endptr);
+   assert( iptr);
+   assert( endptr >= iptr);
+   assert( endptr - iptr < (ssize_t)sizeof( tbuff));
+   memcpy( tbuff, iptr, endptr - iptr);
+   tbuff[endptr - iptr] = '\0';
    while( iptr < endptr)
       {
       switch( ((unsigned char)*iptr) >> 4)
