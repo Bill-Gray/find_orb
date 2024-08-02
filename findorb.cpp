@@ -2483,15 +2483,25 @@ The RGB value is returned,  and may (or may not) be made use of. */
 static int remove_rgb_code( char *buff, int *offset)
 {
    unsigned rval = (unsigned)-1;
-   char *loc = strchr( buff, '$');
+   size_t i;
+   char *loc = buff;
 
-   if( loc && sscanf( loc + 1, "%06x", &rval) == 1)
+   while( (loc = strchr( loc, '$')) != NULL)
       {
-      if( offset)
-         *offset = (int)( loc - buff);
-      memmove( loc, loc + 7, strlen( loc + 6));
+      i = 1;
+      while( i < 7 && isxdigit( loc[i]))
+         i++;
+      if( i == 7)    /* yes,  it's a $ followed by six hex digits */
+         {
+         sscanf( loc + 1, "%06x", &rval);
+         if( offset)
+            *offset = (int)( loc - buff);
+         memmove( loc, loc + 7, strlen( loc + 6));
+         return( (int)rval);
+         }
+      loc++;      /* loop to look for further '$'s   */
       }
-   return( (int)rval);
+   return( -1);
 }
 
 static void show_a_file( const char *filename, const int flags)
@@ -3364,7 +3374,7 @@ static int count_wide_chars_in_utf8_string( const char *iptr, const char *endptr
    assert( endptr);
    assert( iptr);
    assert( endptr >= iptr);
-   assert( endptr - iptr < (ssize_t)sizeof( tbuff));
+   assert( endptr < iptr + sizeof( tbuff));
    memcpy( tbuff, iptr, endptr - iptr);
    tbuff[endptr - iptr] = '\0';
    while( iptr < endptr)
