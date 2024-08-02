@@ -1603,11 +1603,13 @@ VCe !-073.89045    +41.68295           55.0    Vassar College (since 1997), larg
 VCw !-073.89063    +41.68295           55.0    Vassar College (since 1997), larger west dome
 VCn !-073.89054    +41.68323           55.0    Vassar College (since 1997), small north dome
 
-   This is a new telescope near (071),  described at
+   (Roz) is a new telescope near (071),  described at
    https://www.ta3.sk/caosp/Eedition/Abstracts/2024/Vol_54/No_2/pp15-21_abstract.html
-   Coordinates are via a private communication from Rositsa Miteva.
+   Coordinates for it,  and for (AOB),  are via a private communication
+   from Rositsa Miteva.
 
 Roz !+024.73833    +41.69694         1762.0    1.5-m NAO Rozhen, Smolyan
+AOB !+022.675      +43.622777         650.0    AO Belogradchik
 
    Gael Musquet supplied the coordinates for the following two telescopes.
 
@@ -1615,3 +1617,5 @@ VO1 !+001.49914017 +49.103662056      169.222  Vernon Observatory CB
 VO2 !+001.49767872 +49.107084983      170.486  Vernon Observatory L1
 BoR !+007.192566   +51.426990         159.65   Bochum radio observatory
 Cha !+016.11250    -23.290000        1182.0    Chamaeleon Observatory
+
+McC !-078.329166   +44.331944         206.77   Hevans Drive Observatory
