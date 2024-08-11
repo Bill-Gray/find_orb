@@ -1154,7 +1154,7 @@ static void try_adding_comet_name( const char *search, char *name)
                {
                buff[44] = '\0';
                remove_trailing_cr_lf( buff);
-               strcat( name, " ");
+               strcat( name, strchr( name, '/') ? " " : "/");
                strcat( name, buff + slen);
                }
             }
@@ -1405,7 +1405,7 @@ int get_object_name( char *obuff, const char *packed_desig)
          try_artsat_xdesig( obuff);
       if( rval == OBJ_DESIG_COMET_NUMBERED)
          {
-         snprintf_err( xdesig, sizeof( xdesig), "%3d%c/", atoi( obuff + 2), *obuff);
+         snprintf_err( xdesig, sizeof( xdesig), "%3d%c/", atoi( obuff), xdesig[4]);
          try_adding_comet_name( xdesig, obuff);
          }
       if( rval == OBJ_DESIG_COMET_PROVISIONAL)
