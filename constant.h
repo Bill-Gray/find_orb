@@ -20,7 +20,7 @@
 /* "Solar constant" : at one AU from the sun,  a square meter
 collects 1361 watts (total solar irradiance at all wavelengths). */
 
-#define SOLAR_CONSTANT     1361.       /* W/m^2 */
+#define SOLAR_CONSTANT     1361.       /* W/m^2 = kg/s^3 at one AU */
 
 const double SRP1AU = SOLAR_CONSTANT * seconds_per_day * seconds_per_day
                             / (AU_IN_METERS * SPEED_OF_LIGHT * METERS_PER_KM);

@@ -35,10 +35,7 @@ the new code and (b) because the algorithm _is_ of some interest. */
 #include "watdefs.h"
 #include "comets.h"
 #include "afuncs.h"
-
-#define PI 3.1415926535897932384626433832795028841971693993751058209749445923
-#define GAUSS_K .01720209895
-#define SOLAR_GM (GAUSS_K * GAUSS_K)
+#include "constant.h"
 
 int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
 #ifdef __GNUC__
