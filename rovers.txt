@@ -1619,3 +1619,4 @@ BoR !+007.192566   +51.426990         159.65   Bochum radio observatory
 Cha !+016.11250    -23.290000        1182.0    Chamaeleon Observatory
 
 McC !-078.329166   +44.331944         206.77   Hevans Drive Observatory
+088 !+031.827694   +029.93400         494.0    Kottamia
