@@ -35,7 +35,7 @@ cssfield.exe: cssfield.cpp
 
 find_orb.exe:               findorb.obj $(OBJS) clipfunc.obj getstrex.obj
      link /out:find_orb.exe findorb.obj $(OBJS) clipfunc.obj getstrex.obj \
-                       pdcurses.lib user32.lib $(CCLIBS) $(ADD_LIBS)
+                       pdcurses.lib user32.lib winmm.lib $(CCLIBS) $(ADD_LIBS)
 
 fo.exe:                     fo.obj $(OBJS)
      link /out:fo.exe       fo.obj $(OBJS) $(ADD_LIBS)
