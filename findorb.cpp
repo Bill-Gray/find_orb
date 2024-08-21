@@ -3001,51 +3001,6 @@ int find_first_and_last_obs_idx( const OBSERVE *obs, const int n_obs,
          int *last);       /* elem_out.cpp */
 double mid_epoch_of_arc( const OBSERVE *obs, const int n_obs);
 
-static double get_elements( const char *filename, double *state_vect)
-{
-   ELEMENTS elem;
-   FILE *ifile = fopen( filename, "rb");
-   char buff[82];
-
-   memset( &elem, 0, sizeof( ELEMENTS));
-   if( ifile)
-      {
-      while( fgets_trimmed( buff, sizeof( buff), ifile))
-         if( !memcmp( buff, "Epoch:", 6))
-            elem.epoch = get_time_from_string( 0., buff + 6,
-                     FULL_CTIME_YMD | CALENDAR_JULIAN_GREGORIAN, NULL);
-         else if( !memcmp( buff, "q:", 2))
-            elem.q = atof( buff + 2);
-         else if( !memcmp( buff, "e:", 2))
-            elem.ecc = atof( buff + 2);
-         else if( !memcmp( buff, "a:", 2))
-            elem.q = atof( buff + 2) * (1. - elem.ecc);
-         else if( !memcmp( buff, "i:", 2))
-            elem.incl = atof( buff + 2) * PI / 180;
-         else if( !memcmp( buff, "omega:", 6))
-            elem.arg_per = atof( buff + 6) * PI / 180;
-         else if( !memcmp( buff, "node:", 5))
-            elem.asc_node = atof( buff + 5) * PI / 180;
-         else if( !memcmp( buff, "M:", 2))
-            elem.mean_anomaly = atof( buff + 2) * PI / 180;
-         else if( !memcmp( buff, "L:", 2))
-            elem.mean_anomaly = atof( buff + 2) * PI / 180
-                        - elem.arg_per - elem.asc_node;
-         else if( !memcmp( buff, "pi:", 3))
-            elem.mean_anomaly = atof( buff + 3) * PI / 180
-                         - elem.arg_per;
-      fclose( ifile);
-      }
-   if( elem.epoch)
-      {
-      derive_quantities( &elem, SOLAR_GM);
-      elem.perih_time = elem.epoch - elem.mean_anomaly * elem.t0;
-      elem.angular_momentum = sqrt( SOLAR_GM * elem.q);
-      elem.angular_momentum *= sqrt( 1. + elem.ecc);
-      comet_posn_and_vel( &elem, elem.epoch, state_vect, state_vect + 3);
-      }
-   return( elem.epoch);
-}
 
 /* I really should use getopt() or a portable variant.  However,  this has
 been sufficiently effective thus far... */
@@ -6318,19 +6273,6 @@ int main( int argc, const char **argv)
                            (c == ALT_T ? "all" : "selected"));
                   }
             break;
-         case KEY_F(17):    /* shift-f5 */
-            if( !inquire( "Enter element filename: ", tbuff, sizeof( tbuff),
-                                COLOR_DEFAULT_INQUIRY) && *tbuff)
-               {
-               const double rval = get_elements( tbuff, orbit);
-
-               if( rval)
-                  {
-                  curr_epoch = epoch_shown = rval;
-                  update_element_display = 1;
-                  }
-               }
-            break;
          case KEY_F(23):    /* shift-f11: ephemeride-less pseudo-MPEC */
             {
             extern const char *ephemeris_filename;
@@ -6727,6 +6669,7 @@ int main( int argc, const char **argv)
          case PADPLUS: case PADMINUS: case PADSLASH:
 #endif
          case ALT_DOWN:
+         case KEY_F(17):    /* shift-f5 */
          default:
             debug_printf( "Key %d hit\n", c);
             show_a_file( "dos_help.txt", 0);
