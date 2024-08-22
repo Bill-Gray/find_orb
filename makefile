@@ -61,22 +61,24 @@ ifdef MSWIN
 	EXE=.exe
 	CURSES_LIB=-lpdcurses
 	MKDIR=-mkdir
+	DEFAULT_PREFIX=..
 else
 	MKDIR=mkdir -p
+	DEFAULT_PREFIX=~
 endif
 
-# You can have your include files in ../include and libraries in
-# ../lib,  in which case only the current user can use them;  or
+# You can have your include files in ~/include and libraries in
+# ~/lib,  in which case only the current user can use them;  or
 # (with root privileges) you can install them to /usr/local/include
 # and /usr/local/lib for all to enjoy.
 
-PREFIX?=..
+PREFIX?=$(DEFAULT_PREFIX)
 ifdef GLOBAL
 	INSTALL_DIR=/usr/local
 else
 	INSTALL_DIR=$(PREFIX)
 endif
-ifneq ($(PREFIX),..)
+ifneq ($(PREFIX),$(DEFAULT_PREFIX))
 	# enable the automatic setup of ../.find_orb dir from
 	# $PREFIX/share/openorb.  This at the moment requires C++17 features
 	# and works on Linux and macOS
@@ -240,7 +242,7 @@ cvt_elem.o:            conv_ele.cpp
 	$(CXX) $(CXXFLAGS) -o cvt_elem.o -DCGI_VERSION $<
 
 IDIR=$(PREFIX)/share/findorb/data
-ifeq ($(PREFIX),..)
+ifeq ($(PREFIX),$(DEFAULT_PREFIX))
 	# backwards compatibility
 	IDIR=../.find_orb
 endif
