@@ -155,6 +155,12 @@ COM Default details extracted from MPEC 2020-E26
 MEA V. Jelic
 TEL 0.41-m f/4.3 reflector + CCD
 
+COD 126
+OBS L. Sannino, A. Mancuso, S. Mercanti, D. Agnetti
+MEA L. Sannino, A. Mancuso
+COM Default details extracted from MPEC 2024-P161
+TEL 0.41-m f/5.3 reflector + CCD
+
 COD 127
 COM Find_Orb default details
 OBS N. Ehring
@@ -2551,6 +2557,11 @@ OBS K. Johnson
 COM Default details extracted from MPEC 2024-E157
 TEL 0.25-m f/6.8 SCT + CCD
 
+COD M75
+OBS A. V. Skachedub
+COM Default details extracted from MPEC 2024-Q29
+TEL 0.28-m f/2.2 reflector + CMO
+
 COD N42
 COM Default details from private communication
 TEL 1.0-m reflector + CCD
@@ -3402,6 +3413,12 @@ OBS F. Monteiro, H. Medeiros, P. Arcoverde, D. Lazzaro, R. Souza, T. Rodrigues
 MEA M. Micheli, F. Monteiro
 TEL 1.0-m f/7 reflector + CCD
 NET PPMXL
+
+COD Y64
+OBS M. R. Alarcon, M. Serra-Ricart
+MEA M. R. Alarcon
+COM Default details extracted from MPEC 2024-N112
+TEL 1.00-m f/1.3 reflector + CMO
 
 COD Y65
 MEA M. Hierro
