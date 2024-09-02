@@ -179,8 +179,8 @@ TEL 0.35-m f/5.5 reflector + CCD
 
 COD 151
 COM Find_Orb default details
-OBS M. Griesser
-TEL 0.40-m f/5.8 Hypergraph + CCD
+OBS D. Luongo
+TEL 0.6-m f/3.8 Astrograph + CCD
 
 COD 152
 MEA K. Cernis
