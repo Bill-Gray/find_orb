@@ -2772,7 +2772,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                      strlcpy_error( tbuff, offset_dir);
                      text_search_and_replace( tbuff, "%p",
                                  real_packed_desig( packed_buff, obs->packed_id));
-                     text_search_and_replace( tbuff, "%c", cinfo->code);
+                     text_search_and_replace( tbuff, "%c", ephem_mpc_code);
                      full_ctime( date_buff, curr_jd,
                            FULL_CTIME_FORMAT_HH_MM | FULL_CTIME_YMD
                          | FULL_CTIME_MONTHS_AS_DIGITS | FULL_CTIME_NO_SPACES
