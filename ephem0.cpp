@@ -2935,7 +2935,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                            cos_elong = dot_product( vect, topo)
                                         / (moon_dist * vector3_length( topo));
                         else
-                           cos_elong = 1.;
+                           cos_elong = -1.;
                         dist_moon = acose( cos_elong);
 
 #ifdef SHOW_LUNAR_OFFSETS
@@ -2952,7 +2952,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                               (obs_lon - moon_lon) * 180. / PI,
                               (obs_lat - moon_lat) * 180. / PI);
 #endif
-                        if( dist_moon < lunar_radius / moon_dist)
+                        if( moon_dist && dist_moon < lunar_radius / moon_dist)
                            visibility_char = (vector3_length( topo) < moon_dist ?
                                        'l' : 'L');  /* l=obj transits moon, */
                         }                           /* L=obj behind moon   */
@@ -2975,6 +2975,12 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                   alt_az[j].x = centralize_ang( alt_az[j].x + PI);
                   best_alt_az[j].x = centralize_ang( best_alt_az[j].x + PI);
                   }
+               if( is_geocentric && 3 != cinfo->planet)
+                  for( j = 0; j < 3; j++)
+                     {     /* haven't generalized locations for off-earth */
+                     best_alt_az[j].x = alt_az[j].x = 0.;
+                     best_alt_az[j].y = alt_az[j].y = (j ? -PI / 2. : PI / 2.);
+                     }
                if( is_under_horizon( alt_az[0].y * 180. / PI,
                                      alt_az[0].x * 180. / PI, &exposure_config))
                   {
