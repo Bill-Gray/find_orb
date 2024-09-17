@@ -1783,23 +1783,6 @@ static OBSERVE *get_real_arc( OBSERVE *obs, int *n_obs,
 
 #define RAD2SEC (180. * 3600. / PI)
 
-int adjust_herget_results( OBSERVE FAR *obs, int n_obs, double *orbit)
-{
-   int n_found, rval;
-
-   obs = get_real_arc( obs, &n_obs, &n_found);
-   if( n_found < 2)   /* must have at least two obs */
-      rval = -2;
-   else if( is_unreasonable_orbit( orbit))
-      rval = -3;
-   else
-      rval = extended_orbit_fit( orbit, obs, n_obs,
-                     FIT_FIXED_DISTANCES, obs->jd);
-   if( !rval)
-      rval = set_locs( orbit, obs->jd, obs, n_obs);
-   return( rval);
-}
-
 static double max_herget_span( const double r1, const double r2)
 {
    double rval = 100.;           /* default value */
@@ -1813,6 +1796,25 @@ static double max_herget_span( const double r1, const double r2)
       rval = r * AU_IN_KM / (max_speed * seconds_per_day);
       rval *= empirical_fudge_factor;
       }
+   return( rval);
+}
+
+int adjust_herget_results( OBSERVE FAR *obs, int n_obs, double *orbit)
+{
+   int n_found, rval;
+
+   obs = get_real_arc( obs, &n_obs, &n_found);
+   if( n_found < 2)   /* must have at least two obs */
+      rval = -2;
+   else if( is_unreasonable_orbit( orbit))
+      rval = -3;
+   else if( obs[n_obs - 1].jd - obs[0].jd > max_herget_span( obs[n_obs - 1].r, obs->r))
+      rval = -4;
+   else
+      rval = extended_orbit_fit( orbit, obs, n_obs,
+                     FIT_FIXED_DISTANCES, obs->jd);
+   if( !rval)
+      rval = set_locs( orbit, obs->jd, obs, n_obs);
    return( rval);
 }
 
