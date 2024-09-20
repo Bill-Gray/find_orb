@@ -405,7 +405,7 @@ int copy_file_to_clipboard( const char *filename);    /* clipfunc.cpp */
 static bool curses_running = false;
 
 static const char *help_file_name = NULL;
-static bool mpc_code_select = false;
+static int mpc_code_select = 0;
 
 #define HINT_TEXT -1
 
@@ -589,8 +589,6 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
                curr_line = y;
                x -= col;
                y -= line - n_lines;
-               if( mpc_code_select && x > real_width - 4)
-                  x = -1;        /* ignore some of the right margin */
                if( button & BUTTON4_PRESSED)   /* actually 'wheel up' */
                   rval = KEY_UP;
                else if( button5_pressed)       /* actually 'wheel down' */
@@ -598,7 +596,19 @@ static int full_inquire( const char *prompt, char *buff, const int max_len,
                else if( y >= 0 && y < n_lines && x >= 0 && x < real_width)
                   {
                   if( mpc_code_select)
-                     rval = KEY_F( 1 + x / 4 + y * (box_size / 4));
+                     {
+                     int selection;
+
+                     if( x == real_width - 1)
+                        x--;
+                     selection = x / 4 + y * (box_size / 4 + 1);
+                     if( y == n_lines - 1)
+                        rval = 27;
+                     else if( selection < mpc_code_select)
+                        rval = KEY_F( 1 + selection);
+                     else
+                        curr_line = -1;
+                     }
                   else
                      rval = KEY_F( y + 1);
                   }
@@ -697,9 +707,9 @@ static int select_mpc_code( const OBSERVE *obs, const int n_obs, int curr_obs)
    for( i = nx; i < n_codes; i += nx)
       buff[i * 4 - 1] = '\n';
    strlcat_err( buff, "\nCancel", buffsize);
-   mpc_code_select = true;
+   mpc_code_select = n_codes;
    c = inquire( buff, NULL, 0, COLOR_DEFAULT_INQUIRY);
-   mpc_code_select = false;
+   mpc_code_select = 0;
    c -= KEY_F( 1);
    if( c >= 0 && c < n_codes)
       {
