@@ -30,7 +30,7 @@ Shift-Up       ToggUp
 Shift-Dn       ToggDn
 Ctrl-Y         BanObs
 Ctrl-X         SaveOrbs
-)              ReadFile
+)              ShowFile
 End
    Color assignments (foreground,  then background,  in hex form)
    These apply to Windows Find_Orb and most modern Linux/*BSD/OS/X systems.
