@@ -167,7 +167,7 @@ static ldouble pivot_value( const ldouble *line, const unsigned line_size)
    return( sum_squares ? square0 / sum_squares : 0.);
 }
 
-#define swap_ldoubles( a, b)   { const ldouble temp = a;  a = b;  b = temp; }
+#define swap_ldoubles( a, b)   { const ldouble __temp = a;  a = b;  b = __temp; }
 
 static ldouble *calc_inverse( const ldouble *src, const int size)
 {
