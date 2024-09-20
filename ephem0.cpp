@@ -2499,7 +2499,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
       long rgb = 0;
       double sum_r = 0., sum_r2 = 0.;     /* for uncertainty in r */
       double sum_rv = 0., sum_rv2 = 0.;   /* for uncertainty in rvel */
-      double nominal_r, nominal_rv;
+      double nominal_r = 0., nominal_rv = 0.;
 
       if( use_observation_times)
          {
@@ -3832,7 +3832,7 @@ static void put_residual_into_text( char *text, const double resid,
 
    if( resid_format & RESIDUAL_FORMAT_COMPUTER_FRIENDLY)
       {                   /* resids in arcseconds at all times,  with */
-      snprintf_err( text, 11, " %+8.6f", resid);    /* some added precision */
+      snprintf( text, 11, " %+8.6f", resid);    /* some added precision */
       return;
       }
    if( zval > 999. * 3600.)      /* >999 degrees: error must have occurred */
