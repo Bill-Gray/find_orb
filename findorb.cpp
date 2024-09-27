@@ -172,8 +172,6 @@ int find_trial_orbit( double *orbit, OBSERVE FAR *obs, int n_obs,
              const double r1, const double angle_param);   /* orb_func.cpp */
 int search_for_trial_orbit( double *orbit, OBSERVE FAR *obs, int n_obs,
               const double r1, double *angle_param);  /* orb_func.cpp */
-int find_nth_sr_orbit( double *orbit, OBSERVE FAR *obs, int n_obs,
-                            const int orbit_number);       /* orb_func.cpp */
 void create_ades_file( const char *filename, const OBSERVE FAR *obs, int n_obs);
 char *fgets_trimmed( char *buff, size_t max_bytes, FILE *ifile);
 int generic_message_box( const char *message, const char *box_type);
@@ -5323,7 +5321,10 @@ int main( int argc, const char **argv)
             push_orbit( curr_epoch, orbit);
             if( c == AUTO_REPEATING && using_sr)
                {
-               find_nth_sr_orbit( orbit, obs, n_obs, monte_carlo_object_count);
+               sr_orbit_t sr;
+
+               find_nth_sr_orbit( &sr, obs, n_obs, monte_carlo_object_count);
+               memcpy( orbit, sr.orbit, 6 * sizeof( double));
                adjust_herget_results( obs, n_obs, orbit);
                         /* epoch is that of first included observation: */
                get_epoch_range_of_included_obs( obs, n_obs, &curr_epoch, NULL);
@@ -5622,7 +5623,7 @@ int main( int argc, const char **argv)
                             COLOR_DEFAULT_INQUIRY) && atoi( tbuff))
                {
                const unsigned max_orbits = atoi( tbuff);
-               double *orbits = (double *)calloc( max_orbits, 7 * sizeof( double));
+               sr_orbit_t *orbits = (sr_orbit_t *)calloc( max_orbits, sizeof( sr_orbit_t));
                int n_found;
 
                for( i = 0; i < n_obs - 1 && !obs[i].is_included; i++)
@@ -5631,11 +5632,11 @@ int main( int argc, const char **argv)
                         86400., 1., 1);
                snprintf_err( message_to_user, sizeof( message_to_user),
                                 "%d orbits computed: best score=%.3f\n",
-                                n_found, orbits[6]);
+                                n_found, orbits[0].score);
                if( n_found)
                   {
                   push_orbit( curr_epoch, orbit);
-                  memcpy( orbit, orbits, 6 * sizeof( double));
+                  memcpy( orbit, orbits[0].orbit, 6 * sizeof( double));
                   curr_epoch = obs[i].jd;
                   update_element_display = 1;
                   set_locs( orbit, curr_epoch, obs, n_obs);

@@ -385,7 +385,14 @@ void push_orbit( const double epoch, const double *orbit); /* orb_fun2.cpp */
 int pop_orbit( double *epoch, double *orbit);              /* orb_fun2.cpp */
 void pop_all_orbits( void);                                /* orb_fun2.cpp */
 
-int get_sr_orbits( double *orbits, OBSERVE FAR *obs,     /* orb_func.cpp */
+typedef struct
+{
+   double rparam, vparam, orbit[6], score;
+} sr_orbit_t;
+
+int find_nth_sr_orbit( sr_orbit_t *orbit, OBSERVE FAR *obs, int n_obs,
+                            const int orbit_number);         /* orb_func.cpp */
+int get_sr_orbits( sr_orbit_t *orbits, OBSERVE FAR *obs,     /* orb_func.cpp */
                const unsigned n_obs, const unsigned starting_orbit,
                const unsigned max_orbits, const double max_time,
                const double noise_in_sigmas, const int writing_sr_elems);

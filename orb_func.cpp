@@ -1624,7 +1624,7 @@ double find_sr_dist( const double fraction)
    return( sr_roots[n_sr_ranges * 2 - 1]);         /* maxed out */
 }
 
-int find_nth_sr_orbit( double *orbit, OBSERVE FAR *obs, int n_obs,
+int find_nth_sr_orbit( sr_orbit_t *orbit, OBSERVE FAR *obs, int n_obs,
                             const int orbit_number)
 {
    int rval = 0;
@@ -1640,7 +1640,6 @@ int find_nth_sr_orbit( double *orbit, OBSERVE FAR *obs, int n_obs,
       {
       double rand1 = haltonize( (unsigned)orbit_number + 1, 2);
       const double rand2 = haltonize( (unsigned)orbit_number + 1, 3);
-      double dist = 0.;
       int i;
 
       if( !orbit_number)
@@ -1671,12 +1670,13 @@ int find_nth_sr_orbit( double *orbit, OBSERVE FAR *obs, int n_obs,
                debug_printf( "Root %d: %f\n", i, sr_roots[i]);
             }
          }
-            /* We give 'rand1' a slight bias toward lower values. */
-            /* It will still be in the range 0 <= rand1 < 1.      */
-      rand1 = rand1 * (1. + rand1) / 2.;
-      dist = find_sr_dist( rand1);
+            /* We give 'rparam' a slight bias toward lower values. */
+            /* It will still be in the range 0 <= rparam < 1.      */
+      orbit->rparam = rand1 * (1. + rand1) / 2.;
+      orbit->vparam = 2 * rand2 - 1.;
       fail_on_hitting_planet = true;
-      rval = find_trial_orbit( orbit, obs, n_obs, dist, 2. * rand2 - 1.);
+      rval = find_trial_orbit( orbit->orbit, obs, n_obs,
+                    find_sr_dist( orbit->rparam), orbit->vparam);
       fail_on_hitting_planet = false;
       }
    return( rval);
@@ -1684,13 +1684,13 @@ int find_nth_sr_orbit( double *orbit, OBSERVE FAR *obs, int n_obs,
 
 static int sr_orbit_compare( const void *a, const void *b)
 {
-   const double *ta = (const double *)a;
-   const double *tb = (const double *)b;
+   const sr_orbit_t *ta = (const sr_orbit_t *)a;
+   const sr_orbit_t *tb = (const sr_orbit_t *)b;
 
-   return( (ta[6] > tb[6]) ? 1 : -1);
+   return( (ta->score > tb->score) ? 1 : -1);
 }
 
-int get_sr_orbits( double *orbits, OBSERVE FAR *obs,
+int get_sr_orbits( sr_orbit_t *orbits, OBSERVE FAR *obs,
                const unsigned n_obs, const unsigned starting_orbit,
                const unsigned max_orbits, const double max_time,
                const double noise_in_sigmas, const int writing_sr_elems)
@@ -1698,20 +1698,20 @@ int get_sr_orbits( double *orbits, OBSERVE FAR *obs,
    const clock_t end_clock =
              clock( ) + (clock_t)( max_time * (double)CLOCKS_PER_SEC);
    unsigned i, rval = 0;
-   double *tptr = orbits;
+   sr_orbit_t *tptr = orbits;
 
    INTENTIONALLY_UNUSED_PARAMETER( noise_in_sigmas);
    for( i = 0; i < max_orbits && clock( ) < end_clock; i++)
       {
       if( !find_nth_sr_orbit( tptr, obs, n_obs, i + starting_orbit)
-                   && (n_obs == 2 || !adjust_herget_results( obs, n_obs, tptr)))
+                   && (n_obs == 2 || !adjust_herget_results( obs, n_obs, tptr->orbit)))
          {
-         tptr[6] = evaluate_initial_orbit( obs, n_obs, tptr, obs[0].jd);
-         rval++;
-         tptr += 7;
+         tptr->score = evaluate_initial_orbit( obs, n_obs, tptr->orbit, obs[0].jd);
+         tptr++;
          }
       }
-   qsort( orbits, rval, 7 * sizeof( double), sr_orbit_compare);
+   rval = tptr - orbits;
+   qsort( orbits, rval, sizeof( sr_orbit_t), sr_orbit_compare);
    if( writing_sr_elems)
       for( i = 0; i < rval; i++)
          {
@@ -1722,12 +1722,11 @@ int get_sr_orbits( double *orbits, OBSERVE FAR *obs,
 
          elements_filename = "sr_elems.txt";
          append_elements_to_element_file = (i ? 1 : 0);
-         set_locs( orbits, obs[0].jd, obs, n_obs);
-         write_out_elements_to_file( orbits, obs[0].jd,
+         set_locs( orbits[i].orbit, obs[0].jd, obs, n_obs);
+         write_out_elements_to_file( orbits[i].orbit, obs[0].jd,
                   find_epoch_shown( obs, n_obs),
                   obs, n_obs, "", 5,
                   1, ELEM_OUT_NO_COMMENT_DATA | ELEM_OUT_PRECISE_MEAN_RESIDS);
-         orbits += 7;
          append_elements_to_element_file = curr_append;
          elements_filename = tname;
          }
@@ -4029,39 +4028,45 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
 
    if( max_time)
       integration_timeout = clock( ) + (clock_t)( max_time * CLOCKS_PER_SEC);
-   if( obs[n_obs - 1].jd - obs[0].jd < MAX_SR_SPAN)
-      n_sr_orbits = get_sr_orbits( sr_orbits, obs, n_obs, 0, max_n_sr_orbits, .5, 0., 0);
-   else
+   if( obs[n_obs - 1].jd - obs[0].jd > MAX_SR_SPAN)
       n_sr_orbits = 0;     /* don't bother with SR for long time spans */
-   i = 0;
-   while( (unsigned)i < n_sr_orbits && sr_orbits[i * 7 + 6] < .7)
-      i++;
-   n_sr_orbits = i;        /* cut orbits down to the "reasonable" ones */
-   while( n_sr_orbits > 3 && n_sr_orbits <= 10)
+   else
       {
-      unsigned n = get_sr_orbits( sr_orbits + 7 * n_sr_orbits, obs, n_obs,
-                        rand( ), max_n_sr_orbits - n_sr_orbits, .5, 0., 0);
+      sr_orbit_t *sr = (sr_orbit_t *)calloc( max_n_sr_orbits,
+                                       sizeof( sr_orbit_t));
 
+      n_sr_orbits = get_sr_orbits( sr, obs, n_obs, 0, max_n_sr_orbits, .5, 0., 0);
       i = 0;
-      while( (unsigned)i < n_sr_orbits + n && sr_orbits[i * 7 + 6] < .7)
+      while( (unsigned)i < n_sr_orbits && sr[i].score < .7)
          i++;
       n_sr_orbits = i;        /* cut orbits down to the "reasonable" ones */
-      }
-   if( n_sr_orbits > 10)   /* got at least ten "reasonable" SR orbits; */
-      {               /* accept the SR solution */
-      const double epoch_shown = find_epoch_shown( obs, n_obs);
+      while( n_sr_orbits > 3 && n_sr_orbits <= 10)
+         {
+         unsigned n = get_sr_orbits( sr + n_sr_orbits, obs, n_obs,
+                           rand( ), max_n_sr_orbits - n_sr_orbits, .5, 0., 0);
 
-              /* SR orbits are stored in seven doubles,  including a score. */
-      for( i = 1; i < (int)n_sr_orbits; i++)  /* Shift 'em to remove the score. */
-         memmove( sr_orbits + i * 6, sr_orbits + i * 7, 6 * sizeof( double));
-      find_median_orbit( sr_orbits, n_sr_orbits);
-      memcpy( orbit, sr_orbits, 6 * sizeof( double));
-      compute_sr_sigmas( sr_orbits, n_sr_orbits, obs[0].jd, epoch_shown);
-      available_sigmas_hash = compute_available_sigmas_hash( obs, n_obs,
-                  epoch_shown, perturbers, 0);
-      set_locs( orbit, obs[0].jd, obs, n_obs);
-      integration_timeout = 0;
-      return( obs[0].jd);
+         i = 0;
+         while( (unsigned)i < n_sr_orbits + n && sr[i].score < .7)
+            i++;
+         n_sr_orbits = i;        /* cut orbits down to the "reasonable" ones */
+         }
+      if( n_sr_orbits > 10)   /* got at least ten "reasonable" SR orbits; */
+         {               /* accept the SR solution */
+         const double epoch_shown = find_epoch_shown( obs, n_obs);
+
+         for( i = 0; i < (int)n_sr_orbits; i++)
+            memcpy( sr_orbits + i * 6, sr[i].orbit, 6 * sizeof( double));
+         free( sr);
+         find_median_orbit( sr_orbits, n_sr_orbits);
+         memcpy( orbit, sr_orbits, 6 * sizeof( double));
+         compute_sr_sigmas( sr_orbits, n_sr_orbits, obs[0].jd, epoch_shown);
+         available_sigmas_hash = compute_available_sigmas_hash( obs, n_obs,
+                     epoch_shown, perturbers, 0);
+         set_locs( orbit, obs[0].jd, obs, n_obs);
+         integration_timeout = 0;
+         return( obs[0].jd);
+         }
+      free( sr);
       }
 
    n_radar_obs = sort_unused_obs_to_end( obs, n_obs);
