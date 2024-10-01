@@ -4747,6 +4747,10 @@ int main( int argc, const char **argv)
                               snprintf_append( tbuff, sizeof( tbuff), "\n%.2f hours ago", dt * 24.);
                            else if( dt < 7.)
                               snprintf_append( tbuff, sizeof( tbuff), "\n%.2f days ago", dt);
+                           if( utc > 2400001.0)
+                              snprintf_append( tbuff, sizeof( tbuff), "\nMJD %.6f", utc - 2400000.5);
+                           else
+                              snprintf_append( tbuff, sizeof( tbuff), "\nJD %.6f", utc);
                            col1 = 3;
                            col2 = 20;
                            }
