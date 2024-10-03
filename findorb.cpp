@@ -704,6 +704,7 @@ static int select_mpc_code( const OBSERVE *obs, const int n_obs, int curr_obs)
          }
    for( i = nx; i < n_codes; i += nx)
       buff[i * 4 - 1] = '\n';
+   buff[n_codes * 4 - 1] = '\0';
    strlcat_err( buff, "\nCancel", buffsize);
    mpc_code_select = n_codes;
    c = inquire( buff, NULL, 0, COLOR_DEFAULT_INQUIRY);
