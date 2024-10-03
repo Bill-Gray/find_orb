@@ -3189,6 +3189,12 @@ int unload_observations( OBSERVE FAR *obs, const int n_obs)
       destroy_stack( _ades_ids_stack);
       _ades_ids_stack = NULL;
       }
+   if( rovers)
+      {
+      free( rovers);
+      rovers = NULL;
+      n_rovers = 0;
+      }
    available_sigmas = NO_SIGMAS_AVAILABLE;
    return( 0);
 }
