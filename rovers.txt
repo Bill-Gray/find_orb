@@ -294,6 +294,8 @@ Ma2 !  47.           -45.              0   @4  Mars 2 site
 Zhu ! 109.925        +25.066       -4099.4 @4  Zhurong landing site
 
    In some cases,  viewpoints from the Moon may be useful.
+Ch6 !-153.9852       -41.6385          0   @10 Chang'e 6 lander
+Ch5 ! -51.9161       +43.0576          0   @10 Chang'e 5 lander
 Ch4 ! 177.589        -45.457           0   @10 Chang'e 4 lander
 Ch3 ! -19.5116       +44.1214          0   @10 Chang'e 3 lander
 11a !  23.47307      +00.67344989  -1927.6 @10 Apollo 11 LRRR
