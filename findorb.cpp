@@ -2465,6 +2465,15 @@ static void show_residual_legend( const int line_no, const int residual_format)
                   ? "      Xres  Yres  total Mres"
                   : "      Tres  Cres  total Mres");
 
+   if( residual_format & RESIDUAL_FORMAT_SHOW_DESIGS)
+      text_search_and_replace( buff, "sigmas", "desigs");
+   else
+      {
+      extern int sigmas_in_columns_57_to_65;
+
+      if( !sigmas_in_columns_57_to_65)
+         text_search_and_replace( buff, "sigmas", "------");
+      }
    put_colored_text( buff, line_no, 0, -1, COLOR_RESIDUAL_LEGEND);
    add_cmd_area( 't', line_no, 73, 10);  /* click on 'Xres  Yres' resets resid format */
    add_cmd_area( '=', line_no, 85, 7);   /* click on ' delta ' toggles mag resids */
