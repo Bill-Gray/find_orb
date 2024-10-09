@@ -2411,7 +2411,8 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
          }
 
       if( options & OPTION_LUNAR_ELONGATION)
-         snprintf_append( buff, sizeof( buff), "  LuElo");
+         snprintf_append( buff, sizeof( buff),
+                     (cinfo->planet == 10 ? "  EaElo" : "  LuElo"));
       if( options & OPTION_MOTION_OUTPUT)
          snprintf_append( buff, sizeof( buff), " -%s --PA--", motion_unit_text);
       if( options & OPTION_SEPARATE_MOTIONS)
@@ -2892,15 +2893,16 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                            vect[k] = -obs_posn_equatorial[k];
                      else
                         {           /* we want the lunar posn */
-                        double moon_dist, earth_loc[3], lunar_eclipse_mag;
+                        double moon_dist, lunar_eclipse_mag;
+                        double moon_loc[3], earth_loc[3];
                         const double lunar_radius = 1737.4 / AU_IN_KM;
 #ifdef SHOW_LUNAR_OFFSETS
                         double moon_lon, moon_lat, obs_lon, obs_lat;
                         char date_buff[80];
 #endif
 
-                        earth_lunar_posn( ephemeris_t, earth_loc, vect);
-                        lunar_eclipse_mag = lunar_eclipse_magnitude( earth_loc, vect);
+                        earth_lunar_posn( ephemeris_t, earth_loc, moon_loc);
+                        lunar_eclipse_mag = lunar_eclipse_magnitude( earth_loc, moon_loc);
                         if( lunar_eclipse_mag > -0.75 &&
                                        !*get_environment_ptr( "NO_LUNAR_ECLIPSES"))
                            {
@@ -2916,17 +2918,17 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                               lunar_eclipse_mag_drop = 9.;
                            }
                         for( k = 0; k < 3; k++)
-                           vect[k] -= obs_posn[k];
+                           vect[k] = moon_loc[k] - obs_posn[k];
+                        if( cinfo->planet == 10)    /* lunicentric viewpoint; */
+                           for( k = 0; k < 3; k++)  /* show earth elongs instead */
+                              vect[k] = earth_loc[k] - obs_posn[k];
                         moon_dist = vector3_length( vect);
 #ifdef SHOW_LUNAR_OFFSETS
                         moon_lon = atan2( vect[1], vect[0]);
                         moon_lat = asine( vect[2] / moon_dist);
 #endif
-                        if( moon_dist)
-                           cos_elong = dot_product( obs_posn, vect)
+                        cos_elong = dot_product( obs_posn, vect)
                                  / (vector3_length( obs_posn) * moon_dist);
-                        else     /* lunicentric ephems;  'lunar elong' is undefined */
-                           cos_elong = -1.;
                         lunar_elong = acose( -cos_elong);
                         ecliptic_to_equatorial( vect);   /* mpc_obs.cpp */
                         fraction_illum = shadow_check( earth_loc, orbi_after_light_lag,
