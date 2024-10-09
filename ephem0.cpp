@@ -3372,12 +3372,16 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                   {
                   double orbit_norm[3], unused_pa, dist;
                   DPT orbit_pole;
+                  bool is_retrograde;
 
                   vector_cross_product( orbit_norm, orbi, orbi + 3);
+                  is_retrograde = (orbit_norm[2] < 0.);
                   ecliptic_to_equatorial( orbit_norm);
                   vector_to_polar( &orbit_pole.x, &orbit_pole.y, orbit_norm);
                   calc_dist_and_posn_ang( &ra_dec.x, &orbit_pole.x,
                                         &dist, &unused_pa);
+                  if( is_retrograde)    /* odd convention : PlAng is +ive if */
+                     dist = PI - dist;  /* observer is 'above' the orbit plane */
                   snprintf_append( tbuff, sizeof( buff), " %7.3f",
                                     dist * 180. / PI - 90.);
                   }
