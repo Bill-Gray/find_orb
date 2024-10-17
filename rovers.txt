@@ -113,9 +113,11 @@ Bow ! -69.9          +44.01         100        Bowdoinham
 
     The centers of the Sun,  moon,  and planets are treated as 'rovers'.
     (You'll see below Spirit,  Opportunity,  and various other spacecraft
-    set up as 'rovers' on Mars.)
+    set up as 'rovers' on Mars.)  The solar system barycenter can be
+    specified as either (Bar) or (SSB).
 
 Bar !   0.0000       0.00000   +0.00000    @12 SS Barycenter
+SSB !   0.0000       0.00000   +0.00000    @12 SS Barycenter
 Sun !   0.0000       0.00000   +0.00000    @0  Sun
 Mer !   0.0000       0.00000   +0.00000    @1  Mercury
 Ven !   0.0000       0.00000   +0.00000    @2  Venus
@@ -1621,4 +1623,5 @@ BoR !+007.192566   +51.426990         159.65   Bochum radio observatory
 Cha !+016.11250    -23.290000        1182.0    Chamaeleon Observatory
 
 McC !-078.329166   +44.331944         206.77   Hevans Drive Observatory
-088 !+031.827694   +029.93400         494.0    Kottamia
+088 !+031.827694   +29.93400          494.0    Kottamia
+OKC !-097.671787   +35.411143         390.0    Oklahoma City test site
