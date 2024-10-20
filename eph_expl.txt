@@ -85,9 +85,14 @@ somewhere between this angle and the one specified by 'PsAng',  the
 theoretical angle at which an ionized gas trail would be seen.
 # 32
 
-   'PlAng' is the angle between the observer and the target's orbital plane,
-as measured from the target.  If it is positive,  you are looking at the
-object from above the ecliptic.  This quantity can be useful with comets.
+   'PlAng' is the angle between the observer and the target's heliocentric
+orbital plane, as measured from the target.  If it is positive,  you are
+looking at the object from above the ecliptic.  This quantity can be
+useful with comets.
+
+   JPL's Horizons service calculates this quantity using the barycentric
+orbital plane.  This usually results in small differences,  but they can
+be larger if the perihelion distance is low.
 #  5
 
    Apparent motions are given in arcminutes/hour,  or (equivalently)
