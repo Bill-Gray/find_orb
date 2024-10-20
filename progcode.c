@@ -2,6 +2,10 @@
 
 https://minorplanetcenter.net/iau/lists/ProgramCodes.txt
 
+   (should switch over to the JSON form at
+
+https://minorplanetcenter.net/static/downloadable-files/program_codes.json
+
 and produce a file 'progcode.txt' suitable for Find_Orb to extract
 observer info from.  Note that some editing of the input (or output)
 is required; some observers appear twice,  with modifications due to

@@ -71,6 +71,7 @@ alphabetical note (see https://minorplanetcenter.net/iau/info/ObsNote.html
 for their meanings) or a program code :
 
 https://minorplanetcenter.net//iau/lists/ProgramCodes.txt
+https://minorplanetcenter.net/static/downloadable-files/program_codes.json
 
 We do have the problem that many program codes are now letters.  If column
 14 contains a letter,  and that letter is in use as a program code,  we
