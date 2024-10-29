@@ -853,7 +853,8 @@ int get_observer_data( const char FAR *mpc_code, char *buff, mpc_code_t *cinfo)
       debug_printf( "Couldn't find MPC station '%s'\n", mpc_code);
       debug_printf( "Curr t %f; last t %f; delay %f\n",
                   curr_t, last_t, delay);
-      if( curr_t > last_t + delay)
+      if( curr_t > last_t + delay && isalnum( mpc_code[0])
+                                  && isdigit( mpc_code[1]) && isdigit( mpc_code[2]))
          {
          char path[PATH_MAX];
 
@@ -1495,6 +1496,9 @@ static inline int compute_topocentric_offset( const double ut,
       const double omega = planet_rotation_rate( planet_no, 0) * PI / 180.;
                    /* planet rotation rate,  in radians/day */
 
+      if( !omega)
+         generic_message_box( "'cospar.txt' not found!", "!");
+      assert( omega);
       if( offset)
          offset[i] = (rho_cos_phi * precess_matrix[i]
                     + rho_sin_phi * precess_matrix[i + 6]);
