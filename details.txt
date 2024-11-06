@@ -24,7 +24,7 @@ but that others also use it and I've no way of knowing which details
 ought to be shown.  (For example,  (568) Mauna Kea has eleven scopes
 and a bazillion observers;  I've no idea what to show there.)
 
-2023 Feb 27 version
+2024 Nov 6 version
 
 COD 006
 MEA A. Bernal, J. Nunez, N. Torras
@@ -3670,8 +3670,8 @@ NET Gaia-DR2
 
 COD Z84
 COM Find_Orb default details
-OBS E. Schwab
-MEA E. Schwab, D. Koschny, M. Micheli
+OBS R. Kresken, F. Oca\~na, M. Micheli, L. Conversi
+MEA F. Oca\~na, M. Micheli, R. Kresken
 TEL 0.8-m f/3 Schmidt + CCD
 
 COD Z92
