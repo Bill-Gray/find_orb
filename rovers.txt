@@ -816,9 +816,9 @@ FL2 !-110.878488   +31.680868       2287.949   Whipple Observatory,  1.2-m
    (Z84) and (Z79) were identifiable.  I _think_ (G36) = Un1.  Alts are from
    G__gle Earth,  with 51m added for geoid height.  According to Wikipaedia,
    (Z79) = 3.5m scope;  (Z84) = 0.8-m Schmidt; (Un1) = 1.23m;  (Un2) = 1.5m;
-   (Un3) = 2.2m.
+   (Un3) = 2.2m. Z84 is removed from this rovers list as the elevation has 
+   been corrected. 
 
-Z84 !  -2.548143   +37.223981       2207.      Calar Alto-Schmidt
 Un1 !  -2.547483   +37.223165       2211.      Unknown about 100m SSE of Z84;  (G36)?
 Un2 !  -2.548248   +37.224987       2201.      Unknown about 100m north of Z84
 Un3 !  -2.546037   +37.223133       2112.      Unknown about 200m ESE of Z84
