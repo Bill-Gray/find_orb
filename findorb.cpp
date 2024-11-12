@@ -4354,6 +4354,9 @@ int main( int argc, const char **argv)
                if( file_offset < 0L)
                   file_offset = 0L;
                fseek( ifile, file_offset, SEEK_SET);
+               if( file_offset)        /* read and discard partial line */
+                  if( !fgets( tbuff, sizeof( tbuff), ifile))
+                     return( -4);
                if( obs)
                   unload_observations( obs, n_obs);
 
