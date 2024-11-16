@@ -101,8 +101,8 @@ FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 char *make_config_dir_name( char *oname, const char *iname);  /* miscell.cpp */
 int reset_astrometry_filename( int *argc, const char **argv);
 uint64_t parse_bit_string( const char *istr);                /* miscell.cpp */
-const char *write_bit_string( char *ibuff, const uint64_t bits);
-
+const char *write_bit_string( char *ibuff, const uint64_t bits,
+                                          const size_t max_bitstring_len);
 int use_config_directory = false;
 const char *alt_config_directory;
 
@@ -624,10 +624,9 @@ length is 122 bytes :
    but I lack a formal proof of this.  I'm sure 256 bytes will be more
 than enough.   */
 
-const char *write_bit_string( char *ibuff, const uint64_t bits)
+const char *write_bit_string( char *ibuff, const uint64_t bits, const size_t max_bitstring_len)
 {
    int i, j;
-   const size_t max_bitstring_len = 256;
 
    *ibuff = '\0';
    for( i = 0; i < 64; i++)
@@ -670,6 +669,6 @@ int pattern_match(const char* pattern, const char* string)
 const char *find_orb_version_jd( double *jd)
 {
     if( jd)
-      *jd = 2460603.5;
-    return( "2024 Oct 20");
+      *jd = 2460629.5;
+    return( "2024 Nov 15");
 }

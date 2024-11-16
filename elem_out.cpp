@@ -156,7 +156,8 @@ int put_elements_into_sof( char *obuff, const char *templat,
          const int n_obs, const OBSERVE *obs);                /* elem_ou2.cpp */
 int qsort_strcmp( const void *a, const void *b, void *ignored_context);
 uint64_t parse_bit_string( const char *istr);                /* miscell.cpp */
-const char *write_bit_string( char *ibuff, const uint64_t bits);
+const char *write_bit_string( char *ibuff, const uint64_t bits,
+                                          const size_t max_bitstring_len);
 double generate_mc_variant_from_covariance( double *var_orbit,
                                     const double *orbit);    /* orb_func.c */
 void rotate_state_vector_to_current_frame( double *state_vect,
@@ -3863,7 +3864,7 @@ int store_defaults( const ephem_option_t ephemeris_output_options,
                max_residual_for_filtering, noise_in_arcseconds);
    set_environment_ptr( "SETTINGS", buff);
    set_environment_ptr( "EPHEM_OPTIONS",
-                   write_bit_string( buff, ephemeris_output_options));
+                   write_bit_string( buff, ephemeris_output_options, sizeof( buff)));
    snprintf_err( buff, sizeof( buff), "%.3f %f %u %d", probability_of_blunder * 100.,
               overobserving_time_span,
               overobserving_ceiling,
