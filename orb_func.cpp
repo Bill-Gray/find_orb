@@ -1733,6 +1733,84 @@ int get_sr_orbits( sr_orbit_t *orbits, OBSERVE FAR *obs,
    return( rval);
 }
 
+static bool is_valid_sr_orbit( const sr_orbit_t *orbit)
+{
+   return( orbit->rparam > 0. && orbit->rparam < 1.
+                  && orbit->vparam > -1. && orbit->vparam < 1.);
+}
+
+static void possible_sr_improvement( const sr_orbit_t *added, sr_orbit_t *orb1, sr_orbit_t *orb2)
+{
+   if( orb1->score > orb2->score)
+      {
+      sr_orbit_t *tptr = orb1;
+
+      orb1 = orb2;
+      orb2 = tptr;
+      }
+   if( added->score < orb2->score)
+      *orb2 = *added;
+}
+
+static void improve_sr_pair( sr_orbit_t *orb1, sr_orbit_t *orb2,
+               OBSERVE FAR *obs, const unsigned n_obs,
+               const double noise_in_sigmas, const int writing_sr_elems)
+{
+   sr_orbit_t orb3;
+
+   INTENTIONALLY_UNUSED_PARAMETER( noise_in_sigmas);
+   INTENTIONALLY_UNUSED_PARAMETER( writing_sr_elems);
+// if( !is_valid_sr_orbit( orb1) || !is_valid_sr_orbit( orb2))
+      debug_printf( "%f, %f;  %f, %f wrong\n",
+               orb1->rparam, orb1->vparam,
+               orb2->rparam, orb2->vparam);
+   orb3.rparam = (orb1->rparam + orb2->rparam) / 2.;
+   orb3.vparam = (orb1->vparam + orb2->vparam) / 2.;
+   fail_on_hitting_planet = true;
+   if( !find_trial_orbit( orb3.orbit, obs, n_obs,
+                       find_sr_dist( orb3.rparam), orb3.vparam))
+      {
+      double yneg, ypos, a, b;
+      sr_orbit_t orb4;
+
+      orb3.score = evaluate_initial_orbit( obs, n_obs, orb3.orbit, obs[0].jd);
+      yneg = orb1->score - orb3.score;
+      ypos = orb2->score - orb3.score;
+      a = (ypos + yneg) / 2.;
+      b = ypos - a;
+      orb4.score = 1e+20;
+      if( a > 0.)     /* can minimize along this 'parabola' */
+         {
+         const double t = -b / (2. * a);
+
+         orb4.rparam = orb3.rparam + t * (orb2->rparam - orb3.rparam);
+         orb4.vparam = orb3.vparam + t * (orb2->vparam - orb3.vparam);
+         if( is_valid_sr_orbit( &orb4) && !find_trial_orbit( orb4.orbit,
+                                 obs, n_obs, find_sr_dist( orb4.rparam), orb4.vparam))
+            orb4.score = evaluate_initial_orbit( obs, n_obs, orb4.orbit, obs[0].jd);
+         }
+      debug_printf( "Scores %f, %f -> %f, %f\n", orb1->score, orb2->score, orb3.score, orb4.score);
+      possible_sr_improvement( &orb3, orb1, orb2);
+      possible_sr_improvement( &orb4, orb1, orb2);
+      }
+   fail_on_hitting_planet = false;
+}
+
+int improve_sr_orbits( sr_orbit_t *orbits, OBSERVE FAR *obs,
+               const unsigned n_obs, const unsigned n_orbits,
+               const double noise_in_sigmas, const int writing_sr_elems)
+{
+   unsigned i, j;
+
+   i = rand( ) % n_orbits;
+   j = rand( ) % (n_orbits - 1);
+   j = (j + i + 1) % n_orbits;        /* makes sure i != j */
+   improve_sr_pair( orbits + i, orbits + j, obs, n_obs,
+                           noise_in_sigmas, writing_sr_elems);
+   return( 0);
+}
+
+
 static inline void compute_sr_sigmas( const double *sr_orbits,
                const unsigned n_orbits, const double epoch,
                const double epoch_shown)

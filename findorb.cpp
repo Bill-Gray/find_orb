@@ -252,6 +252,9 @@ int find_fcct_biases( const double ra, const double dec, const char catalog,
 int select_tracklet( OBSERVE *obs, const int n_obs, const int idx);
 int get_orbit_from_mpcorb_sof( const char *object_name, double *orbit,
              ELEMENTS *elems, const double full_arc_len, double *max_resid);
+int improve_sr_orbits( sr_orbit_t *orbits, OBSERVE FAR *obs,
+               const unsigned n_obs, const unsigned n_orbits,  /* orb_func.c */
+               const double noise_in_sigmas, const int writing_sr_elems);
 
 #ifdef __cplusplus
 extern "C" {
@@ -5637,29 +5640,46 @@ int main( int argc, const char **argv)
             break;
          case CTRL( 'D'):
             if( !inquire( "Number SR orbits: ", tbuff, sizeof( tbuff),
-                            COLOR_DEFAULT_INQUIRY) && atoi( tbuff))
+                            COLOR_DEFAULT_INQUIRY))
                {
-               const unsigned max_orbits = atoi( tbuff);
-               sr_orbit_t *orbits = (sr_orbit_t *)calloc( max_orbits, sizeof( sr_orbit_t));
-               int n_found;
+               unsigned max_orbits, n_improvements = 0;
 
-               for( i = 0; i < n_obs - 1 && !obs[i].is_included; i++)
-                  ;
-               n_found = get_sr_orbits( orbits, obs + i, n_obs - i, 0, max_orbits,
-                        86400., 1., 1);
-               snprintf_err( message_to_user, sizeof( message_to_user),
-                                "%d orbits computed: best score=%.3f\n",
-                                n_found, orbits[0].score);
-               if( n_found)
+               if( sscanf( tbuff, "%u,%u", &max_orbits, &n_improvements))
                   {
-                  push_orbit( curr_epoch, orbit);
-                  memcpy( orbit, orbits[0].orbit, 6 * sizeof( double));
-                  curr_epoch = obs[i].jd;
-                  update_element_display = 1;
-                  set_locs( orbit, curr_epoch, obs, n_obs);
-                  show_a_file( "sr_elems.txt", 0);
+                  sr_orbit_t *orbits = (sr_orbit_t *)calloc( max_orbits, sizeof( sr_orbit_t));
+                  int n_found;
+
+                  for( i = 0; i < n_obs - 1 && !obs[i].is_included; i++)
+                     ;
+                  n_found = get_sr_orbits( orbits, obs + i, n_obs - i, 0, max_orbits,
+                           86400., 1., 1);
+                  snprintf_err( message_to_user, sizeof( message_to_user),
+                                   "%d orbits computed: best score=%.3f\n",
+                                   n_found, orbits[0].score);
+                  debug_printf( "%d found, will do %u improvements\n",
+                              n_found, n_improvements);
+                  if( n_found > 0)
+                     {
+                     while( n_improvements--)
+                        improve_sr_orbits( orbits, obs + i,
+                                    n_obs - i, n_found, 1., 0);
+                     curr_epoch = obs[i].jd;
+                     for( i = 0; i < n_found; i++)
+                        if( orbits[i].score < orbits[0].score)
+                           {
+                           const sr_orbit_t torbit = orbits[0];
+
+                           orbits[0] = orbits[i];
+                           orbits[i] = torbit;
+                           }
+                     push_orbit( curr_epoch, orbit);
+                     memcpy( orbit, orbits[0].orbit, 6 * sizeof( double));
+                     update_element_display = 1;
+                     set_locs( orbit, curr_epoch, obs, n_obs);
+                     show_a_file( "sr_elems.txt", 0);
+                     }
+                  free( orbits);
                   }
-               free( orbits);
                }
             break;
          case CTRL( 'R'):
