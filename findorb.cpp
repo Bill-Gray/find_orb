@@ -3829,6 +3829,7 @@ static void show_splash_screen( void)
       char buff[200], eop_line_1[200], *eop_line_2;
       char debias_text[100], jpl_ephem_text[250];
       bool show_it = false;
+      int lines, cols, i;
 
       debias_info_text( debias_text, sizeof( debias_text));
       eop_info_text( eop_line_1, sizeof( eop_line_1));
@@ -3839,22 +3840,20 @@ static void show_splash_screen( void)
          strlcpy_error( jpl_ephem_text, " No JPL DE ephemeris set up");
       clear( );
       while( !show_it && fgets( buff, sizeof( buff), ifile))
-         {
-         int lines, cols, i;
-
-         sscanf( buff, "%d %d", &lines, &cols);
-         show_it = (lines < LINES && cols < COLS);
-         for( i = 0; i < lines && fgets_trimmed( buff, sizeof( buff), ifile); i++)
-            if( show_it)
-               {
-               text_search_and_replace( buff, "$v", find_orb_version_jd( NULL));
-               text_search_and_replace( buff, "$d", debias_text);
-               text_search_and_replace( buff, "$e1", eop_line_1);
-               text_search_and_replace( buff, "$e2", (eop_line_2 ? eop_line_2 : ""));
-               text_search_and_replace( buff, "$j", jpl_ephem_text + 1);
-               put_colored_text( buff, (LINES - lines) / 2 + i, 0, -1, COLOR_BACKGROUND);
-               }
-         }
+         if( 2 == sscanf( buff, "%d %d", &lines, &cols))
+            {
+            show_it = (lines < LINES && cols < COLS);
+            for( i = 0; i < lines && fgets_trimmed( buff, sizeof( buff), ifile); i++)
+               if( show_it)
+                  {
+                  text_search_and_replace( buff, "$v", find_orb_version_jd( NULL));
+                  text_search_and_replace( buff, "$d", debias_text);
+                  text_search_and_replace( buff, "$e1", eop_line_1);
+                  text_search_and_replace( buff, "$e2", (eop_line_2 ? eop_line_2 : ""));
+                  text_search_and_replace( buff, "$j", jpl_ephem_text + 1);
+                  put_colored_text( buff, (LINES - lines) / 2 + i, 0, -1, COLOR_BACKGROUND);
+                  }
+            }
       doupdate( );
       fclose( ifile);
       }

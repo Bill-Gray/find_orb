@@ -1,3 +1,16 @@
+Splash screen data for interactive Find_Orb.  The splash screen can
+be seen at any time by hitting '.'.
+
+Find_Orb will search through this file for pairs of numbers giving
+a line/column size.  If it'll fit the current screen,  that number of
+lines is read and displayed.  Otherwise,  it keeps going until it
+finds a pair that will fit (thus,  these go in order of descending size).
+A few variables are provided to be filled in with Find_Orb version info,
+EOP (Earth Orientation Parameters) data,  JPL DE info,  &c.
+
+Lines not starting with two numbers (such as this and the above) are
+treated as comments.
+
 22 76
  ______________________
 /\                     \      __ __   _   __ __  _ ___  __ _ .   .___ _
