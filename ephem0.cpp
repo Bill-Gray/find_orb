@@ -4526,6 +4526,10 @@ static void add_final_period( char *buff)
       strcat( buff, ".");
 }
 
+#define NAME_LIST_SIZE 300
+   /* size after adding 'Observers',  'Measurers',  &c */
+#define PADDED_NAME_LIST_SIZE 320
+
 static void tack_on_names( char *list, const char *names)
 {
    while( *names)
@@ -4541,7 +4545,7 @@ static void tack_on_names( char *list, const char *names)
             if( !memcmp( list + i, names, len))
                if( list[i + len] == ',' || !list[i + len])
                   already_in_list = 1;
-      if( !already_in_list)
+      if( !already_in_list && strlen( list) + len + 3 < NAME_LIST_SIZE)
          {
          char *lptr;
 
@@ -4749,7 +4753,7 @@ static int write_observer_data_to_file( FILE *ofile, const char *ast_filename,
    for( i = 0; i < n_stations; i++)
       {
       char buff[200], tbuff[100];
-      char details[4][310];
+      char details[4][PADDED_NAME_LIST_SIZE];
       char program_codes[30];
       size_t loc, n_program_codes = 0;
       const char *allowable_codes = "0123456789!\"#$%&'()*+,-./[\\]^_`{|}~";
