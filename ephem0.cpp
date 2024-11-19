@@ -3566,7 +3566,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                         lat_lon[0] * 180. / PI,
                         lat_lon[1] * 180. / PI,
                         alt_in_meters / meters_per_km);
-                  tbuff[30] = '\0';
+                  tbuff[29] = '\0';
                   strlcat_error( alt_buff, tbuff);
                   strlcat_error( buff, tbuff);
                   }
@@ -4643,7 +4643,7 @@ static int get_observer_details( const char *observation_filename,
             if( use_lines && !memcmp( buff, "MEA ", 4) && getting_measurers)
                tack_on_names( measurers, buff + 4);
             if( use_lines && !memcmp( buff, "TEL ", 4) && getting_scopes)
-               strcat( scope, buff + 4);
+               strlcpy_err( scope, buff + 4, 60);
             if( !memcmp( buff, "COD ", 4))
                if( !get_details_from_here( buff, mpc_code, prog_codes))
                   new_code_found = true;
