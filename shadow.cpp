@@ -49,7 +49,8 @@ http://articles.adsabs.harvard.edu/pdf/1994SoPh..153...91N
     While the coefficients of the two quintics are very different,  they
 give similar results until you get close to the edge,  and even there,
 the maximum difference is about 0.02.  Comparing intensities as a function
-of radius,  with the intensity at the center being 1,  gets you this :
+of radius gets you this.  Note that they're normalized to have intensity=1
+at the center (with some roundoff occurring).
 
  r/R  Youles  PS1977  NL1994
 0.00: 0.99600 1.00001 1.00000
@@ -103,92 +104,113 @@ TI(r0) = 2pi \  (a0 * mu + a1 * mu2 + a2 * mu^3 + ...) dmu
    which is trivially integrable analytically.  In the following function,
 the 2pi factor is ignored;  all we really care about is the fractional
 intensity (0 if no disk visible,  1 if r=R : the 'normalized' intensity
-I(r) = TI(r) / TI(r0).)     */
+I(r) = TI(r) / TI(r0).)
+
+   Compiles with
+
+g++ -Wall -Wextra -pedantic -oshadow shadow.cpp       */
 
 #include <math.h>
 
-#define NECKEL_LABS_COEFFS
-/* #define YOULES_COEFFS   */
+#define YOULES                      0
+#define PIERCE_SLAUGHTER            1
+#define NECKEL_LABS                 2
+#define UNIFORM_DISK                3
 
-static double total_intensity( const double r)
+static const double pierce_slaughter_coeffs[6] = {
+            0.30505, 1.13123, -0.78604, 0.40560,  0.02297, -0.07880 };
+static const double neckel_labs_coeffs[6] = {
+            0.28392, 1.36896, -1.75998, 2.22154, -1.56074, 0.44630 };
+static const double youles_coeffs[6] = {
+            0.436, 0.72, -0.16, 0., 0., 0.};
+static const double *coeffs[4] = { youles_coeffs,
+          pierce_slaughter_coeffs, neckel_labs_coeffs };
+
+static double intensity( const double r, const int method)
 {
-#ifdef PIERCE_SLAUGHTER_COEFFS
-   const double I0 = 0.4067828571428571;   /* above integral for r=0, mu=1 */
-#endif
-#ifdef NECKEL_LABS_COEFFS
-   const double I0 = 0.4062268095238096;   /* above integral for r=0, mu=1 */
-#endif
-#ifdef YOULES_COEFFS
-   const double I0 = 0.418;                /* above integral for r=0, mu=1 */
-#endif
    const double mu2 = 1. - r * r;
-   double mu, rval = 0, power = mu2;
+   double mu, rval = 0, power = 1.;
    size_t i;
-#ifdef PIERCE_SLAUGHTER_COEFFS
-   static const double coeffs[6] = { 0.30505, 1.13123, -0.78604,
-                                    0.40560,  0.02297, -0.07880 };
-#endif
-#ifdef NECKEL_LABS_COEFFS
-   static const double coeffs[6] = { 0.28392, 1.36896, -1.75998,
-                                    2.22154, -1.56074, 0.44630 };
-#endif
-#ifdef YOULES_COEFFS
-   static const double coeffs[3] = { 0.436,   0.72,    -0.16 };
-#endif
 
    if( mu2 > 0.)        /* with roundoff,  we can be slightly negative */
       mu = sqrt( mu2);
    else
       mu = 0.;
-   for( i = 0; i < sizeof( coeffs) / sizeof( coeffs[0]); i++, power *= mu)
-      rval += coeffs[i] * power / (double)( i + 2);
-/* return( r * r);                  for a uniformly intense solar disc */
-   return( (I0 - rval) / I0);
+   for( i = 0; i < 6; i++, power *= mu)
+      rval += coeffs[method][i] * power;
+   return( rval);
+}
+
+static double total_intensity( const double r, const int method)
+{
+   const double mu2 = 1. - r * r;
+   double mu, rval = 0, power = mu2;
+   size_t i;
+   static double i0;
+   static int curr_method = -1;
+
+   if( method == UNIFORM_DISK)
+      return( r * r);
+   if( method != curr_method)    /* recalculate i0 */
+      {
+      i0 = 0.;
+      curr_method = method;
+      for( i = 0; i < 6; i++)
+         i0 += coeffs[method][i] / (double)( i + 2);
+      }
+   if( mu2 > 0.)        /* with roundoff,  we can be slightly negative */
+      mu = sqrt( mu2);
+   else
+      mu = 0.;
+   for( i = 0; i < 6; i++, power *= mu)
+      rval += coeffs[method][i] * power / (double)( i + 2);
+   return( (i0 - rval) / i0);
 }
 
 #include <stdio.h>
 
+#ifdef OLD_TEST_CODE
+      /* I used this to verify that the numerical derivative of the
+      'total_intensity()' function matches,  after normalization,
+      the results from the 'intensity()' function.  Shouldn't have
+      to do that,  but I didn't entirely trust myself on the above
+      derivation... */
+
 int main( const int argc, const char **argv)
 {
    double r;
+   const int method = (argc < 2 ? PIERCE_SLAUGHTER : atoi( argv[1]));
 
-   printf( "I0 = %.16f\n", total_intensity( 0));
+   printf( "I0 = %.16f\n", total_intensity( 0, method));
    for( r = 0.; r < 1.005; r += (r < 0.94 ? 0.05 : 0.01))
       {
       const double h = 0.001;
       double numeric_deriv =
-               (total_intensity( r + h) - total_intensity( r - h)) / (2. * h);
+               (total_intensity( r + h, method) - total_intensity( r - h, method)) / (2. * h);
 
       if( r)
          numeric_deriv /= r;
-      printf( "%.2f: %.9f %.5f\n", r, total_intensity( r), numeric_deriv);
+      printf( "%.2f: %.9f %.5f\n", r, total_intensity( r, method), numeric_deriv);
       }
    return( 0);
 }
 
-#ifdef OLD_CODE_USED_FOR_TABLE
+#endif         /* #ifdef OLD_TEST_CODE */
 
-/* I used this to make the table in the comments at top. */
+/* Default : generate table in the comments at top. */
 
 int main( const int argc, const char **argv)
 {
    double r;
+   int method;
 
    printf( " r/R  Youles  PS1977  NL1994\n");
    for( r = 0.; r < 1.005; r += (r < 0.94 ? 0.05 : 0.01))
       {
-      double mu2 = 1. - r * r;
-      double mu, youles, ps, nl;
-
-      if( mu2 > 0.)
-         mu = sqrt( 1. - r * r);
-      else
-         mu = 0.;
-      youles = 0.436 + mu * (0.72 - 0.16 * mu);
-      ps = 0.30505 + mu * (1.13123 + mu * (-0.78604 + mu * (0.40560 + mu * ( 0.02297 + mu * -0.07880))));
-      nl = 0.28392 + mu * (1.36896 + mu * (-1.75998 + mu * (2.22154 + mu * (-1.56074 + mu *  0.44630))));
-      printf( "%.2f: %.5f %.5f %.5f\n", r, youles, ps, nl);
+      printf( "%.2f:", r);
+      for( method = 0; method < 3; method++)
+         printf( " %.5f", intensity( r, method));
+      printf( "\n");
       }
    return( 0);
 }
-#endif         /* #ifdef OLD_CODE_NOT_IN_USE */
