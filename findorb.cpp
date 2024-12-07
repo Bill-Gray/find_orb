@@ -1979,7 +1979,9 @@ static int get_character_code( const char *buff)
 {
    int rval;
 
-   if( !memcmp( buff, "Lt", 2))
+   if( *buff <= ' ')
+      rval = 0;
+   else if( !memcmp( buff, "Lt", 2))
       rval = KEY_LEFT;
    else if( !memcmp( buff, "Rt", 2))
       rval = KEY_RIGHT;
