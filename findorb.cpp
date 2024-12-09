@@ -188,10 +188,10 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name);
 int store_defaults( const ephem_option_t ephemeris_output_options,
          const int element_format, const int element_precision,
          const double max_residual_for_filtering,
-         const double noise_in_arcseconds);           /* elem_out.cpp */
+         const double noise_in_sigmas);           /* elem_out.cpp */
 int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
          int *element_precision, double *max_residual_for_filtering,
-         double *noise_in_arcseconds);                /* elem_out.cpp */
+         double *noise_in_sigmas);                /* elem_out.cpp */
 int text_search_and_replace( char FAR *str, const char *oldstr,
                                      const char *newstr);   /* ephem0.cpp */
 int sort_obs_by_date_and_remove_duplicates( OBSERVE *obs, const int n_obs);
@@ -3998,7 +3998,7 @@ int main( int argc, const char **argv)
    int element_format = 0, debug_mouse_messages = 0, prev_getch = 0;
    int auto_repeat_full_improvement = 0, n_ids = 0, planet_orbiting = 0;
    OBJECT_INFO *ids = NULL;
-   double noise_in_arcseconds = 1.;
+   double noise_in_sigmas = 1.;
    double monte_data[MONTE_DATA_SIZE];
    extern int monte_carlo_object_count;
    extern char default_comet_magnitude_type;
@@ -4250,7 +4250,7 @@ int main( int argc, const char **argv)
 
    get_defaults( &ephemeris_output_options, &element_format,
          &element_precision, &max_residual_for_filtering,
-         &noise_in_arcseconds);
+         &noise_in_sigmas);
 
    strlcpy_err( ephemeris_start, get_environment_ptr( "EPHEM_START"),
                   sizeof( ephemeris_start));
@@ -5323,14 +5323,14 @@ int main( int argc, const char **argv)
 
                set_statistical_ranging( c == CTRL( 'A'));
                c = '|';
-               if( !inquire( "Gaussian noise level (arcsec): ",
+               if( !inquire( "Gaussian noise level (sigmas): ",
                              tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY))
                   {
-                  noise_in_arcseconds = atof( tbuff);
-                  if( noise_in_arcseconds)
+                  noise_in_sigmas = atof( tbuff);
+                  if( noise_in_sigmas)
                      {
                      max_monte_rms =
-                              sqrt( noise_in_arcseconds * noise_in_arcseconds
+                              sqrt( noise_in_sigmas * noise_in_sigmas
                                            + rms * rms);
                      c = AUTO_REPEATING;
                      }
@@ -5338,7 +5338,7 @@ int main( int argc, const char **argv)
                }
             if( c == AUTO_REPEATING)
                stored_ra_decs =
-                   add_gaussian_noise_to_obs( n_obs, obs, noise_in_arcseconds);
+                   add_gaussian_noise_to_obs( n_obs, obs, noise_in_sigmas);
             push_orbit( curr_epoch, orbit);
             if( c == AUTO_REPEATING && using_sr)
                {
@@ -6747,7 +6747,7 @@ Shutdown_program:
    set_environment_ptr( "CONSOLE_OPTS", tbuff);
    store_defaults( ephemeris_output_options, element_format,
          element_precision, max_residual_for_filtering,
-         noise_in_arcseconds);
+         noise_in_sigmas);
    set_environment_ptr( "EPHEM_START", ephemeris_start);
    snprintf_err( tbuff, sizeof( tbuff), "%d", n_ephemeris_steps);
    set_environment_ptr( "EPHEM_STEPS", tbuff);

@@ -69,10 +69,10 @@ extern unsigned perturbers;
 int store_defaults( const ephem_option_t ephemeris_output_options,
          const int element_format, const int element_precision,
          const double max_residual_for_filtering,
-         const double noise_in_arcseconds);           /* elem_out.cpp */
+         const double noise_in_sigmas);           /* elem_out.cpp */
 int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
          int *element_precision, double *max_residual_for_filtering,
-         double *noise_in_arcseconds);                /* elem_out.cpp */
+         double *noise_in_sigmas);                /* elem_out.cpp */
 int64_t nanoseconds_since_1970( void);                      /* mpc_obs.c */
 static int elements_in_mpcorb_format( char *buff, const char *packed_desig,
                 const char *full_desig, const ELEMENTS *elem,
@@ -3854,14 +3854,14 @@ extern int sigmas_in_columns_57_to_65;
 int store_defaults( const ephem_option_t ephemeris_output_options,
          const int element_format, const int element_precision,
          const double max_residual_for_filtering,
-         const double noise_in_arcseconds)
+         const double noise_in_sigmas)
 {
    char buff[256];
 
    snprintf_err( buff, sizeof( buff), "%c,%d,%d,0,%f,%f",
                default_comet_magnitude_type,
                element_format, element_precision,
-               max_residual_for_filtering, noise_in_arcseconds);
+               max_residual_for_filtering, noise_in_sigmas);
    set_environment_ptr( "SETTINGS", buff);
    set_environment_ptr( "EPHEM_OPTIONS",
                    write_bit_string( buff, ephemeris_output_options, sizeof( buff)));
@@ -3939,13 +3939,13 @@ unsigned always_included_perturbers;
 
 int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
          int *element_precision, double *max_residual_for_filtering,
-         double *noise_in_arcseconds)
+         double *noise_in_sigmas)
 {
    ephem_option_t unused_ephemeris_output_options;
    int unused_element_format;
    int unused_element_precision;
    double unused_max_residual_for_filtering;
-   double unused_noise_in_arcseconds;
+   double unused_noise_in_sigmas;
    const char *language = get_environment_ptr( "LANGUAGE");
    extern double minimum_jd, maximum_jd;
    extern double maximum_observation_span;
@@ -3992,8 +3992,8 @@ int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
       element_precision = &unused_element_precision;
    if( !max_residual_for_filtering)
       max_residual_for_filtering = &unused_max_residual_for_filtering;
-   if( !noise_in_arcseconds)
-      noise_in_arcseconds = &unused_noise_in_arcseconds;
+   if( !noise_in_sigmas)
+      noise_in_sigmas = &unused_noise_in_sigmas;
    if( sscanf( get_environment_ptr( "TIME_RANGE"), "%lf,%lf",
                &minimum_jd, &maximum_jd) == 2)
       {
@@ -4005,7 +4005,7 @@ int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
                &default_comet_magnitude_type,
                element_format, element_precision,
                &obsolete_ephem_output_options,
-               max_residual_for_filtering, noise_in_arcseconds);
+               max_residual_for_filtering, noise_in_sigmas);
 
    if( !*ephem_bitstring)     /* set defaults;  see 'environ.def' */
       ephem_bitstring = "10,16";
