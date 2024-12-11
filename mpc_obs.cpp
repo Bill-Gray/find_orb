@@ -944,7 +944,10 @@ inline double get_satellite_coordinate( const char *iptr, int *decimal_loc)
       *decimal_loc = 0;
       }
    else if( sign_byte != '+' && sign_byte != '-')
+      {
       *decimal_loc = SATELL_COORD_ERR_BAD_SIGN;
+      rval = atof( tbuff);
+      }
    else
       {
       char *tptr;
@@ -994,6 +997,8 @@ int get_satellite_offset( const char *iline, double *xyz)
          if( strict_sat_xyz_format && !error_code)
             if( decimal_loc < 6 || decimal_loc > 8)
                error_code = SATELL_COORD_ERR_DECIMAL_MISPLACED;
+         if( !error_code && xyz[i] == 0.)
+            error_code = SATELL_COORD_ERR_EXACTLY_ZERO;
          }
       else if( observation_units == 2)          /* offset in AU */
          {                         /* offset must be less than 100 AU */
@@ -1003,8 +1008,6 @@ int get_satellite_offset( const char *iline, double *xyz)
          }
       else if( !error_code)      /* don't know about this sort of offset */
          error_code = SATELL_COORD_ERR_UNKNOWN_OFFSET;
-      if( !error_code && xyz[i] == 0.)
-         error_code = SATELL_COORD_ERR_EXACTLY_ZERO;
       r2 += xyz[i] * xyz[i];
       }
    if( !error_code && r2 < min_radius * min_radius)
