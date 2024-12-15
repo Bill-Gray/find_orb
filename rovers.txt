@@ -482,12 +482,16 @@ SST ! -70.732371     -29.263556     2397       Swedish-ESO Submillimetre (SEST),
    Incidentally,  there are actually four 1.8-m auxiliary telescopes.
    But they can be moved to any of the thirty locations CPA0 to CPM0
    given below.
+   (X11) = VLT Survey Telescope (VST) is omitted.  The MPC location is
+   only six meters lower and one meter away from the position given
+   at the above URL.  (309) is in the midst of UT1, 2, 3, 4,  but its
+   altitude is about 32 meters too low.  I think ObsCodes.html is
+   using a geoid height where it should use an ellipsoidal one.
 
 UT1 ! -702418.27     -243739.44     2369.34    VLT UT1 (Antu)
 UT2 ! -702417.39     -243737.80     2369.34    VLT UT2 (Kueyen)
 UT3 ! -702416.32     -243736.64     2369.34    VLT UT3 (Melipal)
 UT4 ! -702414.25     -243737.36     2369.34    VLT UT4 (Yepun)
-VST ! -702414.27     -243734.79     2369.34    VLT VST
 VIST! -702351.36     -243656.52     2369.34    VLT VISTA
 CPA0! -702418.44     -243740.59     2369.34    VLT A0
 CPA1! -702418.26     -243741.08     2369.34    VLT A1
@@ -1361,7 +1365,7 @@ On6 !+014.78264    +49.91339          559.0    Ondrejov radio telescope (NE)
 On7 !+014.7819072  +49.9090889        580.0    Ondrejov 18cm
 
 McN !+149.15646    -31.27369          610.0    Rob McNaught
-Kau !+024.048722   +54.920805          67.0    Kaunas
+Kau !+024.048889   +54.920931          67.0    Kaunas
 
    The MPC position for Skalnate Pleso is about 600 meters east of the
 one given at https://www.ta3.sk/l3.php?p3=mph (and confirmed on G__gle
