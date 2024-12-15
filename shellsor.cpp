@@ -158,15 +158,16 @@ void shellsort_r( void *base, const size_t n_elements, const size_t elem_size,
 
 #ifdef NOT_CURRENTLY_USED
 /*  https://sourceware.org/ml/libc-alpha/2008-12/msg00007.html mentions
-that, with the arguments given in the order used in glibc,  a non-recursive
-sort can be (and,  in glibc,  is) implemented just by using the recursive
-version.  The last "context" parameter is simply ignored on all
-architectures of which the author was aware.
+that, with the arguments given in the order used in glibc,  a non-re-entrant
+sort can be (and,  in glibc,  is) implemented simply by using the re-entrant
+version,  passing a NULL context pointer.  On all architectures of which the
+author was aware,  this can be done safely,  with the unused/unset NULL
+context pointer never getting used.
 
    It seems like an excellent idea.  The weird cast is essentially the one
 used for bsearch_ext() (see below),  and I am reasonably confident the
 following would work.  However,  I've not needed it yet and it is therefore
-untested and #ifdeffed out.  If I someday decide I need a non-recursive
+untested and #ifdeffed out.  If I someday decide I need a non-re-entrant
 sort,  I'll test it then. */
 
 void shellsort( void *base, const size_t n_elements, const size_t elem_size,

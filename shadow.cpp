@@ -32,10 +32,10 @@ I = 0.436 + 0.72 * mu - 0.16 mu^2
 
    where I = intensity and mu^2 = 1 - (r/R)^2,  r = distance from
 the center of the solar disk and R = radius of the solar disk.  It
-refers to a no-longer-available source,
+refers to :
 
 Youles, S. (2017). "PH3010: Solar Limb Darkening."
-https://twiki.ph.rhul.ac.uk/twiki/pub/Public/SamYoules/PH3010_Solar_limb_darkening.pdf
+https://twiki.ph.rhul.ac.uk/twiki/pub/Public/Solar_Limb_Darkening_Project/Solar_Limb_Darkening.pdf
 
    Two similar polynomials that include terms to mu^5 are given in
 
