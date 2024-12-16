@@ -727,10 +727,7 @@ COM Find_Orb default details
 OBS M. E. Van Ness
 TEL 0.59-m LONEOS Schmidt + CCD
 
-   MPECs with data for CSS sites (703),  (E12),  (I52),  (G96),  and (V06)
-   list everybody who worked at CSS at the time in question.  Properly speaking,
-   we should list one "observer" (person actually at the scope) and everybody
-   else as "measurers",  but we don't really know who that one person was.
+   See below for info on observers.  This is just telescope data.
 COD 703
 COM Find_Orb default details
 COM Valid: 2003 jan 1 - 2016 Dec 02
@@ -1407,6 +1404,11 @@ OBS D. Dormidontov, A. Parkhomenko
 COM Default details extracted from MPEC 2024-D126
 TEL 0.4-m f/2.5 reflector + CCD
 
+COD D63
+OBS R. Bacci
+COM Default details extracted from MPEC 2024-V93
+TEL 0.41-m f/3.75 reflector + CCD
+
 COD D64
 OBS M. F. Caramanico
 COM Default details extracted from MPEC 2024-H91
@@ -1444,6 +1446,11 @@ OBS A. Hidas
 COM Default details extracted from MPEC 2021-C16
 TEL 0.35-m f/1.9 reflector + CCD
 
+COD E62
+OBS B. Lutkenhoner, E. Cortes
+COM Default details extracted from MPEC 2024-T138
+TEL 0.5-m f/6.8 Corrected Dall-Kirkham + CCD
+
 COD E85
 OBS J. McCormick
 COM Default details extracted from MPEC 2021-F20
@@ -1459,21 +1466,6 @@ OBS J. Drummond
 COM Default details extracted from MPEC 2021-C16
 TEL 0.41-m f/4.5 Newtonian reflector + CCD
 
-COD F51
-MEA K. Chambers, S. Chastel, T. de Boer, L. Denneau, J. Fairlamb
-MEA H. Flewelling, M. Huber, C.-C. Lin, E. Magnier, Y. Ramanjooloo
-MEA R. Wainscoat, R. Weryk
-OBS J. Bulger, T. Lowe, A. Schultz, M. Willman
-COM Default details extracted from MPEC 2021-C313
-TEL 1.8-m Ritchey-Chretien + CCD
-
-COD F52
-MEA K. Chambers, S. Chastel, T. de Boer, L. Denneau, J. Fairlamb
-MEA H. Flewelling, M. Huber, C.-C. Lin, E. Magnier, Y. Ramanjooloo
-MEA R. Wainscoat, R. Weryk
-OBS J. Bulger, T. Dukes, T. Lowe, A. Schultz, M. Willman
-COM Default details extracted from MPEC 2021-C318
-TEL 1.8-m Ritchey-Chretien + CCD
 
 COD F65
 MEA M. Wawerzonnek
@@ -1628,12 +1620,10 @@ TEL 0.8-m f/7.0 reflector + CMOS
 
 COD G96
 COM Find_Orb default details
-COM Valid: 2003 jan 1 - 2100
-TEL 1.5-m reflector
 COM Valid: 2003 jan 1 - 2016 May 26
-TEL  + 4K CCD
+TEL 1.5-m reflector + 4K CCD
 COM Valid: 2016 May 26 - 2100
-TEL  + 10K CCD
+TEL 1.5-m reflector + 10K CCD
 
 COD H01
 COM Find_Orb default details
@@ -2449,13 +2439,6 @@ OBS A. Aletti, F. Bellini, L. Buzzi, G. Galli
 COM Default details extracted from MPEC 2022-H30
 TEL 0.36-m f/8.4 reflector + CCD
 
-COD M22
-MEA L. Denneau, N. Erasmus, A. Fitzsimmons, A. Lawrence, J. Robinson
-MEA R. Siverd, J. Tonry, H. Weiland
-OBS L. Denneau, R. Siverd, J. Tonry, H. Weiland
-COM Default details extracted from MPEC 2022-C56
-TEL 0.5-m reflector + CCD
-
 COD M24
 OBS B. Monteleone
 COM Default details extracted from MPEC 2024-J304
@@ -2703,6 +2686,11 @@ OBS H. Watanabe
 COM Default details extracted from MPEC 2024-C158
 TEL 0.35-m f/1.9 Schmidt-Cassegrain + CMO
 
+COD Q10
+OBS M. Ishiguro
+COM Default details extracted from MPEC 2024-W185
+TEL 0.20-m f/5 reflector + CCD
+
 COD Q11
 MEA H. Sato
 OBS T. Ikemura
@@ -2875,30 +2863,6 @@ OBS T. Santana-Ros, M. Micheli, L. Conversi
 COM Default details extracted from MPEC 2021-P122
 MEA M. Micheli
 TEL 0.4-m reflector + CCD
-
-COD T05
-COM Find_Orb default details
-OBS L. Denneau, A. Heinze, H. Weiland,  J. Tonry
-MEA L. Denneau, A. Heinze, J. Tonry
-COM Valid: 2000 - 2018 May 1
-OBS B. Stalder, A. Sherstyuk
-COM Valid: 2018 May 1 - 2100
-OBS H. Flewelling, A. Fitzsimmons, D. Young
-COM Valid: 2018 Sep 1 - 2100
-OBS B. Stalder
-TEL 0.5-m f/2.0 Schmidt + CCD
-
-COD T08
-COM Find_Orb default details
-OBS L. Denneau, A. Heinze, H. Weiland,  J. Tonry
-MEA L. Denneau, A. Heinze, J. Tonry
-COM Valid: 2000 - 2018 May 1
-OBS B. Stalder, A. Sherstyuk
-COM Valid: 2018 May 1 - 2100
-OBS H. Flewelling, A. Fitzsimmons, D. Young
-COM Valid: 2018 Sep 1 - 2100
-OBS B. Stalder
-TEL 0.5-m f/2.0 Schmidt + CCD
 
 COD T09
 COM Find_Orb default details
@@ -3157,13 +3121,6 @@ OBS J. Maikner
 COM Default details extracted from MPEC 2021-J28
 TEL 0.30-m f/3.8 Riccardi-Honders + CCD
 
-COD W68
-MEA L. Denneau, N. Erasmus, A. Fitzsimmons, A. Lawrence, J. Robinson
-MEA R. Siverd, J. Tonry, H. Weiland
-OBS L. Denneau, R. Siverd, J. Tonry, H. Weiland
-COM Default details extracted from MPEC 2022-C56
-TEL 0.5-m reflector + CCD
-
 COD W71
 OBS G. Viscome
 COM Default details extracted from MPEC 2023-C45
@@ -3339,6 +3296,11 @@ OBS M. Park, G. Rochon
 COM Default details extracted from MPEC 2024-A150
 TEL 0.14-m f/7 refractor + CCD
 
+COD X19
+OBS A. Sankovich
+COM Default details extracted from MPEC 2024-U180
+TEL 0.5-m f/1.5 reflector + CMOS
+
 COD X31
 OBS C. Fornari
 COM Default details extracted from MPEC 2021-C16
@@ -3431,6 +3393,11 @@ OBS M. Serra
 COM Default details extracted from MPEC 2024-D123
 MEA M. Hierro
 TEL 0.80-m f/4.38 reflector + CMO
+
+COD Y71
+OBS J. Ryske
+COM Default details extracted from MPEC 2024-X301
+TEL 0.30-m f/8 reflector + CMO
 
 COD Y83
 OBS O. Canales
@@ -3690,57 +3657,154 @@ OBS A. Mickleburgh
 COM Default details extracted from MPEC 2021-B143
 TEL 0.36-m f/8 Schmidt-Cassegrain + CCD
 
+COD Multi F51  F52
+COM Valid: 2024 aug 1 - 2100
+MEA K. Chambers, T. de Boer, J. Fairlamb, H. Gao, M. Huber, C.-C. Lin
+MEA E. Magnier, Y. Ramanjooloo, R. Wainscoat, R. Weryk
+OBS J. Herman, T. Lowe, P. Minguez, A. Schultz, I. Smith
+COM Default details extracted from MPEC 2024-U09 (2024 Oct 17)
+TEL 1.8-m Ritchey-Chretien + CCD
+
+COM Valid: 2024 feb 1 - 2024 aug 1
+MEA K. Chambers, T. de Boer, J. Fairlamb, H. Gao, M. Huber, C.-C. Lin
+MEA E. Magnier, Y. Ramanjooloo, R. Wainscoat, R. Weryk
+OBS J. Herman, T. Lowe, P. Minguez, A. Schultz, I. Smith
+COM Default details extracted from MPEC 2024-K08 (2024 May 17)
+TEL 1.8-m Ritchey-Chretien + CCD
+
+COM Valid: 2023 aug 1 - 2024 feb 1
+MEA K. Chambers, T. de Boer, J. Fairlamb, H. Gao, M. Huber, C.-C. Lin
+MEA E. Magnier, Y. Ramanjooloo, R. Wainscoat, R. Weryk
+OBS J. Bulger, T. Lowe, P. Minguez, A. Schultz, I. Smith
+COM Default details extracted from MPEC 2023-U284
+TEL 1.8-m Ritchey-Chretien + CCD
+
+COM Valid: 2023 feb 1 - 2024 aug 1
+MEA K. Chambers, T. de Boer, J. Bulger, J. Fairlamb, H. Gao, M. Huber
+MEA C.-C. Lin, T. Lowe, E. Magnier, P. Minguez, Y. Ramanjooloo, A. Schultz
+MEA I. Smith, R. Wainscoat, R. Weryk
+OBS J. Bulger, T. Lowe, P. Minguez, A. Schultz, I. Smith
+COM Default details extracted from MPEC 2023-K192
+TEL 1.8-m Ritchey-Chretien + CCD
+
+COM Valid: 2022 aug 1 - 2023 feb 1
+MEA S. Chastel, J. Fairlamb, M. Huber, Y. Ramanjooloo, R. Wainscoat
+MEA R. Weryk
+OBS J. Bulger, K. Chambers, T. Lowe, A. Schultz, I. Smith
+COM Default details extracted from MPEC 2022-U406
+TEL 1.8-m Ritchey-Chretien + CCD
+
+COM Valid: 2021 nov 1 - 2022 aug 1
+MEA K. Chambers, S. Chastel, T. de Boer, J. Fairlamb, H. Gao, M. Huber
+MEA C.-C. Lin, E. Magnier, Y. Ramanjooloo, R. Wainscoat, R. Weryk
+OBS J. Bulger, T. Lowe, A. Schultz, I. Smith, K. Chambers, T. Dukes
+COM Default details extracted from MPEC 2022-K175
+TEL 1.8-m Ritchey-Chretien + CCD
+
+COM Valid: 2020 nov 1 - 2021 nov 1
+MEA S. Chastel, M. Huber, Y. Ramanjooloo, R. Wainscoat, R. Weryk
+OBS J. Bulger, K. Chambers, T. Lowe, A. Schultz, I. Smith
+COM Default details extracted from MPEC 2021-K106
+TEL 1.8-m Ritchey-Chretien + CCD
+
+COM Valid: 2019 nov 1 - 2020 nov 1
+MEA S. Chastel, M. Huber, Y. Ramanjooloo, R. Wainscoat, R. Weryk
+MEA K. Chambers, T. de Boer, L. Denneau, J. Fairlamb, H. Flewelling
+MEA C.-C. Lin, E. Magnier
+OBS J. Bulger, K. Chambers, T. Lowe, A. Schultz, M. Willman
+COM Default details extracted from MPEC 2020-K234
+TEL 1.8-m Ritchey-Chretien + CCD
+
+   MPECs with data for CSS sites (703),  (E12),  (I52),  (G96),  and (V06)
+   list everybody who worked at CSS at the time in question.  Properly speaking,
+   we should list one "observer" (person actually at the scope) and everybody
+   else as "measurers",  but we don't really know who that one person was.
+   For CSS,  unlike ATLAS and PanSTARRS,  the telescopes differ from site
+   to site;  look under COD 703,  COD E12,  etc. for scope details.
+
 COD Multi 703  E12  G96  I52  V00  V06
-COM Valid: 2019 Jan 20 - 2100
-OBS T. A. Pruyne
-COM Valid: 2018 Jan 1 - 2100
-OBS B. M. Africano
-COM Valid: 2010-2014
-OBS J. D. Ahern
-COM Valid: 1900-2014
-OBS E. C. Beshore
-COM Valid: 2006-2014
-OBS A. Boattini
-COM Valid: 2004 jul 1 - 2006
-OBS C. M. Casey
-COM Valid: 2011-2100
-OBS E. J. Christensen
-COM Valid: 2018 Jul 1 - 2300
-OBS G. A. Farneth
-COM Valid: 2014 Jan 1 - 2300
-OBS D. C. Fuls
-COM Valid: 2004 jul 1-2011
-OBS G. J. Garradd
-COM Valid: 2006-2100
-OBS A. R. Gibbs, A. D. Grauer
-COM Valid: 2018 may 1 - 2100
-OBS H. Groeller
-COM Valid: 1999 jan 1 - 2015 Oct 1
-OBS R. E. Hill
-COM Valid: 2014-2100
-OBS J. A. Johnson
-COM Valid: 1900 - 2004 jul 1
-OBS S. Kolar
-COM Valid: 2006 - 2100
-OBS R. A. Kowalski
-COM Valid: 2004 jul 1 - 2100
-OBS S. M. Larson
-COM Valid: 2014 - 2100
-OBS G. J. Leonard
-COM Valid: 2014 - 2018 Feb 20
-OBS R. G. Matheny
-COM Valid: 1900-2004 jul 1
-OBS D. McLean
-COM Valid: 2004 jul 1 - 2015
-OBS R. H. McNaught
-COM Valid: 2019 - 2100
-OBS D. Rankin
-COM Valid: 2014 - 2100
-OBS R. L. Seaman
-COM Valid: 2014 - 2100
-OBS F. C. Shelly
-COM Valid: 2019 Oct 1 - 2100
-OBS K. W. Wierzchos
+COM Valid: 2024 aug 1 - 2100
+MEA T. Beuden, V. F. Carvajal, D. Fay, J. B. Fazekas, D. C. Fuls
+MEA A. R. Gibbs, A. D. Grauer, H. Groeller, J. K. Hogan, R. A. Kowalski
+MEA S. M. Larson, G. J. Leonard, D. Rankin, R. L. Seaman, F. C. Shelly
+MEA K. W. Wierzchos
+COM Default details extracted from MPEC 2024-U09 (2024 Oct 17)
+
+COM Valid: 2024 feb 1 - 2024 aug 1
+MEA T. Beuden, V. F. Carvajal, D. Fay, J. B. Fazekas, D. C. Fuls
+MEA A. R. Gibbs, A. D. Grauer, H. Groeller, J. K. Hogan, R. A. Kowalski
+MEA S. M. Larson, G. J. Leonard, D. Rankin, R. L. Seaman, F. C. Shelly
+MEA K. W. Wierzchos
+COM Default details extracted from MPEC 2024-K08 (2024 May 17)
+
+COM Valid: 2023 aug 1 - 2024 feb 1
+MEA E. C. Beshore, D. Fay, J. B. Fazekas, D. C. Fuls, A. R. Gibbs
+MEA A. D. Grauer, H. Groeller, J. K. Hogan, R. A. Kowalski, S. M. Larson
+MEA G. J. Leonard, D. Rankin, R. L. Seaman, F. C. Shelly, K. W. Wierzchos
+COM Default details extracted from MPEC 2023-U284
+
+COM Valid: 2023 feb 1 - 2023 aug 1
+MEA E. J. Christensen, D. Fay, J. B. Fazekas, D. C. Fuls, A. R. Gibbs
+MEA A. D. Grauer, H. Groeller, J. K. Hogan, R. A. Kowalski, S. M. Larson
+MEA G. J. Leonard, D. Rankin, R. L. Seaman, A. Serrano, F. C. Shelly
+MEA K. W. Wierzchos
+COM Default details extracted from MPEC 2023-K192
+
+COM Valid: 2022 aug 1 - 2023 feb 1
+MEA E. J. Christensen, D. Fay, J. B. Fazekas, D. C. Fuls, A. R. Gibbs
+MEA A. D. Grauer, H. Groeller, J. K. Hogan, R. A. Kowalski, S. M. Larson
+MEA G. J. Leonard, D. Rankin, R. L. Seaman, A. Serrano, F. C. Shelly
+MEA K. W. Wierzchos
+COM Default details extracted from MPEC 2022-U407
+
+COM Valid: 2021 nov 1 - 2022 aug 1
+MEA E. J. Christensen, D. Fay, J. B. Fazekas, D. C. Fuls, A. R. Gibbs
+MEA A. D. Grauer, H. Groeller, J. K. Hogan, R. A. Kowalski, S. M. Larson
+MEA G. J. Leonard, D. Rankin, R. L. Seaman, A. Serrano, F. C. Shelly
+MEA K. W. Wierzchos
+COM Default details extracted from MPEC 2022-K176
+
+COM Valid: 2020 nov 1 - 2021 nov 1
+MEA E. J. Christensen, G. A. Farneth, D. C. Fuls, A. R. Gibbs
+MEA A. D. Grauer, H. Groeller, R. A. Kowalski, S. M. Larson, G. J. Leonard
+MEA T. A. Pruyne, D. Rankin, R. L. Seaman, F. C. Shelly, K. W. Wierzchos
+COM Default details extracted from MPEC 2021-K105
+
+COM Valid: 2019 nov 1 - 2020 nov 1
+MEA E. J. Christensen, G. A. Farneth, D. C. Fuls, A. R. Gibbs
+MEA A. D. Grauer, H. Groeller, R. A. Kowalski, S. M. Larson, G. J. Leonard
+MEA T. A. Pruyne, D. Rankin, R. L. Seaman, F. C. Shelly, K. W. Wierzchos
+COM Default details extracted from MPEC 2020-K227
+
+COD Multi M22  T05  T08  W68
+
+COM Valid: 2024 jan 1 - 2100 nov 1
+MEA L. Denneau, N. Erasmus, A. Fitzsimmons, J. Robinson, R. Siverd
+MEA J. Tonry, H. Weiland
+OBS L. Denneau, R. Siverd, J. Tonry, H. Weiland
+COM Default details extracted from MPEC 2024-U02 (2024 Oct 16)
+TEL 0.5-m f/2.0 Schmidt + CCD
+
+COM Valid: 2021 dec 1 - 2024 jan 1
+MEA L. Denneau, N. Erasmus, A. Fitzsimmons, A. Lawrence, J. Robinson
+MEA R. Siverd, J. Tonry, H. Weiland
+OBS L. Denneau, R. Siverd, J. Tonry, H. Weiland
+COM Default details extracted from MPEC 2023-U150 (2023 oct 20)
+TEL 0.5-m f/2.0 Schmidt + CCD
+
+COM Valid: 2020 dec 1 - 2021 dec 1
+MEA L. Denneau, J. Tonry, A. Heinze, H. Weiland, A. Fitzsimmons
+MEA J. Robinson, N. Erasmus
+OBS L. Denneau, J. Tonry, A. Heinze, H. Weiland
+COM Default details extracted from MPEC 2021-K100
+TEL 0.5-m f/2.0 Schmidt + CCD
+
+COM Valid: 1900 dec 1 - 2020 dec 1
+MEA L. Denneau, J. Tonry, A. Heinze, H. Weiland, H. Flewelling, B. Stalder
+MEA A. Fitzsimmons, J. Robinson, N. Erasmus
+OBS L. Denneau, J. Tonry, A. Heinze, H. Weiland, H. Flewelling
+COM Default details extracted from MPEC 2020-K228
+TEL 0.5-m f/2.0 Schmidt + CCD
 
 COD Def
 COM For ADES,  you _must_ supply a contact, measurer,  and telescope.
