@@ -1451,13 +1451,8 @@ St74!+149.008898   -35.319125         786.     74-in reflector, Mt Stromlo
 St26!+149.009794   -35.318523         787.     26-in Yale-Columbia refractor, Mt Stromlo
 St50!+149.007461   -35.320406         786.     50-in reflector, Mt Stromlo
 
-   Identified from image at
-   https://www.esa.int/Safety_Security/Planetary_Defence/New_ESA_telescope_in_South_America_to_search_for_asteroids
-
-ET2 !-070.73904    -29.25522         2359.     ESA Test-Bed Telescope 2, La Silla
-
 P07 !+114.0899     -21.8957            40.     Space Surveillance Telescope, HEH Station
-SOR !-106.463864   +34.9642312       1892.     Starfire Optical Range,  Albuqueque
+SOR !-106.463864   +34.9642312       1892.     Starfire Optical Range,  Albuquerque
 
    Private communication from Francois Kugel,  2021 Oct 18 : N 43 59' 59.26",
    E 05 38' 48.96", alt 626m ASL.  51m added for geoid height.
