@@ -892,13 +892,17 @@ ELT !-070.191631   -24.589327       3046.      Extremely Large Telescope
 GMT !-0704109.0    -290142.0        2516.      Giant Magellan Telescope
 TMT !-155.4816     +19.8327         4050.      Thirty-Meter Telescope
 
-   Improved coords for both Magellan scopes.  Alt is from
-   https://www.as.arizona.edu/magellan-65m-telescopes (converted from
-   feet,  so treat with caution).  Lat/lons given there are identical
+   Improved coords for both Magellan scopes.  The locations given at
+   https://astro.arizona.edu/magellan-telescopes are indentical,  and
    and split the difference between the positions given below,  which
-   were measured on G__gle Maps.
-268 !-070.692620   -29.014044       2515.      New Horizons KBO Search-Magellan/Clay
-269 !-070.692187   -29.014442       2515.      New Horizons KBO Search-Magellan/Baade
+   were measured on G__gle Earth.  The MPC altitudes match those from
+   Google Earth,  and are probably ground heights uncorrected for
+   geoid height.  The MPC locations are about 70m west of the G__gle
+   ones (used below).  Altitude is that from Google,  with 33m added
+   for geoid height.  The arizona.edu altitude (given in "feet") is
+   ~125m above ground,  which seems unreasonably high.
+268 !-070.692620   -29.014044       2422.      Magellan-Clay Telescope
+269 !-070.692187   -29.014442       2422.      Magellan-Baade Telescope
 
    Las Campanas telescopes,  from G__gle Earth.  Identifications are from
    that source,  and from https://www.lco.cl/tenant-telescopes-2/ and hatpi.org.
