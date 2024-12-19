@@ -96,7 +96,7 @@ Brb !   5.896093     +43.155552      240       Barbeau
 
 Sud !  33.11952      +20.59777       10        Sudan impact site
 Atl ! -43.2          +12.5       100000        2014 AA impact location
-C5i !+233.51049    +05.19390          10   @10 Chang'e 5-T1 stage impact point
+C5T !+233.51049    +05.19390          10   @10 Chang'e 5-T1 stage impact point
 LCO ! 311.75834      -84.56139        10   @10 LCROSS impact site
 WT1 !  80.9004       +05.5488          0       WT1190F nominal impact point
 
@@ -288,7 +288,7 @@ Vk2 !-225.719635     +48.0061408   -3365.8 @4  Viking 2
 Be2 !  90.43         +11.53            0   @4  Beagle 2
 ExM ! 353.79         -02.07            0   @4  ExoMars Schiaparelli
 Per !-282.5491       +18.4446      -2567.  @4  Perseverance, Mars
-ExM ! 335.45         +18.20            0   @4  ExoMars 2022
+Exf ! 335.45         +18.20            0   @4  ExoMars (future)
 MPL ! 195.3          -76.1             0   @4  Mars Polar Lander
 Ma6 !  19.42         -23.9             0   @4  Mars 6 site
 Ma3 ! 202.           -45.              0   @4  Mars 3 site
@@ -617,8 +617,8 @@ J13 ! -17.8792       +28.7624       2403       Liverpool Telescope, Canary Islan
    = 30m precision,  so I'm sticking to G__gle Maps for that part.
 Z18 ! -175330.8      +284523.8      2340       Gran Telescopio Canarias
 Z20 ! -17.878484     +28.762366     2373       Mercator Telescope, Canary Islands
-Ma1 ! -17.890588     +28.761325     2271.38    MAGIC (southwest)
-Ma2 ! -17.890085     +28.761963     2271.38    MAGIC (northeast)
+MA1 ! -17.890588     +28.761325     2271.38    MAGIC (southwest)
+MA2 ! -17.890085     +28.761963     2271.38    MAGIC (northeast)
 
    Various telescopes near JKT can be identified from
    http://www.ing.iac.es/PR/visits/mapaorm.png (WARNING: South is _up_),
