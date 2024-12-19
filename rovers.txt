@@ -900,17 +900,26 @@ TMT !-155.4816     +19.8327         4050.      Thirty-Meter Telescope
 268 !-070.692620   -29.014044       2515.      New Horizons KBO Search-Magellan/Clay
 269 !-070.692187   -29.014442       2515.      New Horizons KBO Search-Magellan/Baade
 
-   Coords for these two telescopes are provided by Wikipaedia,  claimed good to
-   a meter (though given to 3-m precision?),  and they do land squarely on domes
-   in G__gle Maps.  Many Las Campanas telescopes are unidentified.  The
-   coordinates given for (304) and (I05) are identical and about 500m
-   north of the nearest observatory dome.
-War !-704205.9     -290035.8        2275.      Warsaw Telescope, Las Campanas (OGLE)
-ASA !-704205.1     -290036.9        2275?      All-Sky Automated Survey (ASAS), Las Campanas
-Lc1 !-70.70397     -29.00735                   Las Campanas unk 1, northernmos
-Lc2 !-70.70121     -29.01036                   Las Campanas unk 2, ~25m SE of (ASA)
-Lc3 !-70.70026     -29.01193                   Las Campanas unk 3
-Lc4 !-70.68982     -29.02158                   Las Campanas unk 4
+   Las Campanas telescopes,  from G__gle Earth.  Identifications are from
+   that source,  and from https://www.lco.cl/tenant-telescopes-2/ and hatpi.org.
+   (I05) gives coordinates for the TIE (Telescopes In Education) scope,  about
+   500m north of the nearest observatory dome and probably wrong.  As with the
+   Mt Wilson TIE,  good coordinates are lacking.  The twin Magellan telescopes
+   have codes (268) for the Clay Telescope and (269) for the Baade Telescope.
+   Code (304) is between them;  see MPEC 2024-Y07.  For completeness,  a
+   (GMT) Giant Magellan Telescope code is given above.
+   33m added for geoid height.
+DuP !-70.703986    -29.007334       2310       DuPont Telescope, Las Campanas
+LVa !-70.702690    -29.008345       2301       Vacant dome, Las Campanas
+War !-70.701634    -29.009926       2301       Warsaw Telescope, Las Campanas (OGLE)
+ASA !-70.701209    -29.010365       2303       All-Sky Automated Survey (ASAS), Las Campanas
+HAp !-70.701080    -29.010486       2303       HATPI, Las Campanas
+HAW !-70.700881    -29.010788       2304       HAT South (west dome), Las Campanas
+HAS !-70.700832    -29.010790       2304       HAT South (east dome), Las Campanas
+LVM !-70.700709    -29.010851       2304       Local Volume Mapper Instrument, Las Campanas
+CAS !-70.700538    -29.010986       2305       CASCA,  Las Campanas
+HSw !-70.700236    -29.011994       2308       Henrietta Swope Telescope?,  Las Campanas
+BiS !-70.689787    -29.021614       2370       BiSON,  Las Campanas
 
    Carolin Liefke sorted out the history of (024) Heidelberg-Konigstuhl
    (see https://groups.io/g/mpml/message/35417).  The site listed below as
