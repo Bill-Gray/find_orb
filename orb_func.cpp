@@ -3902,12 +3902,16 @@ static double find_sungrazer_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
          if( !find_parabolic_orbit( obs, n_obs, temp_orbit, direction))
             {
             ELEMENTS elem;
+            double ecliptic_lon, ecliptic_lat;
+
             double score;
 
             elem.gm = SOLAR_GM;
             calc_classical_elements( &elem, temp_orbit, obs[0].jd, 1);
-            score = 10. * fabs( elem.ecc - 1.) + fabs( elem.incl * 180. / PI - 144.);
-            if( best_score > score)
+            get_periapsis_loc( &ecliptic_lon, &ecliptic_lat, &elem);
+            score = fabs( ecliptic_lon - 282.81 * PI / 180.)
+                  + fabs( ecliptic_lat - 35.22 * PI / 180.);
+            if( best_score > score && elem.incl > PI / 2.)
                {
                best_score = score;
                memcpy( orbit, temp_orbit, 6 * sizeof( double));
