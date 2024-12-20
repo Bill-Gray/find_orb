@@ -4064,6 +4064,8 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
    if( debug_level)
       debug_printf( "initial_orbit(): %d obs;", n_obs);
    assert( orbit);
+   n_radar_obs = sort_unused_obs_to_end( obs, n_obs);
+   n_obs -= n_radar_obs;
    for( i = 0; i < n_obs; i++)
       {
       obs[i].computed_ra  = obs[i].ra;
@@ -4147,8 +4149,6 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
       free( sr);
       }
 
-   n_radar_obs = sort_unused_obs_to_end( obs, n_obs);
-   n_obs -= n_radar_obs;
    while( best_score > acceptable_score_limit)
       {
       int end, n_subarc_obs, n_geocentric_obs = 0;
