@@ -4138,17 +4138,20 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
          {               /* accept the SR solution */
          const double epoch_shown = find_epoch_shown( obs, n_obs);
 
+         orbit_epoch = obs[0].jd;
          for( i = 0; i < (int)n_sr_orbits; i++)
             memcpy( sr_orbits + i * 6, sr[i].orbit, 6 * sizeof( double));
          free( sr);
          find_median_orbit( sr_orbits, n_sr_orbits);
          memcpy( orbit, sr_orbits, 6 * sizeof( double));
-         compute_sr_sigmas( sr_orbits, n_sr_orbits, obs[0].jd, epoch_shown);
+         compute_sr_sigmas( sr_orbits, n_sr_orbits, orbit_epoch, epoch_shown);
+         n_obs += n_radar_obs;
+         shellsort_r( obs, n_obs, sizeof( OBSERVE), compare_observations, NULL);
          available_sigmas_hash = compute_available_sigmas_hash( obs, n_obs,
                      epoch_shown, perturbers, 0);
-         set_locs( orbit, obs[0].jd, obs, n_obs);
+         set_locs( orbit, orbit_epoch, obs, n_obs);
          integration_timeout = 0;
-         return( obs[0].jd);
+         return( orbit_epoch);
          }
       free( sr);
       }
