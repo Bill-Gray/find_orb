@@ -71,6 +71,7 @@ doing a sufficiently exhaustive search in such cases. */
 #include "date.h"
 #include "norad.h"
 #include "lsquare.h"
+#include "stringex.h"
 #include "afuncs.h"
 
 #define AU_IN_KM 1.495978707e+8
@@ -489,6 +490,25 @@ static FILE *fopen_from_findorb_dir( const char *filename, const char *permits)
    return( rval);
 }
 
+static void auto_set_desigs( char *norad_desig, char *intl_desig)
+{
+   FILE *ifile = fopen( "/home/phred/tles/tle_list.txt", "rb");
+   char buff[200];
+
+   assert( ifile);
+   while( fgets( buff, sizeof( buff), ifile))
+      if( !memcmp( buff, "  note : next artsat will be ", 29))
+         {
+         fclose( ifile);
+         memcpy( norad_desig, buff + 29, 5);
+         memcpy( intl_desig, buff + 37, 8);
+         printf( "Desigs set to '%s', '%s'\n", norad_desig, intl_desig);
+         return;
+         }
+   assert( 0);       /* we shouldn't get here */
+}
+
+
 /* Certain objects have names (preliminary designations from surveys),  but
 no NORAD or international designation.  The following ensures they get one,
 which won't (we lightheartedly hope) conflict with other designations.  The
@@ -538,8 +558,8 @@ int main( const int argc, const char **argv)
    int n_params = 6, n_iterations = 15;
    const int max_n_params = 8;
    char buff[200], obj_name[100];
-   const char *default_intl_desig = "00000", *norad_desig = "99999";
-   const char *intl_desig = default_intl_desig;
+   const char *default_intl_desig = "00000A";
+   char intl_desig[9], norad_desig[6];
    double *slopes = (double *)calloc( max_n_params * 6, sizeof( double));
    double *vectors, worst_resid_in_run = 0., worst_mjd = 0.;
    double tdt = 0., *computed_vects;
@@ -560,7 +580,8 @@ int main( const int argc, const char **argv)
 
    if( argc < 2)
       error_exit( -1);
-
+   strlcpy_error( intl_desig, default_intl_desig);
+   strlcpy_error( norad_desig, "99999");
    setvbuf( stdout, NULL, _IONBF, 0);
    memset( &tle, 0, sizeof( tle_t));
    tle.classification = 'U';
@@ -621,10 +642,12 @@ int main( const int argc, const char **argv)
                output_freq = atoi( argv[i] + 2);
                break;
             case 'n': case 'N':
-               norad_desig = argv[i] + 2;
+               strlcpy_error( norad_desig, argv[i] + 2);
+               if( *norad_desig == 'a' && !norad_desig[1])
+                  auto_set_desigs( norad_desig, intl_desig);
                break;
             case 'i': case 'I':
-               intl_desig = argv[i] + 2;
+               strlcpy_error( intl_desig, argv[i] + 2);
                break;
             case 'l': case 'L':
                sscanf( argv[i] + 2, "%lf", &levenberg_marquardt_lambda0);
@@ -746,7 +769,7 @@ int main( const int argc, const char **argv)
             if( tptr)
                tle.norad_number = atoi( tptr + 6);
             }
-         if( intl_desig == default_intl_desig)
+         if( !strcmp( intl_desig, default_intl_desig))
             for( tptr = obj_name; *tptr; tptr++)
                if( atoi( tptr) > 1900 && tptr[4] == '-' &&
                      atoi( tptr + 5) > 0)
