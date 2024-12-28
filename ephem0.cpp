@@ -2933,6 +2933,8 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                         ecliptic_to_equatorial( vect);   /* mpc_obs.cpp */
                         fraction_illum = shadow_check( earth_loc, orbi_after_light_lag,
                                     EARTH_RADIUS_IN_AU);
+                        fraction_illum *= shadow_check( moon_loc, orbi_after_light_lag,
+                                    LUNAR_RADIUS_IN_AU);
                         if( moon_dist)
                            cos_elong = dot_product( vect, topo)
                                         / (moon_dist * vector3_length( topo));

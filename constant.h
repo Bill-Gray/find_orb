@@ -14,8 +14,10 @@
 
 #define EARTH_RADIUS_IN_KM    6378.140
 #define SUN_RADIUS_IN_KM      695700.
+#define LUNAR_RADIUS_IN_KM    1737.4
 #define EARTH_RADIUS_IN_AU    (EARTH_RADIUS_IN_KM / AU_IN_KM)
 #define SUN_RADIUS_IN_AU      (SUN_RADIUS_IN_KM / AU_IN_KM)
+#define LUNAR_RADIUS_IN_AU    (LUNAR_RADIUS_IN_KM / AU_IN_KM)
 
 /* "Solar constant" : at one AU from the sun,  a square meter
 collects 1361 watts (total solar irradiance at all wavelengths). */
