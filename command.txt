@@ -13,6 +13,7 @@ l              constr
 e              Epoch
 !              all_perts
 u              Undo
+{              FilterObs
 *              NonGravs
 c              Calend
 +              HelioOnly
@@ -111,6 +112,7 @@ w              Show included observation with the worst residuals
 :              Linearize the orbit
 |              Compute Monte Carlo variant orbits
 [              Show the covariance and some debugging data
+{              Toggle obs on below a desired residual level,  off above it
 `              Toggle comet mags between nuclear M(N) and total M(T)
 )              Select a file and show it on-screen
 0              Toggle lunar perturbations
