@@ -2949,6 +2949,8 @@ static void correct_differences( OBSERVE *obs1, const OBSERVE *obs2)
       obs1->mag_band = obs2->mag_band;
    if( obs1->note1 == ' ' && obs2->note1 != ' ')
       obs1->note1 = obs2->note1;
+   if( obs1->discovery_asterisk == ' ' && obs2->discovery_asterisk == '*')
+      obs1->discovery_asterisk = '*';
 }
 
 /* For certain forms of orbit determination,  having radar observations right
