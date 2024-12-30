@@ -3333,6 +3333,18 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
                         epoch_shown);
       ignore_prev_solns = 0;
       }
+   else if( !got_vectors && available_sigmas == NO_SIGMAS_AVAILABLE && !ignore_prev_solns)
+      {                          /* failed to get sigmas;  try more SR orbits */
+      extern unsigned max_n_sr_orbits;
+
+      ignore_prev_solns = 1;
+      debug_printf( "%s failed; trying more SR orbits\n", obs->packed_id);
+      max_n_sr_orbits *= 5;
+      got_vectors = fetch_previous_solution( obs, n_obs, orbit, orbit_epoch,
+                        epoch_shown);
+      max_n_sr_orbits /= 5;
+      ignore_prev_solns = 0;
+      }
    return( got_vectors);
 }
 
