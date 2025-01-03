@@ -2703,6 +2703,16 @@ static void output_json_matrix( FILE *ofile, const char *title, const double *ma
    fprintf( ofile, "]");
 }
 
+/* At present,  the least-squares fit involves variations along the
+state vector axes.  This may change,  probably (back to) being along the
+eigenvectors,  to provide greater stability.  */
+
+static void _tweak_orbit( double *orbit, const int axis, double tweak, const int n_params)
+{
+   INTENTIONALLY_UNUSED_PARAMETER( n_params);
+   orbit[axis] += tweak;
+}
+
 const char *monte_label[MONTE_N_ENTRIES] = {
                            "Tp", "e", "q", "Q", "1/a", "i", "M",
                            "omega", "Omega", "MOID", "H" };
@@ -2947,7 +2957,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
             if( asteroid_mass && i == 6)
                *asteroid_mass -= delta_val;
             else                    /* adjust position/velocity */
-               tweaked_orbit[i] -= delta_val;
+               _tweak_orbit( tweaked_orbit, i, -delta_val, n_params);
             snprintf_err( tstr, sizeof( tstr), "Evaluating %d of %d : iter %d   ", i + 1,
                                     n_params, n_iterations);
             if( debug_level > 4)
@@ -3030,7 +3040,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
             if( asteroid_mass && i == 6)
                *asteroid_mass += delta_val;
             else                    /* adjust position/velocity */
-               tweaked_orbit[i] += delta_val;
+               _tweak_orbit( tweaked_orbit, i, delta_val, n_params);
             memcpy( tstr, "Reverse   ", 10);
             fail_on_hitting_planet = true;
             set_locs_rval = set_locs( tweaked_orbit, epoch, obs, n_obs);
@@ -3191,7 +3201,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
       if( i == 6 && asteroid_mass)
          *asteroid_mass += differences[i] / scale_factor;
       else
-         orbit[i] += differences[i] / scale_factor;
+         _tweak_orbit( orbit, i, differences[i] / scale_factor, n_params);
       if( i == 5)    /* is our new 'orbit' state vector reasonable?  */
          err_code = is_unreasonable_orbit( orbit);
       }
