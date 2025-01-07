@@ -3184,6 +3184,17 @@ double mid_epoch_of_arc( const OBSERVE *obs, const int n_obs)
    return( (obs[first].jd + obs[last].jd) / 2.);
 }
 
+static void _reset_sr_orbits( void)
+{
+   extern double *sr_orbits;
+   extern unsigned max_n_sr_orbits;
+
+   if( sr_orbits)
+      free( sr_orbits);
+   sr_orbits = (double *)calloc( (size_t)max_n_sr_orbits, 7 * sizeof( double));
+   assert( sr_orbits);
+}
+
 const char *state_vect_text = NULL;
 int ignore_prev_solns;
 bool take_first_soln = false, force_final_full_improvement = false;
@@ -3340,9 +3351,11 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
       ignore_prev_solns = 1;
       debug_printf( "%s failed; trying more SR orbits\n", obs->packed_id);
       max_n_sr_orbits *= 5;
+      _reset_sr_orbits( );
       got_vectors = fetch_previous_solution( obs, n_obs, orbit, orbit_epoch,
                         epoch_shown);
       max_n_sr_orbits /= 5;
+      _reset_sr_orbits( );
       ignore_prev_solns = 0;
       }
    return( got_vectors);
@@ -3962,7 +3975,6 @@ int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
    extern double minimum_jd, maximum_jd;
    extern double maximum_observation_span;
    extern int use_config_directory;
-   extern double *sr_orbits;
    extern double automatic_outlier_rejection_limit;
    extern double default_automatic_outlier_rejection_limit;
    extern unsigned max_n_sr_orbits;
@@ -4051,8 +4063,7 @@ int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
    max_n_sr_orbits = atoi( get_environment_ptr( "MAX_SR_ORBITS"));
    if( !max_n_sr_orbits)
       max_n_sr_orbits = 500;
-   sr_orbits = (double *)calloc( (size_t)max_n_sr_orbits, 7 * sizeof( double));
-   assert( sr_orbits);
+   _reset_sr_orbits( );
    sscanf( get_environment_ptr( "PERTURBERS"), "%x", &always_included_perturbers);
    if( *albedo)
       optical_albedo = atof( albedo);
