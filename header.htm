@@ -23,19 +23,16 @@
 $Error      # The server flavor of Find_Orb inserts error messages here.
 <ul>
 <li> <a href="#ast_xx"> Astrometry </a> </li>
-# neocp_only 1    These lines only make sense for NEOCP objects:
-<li> <a href="https://cgi.minorplanetcenter.net/cgi-bin/showobsorbs.cgi?Obj=$Name$&amp;obs=y"> Astrometry (from NEOCP,  if available) </a> </li>
-<li> <a href="https://cneos.jpl.nasa.gov/scout/#/object/$Name$"> 'Scout' (JPL) information </a> </li>
-# neocp_only 0
 <li> <a href="#stations"> Observing stations </a> </li>
 <li> <a href="#elements_xx"> Orbital elements </a> </li>
 <li> <a href="#residuals_xx"> Residuals </a> </li>
 <li> <a href="#eph_xx"> Ephemeris </a> </li>
-# helio_only 1
-<li> <a href="http://skyview.gsfc.nasa.gov/cgi-bin/skymorph/mobssel.pl?target=&amp;NEAT=on&amp;OE_EPOCH=$EpJD$&amp;OE_EC=$ecc$&amp;OE_QR=$q$&amp;OE_TP=$T$&amp;OE_OM=$Node$&amp;OE_W=$Peri$&amp;OE_IN=$Incl$&amp;OE_H=$H$"> Click here to search NEAT images for this object using Skymorph </a> </li>
-<li> <a href="http://skyview.gsfc.nasa.gov/cgi-bin/skymorph/mobssel.pl?target=&amp;DSS2=on&amp;OE_EPOCH=$EpJD$&amp;OE_EC=$ecc$&amp;OE_QR=$q$&amp;OE_TP=$T$&amp;OE_OM=$Node$&amp;OE_W=$Peri$&amp;OE_IN=$Incl$&amp;OE_H=$H$"> Click here to search DSS2 images for this object using Skymorph </a> </li>
-<li> <a href="http://skyview.gsfc.nasa.gov/cgi-bin/skymorph/mobssel.pl?target=&amp;Spacewatch=on&amp;OE_EPOCH=$EpJD$&amp;OE_EC=$ecc$&amp;OE_QR=$q$&amp;OE_TP=$T$&amp;OE_OM=$Node$&amp;OE_W=$Peri$&amp;OE_IN=$Incl$&amp;OE_H=$H$"> Click here to search Spacewatch images for this object using Skymorph </a> </li>
-# helio_only 0
+# neocp_only 1    These lines only make sense for NEOCP objects:
+
+<li> <a href="https://cgi.minorplanetcenter.net/cgi-bin/showobsorbs.cgi?Obj=$Name$&amp;obs=y"> Astrometry (from NEOCP,  if available) </a> </li>
+<li> <a href="https://cneos.jpl.nasa.gov/scout/#/object/$Name$"> 'Scout' (JPL) information </a> </li>
+<li> <a href="https://neofixer.arizona.edu/site/500/$Name$"> NEOfixer information </a> </li>
+# neocp_only 0
 </ul>
 <p>
 <input type = "button" value = "Orbit Simulator View" onclick = "window.open('http://orbitsimulator.com/gravitySimulatorCloud/yr/gsim2023.html?sv,1,$SV$')">
