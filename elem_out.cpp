@@ -158,6 +158,12 @@ int qsort_strcmp( const void *a, const void *b, void *ignored_context);
 uint64_t parse_bit_string( const char *istr);                /* miscell.cpp */
 const char *write_bit_string( char *ibuff, const uint64_t bits,
                                           const size_t max_bitstring_len);
+int save_ephemeris_settings( const ephem_option_t ephemeris_output_options,
+      const int n_steps, const char *obscode, const char *step_size,
+      const char *ephem_start, const char *config);      /* elem_out.cpp */
+int load_ephemeris_settings( ephem_option_t *ephemeris_output_options,
+      int *n_steps, char *obscode, char *step_size, char *ephem_start,
+      const char *config);                               /* elem_out.cpp */
 double generate_mc_variant_from_covariance( double *var_orbit,
                                     const double *orbit);    /* orb_func.c */
 void rotate_state_vector_to_current_frame( double *state_vect,
@@ -3957,6 +3963,43 @@ int set_language( const int language)
       strlcpy_error( month_names[i], tbuff);
       set_month_name( i + 1, month_names[i]);
       }
+   return( 0);
+}
+
+int load_ephemeris_settings( ephem_option_t *ephemeris_output_options,
+      int *n_steps, char *obscode, char *step_size, char *ephem_start,
+      const char *config)
+{
+   char buff[100];
+   const char *settings;
+   int n_found, bytes_read;
+
+   snprintf_err( buff, sizeof( buff), "STORED_EPHEM_%s", config);
+   settings = get_environment_ptr( buff);
+   if( !*settings && !strcmp( config, "F"))  /* factory default: geocentric, */
+      settings = "500 20 10,16 1h +0";    /* 20 one-hour steps starting now  */
+   n_found = sscanf( settings, "%s %d %s %s %n", obscode, n_steps, buff,
+                                                step_size, &bytes_read);
+   assert( n_found == 4 || !n_found);
+   if( n_found < 4)
+      return( -1);
+   *ephemeris_output_options = parse_bit_string( buff);
+   strlcpy_err( ephem_start, settings + bytes_read, 50);
+   return( 0);
+}
+
+int save_ephemeris_settings( const ephem_option_t ephemeris_output_options,
+      const int n_steps, const char *obscode, const char *step_size,
+      const char *ephem_start, const char *config)
+{
+   char buff[150], eph_option_string[256], env_var[25];
+
+   write_bit_string( eph_option_string, ephemeris_output_options,
+                        sizeof( eph_option_string));
+   snprintf_err( env_var, sizeof( env_var), "STORED_EPHEM_%s", config);
+   snprintf_err( buff, sizeof( buff), "%s %d %s %s %s", obscode, n_steps,
+                     eph_option_string, step_size, ephem_start);
+   set_environment_ptr( env_var, buff);
    return( 0);
 }
 

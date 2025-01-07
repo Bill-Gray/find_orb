@@ -255,6 +255,12 @@ int get_orbit_from_mpcorb_sof( const char *object_name, double *orbit,
 int improve_sr_orbits( sr_orbit_t *orbits, OBSERVE FAR *obs,
                const unsigned n_obs, const unsigned n_orbits,  /* orb_func.c */
                const double noise_in_sigmas, const int writing_sr_elems);
+int save_ephemeris_settings( const ephem_option_t ephemeris_output_options,
+      const int n_steps, const char *obscode, const char *step_size,
+      const char *ephem_start, const char *config);      /* elem_out.cpp */
+int load_ephemeris_settings( ephem_option_t *ephemeris_output_options,
+      int *n_steps, char *obscode, char *step_size, char *ephem_start,
+      const char *config);                               /* elem_out.cpp */
 
 #ifdef __cplusplus
 extern "C" {
@@ -937,7 +943,9 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
    double jd_start = 0., jd_end = 0., step = 0.;
    bool show_advanced_options = false;
    int offset_line = 0;
+   char message_to_user[180];
 
+   *message_to_user = '\0';
    while( c > 0)
       {
       int format_start;
@@ -953,6 +961,9 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
       const bool is_topocentric =
                is_topocentric_mpc_code( mpc_code);
 
+      put_colored_text( message_to_user, getmaxy( stdscr) - 1, 0, -1,
+                        COLOR_MESSAGE_TO_USER);
+      *message_to_user = '\0';
       jd_start = 0.;
       format_start = extract_date( ephemeris_start, &jd_start);
       step = get_step_size( ephemeris_step_size, NULL, NULL);
@@ -1192,6 +1203,35 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
          {
          ephemeris_output_options &= ~7;
          ephemeris_output_options |= (c - ALT_0);
+         }
+      else if( c == ALT_A)
+         {                    /* loading configuration */
+         c = inquire( "Hit letter of configuration to load",
+                         NULL, 30, COLOR_MESSAGE_TO_USER);
+         if( c >= 'a' && c <= 'z')
+            {
+            char tstr[2];
+            int err_code;
+
+            tstr[0] = (char)( c + 'A' - 'a');
+            tstr[1] = '\0';
+            snprintf( buff, sizeof( buff), "STORED_EPHEM_%c", c);
+            err_code = load_ephemeris_settings( &ephemeris_output_options, &n_ephemeris_steps,
+                           mpc_code, ephemeris_step_size, ephemeris_start, tstr);
+            snprintf( message_to_user, sizeof( message_to_user),
+                  (err_code ? "Preset %c not found" : "Preset %c loaded"), c);
+            }
+         }
+      else if( c >= CTRL( 'A') && c <= CTRL( 'Z'))
+         {                    /* saving configuration */
+         char tstr[2];
+
+         tstr[0] = (char)( c + 'A' - CTRL( 'A'));
+         tstr[1] = '\0';
+         save_ephemeris_settings( ephemeris_output_options, n_ephemeris_steps,
+                        mpc_code, ephemeris_step_size, ephemeris_start, tstr);
+         snprintf( message_to_user, sizeof( message_to_user),
+                  "Preset %c set to current ephemeris options", c);
          }
       else switch( c)
          {
@@ -2384,6 +2424,7 @@ static void show_one_observation( OBSERVE obs, const int line,
       }
                      /* show corresponding 1s or 0.1s HHMMSS fmt */
    recreate_observation_line( buff, &obs, residual_format);
+   assert( 80 == strlen( buff));
    memmove( buff, buff + dropped_start, strlen( buff + dropped_start) + 1);
    strcat( buff, resid_data);
    if( obs.flags & OBS_IS_SELECTED)
