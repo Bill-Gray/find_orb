@@ -692,7 +692,7 @@ int main( const int argc, const char **argv)
       error_exit( -4);
       }
    fprintf( ofile, "# Made by eph2tle, compiled " __DATE__ " " __TIME__ "\n");
-   fprintf( ofile, "# Run at %s#\n", ctime( &curr_t));
+   fprintf( ofile, "# Run at %.24s UTC\n#\n", asctime( gmtime( &curr_t)));
    if( archival)
       fprintf( ofile, "# No updates     (archival TLEs)\n");
    if( search_dist)

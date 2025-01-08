@@ -2672,7 +2672,8 @@ int write_out_elements_to_file( const double *orbit,
             FILE *ifile = fopen_ext( "mpcorb.hdr", "fcrb");
             time_t t0 = time( NULL);
 
-            fprintf( ofile, "Monte Carlo orbits from Find_Orb\nComputed %s", ctime( &t0));
+            fprintf( ofile, "Monte Carlo orbits from Find_Orb\nComputed %.24s\n",
+                              asctime( gmtime( &t0)));
             fprintf( ofile, "Find_Orb version %s %s\n", __DATE__, __TIME__);
             fprintf( ofile, (using_sr ? "Statistical Ranging\n" : "Full Monte Carlo\n"));
             if( ifile)
