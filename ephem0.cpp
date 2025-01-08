@@ -1929,6 +1929,35 @@ double find_next_auto_step( const double target_diff, const bool going_backward,
    return( rval);
 }
 
+int add_ephemeris_details( FILE *ofile, const double start_jd,
+                                               const double end_jd)
+{
+   time_t t0;
+   char tbuff[128];
+   FILE *ifile;
+   extern const char *elements_filename;
+   const char *vector_options = get_environment_ptr( "VECTOR_OPTS");
+
+   t0 = time( NULL);
+   fprintf( ofile, "\nCreated %s", ctime( &t0));
+
+   full_ctime( tbuff, start_jd, CALENDAR_JULIAN_GREGORIAN);
+   fprintf( ofile, "Ephemeris start: %s\n", tbuff);
+
+   full_ctime( tbuff, end_jd, CALENDAR_JULIAN_GREGORIAN);
+   fprintf( ofile, "Ephemeris end:   %s\n", tbuff);
+
+   fprintf( ofile, "Times are all TDT\n");
+   fprintf( ofile, "Positions/velocities are in %s J2000\n",
+                      atoi( vector_options) ? "ecliptic" : "equatorial");
+
+   ifile = fopen_ext( get_file_name( tbuff, elements_filename), "tfcrb");
+   while( fgets( tbuff, sizeof( tbuff), ifile))
+      fwrite( tbuff, strlen( tbuff), 1, ofile);
+   fclose( ifile);
+   return( 0);
+}
+
 /* A lunar eclipse is said to have an 'eclipse magnitude' U of 0 when the
 umbral phase starts/ends,  and 1 when totality starts/ends.  During
 totality,  the magnitude will be greater than 1.  During the penumbral

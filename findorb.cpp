@@ -196,12 +196,9 @@ int text_search_and_replace( char FAR *str, const char *oldstr,
                                      const char *newstr);   /* ephem0.cpp */
 int sort_obs_by_date_and_remove_duplicates( OBSERVE *obs, const int n_obs);
 double utc_from_td( const double jdt, double *delta_t);     /* ephem0.cpp */
-int create_b32_ephemeris( const char *filename, const double epoch,
-                const double *orbit, const int n_steps,         /* b32_eph.c */
-                const double ephem_step, const double jd_start);
 void fix_home_dir( char *filename);                /* ephem0.cpp */
 int write_environment_pointers( void);             /* mpc_obs.cpp */
-int add_ephemeris_details( FILE *ofile, const double start_jd,  /* b32_eph.c */
+int add_ephemeris_details( FILE *ofile, const double start_jd,  /* ephem0.c */
                                                const double end_jd);
 void set_distance( OBSERVE FAR *obs, double r);             /* orb_func.c */
 void set_statistical_ranging( const int new_using_sr);      /* elem_out.cpp */
@@ -1580,49 +1577,35 @@ static void create_ephemeris( const double *orbit, const double epoch_jd,
 
    if( c == -2)         /* yes,  we're making an ephemeris */
       {
-      if( !strcmp( mpc_code, "32b"))
-         {
-         inquire( ".b32 filename:",
-                               buff, sizeof( buff), COLOR_DEFAULT_INQUIRY);
-         if( *buff)
-            {
-            strcat( buff, ".b32");
-            create_b32_ephemeris( buff, epoch_jd, orbit, n_ephemeris_steps,
-                     atof( ephemeris_step_size), jd_start);    /* b32_eph.c */
-            }
-         }
+      const double *orbits_to_use = orbit;
+      extern const char *ephemeris_filename;
+      unsigned n_orbits = 1;
+      const bool is_observables =
+               ((ephemeris_output_options & 7) == OPTION_OBSERVABLES);
+
+      if( is_observables && (ephemeris_output_options & OPTION_SHOW_SIGMAS))
+         orbits_to_use = set_up_alt_orbits( orbit, &n_orbits);
+      if( ephemeris_in_a_file_from_mpc_code(
+            get_file_name( buff, ephemeris_filename),
+            orbits_to_use, obs, n_obs,
+            epoch_jd, jd_start, ephemeris_step_size,
+            n_ephemeris_steps, mpc_code,
+            ephemeris_output_options, n_orbits))
+         inquire( "Ephemeris generation failed!  Hit any key:", NULL, 0,
+                           COLOR_MESSAGE_TO_USER);
       else
          {
-         const double *orbits_to_use = orbit;
-         extern const char *ephemeris_filename;
-         unsigned n_orbits = 1;
-         const bool is_observables =
-                  ((ephemeris_output_options & 7) == OPTION_OBSERVABLES);
-
-         if( is_observables && (ephemeris_output_options & OPTION_SHOW_SIGMAS))
-            orbits_to_use = set_up_alt_orbits( orbit, &n_orbits);
-         if( ephemeris_in_a_file_from_mpc_code(
-               get_file_name( buff, ephemeris_filename),
-               orbits_to_use, obs, n_obs,
-               epoch_jd, jd_start, ephemeris_step_size,
-               n_ephemeris_steps, mpc_code,
-               ephemeris_output_options, n_orbits))
-            inquire( "Ephemeris generation failed!  Hit any key:", NULL, 0,
-                              COLOR_MESSAGE_TO_USER);
-         else
+         show_a_file( get_file_name( buff, ephemeris_filename),
+                        (is_observables? SHOW_FILE_IS_EPHEM : 0));
+         create_resid_file( obs, n_obs, input_filename, residual_format);
+         make_pseudo_mpec( get_file_name( buff, "mpec.htm"), obj_name);
+         if( ephemeris_output_options
+                  & (OPTION_STATE_VECTOR_OUTPUT | OPTION_POSITION_OUTPUT))
             {
-            show_a_file( get_file_name( buff, ephemeris_filename),
-                           (is_observables? SHOW_FILE_IS_EPHEM : 0));
-            create_resid_file( obs, n_obs, input_filename, residual_format);
-            make_pseudo_mpec( get_file_name( buff, "mpec.htm"), obj_name);
-            if( ephemeris_output_options
-                     & (OPTION_STATE_VECTOR_OUTPUT | OPTION_POSITION_OUTPUT))
-               {
-               FILE *ofile = fopen_ext( ephemeris_filename, "tfca");
+            FILE *ofile = fopen_ext( ephemeris_filename, "tfca");
 
-               add_ephemeris_details( ofile, jd_start, jd_end);
-               fclose( ofile);
-               }
+            add_ephemeris_details( ofile, jd_start, jd_end);
+            fclose( ofile);
             }
          }
       }
