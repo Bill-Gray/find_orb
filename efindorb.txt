@@ -351,6 +351,7 @@
 2060    5 ( ) Comet model (A1, A2, A3)
 2060    6 ( ) Comet model (A1, A2, A3, DT)
 2060    7 ( ) Yarkovsky (A2-only)
+2060    8 ( ) Delta-V
 2060    Cancel
 
 2062    0 ( ) Resids in RA/dec arcsec
@@ -406,3 +407,5 @@
 2095    %d satellite offsets had undeciphered offsets\n
 2096    %d satellite offsets were at the geocenter\n
 2097    %d satellite offsets were inside the earth\n
+
+2099    Enter initial guess for time of delta-V :

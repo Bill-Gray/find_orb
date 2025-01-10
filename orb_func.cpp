@@ -399,6 +399,19 @@ int integrate_orbitl( long double *orbit, const long double t0, const long doubl
 
    assert( fabsl( t0) < 1e+9);
    assert( fabsl( t1) < 1e+9);
+   if( force_model == FORCE_MODEL_DELTA_V)
+      if( (t0 > orbit[9] && t1 < orbit[9]) || (t1 > orbit[9] && t0 < orbit[9]))
+         {                 /* integrate to time of maneuver & add delta-v */
+         size_t i;
+
+         integrate_orbitl( orbit, t0, orbit[9]);
+         for( i = 0; i < 3; i++)
+            if( t0 < t1)      /* integrating forward,  add delta-v; */
+               orbit[i + 3] += orbit[i + 6] * seconds_per_day / AU_IN_METERS;
+            else              /* integrating backward,  subtract it */
+               orbit[i + 3] -= orbit[i + 6] * seconds_per_day / AU_IN_METERS;
+         t = orbit[9];        /* now integrate from maneuver time to t2 */
+         }
    if( use_encke == -1)
       use_encke = atoi( get_environment_ptr( "ENCKE"));
    if( t0 > maximum_jd || t1 > maximum_jd

@@ -3660,7 +3660,8 @@ static int non_grav_menu( char *message_to_user)
    static int models[] = { FORCE_MODEL_NO_NONGRAVS, FORCE_MODEL_SRP,
             FORCE_MODEL_SRP_TWO_PARAM, FORCE_MODEL_SRP_THREE_PARAM,
             FORCE_MODEL_COMET_TWO_PARAM, FORCE_MODEL_COMET_THREE_PARAM,
-            FORCE_MODEL_COMET_FOUR_PARAM, FORCE_MODEL_YARKO_A2 };
+            FORCE_MODEL_COMET_FOUR_PARAM, FORCE_MODEL_YARKO_A2,
+            FORCE_MODEL_DELTA_V };
    const size_t n_models = sizeof( models) / sizeof( models[0]);
 
    while( i < n_models && force_model != models[i])
@@ -5232,8 +5233,21 @@ int main( int argc, const char **argv)
          case '^':
             non_grav_menu( message_to_user);
             if( *message_to_user)      /* new force model selected */
+               {
+               extern int force_model;
+
                for( i = 6; i < n_orbit_params; i++)
                   orbit[i] = 0.;
+               if( force_model == FORCE_MODEL_DELTA_V)
+                  {        /* we need a starting estimate of the maneuver time */
+                  if( !inquire( get_find_orb_text( 2099), tbuff, sizeof( tbuff),
+                            COLOR_DEFAULT_INQUIRY) && *tbuff)
+                     orbit[9] = get_time_from_string( obs->jd, tbuff,
+                             FULL_CTIME_YMD | CALENDAR_JULIAN_GREGORIAN, NULL);
+                  if( orbit[9] < obs->jd || orbit[9] > obs[n_obs - 1].jd)
+                     force_model = FORCE_MODEL_NO_NONGRAVS;
+                  }
+               }
             break;
 #ifndef _WIN32
          case KEY_F(8):     /* show original screens */

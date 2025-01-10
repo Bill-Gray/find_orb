@@ -1,4 +1,4 @@
-   Find_Orb supports (at present) seven different non-gravitational force
+   Find_Orb supports (at present) eight different non-gravitational force
 models.  More may be added later.
 
    'Solar radiation pressure (radial, 1/r^2)' is the simplest : the model
@@ -67,3 +67,11 @@ the various SRP models.  This is basically the same as the 'solar
 radiation pressure (two-parameter)' model, except with A1 constrained to
 be zero.  (In fact, you can set that model, constrain A1=0,  and get
 exactly the same result as with the Yarkovsky (A2-only) model.)
+
+   The 'delta-V' model is used almost entirely for spacecraft,  where you have
+reason to believe that the object had a change of velocity at or near a
+specific time,  and want to determine more precisely when it occurred and the
+direction and amount of the velocity change.  Select this option, and Find_Orb
+will ask for your estimate of when the maneuver occurred. Subsequent
+least-squares fits will determine the time of the maneuver and the components
+of the velocity vector,  in meters per second,  in J2000 ecliptic coordinates.

@@ -915,7 +915,8 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
             oval[i] += asteroid_accel[i];
          }
 
-   if( (n_orbit_params >= 8 && n_orbit_params <= 10) || force_model == FORCE_MODEL_YARKO_A2)
+   if( (n_orbit_params >= 8 && n_orbit_params <= 10 && force_model != FORCE_MODEL_DELTA_V)
+                              || force_model == FORCE_MODEL_YARKO_A2)
       {                  /* Marsden & Sekanina comet formula */
       const ldouble lag = (n_orbit_params == 10 ? ival[9] : 0.);
       const ldouble g = comet_g_func( lagged_dist( ival, jd, lag)) * fraction_illum;

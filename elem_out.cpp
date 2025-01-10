@@ -2101,7 +2101,25 @@ int write_out_elements_to_file( const double *orbit,
                if( showing_sigmas)
                   if( !get_uncertainty( sig_name, sigma_buff + 4, false))
                      format_value_with_sigma( tbuff0, orbit[j + 6], sigma_buff + 4);
-               if( j == 3)
+               if( force_model == FORCE_MODEL_DELTA_V)
+                  {
+                  strlcpy_error( addenda, "T0: ");
+                  if( j < 3)              /* dx, dy, or dz */
+                     {
+                     addenda[0] = 'd';
+                     addenda[1] = 'x' + j;
+                     }
+                  else
+                     {
+                     full_ctime( tbuff0, orbit[9], CALENDAR_JULIAN_GREGORIAN
+                               | FULL_CTIME_YMD | FULL_CTIME_LEADING_ZEROES | FULL_CTIME_MILLIDAYS);
+                     snprintf_append( tbuff0, sizeof( tbuff0), " +/- %s", sigma_buff + 4);
+                     }
+                  strlcat_error( addenda, tbuff0);
+                  if( j == 2)
+                     strlcat_error( addenda, " m/s");
+                  }
+               else if( j == 3)
                   snprintf_err( addenda, sizeof( addenda), "DT: %s", tbuff0);
                else
                   {

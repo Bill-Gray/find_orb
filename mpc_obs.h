@@ -485,6 +485,17 @@ Yarkovsky with A2 (both inverse-square and both one added parameter). */
 #define FORCE_MODEL_COMET_THREE_PARAM  0x03
 #define FORCE_MODEL_COMET_FOUR_PARAM   0x04
 
+/* If we think there was a delta-v,  due to spacecraft maneuver or impact
+or something else,  it can be described in four parameters : three for
+the amount of the delta-V,  and a fourth saying when it happened.  At
+some point,  there will probably be a model with Yet Another Parameter
+so that we can solve for the circumstances of the delta-V _and_ the
+object's area/mass ratio at the same time.  This 'Delta-V plus SRP'
+model has not yet been implemented.    */
+
+#define FORCE_MODEL_DELTA_V            0x204
+#define FORCE_MODEL_DELTA_V_SRP        0x205
+
 /* For some rocks,  Yarkovsky can be modelled as an A2 (along-orbit)
 inverse square force.  */
 
