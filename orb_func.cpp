@@ -2384,11 +2384,15 @@ static int evaluate_limited_orbit( const double *orbit,
                constraints[rval++] = 1. / elem.major_axis - 1. / value;
                break;
             case 'A':            /* area/mass ratio */
-               if( n_orbit_params >= 7)
-                  constraints[rval++] =
-                      10000. * (orbit[6] * SOLAR_GM / SRP1AU - value);
-               if( n_orbit_params > 7)
-                  constraints[rval - 1] *= 100000.;
+               if( force_model != FORCE_MODEL_NO_NONGRAVS
+                                    && force_model != FORCE_MODEL_DELTA_V)
+                  {
+                  if( n_orbit_params >= 7)
+                     constraints[rval++] =
+                         10000. * (orbit[6] * SOLAR_GM / SRP1AU - value);
+                  if( n_orbit_params > 7)
+                     constraints[rval - 1] *= 100000.;
+                  }
                break;
             case '1': case '2': case '3':
                constraints[rval++] = 1e+10 * (orbit[6 + variable - '1'] - value);

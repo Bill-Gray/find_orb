@@ -98,6 +98,7 @@ int parallax_to_lat_alt( const double rho_cos_phi, const double rho_sin_phi,
        double *lat, double *ht_in_meters, const int planet_idx); /* ephem0.c */
 void calc_approx_planet_orientation( const int planet,        /* runge.cpp */
          const int system_number, const double jde, double *matrix);
+void compute_effective_solar_multiplier( const char *constraints);   /* runge.c */
 double geo_potential_in_au( const double x, const double y, const double z,
                  double *derivs, const int n_terms);    /* geo_pot.c */
 double shadow_check( const double *planet_loc,           /* ephem0.cpp */
@@ -821,6 +822,28 @@ static ldouble planet_radius( const int idx)
    return( planet_radius_in_meters( idx) * FUDGE_FACTOR / AU_IN_METERS);
 }
 
+static ldouble solar_multiplier = 1.;
+
+/* If we have constrained an area/mass ratio,  and don't have that as
+a free parameter in the orbit fit,  then the above value will be slightly
+less than 1,  indicating that the object is being slightly pushed away
+from the sun by solar radiation pressure.      */
+
+void compute_effective_solar_multiplier( const char *constraints)
+{
+   extern int force_model;
+   const char *tptr;
+
+   solar_multiplier = 1.;
+   if( constraints)
+      {
+      if( force_model == FORCE_MODEL_NO_NONGRAVS
+               || force_model == FORCE_MODEL_DELTA_V)
+         if( NULL != (tptr = strstr( constraints, "A=")))
+            solar_multiplier = 1. - atof( tptr + 2) * SRP1AU / SOLAR_GM;
+      }
+}
+
 int planet_hit = -1;
 
 int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
@@ -890,6 +913,7 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
       }
 
    solar_accel *= -SOLAR_GM / (r2 * r);
+   solar_accel *= solar_multiplier;
 
    if( perturbers)
       set_relativistic_accel( relativistic_accel, ival);

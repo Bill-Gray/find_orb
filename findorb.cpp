@@ -258,6 +258,7 @@ int save_ephemeris_settings( const ephem_option_t ephemeris_output_options,
 int load_ephemeris_settings( ephem_option_t *ephemeris_output_options,
       int *n_steps, char *obscode, char *step_size, char *ephem_start,
       const char *config);                               /* elem_out.cpp */
+void compute_effective_solar_multiplier( const char *constraints);  /* runge.c */
 
 #ifdef __cplusplus
 extern "C" {
@@ -5601,6 +5602,7 @@ int main( int argc, const char **argv)
                strlcpy_error( orbit_constraints, "e=1,i=72,O=72");
             if( !strcmp( orbit_constraints, "Ma"))
                strlcpy_error( orbit_constraints, "e=1,i=26,O=81"); /* q=.049? */
+            compute_effective_solar_multiplier( orbit_constraints);
             break;
          case 'm': case 'M':
             create_obs_file( obs, n_obs, 0, residual_format);

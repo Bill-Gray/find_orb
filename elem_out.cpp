@@ -93,6 +93,7 @@ int find_best_fit_planet( const double jd, const double *ivect,
                                  double *rel_vect);         /* runge.cpp */
 void find_relative_state_vect( const double jd, const double *ivect,
                double *ovect, const int ref_planet);        /* runge.cpp */
+void compute_effective_solar_multiplier( const char *constraints);   /* runge.c */
 int get_orbit_from_mpcorb_sof( const char *object_name, double *orbit,
              ELEMENTS *elems, const double full_arc_len, double *max_resid);
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
@@ -3575,6 +3576,7 @@ OBSERVE FAR *load_object( FILE *ifile, OBJECT_INFO *id,
       excluded_asteroid_number = atoi( id->obj_name + 1);      /* itself */
    else
       excluded_asteroid_number = 0;
+   compute_effective_solar_multiplier( NULL);
    if( n_obs_actually_loaded > 0)
       {
       const int got_vector = fetch_previous_solution( obs, id->n_obs, orbit,
