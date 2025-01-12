@@ -7,7 +7,7 @@
 
 all: find_orb.exe fo.exe
 
-OBJS=ades_out.obj b32_eph.obj bc405.obj bias.obj collide.obj   \
+OBJS=ades_out.obj bc405.obj bias.obj collide.obj   \
   conv_ele.obj details.obj eigen.obj elem2tle.obj elem_out.obj  \
   elem_ou2.obj ephem0.obj errors.obj expcalc.obj gauss.obj  \
   geo_pot.obj healpix.obj lsquare.obj miscell.obj  \
