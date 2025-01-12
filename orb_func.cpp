@@ -1723,7 +1723,7 @@ int get_sr_orbits( sr_orbit_t *orbits, OBSERVE FAR *obs,
          tptr++;
          }
       }
-   rval = tptr - orbits;
+   rval = (unsigned)( tptr - orbits);
    qsort( orbits, rval, sizeof( sr_orbit_t), sr_orbit_compare);
    if( writing_sr_elems)
       for( i = 0; i < rval; i++)
