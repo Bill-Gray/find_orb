@@ -45,7 +45,6 @@ FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 char *fgets_trimmed( char *buff, size_t max_bytes, FILE *ifile); /*elem_out.c*/
 double utc_from_td( const double jdt, double *delta_t);     /* ephem0.cpp */
 char *iso_time( char *buff, const double jd, const int precision);   /* elem_out.c */
-int get_satellite_offset( const char *iline, double *xyz);  /* mpc_obs.cpp */
 int text_search_and_replace( char FAR *str, const char *oldstr,
                                      const char *newstr);   /* ephem0.cpp */
 double original_observed_ra( const OBSERVE *obs);     /* ephem0.cpp */

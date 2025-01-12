@@ -903,118 +903,6 @@ static int get_observer_data_latlon( const char FAR *mpc_code,
    return( rval);
 }
 
-/*   The offset between a satellite observation and the earth or sun    */
-/* is stored in a second line,  as described at                         */
-/* https://www.minorplanetcenter.net/iau/info/SatelliteObs.html         */
-/*    This format allows parallax type '1' in kilometers or type '2'    */
-/* in AU.  If the input file contains the line '#relax_xyz',  Find_Orb  */
-/* is less picky about where decimal points and +/- signs appear.       */
-/* (It used to insist that the field be "filled out" with digits,  but  */
-/* at least some records contain lower precision positions.  Thus far,  */
-/* the ones I've seen still had enough digits to match the precision of */
-/* the instrument,  so I'm letting "short" records slide if they're     */
-/* only lacking three or fewer places.)                                 */
-
-#define SATELL_COORD_ERR_NO_ERROR            0
-#define SATELL_COORD_ERR_BAD_SIGN           -1
-#define SATELL_COORD_ERR_BAD_NUMBER         -2
-#define SATELL_COORD_ERR_NO_DECIMAL         -3
-#define SATELL_COORD_ERR_DECIMAL_MISPLACED  -4
-#define SATELL_COORD_ERR_UNKNOWN_OFFSET     -5
-#define SATELL_COORD_ERR_EXACTLY_ZERO       -6
-#define SATELL_COORD_ERR_INSIDE_EARTH       -7
-
-#define N_SATELL_COORD_ERRORS                8
-
-static bool strict_sat_xyz_format = true;
-
-inline double get_satellite_coordinate( const char *iptr, int *decimal_loc)
-{
-   char tbuff[12];
-   const char sign_byte = *iptr;
-   double rval = 0.;
-
-   memcpy( tbuff, iptr, 11);
-   tbuff[11] = '\0';
-   if( !strict_sat_xyz_format)
-      {
-      rval = atof( tbuff + 1);
-      if( sign_byte == '-')
-         rval = -rval;
-      *decimal_loc = 0;
-      }
-   else if( sign_byte != '+' && sign_byte != '-')
-      {
-      *decimal_loc = SATELL_COORD_ERR_BAD_SIGN;
-      rval = atof( tbuff);
-      }
-   else
-      {
-      char *tptr;
-      int n_bytes_read;
-
-      if( sscanf( tbuff + 1, "%lf%n", &rval, &n_bytes_read) != 1
-                     || n_bytes_read < 7)
-         *decimal_loc = SATELL_COORD_ERR_BAD_NUMBER;
-      else if( (tptr = strchr( tbuff, '.')) == NULL)
-         *decimal_loc = SATELL_COORD_ERR_NO_DECIMAL;
-      else
-         *decimal_loc = (int)( tptr - tbuff);
-      if( sign_byte == '-')
-         rval = -rval;
-      if( *decimal_loc <= 0)
-         debug_printf( "decimal loc %d: '%s', n_bytes_read %d\n", *decimal_loc,
-                           tbuff, n_bytes_read);
-      }
-   return( rval);
-}
-
-int get_satellite_offset( const char *iline, double *xyz)
-{
-   size_t i;
-   int error_code = 0;
-   const int observation_units = (int)iline[32] - '0';
-   double r2 = 0., min_radius;
-
-   assert( 80 == strlen( iline));
-   if( !strcmp( iline + 77, "275"))   /* geocentric occultation observations */
-      min_radius = 0.;       /* can have offsets inside the earth; */
-   else                      /* others should be outside the atmosphere */
-      min_radius = 1.01 * EARTH_RADIUS_IN_AU;
-   for( i = 0; i < 3; i++)    /* in case of error,  use 0 offsets */
-      xyz[i] = 0.;
-   iline += 34;      /* this is where the offsets start */
-   for( i = 0; i < 3; i++, iline += 12)
-      {
-      int decimal_loc;
-
-      xyz[i] = get_satellite_coordinate( iline, &decimal_loc);
-      if( decimal_loc < 0 && !error_code)
-         error_code = decimal_loc;
-      if( observation_units == 1)         /* offset given in km */
-         {
-         xyz[i] /= AU_IN_KM;
-         if( strict_sat_xyz_format && !error_code)
-            if( decimal_loc < 6 || decimal_loc > 8)
-               error_code = SATELL_COORD_ERR_DECIMAL_MISPLACED;
-         if( !error_code && xyz[i] == 0.)
-            error_code = SATELL_COORD_ERR_EXACTLY_ZERO;
-         }
-      else if( observation_units == 2)          /* offset in AU */
-         {                         /* offset must be less than 100 AU */
-         if( strict_sat_xyz_format && !error_code)
-            if( decimal_loc != 2 && decimal_loc != 3)
-               error_code = SATELL_COORD_ERR_DECIMAL_MISPLACED;
-         }
-      else if( !error_code)      /* don't know about this sort of offset */
-         error_code = SATELL_COORD_ERR_UNKNOWN_OFFSET;
-      r2 += xyz[i] * xyz[i];
-      }
-   if( !error_code && r2 < min_radius * min_radius)
-      error_code = SATELL_COORD_ERR_INSIDE_EARTH;
-   equatorial_to_ecliptic( xyz);
-   return( error_code);
-}
 
 /* Used in part for sanity checks ("is the observed RA/dec above the
    horizon?  Is the sun _below_ the horizon at that time?")  Either
@@ -3995,8 +3883,6 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
             including_obs = true;
          else if( !memcmp( buff, "#toffset", 7))
             observation_time_offset = atof( buff + 8) / seconds_per_day;
-         else if( !memcmp( buff, "#relax_xyz", 10))
-            strict_sat_xyz_format = false;
          else if( !memcmp( buff, "#interstellar", 12))
             is_interstellar = 1;
          else if( !memcmp( buff, "#time ", 6))
