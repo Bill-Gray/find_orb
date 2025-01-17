@@ -2588,6 +2588,7 @@ int write_out_elements_to_file( const double *orbit,
       {
       char time_buff[40];
       bool nongrav_sigmas_found = false;
+      double output_a;
 
       snprintf_err( tbuff, 80, "#  $Name=%s", object_name);
       text_search_and_replace( tbuff + 4, " ", "%20");
@@ -2605,8 +2606,11 @@ int write_out_elements_to_file( const double *orbit,
       snprintf_err( tbuff, 80, "#  $ecc=%.7f  $Eqnx=2000.", helio_elem.ecc);
       fprintf( ofile, "%s\n", tbuff);
 
+      output_a = helio_elem.major_axis;
+      if( fabs( output_a) > 1000000.)
+         output_a = 1000000.;       /* near-parabolic case */
       snprintf_err( tbuff, 80, "#  $a=%.7f  $Peri=%.5f  $Node=%.5f",
-                  helio_elem.major_axis,
+                  output_a,
                   centralize_ang( helio_elem.arg_per) * 180. / PI,
                   centralize_ang( helio_elem.asc_node) * 180. / PI);
       snprintf_append( tbuff, tbuff_size, "  $Incl=%.5f",
