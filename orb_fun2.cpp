@@ -854,7 +854,7 @@ int write_excluded_observations_file( const OBSERVE *obs, int n_obs)
             char time_buff[80];
 
             full_ctime( time_buff, current_jd( ), FULL_CTIME_YMD);
-            fprintf( ofile, "# %s Banned obs file written %s\n",
+            fprintf( ofile, "# %s Banned obs file written %s UTC\n",
                            reduced_desig, time_buff);
             }
          n_excluded++;
