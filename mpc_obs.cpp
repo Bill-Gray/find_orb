@@ -3323,7 +3323,7 @@ have to be given. */
 
 static inline int extract_ades_sigmas( const char *buff,
          double *posn1, double *posn2, double *theta,
-         double *mag_sigma, double *time_sigma)
+         double *mag_sigma, double *time_sigma, double *unc_time)
 {
    int loc, rval = -1;
 
@@ -3355,6 +3355,9 @@ static inline int extract_ades_sigmas( const char *buff,
       tptr = strstr( buff + loc, "t:");
       if( tptr)
          *time_sigma = atof( tptr + 2) / seconds_per_day;
+      tptr = strstr( buff + loc, "u:");
+      if( tptr)
+         *unc_time   = atof( tptr + 2) / seconds_per_day;
       }
    if( rval)
       debug_printf( "Malformed ADES sigma: '%s'\n", buff);
@@ -3459,6 +3462,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
    double override_posn_sigma_theta = 0., ades_posn_sigma_theta = 0.;
    double override_mag_sigma = 0., ades_mag_sigma = 0.;   /* in mags */
    double override_time_sigma = 0., ades_time_sigma = 0.;  /* in seconds */
+   double unc_time = 0.;
             /* We distinguish between observations that are complete clones */
             /* of each other,  and those with the same time, RA/dec, MPC    */
             /* code, and magnitude,  but which differ someplace else.       */
@@ -3782,6 +3786,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
 //             else if( rval[i].note2 != 'X')
 //                insufficient_precision |= INSUFFICIENT_PRECISION_POSN2;
                rval[i].posn_sigma_theta = posn_sigma_theta;
+               rval[i].unc_time = unc_time;
                if( !including_obs)
                   rval[i].is_included = 0;
                if( apply_debiasing)
@@ -3816,7 +3821,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
       if( is_in_range( jd) && buff[14] != 'S')     /* Sigmas from ADES or Dave Tholen apply to only */
          {                 /* one observation.  Zero 'em out after that use : */
          ades_posn_sigma_1 = ades_posn_sigma_2 = ades_mag_sigma = 0.;
-         ades_posn_sigma_theta = ades_time_sigma = 0.;
+         ades_posn_sigma_theta = ades_time_sigma = unc_time = 0.;
          }
       override_time = 0.;
       override_ra = override_dec = override_mag = -100.;
@@ -3826,6 +3831,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                /* indicate 1/sigma arcseconds.                             */
       if( *buff == '#')
          {
+
          if( !memcmp( buff, "#Weight ", 8))
             {
             override_posn_sigma_1 = override_posn_sigma_2 = 1. / atof( buff + 8);
@@ -3854,7 +3860,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
             extract_ades_sigmas( buff + 8, &ades_posn_sigma_1,
                         &ades_posn_sigma_2,
                         &ades_posn_sigma_theta,
-                        &ades_mag_sigma, &ades_time_sigma);
+                        &ades_mag_sigma, &ades_time_sigma, &unc_time);
          else if( !memcmp( buff, "#Mag sigma ", 11))
             override_mag_sigma = atof( buff + 11);
          else if( !memcmp( buff, "#Time sigma ", 12))
@@ -5435,6 +5441,9 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
             *buff = '\0';
          snprintf_append( buff, buffsize, "time sigma %g",
                           optr->time_sigma * seconds_per_day);
+         if( optr->unc_time)
+            snprintf_append( buff, buffsize, "  uncTime %g",
+                          optr->unc_time * seconds_per_day);
          if( optr->ra_bias || optr->dec_bias)
              snprintf_append( buff, buffsize, "  %cRA bias %.3f\" dec bias %.3f\"%c",
                            (apply_debiasing ? ' ' : '['),

@@ -26,6 +26,7 @@ OBSERVE
    double posn_sigma_theta;   /* tilt angle of uncertainty ellipse */
    double mag_sigma;
    double time_sigma;         /* in days */
+   double unc_time;           /* uncTime (semi-systematic timing err) in days */
    double computed_mag;
    double ra_bias, dec_bias;     /* in arcseconds */
    char *second_line;
