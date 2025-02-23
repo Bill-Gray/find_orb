@@ -6682,7 +6682,9 @@ int main( int argc, const char **argv)
                   if( button & REPORT_MOUSE_POSITION)
                      c = 0;         /* ignore mouse moves */
                   }
-               } while( !c);
+               else if( KEY_RESIZE == c)
+                  show_splash_screen( );
+               } while( !c || KEY_RESIZE == c);
             break;
          case ALT_Y:
             {
