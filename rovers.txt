@@ -173,7 +173,6 @@ Luc !   0.0000       0.00000   +0.00000    @-2 Lucy
 SoO !   0.0000       0.00000   +0.00000    @-2 Solar Orbiter
 PSP !   0.0000       0.00000   +0.00000    @-2 Parker Space Probe
 Cas !   0.0000       0.00000   +0.00000    @-2 Cassini
-JWT !   0.0000       0.00000   +0.00000    @-2 James Webb Space Telescope
 MEx !   0.0000       0.00000   +0.00000    @-2 Mars Express
 Goe !   0.0000       0.00000   +0.00000    @-2 GOES-19
 
