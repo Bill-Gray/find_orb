@@ -2104,6 +2104,8 @@ int write_out_elements_to_file( const double *orbit,
                      format_value_with_sigma( tbuff0, orbit[j + 6], sigma_buff + 4);
                if( force_model == FORCE_MODEL_DELTA_V)
                   {
+                  size_t k;
+
                   strlcpy_error( addenda, "T0: ");
                   if( j < 3)              /* dx, dy, or dz */
                      {
@@ -2119,6 +2121,9 @@ int write_out_elements_to_file( const double *orbit,
                   strlcat_error( addenda, tbuff0);
                   if( j == 2)
                      strlcat_error( addenda, " m/s");
+                  for( k = 0; addenda[k]; k++)
+                     while( addenda[k] == ' ' && addenda[k + 1] == ' ')
+                        memmove( addenda + k, addenda + k + 1, strlen( addenda + k));
                   }
                else if( j == 3)
                   snprintf_err( addenda, sizeof( addenda), "DT: %s", tbuff0);
