@@ -1165,11 +1165,11 @@ static bool try_artsat_xdesig( char *name)
       slen = strlen( name);
       if( max_out > slen)
          while( !found_a_match && fgets( tbuff, sizeof( tbuff), ifile))
-            if( !memcmp( tbuff + 20, name, slen) && tbuff[slen + 20] == ' ')
+            if( !memcmp( tbuff + 30, name, slen) && tbuff[slen + 30] == ' ')
                {
                found_a_match = true;
                snprintf_append( name, max_out - slen, " = NORAD %.5s = %.28s",
-                        tbuff + 1, tbuff + 48);
+                        tbuff + 1, tbuff + 58);
                remove_trailing_cr_lf( name);
                }
       fclose( ifile);
