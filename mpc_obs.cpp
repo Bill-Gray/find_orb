@@ -5196,8 +5196,8 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
    const double earth_sun = vector3_length( optr->obs_posn);
 
    *buff = '\0';
-   if( buffsize > 100)      /* no line should be larger than this, */
-      buffsize = 100;       /* even if the buffer does have room for it */
+   if( buffsize > 110)      /* no line should be larger than this, */
+      buffsize = 110;       /* even if the buffer does have room for it */
    switch( line_number)
       {
       case 0:
@@ -5369,8 +5369,10 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
 
                snprintf_err( sig1_buff, sizeof( sig1_buff), "%.6f", optr->posn_sigma_1);
                remove_insignificant_digits( sig1_buff);
+               strip_trailing_zeroes( sig1_buff);
                snprintf_err( sig2_buff, sizeof( sig2_buff), "%.6f", optr->posn_sigma_2);
                remove_insignificant_digits( sig2_buff);
+               strip_trailing_zeroes( sig2_buff);
                if( strcmp( sig1_buff, sig2_buff))
                   {
                   strlcat_err( sig1_buff, "x", sizeof( sig1_buff));
