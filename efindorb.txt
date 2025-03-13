@@ -383,8 +383,8 @@
 2070    3 ( ) Times in MJD DDDDD.DDDDDD
 2070    Cancel
 
-2074    Temporary designations must include only alphanumeric characters.
-2074    The designation '%s' would be rejected by MPC.
+2074    Temporary designations must include only alphanumeric characters or
+2074    '-' or underscores.  The designation '%s' would be rejected by MPC.
 
 2076    Clipboard is empty!
 

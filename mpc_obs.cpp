@@ -1677,6 +1677,8 @@ int object_type;
 int find_fcct_biases( const double ra, const double dec, const char catalog,
                  const double jd, double *bias_ra, double *bias_dec);
 
+#define valid_temp_desig_char( c)  (isalnum( c) || '-' == (c) || '_' == (c))
+
 static int parse_observation( OBSERVE FAR *obs, const char *buff)
 {
    unsigned time_format;
@@ -1702,7 +1704,7 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
       {
       size_t i = 7;
 
-      while( i < 12 && isalnum( buff[i]))
+      while( i < 12 && valid_temp_desig_char( buff[i]))
          i++;
       while( i < 12 && buff[i] == ' ')
          i++;
