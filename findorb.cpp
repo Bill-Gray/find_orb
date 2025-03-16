@@ -368,9 +368,9 @@ is commented out by default. */
 #ifdef __WATCOMC__
 #undef endwin
 extern "C" {
-PDCEX  int     endwin_u64_4302(void);
+PDCEX  int     endwin_u64_4400(void);
 }
-#define endwin endwin_u64_4302
+#define endwin endwin_u64_4400
 #endif
 
 static int full_endwin( void)
