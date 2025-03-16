@@ -53,7 +53,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 int snprintf( char *string, const size_t max_len, const char *format, ...);
 #endif
 
-#ifdef __WATCOMC__
+#if( __cplusplus < 201103L)
+         /* i.e.,  pre-C99 or pre-C++11 standard,  lacking long double funcs */
 #define sqrtl sqrt
 #define powl pow
 #define fabsl fabs

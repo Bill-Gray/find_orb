@@ -180,9 +180,9 @@ int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
 #endif
 ;
 
-/* Old MSVCs and OpenWATCOM lack erf() and many other math functions: */
+/* erf() and many other math functions were added in C++11. */
 
-#if defined( _MSC_VER) && (_MSC_VER < 1800) || defined( __WATCOMC__)
+#if( __cplusplus < 201103L)
 double erf( double x);     /* orb_fun2.cpp */
 #endif
 

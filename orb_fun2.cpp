@@ -530,9 +530,10 @@ https://en.wikipedia.org/wiki/Error_function#Approximation_with_elementary_funct
 
    As described at the second link,  this has maximum error of 1.5x10^-7.
 (Which isn't a problem here,  but some caution would be appropriate.)
-It's only used in early MSVCs which lack erf(),  and in OpenWATCOM.  */
+This is for older compilers lacking the C99 or C++11 standard erf(),
+such as OpenWATCOM and some early MSVCs.  */
 
-#if defined( _MSC_VER) && (_MSC_VER < 1800) || defined( __WATCOMC__)
+#if( __cplusplus < 201103L)
 double erf( double x)
 {
     const double a1 = 0.254829592, a2 = -0.284496736, a3 = 1.421413741;

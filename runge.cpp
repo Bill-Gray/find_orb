@@ -36,7 +36,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 
 #define ldouble long double
 
-#if defined( __WATCOMC__) || defined( __FreeBSD__)
+      /* The following were added in C99 and C++11.  If that's not */
+      /* the version in use,  fall back on 'traditional' functions. */
+#if( __cplusplus < 201103L)
 #define ceill ceil
 #define expl exp
 #define fabsl fabs
