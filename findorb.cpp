@@ -3214,8 +3214,11 @@ static inline int initialize_curses( const int argc, const char **argv)
 
    char xterm_256color_name[20];
 
+   screen_ptr = NULL;
    strlcpy_error( xterm_256color_name, "xterm-256color");
-   if( force_eight_color_mode || !(screen_ptr = newterm( xterm_256color_name, stdout, stdin)))
+   if( !force_eight_color_mode)
+      screen_ptr = newterm( xterm_256color_name, stdout, stdin);
+   if( !screen_ptr)
       screen_ptr = newterm( NULL, stdout, stdin);
 #endif
    if( debug_level > 2)
@@ -3563,7 +3566,6 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
             free( prev_files);
             *err_buff = '\0';    /* signals 'cancel' */
             return( NULL);
-            break;
          }
       }
    if( !*ifilename)
