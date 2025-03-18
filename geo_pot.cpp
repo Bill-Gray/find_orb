@@ -32,16 +32,8 @@ double geo_potential_in_au( const double x, const double y, const double z,
 
 #define PI 3.1415926535897932384626433832795028841971693993751058209749445923
 
-#if( __cplusplus < 201103L)
-static long double sqrtl( const long double ival)
-{            /* Pre-C++11 lacked sqrtl().  This is a workaround. */
-   assert( ival > 0.);
-   return( (long double)sqrt( (double)ival));
-}
-#endif
-
 #ifdef __WATCOMC__
-      /* OpenWATCOM allows smallish stacks. */
+#define sqrtl sqrt
 #define N_TERMS 10
 #else
    /* Everyplace else,  we can go with a lot of spherical harmonic

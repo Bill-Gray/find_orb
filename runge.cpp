@@ -36,15 +36,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 
 #define ldouble long double
 
-      /* The following were added in C99 and C++11.  If that's not */
-      /* the version in use,  fall back on 'traditional' functions. */
-#if( __cplusplus < 201103L)
-#define ceill ceil
-#define expl exp
-#define fabsl fabs
-#define isnanl isnan
-#define powl pow
-#define sqrtl sqrt
+      /* OpenWATCOM lacks all long double functions. */
+#ifdef __WATCOMC__
+#define expl      exp
+#define fabsl     fabs
+#define powl      pow
+#define sqrtl     sqrt
 #endif
 
 /* perturbers
@@ -867,19 +864,19 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
    assert( fabsl( jd) < 1e+9);
 #if !defined( _WIN32) && !defined( __APPLE__)
    for( i = 0; i < 6; i++)
-      if( isnanl( ival[i]))
+      if( isnan( (double)ival[i]))
          {
          debug_printf( "Bad derivs; jd %Lf; ref %d\n", jd, reference_planet);
          debug_printf( "%Lf %Lf %Lf\n", ival[0], ival[1], ival[2]);
          debug_printf( "%Lf %Lf %Lf\n", ival[3], ival[4], ival[5]);
          assert( 0);
          }
-   assert( !isnanl( ival[0]));
-   assert( !isnanl( ival[1]));
-   assert( !isnanl( ival[2]));
-   assert( !isnanl( ival[3]));
-   assert( !isnanl( ival[4]));
-   assert( !isnanl( ival[5]));
+   assert( !isnan( (double)ival[0]));
+   assert( !isnan( (double)ival[1]));
+   assert( !isnan( (double)ival[2]));
+   assert( !isnan( (double)ival[3]));
+   assert( !isnan( (double)ival[4]));
+   assert( !isnan( (double)ival[5]));
 #endif
    oval[0] = ival[3];
    oval[1] = ival[4];
@@ -949,7 +946,7 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
       ldouble transverse[3], dot_prod = 0.;
 
 #if !defined( _WIN32) && !defined( __APPLE__)
-      assert( !isnanl( g));
+      assert( !isnan( (double)g));
 #endif
       memcpy( transverse, ival + 3, 3 * sizeof( ldouble));
       for( i = 0; i < 3; i++)
