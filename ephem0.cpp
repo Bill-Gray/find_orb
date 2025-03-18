@@ -3591,11 +3591,10 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
 
                   alt_in_meters = find_lat_lon_alt( utc, geo, cinfo->planet, lat_lon,
                            *get_environment_ptr( "GEOMETRIC_GROUND_TRACK") == '1');
-                  snprintf( tbuff, 30, "%9.4f %+08.4f %10.3f",
+                  snprintf( tbuff, 30, "%9.4f %+08.4f %10.2f",
                         lat_lon[0] * 180. / PI,
                         lat_lon[1] * 180. / PI,
                         alt_in_meters / meters_per_km);
-                  tbuff[29] = '\0';
                   strlcat_error( alt_buff, tbuff);
                   strlcat_error( buff, tbuff);
                   }
