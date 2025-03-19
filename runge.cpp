@@ -979,7 +979,7 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
          if( ((local_perturbers >> i) & 1)
                    && !((excluded_perturbers >> i) & 1))
             {
-            double planet_loc[15], accel[3], mass_to_use = planet_mass[i];
+            double planet_loc[3], accel[3], mass_to_use = planet_mass[i];
 
             r = r2 = 0.;
             if( i >= IDX_IO)       /* Galileans,  Titan */
@@ -1000,21 +1000,19 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
                rotate_vector( sat_loc, mean_obliquity( t_years / 100.), 0);
                                  /* then to equatorial J2000: */
                setup_precession( matrix, 2000. + t_years, 2000.);
-               precess_vector( matrix, sat_loc, planet_loc + 12);
+               precess_vector( matrix, sat_loc, planet_loc);
                                  /* then to ecliptic J2000: */
-               equatorial_to_ecliptic( planet_loc + 12);
+               equatorial_to_ecliptic( planet_loc);
                for( j = 0; j < 3; j++)
                   {
                   double coord;
 
                   if( i >= IDX_TETHYS)         /* Saturnian */
-                     coord = saturn_loc[j] + planet_loc[12 + j];
+                     coord = saturn_loc[j] + planet_loc[j];
                   else
-                     coord = jupiter_loc[j] + planet_loc[12 + j] * JUPITER_R;
-                  r2 += coord * coord;
-                  planet_loc[12 + j] = coord;
+                     coord = jupiter_loc[j] + planet_loc[j] * JUPITER_R;
+                  planet_loc[j] = coord;
                   }
-               planet_loc[2] = sqrt( r2);
                }
             else
                {
@@ -1029,23 +1027,18 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
                   }
                else
                   planet_posn( i, jd, planet_loc);
-
-               for( j = 0; j < 3; j++)
-                  r2 += planet_loc[j] * planet_loc[j];
-               memcpy( planet_loc + 12, planet_loc, 3 * sizeof( double));
-               planet_loc[2] = sqrt( r2);
                }
 
             for( j = 0; j < 3; j++)
                {
-               accel[j] = ival[j] - planet_loc[12 + j];
+               accel[j] = ival[j] - planet_loc[j];
                r += accel[j] * accel[j];
                }
             r = sqrt( r);
 
             if( i == IDX_JUPITER)
                {
-               memcpy( jupiter_loc, planet_loc + 12, 3 * sizeof( double));
+               memcpy( jupiter_loc, planet_loc, 3 * sizeof( double));
                if( r < GALILEAN_LIMIT)
                   local_perturbers |= (15 << 11);
                else     /* "throw" Galileans into Jupiter: */
@@ -1054,7 +1047,7 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
 
             if( i == IDX_SATURN)
                {
-               memcpy( saturn_loc, planet_loc + 12, 3 * sizeof( double));
+               memcpy( saturn_loc, planet_loc, 3 * sizeof( double));
                if( r < TITAN_LIMIT)
                   local_perturbers |= (31 << 15);
                else        /* "throw" saturn's satellites into the primary: */
@@ -1139,7 +1132,7 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
                   equatorial_to_ecliptic( vel);
                   for( j = 0; j < 3; j++)
                      {
-                     const double earth_vel = (earth_loc[j] - planet_loc[j + 12]) / dt;
+                     const double earth_vel = (earth_loc[j] - planet_loc[j]) / dt;
 
                      vel[j] += earth_vel - oval[j];       /* in AU/day */
                      vel[j] *= AU_IN_METERS / seconds_per_day;  /* cvt to m/s */
@@ -1184,23 +1177,21 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
 
                   get_planet_posn_vel( jd, reference_planet, planet_posn, NULL);
                   for( j = 0; j < 3; j++)
-                     planet_loc[j + 12] -= planet_posn[j];
-                  r = vector3_length( planet_loc + 12);
+                     planet_loc[j] -= planet_posn[j];
                   }
-               else
-                  r = planet_loc[2];
+               r = vector3_length( planet_loc);
                if( r)
                    r = -SOLAR_GM * mass_to_use / (r * r * r);
                for( j = 0; j < 3; j++)
-                  oval[j + 3] += r * planet_loc[j + 12];
+                  oval[j + 3] += r * planet_loc[j];
                }
             else        /* subtract sun's attraction to reference planet */
                {
-               r = planet_loc[2];
+               r = vector3_length( planet_loc);
                if( r)
                    r = SOLAR_GM / (r * r * r);
                for( j = 0; j < 3; j++)
-                  oval[j + 3] += r * planet_loc[j + 12];
+                  oval[j + 3] += r * planet_loc[j];
                }
             }
    if( planet_hit != -1)
