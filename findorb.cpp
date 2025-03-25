@@ -873,8 +873,9 @@ static void select_angular_motion_units( void)
       }
    c = inquire( buff, NULL, 0, COLOR_DEFAULT_INQUIRY);
    if( c >= '0' && c < '9')
-      c += KEY_F( 1) - '1';
-   c -= KEY_F( 0);
+      c -= '0';
+   else
+      c -= KEY_F( 1);
    if( c >= 0)
       {
       tptr = buff;
