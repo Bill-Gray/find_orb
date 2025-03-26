@@ -27,6 +27,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include <unistd.h>
 #endif
 #include "watdefs.h"
+#include "pl_cache.h"
 #include "lunar.h"
 #include "afuncs.h"
 #include "comets.h"
@@ -1217,36 +1218,39 @@ int calc_derivatives( const double jd, const double *ival, double *oval,
    return( rval);
 }
 
+int earth_lunar_vel( const double jd, double FAR *earth_loc, double FAR *lunar_loc);
+
 int get_planet_posn_vel( const double jd, const int planet_no,
                      double *posn, double *vel)
 {
    assert( fabs( jd) < 1e+9);
-   if( posn)
+   if( !planet_no)
       {
-      if( !planet_no)       /* sun doesn't move in the heliocentric frame */
+      if( posn)       /* sun doesn't move in the heliocentric frame */
          memset( posn, 0, 3 * sizeof( double));
-      else if( planet_no == 3)
-         earth_lunar_posn( jd, posn, NULL);
-      else if( planet_no == 10)
-         earth_lunar_posn( jd, NULL, posn);
-      else
-         planet_posn( planet_no, jd, posn);
-      }
-   if( vel)
-      {
-      if( !planet_no)       /* sun doesn't move in the heliocentric frame */
+      if( vel)
          memset( vel, 0, 3 * sizeof( double));
-      else
-         {
-         int i;
-         double loc1[3], loc2[3];
-         const double delta = 1. / minutes_per_day;    /* one minute delta... */
-
-         get_planet_posn_vel( jd + delta, planet_no, loc2, NULL);
-         get_planet_posn_vel( jd - delta, planet_no, loc1, NULL);
-         for( i = 0; i < 3; i++)
-            vel[i] = (loc2[i] - loc1[i]) / (2. * delta);
-         }
+      }
+   else if( planet_no == 3)
+      {
+      if( posn)
+         earth_lunar_posn( jd, posn, NULL);
+      if( vel)
+         earth_lunar_vel( jd, vel, NULL);
+      }
+   else if( planet_no == 10)
+      {
+      if( posn)
+         earth_lunar_posn( jd, NULL, posn);
+      if( vel)
+         earth_lunar_vel( jd, NULL, vel);
+      }
+   else
+      {
+      if( posn)
+         planet_posn( planet_no, jd, posn);
+      if( vel)
+         planet_posn( planet_no + PLANET_POSN_VELOCITY_OFFSET, jd, vel);
       }
    return( 0);
 }
