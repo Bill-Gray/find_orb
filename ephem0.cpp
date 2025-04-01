@@ -358,6 +358,20 @@ planets as well. */
 double find_lat_lon_alt( const double ut, const double *ivect,
                   const int planet_no, double *lat_lon, const bool geometric);
 
+double seconds_per_time_unit_symbol( const char *symbol)
+{
+   size_t i;
+   const char *units = "smhdwy";
+   const double rvals[6] = { 1., 60., seconds_per_hour, seconds_per_day,
+               7. * seconds_per_day, 365.25 * seconds_per_day };
+
+   for( i = 0; units[i]; i++)
+      if( *symbol == units[i])
+         return( rvals[i]);
+   assert( 0);
+   return 0.;
+}
+
 /* 'get_step_size' parses input text to get a step size in days,  so that */
 /* '4h' becomes .16667 days,  '30m' becomes 1/48 day,  and '10s' becomes  */
 /* 10/(24*60*60) days.  The units (days, hours, minutes,  or seconds) are */
@@ -404,26 +418,7 @@ double get_step_size( const char *stepsize, char *step_units, int *step_digits)
          units = tolower( units);
          if( step_units)
             *step_units = units;
-         switch( units)
-            {
-            case 'd':
-               break;
-            case 'h':
-               step /= hours_per_day;
-               break;
-            case 'm':
-               step /= minutes_per_day;
-               break;
-            case 's':
-               step /= seconds_per_day;
-               break;
-            case 'w':
-               step *= 7.;
-               break;
-            case 'y':
-               step *= 365.25;
-               break;
-            }
+         step *= seconds_per_time_unit_symbol( &units) / seconds_per_day;
          }
    return( step);
 }
@@ -1379,20 +1374,29 @@ static inline void clean_up_json_number( char *out_text)
 static double get_motion_unit_text( char *obuff)
 {
    double motion_units = 1.;
+   const char *units_set = get_environment_ptr( "MOTION_UNITS");
 
-   strlcpy_err( obuff, get_environment_ptr( "MOTION_UNITS"), 6);
-   if( !*obuff)
-      strlcpy_err( obuff, "'/hr", 6);
-   if( *obuff == '"')
-      motion_units = 60.;
-   else if( *obuff == 'd')
-      motion_units = 1. / 60.;
-   if( strstr( obuff, "/m"))
-      motion_units /= 60.;
-   else if( strstr( obuff, "/s"))
-      motion_units /= 3600.;
-   else if( strstr( obuff, "/d"))
-      motion_units *= 24.;
+   if( !*units_set)
+      units_set = "'/hr";
+   strlcpy_err( obuff, units_set, 7);
+   if( *obuff == 'm')
+      {
+      obuff++;
+      motion_units = 1000.;
+      }
+   switch( *obuff)
+      {
+      case '"':
+         motion_units *= 60.;
+         break;
+      case 'd':
+         motion_units /= 60.;
+         break;
+      default:
+         break;
+      }
+   assert( obuff[1] == '/');
+   motion_units *= seconds_per_time_unit_symbol( obuff + 2) / 3600.;
    return( motion_units);
 }
 
