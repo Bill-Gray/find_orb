@@ -4938,6 +4938,7 @@ int detect_perturbers( const double jd, const double * __restrict xyz,
 int clean_up_find_orb_memory( void)
 {
    extern char *temp_obs_filename;     /* miscell.cpp */
+   extern char *mpec_error_message;
 
    free_sigma_recs( );
    get_observer_data( NULL, NULL, NULL);
@@ -4976,5 +4977,7 @@ int clean_up_find_orb_memory( void)
    _unlink( temp_obs_filename);
 #endif
    free( temp_obs_filename);
+   free( mpec_error_message);
+   mpec_error_message = NULL;
    return( 0);
 }
