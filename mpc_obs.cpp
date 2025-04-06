@@ -3441,6 +3441,12 @@ single_observation_posn_sigma_1 looked too long to me.     */
    /* adjusted in 'environ.dat'.                                  */
 double maximum_observation_span = 200.;
 
+   /* The longest ADES line I've seen was about 570 bytes.  2000 bytes  */
+   /* ought to be enough for anyone.  (I may add error checks/warnings  */
+   /* here,  though.)                                                   */
+
+#define MAX_ADES_LINE_LEN 2000
+
 int sanity_check_observations = 1;
 bool use_sigmas = true;
 extern int is_interstellar;
@@ -3450,7 +3456,7 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                            const int n_obs)
 {
    const double days_per_year = 365.25;
-   char buff[650], mpc_code_from_neocp[4], desig_from_neocp[15];
+   char buff[MAX_ADES_LINE_LEN], mpc_code_from_neocp[4], desig_from_neocp[15];
    char obj_name[80], curr_ades_ids[100];
    OBSERVE FAR *rval;
    bool including_obs = true;
@@ -4270,7 +4276,7 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
    int i, n = 0, n_alloced = 20, prev_loc = -1;
    const int fixing_trailing_and_leading_spaces =
                *get_environment_ptr( "FIX_OBSERVATIONS");
-   char buff[550], mpc_code_from_neocp[4], desig_from_neocp[15];
+   char buff[MAX_ADES_LINE_LEN], mpc_code_from_neocp[4], desig_from_neocp[15];
    void *ades_context;
    const clock_t t0 = clock( );
    int next_output = 2000, n_obs_read = 0;
