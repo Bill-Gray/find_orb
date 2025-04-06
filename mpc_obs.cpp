@@ -5132,16 +5132,19 @@ static void show_radar_info( char *buff, const OBSERVE *obs)
                rinfo.doppler_comp);
 }
 
-static size_t strip_trailing_zeroes( char *buff)
+static void strip_trailing_zeroes( char *buff)
 {
-   size_t i = strlen( buff);
+   buff = strchr( buff, '.');
+   if( buff)
+      {
+      size_t i = strlen( buff);
 
-   while( i && buff[i - 1] == '0')
-      i--;
-   if( i && buff[i - 1] == '.')
-      i--;
-   buff[i] = '\0';
-   return( i);
+      while( i && buff[i - 1] == '0')
+         i--;
+      if( i == 1)
+         i = 0;
+      buff[i] = '\0';
+      }
 }
 
 /* get_net_used_from_obs_header( ) looks through the observation header
