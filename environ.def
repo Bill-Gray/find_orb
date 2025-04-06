@@ -308,6 +308,10 @@ LANGUAGE=e
    decimal.  Format numbers 200 to 215 are for RA only,  to get decimal
    degrees.  Note that the higher-precision values will be almost
    meaningless noise.
+      A full list of formats is provided at
+   https://github.com/Bill-Gray/lunar/blob/mpc_fmt.cpp
+   (search for comments above the get_ra_dec() function.)
+
 RA_DEC_FORMAT=3,2
 
    By default,  Find_Orb does a decent job of figuring out which objects
