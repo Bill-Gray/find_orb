@@ -24,7 +24,7 @@ but that others also use it and I've no way of knowing which details
 ought to be shown.  (For example,  (568) Mauna Kea has eleven scopes
 and a bazillion observers;  I've no idea what to show there.)
 
-2024 Nov 6 version
+2025 Apr 9 version
 
 COD 006
 MEA A. Bernal, J. Nunez, N. Torras
@@ -1326,6 +1326,12 @@ COD D03
 COM Default details from http://www.6roads.com.pl/
 TEL 0.40-m f/3.8 Newtonian + CCD
 
+COD D04
+MEA A. Ivanov
+OBS A. Ivanov, V. Ivanov, N. Ivanova, M. Archibasov
+COM Default details extracted from MPEC 2025-E162
+TEL 0.279-m f/2.2 reflector + CCD
+
 COD D15
 OBS T. Lehmann
 COM Default details extracted from MPEC 2022-G109
@@ -1430,6 +1436,11 @@ COM Default details extracted from MPEC 2025-D255
 MEA M. Zancan
 TEL 0.36-m f/7 reflector + CMO
 
+COD D66
+OBS F. Palaia
+COM Default details extracted from MPEC 2025-G43
+TEL 0.40-m f/10 reflector + CCD
+
 COD D78
 OBS T. Tanaka
 COM Default details extracted from MPEC 2021-O47
@@ -1472,6 +1483,11 @@ OBS J. McCormick
 COM Default details extracted from MPEC 2021-F20
 TEL 0.35-m f/10 Schmidt-Cassegrain + CCD
 
+COD E86
+OBS S. Badcock
+COM Default details extracted from MPEC 2025-G81
+TEL 0.25-m f/4.0 reflector + CMO
+
 COD E89
 OBS R. Carstens
 COM Default details extracted from MPEC 2021-A190
@@ -1481,7 +1497,6 @@ COD E94
 OBS J. Drummond
 COM Default details extracted from MPEC 2021-C16
 TEL 0.41-m f/4.5 Newtonian reflector + CCD
-
 
 COD F65
 MEA M. Wawerzonnek
@@ -2514,6 +2529,16 @@ MEA M. Odeh, S. Ashi
 COM Default details extracted from MPEC 2023-X175
 TEL 0.36-m f/7.7 Schmidt-Cassegrain + CMO
 
+COD M45
+OBS F. Ursache
+COM Default details extracted from MPEC 2025-E162
+TEL 0.41-m f/7.5 reflector + CMO
+
+COD M47
+OBS M. F. Talafha
+COM Default details extracted from MPEC 2025-G102
+TEL 0.43-m f/6.8 reflector + CCD
+
 COD M49
 MEA D. Husar
 OBS D. Husar, M. Junius
@@ -2523,7 +2548,7 @@ TEL 0.25-m f/4.6 reflector + CCD
 COD M50
 OBS G. Masi
 COM Default details extracted from MPEC 2023-M28
-TEL 0.36-m  f/7.2 Schmidt-Cassegrain + CCD
+TEL 0.36-m f/7.2 Schmidt-Cassegrain + CCD
 
 COD M52
 OBS M. Dionisi
@@ -2629,6 +2654,11 @@ MEA B. Li, H. B. Zhao, Z. J. Xu, G. T. Zhaori
 OBS K. Yan, Z. Q. Li, J. Z. Zhu, N. Jiang, Z. Y. Liu
 COM Default details extracted from MPEC 2023-X77
 TEL 2.5-m f/2.48 reflector + CCD
+
+COD O40
+OBS C. Guo
+COM Default details extracted from MPEC 2025-G102
+TEL 0.36-m f/2.2 reflector + CMO
 
 COD O46
 OBS Z. Wang
@@ -3124,8 +3154,8 @@ TEL 0.36-m f/4.5 reflector + CCD
 
 COD W53
 OBS R. Jennings
-COM Default details extracted from MPEC 2021-N06
-TEL 0.20-m f/3.9 reflector + CCD
+COM Default details extracted from MPEC 2025-E162
+TEL 0.30-m f/3.9 reflector + CCD + CCD
 
 COD W57
 MEA F. Ocana, M. Micheli
@@ -3583,6 +3613,7 @@ COD Z43
 OBS C. Ratinaud
 COM Default details extracted from MPEC 2023-C59
 TEL 0.25-m f/4.7 Reflector + CCD
+
 COD Z45
 OBS F. Jackson
 COM Default details extracted from MPEC 2020-P19
