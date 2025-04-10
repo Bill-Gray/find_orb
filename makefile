@@ -87,7 +87,7 @@ endif
 
 ifdef X
 	CURSES_FLAGS=-DXCURSES -I../PDCursesMod
-	CURSES_LIB=-lXCurses -lXaw -lXmu -lXt -lX11 -lSM -lICE -lXext -lXpm
+	CURSES_LIB=$(HOME)/PDCursesMod/x11new/libpdcurses.a -lX11 -lpthread
 endif
 
 ifdef VT

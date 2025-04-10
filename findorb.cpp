@@ -3196,31 +3196,29 @@ static int *get_key_remap_table( void)
 
 static SCREEN *screen_ptr;
 
-static inline int initialize_curses( const int argc, const char **argv)
+static inline int initialize_curses( void)
 {
 #ifdef __PDCURSES__
    ttytype[0] = 20;    /* Window must have at least 20 lines in Win32a */
    ttytype[1] = 55;    /* Window can have a max of 55 lines in Win32a */
    ttytype[2] = 70;    /* Window must have at least 70 columns in Win32a */
    ttytype[3] = (char)200; /* Window can have a max of 200 columns in Win32a */
-#else
-   PDC_set_title( get_find_orb_text( 18));
-#endif
 
+   PDC_set_title( get_find_orb_text( 18));
 #ifdef XCURSES
    resize_term( 50, 98);
-   Xinitscr( argc, (char **)argv);
-   screen_ptr = SP;
-#else
-   INTENTIONALLY_UNUSED_PARAMETER( argc);
-   INTENTIONALLY_UNUSED_PARAMETER( argv);
-
-   char xterm_256color_name[20];
+#endif
+   screen_ptr = newterm( NULL, stdout, stdin);
+#else             /* not PDCurses,  assume ncurses */
 
    screen_ptr = NULL;
-   strlcpy_error( xterm_256color_name, "xterm-256color");
    if( !force_eight_color_mode)
+      {
+      char xterm_256color_name[20];
+
+      strlcpy_error( xterm_256color_name, "xterm-256color");
       screen_ptr = newterm( xterm_256color_name, stdout, stdin);
+      }
    if( !screen_ptr)
       screen_ptr = newterm( NULL, stdout, stdin);
 #endif
@@ -4299,7 +4297,7 @@ int main( int argc, const char **argv)
       debug_printf( "%d sigma recs read\n", i);
    key_remaps = get_key_remap_table( );
 
-   initialize_curses( argc, argv);
+   initialize_curses( );
 
    *message_to_user = '\0';
    while( !quit)
