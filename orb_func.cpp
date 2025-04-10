@@ -3906,6 +3906,125 @@ bool is_sungrazing_comet( const OBSERVE *obs, const int n_obs)
    return( i == n_obs);    /* all obs are from SOHO or STEREOs */
 }
 
+int solve_quadratic( const double a, const double b, const double c,
+                     double *low, double *high)
+{
+   const double discr = b * b - 4. * a * c;
+
+   int rval;
+
+   if( discr >= 0)
+      {
+      const double sqrt_discr = sqrt( discr);
+      if( low)
+         *low = (-b - sqrt_discr) / (2. * a);
+      if( high)
+         *high = (-b + sqrt_discr) / (2. * a);
+      rval = 1;
+      }
+   else
+      rval = 0;
+   return( rval);
+}
+
+/* Kreutz comets all have basically parabolic orbits with very similar
+perihelion directions.  They effectively "fall from infinity" from
+ecliptic longitude 102.81, latitude -35.22,  and therefore come to
+perihelion at ecliptic longitude 182.81,  latitude +35.22.  The
+perihelion distance ranges from slightly inside the sun to about 0.01 AU.
+
+   For a given perihelion distance,  the orbit will lie on a paraboloid
+of revolution around the line described by the above ecliptic lat/lon.
+In a coordinate system in which the x-axis points to the perihelion
+point,  such that the perihelion point is at (q, 0, 0), the equation for
+the paraboloid of revolution around the x-axis will be
+
+4q(q-x) = (y^2 + z^2)
+
+   One optical observation will require that the object be at a certain
+point along a ray,  starting at the observer's location and pointed
+along the RA/dec of the observation.  Let's say that,  in the rotated
+system,  the observation describes a ray
+
+x = x0 + vx * d
+y = y0 + vy * d
+z = z0 + vz * d
+
+   where (vx, vy, vz) is a unit vector and d is the distance from the
+observer to the comet.  The intersection of this ray with the above
+paraboloid will happen when
+
+4q( q - x0 - vx * d) = (y0 + vy * d)^2 + (z0 + vz * d)^2
+
+(vy^2 + vz^2) * d^2 + (2(y0 * vy + z0 * vz) + 4q * vx)d + (y0^2 + z0^2 + 4q( x0 - q))
+
+   So we have a quadratic in d.  That will give us the two distances along
+the ray that pass through the paraboloid.  (Or the quadratic will have no
+real roots,  telling us that the ray misses the paraboloid.  In that case,
+we can only return "sorry,  no such orbit is possible.")
+
+   For each distance,  we can compute (x, y, z) as given above,  and
+therefore the distance from the sun,  and therefore the speed for an object
+in a parabolic orbit v = sqrt( 2GM/r).  The direction of the velocity
+vector should bisect the vectors toward the sun and the perihelion vector
+'perih_vect' computed at the start of this exercise.  (In theory,  it could
+bisect "the long way",  resulting in a velocity vector pointed away from
+the sun.  But we rarely see Kreutz comets after perihelion;  taking the
+vector pointing toward the sun is a perfectly reasonable assumption.)
+
+   Both of the two roots will produce parabolic orbits that take the object
+from the observation point to the perihelion point (q, 0, 0).  The Kreutz
+comets tend to lie in the same plane,  but it's a little risky to rely on
+that;  there is considerable rotation around it,  and when the roots of the
+quadratic are close together (i.e.,  the "ray" described by the observation
+just barely intersects the paraboloid),  you might find that both roots
+seem plausible. Our best guide is probably just to look at the resulting
+residuals for the other observations. */
+
+double find_kreutz_orbit( OBSERVE FAR *obs, int n_obs, double *orbit,
+                       const double q)
+{
+   const double ecl_lon = 282.81 * PI / 180.;
+   const double ecl_lat = 35.22 * PI / 180.;
+   double basis[3][3], perih_vect[3], loc[3], vel[3], a, b, c, dist[2];
+   double rval = 0.;
+   size_t i;
+
+   INTENTIONALLY_UNUSED_PARAMETER( n_obs);
+   polar3_to_cartesian( perih_vect, ecl_lon, ecl_lat);
+   generate_orthonormal_basis( basis[0], basis[1], basis[2], perih_vect);
+   for( i = 0; i < 3; i++)
+      {
+      loc[i] = dot_product( basis[i], obs->obs_posn);
+      vel[i] = dot_product( basis[i], obs->vect);
+      }
+   a = vel[1] * vel[1] + vel[2] * vel[2];
+   b = 2. * (loc[1] * vel[1] + loc[2] * vel[2]) + 4. * q * vel[0];
+   c = loc[1] * loc[1] + loc[2] * loc[2] + 4. * q * (loc[0] - q);
+   if( solve_quadratic( a, b, c, dist, dist + 1))
+      {
+      static int choice;
+
+      debug_printf( "distances %f %f\n", dist[0], dist[1]);
+      rval = dist[choice ^= 1];
+      if( orbit)
+         {
+         double r, renormalize;
+
+         for( i = 0; i < 3; i++)
+            orbit[i] = obs->obs_posn[i] + rval * obs->vect[i];
+         r = vector3_length( orbit);
+         for( i = 0; i < 3; i++)
+            orbit[i + 3] = perih_vect[i] - orbit[i] / r;
+         renormalize = sqrt( 2. * SOLAR_GM / r);
+         renormalize /= vector3_length( orbit + 3);
+         for( i = 0; i < 3; i++)
+            orbit[i + 3] *= renormalize;
+         }
+      }
+   return( rval);
+}
+
 static double find_sungrazer_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
 {
    double best_score = 1e+10;

@@ -259,6 +259,8 @@ int load_ephemeris_settings( ephem_option_t *ephemeris_output_options,
       int *n_steps, char *obscode, char *step_size, char *ephem_start,
       const char *config);                               /* elem_out.cpp */
 void compute_effective_solar_multiplier( const char *constraints);  /* runge.c */
+double find_kreutz_orbit( OBSERVE FAR *obs, int n_obs, double *orbit,
+                  const double q);  /* orb_func.c */
 
 #ifdef __cplusplus
 extern "C" {
@@ -3567,6 +3569,7 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
             free( prev_files);
             *err_buff = '\0';    /* signals 'cancel' */
             return( NULL);
+            break;
          }
       }
    if( !*ifilename)
@@ -6737,6 +6740,18 @@ int main( int argc, const char **argv)
             }
             break;
          case '\\':
+            if( !inquire( "Enter Kreutz perihelion distance:",
+                       tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY) && *tbuff)
+               {
+               const double r = find_kreutz_orbit( obs + curr_obs, 1, orbit, atof( tbuff));
+
+               snprintf_err( message_to_user, sizeof( message_to_user),
+                       "Kreutz r = %f AU", r);
+               curr_epoch = obs[curr_obs].jd - r / AU_PER_DAY;
+               set_locs( orbit, curr_epoch, obs, n_obs);
+               update_element_display = 1;
+               }
+            break;
          case 'O':
          case ';': case ']':
          case CTRL( 'E'): case CTRL( 'J'): case CTRL( 'L'):
