@@ -1220,6 +1220,8 @@ static void format_motion( char *buff, const double motion)
 
    if( fabs_motion > 999999.)
       motion_format = "-------";
+   else if( fabs_motion > 9999.)
+      motion_format = "%7.0f";
    else if( fabs_motion > 999.)
       motion_format = "%7.1f";
    else if( fabs_motion > 99.9)
