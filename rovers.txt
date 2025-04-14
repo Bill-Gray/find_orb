@@ -1510,8 +1510,9 @@ L78 !+014.780211   +40.6826087        134.     San Marco Observatory, Salerno
 073 !+026.09391    +44.41197          134.     Bucharest
 
    The MPC coordinates for Geneva are about 190m north-northeast of the dome
-   as seen on G__gle Maps.  50m added for geoid height.
-517 !+006.13497    +46.30916          512.     Geneva (from 1967)
+   as seen on G__gle Maps.   Corrected location from Stephan Hellmich.
+   50m added for geoid height.
+517 !+006.1349802  +46.3091749        509.     Geneva (from 1967)
 
    The following position is from a GPS survey, from a private communication
    from Mike Nolan.  _Horizons_ uses an almost identical position,  except
