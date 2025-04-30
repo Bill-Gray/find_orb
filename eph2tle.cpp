@@ -83,6 +83,10 @@ doing a sufficiently exhaustive search in such cases. */
 #define FIT_EPOCH    2
 #define FIT_BOTH     3
 
+         /* from 'norad_in.h' */
+#define earth_radius_in_km           6378.135
+#define xke                             0.0743669161331734132
+
 int vector_to_tle( tle_t *tle, const double *state_vect, const double epoch);
 
 int verbose = 0;
@@ -575,6 +579,7 @@ int main( const int argc, const char **argv)
    double levenberg_marquardt_lambda0 = 0.;
    double sum_of_worst_resids = 0.;
    double dist_units = 1., time_units = 1.;
+   double lowest_perigee = 1e+10, lowest_perigee_jd = 0.;
    const char *search_dist = NULL;
    long end_of_header_offset = 0L;
 
@@ -1019,6 +1024,18 @@ int main( const int argc, const char **argv)
          {
          const double revs_per_day = tle_to_output.xno * minutes_per_day / (2. * PI);
 
+         if( tle.ephemeris_type != EPHEM_TYPE_HIGH)
+            {
+            const double semimajor_axis =
+                pow( xke / tle_to_output.xno, 2. / 3.) * earth_radius_in_km;
+            const double perigee = semimajor_axis * (1. - tle_to_output.eo);
+
+            if( lowest_perigee > perigee)
+               {
+               lowest_perigee = perigee;
+               lowest_perigee_jd = tdt;
+               }
+            }
 //       if( tle.ephemeris_type != EPHEM_TYPE_HIGH)
             fprintf( ofile, "\n# Worst residual: %.2f km\n",
                           worst_resid);
@@ -1100,10 +1117,15 @@ int main( const int argc, const char **argv)
       else
          break;
       }
-   printf( "Freeing vectors\n");
+   lowest_perigee -= earth_radius_in_km;
+   if( lowest_perigee < 150.)
+      {
+      full_ctime( buff, lowest_perigee_jd,
+                    FULL_CTIME_YMD | FULL_CTIME_FORMAT_HH_MM);
+      fprintf( stderr, "LOWEST PERIGEE = %.1f km at %s\n", lowest_perigee, buff);
+      }
    free( vectors);
    free( slopes);
-   printf( "All done\n");
    return( 0);
 }
 
