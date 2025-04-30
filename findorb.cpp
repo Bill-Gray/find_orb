@@ -5240,6 +5240,7 @@ int main( int argc, const char **argv)
             if( *message_to_user)      /* new force model selected */
                {
                extern int force_model;
+               char *delta_v = NULL;
 
                for( i = 6; i < n_orbit_params; i++)
                   orbit[i] = 0.;
@@ -5247,10 +5248,17 @@ int main( int argc, const char **argv)
                   {        /* we need a starting estimate of the maneuver time */
                   if( !inquire( get_find_orb_text( 2099), tbuff, sizeof( tbuff),
                             COLOR_DEFAULT_INQUIRY) && *tbuff)
+                     {
+                     delta_v = strstr( tbuff, "v=");
+                     if( delta_v)
+                        *delta_v = '\0';
                      orbit[9] = get_time_from_string( obs->jd, tbuff,
                              FULL_CTIME_YMD | CALENDAR_JULIAN_GREGORIAN, NULL);
+                     }
                   if( orbit[9] < obs->jd || orbit[9] > obs[n_obs - 1].jd)
                      force_model = FORCE_MODEL_NO_NONGRAVS;
+                  else if( delta_v)
+                     sscanf( delta_v + 2, "%lf,%lf,%lf", orbit + 6, orbit + 7, orbit + 8);
                   }
                }
             break;
