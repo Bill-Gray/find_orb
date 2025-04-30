@@ -210,20 +210,22 @@ static void vector_cross_productl( ldouble *xprod, const ldouble *a, const ldoub
 #define ATMOSPHERIC_LIMIT (EARTH_RADIUS_IN_AU + 500. / AU_IN_KM)
 /* #define ATMOSPHERIC_LIMIT 0      */
 
-/*  Jupiter field is now from doi:10.1038/nature25776, "Measurement of
-Jupiter's asymmetric gravity field".   Saturn,  Uranus, and Neptune
-fields are from http://ssd.jpl.nasa.gov/?gravity_fields_op .*/
+/*  Jupiter,  Saturn,  Uranus, and Neptune fields are from
+https://ssd.jpl.nasa.gov/tools/gravity.html#/outerplanets .*/
 
-#define J2_IN_JUPITER_UNITS (.0146956572)      /* +/- 1.4e-8 */
-#define J3_IN_JUPITER_UNITS (-0.042e-6)        /* +/- 0.010e-6 */
-#define J4_IN_JUPITER_UNITS (-5.86609e-4)      /* +/- 4e-8 */
+#define J2_IN_JUPITER_UNITS (.014695735)      /* +/- 1.7e-9 */
+#define J3_IN_JUPITER_UNITS (-0.045e-6)        /* +/- 0.0033e-6 */
+#define J4_IN_JUPITER_UNITS (-5.866085e-4)      /* +/- 2.4e-9 */
 #ifdef NOT_USING_ANYTHING_PAST_J4_YET
-   #define J5_IN_JUPITER_UNITS   (-6.9e-8)     /* +/- 0.8e-8 */
-   #define J6_IN_JUPITER_UNITS   34.198e-6     /* +/- 0.9e-8 */
-   #define J7_IN_JUPITER_UNITS   1.24e-7       /* +/- 0.17e-7 */
+   #define J5_IN_JUPITER_UNITS   (-0.0723e-6)     /* +/- 0.0042e-6 */
+   #define J6_IN_JUPITER_UNITS   34.2007e-6     /* +/- 0.0067e-6 */
+   #define J7_IN_JUPITER_UNITS   0.120e-6       /* +/- 0.012e-6 */
+   #define J8_IN_JUPITER_UNITS   (-2.422e-6)    /* +/- 0.021e-6 */
 
-   #define J6_IN_SATURN_UNITS    86.14e-6
-   #define J8_IN_SATURN_UNITS   -10.e-6
+   #define J6_IN_SATURN_UNITS    86.8e-6
+   #define J8_IN_SATURN_UNITS   -13.9e-6
+
+   #define J6_IN_NEPTUNE_UNITS    0.5e-6
 #endif
 #define JUPITER_R (71492. / AU_IN_KM)
 #define JUPITER_R2 (JUPITER_R * JUPITER_R)
@@ -231,25 +233,25 @@ fields are from http://ssd.jpl.nasa.gov/?gravity_fields_op .*/
 #define JUPITER_J3 (J3_IN_JUPITER_UNITS * JUPITER_R2 * JUPITER_R)
 #define JUPITER_J4 (J4_IN_JUPITER_UNITS * JUPITER_R2 * JUPITER_R2)
 
-#define J2_IN_SATURN_UNITS (.01629071)
-#define J4_IN_SATURN_UNITS (-.00093583)
+#define J2_IN_SATURN_UNITS (.0162906)
+#define J4_IN_SATURN_UNITS (-.0009351)
 #define SATURN_R (60330. / AU_IN_KM)
 #define SATURN_R2 (SATURN_R * SATURN_R)
 #define SATURN_J2 (J2_IN_SATURN_UNITS * SATURN_R2)
 #define SATURN_J3 0.
 #define SATURN_J4 (J4_IN_SATURN_UNITS * SATURN_R2 * SATURN_R2)
 
-#define J2_IN_URANUS_UNITS  3510.68e-6
-#define J4_IN_URANUS_UNITS   -34.17e-6
+#define J2_IN_URANUS_UNITS  3510.7e-6
+#define J4_IN_URANUS_UNITS   -34.2e-6
 #define URANUS_R (25559. / AU_IN_KM)
 #define URANUS_R2 (URANUS_R * URANUS_R)
 #define URANUS_J2 (J2_IN_URANUS_UNITS * URANUS_R * URANUS_R)
 #define URANUS_J3 0.
 #define URANUS_J4 (J4_IN_URANUS_UNITS * URANUS_R2 * URANUS_R2)
 
-#define J2_IN_NEPTUNE_UNITS  3408.43e-6
-#define J4_IN_NEPTUNE_UNITS   -33.40e-6
-#define NEPTUNE_R (25225. / AU_IN_KM)
+#define J2_IN_NEPTUNE_UNITS  3536.3e-6
+#define J4_IN_NEPTUNE_UNITS   -36.0e-6
+#define NEPTUNE_R (24764. / AU_IN_KM)
 #define NEPTUNE_R2 (NEPTUNE_R * NEPTUNE_R)
 #define NEPTUNE_J2 (J2_IN_NEPTUNE_UNITS * NEPTUNE_R * NEPTUNE_R)
 #define NEPTUNE_J3 0.
