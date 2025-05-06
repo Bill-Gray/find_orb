@@ -2644,8 +2644,9 @@ void compute_error_ellipse_adjusted_for_motion( double *sigma1, double *sigma2,
    *sigma1 = obs->posn_sigma_1;    /* start with "non-moving" error ellipse */
    *sigma2 = obs->posn_sigma_2;
    *posn_angle = obs->posn_sigma_theta;
-   adjust_error_ellipse_for_timing_error( sigma1, sigma2, posn_angle,
-                  dx, dy);
+   if( !(obs->flags & OBS_NO_VELOCITY))
+      adjust_error_ellipse_for_timing_error( sigma1, sigma2, posn_angle,
+                       dx, dy);
 }
 
 int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid)
