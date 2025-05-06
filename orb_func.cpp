@@ -2756,8 +2756,6 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
                get_asteroid_mass( atoi( limited_orbit + 2)) : NULL);
    int n_params;
    void *lsquare;
-   double FAR *xresids;
-   double FAR *yresids;
    double FAR *slopes;
    double constraint_slope[MAX_CONSTRAINTS][MAX_N_PARAMS];
    double element_slopes[MAX_N_PARAMS][MONTE_N_ENTRIES];
@@ -2915,9 +2913,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
    put_orbital_elements_in_array_form( &elem, elements_in_array);
 
    uncertainty_parameter = 99.;
-   xresids = (double FAR *)FCALLOC( (2 + 2 * n_params) * n_obs + n_params, sizeof( double));
-   yresids = xresids + n_obs;
-   slopes = yresids + n_obs;
+   slopes = (double FAR *)FCALLOC( 2 * n_params * n_obs + n_params, sizeof( double));
 
    before_rms = compute_rms( obs, n_obs);
    if( limited_orbit && *limited_orbit == 'R')
@@ -2925,8 +2921,6 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
               r_mult * (dotted_dist( obs + n_obs - 1) - atof( limited_orbit + 2));
 
    snprintf_err( tstr, sizeof( tstr), "fi/locs set: %f  ", JD_TO_YEAR( epoch));
-   for( i = 0; i < n_obs; i++)
-      get_residual_data( obs + i, xresids + i, yresids + i);
 
              /* 'integration_length' = maximum time span over which we'll */
              /* be integrating,  from the working epoch to either the first */
@@ -3013,7 +3007,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
             {
             memcpy( obs, orig_obs, n_obs * sizeof( OBSERVE));
             free( orig_obs);
-            free( xresids);
+            free( slopes);
             memcpy( orbit, original_orbit, n_orbit_params * sizeof( double));
             return( -8);
             }
@@ -3065,7 +3059,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
             set_locs_rval = set_locs( tweaked_orbit, epoch, obs, n_obs);
             if( set_locs_rval == USER_INTERRUPTED)
                {
-               free( xresids);
+               free( slopes);
                free( orig_obs);
                memcpy( orbit, original_orbit, n_orbit_params * sizeof( double));
                runtime_message = NULL;
@@ -3147,10 +3141,10 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
          }
       }
    memcpy( obs, orig_obs, n_obs * sizeof( OBSERVE));
-   free( orig_obs);
    if( err_code)
       {
-      free( xresids);
+      free( slopes);
+      free( orig_obs);
       memcpy( orbit, original_orbit, n_orbit_params * sizeof( double));
       return( -1);
       }
@@ -3163,9 +3157,10 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
       if( obs[i].is_included)
          {
          double loc_vals[22], weight = 1.;
-         const double xresid = xresids[i];
-         const double yresid = yresids[i];      /* all in _radians_ */
-         const double resid2 = xresid * xresid + yresid * yresid;
+         double xresid, yresid, resid2;
+
+         get_residual_data( orig_obs + i, &xresid, &yresid);
+         resid2 = xresid * xresid + yresid * yresid;
 
          if( !(obs[i].flags & OBS_ALREADY_CORRECTED_FOR_OVEROBSERVING))
             {
@@ -3180,6 +3175,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
          lsquare_add_observation( lsquare, yresid, weight, loc_vals + n_params);
          sigma_squared += weight * weight * (resid2 + 1.);
          }
+   free( orig_obs);
    i = n_included_observations * 2 - n_params;
    if( i > 0)
       sigma_squared /= (double)i;
@@ -3473,7 +3469,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
       available_sigmas_hash = compute_available_sigmas_hash( obs, n_obs, epoch2,
                   perturbers, planet_orbiting);
       }
-   FFREE( xresids);
+   FFREE( slopes);
    lsquare_free( lsquare);
 
    if( levenberg_marquardt_lambda)
