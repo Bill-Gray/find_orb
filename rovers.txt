@@ -891,6 +891,11 @@ ELT !-070.191631   -24.589327       3046.      Extremely Large Telescope
 GMT !-0704109.0    -290142.0        2516.      Giant Magellan Telescope
 TMT !-155.4816     +19.8327         4050.      Thirty-Meter Telescope
 
+   Low-precision coordinates given in the May 2025 NEOCC monthly newsletter.
+   Just for interim use;  I assume we'll see accurate coordinates sometime
+   before the scope is operational...
+Fly !+014.023      +37.868           1850.     Flyeye,  Mt. Mufara
+
    Improved coords for both Magellan scopes.  The locations given at
    https://astro.arizona.edu/magellan-telescopes are indentical,  and
    and split the difference between the positions given below,  which
