@@ -2378,6 +2378,7 @@ static void show_one_observation( OBSERVE obs, const int line,
    int color = COLOR_BACKGROUND;       /* show in 80-column MPC */
    char resid_data[70];      /* format, w/added data if it fits */
    const int dropped_start = 12;     /* ...but omit designation */
+   size_t i, len;
 
    put_colored_text( "", line, 0, -1, COLOR_BACKGROUND);
    add_to_mpc_color( obs.mpc_code, 1000);
@@ -2412,7 +2413,10 @@ static void show_one_observation( OBSERVE obs, const int line,
                      /* show corresponding 1s or 0.1s HHMMSS fmt */
    recreate_observation_line( buff, &obs, residual_format);
    assert( 80 == strlen( buff));
-   memmove( buff, buff + dropped_start, strlen( buff + dropped_start) + 1);
+   len = strlen( buff + dropped_start) + 1;
+   for( i = 0; i < len; i++)
+      buff[i] = buff[i + dropped_start];
+/* memmove( buff, buff + dropped_start, strlen( buff + dropped_start) + 1);   */
    strcat( buff, resid_data);
    if( obs.flags & OBS_IS_SELECTED)
       color = COLOR_SELECTED_OBS;
