@@ -3123,9 +3123,9 @@ static double extract_state_vect_from_text( const char *text,
          {
          extern int n_orbit_params;
 
-         n_orbit_params = 6 + text[1] - '1';
+         n_orbit_params = 6 + text[1] - '0';
          force_model = ((n_orbit_params - 6) | 0x10);   /* assume inverse square for the nonce */
-         orbit[n_orbit_params - 7] = atof( text + 3);
+         orbit[n_orbit_params - 1] = atof( text + 3);
          }
       while( *text != ',' && *text)
          text++;
