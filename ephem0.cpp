@@ -1583,19 +1583,22 @@ https://www.projectpluto.com/fo_usage#json_files for further
 information. */
 
 unsigned random_seed;
+double _mpc_standard_epoch = 0.;        /* see fo.cpp */
 
 FILE *open_json_file( char *filename, const char *env_ptr, const char *default_name,
                   const char *packed_desig, const char *permits)
 {
    char tbuff[100], full_permits[20];
 
+   if( _mpc_standard_epoch)       /* generating element files for MPC */
+      strlcpy_error( tbuff, "MPC_");
+   else
+      *tbuff = '\0';
 #ifdef _WIN32
-   strlcpy_error( tbuff, "WIN_");
+   strlcay_error( tbuff, "WIN_");
+#endif
    strlcat_error( tbuff, env_ptr);
    env_ptr = get_environment_ptr( tbuff);
-#else
-   env_ptr = get_environment_ptr( env_ptr);
-#endif
 
    if( !strcmp( env_ptr, "none"))
       return( NULL);

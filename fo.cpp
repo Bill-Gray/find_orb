@@ -492,6 +492,36 @@ static const char *get_arg( const int argc, const char **argv, const int idx)
    return( rval);
 }
 
+static void emit_mpc_standard_epoch_elements( double *orbit, const double curr_epoch,
+                  OBSERVE *obs, const int n_obs, const char *orbit_constraints,
+                  const int element_precision, const int element_options)
+{
+   const char *std_epoch_text = get_environment_ptr( "MPC_EPOCH");
+   extern double _mpc_standard_epoch;
+
+   _mpc_standard_epoch = get_time_from_string( 0., std_epoch_text,
+                          FULL_CTIME_YMD | CALENDAR_JULIAN_GREGORIAN, NULL);
+
+   if( _mpc_standard_epoch)
+      {
+      const int err = full_improvement( obs, n_obs, orbit, curr_epoch, NULL,
+                        ORBIT_SIGMAS_REQUESTED, _mpc_standard_epoch);
+
+      if( !err)
+         {
+         extern const char *elements_filename;
+         const char *saved_elements_filename = elements_filename;
+
+         elements_filename = "mpc_elem.txt";
+         write_out_elements_to_file( orbit, curr_epoch, _mpc_standard_epoch, obs, n_obs,
+                     orbit_constraints, element_precision,
+                     0, element_options);
+         elements_filename = saved_elements_filename;
+         }
+      _mpc_standard_epoch = 0.;
+      }
+}
+
 int main( int argc, const char **argv)
 {
    char tbuff[300], *mpc_codes = (char *)malloc( 20);
@@ -881,6 +911,7 @@ int main( int argc, const char **argv)
             {
             extern int append_elements_to_element_file;
             extern int n_obs_actually_loaded;
+            extern int available_sigmas;
             extern char orbit_summary_text[];
             long file_offset = ids[i].file_offset - 40000L;
             int element_options = ELEM_OUT_ALTERNATIVE_FORMAT;
@@ -896,7 +927,6 @@ int main( int argc, const char **argv)
 
             if( (n_obs_actually_loaded > 1 || !drop_single_obs) && curr_epoch > 0.)
                {
-               extern int available_sigmas;
                int n_obs_included = 0;
                unsigned j = 0;
 
@@ -1090,6 +1120,9 @@ int main( int argc, const char **argv)
             if( n_processes == 1)
                add_json_data( "total.json", have_json_ephem, obs->packed_id,
                      i == starting_object + total_objects - 1);
+            if( available_sigmas == COVARIANCE_AVAILABLE)
+               emit_mpc_standard_epoch_elements( orbit, curr_epoch, obs, n_obs_actually_loaded,
+                                       orbit_constraints, element_precision, element_options);
             unload_observations( obs, n_obs_actually_loaded);
             }
          object_comment_text( tbuff, ids + i);
