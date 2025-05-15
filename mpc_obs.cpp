@@ -4466,6 +4466,10 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
          }
       if( !memcmp( buff, "#= ", 3))
          {
+         char *equals_ptr = strchr( buff + 3, '=');
+
+         if( equals_ptr)            /* if given multiple xrefs,  just */
+            *equals_ptr = '\0';     /* use the first one */
          *new_xdesig = '!';
          strlcpy( new_xdesig + 13, buff + 3, 20);
          strlcat( new_xdesig + 13, "            ", 14);
