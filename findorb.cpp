@@ -3680,7 +3680,7 @@ static int non_grav_menu( char *message_to_user)
    _set_radio_button( buff, (int)i);
    help_file_name = "nongravs.txt";
    c = full_inquire( buff, NULL, 0, COLOR_MENU, -1, -1);
-   if( c >= KEY_F(1) && c <= KEY_F(8))
+   if( c >= KEY_F(1) && c <= KEY_F(9))
       c -= KEY_F( 1);
    else
       c -= '0';
