@@ -1595,7 +1595,7 @@ FILE *open_json_file( char *filename, const char *env_ptr, const char *default_n
    else
       *tbuff = '\0';
 #ifdef _WIN32
-   strlcay_error( tbuff, "WIN_");
+   strlcat_error( tbuff, "WIN_");
 #endif
    strlcat_error( tbuff, env_ptr);
    env_ptr = get_environment_ptr( tbuff);
