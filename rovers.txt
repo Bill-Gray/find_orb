@@ -142,6 +142,8 @@ Lun !   0.0000       0.00000   +0.00000    @10 Luna
    example,  EM1 is 84.906% of the way from the earth to the moon.  See
    'lagrange.c' in the 'junk' repository for mathematical details and
    code to generate these values for other systems.
+      The '@90xx' numbers are used as an index by Find_Orb.  They
+   have to be unique and over 9000,  but otherwise have no meaning.
 
 SE1 !   0    3 0.98998902 0              @9001 Sun-Earth L1
 SE2 !   0    3 1.01007824 0              @9002 Sun-Earth L2
@@ -158,6 +160,11 @@ SJ2 !   0    5 1.06978454 0              @9012 Sun-Jupiter L2
 SJ3 !   0    5 -0.99944357 0             @9013 Sun-Jupiter L3
 SJ4 !   0    5 0.5  0.8660254            @9014 Sun-Jupiter L4
 SJ5 !   0    5 0.5 -0.8660254            @9015 Sun-Jupiter L5
+
+   Trickery similar to the above gets us the Earth-Moon barycenter.
+   mass(moon) / mass( earth + moon) = 0.01215058.
+
+EMB !   3   10 0.01215058 0              @9016 Earth-Moon barycenter
 
    Note that ephems generated from these spacecraft require auxiliary
    files saying where the spacecraft were at a given time.  I don't
@@ -893,7 +900,8 @@ TMT !-155.4816     +19.8327         4050.      Thirty-Meter Telescope
 
    Low-precision coordinates given in the May 2025 NEOCC monthly newsletter.
    Just for interim use;  I assume we'll see accurate coordinates sometime
-   before the scope is operational...
+   before the scope is operational... as noted in that newsletter,  Flyeye
+   is currently installed in Matera.  That site has obscode (S16).
 Fly !+014.023      +37.868           1850.     Flyeye,  Mt. Mufara
 
    Improved coords for both Magellan scopes.  The locations given at
