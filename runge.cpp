@@ -883,7 +883,7 @@ static void set_satellite_and_planet_locs( const size_t n_sats,
 static void get_saturn_sats( const double jd, double *ssat_locs,
                                     double *saturn_loc)
 {
-   size_t i;
+   int i;
 
    for( i = 0; i < 5; i++)
       calc_ssat_loc( jd, ssat_locs + i * 3,
