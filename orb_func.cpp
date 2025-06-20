@@ -2755,7 +2755,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
    double *asteroid_mass = ((limited_orbit && *limited_orbit == 'm') ?
                get_asteroid_mass( atoi( limited_orbit + 2)) : NULL);
    int n_params;
-   void *lsquare;
+   void *lsquare = NULL;
    double FAR *slopes;
    double constraint_slope[MAX_CONSTRAINTS][MAX_N_PARAMS];
    double element_slopes[MAX_N_PARAMS][MONTE_N_ENTRIES];
@@ -3149,107 +3149,112 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
       return( -1);
       }
 
-   lsquare = lsquare_init( n_params);
-   assert( lsquare);
-   if( debug_level > 1)
-      debug_printf( "Adding obs to lsquare\n");
-   for( i = 0; i < n_obs; i++)
-      if( obs[i].is_included)
-         {
-         double loc_vals[22], weight = 1.;
-         double xresid, yresid, resid2;
-
-         get_residual_data( orig_obs + i, &xresid, &yresid);
-         resid2 = xresid * xresid + yresid * yresid;
-
-         if( !(obs[i].flags & OBS_ALREADY_CORRECTED_FOR_OVEROBSERVING))
+   for( int loop = atoi( get_environment_ptr( "LS_ITERATIONS")); !err_code && loop >= 0; loop--)
+      {
+      lsquare = lsquare_init( n_params);
+      assert( lsquare);
+      if( debug_level > 1)
+         debug_printf( "Adding obs to lsquare\n");
+      for( i = 0; i < n_obs; i++)
+         if( obs[i].is_included)
             {
-            if( use_blunder_method == 2 && probability_of_blunder)
-               weight = reweight_for_blunders( resid2, weight);
-            if( overobserving_time_span && overobserving_ceiling)
-               weight *= reweight_for_overobserving( obs, n_obs, i);
+            double loc_vals[22], weight = 1.;
+            double xresid, yresid, resid2;
+
+            get_residual_data( obs + i, &xresid, &yresid);
+            resid2 = xresid * xresid + yresid * yresid;
+
+            if( !(obs[i].flags & OBS_ALREADY_CORRECTED_FOR_OVEROBSERVING))
+               {
+               if( use_blunder_method == 2 && probability_of_blunder)
+                  weight = reweight_for_blunders( resid2, weight);
+               if( overobserving_time_span && overobserving_ceiling)
+                  weight *= reweight_for_overobserving( obs, n_obs, i);
+               }
+            FMEMCPY( loc_vals, slopes + i * 2 * n_params,
+                                            2 * n_params * sizeof( double));
+            lsquare_add_observation( lsquare, xresid, weight, loc_vals);
+            lsquare_add_observation( lsquare, yresid, weight, loc_vals + n_params);
+            sigma_squared += weight * weight * (resid2 + 1.);
             }
-         FMEMCPY( loc_vals, slopes + i * 2 * n_params,
-                                         2 * n_params * sizeof( double));
-         lsquare_add_observation( lsquare, xresid, weight, loc_vals);
-         lsquare_add_observation( lsquare, yresid, weight, loc_vals + n_params);
-         sigma_squared += weight * weight * (resid2 + 1.);
-         }
-   free( orig_obs);
-   i = n_included_observations * 2 - n_params;
-   if( i > 0)
-      sigma_squared /= (double)i;
+      i = n_included_observations * 2 - n_params;
+      if( i > 0)
+         sigma_squared /= (double)i;
 
-   if( limited_orbit)
-      for( j = 0; j < n_constraints; j++)
-         lsquare_add_observation( lsquare, constraint[j], 1.,
-                                            constraint_slope[j]);
+      if( limited_orbit)
+         for( j = 0; j < n_constraints; j++)
+            lsquare_add_observation( lsquare, constraint[j], 1.,
+                                               constraint_slope[j]);
 
-   if( debug_level > 1)
-      debug_printf( "lsquare solve\n");
-   if( !err_code)
-      {
-      err_code = lsquare_solve( lsquare, differences);
-      if( err_code)
-         debug_printf( "Failure in lsquare_solve: %d\n", err_code);
-      }
-
-   for( i = 0; !err_code && i < 6 && i < n_params; i++)
-      for( j = 0; j < 6; j++)
+      if( debug_level > 1)
+         debug_printf( "lsquare solve\n");
+      if( !err_code)
          {
-         double max_difference = obs->r * .7, ratio;
-
-         if( j > 2)     /* velocity component */
-            max_difference /= (obs[n_obs - 1].jd - obs[0].jd) * .5;
-         if( i == j)
-            ratio = fabs( differences[i] / max_difference);
-         else
-            ratio = 0.;
-         if( ratio > scale_factor)
-            scale_factor = ratio;
+         err_code = lsquare_solve( lsquare, differences);
+         if( err_code)
+            debug_printf( "Failure in lsquare_solve: %d\n", err_code);
          }
-   if( debug_level > 1)
-      debug_printf( "lsquare computed\n");
-   memcpy( orbit2, orbit, 6 * sizeof( double));
-   for( i = 0; i < n_params && !err_code; i++)
-      {
-      if( i == 6 && asteroid_mass)
-         *asteroid_mass += differences[i] / scale_factor;
-      else
-         _tweak_orbit( orbit, i, differences[i] / scale_factor, n_params);
-      if( i == 5)    /* is our new 'orbit' state vector reasonable?  */
-         err_code = is_unreasonable_orbit( orbit);
-      }
-               /* If the orbit "blew up" or otherwise failed,  restore */
-               /* the original version:  */
-   if( err_code || is_unreasonable_orbit( orbit))
-      debug_printf( "Failed full step: %d: %s\n", err_code, obs->packed_id);
-   snprintf_err( tstr, sizeof( tstr), "Final setting of orbit    ");
-   i = 6;      /* possibly try six half-steps */
-   do
-      {
-      if( setting_outside_of_arc)
-         err_code = set_locs( orbit, epoch, obs - n_skipped_obs, n_total_obs);
-      else
-         err_code = set_locs( orbit, epoch, obs, n_obs);
-      if( *get_environment_ptr( "HALF_STEPS"))
-         {
-         const double after_rms = compute_rms( obs, n_obs);
 
-         snprintf_err( tstr, sizeof( tstr), "Half-stepping %d\n", 7 - i);
-         if( after_rms > before_rms * 1.5 && !limited_orbit)
+      for( i = 0; !err_code && i < 6 && i < n_params; i++)
+         for( j = 0; j < 6; j++)
             {
-            for( j = 0; j < n_orbit_params; j++)
-               orbit[j] = (orbit[j] + orbit2[j]) * .5;
-            i--;
+            double max_difference = obs->r * .7, ratio;
+
+            if( j > 2)     /* velocity component */
+               max_difference /= (obs[n_obs - 1].jd - obs[0].jd) * .5;
+            if( i == j)
+               ratio = fabs( differences[i] / max_difference);
+            else
+               ratio = 0.;
+            if( ratio > scale_factor)
+               scale_factor = ratio;
+            }
+      if( debug_level > 1)
+         debug_printf( "lsquare computed\n");
+      memcpy( orbit2, orbit, 6 * sizeof( double));
+      for( i = 0; i < n_params && !err_code; i++)
+         {
+         if( i == 6 && asteroid_mass)
+            *asteroid_mass += differences[i] / scale_factor;
+         else
+            _tweak_orbit( orbit, i, differences[i] / scale_factor, n_params);
+         if( i == 5)    /* is our new 'orbit' state vector reasonable?  */
+            err_code = is_unreasonable_orbit( orbit);
+         }
+                  /* If the orbit "blew up" or otherwise failed,  restore */
+                  /* the original version:  */
+      if( err_code || is_unreasonable_orbit( orbit))
+         debug_printf( "Failed full step: %d: %s\n", err_code, obs->packed_id);
+      snprintf_err( tstr, sizeof( tstr), "Final setting of orbit    ");
+      i = 6;      /* possibly try six half-steps */
+      do
+         {
+         if( !loop && setting_outside_of_arc)
+            err_code = set_locs( orbit, epoch, obs - n_skipped_obs, n_total_obs);
+         else
+            err_code = set_locs( orbit, epoch, obs, n_obs);
+         if( *get_environment_ptr( "HALF_STEPS"))
+            {
+            const double after_rms = compute_rms( obs, n_obs);
+
+            snprintf_err( tstr, sizeof( tstr), "Half-stepping %d\n", 7 - i);
+            if( after_rms > before_rms * 1.5 && !limited_orbit)
+               {
+               for( j = 0; j < n_orbit_params; j++)
+                  orbit[j] = (orbit[j] + orbit2[j]) * .5;
+               i--;
+               }
+            else
+               i = 0;
             }
          else
             i = 0;
          }
-      else
-         i = 0;
+         while( !err_code && i);
+      if( loop && !err_code)
+         lsquare_free( lsquare);
       }
-      while( !err_code && i);
+   free( orig_obs);
 
    if( debug_level > 1)
       debug_printf( "full_improve done\n");
