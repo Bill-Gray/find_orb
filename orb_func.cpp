@@ -4508,24 +4508,16 @@ int orbital_monte_carlo( const double *orbit, OBSERVE *obs, const int n_obs,
    for( i = 0; i < n_sr_orbits; i++)
       {
       double *torbit = sr_orbits + i * n_orbit_params;
-      const double sig_squared = generate_mc_variant_from_covariance( torbit, orbit);
-      const char *format_str = "%+17.6f %+17.6f %+17.6f %+14.12f %+14.12f %+14.12f\n";
 
-      if( i < 1000)
-         {
-         double rms;
-         int n_resids;
-
-         set_locs( torbit, curr_epoch, obs, n_obs);
-         rms = compute_weighted_rms( obs, n_obs, &n_resids);
-         debug_printf( "Var %4d: %9.6f %.8f\n", i, sig_squared,
-                        rms * rms * n_resids);
-         }
+      generate_mc_variant_from_covariance( torbit, orbit);
       integrate_orbit( torbit, curr_epoch, epoch_shown);
       write_out_elements_to_file( torbit, epoch_shown, epoch_shown,
            obs, n_obs, "", 6, 1, ELEM_OUT_ALTERNATIVE_FORMAT | ELEM_OUT_NO_COMMENT_DATA);
       append_elements_to_element_file = 1;
       if( ofile)
+         {
+         const char *format_str = "%+17.6f %+17.6f %+17.6f %+14.12f %+14.12f %+14.12f\n";
+
          fprintf( ofile, format_str,
                torbit[0] * AU_IN_KM,
                torbit[1] * AU_IN_KM,
@@ -4533,6 +4525,7 @@ int orbital_monte_carlo( const double *orbit, OBSERVE *obs, const int n_obs,
                torbit[3] * AU_IN_KM / seconds_per_day,
                torbit[4] * AU_IN_KM / seconds_per_day,
                torbit[5] * AU_IN_KM / seconds_per_day);
+         }
       }
    if( ofile)
       fclose( ofile);
