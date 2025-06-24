@@ -930,6 +930,7 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
    int i, j;
    unsigned local_perturbers = perturbers;
    double lunar_loc[3], jsat_loc[12], ssat_loc[15];
+   double reference_planet_posn[3];
    ldouble relativistic_accel[3];
    double fraction_illum = 1., ival_as_double[3];
    extern int force_model;
@@ -1048,6 +1049,8 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
             oval[i + 3] += g * ival[8] * out_of_plane[i] / dot_prod;
          }
       }
+   if( reference_planet >= 0)
+      get_planet_posn_vel( jd, reference_planet, reference_planet_posn, NULL);
 
    if( perturbers)
       for( i = 1; i < N_PERTURB + 1; i++)
@@ -1226,27 +1229,22 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
                for( j = 0; j < 3; j++)
                   oval[j + 3] += accel_factor * accel[j];
                }
-            if( i != reference_planet)
+            if( i != reference_planet || (position_shifted && i >= 5))
                {
                if( reference_planet >= 0)
-                  {
-                  double planet_posn[3];
-
-                  get_planet_posn_vel( jd, reference_planet, planet_posn, NULL);
                   for( j = 0; j < 3; j++)
-                     planet_loc[j] -= planet_posn[j];
-                  }
+                     planet_loc[j] -= reference_planet_posn[j];
                r = vector3_length( planet_loc);
-               if( r)
-                   r = -SOLAR_GM * mass_to_use / (r * r * r);
+               assert( r);
+               r = -SOLAR_GM * mass_to_use / (r * r * r);
                for( j = 0; j < 3; j++)
                   oval[j + 3] += r * planet_loc[j];
                }
             else        /* subtract sun's attraction to reference planet */
                {
                r = vector3_length( planet_loc);
-               if( r)
-                   r = SOLAR_GM / (r * r * r);
+               assert( r);
+               r = SOLAR_GM / (r * r * r);
                for( j = 0; j < 3; j++)
                   oval[j + 3] += r * planet_loc[j];
                }
