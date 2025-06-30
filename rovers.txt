@@ -1651,3 +1651,7 @@ Cha !+016.11250    -23.290000        1182.0    Chamaeleon Observatory
 McC !-078.329166   +44.331944         206.77   Hevans Drive Observatory
 088 !+031.827694   +29.93400          494.0    Kottamia
 OKC !-097.671787   +35.411143         390.0    Oklahoma City test site
+
+   A couple of corrections,  from private communications.
+J04 !-016.511823   +28.300971        2450.     ESA Optical Ground Station, Tenerife
+853 !-110.846731   +32.581173        1166.9    Biosphere 2

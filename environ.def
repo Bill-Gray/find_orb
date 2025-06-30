@@ -7,11 +7,11 @@
    settings are written to 'environ.dat'.  If you decide at some point that
    you'd like to reset to factory defaults,  just delete 'environ.dat'.
 
-   Windows Find_Orb ignores the following 'CONSOLE_OPTS' line.  For the
-   console flavor of Find_Orb,  this line gives the default MPC code for
-   ephems, which items are shown on-screen, residual display format, and
-   whether all,  some,  or only one MPC code(s) are displayed.
-CONSOLE_OPTS=500 15 3 1
+   The following line gives the default MPC code for ephems;  a zero for
+   a now-obsolete quantity;  and (for interactive Find_Orb) quantities
+   specifying how residuals are displayed and whether all,  some,  or
+   only one MPC code(s) are displayed at the bottom of the screen.
+CONSOLE_OPTS=500 0 3 1
 
    The 'settings' give the comet magnitude type used (defaults to 'N', or
    'nuclear');  the format used for orbital elements;  the precision used
@@ -91,7 +91,7 @@ MAX_OBSERVATION_SPAN=200
       2020 May 22: corrected Arecibo parameters based on
    http://www.naic.edu/~pradar/detect.php . As that page explains,  Hurricane
    Maria downgraded the power level to 350 kW (was 900) and the gain to 7
-   (was 10).  Hope I'll be able to bump those values back up someday soon...
+   (was 10).  Sadly,  it didn't get upgraded.
 RADAR_251=350000,24,7,70.5,1.5e-11
 RADAR_253=430000,17,.94,20,1e-11
    The Parkes radio telescope in Australia lacks an official MPC code.  But it
@@ -219,7 +219,7 @@ AUTO_ARC_LEN=7300
    unit to Earth radii (this assumes the equatorial radius of 6378.140 km.)
    The final value gives the time unit:  1=days (default),  24=hours,
    1440=minutes, 86400=seconds.  For example,  VECTOR_OPTS=1,149597870.7,86400
-   would get you ecliptic vectors in kilometers and km/s.
+   would get you ecliptic J2000 vectors in kilometers and km/s.
       By default,  the vectors will be in the J2000 epoch.  You can add
    (for example) ',2016' to get output in the J2016 epoch,  or ',t' for
    output in true coordinates of date,  or ',m' for mean coordinates of
@@ -311,7 +311,6 @@ LANGUAGE=e
       A full list of formats is provided at
    https://github.com/Bill-Gray/lunar/blob/mpc_fmt.cpp
    (search for comments above the get_ra_dec() function.)
-
 RA_DEC_FORMAT=3,2
 
    By default,  Find_Orb does a decent job of figuring out which objects
@@ -510,3 +509,12 @@ MOTION_UNITS="/min
    or to the current directory (Windows).  You can specify a directory explicitly
    with the following parameter,  and 'temporary' files will be put there instead.
 OUTPUT_DIR=
+
+   (Humans should never have to edit the following line.)  If Find_Orb
+   encounters an unknown (and possibly newly assigned) observatory code,
+   it will automatically download the latest copy of MPC's ObsCodes.html.  To
+   avoid hammering MPC's servers, it will check the following values,  giving
+   the JD of the last time it downloaded the file and a 'delay' time (by
+   default,  0.1 day = 2.4 hours).  If the previous download was within that
+   delay,  it doesn't make another request.
+UPDATE_OBSCODES_HTML=2460824.384279 0.100000
