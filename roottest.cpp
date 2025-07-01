@@ -127,13 +127,20 @@ static void remove_spaces( char *buff)
 
 int main( const int argc, const char **argv)
 {
-   char poly_text[1000];
+   char poly_text[100];
    double poly[MAX_POLY], roots[MAX_POLY];
    int err_code = -99, i, order = 0, n_roots;
 
    *poly_text = '\0';
    for( i = 1; i < argc; i++)
+      {
+      if( strlen( poly_text) + strlen( argv[i]) >= sizeof( poly_text) - 1)
+         {
+         fprintf( stderr, "Overflow in polynomial buffer;  got\n%s\n", poly_text);
+         return( -1);
+         }
       strcat( poly_text, argv[i]);
+      }
    remove_spaces( poly_text);
    if( *poly_text)
       err_code = extract_full_polynomial( poly_text, poly);
@@ -143,7 +150,7 @@ int main( const int argc, const char **argv)
       printf( "'roottest' will find all _real_ roots of a given polynomial with\n");
       printf( "real coefficients,  guaranteed,  but no complex ones. For example :\n\n");
       printf( "./roottest \"(12 x^2 + x - 1)*(x-2)\"\n");
-      printf( "./roottest +12 * x ^ 3 -23 * x ^ 2 -3 * x+2\n\n");
+      printf( "./roottest \"+12 * x ^ 3 -23 * x ^ 2 -3 * x+2\"\n\n");
       printf( "would both result in finding roots at x=-1/3, x=1/4,  and x=2.\n");
       printf( "Method is described in 'roots.cpp'.\n");
       return( -1);
