@@ -2684,9 +2684,9 @@ int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid)
          cos_tilt = cos( tilt);
          sin_tilt = sin( tilt);
          *xresid = (cos_tilt * m.xresid - sin_tilt * m.yresid);
-         *xresid /= sigma_2;
+         *xresid /= sigma_1;
          *yresid = (sin_tilt * m.xresid + cos_tilt * m.yresid);
-         *yresid /= sigma_1;
+         *yresid /= sigma_2;
          n_residuals = 2;
          }
       }
