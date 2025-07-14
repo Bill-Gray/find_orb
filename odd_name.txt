@@ -202,7 +202,7 @@ P002S        Pluto II = Nix = S/2005 P 2
 P003S        Pluto III = Hydra = S/2005 P 1
 P004S        Pluto IV = Kerberos = S/2011 (134340) 1 = P4
 P005S        Pluto V = Styx = S/2012 (134340) 1 = P5
-D34340       (134340) Pluto
+D4340        (134340) Pluto
 
      WT1190F WT1190F = UDA34A3 = UW8551D = 9U01FF6
 2009-026E    2009-026E = HPO4
@@ -224,6 +224,12 @@ D34340       (134340) Pluto
 S509559      S509559 = probable Vela
      YS18A5C YS18A5C = YS16534 = A104ayW = A104lks
     AK17U010 1I/`Oumuamua
+0001I        1I/`Oumuamua = A/2017 U1
+0001IK17U010 1I/`Oumuamua = A/2017 U1
+0002I        2I/Borisov = C/2019 Q4
+0002IK19Q040 2I/Borisov = C/2019 Q4
+0003I        3I = C/2025 N1 (ATLAS)
+0003IK25N010 3I = C/2025 N1 (ATLAS)
      ZGBD4BF ZGBD4BF = ZJ15031 = unknown
      ZTF00pm ZTF00pm = ZTF01Ls
      ZTF01sS ZTF01sS = ZTF01sX = ZTF01wl
