@@ -33,7 +33,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include <stdlib.h>
 #include <time.h>
 #include <ctype.h>
-#include <assert.h>
+#include "assert2.h"
 #include <stdbool.h>
 #include "watdefs.h"
 #include "afuncs.h"

@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include <assert.h>
+#include "assert2.h"
 #include <stdio.h>
 #include <ctype.h>
 #include <math.h>

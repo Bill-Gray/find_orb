@@ -32,7 +32,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include <windows.h>
 #endif
 #include <stdarg.h>
-#include <assert.h>
+#include "assert2.h"
 #include <errno.h>
 #include "watdefs.h"
 #include "details.h"
