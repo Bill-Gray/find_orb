@@ -3349,7 +3349,7 @@ static inline int extract_ades_sigmas( const char *buff,
             }
          }
       else        /* circular position error */
-         *posn1 = *posn1;
+         *posn1 = *posn2;
       tptr = strstr( buff + loc, "m:");
       if( tptr)
          *mag_sigma = atof( tptr + 2);
