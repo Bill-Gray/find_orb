@@ -220,7 +220,7 @@ static void convert_quadratic_form_to_error_ellipse( const double A,
 /* ADES gives uncertainties in RA and dec,  plus their correlation
 (between -1 and +1).  That becomes the correlation matrix
 
-/ a  b \    a = -sig_ra^2     b = -correl * sig_ra * sig_dec
+/ a  b \    a = -sig_ra^2     b = correl * sig_ra * sig_dec
 |      |
 \ b  c /    c = -sig_dec^2
 
@@ -239,7 +239,7 @@ void convert_ades_sigmas_to_error_ellipse( const double sig_ra,
          double *minor, double *angle)
 {
    const double a = -sig_ra * sig_ra;
-   const double b = -sig_ra * sig_dec * correl;
+   const double b =  sig_ra * sig_dec * correl;
    const double c = -sig_dec * sig_dec;
    const double det = a * c - b * b;
    const double A = c / det;
@@ -269,8 +269,12 @@ void adjust_error_ellipse_for_timing_error( double *sigma_a, double *sigma_b,
                  sigma_a, sigma_b, angle);
 }
 
-
 #ifdef TEST_CODE
+
+/*  To compile the test code :
+
+cc -Wall -Wextra -pedantic -DTEST_CODE -o errors errors.cpp -lm      */
+
 int main( const int argc, const char **argv)
 {
    const double sigma_a = atof( argv[1]);
