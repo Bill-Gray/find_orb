@@ -458,6 +458,7 @@ int fetch_astrometry_from_mpc( FILE *ofile, const char *desig)
          }
       else
          {
+         debug_printf( "Command '%s' failed\n", tbuff);
          debug_printf( "grab_mpc error code %d (%x) %s\n", err_code, err_code,
                      strerror( err_code));
          generic_message_box( get_find_orb_text( 2058), "o");
@@ -669,6 +670,6 @@ int pattern_match(const char* pattern, const char* string)
 const char *find_orb_version_jd( double *jd)
 {
     if( jd)
-      *jd = 2460870.5;
-    return( "2025 Jul 14");
+      *jd = 2460880.5;
+    return( "2025 Jul 24");
 }
