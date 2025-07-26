@@ -3329,7 +3329,7 @@ static inline int extract_ades_sigmas( const char *buff,
 {
    int loc, rval = -1;
 
-   if( sscanf( buff, "%lf%n", posn1, &loc) == 1)
+   if( sscanf( buff, "%lf%n", posn2, &loc) == 1)
       {
       const char *tptr;
 
@@ -3337,7 +3337,7 @@ static inline int extract_ades_sigmas( const char *buff,
       *theta = 0.;
       if( buff[loc] == 'x')
          {
-         *posn2 = atof( buff + loc + 1);
+         *posn1 = atof( buff + loc + 1);
          while( buff[loc] > ' ' && buff[loc] != ',')
             loc++;
          if( buff[loc] == ',')
@@ -3346,11 +3346,10 @@ static inline int extract_ades_sigmas( const char *buff,
 
             convert_ades_sigmas_to_error_ellipse( *posn1, *posn2,
                               correlation, posn1, posn2, theta);
-            *theta = PI / 2. + *theta;
             }
          }
       else        /* circular position error */
-         *posn2 = *posn1;
+         *posn1 = *posn1;
       tptr = strstr( buff + loc, "m:");
       if( tptr)
          *mag_sigma = atof( tptr + 2);
@@ -5379,7 +5378,6 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
                   || optr->posn_sigma_1 != optr->posn_sigma_2)
             if( optr->note2 != 'R')
                {
-               int tilt_angle = 0;
                char sig1_buff[20], sig2_buff[20];
 
                snprintf_err( sig1_buff, sizeof( sig1_buff), "%.6f", optr->posn_sigma_1);
@@ -5388,15 +5386,19 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
                snprintf_err( sig2_buff, sizeof( sig2_buff), "%.6f", optr->posn_sigma_2);
                remove_insignificant_digits( sig2_buff);
                strip_trailing_zeroes( sig2_buff);
+               strlcpy_err( buff, "Sigma ", buffsize);
                if( strcmp( sig1_buff, sig2_buff))
                   {
-                  strlcat_err( sig1_buff, "x", sizeof( sig1_buff));
-                  strlcat_err( sig1_buff, sig2_buff, sizeof( sig1_buff));
-                  tilt_angle = (int)( optr->posn_sigma_theta * 180. / PI);
+                  const int tilt_angle =
+                               (int)( optr->posn_sigma_theta * 180. / PI) % 180;
+
+                  if( !tilt_angle)  /* PA=0 means sig1 = sigma(dec), sig2 = sigma(RA) */
+                      snprintf_append( buff, buffsize, "%sx%s\" ", sig2_buff, sig1_buff);
+                  else
+                      snprintf_append( buff, buffsize, "%sx%s\" %d ", sig1_buff, sig2_buff, tilt_angle);
                   }
-               snprintf_err( buff, buffsize, "Sigma %s\" ", sig1_buff);
-               if( tilt_angle % 180)
-                  snprintf_append( buff, buffsize, "%d ", tilt_angle);
+               else
+                  snprintf_append( buff, buffsize, "%s\" ", sig1_buff);
                }
          end_ptr = buff + strlen( buff);
          reference_to_text( end_ptr, 15, optr->reference, optr->jd);
