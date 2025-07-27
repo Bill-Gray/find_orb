@@ -235,6 +235,7 @@ char *make_config_dir_name( char *oname, const char *iname);    /* miscell.cpp *
 int reset_astrometry_filename( int *argc, const char **argv);
 int set_language( const int language);                      /* elem_out.cpp */
 static void show_splash_screen( void);
+static void show_splash_screen_and_wait( void);
 void shellsort_r( void *base, const size_t n_elements, const size_t esize,
          int (*compare)(const void *, const void *, void *), void *context);
 static int count_wide_chars_in_utf8_string( const char *iptr, const char *endptr);
@@ -1781,11 +1782,12 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
             }
          put_colored_text( "[?]", 0, xmax - 4, 3,
                               A_REVERSE | COLOR_BACKGROUND);
+         put_colored_text( "Open...", n_lines + 1, x0 + 12, 7, COLOR_HIGHLIT_BUTTON);
+         put_colored_text( "About", n_lines + 1, x0 + 6, 5, COLOR_HIGHLIT_BUTTON);
+         put_colored_text( "HELP", n_lines + 1, x0 + 20, 4, COLOR_HIGHLIT_BUTTON);
          if( *search_text)
             put_colored_text( search_text, n_lines + 1, x0,
                       (int)strlen( search_text), COLOR_FINAL_LINE);
-         put_colored_text( "Open...", n_lines + 1, x0 + 12, 7, COLOR_HIGHLIT_BUTTON);
-         put_colored_text( "HELP", n_lines + 1, x0 + 20, 4, COLOR_HIGHLIT_BUTTON);
          flushinp( );
          do
             {
@@ -1793,10 +1795,11 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
             err_message = 0;
             if( c == KEY_MOUSE)
                {
-               int x, y, z;
+               int x, y, z, dx;
                mmask_t button;
 
                get_mouse_data( &x, &y, &z, &button);
+               dx = x - x0;
                if( button & REPORT_MOUSE_POSITION)
                   c = 0;
                else if( button & BUTTON4_PRESSED)   /* actually 'wheel up' */
@@ -1807,14 +1810,17 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
                   c = '?';                 /* clicked on [?] at upper right */
                else if( y < n_lines)
                   choice = curr_page + y + (x / column_width) * n_lines;
-               else if( y == n_lines + 1 && x >= x0 - 12 && x < x0 + 19)
-                  c = ALT_F;           /* clicked on 'Open...' */
-               else if( y == n_lines + 1 || y == n_lines)
-                  c = '?';
-               else if( y == n_lines + 2 && x >= x0)
+               else if( y == n_lines + 1 && dx >= 6)
                   {
-                  const int dx = x - x0;
-
+                  if( dx >= 19)
+                     c = '?';           /* clicked on 'HELP' */
+                  else if( dx >= 11)
+                     c = ALT_F;           /* clicked on 'Open...' */
+                  else
+                     c = '.';           /* clicked on 'About' */
+                  }
+               else if( y == n_lines + 2 && dx > 0)
+                  {
                   if( dx >= 20)
                      c = 27;          /* quit */
                   else if( dx >= 15)
@@ -1834,7 +1840,7 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
             c = 8;
                      /* if a letter/number is hit,  look for an obj that */
                      /* starts with that letter/number: */
-         if( (c >= ' ' && c <= 'z' && c != '?') || c == 8)
+         if( (c >= ' ' && c <= 'z' && c != '?' && c != '.') || c == 8)
             {
             size_t len = strlen( search_text);
 
@@ -1874,6 +1880,9 @@ int select_object_in_file( OBJECT_INFO *ids, const int n_ids)
 #endif
          switch( c)
             {
+            case '.':
+               show_splash_screen_and_wait( );
+               break;
             case '?':
                show_a_file( "obj_help.txt", 0);
                break;
@@ -3893,6 +3902,20 @@ static void show_splash_screen( void)
       doupdate( );
       fclose( ifile);
       }
+}
+
+static void show_splash_screen_and_wait( void)
+{
+#ifdef MOUSE_MOVEMENT_EVENTS_ENABLED
+   mousemask( default_mouse_events, NULL);
+#endif
+   do
+      {
+      show_splash_screen( );
+      } while( KEY_RESIZE == extended_getch( ));
+#ifdef MOUSE_MOVEMENT_EVENTS_ENABLED
+   mousemask( default_mouse_events | REPORT_MOUSE_POSITION, NULL);
+#endif
 }
 
 static int find_command_area( const unsigned mouse_x, const unsigned mouse_y,
@@ -6688,19 +6711,7 @@ int main( int argc, const char **argv)
             show_calendar( );
             break;
          case '.':
-            show_splash_screen( );     /* just to test */
-            do
-               {
-               c = extended_getch( );
-               if( c == KEY_MOUSE)
-                  {
-                  get_mouse_data( (int *)&mouse_x, (int *)&mouse_y, (int *)&mouse_z, &button);
-                  if( button & REPORT_MOUSE_POSITION)
-                     c = 0;         /* ignore mouse moves */
-                  }
-               else if( KEY_RESIZE == c)
-                  show_splash_screen( );
-               } while( !c || KEY_RESIZE == c);
+            show_splash_screen_and_wait( );     /* just to test */
             break;
          case ALT_Y:
             {
