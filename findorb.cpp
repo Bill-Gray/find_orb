@@ -262,6 +262,7 @@ int load_ephemeris_settings( ephem_option_t *ephemeris_output_options,
 void compute_effective_solar_multiplier( const char *constraints);  /* runge.c */
 double find_kreutz_orbit( OBSERVE FAR *obs, int n_obs, double *orbit,
                   const double q);  /* orb_func.c */
+void reset_sr_orbits( void);                             /* elem_out.cpp */
 
 #ifdef __cplusplus
 extern "C" {
@@ -6554,9 +6555,26 @@ int main( int argc, const char **argv)
             update_element_display = 1;
             break;
          case ALT_G:
-            orbital_monte_carlo( orbit, obs, n_obs, curr_epoch, epoch_shown);
-            update_element_display = 1;
-            strlcpy_error( message_to_user, "Orbital MC generated");
+            if( !inquire( get_find_orb_text( 2101),
+                               tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY))
+               {
+               const unsigned new_n_orbits = atoi( tbuff);
+
+               if( new_n_orbits)
+                  {
+                  extern unsigned max_n_sr_orbits;
+
+                  if( max_n_sr_orbits < new_n_orbits)
+                     {
+                     max_n_sr_orbits = new_n_orbits;
+                     reset_sr_orbits( );
+                     }
+                  orbital_monte_carlo( orbit, obs, n_obs, curr_epoch, epoch_shown);
+                  update_element_display = 1;
+                  strlcpy_error( message_to_user, "Orbital MC generated");
+                  }
+               }
+            break;
             break;
          case ALT_I:
             {

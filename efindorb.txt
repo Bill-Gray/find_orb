@@ -409,3 +409,5 @@
 2097    %d satellite offsets were inside the earth\n
 
 2099    Enter initial guess for time of delta-V :
+
+2101    Enter number of desired variant orbits :

@@ -3219,7 +3219,7 @@ double mid_epoch_of_arc( const OBSERVE *obs, const int n_obs)
    return( (obs[first].jd + obs[last].jd) / 2.);
 }
 
-static void _reset_sr_orbits( void)
+void reset_sr_orbits( void)
 {
    extern double *sr_orbits;
    extern unsigned max_n_sr_orbits;
@@ -3386,11 +3386,11 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
       ignore_prev_solns = 1;
       debug_printf( "%s failed; trying more SR orbits\n", obs->packed_id);
       max_n_sr_orbits *= 5;
-      _reset_sr_orbits( );
+      reset_sr_orbits( );
       got_vectors = fetch_previous_solution( obs, n_obs, orbit, orbit_epoch,
                         epoch_shown);
       max_n_sr_orbits /= 5;
-      _reset_sr_orbits( );
+      reset_sr_orbits( );
       ignore_prev_solns = 0;
       }
    return( got_vectors);
@@ -4136,7 +4136,7 @@ int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
    max_n_sr_orbits = atoi( get_environment_ptr( "MAX_SR_ORBITS"));
    if( !max_n_sr_orbits)
       max_n_sr_orbits = 500;
-   _reset_sr_orbits( );
+   reset_sr_orbits( );
    sscanf( get_environment_ptr( "PERTURBERS"), "%x", &always_included_perturbers);
    if( *albedo)
       optical_albedo = atof( albedo);
