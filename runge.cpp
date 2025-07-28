@@ -80,8 +80,6 @@ ldouble take_rk_stepl( const ldouble jd, ELEMENTS *ref_orbit,
 ldouble take_pd89_step( const ldouble jd, ELEMENTS *ref_orbit,
                  const ldouble *ival, ldouble *ovals,
                  const int n_vals, const ldouble step);    /* runge.cpp */
-int symplectic_6( double jd, ELEMENTS *ref_orbit, double *vect,
-                                          const double dt);
 int get_planet_posn_vel( const double jd, const int planet_no,
                      double *posn, double *vel);         /* runge.cpp */
 int find_best_fit_planet( const double jd, const double *ivect,
@@ -1807,32 +1805,23 @@ ldouble take_rk_stepl( const ldouble jd, ELEMENTS *ref_orbit,
    return( sqrtl( rval * step * step));
 }
 
-int symplectic_6( double jd, ELEMENTS *ref_orbit, double *vect,
-                                          const double dt)
+#define W1  -1.17767998417887
+#define W2  0.235573213359357
+#define W3  0.784513610477560
+#define W0  (1-2*(W1+W2+W3))
+
+int symplectic_6( ldouble jd, ELEMENTS *ref_orbit, ldouble *vect,
+                                          const ldouble dt)
 {
    int i, j;
-#ifdef FOR_REFERENCE_ONLY
-         /* Some compilers object to mathematically defined consts,  so  */
-         /* I had to replace these lines with explicit numerical consts: */
-   const double w1 = -0.117767998417887E1;
-   const double w2 = 0.235573213359357E0;
-   const double w3 = 0.784513610477560E0;
-   const double w0 = (1-2*(w1+w2+w3));
-   const double d6[7] = { w3, w2, w1, w0, w1, w2, w3 };
-   const double c6[8] = { w3/2, (w3+w2)/2, (w2+w1)/2, (w1+w0)/2,
-                         (w1+w0)/2, (w2+w1)/2, (w3+w2)/2, w3/2 };
-#endif
-   static const double d6[7] = { 0.7845136104775600,  0.2355732133593570,
-            -1.1776799841788700, 1.3151863206839060, -1.1776799841788700,
-             0.2355732133593570, 0.7845136104775600 };
-   static const double c6[8] = { 0.3922568052387800,  0.5100434119184585,
-            -0.4710533854097566, 0.0687531682525180,  0.0687531682525180,
-            -0.4710533854097566, 0.5100434119184585,  0.3922568052387800 };
+   const ldouble d6[7] = { W3, W2, W1, W0, W1, W2, W3 };
+   const ldouble c6[8] = { W3/2, (W3+W2)/2, (W2+W1)/2, (W1+W0)/2,
+                         (W1+W0)/2, (W2+W1)/2, (W3+W2)/2, W3/2 };
 
    for( i = 0; i < 8; i++)
       {
-      double deriv[6];
-      const double step = dt * c6[i];
+      ldouble deriv[6];
+      const ldouble step = dt * c6[i];
 
       for( j = 0; j < 3; j++)
          vect[j] += step * vect[j + 3];
@@ -1842,11 +1831,10 @@ int symplectic_6( double jd, ELEMENTS *ref_orbit, double *vect,
          assert( fabs( jd) < 1e+9);
          for( j = 3; j < 6; j++)
             deriv[j] = 0.;
-         calc_derivatives( jd, vect, deriv, ref_orbit->central_obj);
+         calc_derivativesl( jd, vect, deriv, ref_orbit->central_obj);
          for( j = 3; j < 6; j++)
             vect[j] += dt * d6[i] * deriv[j];
          }
       }
    return( 0);
 }
-

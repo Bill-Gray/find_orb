@@ -319,8 +319,8 @@ long double take_rk_stepl( const long double jd, ELEMENTS *ref_orbit,
 long double take_pd89_step( const long double jd, ELEMENTS *ref_orbit,
                  const long double *ival, long double *ovals,
                  const int n_vals, const long double step);    /* runge.cpp */
-int symplectic_6( double jd, ELEMENTS *ref_orbit, double *vect,
-                                          const double dt);
+int symplectic_6( long double jd, ELEMENTS *ref_orbit, long double *vect,
+                                          const long double dt);   /* runge.cpp */
 static int is_unreasonable_orbit( const double *orbit);     /* orb_func.cpp */
 static int is_unreasonable_orbitl( const long double *orbit);
 
@@ -544,11 +544,9 @@ int integrate_orbitl( long double *orbit, const long double t0, const long doubl
 
       switch( integration_method)
          {
-#ifdef NOT_READY_FOR_LONG_DOUBLES
          case 1:
             symplectic_6( t, &ref_orbit, orbit, delta_t);
             break;
-#endif
          case 0:
          default:
             {
