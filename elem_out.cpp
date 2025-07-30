@@ -1541,7 +1541,9 @@ static void _store_extra_orbit_info( const char *packed_id,
       if( force_model)
          snprintf_append( buff, sizeof( buff), " model=%x", force_model);
       for( i = 0; i < n_extra_params; i++)
-         snprintf_append( buff, sizeof( buff), " A%d=%e", i + 1, solar_pressure[i]);
+         snprintf_append( buff, sizeof( buff),
+                 (n_extra_params <= 3 ? " A%d=%e" : " A%d=%f"),
+                 i + 1, solar_pressure[i]);
       if( *constraints)
          snprintf_append( buff, sizeof( buff), " Constraint=%s", constraints);
       if( line_no >= 0 && !strcmp( buff, lines[line_no]))
