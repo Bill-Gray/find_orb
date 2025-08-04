@@ -158,6 +158,7 @@
  256                                     7         1e-9   Green Bank
  257                                     7         1e-9   Goldstone DSS 25, Fort Irwin
  259                                     7         1e-9   EISCAT Tromso UHF
+ d47                                     7         1e-9   Canberra DSS 47
 #  Marco Micheli tells me that (Z84) Calar Alto has been tested
 #  to be good to about 0.05 seconds.  He usually provides positional
 #  uncertainties with the data,  so I'll just specify a 0.1-s timing
