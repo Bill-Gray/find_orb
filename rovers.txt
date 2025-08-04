@@ -483,7 +483,7 @@ SST ! -70.732371     -29.263556     2397       Swedish-ESO Submillimetre (SEST),
    making up the VLT;  it also gives lat/longs for the many auxiliary
    telescopes.  However,  they're all given as being at 2635.43 meters
    above sea level.  The geoid height is 33.91 meters for UT1 (using
-   EGM96),  resulting in an ellipsoidal height of 2369.34 meters.
+   EGM96),  resulting in an ellipsoidal height of 2669.34 meters.
    I'll go with that until we get better data...
    Incidentally,  there are actually four 1.8-m auxiliary telescopes.
    But they can be moved to any of the thirty locations CPA0 to CPM0
@@ -494,41 +494,41 @@ SST ! -70.732371     -29.263556     2397       Swedish-ESO Submillimetre (SEST),
    altitude is about 32 meters too low.  I think ObsCodes.html is
    using a geoid height where it should use an ellipsoidal one.
 
-UT1 ! -702418.27     -243739.44     2369.34    VLT UT1 (Antu)
-UT2 ! -702417.39     -243737.80     2369.34    VLT UT2 (Kueyen)
-UT3 ! -702416.32     -243736.64     2369.34    VLT UT3 (Melipal)
-UT4 ! -702414.25     -243737.36     2369.34    VLT UT4 (Yepun)
-VIST! -702351.36     -243656.52     2369.34    VLT VISTA
-CPA0! -702418.44     -243740.59     2369.34    VLT A0
-CPA1! -702418.26     -243741.08     2369.34    VLT A1
-CPB0! -702418.17     -243740.50     2369.34    VLT B0
-CPB1! -702417.99     -243740.99     2369.34    VLT B1
-CPB2! -702417.89     -243741.24     2369.34    VLT B2
-CPB3! -702417.80     -243741.48     2369.34    VLT B3
-CPB4! -702417.71     -243741.73     2369.34    VLT B4
-CPB5! -702417.62     -243741.97     2369.34    VLT B5
-CPC0! -702417.90     -243740.42     2369.34    VLT C0
-CPC1! -702417.72     -243740.91     2369.34    VLT C1
-CPC2! -702417.63     -243741.15     2369.34    VLT C2
-CPC3! -702417.53     -243741.40     2369.34    VLT C3
-CPD0! -702417.36     -243740.25     2369.34    VLT D0
-CPD1! -702416.99     -243741.23     2369.34    VLT D1
-CPD2! -702416.81     -243741.72     2369.34    VLT D2
-CPE0! -702416.83     -243740.08     2369.34    VLT E0
-CPG0! -702416.29     -243739.91     2369.34    VLT G0
-CPG1! -702415.55     -243741.87     2369.34    VLT G1
-CPG2! -702416.57     -243739.18     2369.34    VLT G2
-CPH0! -702415.21     -243739.58     2369.34    VLT H0
-CPI1! -702414.48     -243740.72     2369.34    VLT I1
-CPJ1! -702414.13     -243740.06     2369.34    VLT J1
-CPJ2! -702413.85     -243740.79     2369.34    VLT J2
-CPJ3! -702415.05     -243737.61     2369.34    VLT J3
-CPJ4! -702415.24     -243737.12     2369.34    VLT J4
-CPJ5! -702415.52     -243736.39     2369.34    VLT J5
-CPJ6! -702415.79     -243735.65     2369.34    VLT J6
-CPK0! -702414.14     -243739.24     2369.34    VLT K0
-CPL0! -702413.87     -243739.16     2369.34    VLT L0
-CPM0! -702413.60     -243739.07     2369.34    VLT M0
+UT1 ! -702418.27     -243739.44     2669.34    VLT UT1 (Antu)
+UT2 ! -702417.39     -243737.80     2669.34    VLT UT2 (Kueyen)
+UT3 ! -702416.32     -243736.64     2669.34    VLT UT3 (Melipal)
+UT4 ! -702414.25     -243737.36     2669.34    VLT UT4 (Yepun)
+VIST! -702351.36     -243656.52     2669.34    VLT VISTA
+CPA0! -702418.44     -243740.59     2669.34    VLT A0
+CPA1! -702418.26     -243741.08     2669.34    VLT A1
+CPB0! -702418.17     -243740.50     2669.34    VLT B0
+CPB1! -702417.99     -243740.99     2669.34    VLT B1
+CPB2! -702417.89     -243741.24     2669.34    VLT B2
+CPB3! -702417.80     -243741.48     2669.34    VLT B3
+CPB4! -702417.71     -243741.73     2669.34    VLT B4
+CPB5! -702417.62     -243741.97     2669.34    VLT B5
+CPC0! -702417.90     -243740.42     2669.34    VLT C0
+CPC1! -702417.72     -243740.91     2669.34    VLT C1
+CPC2! -702417.63     -243741.15     2669.34    VLT C2
+CPC3! -702417.53     -243741.40     2669.34    VLT C3
+CPD0! -702417.36     -243740.25     2669.34    VLT D0
+CPD1! -702416.99     -243741.23     2669.34    VLT D1
+CPD2! -702416.81     -243741.72     2669.34    VLT D2
+CPE0! -702416.83     -243740.08     2669.34    VLT E0
+CPG0! -702416.29     -243739.91     2669.34    VLT G0
+CPG1! -702415.55     -243741.87     2669.34    VLT G1
+CPG2! -702416.57     -243739.18     2669.34    VLT G2
+CPH0! -702415.21     -243739.58     2669.34    VLT H0
+CPI1! -702414.48     -243740.72     2669.34    VLT I1
+CPJ1! -702414.13     -243740.06     2669.34    VLT J1
+CPJ2! -702413.85     -243740.79     2669.34    VLT J2
+CPJ3! -702415.05     -243737.61     2669.34    VLT J3
+CPJ4! -702415.24     -243737.12     2669.34    VLT J4
+CPJ5! -702415.52     -243736.39     2669.34    VLT J5
+CPJ6! -702415.79     -243735.65     2669.34    VLT J6
+CPK0! -702414.14     -243739.24     2669.34    VLT K0
+CPL0! -702413.87     -243739.16     2669.34    VLT L0
+CPM0! -702413.60     -243739.07     2669.34    VLT M0
 
    Private communication from Peter Birtwhistle. (J95) is at
    a _geoid_ height (from Google Earth) of 105 metres;  this was
