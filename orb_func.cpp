@@ -2373,7 +2373,7 @@ static int evaluate_limited_orbit( const double *orbit,
                                                      2. / 3.);
                            /* fall-thru   */
             case 'a':
-               constraints[rval++] = (elem.major_axis / value) - 1.;
+               constraints[rval++] = 1. / elem.major_axis - 1. / value;
                break;
             case 'n':
                value = 360. / value;         /* now value = period in days */
