@@ -870,6 +870,12 @@ OBS T. Oribe
 COM Default details extracted from MPEC 2021-F20
 TEL 1.03-m f/4.6 reflector + CCD
 
+COD 874
+OBS E. Martiolli, F. Falkenberg, F. Monteiro, L. Fraga, F. Rodrigues, E. Martioli
+MEA F. Monteiro
+COM Default details extracted from MPEC 2025-O40
+TEL 1.60-m f/10.0 Ritchey-Chretien + CCD
+
 COD 900
 OBS Y. Ikari
 COM Default details extracted from MPEC 2021-A190
@@ -1472,6 +1478,11 @@ COD E23
 OBS A. Hidas
 COM Default details extracted from MPEC 2021-C16
 TEL 0.35-m f/1.9 reflector + CCD
+
+COD E29
+OBS A. Pearce
+COM Default details extracted from MPEC 2025-P113
+TEL 1.00-m f/6.0 reflector + CCD
 
 COD E62
 OBS B. Lutkenhoner, E. Cortes
@@ -3259,6 +3270,12 @@ OBS J. Maikner
 COM Default details extracted from MPEC 2021-J28
 TEL 0.30-m f/3.8 Riccardi-Honders + CCD
 
+COD W63
+OBS J. A. Aguirre, L. Florez, D. Ruiz
+COM Default details extracted from MPEC 2025-O40
+MEA E. A. Quintero
+TEL 0.41-m f/10.0 Schmidt-Cassegrain + CCD
+
 COD W71
 OBS G. Viscome
 COM Default details extracted from MPEC 2023-C45
@@ -3562,6 +3579,12 @@ COD Y87
 OBS J.-G. Bosch
 COM Default details extracted from MPEC 2024-E49
 TEL 0.25-m f/4.75 reflector + CMO
+
+COD Y88
+OBS I. Smith, M. Phillips
+MEA P. Devine
+COM Default details extracted from MPEC 2025-O40
+TEL 0.30-m f/4 reflector + CMO
 
 COD Y89
 OBS R. Hahn
