@@ -4384,12 +4384,6 @@ void recreate_observation_line( char *obuff, const OBSERVE FAR *obs,
    int mag_digits_to_erase = 0;
    OBSERVE tobs = *obs;
 
-   if( obs->note2 == 'R')     /* for radar obs,  we simply store the */
-      {                       /* original observation line           */
-      strlcpy_err( obuff, obs->second_line + 81, 81);
-      return;
-      }
-// set_obs_to_microday( &tobs);
    switch( GET_RESID_RA_DEC_FORMAT( residual_format))
       {
       case 0:           /* use same format as obs was reported in */
@@ -4415,6 +4409,11 @@ void recreate_observation_line( char *obuff, const OBSERVE FAR *obs,
    obuff[13] = obs->note1;
    obuff[14] = obs->note2;
    memcpy( obuff + 15, buff, 17);      /* date/time */
+   if( obs->note2 == 'R')         /* restore orig observation line */
+      {                           /* for everything past column 32 */
+      strlcpy_err( obuff + 32, obs->second_line + 81 + 32, 81 - 32);
+      return;
+      }
    memcpy( obuff + 32, buff + 24, 12);      /* RA */
    memcpy( obuff + 44, buff + 38, 13);      /* dec */
    snprintf_err( obuff + 57, 24, "%13.2f%c%c%s%s", obs->obs_mag,
