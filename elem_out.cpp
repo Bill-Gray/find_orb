@@ -3392,7 +3392,6 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
       got_vectors = fetch_previous_solution( obs, n_obs, orbit, orbit_epoch,
                         epoch_shown);
       max_n_sr_orbits /= 5;
-      reset_sr_orbits( );
       ignore_prev_solns = 0;
       }
    return( got_vectors);
