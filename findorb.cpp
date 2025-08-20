@@ -4332,6 +4332,7 @@ int main( int argc, const char **argv)
       {
       int line_no = 0, mouse_wheel_motion;
       extern bool saving_elements_for_reuse;
+      int top_line_to_blink = 0, bottom_line_to_blink = 0;
 
       prev_getch = c;
       while( get_new_file || get_new_object)
@@ -4549,9 +4550,9 @@ int main( int argc, const char **argv)
             unsigned right_side_col = 0;
             const unsigned spacing = 4;  /* allow four columns between */
                         /* 'standard' and 'extended' (right-hand) text */
-            int elem_color = (bad_elements ?
-                              A_BLINK + COLOR_OBS_INFO : COLOR_ORBITAL_ELEMENTS);
 
+            if( bad_elements)
+               top_line_to_blink = line_no + iline;
             while( iline < 20 && fgets_trimmed( tbuff, sizeof( tbuff), ifile))
                {
                if( show_commented_elements && *tbuff == '#')
@@ -4559,7 +4560,7 @@ int main( int argc, const char **argv)
                   if( tbuff[3] != '$' && memcmp( tbuff, "# Find", 6)
                                       && memcmp( tbuff, "# Scor", 6))
                      {
-                     put_colored_text( tbuff + 2, line_no + iline, 0, -1, elem_color);
+                     put_colored_text( tbuff + 2, line_no + iline, 0, -1, COLOR_ORBITAL_ELEMENTS);
                      iline++;
                      }
                   }
@@ -4569,8 +4570,11 @@ int main( int argc, const char **argv)
                   int n_chars_to_highlight = 0;
                   const char *reference = get_environment_ptr( "REFERENCE");
 
-                  if( !memcmp( tbuff, "IMPACT", 6))
-                     elem_color = COLOR_ATTENTION + A_BLINK;
+                  if( !memcmp( tbuff, "IMPACT", 6) && !top_line_to_blink)
+                     {
+                     top_line_to_blink = line_no + iline;
+                     bottom_line_to_blink = top_line_to_blink + 1;
+                     }
                   if( !memcmp( tbuff, "Epoch", 5))
                      add_cmd_area( 'e', line_no + iline, 0, 5);
                   if( !memcmp( tbuff + 3, "Peri", 4))
@@ -4605,7 +4609,7 @@ int main( int argc, const char **argv)
                      text_search_and_replace( tbuff, " +/- ", " \xc2\xb1 ");
                      text_search_and_replace( tbuff, "^2", "\xc2\xb2");
                      }
-                  put_colored_text( tbuff, line_no + iline, 0, -1, elem_color);
+                  put_colored_text( tbuff, line_no + iline, 0, -1, COLOR_ORBITAL_ELEMENTS);
                   if( right_side_col < (unsigned)strlen( tbuff) + spacing)
                      right_side_col = (unsigned)strlen( tbuff) + spacing;
                   tptr = strstr( tbuff, "Earth MOID:");
@@ -4642,11 +4646,13 @@ int main( int argc, const char **argv)
                        || !memcmp( tbuff + 2, "MOID", 4))
                         {
                         put_colored_text( tbuff + 2, line_no + right_side_line,
-                                right_side_col, -1, elem_color);
+                                right_side_col, -1, COLOR_ORBITAL_ELEMENTS);
                         right_side_line++;
                         }
                }
             line_no += iline;
+            if( bad_elements)
+               bottom_line_to_blink = line_no;
             fclose( ifile);
             }
          if( debug_level)
@@ -4765,6 +4771,13 @@ int main( int argc, const char **argv)
                   tbuff[9] = '\0';
                   put_colored_text( tbuff, clock_line,
                                  getmaxx( stdscr) - 9, 9, COLOR_OBS_INFO);
+                  for( i = top_line_to_blink; i < bottom_line_to_blink; i++)
+                     {
+                     attr_t attrib = (t0 % 3) ? A_NORMAL : A_REVERSE;
+                     short color = (t0 % 3 == 2) ? COLOR_OBS_INFO : COLOR_ORBITAL_ELEMENTS;
+
+                     mvchgat( i, 0, getmaxx( stdscr), attrib, color, 0);
+                     }
                   }
                napms( 50);      /* a 'tick' is 50 milliseconds long */
                n_ticks_elapsed++;
