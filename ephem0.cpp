@@ -4072,7 +4072,8 @@ void format_observation( const OBSERVE FAR *obs, char *text,
 
             if( base_time_format != 3)
                {
-               show_dd_hh_mm_ss_point_sss( text + 5, day, n_time_digits);
+               show_dd_hh_mm_ss_point_sss( text + 5, day,
+                           (obs->note2 == 'R' ? 0 : n_time_digits));
                text[7] = ':';
                text[10] = text[11];     /* Turn dd hh:mm:ss into dd:hhmmss. This */
                text[11] = text[12];     /* corresponds to the somewhat weird way */
