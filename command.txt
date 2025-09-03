@@ -2,7 +2,7 @@ q              Quit
 .              About
 o              Open...
 n              NewObj
-F16 (shift-f4) AddObj
+O              AddObj
 m              epheM
 f              Full
 h              Herget
@@ -16,10 +16,11 @@ u              Undo
 {              FilterObs
 *              NonGravs
 c              Calend
-+              HelioOnly
++              OrbCenter
 -              Obs'ories
 x              ToggObs
 =              MagResids
+j              MagType
 w              Worst
 #              Simplex
 /              Superplex
@@ -84,13 +85,14 @@ End colors
 
 Start hints
 
+.              Splash screen/Find_Orb version info
 b              Select format for observation times
 c              Show calendar
 r              Enter dist to object at start and end of arc
 q              Quit Find_Orb
 o              Open a file of astrometry
 n              Select a different object from the file
-Shift-F4       Add astrometry for a different object
+O              Add astrometry for a different object
 m              Generate ephemerides
 f              Do a full least-squares improvement of the orbit
 h              Compute an orbit using the method of Herget
@@ -106,6 +108,7 @@ u              Undo (go back to previous orbit)
 -              Change the number of observatories shown at bottom
 x              Toggle currently selected observation(s) on/off
 =              Toggle display of magnitude residuals
+j              Cycle magnitude model from asteroid to comet nuclear to comet total
 w              Show included observation with the worst residuals
 #              Apply the 'simplex' orbit improvement method
 /              Apply the 'superplex' orbit improvement method
@@ -134,6 +137,8 @@ Alt-X          Find next obs with a desired MPC code
 U+9            Toggle sort obs by date vs. sort by MPC code
 U+31004        Add a line of menu options
 U+31005        Remove last line of menu options
+Shift-Up       Toggle all observations above the selected one
+Shift-Dn       Toggle all observations below the selected one
 ?              Get help
 %              Set uncertainties for the selected observation(s)
 &              Select format for observation RA/decs

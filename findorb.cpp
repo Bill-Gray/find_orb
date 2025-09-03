@@ -3044,24 +3044,6 @@ static void put_colored_text( const char *text, const int line_no,
    attroff( color & attrib_mask);
 }
 
-OBSERVE *add_observations( FILE *ifile, OBSERVE *obs,
-                  const OBJECT_INFO *ids, int *n_obs)
-{
-   OBSERVE *obs2 = load_observations( ifile, ids->packed_desig, ids->n_obs);
-   extern int n_obs_actually_loaded;
-
-   if( debug_level)
-      printf( "Got %d new obs\n", n_obs_actually_loaded);
-   fclose( ifile);
-   obs = (OBSERVE *)realloc( obs,
-                 (*n_obs + n_obs_actually_loaded) * sizeof( OBSERVE));
-   memcpy( obs + *n_obs, obs2, n_obs_actually_loaded * sizeof( OBSERVE));
-   *n_obs += n_obs_actually_loaded;
-   free( obs2);
-   *n_obs = sort_obs_by_date_and_remove_duplicates( obs, *n_obs);
-   return( obs);
-}
-
 int find_first_and_last_obs_idx( const OBSERVE *obs, const int n_obs,
          int *last);       /* elem_out.cpp */
 double mid_epoch_of_arc( const OBSERVE *obs, const int n_obs);
@@ -5218,29 +5200,6 @@ int main( int argc, const char **argv)
             strlcpy_error( message_to_user, get_find_orb_text( 20));
             add_off_on = obs[curr_obs].is_included;
             break;
-         case KEY_F(16):     /* Shift-F4:  select another object to add in */
-            if( (i = select_object_in_file( ids, n_ids)) >= 0)
-               {
-               FILE *ifile = fopen( ifilename, "rb");
-
-               obs = add_observations( ifile, obs, ids + i, &n_obs);
-               if( debug_level)
-                  printf( "Now have %d obs\n", n_obs);
-               if( mpc_color_codes)
-                  free( mpc_color_codes);
-               if( max_mpc_color_codes)
-                  mpc_color_codes = find_mpc_color_codes( n_obs, obs,
-                             max_mpc_color_codes);
-               if( debug_level)
-                  debug_printf( "got color codes; ");
-               for( i = 0; i < n_obs - 1 && !obs[i].is_included; i++)
-                  ;
-               curr_obs = i;
-               set_locs( orbit, curr_epoch, obs, n_obs);
-               update_element_display = 1;
-               clear( );
-               }
-            break;
 #ifdef KEY_SDOWN
          case KEY_SDOWN:
 #endif
@@ -6829,6 +6788,7 @@ int main( int argc, const char **argv)
          case KEY_F( 2):
          case KEY_F( 13):        /* shift-f1 */
          case KEY_F( 14):        /* shift-f2 */
+         case KEY_F( 16):        /* shift-f4 */
          case KEY_F( 24):        /* shift-f12 */
          case KEY_DC:            /* delete key */
          case CTL_DEL:
