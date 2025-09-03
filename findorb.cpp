@@ -4067,7 +4067,7 @@ int main( int argc, const char **argv)
    bool drop_single_obs = true;
    int sort_obs_by_code = 0, *key_remaps;
    int n_stations_shown = 0, top_obs_shown = 0, n_obs_shown = 0;
-   bool single_obs_selected = false;
+   bool single_obs_selected = false, appending_observations = false;
    extern unsigned random_seed;
    unsigned mouse_x = (unsigned)-1, mouse_y = 0, mouse_z = 0;
    mmask_t button = 0;
@@ -4399,6 +4399,8 @@ int main( int argc, const char **argv)
                {
                FILE *ifile;
                long file_offset;
+               OBSERVE *prev_obs = obs;
+               int prev_n_obs = n_obs;
 
                strlcpy_error( obj_name, ids[id_number].obj_name);
                snprintf_err( tbuff, sizeof( tbuff), "Loading '%s'...", obj_name);
@@ -4420,7 +4422,7 @@ int main( int argc, const char **argv)
                if( file_offset)        /* read and discard partial line */
                   if( !fgets( tbuff, sizeof( tbuff), ifile))
                      return( -4);
-               if( obs)
+               if( obs && !appending_observations)
                   unload_observations( obs, n_obs);
 
                strlcpy_error( tbuff, get_find_orb_text( 18));
@@ -4433,6 +4435,13 @@ int main( int argc, const char **argv)
                assert( obs);
                fclose( ifile);
                n_obs = ids[id_number].n_obs;
+               if( appending_observations)
+                  {
+                  obs = (OBSERVE *)realloc( obs, (n_obs + prev_n_obs) * sizeof( OBSERVE));
+                  memcpy( obs + n_obs, prev_obs, prev_n_obs * sizeof( OBSERVE));
+                  n_obs += prev_n_obs;
+                  shellsort_r( obs, n_obs, sizeof( OBSERVE), compare_observations, NULL);
+                  }
                if( !curr_epoch || !epoch_shown || !obs || n_obs < 2)
                   debug_printf( "Curr epoch %f; shown %f; obs %p; %d obs\n",
                                  curr_epoch, epoch_shown, (void *)obs, n_obs);
@@ -4830,7 +4839,8 @@ int main( int argc, const char **argv)
                                       | FULL_CTIME_YMD | FULL_CTIME_LEADING_ZEROES
                                       | FULL_CTIME_MICRODAYS);
                            strcat( tbuff, " = ");
-                           full_ctime( tbuff + strlen( tbuff), utc, FULL_CTIME_TIME_ONLY);
+                           full_ctime( tbuff + strlen( tbuff), utc,
+                                      FULL_CTIME_TIME_ONLY | FULL_CTIME_HUNDREDTH_SEC);
                            if( dt < 1.)
                               snprintf_append( tbuff, sizeof( tbuff), "\n%.2f hours ago", dt * 24.);
                            else if( dt < 7.)
@@ -5663,11 +5673,14 @@ int main( int argc, const char **argv)
                            ifilename, residual_format);
             break;
          case 'o':             /* select a new file */
+         case 'O':             /* append observations */
             get_new_file = get_new_object = true;
+            appending_observations = (c == 'O');
             *ifilename = '\0';
             break;
          case 'n': case 'N':   /* select a new object from the input file */
             get_new_object = true;
+            appending_observations = (c == 'N');
             update_element_display = 1;
             pop_all_orbits( );
             break;
@@ -6804,7 +6817,6 @@ int main( int argc, const char **argv)
                update_element_display = 1;
                }
             break;
-         case 'O':
          case ';': case ']':
          case CTRL( 'E'): case CTRL( 'J'): case CTRL( 'L'):
          case CTRL( 'N'): case CTRL( 'O'): case CTRL( 'Q'):
