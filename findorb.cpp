@@ -20,7 +20,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #define _XOPEN_SOURCE_EXTENDED   1
 #define PDC_NCMOUSE
 #define PDC_FORCE_UTF8
-#define MOUSE_MOVEMENT_EVENTS_ENABLED
 
 #ifdef _WIN32
 #include <windows.h>
@@ -357,17 +356,30 @@ static int *store_curr_screen( void)
    return( rval);
 }
 
-#ifndef __PDCURSES__
 /* Some ncurses platforms are squirrelly about how they handle
 mouse movements.  Console commands have to be issued to turn
-the mouse on or off.  This is still getting some testing,  and
-is commented out by default. */
+the mouse on or off.  */
 
-#ifdef MOUSE_MOVEMENT_EVENTS_ENABLED
+#ifndef __PDCURSES__
    #define VT_IGNORE_ALL_MOUSE      CSI "?1003l\n"
    #define VT_RECEIVE_ALL_MOUSE     CSI "?1003h\n"
 #endif
+
+static void _disable_mouse_movements( void)
+{
+#ifdef VT_IGNORE_ALL_MOUSE
+   printf( VT_IGNORE_ALL_MOUSE);
 #endif
+   mousemask( default_mouse_events, NULL);
+}
+
+static void _enable_mouse_movements( void)
+{
+#ifdef VT_RECEIVE_ALL_MOUSE
+   printf( VT_RECEIVE_ALL_MOUSE);
+#endif
+   mousemask( default_mouse_events | REPORT_MOUSE_POSITION, NULL);
+}
 
 #ifdef __WATCOMC__
 #undef endwin
@@ -379,18 +391,14 @@ PDCEX  int     endwin_u64_4400(void);
 
 static int full_endwin( void)
 {
-#ifdef VT_IGNORE_ALL_MOUSE
-   printf( VT_IGNORE_ALL_MOUSE);
-#endif
+   _disable_mouse_movements( );
    return( endwin( ));
 }
 
 #ifndef _WIN32
 static int restart_curses( void)
 {
-#ifdef VT_RECEIVE_ALL_MOUSE
-   printf( VT_RECEIVE_ALL_MOUSE);
-#endif
+   _enable_mouse_movements( );
    return( refresh( ));
 }
 #endif
@@ -3242,17 +3250,10 @@ static inline int initialize_curses( void)
    PDC_set_title( get_find_orb_text( 18));
                               /* "Find_Orb -- Orbit Determination" */
 #endif
-#ifdef VT_RECEIVE_ALL_MOUSE
-   printf( VT_RECEIVE_ALL_MOUSE);
-#endif
+   _enable_mouse_movements( );
    if( debug_level > 2)
       debug_printf( "(3)\n");
    keypad( stdscr, 1);
-#ifdef MOUSE_MOVEMENT_EVENTS_ENABLED
-   mousemask( default_mouse_events | REPORT_MOUSE_POSITION, NULL);
-#else
-   mousemask( default_mouse_events, NULL);
-#endif
    set_color_table( );
    return( 0);
 }
@@ -3893,16 +3894,12 @@ static void show_splash_screen( void)
 
 static void show_splash_screen_and_wait( void)
 {
-#ifdef MOUSE_MOVEMENT_EVENTS_ENABLED
-   mousemask( default_mouse_events, NULL);
-#endif
+   _disable_mouse_movements( );
    do
       {
       show_splash_screen( );
       } while( KEY_RESIZE == extended_getch( ));
-#ifdef MOUSE_MOVEMENT_EVENTS_ENABLED
-   mousemask( default_mouse_events | REPORT_MOUSE_POSITION, NULL);
-#endif
+   _enable_mouse_movements( );
 }
 
 static int find_command_area( const unsigned mouse_x, const unsigned mouse_y,
