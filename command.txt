@@ -28,6 +28,8 @@ w              Worst
 |              MonteCarlo
 [              CovarData
 `              CmtMags
+Ctrl-Dn        NextOpp
+Ctrl-Up        PrevOpp
 Shift-Up       ToggUp
 Shift-Dn       ToggDn
 Ctrl-Y         BanObs
@@ -137,6 +139,8 @@ Alt-X          Find next obs with a desired MPC code
 U+9            Toggle sort obs by date vs. sort by MPC code
 U+31004        Add a line of menu options
 U+31005        Remove last line of menu options
+Ctrl-Dn        Find first observation in the next opposition
+Ctrl-Up        Find last observation from the previous opposition
 Shift-Up       Toggle all observations above the selected one
 Shift-Dn       Toggle all observations below the selected one
 ?              Get help

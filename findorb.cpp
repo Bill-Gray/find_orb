@@ -2043,10 +2043,14 @@ static int get_character_code( const char *buff)
       rval = atoi( buff + 2);
    else if( !memcmp( buff, "Ctrl-", 5))
       {
-      if( !memcmp( buff + 4, "Up", 2))
+      if( !memcmp( buff + 5, "Up", 2))
          rval = CTL_UP;
-      else if( !memcmp( buff + 4, "Dn", 2))
+      else if( !memcmp( buff + 5, "Dn", 2))
          rval = CTL_DN;
+      else if( !memcmp( buff + 5, "Lf", 2))
+         rval = CTL_LEFT;
+      else if( !memcmp( buff + 5, "Rt", 2))
+         rval = CTL_RIGHT;
       else
          rval = buff[5] - 64;
       }
@@ -6679,11 +6683,7 @@ int main( int argc, const char **argv)
                single_obs_selected = true;
                }
             break;
-#ifdef CTL_DOWN        /* PDCurses uses this #define */
-         case CTL_DOWN:
-#else                  /* ncurses uses this #define */
          case CTL_DN:
-#endif
             if( curr_obs < n_obs - 1)
                {
                curr_obs++;
