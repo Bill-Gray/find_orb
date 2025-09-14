@@ -5118,8 +5118,8 @@ int compute_radar_info( const OBSERVE *obs, RADAR_INFO *rinfo)
    memcpy( tbuff, first_line + 62, 5);
    tbuff[5] = '.';
    tbuff[6] = first_line[67];
-   memcpy( tbuff + 7, obs->second_line + 62, 8);
-   tbuff[15] = '\0';
+   memcpy( tbuff + 7, obs->second_line + 62, 6);
+   tbuff[13] = '\0';
    rinfo->freq_hz = atof( tbuff) * 1e+6;   /* cvt MHz to Hz */
    rinfo->rtt_obs = extract_radar_value( first_line + 32) * 1.e-6;
    rinfo->rtt_sigma = extract_radar_value( obs->second_line + 32) * 1e-6;
