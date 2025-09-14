@@ -2960,8 +2960,9 @@ int sort_obs_by_date_and_remove_duplicates( OBSERVE *obs, const int n_obs)
    if( debug_level)
       debug_printf( "%d obs sorted by date\n", n_obs);
    for( i = j = 1; i < n_obs; i++)
-      if( !times_very_close( obs + i, obs + i - 1) || strcmp( obs[i].mpc_code,
-                                                obs[i - 1].mpc_code))
+      if( !times_very_close( obs + i, obs + i - 1)
+                      || strcmp( obs[i].mpc_code, obs[i - 1].mpc_code)
+                      || (obs[i].flags & OBS_DONT_USE))
          obs[j++] = obs[i];
       else if( memcmp( obs + i, obs + i - 1, sizeof( OBSERVE)))
          {
