@@ -4575,7 +4575,9 @@ int main( int argc, const char **argv)
                   if( tptr)
                      add_cmd_area( 't', line_no + iline,
                                           (int)( tptr - tbuff), 20);
-                  tptr = strstr( tbuff, "(J2000 ");
+                  tptr = strstr( tbuff, "(J2000");
+                  if( !tptr)
+                     tptr = strstr( tbuff, "(body fr");
                   if( tptr)
                      add_cmd_area( ALT_N, line_no + iline,
                                           (int)( tptr - tbuff) - 3, 20);
@@ -6209,15 +6211,6 @@ int main( int argc, const char **argv)
                                tbuff, sizeof( tbuff), COLOR_DEFAULT_INQUIRY))
                show_a_file( tbuff, 0);
             break;
-         case '`':
-            {
-            default_comet_magnitude_type =
-                        'N' + 'T' - default_comet_magnitude_type;
-            if( default_comet_magnitude_type == 'N')
-               strlcpy_error( message_to_user, "Using nuclear mags for comets");
-            else
-               strlcpy_error( message_to_user, "Using total mags for comets");
-            }
          case KEY_MOUSE:   /* already handled above */
             break;
          case 'b':
@@ -6773,7 +6766,7 @@ int main( int argc, const char **argv)
                update_element_display = 1;
                }
             break;
-         case ';': case ']':
+         case ';': case ']': case '`':
          case CTRL( 'E'): case CTRL( 'J'): case CTRL( 'L'):
          case CTRL( 'N'): case CTRL( 'O'): case CTRL( 'Q'):
          case CTRL( 'S'): case CTRL( 'T'): case CTRL( 'U'):
