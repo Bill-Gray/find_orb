@@ -677,8 +677,7 @@ int main( int argc, const char **argv)
                break;
             case 'p':
                {
-               FILE *ifile = fopen_ext( "dummy.txt", "tfcw");
-
+               ifile = fopen_ext( "dummy.txt", "tfcw");
                fclose( ifile);
                n_processes = atoi( arg);
                }

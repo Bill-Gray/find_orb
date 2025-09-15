@@ -1516,7 +1516,7 @@ void get_periapsis_loc( double *ecliptic_lon, double *ecliptic_lat,
 }
 
 static void _store_extra_orbit_info( const char *packed_id,
-               const unsigned perturbers, const int n_extra_params,
+               const int n_extra_params,
                const double *solar_pressure, const char *constraints)
 {
    extern int force_model;
@@ -1593,7 +1593,7 @@ static int _compare_misaligned_packed_desigs( const char *desig1,
 }
 
 static int _get_extra_orbit_info( const char *packed_id,
-                unsigned *perturbers, int *n_extra_params,
+                int *n_extra_params,
                 double *solar_pressure, char *constraints)
 {
    extern int force_model;
@@ -1610,7 +1610,7 @@ static int _get_extra_orbit_info( const char *packed_id,
          const char *tptr;
 
          if( (tptr = strstr( lines[i], " p=")) != NULL)
-            sscanf( tptr + 3, "%x", perturbers);
+            sscanf( tptr + 3, "%x", &perturbers);
          if( (tptr = strstr( lines[i], " model=")) != NULL)
             sscanf( tptr + 7, "%x", (unsigned *)&force_model);
          for( j = 0; j < 5; j++)
@@ -2009,7 +2009,7 @@ int write_out_elements_to_file( const double *orbit,
    if( saving_elements_for_reuse && available_sigmas == COVARIANCE_AVAILABLE)
       {
       add_sof_to_file( "orbits.sof", &elem, orbit + 6, n_obs, obs, "orbitdef.sof");
-      _store_extra_orbit_info( obs->packed_id, perturbers, n_orbit_params - 6,
+      _store_extra_orbit_info( obs->packed_id, n_orbit_params - 6,
                      orbit + 6, constraints);
       }
 /* if( showing_sigmas == COVARIANCE_AVAILABLE)
@@ -2252,10 +2252,10 @@ int write_out_elements_to_file( const double *orbit,
          {
          if( i >= 4 && i <= 6)        /* lines w/Peri., Node, & Incl. */
             {
-            char *tptr = buff + (precision < 10 ? 19 : 9 + precision);
+            char *angle_ptr = buff + (precision < 10 ? 19 : 9 + precision);
 
-            memmove( tptr + 17, tptr, strlen( tptr) + 1);
-            memset( tptr, ' ', 17);
+            memmove( angle_ptr + 17, angle_ptr, strlen( angle_ptr) + 1);
+            memset( angle_ptr, ' ', 17);
             consider_replacing( buff, "Peri.", "sigma_omega");
             consider_replacing( buff, "Node", "sigma_Omega");
             consider_replacing( buff, "Incl.", "sigma_i");
@@ -2281,16 +2281,16 @@ int write_out_elements_to_file( const double *orbit,
             case 'P':
                {
                char *zptr = strchr( buff, 'Q');
-               char tbuff[80];
+               char apo_buff[80];
 
                if( zptr)
                   {
-                  strlcpy_error( tbuff, zptr);
-                  consider_replacing( tbuff, "Q", "sigma_Q");
+                  strlcpy_error( apo_buff, zptr);
+                  consider_replacing( apo_buff, "Q", "sigma_Q");
                   zptr[-1] = '\0';
                   }
                else                 /* no aphelion given */
-                  *tbuff = '\0';
+                  *apo_buff = '\0';
                zptr = strchr( buff, 'q');
                if( zptr)
                   {
@@ -2321,7 +2321,7 @@ int write_out_elements_to_file( const double *orbit,
                   memmove( buff, zptr, strlen( zptr) + 1);
                   consider_replacing( buff, "q", "sigma_q");
                   strlcat_error( buff, "    ");
-                  strlcat_error( buff, tbuff);
+                  strlcat_error( buff, apo_buff);
                   }
                }
                break;
@@ -2870,7 +2870,7 @@ static int get_orbit_from_sof( const char *filename,
          snprintf( tname, sizeof( tname), "%-12.12s", object_name);
       while( !got_vectors && fgets_trimmed( buff, sizeof( buff), ifile))
          if( !memcmp( tname, buff, 12) && !_get_extra_orbit_info(
-                       tname, &perturbers, &n_extra_params,
+                       tname, &n_extra_params,
                        orbit + 6, NULL))
             {
             double extra_info[10];

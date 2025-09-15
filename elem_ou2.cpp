@@ -186,13 +186,13 @@ int put_elements_into_sof( char *obuff, const char *templat,
                   (right_justify ? "%*s" : "%-*s"), (int)i, text_to_put);
       else if( val_to_put)
          {
-         size_t j = 1;
+         size_t k = 1;
 
-         while( j < i && templat[j] != '.')
-            j++;
-         if( j == i)       /* no decimal point found */
-            j = 0;
-         snprintf( obuff, i + 1, "%*.*f", (int)i, (int)(i - j) - 1, val_to_put);
+         while( k < i && templat[k] != '.')
+            k++;
+         if( k == i)       /* no decimal point found */
+            k = 0;
+         snprintf( obuff, i + 1, "%*.*f", (int)i, (int)(i - k) - 1, val_to_put);
          }
       else if( integer_to_put)
          snprintf( obuff, i + 1, "%*d", (int)i, integer_to_put);
