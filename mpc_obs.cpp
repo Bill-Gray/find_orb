@@ -1321,7 +1321,23 @@ int get_object_name( char *obuff, const char *packed_desig)
                remove_trailing_cr_lf( obuff);
                }
             if( info[9] != ' ')              /* append name */
-               strlcpy( obuff + strlen( obuff), info + 8, 19);
+               {
+               FILE *ifile = fopen_ext( "astnames.txt", "crb");
+               int n_read = 0;
+               char buff[200];
+
+               if( ifile)
+                  {
+                  while( fgets( buff, sizeof( buff), ifile) && memcmp( buff, "Ref N", 5))
+                     ;
+                  while( n_read < number && fgets_trimmed( buff, sizeof( buff), ifile))
+                     if( (n_read = atoi( buff + 10)) == number)
+                        strlcpy( obuff + strlen( obuff), buff + 17, 30);
+                  fclose( ifile);
+                  }
+               if( n_read != number)
+                  strlcpy( obuff + strlen( obuff), info + 8, 19);
+               }
             remove_trailing_cr_lf( obuff);
             }
          }
