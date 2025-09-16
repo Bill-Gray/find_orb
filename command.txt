@@ -8,6 +8,8 @@ f              Full
 h              Herget
 v              Vaisa
 d              resiD
+}              ResidFmt
+Alt-L          Language
 g              Gauss
 l              constr
 e              Epoch
@@ -27,7 +29,6 @@ w              Worst
 :              Linearize
 |              MonteCarlo
 [              CovarData
-`              CmtMags
 Ctrl-Dn        NextOpp
 Ctrl-Up        PrevOpp
 Shift-Up       ToggUp
@@ -118,7 +119,6 @@ w              Show included observation with the worst residuals
 |              Compute Monte Carlo variant orbits
 [              Show the covariance and some debugging data
 {              Toggle obs on below a desired residual level,  off above it
-`              Toggle comet mags between nuclear M(N) and total M(T)
 )              Select a file and show it on-screen
 0              Toggle lunar perturbations
 1              Toggle perturbations from Mercury
@@ -132,6 +132,7 @@ w              Show included observation with the worst residuals
 9              Toggle perturbations from Pluto
 a              Toggle perturbations from asteroids
 t              Select how residuals are shown
+Alt-L          Select display language
 Alt-K          Toggle display of uncertainties
 Alt-N          Select frame for orbital elements
 Alt-R          Set reference for orbital elements
@@ -152,6 +153,7 @@ Ctrl-X         Save orbits for re-use
 Ctrl-Y         Write excluded observations to be 'banned'
 Ctrl-G         Set magnitude slope parameter (G)
 U+31008        Left-click to select tracklet, right to toggle it
+}              Cycle precision in which residuals are shown
 
 Start remaps :
     ; PuTTY doesn't recognize Shift-Up or Shift-Dn (just returns the same key
