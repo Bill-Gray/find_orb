@@ -2868,6 +2868,9 @@ static int get_orbit_from_sof( const char *filename,
                   atoi( object_name + 2));
       else
          snprintf( tname, sizeof( tname), "%-12.12s", object_name);
+      for( size_t i = 0; i < 12; i++)
+         if( tname[i] == '(')
+            memset( tname + i, ' ', 12 - i);
       while( !got_vectors && fgets_trimmed( buff, sizeof( buff), ifile))
          if( !memcmp( tname, buff, 12) && !_get_extra_orbit_info(
                        tname, &n_extra_params,
@@ -2884,7 +2887,7 @@ static int get_orbit_from_sof( const char *filename,
             n_orbit_params = n_extra_params + 6;
             compute_two_body_state_vect( elems, orbit, elems->epoch);
             push_orbit( elems->epoch, orbit);
-            if( extra_info[1] - extra_info[0] > full_arc_len / 2.)
+            if( extra_info[1] - extra_info[0] >= full_arc_len / 2.)
                {
                got_vectors = 1;
                if( elems->ecc == 1.)     /* indicate parabolic-constraint orbit */
@@ -3263,13 +3266,12 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
       const double full_arc_len = obs[n_obs - 1].jd - obs[0].jd;
       double rms_resid;
 
-      got_vectors = get_orbit_from_sof( "orbits.sof", obs->packed_id,
-                                          orbit, &elems, full_arc_len, &rms_resid);
-#ifdef FALLING_BACK_ON_MPCORB          /* MPCORB isn't entirely reliable */
-      if( !got_vectors)
+      if( n_obs == 1)
          got_vectors = get_orbit_from_mpcorb_sof( object_name, orbit, &elems,
                                   full_arc_len, &rms_resid);
-#endif
+      else
+         got_vectors = get_orbit_from_sof( "orbits.sof", obs->packed_id,
+                                          orbit, &elems, full_arc_len, &rms_resid);
       if( got_vectors)
          {
          move_add_nstr( 2, 2, "Stored soln loaded", -1);
@@ -3303,6 +3305,8 @@ static int fetch_previous_solution( OBSERVE *obs, const int n_obs, double *orbit
                  obs->r, vector3_length( obs->obs_posn), NULL);
       obs->obs_mag = floor( obs->obs_mag * 10. + .5) * .1;
       obs->mag_precision = 1;         /* start out assuming mag to .1 mag */
+      *epoch_shown = *orbit_epoch;
+      return( got_vectors);
       }
    for( i = 0; i < n_obs; i++)
       if( obs[i].note2 == 'R')
