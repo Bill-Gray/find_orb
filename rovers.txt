@@ -338,10 +338,10 @@ d26 !-116.87301642 +35.33568918      968.6932  DSS 26 Goldstone 34-meter
 d27 !-116.77665045 +35.23827178     1052.4689  DSS 27 Goldstone 34-meter
 d28 !-116.77889117 +35.23827202     1064.6481  DSS 28 Goldstone 34-meter
 d34 ! 148.98196443 -35.39847884      692.0204  DSS 34 Canberra 34-meter
-d35 ! 148.98145576 -35.39579552      694.8893  DSS 35 Canberra 34-meter
-d36 ! 148.97854426 -35.39510176      685.5055  DSS 36 Canberra 34-meter
+263 ! 148.98145576 -35.39579552      694.8893  Canberra DSS 35
+264 ! 148.97854426 -35.39510176      685.5055  Canberra DSS 36
 d42 ! 148.98126740 -35.40067464      674.6155  DSS 42 Canberra 34-meter
-d43 ! 148.98126731 -35.40242423      688.7973  DSS 43 Tidbinbilla 70-meter
+265 ! 148.98126731 -35.40242423      688.7973  Canberra DSS 43
 d45 ! 148.97768563 -35.39845769      674.3329  DSS 45 Canberra 34-meter
 d46 ! 148.98308169 -35.40501064      676.8121  DSS 46 Canberra 26-meter
 d49 ! 148.26351559 -32.99839901      414.8151  DSS 49 Parkes
@@ -385,6 +385,18 @@ d66 ! 3554454.89654  +402547.90955   849.87404 DSS 66 Madrid 26-meter
 252 ! 2431219.94762  +351449.79132  1070.44450 Goldstone DSS 13, Fort Irwin
 253 ! 2430637.66245  +352533.24313  1001.39054 Goldstone DSS 14, Fort Irwin
 257 ! 2430728.69246  +352015.40307   959.63401 Goldstone DSS 25, Fort Irwin
+
+   These coordinates came from JPL's radar API.  The MPC file has slightly
+   bad positions.  Their position for Haystack is 47 meters to the west and
+   39 meters higher than that given by JPL.  Evpatoria has a 9-m horizontal
+   difference and six vertically;  Green Bank is two meters off horizontally
+   and three vertically.  (I would expect JPL's coordinates to be accurate.)
+   DSS-74 currently lacks an official observatory code.
+
+254 !-071.488161     +42.623297      116.69    Haystack (37-m)
+255 ! 033.186954     +45.189153       69.      Yevpatoriya
+256 !-079.8398386    +38.4331291     823.64    Green Bank
+d74 ! 133.8098322    -31.8676903     164.66    Ceduna 30-m, UTAS
 
    Coordinates for Cerro Tololo and Cerro Pachon telescopes,  from
    https://arxiv.org/abs/1210.1616 , Table 6.  Note that some positions
@@ -1542,7 +1554,7 @@ UAZ !-110.947361   +32.232722         100.000  University of Arizona 24"
    locations.  The following coordinates came a private communication from
    Jon Giorgini at JPL.
 
-d47 ! 149.5501388  -30.3128846       236.87    DSS 47
+271 ! 149.5501388  -30.3128846       236.87    ATCA DSS 47
 
    (Opt) is a 'floating' location,  used internally in Find_Orb.  It is the
    'best' topocentric location for observing an object at a given time (puts
@@ -1655,3 +1667,11 @@ OKC !-097.671787   +35.411143         390.0    Oklahoma City test site
    A couple of corrections,  from private communications.
 J04 !-016.511823   +28.300971        2450.     ESA Optical Ground Station, Tenerife
 853 !-110.846731   +32.581173        1166.9    Biosphere 2
+
+   Andrew Pearce and Terry Lovejoy provided these coordinates for the old
+   Perth Observatory.  "(323) represents the Perth Observatory at the
+   current site but before 1966 it was located about 30kms west."  They
+   measured some plates of C/1917 F1 (Mellish) in 2025 (submitted to MPC
+   as 'roving observer' observations).
+
+OPe !-115.8444     -31.9525            70.0    Perth Observatory (before 1966)
