@@ -239,7 +239,7 @@ static void _merge_element_files( const char *filename, const int n_processes,
    for( i = 0; i < n_processes; i++)
       {
       process_count = i + 1;
-      input_files[i] = fopen_ext( get_file_name( buff, filename), "tfclr");
+      input_files[i] = fopen_ext( get_file_name( buff, filename), "tfcr");
       }
    for( i = quit = 0; !quit; i++)
       {

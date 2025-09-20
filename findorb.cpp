@@ -930,7 +930,7 @@ static char *_set_radio_button( char *text, const int option_num)
 
 static void show_calendar( void)
 {
-   FILE *ifile = fopen_ext( "calend.txt", "clrb");
+   FILE *ifile = fopen_ext( "calend.txt", "crb");
 
    if( ifile)
       fclose( ifile);
@@ -2583,7 +2583,7 @@ static int remove_rgb_code( char *buff, int *offset)
 
 static void show_a_file( const char *filename, const int flags)
 {
-   FILE *ifile = fopen_ext( filename, "tclrb");
+   FILE *ifile = fopen_ext( filename, "tcrb");
    char buff[560], err_text[100];
    int line_no = 0, keep_going = 1;
    int n_lines = 0, msg_num = 0;
@@ -2597,7 +2597,7 @@ static void show_a_file( const char *filename, const int flags)
    size_t max_column_shown = 0;
 
    if( !ifile)
-      ifile = fopen_ext( filename, "clrb");
+      ifile = fopen_ext( filename, "crb");
    if( !ifile)
       {
       snprintf_err( buff, sizeof( buff), "Couldn't open '%s'", filename);
@@ -3486,7 +3486,7 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
 
       help_file_name = "openfile.txt";
       clear( );
-      ifile = fopen_ext( help_file_name, "fclrb");
+      ifile = fopen_ext( help_file_name, "fcrb");
       i = 0;
       while( fgets_trimmed( buff, buffsize, ifile) && *buff != '$')
          put_colored_text( buff, (int)i++, 0, -1, COLOR_BACKGROUND);

@@ -73,14 +73,11 @@ t  File is temporary (doesn't actually have an effect yet).
 f  If the file isn't opened,  a fatal error message is shown.
 c  Configuration file:  look for it in ~/.find_orb (for Linux) or in
    the directory in which Find_Orb is running (Windows).
-l  Try opening locally;  if that fails,  try the config directory.
 
    One can combine these.  For example, 'permits' of tfcw would
 tell the function that the file is a temporary one,  should be
 opened within the configuration directory for writing,  and that
-if it can't be opened, it's a fatal error.  'cl' = try config,
-then local; 'lc' = try local,  then config;  'c' = try config
-only.
+if it can't be opened, it's a fatal error.
 
    I'm still working out the degree to which a separate directory
 for these files will be needed.  In the past,  find_orb,  fo,
@@ -257,9 +254,13 @@ FILE *fopen_ext( const char *filename, const char *permits)
 {
    FILE *rval = NULL;
    bool is_fatal = false;
-   bool try_local = true;
    bool is_temporary = false;
 
+   if( strchr( permits, 'l'))
+      {
+      debug_printf( "fopen_ext( '%s', '%s') error\n", filename, permits);
+      assert( 0);
+      }
    if( *permits == 't')
       {
 #if !defined( _WIN32) && !defined( __WATCOMC__)
@@ -275,16 +276,10 @@ FILE *fopen_ext( const char *filename, const char *permits)
       permits++;
       }
    if( !use_config_directory || is_temporary)
-      while( *permits == 'l' || *permits == 'c')
+      if( *permits == 'c')
          permits++;
    if( *permits == 'c' && strchr( filename, '/'))
       permits++;              /* not really in the config directory */
-   if( permits[0] == 'l' && permits[1] == 'c')
-      {     /* try local,  then config version */
-      try_local = false;
-      permits++;
-      rval = fopen_tilde( filename, permits + 1);
-      }
 #ifndef _WIN32
    if( is_temporary)
       {
@@ -301,14 +296,8 @@ FILE *fopen_ext( const char *filename, const char *permits)
 
       make_config_dir_name( tname, filename);
       permits++;
-      if( *permits == 'l')       /* permits are 'cl' = check both */
-         permits++;
-      else                       /* check config version only */
-         try_local = false;
       rval = fopen_tilde( tname, permits);
       }
-   if( try_local && !rval && !is_temporary)
-      rval = fopen_tilde( filename, permits);
    if( !rval && is_fatal)
       {
       char buff[300];

@@ -3748,7 +3748,7 @@ bool is_topocentric_mpc_code( const char *mpc_code)
 
 static double get_telescope_primary_diameter( const char *mpc_code)
 {
-   FILE *ifile = fopen_ext( "details.txt", "fclrb");
+   FILE *ifile = fopen_ext( "details.txt", "fcrb");
    char buff[100];
    double rval = 0.;
    int in_code_section = 0;
@@ -3775,7 +3775,7 @@ static void get_scope_params( const char *mpc_code, expcalc_config_t *c)
    char filename[120];
 
    snprintf_err( filename, sizeof( filename), "site_%.3s.txt", mpc_code);
-   ifile = fopen_ext( filename, "clrb");
+   ifile = fopen_ext( filename, "crb");
    if( ifile)
       {
       scope_details = find_expcalc_config_from_mpc_code( mpc_code, ifile, c);
@@ -3794,7 +3794,7 @@ static void get_scope_params( const char *mpc_code, expcalc_config_t *c)
       }
    if( scope_details == EXPCALC_NO_CONFIG_FOUND)
       {
-      ifile = fopen_ext( "scope.json", "fclrb");
+      ifile = fopen_ext( "scope.json", "fcrb");
       scope_details = find_expcalc_config_from_mpc_code( mpc_code, ifile, c);
       fclose( ifile);
       }
@@ -4652,7 +4652,7 @@ static int get_observer_details( const char *observation_filename,
       const char *mpc_code, const char *prog_codes,
       char *observers, char *measurers, char *scope)
 {
-   FILE *ifile = fopen_ext( observation_filename, "fclrb");
+   FILE *ifile = fopen_ext( observation_filename, "fcrb");
    char buff[700];
    const bool getting_observers = (*observers == '\0');
    const bool getting_measurers = (*measurers == '\0');
