@@ -397,6 +397,7 @@ d66 ! 3554454.89654  +402547.90955   849.87404 DSS 66 Madrid 26-meter
 255 ! 033.186954     +45.189153       69.      Yevpatoriya
 256 !-079.8398386    +38.4331291     823.64    Green Bank
 d74 ! 133.8098322    -31.8676903     164.66    Ceduna 30-m, UTAS
+d86 ! 138.3627624    +36.1324029    1532.72    Usuda 64-m, JAXA
 
    Coordinates for Cerro Tololo and Cerro Pachon telescopes,  from
    https://arxiv.org/abs/1210.1616 , Table 6.  Note that some positions
