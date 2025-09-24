@@ -97,7 +97,7 @@ dmu/dr = -r/mu,  dr = -(mu/r) dmu,  and we can change variables :
 
              1
             (
-TI(r0) = 2pi \  (a0 * mu + a1 * mu2 + a2 * mu^3 + ...) dmu
+TI(r0) = 2pi \  (a0 * mu + a1 * mu^2 + a2 * mu^3 + ...) dmu
               )
             mu=mu0
 
@@ -108,7 +108,7 @@ I(r) = TI(r) / TI(r0).)
 
    Compiles with
 
-g++ -Wall -Wextra -pedantic -oshadow shadow.cpp       */
+g++ -Wall -Wextra -Wshadow -pedantic -oshadow shadow.cpp       */
 
 #include <math.h>
 
@@ -141,6 +141,10 @@ static double intensity( const double r, const int method)
    return( rval);
 }
 
+#include <stdio.h>
+
+#ifdef OLD_TEST_CODE
+
 static double total_intensity( const double r, const int method)
 {
    const double mu2 = 1. - r * r;
@@ -167,9 +171,6 @@ static double total_intensity( const double r, const int method)
    return( (i0 - rval) / i0);
 }
 
-#include <stdio.h>
-
-#ifdef OLD_TEST_CODE
       /* I used this to verify that the numerical derivative of the
       'total_intensity()' function matches,  after normalization,
       the results from the 'intensity()' function.  Shouldn't have
@@ -190,16 +191,17 @@ int main( const int argc, const char **argv)
 
       if( r)
          numeric_deriv /= r;
-      printf( "%.2f: %.9f %.5f\n", r, total_intensity( r, method), numeric_deriv);
+      printf( "%.2f: %.9f %.9f %.5f\n", r, intensity( r, method),
+                              total_intensity( r, method), numeric_deriv);
       }
    return( 0);
 }
 
-#endif         /* #ifdef OLD_TEST_CODE */
+#else         /* #ifdef OLD_TEST_CODE */
 
 /* Default : generate table in the comments at top. */
 
-int main( const int argc, const char **argv)
+int main( void)
 {
    double r;
    int method;
@@ -214,3 +216,4 @@ int main( const int argc, const char **argv)
       }
    return( 0);
 }
+#endif
