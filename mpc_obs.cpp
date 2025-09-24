@@ -113,7 +113,7 @@ void compute_error_ellipse_adjusted_for_motion( double *sigma1, double *sigma2,
                   const MOTION_DETAILS *m);                  /* orb_func.cpp */
 double n_nearby_obs( const OBSERVE FAR *obs, const unsigned n_obs,
           const unsigned idx, const double time_span);       /* orb_func.cpp */
-void convert_ades_sigmas_to_error_ellipse( const double sig_ra,
+int convert_ades_sigmas_to_error_ellipse( const double sig_ra,
          const double sig_dec, const double correl, double *major,
          double *minor, double *angle);                      /* errors.cpp */
 
@@ -3738,9 +3738,18 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
 
                   SET_SIGMA( mag_sigma, ades_mag_sigma, override_mag_sigma);
                   SET_SIGMA( time_sigma, ades_time_sigma, override_time_sigma);
-                  SET_SIGMA( posn_sigma_1, ades_posn_sigma_1, override_posn_sigma_1);
-                  SET_SIGMA( posn_sigma_2, ades_posn_sigma_2, override_posn_sigma_2);
-                  SET_SIGMA( posn_sigma_theta, ades_posn_sigma_theta, override_posn_sigma_theta);
+                  if( ades_posn_sigma_1 > 0.)
+                     {
+                     posn_sigma_1 = ades_posn_sigma_1;
+                     posn_sigma_2 = ades_posn_sigma_2;
+                     posn_sigma_theta = ades_posn_sigma_theta;
+                     }
+                  else if( override_posn_sigma_1 > 0.)
+                     {
+                     posn_sigma_1 = override_posn_sigma_1;
+                     posn_sigma_2 = override_posn_sigma_2;
+                     posn_sigma_theta = override_posn_sigma_theta;
+                     }
 
                   if( sscanf( rval[i].columns_57_to_65, "%lf %lf%n",
                               &ra_sigma, &dec_sigma, &bytes_read) >= 2
@@ -3805,7 +3814,8 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                   rval[i].posn_sigma_1 = posn_sigma_1;
 //             else if( rval[i].note2 != 'X')
 //                insufficient_precision |= INSUFFICIENT_PRECISION_POSN1;
-               if( posn_sigma_2 * 1.1 > rval[i].posn_sigma_2 || !use_sigmas)
+               if( posn_sigma_2 * 1.1 > rval[i].posn_sigma_2 || !use_sigmas
+                                 || !posn_sigma_2)
                   rval[i].posn_sigma_2 = posn_sigma_2;
 //             else if( rval[i].note2 != 'X')
 //                insufficient_precision |= INSUFFICIENT_PRECISION_POSN2;
@@ -3957,6 +3967,12 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
       if( rval[i].note2 == 'X' || rval[i].note2 == 'x')     /* deleted observation */
          {
          comment_observation( rval + i, "Deleted");
+         rval[i].flags |= OBS_DONT_USE;
+         rval[i].is_included = 0;
+         }
+      else if( rval[i].posn_sigma_1 <= 0. || rval[i].posn_sigma_2 <= 0.)
+         {
+         comment_observation( rval + i, "BadSigm");
          rval[i].flags |= OBS_DONT_USE;
          rval[i].is_included = 0;
          }

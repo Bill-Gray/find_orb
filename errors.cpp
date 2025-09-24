@@ -154,9 +154,9 @@ of the following.)
    ...i.e.,  we have reduced it to a new quadratic form/covariance matrix.
 */
 
-void adjust_error_ellipse_for_timing_error( double *sigma_a, double *sigma_b,
+int adjust_error_ellipse_for_timing_error( double *sigma_a, double *sigma_b,
          double *angle, const double vx, const double vy);   /* errors.cpp */
-void convert_ades_sigmas_to_error_ellipse( const double sig_ra,
+int convert_ades_sigmas_to_error_ellipse( const double sig_ra,
          const double sig_dec, const double correl, double *major,
          double *minor, double *angle);                      /* errors.cpp */
 
@@ -168,6 +168,7 @@ static void adjust_quadratic_form_for_timing_error( const double A,
    const double Fx = A * vx + B * vy;
    const double Fy = C * vy + B * vx;
 
+   assert( E);
    *A1 = A - Fx * Fx / E;
    *B1 = B - Fx * Fy / E;
    *C1 = C - Fy * Fy / E;
@@ -199,22 +200,27 @@ precision problems that can crop up when you're taking the difference of
 two similar quantities.  (Though it may not avoid such problems,  if
 AC is close to B^2.... not much we can do about that,  though.)  */
 
-static void convert_quadratic_form_to_error_ellipse( const double A,
+static int convert_quadratic_form_to_error_ellipse( const double A,
          const double B, const double C, double *a, double *b,
          double *angle)
 {
-   const double tval = sqrt( (A - C) * (A - C) + 4. * B * B);
+   const double tval_squared = (A - C) * (A - C) + 4. * B * B;
+   const double tval = sqrt( tval_squared);
    const double eigenval2 = (A + C - tval) * .5;
    const double eigenval1 = (A * C - B * B) / eigenval2;
 
 #ifdef TEST_CODE
    printf( "Eigenvals %f %f\n", eigenval1, eigenval2);
 #endif          /* #ifdef TEST_CODE */
-   assert( eigenval1 < 0.);
-   assert( eigenval2 < 0.);
+   if( eigenval1 >= 0. || eigenval2 >= 0. || tval_squared < 0.)
+      {
+      *a = *b = *angle = 0.;
+      return( -1);
+      }
    *a = 1. / sqrt( -eigenval1);
    *b = 1. / sqrt( -eigenval2);
    *angle = atan2( eigenval1 - A, B);
+   return( 0);
 }
 
 /* ADES gives uncertainties in RA and dec,  plus their correlation
@@ -234,7 +240,7 @@ matrix,
    and we can feed said quadratic form through the above function
 to get the error ellipse,  which is what Find_Orb actually wants. */
 
-void convert_ades_sigmas_to_error_ellipse( const double sig_ra,
+int convert_ades_sigmas_to_error_ellipse( const double sig_ra,
          const double sig_dec, const double correl, double *major,
          double *minor, double *angle)
 {
@@ -242,11 +248,24 @@ void convert_ades_sigmas_to_error_ellipse( const double sig_ra,
    const double b =  sig_ra * sig_dec * correl;
    const double c = -sig_dec * sig_dec;
    const double det = a * c - b * b;
-   const double A = c / det;
-   const double B = b / det;
-   const double C = a / det;
 
-   convert_quadratic_form_to_error_ellipse( A, B, C, major, minor, angle);
+   if( !det || isnan( det) || sig_ra <= 0. || sig_dec <= 0.
+               || correl >= 1. || correl <= -1.)
+
+      {                             /* should never happen;  indicates */
+      *major = sqrt( -a - c);       /* non-physical uncertainties */
+      *minor = 0.;
+      *angle = 0.;
+      return( -2);
+      }
+   else
+      {
+      const double A = c / det;
+      const double B = b / det;
+      const double C = a / det;
+
+      return( convert_quadratic_form_to_error_ellipse( A, B, C, major, minor, angle));
+      }
 }
 
 /* adjust_error_ellipse_for_timing_error( ) puts the above pieces
@@ -254,19 +273,22 @@ together : given the estimated error ellipse and the uncertainty
 vector from timing,  it computes an adjusted error ellipse "stretched
 out" in the direction of motion.   */
 
-void adjust_error_ellipse_for_timing_error( double *sigma_a, double *sigma_b,
+int adjust_error_ellipse_for_timing_error( double *sigma_a, double *sigma_b,
          double *angle, const double vx, const double vy)
 {
    double A, B, C;
    double A1, B1, C1;
+
+   if( *sigma_a <= 0. || *sigma_b <= 0.)      /* non-physical ellipse; */
+      return( -2);                            /* leave it alone */
 
    convert_error_ellipse_to_quadratic_form( *sigma_a,
                *sigma_b, *angle, &A, &B, &C);
 
    adjust_quadratic_form_for_timing_error( A, B, C, vx, vy,
                   &A1, &B1, &C1);
-   convert_quadratic_form_to_error_ellipse( A1, B1, C1,
-                 sigma_a, sigma_b, angle);
+   return( convert_quadratic_form_to_error_ellipse( A1, B1, C1,
+                 sigma_a, sigma_b, angle));
 }
 
 #ifdef TEST_CODE

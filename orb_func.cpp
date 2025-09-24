@@ -143,7 +143,7 @@ const char *get_find_orb_text( const int index);      /* elem_out.cpp */
 void set_obs_vect( OBSERVE FAR *obs);        /* mpc_obs.h */
 double improve_along_lov( double *orbit, const double epoch, const double *lov,
           const unsigned n_params, unsigned n_obs, OBSERVE *obs);
-void adjust_error_ellipse_for_timing_error( double *sigma_a, double *sigma_b,
+int adjust_error_ellipse_for_timing_error( double *sigma_a, double *sigma_b,
          double *angle, const double vx, const double vy);   /* errors.cpp */
 void compute_error_ellipse_adjusted_for_motion( double *sigma1, double *sigma2,
                   double *posn_angle, const OBSERVE *obs,
@@ -2674,17 +2674,20 @@ int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid)
          {
          MOTION_DETAILS m;
          double sigma_1, sigma_2, tilt;
-         double cos_tilt, sin_tilt;
 
          compute_observation_motion_details( obs, &m);
          compute_error_ellipse_adjusted_for_motion( &sigma_1, &sigma_2,
                   &tilt, obs, &m);
-         cos_tilt = cos( tilt);
-         sin_tilt = sin( tilt);
-         *xresid = (sin_tilt * m.xresid + cos_tilt * m.yresid);
-         *xresid /= sigma_1;
-         *yresid = (cos_tilt * m.xresid - sin_tilt * m.yresid);
-         *yresid /= sigma_2;
+         if( sigma_1 > 0. && sigma_2 > 0.)      /* if sigmas are bogus,  leave */
+            {                                   /* xresid = yresid = 0 */
+            const double cos_tilt = cos( tilt);
+            const double sin_tilt = sin( tilt);
+
+            *xresid = (sin_tilt * m.xresid + cos_tilt * m.yresid);
+            *xresid /= sigma_1;
+            *yresid = (cos_tilt * m.xresid - sin_tilt * m.yresid);
+            *yresid /= sigma_2;
+            }
          n_residuals = 2;
          }
       }
