@@ -170,6 +170,37 @@
 # the 80-column astrometric format won't give us all of that.)
 # I assume accuracy in time to a video frame = 1/60 second.
  244                                    .001       .017   Geocentric occultation
+# Unistellar telescopes have quite iffy astrometry.  The first
+# such observer will have obscode (270);  additional ones will
+# be assigned obscodes (27a),  (27b), ... just to keep them
+# reasonably straight.
+ 270                                    10         1.0    Unistellar Network
+ 27a                                    10         1.0    Unistellar Network
+ 27b                                    10         1.0    Unistellar Network
+ 27c                                    10         1.0    Unistellar Network
+ 27d                                    10         1.0    Unistellar Network
+ 27e                                    10         1.0    Unistellar Network
+ 27f                                    10         1.0    Unistellar Network
+ 27g                                    10         1.0    Unistellar Network
+ 27h                                    10         1.0    Unistellar Network
+ 27i                                    10         1.0    Unistellar Network
+ 27j                                    10         1.0    Unistellar Network
+ 27k                                    10         1.0    Unistellar Network
+ 27l                                    10         1.0    Unistellar Network
+ 27m                                    10         1.0    Unistellar Network
+ 27n                                    10         1.0    Unistellar Network
+ 27o                                    10         1.0    Unistellar Network
+ 27p                                    10         1.0    Unistellar Network
+ 27q                                    10         1.0    Unistellar Network
+ 27r                                    10         1.0    Unistellar Network
+ 27s                                    10         1.0    Unistellar Network
+ 27t                                    10         1.0    Unistellar Network
+ 27u                                    10         1.0    Unistellar Network
+ 27v                                    10         1.0    Unistellar Network
+ 27w                                    10         1.0    Unistellar Network
+ 27x                                    10         1.0    Unistellar Network
+ 27y                                    10         1.0    Unistellar Network
+ 27z                                    10         1.0    Unistellar Network
 #  You MUST have some final "catchall" lines that assign sigmas to all
 # observations not otherwise catalogued.  Here,  we'll say that if the
 # observation predates 1993,  we'll assume a sigma of 3",  no matter
