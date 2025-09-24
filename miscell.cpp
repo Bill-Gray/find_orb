@@ -540,7 +540,7 @@ int reset_astrometry_filename( int *argc, const char **argv)
          }
       if( argv[1][1] == 'f')
          {
-         FILE *ofile = fopen_ext( temp_obs_filename, "fwb");
+         FILE *ofile = fopen( temp_obs_filename, "wb");
 
          assert( ofile);
          fetch_astrometry_from_mpc( ofile, obj_name);
@@ -659,6 +659,6 @@ int pattern_match(const char* pattern, const char* string)
 const char *find_orb_version_jd( double *jd)
 {
     if( jd)
-      *jd = 2460934.5;
-    return( "2025 Sep 16");
+      *jd = 2460941.5;
+    return( "2025 Sep 23");
 }
