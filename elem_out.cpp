@@ -3121,6 +3121,8 @@ static double extract_state_vect_from_text( const char *text,
          dist_units = AU_IN_METERS;
       else if( *text == 'g')
          central_object = 3;
+      else if( *text == 'l')
+         central_object = 10;
       else if( *text == 's')
          time_units = seconds_per_day;
       else if( *text == 'A' && text[1] >= '1' && text[1] <= '3'
