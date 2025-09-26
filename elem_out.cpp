@@ -437,6 +437,7 @@ static void observation_summary_data( char *obuff, const OBSERVE FAR *obs,
                   compute_rms( obs, n_obs);
       char rms_buff[24];
       const char *rms_format = "%.2f";
+      const char *extended = get_environment_ptr( "EXTENDED_RESID");
 
       strlcat_err( obuff, " ", obuff_size);
       obuff += strlen( obuff);
@@ -450,7 +451,10 @@ static void observation_summary_data( char *obuff, const OBSERVE FAR *obs,
       else
          text_search_and_replace( rms_buff, ".", "\".");
       snprintf_err( obuff, obuff_size, get_find_orb_text( 17), rms_buff);
-      }                                 /* "; mean residual %s." */
+      if( *extended)
+         snprintf_append( obuff, obuff_size, "/%.2f sigmas",
+                     compute_weighted_rms( obs, n_obs, NULL));
+      }
 }
 
 double centralize_ang( double ang)
