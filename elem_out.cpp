@@ -922,7 +922,7 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
             {
             const char *fields[] = { "name", "prov_desig", "disc_date", "disc_site",
                            "disc_ref", "discover" };
-            const int offsets[] = { 9, 29, 41, 53, 72, 78 };
+            const int offsets[] = { 12, 32, 44, 56, 75, 81 };
             char *tptr = (char *)find_nth_utf8_char( text, offsets[i]);
 
             remove_trailing_cr_lf( tptr);

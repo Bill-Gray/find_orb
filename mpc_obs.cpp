@@ -1078,7 +1078,7 @@ char *find_numbered_mp_info( const int number)
    const int tolerance = 10;        /* try to get within ten lines */
    static int cached_number = -1;
    static char *cached = NULL;
-   char buff[200];
+   char buff[200], *name_text;
    FILE *ifile;
 
    if( !number)
@@ -1092,11 +1092,13 @@ char *find_numbered_mp_info( const int number)
    if( cached_number == -2)      /* haven't got the file */
       return( NULL);
    ifile = fopen_ext( "NumberedMPs.txt", "crb");
-   if( !ifile)
+   if( !ifile || !fgets( buff, sizeof( buff), ifile))
       {
       cached_number = -2;
       return( NULL);
       }
+   name_text = strstr( buff, "Ceres");
+   assert( name_text);
    while( !got_it)
       {
       if( number < tolerance)
@@ -1105,7 +1107,7 @@ char *find_numbered_mp_info( const int number)
          {
          fseek( ifile, loc, SEEK_SET);
          for( i = 0; i < 2; i++)
-            if( !fgets( buff, sizeof( buff), ifile))
+            if( !fgets_trimmed( buff, sizeof( buff), ifile))
                {
                fclose( ifile);
                return( NULL);
@@ -1118,7 +1120,7 @@ char *find_numbered_mp_info( const int number)
       if( curr_no > number - tolerance && curr_no <= number)
          {
          for( i = number - curr_no; i; i--)
-            if( !fgets( buff, 200, ifile))
+            if( !fgets_trimmed( buff, 200, ifile))
                {
                fclose( ifile);
                return( NULL);
@@ -1131,6 +1133,11 @@ char *find_numbered_mp_info( const int number)
    fclose( ifile);
    if( !cached)
       cached = (char *)malloc( 200);
+   if( name_text < buff + 12)       /* old 'NumberedMPs.txt' files put the */
+      {                            /* asteroid names in a different column */
+      memmove( buff + 12, name_text, strlen( name_text) + 1);
+      memset( name_text, ' ', (buff + 12) - name_text);
+      }
    strlcpy_err( cached, buff, 200);
    cached_number = number;
    return( cached);
@@ -1314,13 +1321,13 @@ int get_object_name( char *obuff, const char *packed_desig)
          obuff += strlen( obuff);
          if( info)
             {
-            if( info[29] != ' ')        /* prov ID */
+            if( info[33] != ' ')        /* prov ID */
                {
                strlcpy( obuff, " =", 3);
-               strlcpy( obuff + 2, info + 28, 12);
+               strlcpy( obuff + 2, info + 31, 12);
                remove_trailing_cr_lf( obuff);
                }
-            if( info[9] != ' ')              /* append name */
+            if( info[12] != ' ')             /* append name */
                {
                FILE *ifile = fopen_ext( "astnames.txt", "crb");
                int n_read = 0;
@@ -1336,7 +1343,7 @@ int get_object_name( char *obuff, const char *packed_desig)
                   fclose( ifile);
                   }
                if( n_read != number)
-                  strlcpy( obuff + strlen( obuff), info + 8, 19);
+                  strlcpy( obuff + strlen( obuff), info + 11, 19);
                }
             remove_trailing_cr_lf( obuff);
             }
@@ -3865,7 +3872,6 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                /* indicate 1/sigma arcseconds.                             */
       if( *buff == '#')
          {
-
          if( !memcmp( buff, "#Weight ", 8))
             {
             override_posn_sigma_1 = override_posn_sigma_2 = 1. / atof( buff + 8);
