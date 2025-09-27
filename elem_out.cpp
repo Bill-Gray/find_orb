@@ -165,6 +165,7 @@ int save_ephemeris_settings( const ephem_option_t ephemeris_output_options,
 int load_ephemeris_settings( ephem_option_t *ephemeris_output_options,
       int *n_steps, char *obscode, char *step_size, char *ephem_start,
       const char *config);                               /* elem_out.cpp */
+char *default_config_dir_name( char *oname, const char *iname);  /* miscell.c */
 double generate_mc_variant_from_covariance( double *var_orbit,
                                     const double *orbit);    /* orb_func.c */
 void rotate_state_vector_to_current_frame( double *state_vect,
@@ -4058,7 +4059,6 @@ int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
    const char *language = get_environment_ptr( "LANGUAGE");
    extern double minimum_jd, maximum_jd;
    extern double maximum_observation_span;
-   extern int use_config_directory;
    extern double automatic_outlier_rejection_limit;
    extern double default_automatic_outlier_rejection_limit;
    extern unsigned max_n_sr_orbits;
@@ -4073,6 +4073,7 @@ int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
    const char *outlier_limit = get_environment_ptr( "OUTLIER_REJECTION_LIMIT");
    const char *output_dir = get_environment_ptr( "OUTPUT_DIR");
    extern const char *output_directory;
+   char cospar_name[255];
 
    if( !output_directory && *output_dir)
       output_directory = output_dir;
@@ -4137,13 +4138,9 @@ int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
 
       combine_all_observations = "";
       }
-   if( use_config_directory)
-      {
-      char cospar_name[255];
 
-      make_config_dir_name( cospar_name, "cospar.txt");
-      load_cospar_file( cospar_name);
-      }
+   default_config_dir_name( cospar_name, "cospar.txt");
+   load_cospar_file( cospar_name);
    max_n_sr_orbits = atoi( get_environment_ptr( "MAX_SR_ORBITS"));
    if( !max_n_sr_orbits)
       max_n_sr_orbits = 500;

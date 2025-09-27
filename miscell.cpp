@@ -77,15 +77,7 @@ c  Configuration file:  look for it in ~/.find_orb (for Linux) or in
    One can combine these.  For example, 'permits' of tfcw would
 tell the function that the file is a temporary one,  should be
 opened within the configuration directory for writing,  and that
-if it can't be opened, it's a fatal error.
-
-   I'm still working out the degree to which a separate directory
-for these files will be needed.  In the past,  find_orb,  fo,
-and fo_serve.cgi simply read what they needed from the current
-folder.  At present,  the only case in which use_config_directory
-is 'true' is for console Find_Orb in Linux,  and even there,  you
-can turn it back to 'false'.
-*/
+if it can't be opened, it's a fatal error.      */
 
 #ifndef _WIN32
 int get_temp_dir( char *name, const size_t max_len);      /* miscell.cpp */
@@ -100,7 +92,6 @@ int reset_astrometry_filename( int *argc, const char **argv);
 uint64_t parse_bit_string( const char *istr);                /* miscell.cpp */
 const char *write_bit_string( char *ibuff, const uint64_t bits,
                                           const size_t max_bitstring_len);
-int use_config_directory = false;
 const char *alt_config_directory;
 
 #ifndef CONFIG_DIR_AUTOCOPY
@@ -119,9 +110,6 @@ void ensure_config_directory_exists()
 static char PREFIX_STATIC[500] = PREFIX;
 void ensure_config_directory_exists()
 {
-   if (!use_config_directory)
-      return;
-
    // The c_str() magic in the next line allows conda-build's prefix
    // replacer to work as expected.
    // See https://github.com/conda/conda-build/issues/1674 for details.
@@ -162,59 +150,94 @@ void ensure_config_directory_exists()
 }
 #endif
 
-/* Users may specify files such as ~/this/that.txt on non-Windows boxes.
-The following function replaces ~ with the home directory. */
+/* In Windows or DOS,  the 'default config directory name' will be
+the one in which Find_Orb is running.  (Currently assumed to be the
+default directory,  but it'd be a good idea to check argv[0].)
 
-static FILE *fopen_tilde( const char *filename, const char *permits)
+   On everything else,  it will normally be in ~/.find_orb.  On
+Docker,  it'll be in /software/.find_orb.  On Puppy Linux,  where
+the only user is root,  it'll be in /root/.find_orb.
+
+   To figure out where it is,  we look for the file 'cospar.txt'
+in these three places.  If they all fail,  but an 'alt config
+directory' is specified,  we try that.  After that,  we give up. */
+
+char *default_config_dir_name( char *oname, const char *iname)
 {
 #ifdef _WIN32
-   return( fopen( filename, permits));
+   if( oname)
+      strcpy( oname, iname);
 #else
-   if( *filename != '~' || filename[1] != '/')
-      return( fopen( filename, permits));
-   else
-      {
-      char fullname[255];
+   static char *config_dir = NULL;
 
-      strlcpy_err( fullname, getenv( "HOME"), sizeof( fullname));
-      strlcat_err( fullname, filename + 1, sizeof( fullname));
-      return( fopen( fullname, permits));
-      }
-#endif
-}
-
-char *make_config_dir_name( char *oname, const char *iname)
-{
-#ifndef _WIN32
-   char *home_ptr = getenv( "HOME");
-#endif
-
-   if( alt_config_directory && *alt_config_directory)
+   if( !oname)       /* memory cleanup */
       {
-      strcpy( oname, alt_config_directory);
-      strcat( oname, iname);
-      return( oname);
+      free( config_dir);
+      config_dir = NULL;
+      return( NULL);
       }
-#ifdef _WIN32
-   strcpy( oname, iname);
-#else
-   if( home_ptr)
+
+   if( !config_dir)
       {
-      strcpy( oname, home_ptr);
-      strcat( oname, "/.find_orb/");
+      char *home_ptr = getenv( "HOME");
+      const char *test_filename = "cospar.txt";
+      FILE *test_ifile = NULL;
+      int pass;
+
+      for( pass = 0; !test_ifile && pass < 4; pass++)
+         {
+         *oname = '\0';
+         if( !pass && home_ptr)
+            strcpy( oname, home_ptr);        /* usual case */
+         else if( pass == 1)
+            strcpy( oname, "/software");     /* Docker uses this */
+         else if( pass == 2)
+            strcpy( oname, "/root");         /* Puppy Linux uses this */
+         else if( pass == 3 && alt_config_directory)
+            strcpy( oname, alt_config_directory);
+         if( *oname)
+            {
+            if( pass < 3)
+               strcat( oname, "/.find_orb/");
+            strcat( oname, test_filename);
+            test_ifile = fopen( oname, "rb");
+            }
+         }
+      assert( test_ifile);
+      fclose( test_ifile);
+      oname[strlen( oname) - 10] = '\0';
+      config_dir = strdup( oname);
       }
-   else
-      *oname = '\0';
+   strcpy( oname, config_dir);
    strcat( oname, iname);
 #endif
    return( oname);
 }
 
+char *make_config_dir_name( char *oname, const char *iname)
+{
+
+   if( alt_config_directory && *alt_config_directory)
+      {
+      strcpy( oname, alt_config_directory);
+      strcat( oname, iname);
+      }
+   else
+      default_config_dir_name( oname, iname);
+   return( oname);
+}
+
 const char *output_directory = NULL;
 
-#ifndef _WIN32
 int get_temp_dir( char *name, const size_t max_len)
 {
+#if defined( _WIN32) || defined( __WATCOMC__)
+   if( output_directory)
+      strlcpy_err( name, output_directory, max_len);
+   else
+      *name = '\0';
+   return( 0);
+#else          /* non-Windows(R) or MS-DOS case : Linux, *BSD,  etc.  */
    static int process_id = 0;
 
    if( output_directory)
@@ -224,22 +247,14 @@ int get_temp_dir( char *name, const size_t max_len)
       const bool first_time = (process_id == 0);
 
       if( first_time)
-#if defined( _WIN32) || defined( __WATCOMC__)
-         process_id = 1;
-#else
          process_id = getpid( );
-#endif
       snprintf_err( name, max_len, "/tmp/find_orb%d", process_id);
       if( first_time)
-#if defined( _WIN32) || defined( __WATCOMC__)
-         _mkdir( name);
-#else
          mkdir( name, 0777);
-#endif
       }
    return( process_id);
-}
 #endif
+}
 
 /* We use a lock file to determine if Find_Orb is already running,  and
 therefore putting some temporary files (ephemerides,  elements,  etc.)
@@ -255,32 +270,34 @@ FILE *fopen_ext( const char *filename, const char *permits)
    FILE *rval = NULL;
    bool is_fatal = false;
    bool is_temporary = false;
+   bool is_config = false;
 
    if( strchr( permits, 'l'))
       {
       debug_printf( "fopen_ext( '%s', '%s') error\n", filename, permits);
       assert( 0);
       }
-   if( *permits == 't')
-      {
-#if !defined( _WIN32) && !defined( __WATCOMC__)
-      extern bool findorb_already_running;
 
-      is_temporary = findorb_already_running || (output_directory != NULL);
-#endif
-      permits++;
-      }
-   if( *permits == 'f')
+   while( *permits != 'r' && *permits != 'w' && *permits != 'a')
       {
-      is_fatal = true;
-      permits++;
+      const char c = *permits++;
+
+      if( c == 'f')
+         is_fatal = true;
+      else if( c == 'c')
+         is_config = true;
+      else if( c == 't')
+         is_temporary = true;
+      else
+         {
+         fprintf( stderr, "File '%s'\n", filename);
+         assert( 0);
+         }
       }
-   if( !use_config_directory || is_temporary)
-      if( *permits == 'c')
-         permits++;
-   if( *permits == 'c' && strchr( filename, '/'))
-      permits++;              /* not really in the config directory */
-#ifndef _WIN32
+
+   if( strchr( filename, '/'))
+      is_temporary = is_config = false;    /* filename has an explicit path */
+
    if( is_temporary)
       {
       char tname[255];
@@ -289,15 +306,26 @@ FILE *fopen_ext( const char *filename, const char *permits)
       snprintf_append( tname, sizeof( tname), "/%s",  filename);
       rval = fopen( tname, permits);
       }
-#endif
-   if( !rval && *permits == 'c' && !is_temporary)
-      {
-      char tname[255];
 
-      make_config_dir_name( tname, filename);
-      permits++;
-      rval = fopen_tilde( tname, permits);
-      }
+   if( !rval)
+      if( is_temporary || is_config)
+         {
+         char tname[255];
+
+         if( alt_config_directory && *alt_config_directory)
+            {
+            strcpy( tname, alt_config_directory);
+            strcat( tname, filename);
+            rval = fopen( tname, permits);
+            }
+         if( !rval)    /* alt config directory didn't work */
+            {
+            default_config_dir_name( tname, filename);
+            rval = fopen( tname, permits);
+            }
+         }
+   if( !is_temporary && !is_config)
+      rval = fopen( filename, permits);
    if( !rval && is_fatal)
       {
       char buff[300];
@@ -659,6 +687,6 @@ int pattern_match(const char* pattern, const char* string)
 const char *find_orb_version_jd( double *jd)
 {
     if( jd)
-      *jd = 2460941.5;
-    return( "2025 Sep 23");
+      *jd = 2460945.5;
+    return( "2025 Sep 27");
 }

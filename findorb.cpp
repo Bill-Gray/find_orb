@@ -4042,7 +4042,6 @@ int main( int argc, const char **argv)
    extern int monte_carlo_object_count;
    extern char default_comet_magnitude_type;
    extern double max_monte_rms;
-   extern int use_config_directory;          /* miscell.c */
    double max_residual_for_filtering = 2.5;
    bool show_commented_elements = false;
    bool drop_single_obs = true;
@@ -4054,10 +4053,6 @@ int main( int argc, const char **argv)
    mmask_t button = 0;
 
    random_seed = get_random_seed( );
-   if( !strcmp( argv[0], "find_orb"))
-      use_config_directory = true;
-   else
-      use_config_directory = false;
    ensure_config_directory_exists();
    if( !setlocale( LC_ALL, "C.UTF-8"))
       setlocale( LC_ALL, "en_US.utf8");
@@ -4239,6 +4234,13 @@ int main( int argc, const char **argv)
                break;
             case 'x':
                {
+               extern const char *alt_config_directory;
+
+               alt_config_directory = arg;
+               }
+               break;
+            case 'X':
+               {
                extern bool saving_elements_for_reuse;
 
                saving_elements_for_reuse = true;
@@ -4249,14 +4251,6 @@ int main( int argc, const char **argv)
                extern int n_extra_full_steps;
 
                n_extra_full_steps = atoi( arg);
-               }
-               break;
-            case 'z':
-               {
-               extern const char *alt_config_directory;
-
-               use_config_directory = true;
-               alt_config_directory = arg;
                }
                break;
             default:

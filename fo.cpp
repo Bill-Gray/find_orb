@@ -173,7 +173,6 @@ static int unlink_config_file( const char *filename)
 {
    char buff[255];
    int err_code;
-   extern int use_config_directory;          /* miscell.c */
    extern const char *output_directory;
 
    get_file_name( buff, filename);
@@ -188,7 +187,7 @@ static int unlink_config_file( const char *filename)
       if( err_code)
          fprintf( stderr, "Failed unlinking '%s' ('%s')\n", filename, buff);
       }
-   else if( use_config_directory)
+   else
       {
       char cpath[255];
 
@@ -197,8 +196,6 @@ static int unlink_config_file( const char *filename)
       if( err_code)
          fprintf( stderr, "Failed unlinking '%s'\n", cpath);
       }
-   else
-      err_code = UNLINK( buff);
    if( err_code)
       fprintf( stderr, "Failed unlinking '%s' ('%s')\n", filename, buff);
    return( err_code);
@@ -536,7 +533,6 @@ int main( int argc, const char **argv)
    FILE *summary_ofile = NULL;
    extern int forced_central_body;
    int override_forced_central_body = 0;     /* by default,  all orbits are heliocentric */
-   extern int use_config_directory;          /* miscell.c */
    int element_precision = 5;
    bool use_colors = true;
    bool show_processing_steps = true;
@@ -553,10 +549,6 @@ int main( int argc, const char **argv)
    int child_status;
 #endif
 
-   if( !strcmp( argv[0], "fo"))
-      use_config_directory = true;
-   else
-      use_config_directory = false;
    ensure_config_directory_exists();
    *mpc_codes = '\0';
    if( reset_astrometry_filename( &argc, argv))
@@ -778,7 +770,6 @@ int main( int argc, const char **argv)
                {
                extern const char *alt_config_directory;
 
-               use_config_directory = true;
                alt_config_directory = arg;
                }
                break;
@@ -795,9 +786,6 @@ int main( int argc, const char **argv)
 
                n_extra_full_steps = atoi( arg);
                }
-               break;
-            case 'z':
-               use_config_directory = true;
                break;
             default:
                printf( "Unknown command-line option '%s'\n", argv[i]);
