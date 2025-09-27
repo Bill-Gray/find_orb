@@ -1,5 +1,5 @@
 FROM ubuntu:latest
-MAINTAINER Bill Gray 
+MAINTAINER Bill Gray
 
 SHELL ["/bin/bash", "-c"]
 ENV PATH="${PATH}:~/bin"
@@ -7,7 +7,7 @@ ENV PATH="${PATH}:~/bin"
 # Update applications and install OS-level dependencies
 RUN apt-get update \
 	&& apt-get upgrade -y \
-	&& apt-get install g++ make wget libncurses5-dev libcurl4-openssl-dev git -y
+	&& apt-get install g++ make wget libncurses5-dev libcurl4-openssl-dev zlib1g-dev git -y
 
 # Download and install find_orb and dependencies
 RUN mkdir software && cd software \
