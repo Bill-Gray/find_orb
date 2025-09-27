@@ -49,8 +49,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "constant.h"
 
 int pattern_match(const char* pattern, const char* string);   /* miscell.c */
-int text_search_and_replace( char FAR *str, const char *oldstr,
-                                     const char *newstr);   /* ephem0.cpp */
 double utc_from_td( const double jdt, double *delta_t);     /* ephem0.cpp */
 int apply_excluded_observations_file( OBSERVE *obs, const int n_obs);
 void set_up_observation( OBSERVE FAR *obs);                 /* mpc_obs.c */

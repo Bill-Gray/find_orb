@@ -814,9 +814,6 @@ double generate_mc_variant_from_covariance( double *var_orbit,
    return( rval);
 }
 
-int text_search_and_replace( char FAR *str, const char *oldstr,
-                                     const char *newstr);   /* ephem0.cpp */
-
 const char *excluded_filename = "excluded.txt";
 
 int write_excluded_observations_file( const OBSERVE *obs, int n_obs)
