@@ -130,6 +130,8 @@ double evaluate_initial_orbit( const OBSERVE FAR *obs,      /* orb_func.c */
 static int find_transfer_orbit( double *orbit, OBSERVE FAR *obs1,
                 OBSERVE FAR *obs2,
                 const int already_have_approximate_orbit);
+int find_central_object( const OBSERVE *obs, const double epoch_shown,
+                        const double *ivect, double *ovect);      /* elem_out.c */
 bool is_sungrazing_comet( const OBSERVE *obs, const int n_obs);  /* orb_func.c */
 double observation_rms( const OBSERVE FAR *obs);            /* elem_out.cpp */
 double compute_weighted_rms( const OBSERVE FAR *obs, const int n_obs,
@@ -2774,7 +2776,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
    double scale_factor = 1.;
    double integration_length;
    double before_rms;
-   int planet_orbiting = forced_central_body, n_constraints = 0;
+   int planet_orbiting, n_constraints = 0;
    int i, j, n_skipped_obs = 0, err_code = 0;
    int n_included_observations = 0;
    bool really_use_symmetric_derivatives;
@@ -2882,10 +2884,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
       return( -4);
       }
 
-   if( planet_orbiting == ORBIT_CENTER_AUTO)    /* select 'best' orbit center */
-      planet_orbiting = find_best_fit_planet( epoch2, orbit2, tvect);
-   else
-      get_relative_vector( epoch2, orbit2, tvect, planet_orbiting);
+   planet_orbiting = find_central_object( obs, epoch2, orbit2, tvect);
    assert( planet_orbiting >= -1);
    for( i = 0; i < 6; i++)
       {

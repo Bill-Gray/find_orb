@@ -93,6 +93,8 @@ int find_best_fit_planet( const double jd, const double *ivect,
                                  double *rel_vect);         /* runge.cpp */
 void find_relative_state_vect( const double jd, const double *ivect,
                double *ovect, const int ref_planet);        /* runge.cpp */
+int find_central_object( const OBSERVE *obs, const double epoch_shown,
+                        const double *ivect, double *ovect);  /* elem_out.c */
 void compute_effective_solar_multiplier( const char *constraints);   /* runge.c */
 int get_orbit_from_mpcorb_sof( const char *object_name, double *orbit,
              ELEMENTS *elems, const double full_arc_len, double *max_resid);
@@ -131,6 +133,7 @@ void get_find_orb_text_filename( char *filename);     /* elem_out.cpp */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 static int names_compare( const char *name1, const char *name2);
 static int get_uncertainty( const char *key, char *obuff, const bool in_km);
+static int obj_desig_to_perturber( const char *packed_desig);
 char *iso_time( char *buff, const double jd, const int precision); /* elem_out.cpp */
 int compute_canned_object_state_vect( double *loc, const char *mpc_code,
                      const double jd);                /* elem_out.cpp */
@@ -1942,14 +1945,7 @@ int write_out_elements_to_file( const double *orbit,
       }
    memcpy( orbit2, orbit, n_orbit_params * sizeof( double));
    integrate_orbit( orbit2, curr_epoch, epoch_shown);
-   if( forced_central_body != ORBIT_CENTER_AUTO)
-      {
-      planet_orbiting = forced_central_body;
-      get_relative_vector( epoch_shown, orbit2, rel_orbit, planet_orbiting);
-      }
-   else
-      planet_orbiting = find_best_fit_planet( epoch_shown, orbit2, rel_orbit);
-
+   planet_orbiting = find_central_object( obs, epoch_shown, orbit2, rel_orbit);
    memcpy( j2000_ecliptic_rel_orbit, rel_orbit, n_orbit_params * sizeof( double));
    rotate_state_vector_to_current_frame( rel_orbit, epoch_shown, planet_orbiting,
                        body_frame_note);
@@ -3505,6 +3501,32 @@ static int obj_desig_to_perturber( const char *packed_desig)
          debug_printf( "Excluded: %d (%x)\n", rval, excluded_perturbers);
          }
    return( rval);
+}
+
+int find_central_object( const OBSERVE *obs, const double epoch_shown,
+                        const double *ivect, double *ovect)
+{
+   extern int forced_central_body;
+   int planet_orbiting;
+
+   if( forced_central_body != ORBIT_CENTER_AUTO)
+      {
+      planet_orbiting = forced_central_body;
+      get_relative_vector( epoch_shown, ivect, ovect, planet_orbiting);
+      }
+   else
+      {
+      const int idx = obj_desig_to_perturber( obs->packed_id);
+
+      if( idx > 0 && idx < 10)         /* Merc through Pluto */
+         {
+         planet_orbiting = 0;
+         get_relative_vector( epoch_shown, ivect, ovect, planet_orbiting);
+         }
+      else
+         planet_orbiting = find_best_fit_planet( epoch_shown, ivect, ovect);
+      }
+   return( planet_orbiting);
 }
 
 double get_max_included_resid( const OBSERVE *obs, int n_obs)
