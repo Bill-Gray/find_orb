@@ -56,8 +56,14 @@ namespace fs = ghc::filesystem;
 
 #endif
 
+/* For Microsoft Windows and MS-DOS,  there is no 'home' directory and
+therefore no ~/.find_orb configuration directory.  The configuration files
+therefore live in the same directory as Find_Orb,  meaning we #define
+CONFIG_IS_LOCAL for such cases.        */
+
 #if defined( _WIN32) || defined( __WATCOMC__)
    #include <direct.h>        /* for _mkdir() definition */
+   #define CONFIG_IS_LOCAL
 #else
    #include <sys/stat.h>
    #include <sys/types.h>
@@ -79,9 +85,6 @@ tell the function that the file is a temporary one,  should be
 opened within the configuration directory for writing,  and that
 if it can't be opened, it's a fatal error.      */
 
-#ifndef _WIN32
-int get_temp_dir( char *name, const size_t max_len);      /* miscell.cpp */
-#endif
 int fetch_astrometry_from_mpc( FILE *ofile, const char *desig);
 int download_a_file( const char *ofilename, const char *url);
 int generic_message_box( const char *message, const char *box_type);
@@ -150,6 +153,20 @@ void ensure_config_directory_exists()
 }
 #endif
 
+#ifndef CONFIG_IS_LOCAL
+static void fix_tilde( char *filename)
+{
+   if( *filename == '~')
+      {
+      char *home_ptr = getenv( "HOME");
+
+      assert( home_ptr);
+      memmove( filename + strlen( home_ptr), filename + 1, strlen( filename));
+      memcpy( filename, home_ptr, strlen( home_ptr));
+      }
+}
+#endif
+
 /* In Windows or DOS,  the 'default config directory name' will be
 the one in which Find_Orb is running.  (Currently assumed to be the
 default directory,  but it'd be a good idea to check argv[0].)
@@ -164,7 +181,7 @@ directory' is specified,  we try that.  After that,  we give up. */
 
 char *default_config_dir_name( char *oname, const char *iname)
 {
-#ifdef _WIN32
+#ifdef CONFIG_IS_LOCAL           /* Microsoft Windows or MS-DOS */
    if( oname)
       strcpy( oname, iname);
 #else
@@ -179,7 +196,6 @@ char *default_config_dir_name( char *oname, const char *iname)
 
    if( !config_dir)
       {
-      char *home_ptr = getenv( "HOME");
       const char *test_filename = "cospar.txt";
       FILE *test_ifile = NULL;
       int pass;
@@ -187,8 +203,8 @@ char *default_config_dir_name( char *oname, const char *iname)
       for( pass = 0; !test_ifile && pass < 4; pass++)
          {
          *oname = '\0';
-         if( !pass && home_ptr)
-            strcpy( oname, home_ptr);        /* usual case */
+         if( !pass)
+            strcpy( oname, "~");        /* usual case */
          else if( pass == 1)
             strcpy( oname, "/software");     /* Docker uses this */
          else if( pass == 2)
@@ -197,6 +213,7 @@ char *default_config_dir_name( char *oname, const char *iname)
             strcpy( oname, alt_config_directory);
          if( *oname)
             {
+            fix_tilde( oname);
             if( pass < 3)
                strcat( oname, "/.find_orb/");
             strcat( oname, test_filename);
@@ -231,7 +248,7 @@ const char *output_directory = NULL;
 
 int get_temp_dir( char *name, const size_t max_len)
 {
-#if defined( _WIN32) || defined( __WATCOMC__)
+#ifdef CONFIG_IS_LOCAL
    if( output_directory)
       strlcpy_err( name, output_directory, max_len);
    else
@@ -687,6 +704,6 @@ int pattern_match(const char* pattern, const char* string)
 const char *find_orb_version_jd( double *jd)
 {
     if( jd)
-      *jd = 2460945.5;
-    return( "2025 Sep 27");
+      *jd = 2460950.5;
+    return( "2025 Oct 02");
 }
