@@ -138,6 +138,7 @@ double compute_weighted_rms( const OBSERVE FAR *obs, const int n_obs,
                            int *n_resids);                  /* orb_func.cpp */
 double find_epoch_shown( const OBSERVE *obs, const int n_obs); /* elem_out */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
+char *default_config_dir_name( char *oname, const char *iname); /* miscell.cpp */
 void rotate_state_vector_to_current_frame( double *state_vect,
                   const double epoch_shown, const int planet_orbiting,
                   char *body_frame_note);               /* elem_out.cpp */
@@ -5076,6 +5077,7 @@ int clean_up_find_orb_memory( void)
    galactic_confusion( -99., 0.);
    find_numbered_mp_info( 0);
    detect_perturbers( 0, NULL, NULL);
+   default_config_dir_name( NULL, NULL);
 #if !defined( _WIN32) && !defined( __WATCOMC__)
    if( check_for_other_processes( 0))
       {
