@@ -119,6 +119,19 @@ const char *elements_filename = "elements.txt";
 static expcalc_config_t exposure_config;
 extern int n_orbit_params;
 
+/* Optimization can result in memmove() being remapped to memcpy()
+when the compiler can tell that the latter will actually work.  But you
+can then getting spurious warnings from Valgrind.  This code suppresses
+those spurious warnings,  and adds a check that we won't put data beyond
+the end of the buffer nor copy data that comes from after the buffer. */
+
+void *memmove_err( void *dest, const void *src, const size_t n, const void *endptr)
+{
+   assert( (char *)endptr >= (char *)dest + n);
+   assert( (char *)endptr >= (char *)src  + n);
+   return( memcpy( dest, src, n));
+}
+
 /* Returns parallax constants (rho_cos_phi, rho_sin_phi) in AU. */
 
 int lat_alt_to_parallax( const double lat, const double ht_in_meters,
@@ -1497,7 +1510,7 @@ static int create_json_ephemeris( FILE *ofile, FILE *ifile, char *header,
                {
                const size_t len = strlen( out_text);
 
-               memmove( out_text + 1, out_text, len + 1);
+               memmove_err( out_text + 1, out_text, len + 1, out_text + sizeof( out_text));
                *out_text = out_text[len + 1] = '\"';
                out_text[len + 2] = '\0';
                }
@@ -4363,7 +4376,7 @@ static void put_sigma( char *buff, const double val)
       {
       snprintf_err( tbuff, sizeof( tbuff), "%.2f", val);
       if( *tbuff == '0')         /* skip leading zero */
-         memmove( tbuff, tbuff + 1, strlen( tbuff));
+         memmove_err( tbuff, tbuff + 1, strlen( tbuff), tbuff + sizeof( tbuff));
       }
    else if( val < 999.)
       snprintf_err( tbuff, sizeof( tbuff), "%3.0f", val);
