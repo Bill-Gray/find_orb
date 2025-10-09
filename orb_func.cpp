@@ -1244,9 +1244,6 @@ int extended_orbit_fit( double *orbit, OBSERVE *obs, int n_obs,
    OBSERVE obs1, obs2;
 
    obs += drop_excluded_obs( obs, &n_obs);
-   n_resids = 2 * n_obs + MAX_CONSTRAINTS;
-   resids = (double *)calloc( n_resids * (n_params + 1), sizeof( double));
-   slopes = resids + n_resids;
    for( i = n_selected = 0; i < n_obs; i++)
       if( obs[i].flags & OBS_IS_SELECTED)
          n_selected++;
@@ -1268,6 +1265,10 @@ int extended_orbit_fit( double *orbit, OBSERVE *obs, int n_obs,
    rval = integrate_orbit( torbit, epoch, obs1.jd);
    if( rval)
       return( rval);
+
+   n_resids = 2 * n_obs + MAX_CONSTRAINTS;
+   resids = (double *)calloc( n_resids * (n_params + 1), sizeof( double));
+   slopes = resids + n_resids;
    for( i = -1; i < n_params; i++)
       {
       for( j = 0; j < n_params; j++)
