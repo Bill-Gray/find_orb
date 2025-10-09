@@ -350,11 +350,8 @@ MEA S. B. Porter
 TEL 8.2-m f/2.2 Subaru reflector
 
 COD 274
-MEA M. Micheli, M. S. Kelley, D. Farnocchia
-OBS M. S. Kelley, D. Farnocchia, A. McKay, M. Micheli, C. Opitom
-OBS S. Protopapa, C. Snodgrass
 COM Default details extracted from MPEC 2022-S20
-TEL 6.5-m reflector + CMO
+TEL 6.5-m f/20 reflector + CMO
 
 COD 290
 COM Default details extracted from MPEC 2022-T132
@@ -2204,9 +2201,9 @@ OBS V. Kudak, V. Perig
 TEL 0.40-m telescope + CCD
 
 COD L01
-MEA D. Pujagic, K. Korlevic
-OBS K. Korlevic, D. Pujagic, V. Dobos
-COM Default details extracted from MPEC 2021-C313
+COM Default details 2025 Oct 03 from L. Poropat
+OBS K. Korlevic, L. Poropat
+MEA K. Korlevic
 TEL 1.0-m f/2.9 reflector + CCD
 
 COD L02

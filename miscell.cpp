@@ -704,6 +704,6 @@ int pattern_match(const char* pattern, const char* string)
 const char *find_orb_version_jd( double *jd)
 {
     if( jd)
-      *jd = 2460950.5;
-    return( "2025 Oct 02");
+      *jd = 2460957.5;
+    return( "2025 Oct 09");
 }
