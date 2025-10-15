@@ -5080,15 +5080,17 @@ int clean_up_find_orb_memory( void)
    detect_perturbers( 0, NULL, NULL);
    default_config_dir_name( NULL, NULL);
 #if !defined( _WIN32) && !defined( __WATCOMC__)
-   if( check_for_other_processes( 0))
-      {
-      char cmd[100];
+   char cmd[100];
 
-      strcpy( cmd, "rm -r ");
-      get_temp_dir( cmd + 6, sizeof( cmd) - 6);
-      if( !memcmp( cmd + 6, "/tmp/", 5))
-         debug_printf( "Result %d\n", system( cmd));
-      }
+   strcpy( cmd, "rm -r ");
+   if( get_temp_dir( cmd + 6, sizeof( cmd) - 6))
+      if( !memcmp( cmd, "rm -r /tmp/find_orb", 19))
+         {
+         const int ret_val = system( cmd);
+
+         if( ret_val)
+            debug_printf( "Result %d\n", ret_val);
+         }
    unlink( temp_obs_filename);
 #else
    _unlink( temp_obs_filename);
