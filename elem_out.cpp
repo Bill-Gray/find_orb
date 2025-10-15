@@ -1607,12 +1607,12 @@ static int _get_extra_orbit_info( const char *packed_id,
    extern int force_model;
    size_t n_lines;
    char **lines = load_file_into_memory( _extras_filename, &n_lines, false);
-   int i, j, rval = 0;
+   int rval = 0;
 
    if( !lines)
       lines = load_file_into_memory( _default_extras_filename, &n_lines, true);
    assert( strlen( packed_id) == 12);
-   for( i = 0; i < (int)n_lines; i++)
+   for( size_t i = 0; i < n_lines; i++)
       if( !_compare_misaligned_packed_desigs( lines[i], packed_id))
          {
          const char *tptr;
@@ -1621,11 +1621,11 @@ static int _get_extra_orbit_info( const char *packed_id,
             sscanf( tptr + 3, "%x", &perturbers);
          if( (tptr = strstr( lines[i], " model=")) != NULL)
             sscanf( tptr + 7, "%x", (unsigned *)&force_model);
-         for( j = 0; j < 5; j++)
+         for( unsigned j = 0; j < 5; j++)
             {
             char tbuff[6];
 
-            snprintf( tbuff, sizeof( tbuff), " A%d=", j + 1);
+            snprintf( tbuff, sizeof( tbuff), " A%u=", j + 1);
             if( (tptr = strstr( lines[i], tbuff)) != NULL)
                {
                sscanf( tptr + 4, "%lf", solar_pressure + j);
