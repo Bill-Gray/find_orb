@@ -169,6 +169,8 @@ char *make_config_dir_name( char *oname, const char *iname);
 #endif
 
 #ifdef FORKING
+void fix_tilde( char *filename);       /* miscell.cpp */
+
 static int unlink_config_file( const char *filename)
 {
    char buff[255];
@@ -181,8 +183,10 @@ static int unlink_config_file( const char *filename)
       char cpath[255];
 
       strlcpy_error( cpath, output_directory);
+      fix_tilde( cpath);
       strlcat_error( cpath, "/");
       strlcat_error( cpath, buff);
+
       err_code = UNLINK( cpath);
       if( err_code)
          fprintf( stderr, "Failed unlinking '%s' ('%s')\n", filename, buff);

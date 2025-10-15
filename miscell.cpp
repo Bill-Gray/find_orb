@@ -154,7 +154,7 @@ void ensure_config_directory_exists()
 #endif
 
 #ifndef CONFIG_IS_LOCAL
-static void fix_tilde( char *filename)
+void fix_tilde( char *filename)
 {
    if( *filename == '~')
       {
@@ -258,7 +258,10 @@ int get_temp_dir( char *name, const size_t max_len)
    static int process_id = 0;
 
    if( output_directory)
+      {
       strlcpy_err( name, output_directory, max_len);
+      fix_tilde( name);
+      }
    else
       {
       const bool first_time = (process_id == 0);
@@ -704,6 +707,6 @@ int pattern_match(const char* pattern, const char* string)
 const char *find_orb_version_jd( double *jd)
 {
     if( jd)
-      *jd = 2460957.5;
-    return( "2025 Oct 09");
+      *jd = 2460962.5;
+    return( "2025 Oct 14");
 }
