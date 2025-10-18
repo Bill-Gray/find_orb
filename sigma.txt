@@ -132,6 +132,10 @@
 # Still puzzling out how Solar Orbiter astrometry should be handled.
 # Based on exactly one object,  let's say 20".
  SoO                                    20                Solar Orbiter
+# Similar uncertainty about Parker Space Probe.  We think it depends
+# a lot on where you are in the FOV.  But (again based on one object),
+# let's say 30".
+ PSP                                    30                Parker Space Probe
 # TESS data has (I assume) beautiful photometry,  but the astrometry
 # appears to be approximate at best.
  C57                                     5                TESS

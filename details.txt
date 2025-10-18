@@ -2213,9 +2213,11 @@ TEL 0.25-m f/4.7 reflector + CCD
 
 COD L04
 OBS L. Hudin
-COM Default details extracted from MPEC 2021-A190
-TEL 0.3-m f/5 reflector + CCD
+COM From personal communication
+COM Valid: 1900 dec 1 - 2012 apr 1
 TEL 0.1-m f/9 refractor + CCD
+COM Valid: 2012 apr 1 - 2100 dec 1
+TEL 0.3-m f/5 reflector + CCD
 
 COD L05
 OBS C. Ghidetti
