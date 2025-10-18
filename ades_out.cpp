@@ -234,7 +234,7 @@ static void create_ades_file_for_one_code( FILE *ofile,
    char buff[200];
    const char *code = obs->mpc_code;
    const char progcode = program_code( obs);
-   const bool is_sungrazer = (strstr( "249 C49 C50", code) != NULL);
+   const bool is_sungrazer = (strstr( "249 C49 C50 PSP", code) != NULL);
 
    fprintf( ofile, "  <obsBlock>\n");
    fprintf( ofile, "    <obsContext>\n");

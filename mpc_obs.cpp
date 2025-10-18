@@ -1863,7 +1863,7 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
          obs->obs_mag = override_mag;
          override_mag = -100.;
          }
-      if( obs->mag_band == ' ' && strstr( "249 C49 C50", obs->mpc_code))
+      if( obs->mag_band == ' ' && strstr( "249 C49 C50 PSP", obs->mpc_code))
          obs->mag_band = 'V';   /* Sungrazer obs usually have a blank mag */
       }                         /* band, but are basically V */
    else
@@ -4631,7 +4631,12 @@ int write_environment_pointers( void)
 
    fprintf( ofile, "%d vars\n", (int)n_lines);
    for( i = 0; i < n_lines; i++)
-      fprintf( ofile, "%s\n", edata[i]);
+      {
+      const size_t len = strlen( edata[i]);
+
+      if( len && edata[i][len - 1] != '=')
+         fprintf( ofile, "%s\n", edata[i]);
+      }
    fclose( ofile);
    return( (int)n_lines);
 }
