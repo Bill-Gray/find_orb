@@ -541,8 +541,6 @@ static int elements_in_mpcorb_format( char *buff, const char *packed_desig,
    double arc_length;
    char packed_desig2[40];
    const size_t mpcorb_line_len = 203;
-   int precision = 7;
-   double tval;
    double abs_mag = elem->abs_mag;
 
    packed_desig_minus_spaces( packed_desig2, packed_desig);
@@ -570,18 +568,11 @@ static int elements_in_mpcorb_format( char *buff, const char *packed_desig,
            centralize_ang( elem->incl) * 180. / PI,
            elem->ecc);
    assert( 79 == strlen( buff));
-   tval = elem->major_axis;
-   while( tval > 999.9999)
-      {
-      tval /= 10.;
-      precision--;
-      }
-   snprintf_append( buff, mpcorb_line_len, "%12.8f%12.*f",
-            (180 / PI) / elem->t0,        /* n */
-            precision, elem->major_axis);
-   if( 103 != strlen( buff))
-      printf( "Weirdness '%s'\n", buff);
-   assert( 103 == strlen( buff));
+   snprintf_append( buff, mpcorb_line_len, " %11.8f",
+               (180. / PI) / elem->t0);   /* n = mean motion in deg/day */
+   buff[91] = '\0';
+   snprintf_append( buff, mpcorb_line_len, " %11.7f", elem->major_axis);
+   buff[103] = '\0';
    for( i = 0; i < n_obs; i++)
       if( obs[i].is_included)
          n_included_obs++;
