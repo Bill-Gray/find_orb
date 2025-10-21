@@ -1169,14 +1169,27 @@ static bool try_artsat_xdesig( char *name)
       remove_trailing_cr_lf( name);
       slen = strlen( name);
       if( max_out > slen)
+         {
+         char *name_ptr = NULL, *norad_num_ptr = NULL, *intl_desig_ptr = NULL;
+
+         strcpy( tbuff, "     ");
+         while( memcmp( tbuff, "JCAT ", 5) && fgets( tbuff, sizeof( tbuff), ifile))
+            ;
+         norad_num_ptr = strstr( tbuff, "Satca");
+         assert( norad_num_ptr);
+         intl_desig_ptr = strstr( tbuff, "Piece");
+         assert( intl_desig_ptr);
+         name_ptr = strstr( tbuff, "Name ");
+         assert( name_ptr);
          while( !found_a_match && fgets( tbuff, sizeof( tbuff), ifile))
-            if( !memcmp( tbuff + 30, name, slen) && tbuff[slen + 30] == ' ')
+            if( !memcmp( intl_desig_ptr, name, slen) && intl_desig_ptr[slen] == ' ')
                {
                found_a_match = true;
                snprintf_append( name, max_out - slen, " = NORAD %.5s = %.28s",
-                        tbuff + 1, tbuff + 58);
+                        norad_num_ptr, name_ptr);
                remove_trailing_cr_lf( name);
                }
+         }
       fclose( ifile);
       }
    return( found_a_match);
