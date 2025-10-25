@@ -90,7 +90,8 @@ jobs:
         cd PDCursesMod\wingui
         set CL=/I"../myincl"
         nmake UTF8=Y DLL=Y -f Makefile.vc
-        copy jpleph64.lib ..\..
+        copy pdcurses.lib ..\..
+        copy pdcurses.dll ..\..
         copy ..\curses.h ..\..\myincl
         cd ..\..
 
