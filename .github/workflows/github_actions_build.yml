@@ -98,10 +98,10 @@ jobs:
         nmake -f dos_find.mak fo.exe cssfield.exe eph2tle.exe roottest.exe find_orb.exe
 
         cl -W4 -Ox win_get.c urlmon.lib
+      shell: cmd
     - name: Archive .EXEs
       uses: actions/upload-artifact@v4
       with:
          name: exes
          path: '*.exe'
 
-      shell: cmd
