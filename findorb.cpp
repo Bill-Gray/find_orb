@@ -5901,8 +5901,11 @@ int main( int argc, const char **argv)
                   vaisala_dist /= AU_IN_KM;        /* to be in kilometers */
                if( vaisala_dist)
                   {
-                  curr_epoch = obs->jd;
-                  find_vaisala_orbit( orbit, obs, obs + n_obs - 1, vaisala_dist);
+                  int idx1, idx2;
+
+                  get_idx1_and_idx2( n_obs, obs, &idx1, &idx2);
+                  curr_epoch = obs[idx1].jd;
+                  find_vaisala_orbit( orbit, obs + idx1, obs + idx2, vaisala_dist);
                   update_element_display = 1;
                   set_locs( orbit, curr_epoch, obs, n_obs);
                   }
