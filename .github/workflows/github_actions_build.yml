@@ -89,9 +89,8 @@ jobs:
         git clone https://github.com/Bill-Gray/PDCursesMod
         cd PDCursesMod\wingui
         set CL=/I"../myincl"
-        nmake UTF8=Y DLL=Y -f Makefile.vc
+        nmake UTF8=Y -f Makefile.vc
         copy pdcurses.lib ..\..
-        copy pdcurses.dll ..\..
         copy ..\curses.h ..\..\myincl
         cd ..\..
 
