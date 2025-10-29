@@ -86,11 +86,21 @@ jobs:
         copy jpleph.h ..\myincl
         cd ..
 
+        git clone https://github.com/Bill-Gray/PDCursesMod
+        cd PDCursesMod\wingui
+        set CL=/I"../myincl"
+        nmake UTF8=Y -f Makefile.vc
+        copy pdcurses.lib ..\..
+        copy ..\curses.h ..\..\myincl
+        cd ..\..
+
         set CL=/I"./myincl"
-        nmake -f dos_find.mak fo.exe cssfield.exe eph2tle.exe roottest.exe
+        nmake -f dos_find.mak fo.exe cssfield.exe eph2tle.exe roottest.exe find_orb.exe
 
         cl -W4 -Ox win_get.c urlmon.lib
-        win_get https://raw.githubusercontent.com/Bill-Gray/PDCursesMod/master/curses.h curses.h
-        nmake -f dos_find.mak findorb.obj
-
       shell: cmd
+    - name: Archive .EXEs
+      uses: actions/upload-artifact@v4
+      with:
+         name: exes
+         path: '*.exe'
