@@ -2539,22 +2539,20 @@ int write_out_elements_to_file( const double *orbit,
       t0 = find_collision_time( &j2000_ecliptic_rel_elem, latlon, is_an_impact);
       if( t0 < 1.)      /* t0 = 1 -> it was a miss after all */
          {
-         char *end_ptr;
          const double lon = latlon[0] * 180. / PI;
          const double impact_time_td = elem.perih_time + t0;
          const double impact_time_utc = utc_from_td( impact_time_td, NULL);
 
          full_ctime( buff, impact_time_utc,
                        FULL_CTIME_HUNDREDTH_SEC | CALENDAR_JULIAN_GREGORIAN);
-         snprintf( impact_buff, sizeof( impact_buff),
+         snprintf_err( impact_buff, sizeof( impact_buff),
                " %.55s lat %+9.5f lon ", buff,
                latlon[1] * 180. / PI);
-         end_ptr = impact_buff + strlen( impact_buff);
                      /* 0 < longitude < 360;  for Earth,  show this in */
                      /* "conventional" East/West 0-180 degree format:  */
          if( elem.central_obj == 3)
             {
-            snprintf_err( end_ptr, 11, "%c%.5f",
+            snprintf_append( impact_buff, sizeof( impact_buff), "%c%.5f",
                   (lon < 180. ? 'E' : 'W'),
                   (lon < 180. ? lon : 360. - lon));
             fprintf( ofile, "%s at %s\n", (is_an_impact ? "IMPACT" : "LAUNCH"),
@@ -2562,7 +2560,7 @@ int write_out_elements_to_file( const double *orbit,
             }
                      /* Then show in 0-360 format,  for all other  */
                      /* planets, and for output to file:           */
-         snprintf_err( end_ptr, 10, "%9.5f", lon);
+         snprintf_append( impact_buff, sizeof( impact_buff), "%9.5f", lon);
          if( elem.central_obj != 3)
             fprintf( ofile, "%s at %s\n", (is_an_impact ? "IMPACT" : "LAUNCH"),
                              impact_buff);
