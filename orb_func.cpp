@@ -1842,12 +1842,12 @@ static inline void compute_sr_sigmas( const double *sr_orbits,
    elem0.major_axis = elem0.ecc = 0.;     /* just to avoid uninitialized  */
    for( i = 0; i < n_orbits; i++)         /* variable warnings            */
       {
-      double orbit[6];
+      double orbit[MAX_N_PARAMS];
       ELEMENTS elem;
 
       memset( &elem, 0, sizeof( ELEMENTS));
       elem.gm = SOLAR_GM;
-      memcpy( orbit, sr_orbits + 6 * i, 6 * sizeof( double));
+      memcpy( orbit, sr_orbits + n_orbit_params * i, n_orbit_params * sizeof( double));
       integrate_orbit( orbit, epoch, epoch_shown);
       calc_classical_elements( &elem, orbit, epoch_shown, 1);
       add_monte_orbit( monte_data, &elem, i);

@@ -802,7 +802,7 @@ double generate_mc_variant_from_covariance( double *var_orbit,
    double rval = 0.;
 
    assert( eigenvects);
-   memcpy( var_orbit, orbit, 6 * sizeof( double));
+   memcpy( var_orbit, orbit, n_orbit_params * sizeof( double));
    for( i = 0; i < n_orbit_params; i++)
       {
       const double g_rand = gaussian_random( );

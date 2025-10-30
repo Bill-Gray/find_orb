@@ -786,7 +786,7 @@ static double *set_up_alt_orbits( const double *orbit, unsigned *n_orbits)
    switch( available_sigmas)
       {
       case COVARIANCE_AVAILABLE:
-         memcpy( sr_orbits, orbit, MAX_N_PARAMS * sizeof( double));
+         memcpy( sr_orbits, orbit, n_orbit_params * sizeof( double));
          compute_variant_orbit( sr_orbits + n_orbit_params, sr_orbits, 1.);
          *n_orbits = 2;
          break;
@@ -794,7 +794,7 @@ static double *set_up_alt_orbits( const double *orbit, unsigned *n_orbits)
          *n_orbits = n_sr_orbits;
          break;
       default:
-         memcpy( sr_orbits, orbit, MAX_N_PARAMS * sizeof( double));
+         memcpy( sr_orbits, orbit, n_orbit_params * sizeof( double));
          *n_orbits = 1;
          break;
       }

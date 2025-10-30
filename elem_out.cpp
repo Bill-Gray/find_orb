@@ -3222,10 +3222,11 @@ void reset_sr_orbits( void)
 {
    extern double *sr_orbits;
    extern unsigned max_n_sr_orbits;
+   extern int n_orbit_params;
 
    if( sr_orbits)
       free( sr_orbits);
-   sr_orbits = (double *)calloc( (size_t)max_n_sr_orbits, 7 * sizeof( double));
+   sr_orbits = (double *)calloc( (size_t)max_n_sr_orbits, n_orbit_params * sizeof( double));
    assert( sr_orbits);
 }
 
