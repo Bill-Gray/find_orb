@@ -5073,7 +5073,6 @@ int clean_up_find_orb_memory( void)
    load_cospar_file( NULL);
    update_environ_dot_dat( );
    load_earth_orientation_params( NULL, NULL);
-   get_environment_ptr( NULL);
    pop_all_orbits( );
    galactic_confusion( -99., 0.);
    find_numbered_mp_info( 0);
@@ -5095,6 +5094,7 @@ int clean_up_find_orb_memory( void)
 #else
    _unlink( temp_obs_filename);
 #endif
+   get_environment_ptr( NULL);
    free( temp_obs_filename);
    free( mpec_error_message);
    mpec_error_message = NULL;
