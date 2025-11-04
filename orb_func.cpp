@@ -1829,6 +1829,7 @@ int improve_sr_orbits( sr_orbit_t *orbits, OBSERVE FAR *obs,
 
 static inline void compute_sr_sigmas( const double *sr_orbits,
                const unsigned n_orbits, const double epoch,
+               const int planet_orbiting,
                const double epoch_shown)
 {
    unsigned i;
@@ -1836,7 +1837,6 @@ static inline void compute_sr_sigmas( const double *sr_orbits,
    double sigmas[MONTE_N_ENTRIES];
    FILE *monte_file;
    char filename[100];
-   const int planet_orbiting = 0;      /* heliocentric only,  at least for now */
    ELEMENTS elem0;
 
    elem0.major_axis = elem0.ecc = 0.;     /* just to avoid uninitialized  */
@@ -1849,7 +1849,7 @@ static inline void compute_sr_sigmas( const double *sr_orbits,
       elem.gm = SOLAR_GM;
       memcpy( orbit, sr_orbits + n_orbit_params * i, n_orbit_params * sizeof( double));
       integrate_orbit( orbit, epoch, epoch_shown);
-      calc_classical_elements( &elem, orbit, epoch_shown, 1);
+      find_relative_orbit( epoch_shown, orbit, &elem, planet_orbiting);
       add_monte_orbit( monte_data, &elem, i);
       if( !i)
          elem0 = elem;
@@ -4295,7 +4295,7 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
          free( sr);
          find_median_orbit( sr_orbits, n_sr_orbits);
          memcpy( orbit, sr_orbits, 6 * sizeof( double));
-         compute_sr_sigmas( sr_orbits, n_sr_orbits, orbit_epoch, epoch_shown);
+         compute_sr_sigmas( sr_orbits, n_sr_orbits, orbit_epoch, 0, epoch_shown);
          n_obs += n_radar_obs;
          shellsort_r( obs, n_obs, sizeof( OBSERVE), compare_observations, NULL);
          available_sigmas_hash = compute_available_sigmas_hash( obs, n_obs,
@@ -4495,6 +4495,7 @@ int orbital_monte_carlo( const double *orbit, OBSERVE *obs, const int n_obs,
          const double curr_epoch, const double epoch_shown)
 {
    unsigned i;
+   int planet_orbiting = 0;
    extern int append_elements_to_element_file;
    extern const char *elements_filename;
    const char *saved_name = elements_filename;
@@ -4513,6 +4514,13 @@ int orbital_monte_carlo( const double *orbit, OBSERVE *obs, const int n_obs,
 
       generate_mc_variant_from_covariance( torbit, orbit);
       integrate_orbit( torbit, curr_epoch, epoch_shown);
+      if( !i)
+         {
+         double unused_relative_vect[MAX_N_PARAMS];
+
+         planet_orbiting = find_central_object( obs, epoch_shown, torbit,
+                                         unused_relative_vect);
+         }
       write_out_elements_to_file( torbit, epoch_shown, epoch_shown,
            obs, n_obs, "", 6, 1, ELEM_OUT_ALTERNATIVE_FORMAT | ELEM_OUT_NO_COMMENT_DATA);
       append_elements_to_element_file = 1;
@@ -4532,7 +4540,7 @@ int orbital_monte_carlo( const double *orbit, OBSERVE *obs, const int n_obs,
    if( ofile)
       fclose( ofile);
    set_locs( orbit, curr_epoch, obs, n_obs);
-   compute_sr_sigmas( sr_orbits, n_sr_orbits, curr_epoch, epoch_shown);
+   compute_sr_sigmas( sr_orbits, n_sr_orbits, curr_epoch, planet_orbiting, epoch_shown);
    available_sigmas_hash = compute_available_sigmas_hash( obs, n_obs,
          epoch_shown, perturbers, 0);
    append_elements_to_element_file = 0;
