@@ -1850,7 +1850,7 @@ static inline void compute_sr_sigmas( const double *sr_orbits,
       memcpy( orbit, sr_orbits + n_orbit_params * i, n_orbit_params * sizeof( double));
       integrate_orbit( orbit, epoch, epoch_shown);
       find_relative_orbit( epoch_shown, orbit, &elem, planet_orbiting);
-      add_monte_orbit( monte_data, &elem, i);
+      add_monte_orbit( monte_data, &elem, orbit, i);
       if( !i)
          elem0 = elem;
       }
@@ -2912,7 +2912,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
    rotate_state_vector_to_current_frame( orbit2, epoch2, planet_orbiting, NULL);
    calc_classical_elements( &elem, orbit2, epoch2, 1);
 
-   put_orbital_elements_in_array_form( &elem, elements_in_array);
+   put_orbital_elements_in_array_form( &elem, orbit, elements_in_array);
 
    uncertainty_parameter = 99.;
    slopes = (double FAR *)FCALLOC( 2 * n_params * n_obs + n_params, sizeof( double));
@@ -3026,7 +3026,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
          rotate_state_vector_to_current_frame( rel_orbit, epoch2, planet_orbiting, NULL);
          calc_classical_elements( &elem, rel_orbit, epoch2, 1);
 
-         put_orbital_elements_in_array_form( &elem, element_slopes[i]);
+         put_orbital_elements_in_array_form( &elem, rel_orbit, element_slopes[i]);
          for( j = 0; j < MONTE_N_ENTRIES; j++)
             {
             element_slopes[i][j] -= elements_in_array[j];
@@ -3437,6 +3437,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
             fprintf( ofile, "%s", tbuff);
             }
          }
+#ifdef NO_LONGER_NEEDED
       for( i = 6; i < n_params; i++)
          {
          double sigma;
@@ -3460,6 +3461,7 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
             }
          fprintf( ofile, "\n%s: %s", title_text, tbuff);
          }
+#endif
 
       fprintf( ofile, "\n\n");
       if( limited_orbit && strstr( limited_orbit, "e="))

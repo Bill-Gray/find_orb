@@ -5466,7 +5466,7 @@ int main( int argc, const char **argv)
                   {
                   elem.gm = get_planet_mass( planet_orbiting);
                   calc_classical_elements( &elem, rel_orbit, epoch_shown, 1);
-                  add_monte_orbit( monte_data, &elem, monte_carlo_object_count);
+                  add_monte_orbit( monte_data, &elem, orbit2, monte_carlo_object_count);
                   }
                if( monte_carlo_object_count > 3)
                   {
@@ -6538,11 +6538,8 @@ int main( int argc, const char **argv)
                   {
                   extern unsigned max_n_sr_orbits;
 
-                  if( max_n_sr_orbits < new_n_orbits)
-                     {
-                     max_n_sr_orbits = new_n_orbits;
-                     reset_sr_orbits( );
-                     }
+                  max_n_sr_orbits = new_n_orbits;
+                  reset_sr_orbits( );
                   orbital_monte_carlo( orbit, obs, n_obs, curr_epoch, epoch_shown);
                   update_element_display = 1;
                   strlcpy_error( message_to_user, "Orbital MC generated");

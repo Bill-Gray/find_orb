@@ -26,20 +26,21 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #define MONTE_ASC_NODE     8
 #define MONTE_EARTH_MOID   9
 #define MONTE_H           10
+#define MONTE_NONGRAVS    11
 
-#define MONTE_N_ENTRIES   11
+#define MONTE_N_ENTRIES   16
 #define MONTE_DATA_SIZE   (3 * MONTE_N_ENTRIES)
 
 double *add_gaussian_noise_to_obs( int n_obs, OBSERVE *obs,
                  const double noise_in_sigmas);             /* monte0.cpp */
 void add_monte_orbit( double *monte_data, const ELEMENTS *elem,
-                  const int n_orbits);                      /* monte0.cpp */
+                const double *nongravs, const int n_orbits);  /* monte0.cpp */
 void compute_monte_sigmas( double *sigmas, const double *monte_data,
                   const int n_orbits);                      /* monte0.cpp */
 void restore_ra_decs_mags_times( unsigned n_obs, OBSERVE *obs,
                            const double *stored_ra_decs);
 void put_orbital_elements_in_array_form( const ELEMENTS *elem,
-                  double *output_array);                    /* monte0.cpp */
+               const double *nongravs, double *output_array);  /* monte0.cpp */
 double dump_monte_data_to_file( FILE *ofile, const double *sigmas,
             const double semimajor_axis, const double ecc,
             const int planet_orbiting);                       /* monte0.cpp */

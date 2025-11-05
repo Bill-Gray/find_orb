@@ -26,6 +26,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "stringex.h"
 #include "afuncs.h"
 #include "monte0.h"
+#include "constant.h"
 
 double gaussian_random( void);                           /* monte0.c */
 int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
@@ -39,11 +40,12 @@ void set_up_observation( OBSERVE FAR *obs);                 /* mpc_obs.c */
 void set_obs_vect( OBSERVE FAR *obs);        /* mpc_obs.h */
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 
-#define PI 3.1415926535897932384626433832795028841971693993751058209749445923
-
 void put_orbital_elements_in_array_form( const ELEMENTS *elem,
-                  double *output_array)
+               const double *nongravs, double *output_array)
 {
+   int i;
+   extern int n_orbit_params;
+
    output_array[MONTE_TP] = elem->perih_time;
    output_array[MONTE_ECC] = elem->ecc;
    output_array[MONTE_q] = elem->major_axis * (1. - elem->ecc);
@@ -55,16 +57,22 @@ void put_orbital_elements_in_array_form( const ELEMENTS *elem,
    output_array[MONTE_ASC_NODE] = elem->asc_node * 180. / PI;
    output_array[MONTE_EARTH_MOID] = 0.;
    output_array[MONTE_H] = elem->abs_mag;
+   for( i = MONTE_NONGRAVS; i < MONTE_N_ENTRIES; i++)
+      output_array[i] = 0.;
+   assert( nongravs || (6 == n_orbit_params));
+   assert( n_orbit_params < MONTE_N_ENTRIES - MONTE_NONGRAVS + 6);
+   for( int i = 0; i < n_orbit_params - 6; i++)
+      output_array[MONTE_NONGRAVS + i] = nongravs[i + 6];
 }
 
 void add_monte_orbit( double *monte_data, const ELEMENTS *elem,
-                  const int n_orbits)
+                const double *nongravs, const int n_orbits)
 {
    double tarr[MONTE_N_ENTRIES];
    double *offsets = monte_data + 2 * MONTE_N_ENTRIES;
    int i;
 
-   put_orbital_elements_in_array_form( elem, tarr);
+   put_orbital_elements_in_array_form( elem, nongravs, tarr);
    if( !n_orbits)                /* initializing step */
       for( i = 0; i < MONTE_N_ENTRIES; i++)
          {
@@ -400,10 +408,11 @@ double dump_monte_data_to_file( FILE *ofile, const double *sigmas,
    int i;
    char tbuff[40], *tptr;
    extern int available_sigmas;
+   extern int n_orbit_params;
 
    fprintf( ofile, "Planet orbiting: %d\n", planet_orbiting);
    fprintf( ofile, "Sigmas:\n");
-   for( i = 0; i < MONTE_N_ENTRIES; i++)
+   for( i = 0; i < MONTE_NONGRAVS; i++)
       {
       if( !strcmp( units_text[i], "deg"))
          {
@@ -429,8 +438,6 @@ double dump_monte_data_to_file( FILE *ofile, const double *sigmas,
 // if( semimajor_axis > sigma_a * .3)
    if( semimajor_axis > 0.)
       {
-      const double GAUSS_K = .01720209895;
-      const double SOLAR_GM = GAUSS_K * GAUSS_K;
       const double mass = get_planet_mass( planet_orbiting) / SOLAR_GM;
       const double per_yrs = semimajor_axis * sqrt( semimajor_axis / mass);
       const double days_per_year = 365.25;
@@ -469,6 +476,16 @@ double dump_monte_data_to_file( FILE *ofile, const double *sigmas,
          fprintf( ofile, "U=%.1f\n", uparam);
       else
          uparam = 97.;     /* 'bogus' U */
+      }
+   if( force_model == FORCE_MODEL_SRP)
+      {
+      put_double_in_buff( tbuff, sigmas[MONTE_NONGRAVS] * SOLAR_GM / SRP1AU);
+      fprintf( ofile, "Sigma_AMR: %s\n", tbuff);
+      }
+   else for( i = 0; i < n_orbit_params - 6; i++)
+      {
+      put_double_in_buff( tbuff, sigmas[MONTE_NONGRAVS + i]);
+      fprintf( ofile, "Sigma_A%d: %s\n", i + 1, tbuff);
       }
    available_sigmas = MONTE_CARLO_SIGMAS_AVAILABLE;
    return( uparam);
