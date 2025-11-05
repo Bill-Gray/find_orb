@@ -314,6 +314,22 @@ static inline double cauchy_upper_root_bound( const double *poly,
    return( 1. + max / fabs( *poly));
 }
 
+/* https://en.wikipedia.org/wiki/Geometrical_properties_of_polynomial_roots
+says that the following bound was "originally given by Lagrange,  but
+attributed to Zassenhaus by Donald Knuth."  It is twice the largest value
+in the sequence
+
+|a(n-1) / a(n)|,  |a(n-2) / a(n)| ^ 1/2,  .... |a(0) / a(n)| ^ 1/n
+
+    The same article mentions that Lagrange improved it by having the bound
+be the sum of the largest two values in the above sequence.  So we could do
+a little better here.  We could do still better by looking for bounds for real
+valued roots;  at present,  we're looking at the bounds for all roots,
+including complex ones we aren't attempting to determine anyway.
+
+   The following code evaluates the logarithms of the above terms,  then
+calls exp( ) to get the actual largest term so that it can be doubled. */
+
 static inline double knuth_upper_root_bound( const double *poly,
                                int poly_degree)
 {

@@ -307,7 +307,9 @@ LANGUAGE=e
    RA) or degrees/arcmin (for dec) with zero to eight places after the
    decimal.  Format numbers 200 to 215 are for RA only,  to get decimal
    degrees.  Note that the higher-precision values will be almost
-   meaningless noise.
+   meaningless noise.  Also,  note that the menu for RA/dec formats (shown
+   when you turn RA/dec display on for ephems) is in 'efindorb.txt';  that
+   file has more comments (and allows you to add/remove formats).
       A full list of formats is provided at
    https://github.com/Bill-Gray/lunar/blob/mpc_fmt.cpp
    (search for comments above the get_ra_dec() function.)

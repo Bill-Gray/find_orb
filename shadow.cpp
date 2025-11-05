@@ -23,6 +23,13 @@ that ring and the fraction of that ring which is uneclipsed.  Summing
 up those ring contributions gets you a value between 0% (total eclipse)
 and 100% (no eclipse).
 
+   It seems to me that for computing solar radiation pressure,  we would
+want "the limb darkening for total energy radiated by that part of the
+sun".  For computing the effect on apparent magnitude,  we would want
+to know "the limb darkening for V magnitude for that part of the sun".
+I haven't seen that distinction drawn anywhere,  but would expect it to
+make a small difference.
+
    A formula on page 216 of
 https://ui.adsabs.harvard.edu/abs/2018MPBu...45..215B/abstract gives
 a decent approximation of disk brightness as a function of radius,
