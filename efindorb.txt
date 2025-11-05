@@ -130,11 +130,11 @@
 22      All Perturbers Off
 
 900     English
-901     French
-902     Italian
-903     Russian
-904     Spanish
-905     German
+901     Français
+902     Italiano
+903     русский
+904     Español
+905     Deutsch
 
 # months
 1000    January
@@ -275,11 +275,11 @@
 2034    Cancel
 
 2035    English
-2035    French
-2035    Italian
-2035    Russian
-2035    Spanish
-2035    German
+2035    Français
+2035    Italiano
+2035    русский
+2035    Español
+2035    Deutsch
 
 2036    Help about this dialog
 2036    Select file of observations
