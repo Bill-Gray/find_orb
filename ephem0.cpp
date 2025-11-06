@@ -129,7 +129,7 @@ void *memmove_err( void *dest, const void *src, const size_t n, const void *endp
 {
    assert( (char *)endptr >= (char *)dest + n);
    assert( (char *)endptr >= (char *)src  + n);
-   return( memcpy( dest, src, n));
+   return( memmove( dest, src, n));
 }
 
 /* Returns parallax constants (rho_cos_phi, rho_sin_phi) in AU. */
