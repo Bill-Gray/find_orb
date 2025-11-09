@@ -4767,40 +4767,46 @@ static void observer_link_substitutions( char *buff)
       }
 }
 
-static unsigned get_list_of_stations( const unsigned n_obs,
-               const OBSERVE FAR *obs_data, const unsigned max_n_stations,
-               char stations[][5])
-{
-   unsigned n_stations = 0, i, j;
+#define is_power_of_two( X)   (!((X) & ((X) - 1)))
 
-   for( i = 0; i < n_obs; i++)
+static char *get_list_of_stations( const unsigned n_obs,
+               const OBSERVE FAR *obs_data, unsigned *n_stations)
+{
+   char *rval = (char *)malloc( 6);
+
+   *n_stations = 0;
+   for( unsigned i = 0; i < n_obs; i++)
       {
       int compare = 1;
+      unsigned j = 0;
 
-      j = 0;
-      while( j < n_stations &&
-             (compare = strcmp( obs_data[i].mpc_code, stations[j])) > 0)
+      while( j < *n_stations &&
+            (compare = strcmp( obs_data[i].mpc_code, rval + j * 6)) > 0)
          j++;
       if( compare)         /* got a new one */
          {
+         char *tptr;
+
          assert( strlen( obs_data[i].mpc_code) == 3);
-         memmove( stations + j + 1, stations + j, (n_stations - j)  * sizeof( stations[0]));
-         strlcpy( stations[j], obs_data[i].mpc_code, 4);
-         n_stations++;
-         assert( n_stations < max_n_stations);
+         if( is_power_of_two( *n_stations))
+            rval = (char *)realloc( rval, (2 * *n_stations + 1) * 6);
+         tptr = rval + j * 6;
+         memmove( tptr + 6, tptr, (*n_stations - j) * 6);
+         strlcpy( tptr, obs_data[i].mpc_code, 4);
+         (*n_stations)++;
          }
       }
-   return( n_stations);
+   return( rval);
 }
 
 static int write_observer_data_to_file( FILE *ofile, const char *ast_filename,
                  const int n_obs, const OBSERVE FAR *obs_data)
 {
-   unsigned n_stations = 0, i, j;
-   char stations[400][5];
+   unsigned n_stations, i, j;
+   char *stations;
 
    INTENTIONALLY_UNUSED_PARAMETER( ast_filename);
-   n_stations = get_list_of_stations( n_obs, obs_data, 400, stations);
+   stations = get_list_of_stations( n_obs, obs_data, &n_stations);
    for( i = 0; i < n_stations; i++)
       {
       char buff[200], tbuff[100];
@@ -4811,7 +4817,7 @@ static int write_observer_data_to_file( FILE *ofile, const char *ast_filename,
 
       *program_codes = '\0';
       for( j = 0; j < (unsigned)n_obs; j++)
-         if( !strcmp( stations[i], obs_data[j].mpc_code)
+         if( !strcmp( stations + i * 6, obs_data[j].mpc_code)
                && strchr( allowable_codes, obs_data[j].note1)
                && !strchr( program_codes, obs_data[j].note1))
              {
@@ -4819,7 +4825,7 @@ static int write_observer_data_to_file( FILE *ofile, const char *ast_filename,
              program_codes[n_program_codes] = '\0';
              }
 
-      strlcpy_error( tbuff, stations[i]);
+      strlcpy_error( tbuff, stations + i * 6);
       put_observer_data_in_text( tbuff, buff);
       snprintf_err( details[0], sizeof( details[0]), "(%s) %s.", tbuff, buff);
 
@@ -4831,7 +4837,7 @@ static int write_observer_data_to_file( FILE *ofile, const char *ast_filename,
             const char *filenames[3] = { "progcode.txt", "details.txt", "scopes.txt" };
 
             get_observer_details( filenames[j], obs_data,
-                      n_obs, stations[i], program_codes, details[1], details[2], details[3]);
+                      n_obs, stations + i * 6, program_codes, details[1], details[2], details[3]);
             }
       for( j = 1; j <= 3; j++)
          add_final_period( details[j]);
@@ -4884,6 +4890,7 @@ static int write_observer_data_to_file( FILE *ofile, const char *ast_filename,
             }
       fprintf( ofile, "\n");
       }
+   free( stations);
    return( 0);
 }
 
