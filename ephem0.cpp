@@ -4389,6 +4389,49 @@ static void put_sigma( char *buff, const double val)
    memcpy( buff, tbuff, 3);
 }
 
+/* Some explanation of what may be weird-looking stuff in the following two
+functions : uncorrelated astrometric uncertainties are stored with
+posn_sigma_1 = rmsDec,  posn_sigma_2 = rmsRA, posn_sigma_theta = 0.
+Correlated are stored with posn_sigma_1 = major axis of the uncertainty
+ellipse,  posn_sigma_2 = minor axis,  and a non-zero posn_sigma_theta.
+
+When showing 'elliptical' uncertainties to humans,  we show rmsRA x rmsDec
+(and no position angle) if they're uncorrelated,  and major axis x minor
+axis and the position angle if they are correlated.  Which unfortunately
+means that in the first case,  we show posn_sigma_2 followed by
+posn_sigma_1;  in the correlated case,  we swap them.   */
+
+int error_ellipse_to_ades_value( const double major, const double minor, const double angle,
+         double *sigma_ra, double *sigma_dec, double *correl);
+
+void create_sigma_hover_text( char *buff, const size_t buffsize,
+                     const OBSERVE FAR *obs)
+{
+   strlcpy_err( buff, obs->packed_id, buffsize);
+   text_search_and_replace( buff, " ", "");
+   if( obs->posn_sigma_1 != obs->posn_sigma_2)
+      {
+      const int pa_tenths = (int)( obs->posn_sigma_theta * 1800. / PI + 0.5);
+      const double sig1 = (pa_tenths ? obs->posn_sigma_1 : obs->posn_sigma_2);
+      const double sig2 = (pa_tenths ? obs->posn_sigma_2 : obs->posn_sigma_1);
+
+      snprintf_append( buff, buffsize, "\n%.4g x %.4g", sig1, sig2);
+      if( pa_tenths)
+         {
+         double sigma_ra, sigma_dec, correl;
+
+         snprintf_append( buff, buffsize, " at PA %d.%d",
+                     pa_tenths / 10, pa_tenths % 10);
+         error_ellipse_to_ades_value( obs->posn_sigma_2, obs->posn_sigma_1, obs->posn_sigma_theta,
+                           &sigma_ra, &sigma_dec, &correl);
+         snprintf_append( buff, buffsize, "\nrmsRA=%.4g rmsDec=%.4g correl=%.4g",
+                           sigma_ra, sigma_dec, correl);
+         }
+      }
+   else
+      snprintf_append( buff, buffsize, "\nSigma %.4g", obs->posn_sigma_1);
+}
+
 int sigmas_in_columns_57_to_65 = 0;
 
 void recreate_observation_line( char *obuff, const OBSERVE FAR *obs,
@@ -4453,6 +4496,12 @@ void recreate_observation_line( char *obuff, const OBSERVE FAR *obs,
             }
          put_sigma( obuff + 57, obs->posn_sigma_1 * multiplier);
          put_sigma( obuff + 61, obs->posn_sigma_2 * multiplier);
+         if( !obs->posn_sigma_theta)
+            {
+            memcpy( buff, obuff + 57, 3);
+            memcpy( obuff + 57, obuff + 61, 3);
+            memcpy( obuff + 61, buff, 3);
+            }
          }
       }
    else
