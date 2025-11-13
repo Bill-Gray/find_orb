@@ -5444,7 +5444,7 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
                if( strcmp( sig1_buff, sig2_buff))
                   {
                   const int tilt_angle =
-                               (int)( optr->posn_sigma_theta * 180. / PI) % 180;
+                               (int)( optr->posn_sigma_theta * 180. / PI + 0.5) % 180;
 
                   if( !tilt_angle)  /* PA=0 means sig1 = sigma(dec), sig2 = sigma(RA) */
                       snprintf_append( buff, buffsize, "%sx%s\" ", sig2_buff, sig1_buff);
