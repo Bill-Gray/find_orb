@@ -191,7 +191,6 @@ int store_defaults( const ephem_option_t ephemeris_output_options,
 int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
          int *element_precision, double *max_residual_for_filtering,
          double *noise_in_sigmas);                /* elem_out.cpp */
-int sort_obs_by_date_and_remove_duplicates( OBSERVE *obs, const int n_obs);
 double utc_from_td( const double jdt, double *delta_t);     /* ephem0.cpp */
 void fix_home_dir( char *filename);                /* ephem0.cpp */
 int write_environment_pointers( void);             /* mpc_obs.cpp */

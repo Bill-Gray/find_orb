@@ -54,7 +54,6 @@ int apply_excluded_observations_file( OBSERVE *obs, const int n_obs);
 void set_up_observation( OBSERVE FAR *obs);                 /* mpc_obs.c */
 static double observation_jd( const char *buff);
 double centralize_ang( double ang);             /* elem_out.cpp */
-int sort_obs_by_date_and_remove_duplicates( OBSERVE *obs, const int n_obs);
 char *fgets_trimmed( char *buff, size_t max_bytes, FILE *ifile); /*elem_out.c*/
 int lat_alt_to_parallax( const double lat, const double ht_in_meters,
              double *rho_cos_phi, double *rho_sin_phi, const int planet_idx);
@@ -2984,7 +2983,7 @@ static void exclude_unusable_duplicate_obs( OBSERVE *obs, int n_obs)
 /* Does what the function name suggests.  Return value is the number
 of observations left after duplicates have been removed.   */
 
-int sort_obs_by_date_and_remove_duplicates( OBSERVE *obs, const int n_obs)
+static int sort_obs_by_date_and_remove_duplicates( OBSERVE *obs, const int n_obs)
 {
    int i, j;
 
