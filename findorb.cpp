@@ -242,6 +242,8 @@ void make_observatory_info_text( char *text, const size_t textlen,
              const OBSERVE *obs, int n_obs, const char *mpc_code);
 void size_from_h_text( const double abs_mag, char *obuff,
                                  const int obuff_size);  /* ephem0.c */
+void create_sigma_hover_text( char *buff, const size_t buffsize,
+                     const OBSERVE FAR *obs);            /* ephem0.c */
 int find_fcct_biases( const double ra, const double dec, const char catalog,
                  const double jd, double *bias_ra, double *bias_dec);
 int select_tracklet( OBSERVE *obs, const int n_obs, const int idx);
@@ -4829,7 +4831,7 @@ int main( int argc, const char **argv)
                            col1 = 3;
                            col2 = 20;
                            }
-                        else if( mouse_x < 42)
+                        else if( mouse_x < 44)
                            {
                            char formatted[82];
 
@@ -4842,6 +4844,12 @@ int main( int argc, const char **argv)
                            strlcat_error( tbuff, formatted + 32);
                            col1 = 20;
                            col2 = 44;
+                           }
+                        else if( mouse_x < 52)
+                           {
+                           col1 = 44;
+                           col2 = 52;
+                           create_sigma_hover_text( tbuff, sizeof( tbuff), obs + i);
                            }
                         if( mouse_x >= 53 && mouse_x < 59 && obs[i].computed_mag != BLANK_MAG)
                            {
