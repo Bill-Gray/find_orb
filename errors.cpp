@@ -268,6 +268,29 @@ int convert_ades_sigmas_to_error_ellipse( const double sig_ra,
       }
 }
 
+/* Mostly,  Find_Orb works with the error ellipse.  It is converted back to the
+ADES form (sigRA, sigDec, correl) for testing purposes and for output to ADES,
+using the following function.  */
+
+int error_ellipse_to_ades_value( const double major, const double minor, const double angle,
+         double *sigma_ra, double *sigma_dec, double *correl)
+{
+   double A, B, C;
+   double a, b, c, determ;
+
+   convert_error_ellipse_to_quadratic_form( major, minor, angle, &A, &B, &C);
+   determ = A * C - B * B;
+   if( determ <= 0. || A >= 0. || C >= 0.)
+      return( -1);
+   a = C / determ;
+   b = B / determ;
+   c = A / determ;
+   *sigma_ra = sqrt( -a);
+   *sigma_dec = sqrt( -c);
+   *correl = -b / (*sigma_ra * *sigma_dec);
+   return( 0);
+}
+
 /* adjust_error_ellipse_for_timing_error( ) puts the above pieces
 together : given the estimated error ellipse and the uncertainty
 vector from timing,  it computes an adjusted error ellipse "stretched
@@ -303,10 +326,15 @@ int main( const int argc, const char **argv)
    const double sigma_b = atof( argv[2]);
    const double theta = atof( argv[3]) * PI / 180.;
    double A, B, C, a, b, angle;
+   double sigma_ra, sigma_dec, correl;
 
    convert_error_ellipse_to_quadratic_form( sigma_a,
                sigma_b, theta, &A, &B, &C);
    printf( "Quad form: %f %f %f\n", A, B, C);
+   error_ellipse_to_ades_value( sigma_a, sigma_b, theta,
+                  &sigma_ra, &sigma_dec, &correl);
+   printf( "In ADES form: sigRA = %f, sigDec = %f, correl = %f\n",
+               sigma_ra, sigma_dec, correl);
    convert_quadratic_form_to_error_ellipse( A, B, C,
                &a, &b, &angle);
    printf( "Converted back: %f %f at angle %f\n",
