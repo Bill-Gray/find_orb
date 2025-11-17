@@ -3767,10 +3767,6 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                      posn_sigma_2 = override_posn_sigma_2;
                      posn_sigma_theta = override_posn_sigma_theta;
                      }
-                                   /* Sigmas from ADES or Dave Tholen apply to only */
-                                   /* one observation.  Zero 'em out after that use : */
-                  ades_posn_sigma_1 = ades_posn_sigma_2 = ades_mag_sigma = 0.;
-                  ades_posn_sigma_theta = ades_time_sigma = unc_time = 0.;
 
                   if( sscanf( rval[i].columns_57_to_65, "%lf %lf%n",
                               &ra_sigma, &dec_sigma, &bytes_read) >= 2
@@ -3872,6 +3868,11 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                spacecraft_offset_reference = 399;  /* default to geocentric offsets */
                }
             }
+         }
+      if( jd > 1.)       /* Sigmas from ADES or Dave Tholen apply to only */
+         {              /* one observation.  Zero 'em out after that use : */
+         ades_posn_sigma_1 = ades_posn_sigma_2 = ades_mag_sigma = 0.;
+         ades_posn_sigma_theta = ades_time_sigma = unc_time = 0.;
          }
       override_time = 0.;
       override_ra = override_dec = override_mag = -100.;
