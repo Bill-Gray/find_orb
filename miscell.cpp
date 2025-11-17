@@ -176,8 +176,10 @@ Docker,  it'll be in /software/.find_orb.  On Puppy Linux,  where
 the only user is root,  it'll be in /root/.find_orb.
 
    To figure out where it is,  we look for the file 'cospar.txt'
-in these three places.  If they all fail,  but an 'alt config
-directory' is specified,  we try that.  After that,  we give up. */
+(one of many files in the configuration directory,  and an unusual
+enough name to probably avoid collisions) in these three places.  If
+they all fail,  but an 'alt config directory' is specified,  we try
+that.  After that,  we give up. */
 
 char *default_config_dir_name( char *oname, const char *iname)
 {
@@ -707,6 +709,6 @@ int pattern_match(const char* pattern, const char* string)
 const char *find_orb_version_jd( double *jd)
 {
     if( jd)
-      *jd = 2460991.5;
-    return( "2025 Nov 12");
+      *jd = 2460996.5;
+    return( "2025 Nov 17");
 }

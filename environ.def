@@ -260,7 +260,7 @@ IOD_TIMEOUT=20
    rename it.
 # BC405_FILENAME=/home/phred/big/asteroid_ephemeris.txt
 
-   I had a request (https://groups.yahoo.com/neo/groups/find_orb/conversations/messages/35)
+   I had a request (https://projectpluto.com/groups/find_orb/msg33.htm)
    for an option to output planetary state vectors at the epoch of the orbital
    elements to 'elements.txt'.  If you want to do that,  set PLANET_STATES=1.
    By default,  it's blank and planet states are not written out.
@@ -473,6 +473,8 @@ SIGMAS_FILE=
    is best placed.  This is useful with telescope networks where you might
    well shift the imaging to whichever scope is best placed at a given time.
    Note that these 'MPC codes' also have lines in rovers.txt (q.v.).
+   Las Cumbres Observatory operates two two-meter telescopes,  lumped
+   here as (LC2),  and several one-meter telescopes,  lumped as (LC1).
 GROUP_ATL=M22 T05 T08 W68
 GROUP_LC2=E10 F65
 GROUP_LC1=V37 W85 K91 Q63 Z31 097 T04
