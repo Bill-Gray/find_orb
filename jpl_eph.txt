@@ -22,11 +22,11 @@ unix.406
 ; 1600-2200:  about 56 MBytes:
 unix.405
 
-; http://cococubed.asu.edu/codes/ephem/unxp1600-2200_ppc_mac_xlf.405
+; (dead) http://cococubed.asu.edu/codes/ephem/unxp1600-2200_ppc_mac_xlf.405
 ; Same file as above,  I think
 unxp1600-2200_ppc_mac_xlf.405
 
-; http://cococubed.asu.edu/codes/ephem/unxp1600-2200_intel_mac_ifort.405
+; (dead) http://cococubed.asu.edu/codes/ephem/unxp1600-2200_intel_mac_ifort.405
 ; Same file as above,  I think,  except reversed byte order
 unxp1600-2200_intel_mac_ifort.405
 
@@ -57,7 +57,7 @@ lnxp1900p2050.418
 ; https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de414/lnxp1600p2200.414
 ; (about 55 MBytes)
 lnxp1600p2200.414
-;https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de405/lnxp1600p2200.405
+; https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de405/lnxp1600p2200.405
 ; (about 55 MBytes)
 lnxp1600p2200.405
 ; https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de406/lnxm3000p3000.406
