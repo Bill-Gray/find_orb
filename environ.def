@@ -511,8 +511,9 @@ MOTION_UNITS="/min
    to ADES,  debugging files,  orbital elements and ephemerides in text and JSON
    formats and more are written to the configuration directory ~/.find_orb (Linux)
    or to the current directory (Windows).  You can specify a directory explicitly
-   with the following parameter,  and 'temporary' files will be put there instead.
+   with the following parameters,  and 'temporary' files will be put there instead.
 OUTPUT_DIR=
+WIN_OUTPUT_DIR=
 
    (Humans should never have to edit the following line.)  If Find_Orb
    encounters an unknown (and possibly newly assigned) observatory code,

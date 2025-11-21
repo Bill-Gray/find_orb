@@ -4083,7 +4083,11 @@ int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
    extern double minimum_observation_jd;
    extern double maximum_observation_jd;
    const char *outlier_limit = get_environment_ptr( "OUTLIER_REJECTION_LIMIT");
+#if !defined( _WIN32) && !defined( __WATCOMC__)
    const char *output_dir = get_environment_ptr( "OUTPUT_DIR");
+#else
+   const char *output_dir = get_environment_ptr( "WIN_OUTPUT_DIR");
+#endif
    extern const char *output_directory;
    char cospar_name[255];
 
