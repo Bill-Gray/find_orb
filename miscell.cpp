@@ -325,8 +325,11 @@ FILE *fopen_ext( const char *filename, const char *permits)
       char tname[255];
 
       get_temp_dir( tname, sizeof( tname));
-      snprintf_append( tname, sizeof( tname), "/%s",  filename);
-      rval = fopen( tname, permits);
+      if( *tname)
+         {
+         snprintf_append( tname, sizeof( tname), "/%s",  filename);
+         rval = fopen( tname, permits);
+         }
       }
 
    if( !rval)
