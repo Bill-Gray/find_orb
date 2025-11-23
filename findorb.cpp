@@ -3376,14 +3376,9 @@ extern const char *elements_filename;
 static int count_wide_chars_in_utf8_string( const char *iptr, const char *endptr)
 {
    int rval = 0;
-   char tbuff[200];
 
-   assert( endptr);
    assert( iptr);
    assert( endptr >= iptr);
-   assert( endptr < iptr + sizeof( tbuff));
-   memcpy( tbuff, iptr, endptr - iptr);
-   tbuff[endptr - iptr] = '\0';
    while( iptr < endptr)
       {
       switch( ((unsigned char)*iptr) >> 4)
