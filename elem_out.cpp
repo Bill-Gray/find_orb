@@ -83,7 +83,6 @@ static int elements_in_guide_format( char *buff, const ELEMENTS *elem,
 FILE *open_json_file( char *filename, const char *env_ptr, const char *default_name,
                   const char *packed_desig, const char *permits); /* ephem0.cpp */
 int find_worst_observation( const OBSERVE FAR *obs, const int n_obs);
-double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit);
 int set_locs( const double *orbit, double t0, OBSERVE FAR *obs, int n_obs);
 void attempt_extensions( OBSERVE *obs, const int n_obs, double *orbit,
                   const double epoch);                  /* orb_func.cpp */
@@ -3725,11 +3724,11 @@ double mag_band_shift( const char mag_band, int *err_code)
              {'H', 1.4 },   {'i', 0.32 },   {'I', 0.8 },
              {'J', 1.2 },   {'K', 1.7 },    {'L', 0.2 },
              {'o', 0.33 },  {'r', 0.14 },   {'R', 0.4 }, {'u', 2.5 },
-             {'U', -1.3 },  {'v', 0},       {'W', 0.4 },
+             {'U', -1.3 },                  {'W', 0.4 },
              {'w', -0.13 }, {'y', 0.32 },   {'Y', 0.7 },
              {'z', 0.26, },    {'\0', 0. } };
 
-   if( strchr( "VNT", mag_band))
+   if( strchr( "VNTjv", mag_band))
       return( 0.);
    for( i = 0; bands[i].band; i++)
       if( mag_band == bands[i].band)
