@@ -182,6 +182,7 @@ PSP !   0.0000       0.00000   +0.00000    @-2 Parker Space Probe
 Cas !   0.0000       0.00000   +0.00000    @-2 Cassini
 MEx !   0.0000       0.00000   +0.00000    @-2 Mars Express
 Goe !   0.0000       0.00000   +0.00000    @-2 GOES-19
+MRO !   0.0000       0.00000   +0.00000    @-2 Mars Reconnaissance Orbiter
 
 Met !   7.212778     +51.520802       54       Bernd Brinkmann meteor site
 JSt !   8.32         +52.02          300       Joerg Strunk meteor site
