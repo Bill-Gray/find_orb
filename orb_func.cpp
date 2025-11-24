@@ -4221,8 +4221,6 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
    if( debug_level)
       debug_printf( "initial_orbit(): %d obs;", n_obs);
    assert( orbit);
-   n_radar_obs = sort_unused_obs_to_end( obs, n_obs);
-   n_obs -= n_radar_obs;
    for( i = 0; i < n_obs; i++)
       {
       obs[i].computed_ra  = obs[i].ra;
@@ -4237,6 +4235,8 @@ double initial_orbit( OBSERVE FAR *obs, int n_obs, double *orbit)
       obs++;
       n_obs--;
       }
+   n_radar_obs = sort_unused_obs_to_end( obs, n_obs);
+   n_obs -= n_radar_obs;
                /* We may have eliminated all observations,  or all */
                /* but one... in which case we do this :            */
    if( n_obs <= 1 || force_bogus_orbit)
