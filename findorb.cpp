@@ -308,13 +308,6 @@ int curses_kbhit( )
    return( c);
 }
 
-int curses_kbhit_without_mouse( )
-{
-   const int rval = curses_kbhit( );
-
-   return( rval != KEY_MOUSE ? rval : 0);
-}
-
 static int extended_getch( void)
 {
 #ifdef _WIN32
@@ -336,6 +329,24 @@ static int extended_getch( void)
          rval += (ALT_A - 'a');
       }
 #endif
+   return( rval);
+}
+
+int curses_kbhit_without_mouse( )
+{
+   int rval = curses_kbhit( );
+
+   if( rval != ERR)
+      {
+      extended_getch( );
+      if( rval == KEY_MOUSE)        /* ignoring the mouse */
+         {
+         MEVENT mouse_event;
+
+         getmouse( &mouse_event);
+         rval = ERR;
+         }
+      }
    return( rval);
 }
 
@@ -4736,11 +4747,8 @@ int main( int argc, const char **argv)
       add_off_on = -1;
       move( getmaxy( stdscr) - 1, 0);
       if( c == AUTO_REPEATING)
-         if( curses_kbhit( ) != ERR)
-            {
-            extended_getch( );
-            c = 0;
-            }
+         if( (i = curses_kbhit_without_mouse( )) != ERR)
+            c = 0;                        /* stopping a Monte Carlo run */
       if( c != AUTO_REPEATING)
          {
          int n_ticks_elapsed = 0, n_ticks_mouse_stationary = 0;
@@ -5505,11 +5513,8 @@ int main( int argc, const char **argv)
                {
                strlcpy_error( message_to_user,
                                (err ? "Full step FAILED" : "Full step taken"));
-               if( curses_kbhit_without_mouse( ) > 0)
-                  {
-                  extended_getch( );
+               if( curses_kbhit_without_mouse( ) != ERR)
                   strlcpy_error( message_to_user, "User interrupted step");
-                  }
                snprintf_append( message_to_user, sizeof( message_to_user), "(%.5f s)",
                       (double)( clock( ) - t0) / (double)CLOCKS_PER_SEC);
                }
