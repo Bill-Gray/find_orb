@@ -3847,6 +3847,19 @@ static void debias_info_text( char *buff, const size_t buffsize)
       strlcpy_err( buff, "No astrometric debiasing applied\n", buffsize);
 }
 
+static void moon_info_text( char *buff, const size_t buffsize)
+{
+   const double jd = current_jd( );
+   const double nm_time = jd - get_time_from_string( jd, "nm", 0, NULL);
+   const double fm_time = jd - get_time_from_string( jd, "fm", 0, NULL);
+   const bool is_fm = (fabs( nm_time) > fabs( fm_time));
+   const double dt = (is_fm ? fm_time : nm_time);
+
+   snprintf_err( buff, buffsize, "%.1f days %s %s moon", fabs( dt),
+                  (dt < 0. ? "until" : "after"),
+                  (is_fm ? "full" : "new"));
+}
+
 static void show_splash_screen( void)
 {
    FILE *ifile = fopen_ext( "splash.txt", "crb");
@@ -3855,9 +3868,11 @@ static void show_splash_screen( void)
       {
       char buff[200], eop_line_1[200], *eop_line_2;
       char debias_text[100], jpl_ephem_text[250];
+      char moon_text[90];
       bool show_it = false;
       int lines, cols, i;
 
+      moon_info_text( moon_text, sizeof( moon_text));
       debias_info_text( debias_text, sizeof( debias_text));
       eop_info_text( eop_line_1, sizeof( eop_line_1));
       eop_line_2 = strchr( eop_line_1, '\n');
@@ -3875,6 +3890,7 @@ static void show_splash_screen( void)
                   {
                   text_search_and_replace( buff, "$v", find_orb_version_jd( NULL));
                   text_search_and_replace( buff, "$d", debias_text);
+                  text_search_and_replace( buff, "$m", moon_text);
                   text_search_and_replace( buff, "$e1", eop_line_1);
                   text_search_and_replace( buff, "$e2", (eop_line_2 ? eop_line_2 : ""));
                   text_search_and_replace( buff, "$j", jpl_ephem_text + 1);
