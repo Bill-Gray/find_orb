@@ -1782,8 +1782,8 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
    else
       {
       const int rval = get_ra_dec_from_mpc_report( buff,
-                  &obs->ra_precision, &obs->ra, &obs->posn_sigma_1,
-                  &obs->dec_precision, &obs->dec, &obs->posn_sigma_2);
+                  &obs->ra_precision, &obs->ra, &obs->posn_sigma_2,
+                  &obs->dec_precision, &obs->dec, &obs->posn_sigma_1);
 
       if( override_ra >= 0.)
          {
