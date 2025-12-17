@@ -929,8 +929,16 @@ int set_locs( const double *orbit, const double t0, OBSERVE FAR *obs,
 
 double observation_rms( const OBSERVE FAR *obs)
 {
-   const double d_dec = obs->computed_dec - obs->dec;
-   const double d_ra  = (obs->computed_ra  - obs->ra) * cos( obs->computed_dec);
+   double d_dec = obs->computed_dec - obs->dec;
+   double d_ra  = (obs->computed_ra  - obs->ra) * cos( obs->computed_dec);
+
+   if( !obs->posn_sigma_theta)
+      {
+      if( obs->posn_sigma_1 > 900000.)    /* no dec reported;  RA only */
+         d_dec = 0.;
+      if( obs->posn_sigma_2 > 900000.)    /* no RA reported;  dec only */
+         d_ra = 0.;
+      }
 
    return( hypot( d_dec, d_ra) * 3600. * 180. / PI);
 }
@@ -4190,7 +4198,6 @@ static void find_median_orbit( double *sr_orbits, const unsigned n_sr_orbits)
       sr_orbits[i + best_idx * 6] = swap_val;
       }
 }
-
 
 #define INITIAL_ORBIT_NOT_YET_FOUND       -2
 #define INITIAL_ORBIT_FAILED              -1

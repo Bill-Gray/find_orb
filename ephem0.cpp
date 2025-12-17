@@ -4260,6 +4260,13 @@ void format_observation( const OBSERVE FAR *obs, char *text,
          show_resid_in_sigmas( yresid, resid2);
          }
       }
+   if( !obs->posn_sigma_theta)
+      {
+      if( obs->posn_sigma_1 > 900000.)    /* means 'no dec supplied;  RA-only observation' */
+         strcpy( yresid, " ---- ");
+      if( obs->posn_sigma_2 > 900000.)    /* means 'no RA supplied; dec-only observation' */
+         strcpy( xresid, " ---- ");
+      }
    if( base_format != RESIDUAL_FORMAT_SHORT)
       {
       const char *tab_separator =
@@ -4473,6 +4480,13 @@ void recreate_observation_line( char *obuff, const OBSERVE FAR *obs,
       }
    memcpy( obuff + 32, buff + 24, 12);      /* RA */
    memcpy( obuff + 44, buff + 38, 13);      /* dec */
+   if( !obs->posn_sigma_theta)
+      {
+      if( obs->posn_sigma_1 > 900000.)    /* means 'no dec supplied;  RA-only observation' */
+         memset( obuff + 44, ' ', 13);
+      if( obs->posn_sigma_2 > 900000.)    /* means 'no RA supplied; dec-only observation' */
+         memset( obuff + 32, ' ', 12);
+      }
    snprintf_err( obuff + 57, 24, "%13.2f%c%c%s%s", obs->obs_mag,
               obs->mag_band, obs->astrometric_net_code, obs->reference, obs->mpc_code);
    if( obs->obs_mag == BLANK_MAG)        /* no mag given;  clean out that value */
