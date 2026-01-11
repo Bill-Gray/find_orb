@@ -1669,6 +1669,7 @@ OKC !-097.671787   +35.411143         390.0    Oklahoma City test site
    A couple of corrections,  from private communications.
 J04 !-016.511823   +28.300971        2450.     ESA Optical Ground Station, Tenerife
 853 !-110.846731   +32.581173        1166.9    Biosphere 2
+089 !+031.97333    +46.972485          79.     Mykolaiv
 
    Andrew Pearce and Terry Lovejoy provided these coordinates for the old
    Perth Observatory.  "(323) represents the Perth Observatory at the
