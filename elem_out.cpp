@@ -2035,9 +2035,6 @@ int write_out_elements_to_file( const double *orbit,
       char *tt_ptr;
       char sigma_buff[80];
       extern double uncertainty_parameter;
-             /* "Solar radiation pressure at 1 AU",  in             */
-             /* kg*AU^3 / (m^2*d^2),  from a private communication  */
-             /* from Steve Chesley; see orb_func.cpp for details    */
 
       strlcpy_error( sigma_buff, "+/- ");
       strlcpy_error( buff, tptr);
