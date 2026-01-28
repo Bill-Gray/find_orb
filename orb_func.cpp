@@ -1947,7 +1947,7 @@ int herget_method( OBSERVE FAR *obs, int n_obs, double r1, double r2,
    end_jd = obs[0].jd + max_herget_span( r1, r2);
             /* Look "ahead" up to maximum span : days: */
    i = n_obs - 1;
-   while( i > 0 && obs[i].jd > end_jd)
+   while( i > 1 && obs[i].jd > end_jd)
       i--;
    if( obs[i].jd == obs[0].jd)
       return( -1);
@@ -3915,9 +3915,12 @@ bool is_sungrazing_comet( const OBSERVE *obs, const int n_obs)
 
    while( i < n_obs && ( !strcmp( obs[i].mpc_code, "249")
                       || !strcmp( obs[i].mpc_code, "C49")
+                      || !strcmp( obs[i].mpc_code, "PSP")
+                      || !strcmp( obs[i].mpc_code, "Goe")
+                      || !strcmp( obs[i].mpc_code, "SWF")
                       || !strcmp( obs[i].mpc_code, "C50")))
       i++;
-   return( i == n_obs);    /* all obs are from SOHO or STEREOs */
+   return( i == n_obs);    /* all obs are from sungrazing comet platforms */
 }
 
 int solve_quadratic( const double a, const double b, const double c,
