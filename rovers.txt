@@ -166,22 +166,15 @@ SJ5 !   0    5 0.5 -0.8660254            @9015 Sun-Jupiter L5
 
 EMB !   3   10 0.01215058 0              @9016 Earth-Moon barycenter
 
-   Note that ephems generated from these spacecraft require auxiliary
-   files saying where the spacecraft were at a given time.  I don't
-   distribute those files by default,  because (a) some of them are
-   large and (b) you can only go just so far into the future before
-   they may not be entirely accurate.  Should you want ephems for
-   objects as seen from these spacecraft,  or any other spacecraft
-   listed on JPL's Horizons system,  contact me.  (I may set this up
-   so that Find_Orb just looks for the relevant ephems on Horizons,
-   as you need them.)
+   The following spacecraft lack MPC observatory codes,  but either
+   have provided astrometry (though not to MPC) or might do so.
 
-Luc !   0.0000       0.00000   +0.00000    @-2 Lucy
 SoO !   0.0000       0.00000   +0.00000    @-2 Solar Orbiter
 PSP !   0.0000       0.00000   +0.00000    @-2 Parker Space Probe
 Cas !   0.0000       0.00000   +0.00000    @-2 Cassini
 MEx !   0.0000       0.00000   +0.00000    @-2 Mars Express
 Goe !   0.0000       0.00000   +0.00000    @-2 GOES-19
+SWF !   0.0000       0.00000   +0.00000    @-2 Space Weather Follow-On L1
 MRO !   0.0000       0.00000   +0.00000    @-2 Mars Reconnaissance Orbiter
 
 Met !   7.212778     +51.520802       54       Bernd Brinkmann meteor site
