@@ -4796,6 +4796,7 @@ void attempt_extensions( OBSERVE *obs, int n_obs, double *orbit,
    double best_orbit[6];
    int best_start, best_end, i;
    bool done = false;
+   bool reverted_to_best_orbit = false;
    const double residual_limit = 200.;   /* allow up to 200" in orbit extension */
    double arc_limit_in_days = atof( get_environment_ptr( "AUTO_ARC_LEN"));
    const int stored_setting_outside_of_arc = setting_outside_of_arc;
@@ -4909,10 +4910,7 @@ void attempt_extensions( OBSERVE *obs, int n_obs, double *orbit,
       memcpy( orbit, best_orbit, 6 * sizeof( double));
       available_sigmas = best_available_sigmas;
       perturbers = best_perturbers;
-#if 0
-      full_improvement( obs, n_obs, orbit, epoch, NULL,
-                           NO_ORBIT_SIGMAS_REQUESTED, epoch);
-#endif
+      reverted_to_best_orbit = true;
       }
    for( i = 0; i < best_start; i++)
       obs[i].is_included = 0;
@@ -4937,6 +4935,15 @@ void attempt_extensions( OBSERVE *obs, int n_obs, double *orbit,
          adjust_herget_results( obs, n_obs, orbit);
          integrate_orbit( orbit, obs[j].jd, epoch);
          }
+      }
+   if( reverted_to_best_orbit && available_sigmas == COVARIANCE_AVAILABLE)
+      {
+      /* Find_Orb may write covar.json during an attempted arc extension,  then
+      revert to `best_orbit` without re-running `full_improvement()` (and thus
+      without rewriting covar.json).  Ensure the covariance output is synced to
+      the final orbit and final included-observation set. */
+      full_improvement( obs, n_obs, orbit, epoch, NULL,
+                           NO_ORBIT_SIGMAS_REQUESTED, epoch);
       }
    if( n_radar_obs)
       {
