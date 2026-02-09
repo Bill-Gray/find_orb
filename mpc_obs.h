@@ -278,7 +278,7 @@ int compute_observer_loc( const double jde, const int planet_no,
 int compute_observer_vel( const double jde, const int planet_no,
                const double rho_cos_phi,                    /* mpc_obs.cpp */
                const double rho_sin_phi, const double lon, double FAR *offset);
-int get_findorb_text( char *buff, const int ival);    /* ephem.cpp */
+const char *get_find_orb_text( const int index);    /* elem_out.cpp */
 int write_out_elements_to_file( const double *orbit,
             const double curr_epoch,
             const double epoch_shown,

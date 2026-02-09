@@ -411,3 +411,7 @@
 2099    Enter initial guess for time of delta-V :
 
 2101    Enter number of desired variant orbits :
+
+2103    Residuals in arcseconds
+2104    Residuals in seconds along-track and arcseconds cross-track
+2105    Normalized residuals

@@ -215,7 +215,6 @@ bool is_topocentric_mpc_code( const char *mpc_code);
 int64_t nanoseconds_since_1970( void);                      /* mpc_obs.c */
 int metropolis_search( OBSERVE *obs, const int n_obs, double *orbit,
                const double epoch, int n_iterations, double scale);
-const char *get_find_orb_text( const int index);
 int set_tholen_style_sigmas( OBSERVE *obs, const char *buff);  /* mpc_obs.c */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 int find_vaisala_orbit( double *orbit, const OBSERVE *obs1,   /* orb_func.c */

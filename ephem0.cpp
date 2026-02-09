@@ -4970,13 +4970,21 @@ int write_residuals_to_file( const char *filename, const char *ast_filename,
       {
       char buff[200];
       int number_lines = (n_obs + 2) / 3;
-      int i;
+      int i, line_to_show;
 
+      if( resid_format & RESIDUAL_FORMAT_NORMALIZED)
+         line_to_show = 2105;
+      else if( resid_format & RESIDUAL_FORMAT_TIME_RESIDS)
+         line_to_show = 2104;
+      else
+         line_to_show = 2103;
+
+      fprintf( ofile, "%s\n", get_find_orb_text( line_to_show));
       if( (resid_format & 3) == RESIDUAL_FORMAT_SHORT)
          for( i = 0; i < number_lines * 3; i++)
             {
             int num = (i % 3) * number_lines + i / 3;
-            OBSERVE FAR *obs = ((OBSERVE FAR *)obs_data) + num;
+            const OBSERVE FAR *obs = obs_data + num;
 
             if( num < n_obs)
                {
@@ -5279,6 +5287,7 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
             orbit_is_heliocentric = false;
       }
 
+   residuals_ifile = fopen_ext( get_file_name( buff, residual_filename), "tfcrb");
    if( mpec_no)
       snprintf_err( mpec_buff, 4, "_%02x", mpec_no % 256);
    else
@@ -5354,6 +5363,11 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
                      else if( !strcmp( search_str, "$Name"))
                         {
                         strlcpy_error( replace_str, obj_name);
+                        found_replacement_text = true;
+                        }
+                     else if( !strcmp( search_str, "$ResTy"))
+                        {
+                        fgets_trimmed( replace_str, sizeof( replace_str), residuals_ifile);
                         found_replacement_text = true;
                         }
                      else if( !strcmp( search_str, "$SV"))   /* state vect */
@@ -5499,7 +5513,6 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
       fclose( observations_ifile);
       }
 
-   residuals_ifile = fopen_ext( get_file_name( buff, residual_filename), "tfcrb");
    if( residuals_ifile)
       {
       FILE *obslinks_file = fopen_ext( "obslinks.htm", "fcrb");
@@ -5684,10 +5697,10 @@ int make_pseudo_mpec( const char *mpec_filename, const char *obj_name)
    if( residuals_ifile)
       {
       fseek( residuals_ifile, 0L, SEEK_SET);
-      fprintf( ofile, "<pre><b><a name=\"residuals%s\"></a>"
-                      "<a href=\"%s#resids\">"
-                      "Residuals in arcseconds:</a> </b>\n",
-                           mpec_buff, explanations_url);
+      if( fgets_trimmed( buff, sizeof( buff), residuals_ifile))
+         fprintf( ofile, "<pre><b><a name=\"residuals%s\"></a>"
+                      "<a href=\"%s#resids\">%s:</a> </b>\n",
+                           mpec_buff, explanations_url, buff);
       line_no = 0;
       while( fgets( buff, sizeof( buff), residuals_ifile) && *buff > ' ')
          {
