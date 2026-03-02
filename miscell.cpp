@@ -26,6 +26,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include <errno.h>
 #include "stringex.h"
 #include "mpc_func.h"
+#include "mpc_obs.h"
 
 int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
 #ifdef __GNUC__
@@ -69,8 +70,6 @@ CONFIG_IS_LOCAL for such cases.        */
    #include <sys/types.h>
    #include <unistd.h>
 #endif
-
-const char *get_find_orb_text( const int index);
 
 /* This function allows one to put the following options in front of
 the 'permits' string :
@@ -712,6 +711,6 @@ int pattern_match(const char* pattern, const char* string)
 const char *find_orb_version_jd( double *jd)
 {
     if( jd)
-      *jd = 2461060.5;
-    return( "2026 Jan 20");
+      *jd = 2461100.5;
+    return( "2026 Mar 01");
 }
