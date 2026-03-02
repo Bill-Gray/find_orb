@@ -2361,17 +2361,18 @@ int write_out_elements_to_file( const double *orbit,
          }
    if( !(options & ELEM_OUT_NO_COMMENT_DATA))
       {
-      double orb[6];
+      double orb[6], rel_orb[6];
       const bool is_ecliptic =
                   (atoi( get_environment_ptr( "VECTOR_OPTS")) != 0);
 
       memcpy( orb, orbit2, 6 * sizeof( double));
+      memcpy( rel_orb, j2000_ecliptic_rel_orbit, 6 * sizeof( double));
       if( !is_ecliptic)
          {
          ecliptic_to_equatorial( orb);
          ecliptic_to_equatorial( orb + 3);
-         ecliptic_to_equatorial( rel_orbit);
-         ecliptic_to_equatorial( rel_orbit + 3);
+         ecliptic_to_equatorial( rel_orb);
+         ecliptic_to_equatorial( rel_orb + 3);
          }
       if( _include_comment( "State"))
          {
@@ -2385,9 +2386,9 @@ int write_out_elements_to_file( const double *orbit,
             {
             fprintf( ofile, "# State vector relative to central body:\n");
             fprintf( ofile, "# %17.12f%17.12f%17.12f AU\n",
-                  rel_orbit[0], rel_orbit[1], rel_orbit[2]);
+                  rel_orb[0], rel_orb[1], rel_orb[2]);
             fprintf( ofile, "# %17.12f%17.12f%17.12f mAU/day\n",
-                  rel_orbit[3] * 1000., rel_orbit[4] * 1000., rel_orbit[5] * 1000.);
+                  rel_orb[3] * 1000., rel_orb[4] * 1000., rel_orb[5] * 1000.);
             }
          }
       if( !planet_orbiting && _include_comment( "MOID"))
