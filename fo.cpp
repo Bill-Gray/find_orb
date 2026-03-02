@@ -553,6 +553,13 @@ int main( int argc, const char **argv)
    int child_status;
 #endif
 
+   for( i = 1; i < argc; i++)
+      if( argv[i][0] == '-' && argv[i][1] == 'x')
+         {
+         extern const char *alt_config_directory;
+
+         alt_config_directory = get_arg( argc, argv, i);
+         }
    ensure_config_directory_exists();
    *mpc_codes = '\0';
    if( reset_astrometry_filename( &argc, argv))
@@ -770,12 +777,7 @@ int main( int argc, const char **argv)
                   state_vect_text = arg;
                   }
                break;
-            case 'x':
-               {
-               extern const char *alt_config_directory;
-
-               alt_config_directory = arg;
-               }
+            case 'x':            /* handled above */
                break;
             case 'X':
                {

@@ -4075,6 +4075,13 @@ int main( int argc, const char **argv)
    mmask_t button = 0;
 
    random_seed = get_random_seed( );
+   for( i = 1; i < argc; i++)
+      if( argv[i][0] == '-' && argv[i][1] == 'x')
+         {
+         extern const char *alt_config_directory;
+
+         alt_config_directory = get_arg( argc, argv, i);
+         }
    ensure_config_directory_exists();
    if( !setlocale( LC_ALL, "C.UTF-8"))
       setlocale( LC_ALL, "en_US.utf8");
@@ -4254,12 +4261,7 @@ int main( int argc, const char **argv)
                state_vect_text = arg;
                }
                break;
-            case 'x':
-               {
-               extern const char *alt_config_directory;
-
-               alt_config_directory = arg;
-               }
+            case 'x':            /* handled above */
                break;
             case 'X':
                {
