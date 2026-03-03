@@ -152,19 +152,7 @@ void ensure_config_directory_exists()
 }
 #endif
 
-#ifndef CONFIG_IS_LOCAL
-void fix_tilde( char *filename)
-{
-   if( *filename == '~')
-      {
-      char *home_ptr = getenv( "HOME");
-
-      assert( home_ptr);
-      memmove( filename + strlen( home_ptr), filename + 1, strlen( filename));
-      memcpy( filename, home_ptr, strlen( home_ptr));
-      }
-}
-#endif
+void fix_home_dir( char *filename);    /* ephem0.cpp */
 
 /* In Windows or DOS,  the 'default config directory name' will be
 the one in which Find_Orb is running.  (Currently assumed to be the
@@ -214,7 +202,7 @@ char *default_config_dir_name( char *oname, const char *iname)
             strcpy( oname, alt_config_directory);
          if( *oname)
             {
-            fix_tilde( oname);
+            fix_home_dir( oname);
             if( pass < 3)
                strcat( oname, "/.find_orb/");
             strcat( oname, test_filename);
@@ -261,7 +249,7 @@ int get_temp_dir( char *name, const size_t max_len)
    if( output_directory)
       {
       strlcpy_err( name, output_directory, max_len);
-      fix_tilde( name);
+      fix_home_dir( name);
       }
    else
       {

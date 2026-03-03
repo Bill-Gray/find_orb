@@ -166,6 +166,7 @@ int main( const int argc, const char **argv)
    const char *file_names[4] = { "mpec.htm", "combined.json", "elements.json", "ephemeri.json" };
    extern bool neocp_redaction_turned_on;
    int center_object = -2;
+   extern const char *alt_config_directory;
 #ifndef _WIN32
    extern char **environ;
    extern bool findorb_already_running;
@@ -174,6 +175,7 @@ int main( const int argc, const char **argv)
 #endif         /* _WIN32 */
    INTENTIONALLY_UNUSED_PARAMETER( argv);
    INTENTIONALLY_UNUSED_PARAMETER( argc);
+   alt_config_directory = "./";        /* program runs in config directory */
    setvbuf( lock_file, NULL, _IONBF, 0);
    neocp_redaction_turned_on = false;
    fprintf( lock_file, "We're in\n");

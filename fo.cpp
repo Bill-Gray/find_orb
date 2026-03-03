@@ -169,7 +169,7 @@ char *make_config_dir_name( char *oname, const char *iname);
 #endif
 
 #ifdef FORKING
-void fix_tilde( char *filename);       /* miscell.cpp */
+void fix_home_dir( char *filename);       /* ephem0.cpp */
 
 static int unlink_config_file( const char *filename)
 {
@@ -183,7 +183,7 @@ static int unlink_config_file( const char *filename)
       char cpath[255];
 
       strlcpy_error( cpath, output_directory);
-      fix_tilde( cpath);
+      fix_home_dir( cpath);
       strlcat_error( cpath, "/");
       strlcat_error( cpath, buff);
 

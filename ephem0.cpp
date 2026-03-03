@@ -1561,13 +1561,14 @@ void make_path_available( const char *filename)
 #ifndef _WIN32
 void fix_home_dir( char *filename)
 {
-   if( filename[0] == '~' && filename[1] == '/')
+   if( filename[0] == '~')
       {
       const char *home_dir = getenv( "HOME");
-      const size_t len = strlen( home_dir);
+      const size_t len = (home_dir ? strlen( home_dir) : 0);
 
       memmove( filename + len, filename + 1, strlen( filename));
-      memcpy( filename, home_dir, len);
+      if( home_dir)
+         memcpy( filename, home_dir, len);
       }
 }
 #endif
