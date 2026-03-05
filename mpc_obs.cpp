@@ -93,7 +93,6 @@ void *bsearch_ext( const void *key, const void *base0,
       size_t nmemb, const size_t size,                   /* shellsor.cpp */
       int (*compar)(const void *, const void *), bool *found);
 int string_compare_for_sort( const void *a, const void *b, void *context);
-const char *get_find_orb_text( const int index);      /* elem_out.cpp */
 static void reduce_designation( char *desig, const char *idesig);
 int set_tholen_style_sigmas( OBSERVE *obs, const char *buff);  /* mpc_obs.c */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
@@ -1795,6 +1794,12 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
          obs->dec = override_dec * PI / 180.;
          override_dec = -100.;
          }
+#ifdef NOT_CURRENTLY_IN_USE
+      if( obs->ra_precision > 3)    /* indicates ADES format.  In ADES,  trailing */
+         obs->posn_sigma_2 = 0.;    /* zeroes are sometimes omitted.  So we can't */
+      if( obs->dec_precision > 3)   /* use precision as an uncertainty indicator, */
+         obs->posn_sigma_1 = 0.;    /* the way we can with 80-column data.        */
+#endif
       if( rval)
          return( rval);
       }
