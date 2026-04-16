@@ -196,7 +196,7 @@ GEO_TERMS=6
    which you just integrate the accelerations from all bodies).  I'm still
    experimenting with both methods.  But you will probably be best off leaving
    this value at zero,  meaning Cowell is used.
-ENCKE=1
+ENCKE=
 
    By default,  the DRAG_SHUTOFF=1 tells Find_Orb not to include the effects
    of atmospheric drag.  Set it to zero if you want objects entering the
@@ -366,7 +366,7 @@ EOP_FILE=finals.all
    By default,  magnitudes in ephemerides are shown to tenths.  Set
    the following to MAG_DIGITS=2 to get hundredths (almost always
    a meaningless level of precision,  but some people do get good
-   photometry...)
+   photometry),  MAG_DIGITS=3 for thousandths,  etc.
 MAG_DIGITS=1
 
    By default,  sigmas and covariance matrix values in 'covar.txt'
