@@ -59,7 +59,7 @@ int main( const int argc, const char **argv)
    const double centrifugal_pot_at_equator =
          EARTH_MAJOR_AXIS * EARTH_MAJOR_AXIS * EARTH_MAJOR_AXIS * omega * omega / earth_gm_mks;
    const double r = atof( argv[3]);
-   const double delta = r * .0001 * EARTH_MAJOR_AXIS / AU_IN_METERS;
+   double delta = r * .0001 * EARTH_MAJOR_AXIS / AU_IN_METERS;
 
    assert( argc > 3);
    assert( r > 0.);
@@ -70,7 +70,7 @@ int main( const int argc, const char **argv)
    loc[2] = (long double)  sin( lat);
    for( i = 0; i < 3; i++)       /* cvt distances to AU */
       loc[i] *= EARTH_R;
-   _starting_term = 0;
+   _starting_term = (argc > 5 ? 1 : 0);
    oval = (double)geo_potential_in_au( loc[0], loc[1],
                   loc[2] * earth_minor_axis / EARTH_MAJOR_AXIS, derivs, n_terms);
    oval = 1 + oval * EARTH_R / earth_gm_aud;
@@ -104,6 +104,20 @@ int main( const int argc, const char **argv)
    printf( "Lat %c%f Long %c%f\n",
          (lat > 0. ? 'N' : 'S'), fabs( lat) * 180. / PI,
          (lon > 0. ? 'E' : 'W'), fabs( lon) * 180. / PI);
+
+   for( i = 0; i < 3; i++)
+      loc[i] *= AU_IN_METERS / EARTH_MAJOR_AXIS;
+   delta *= AU_IN_METERS / EARTH_MAJOR_AXIS;
+   dpot = jn_potential( loc[0] + delta, loc[1], loc[2], EARTH_J2, EARTH_J3, EARTH_J4)
+        - jn_potential( loc[0] - delta, loc[1], loc[2], EARTH_J2, EARTH_J3, EARTH_J4);
+   derivs[0] = .5 * dpot / delta;
+   dpot = jn_potential( loc[0], loc[1] + delta, loc[2], EARTH_J2, EARTH_J3, EARTH_J4)
+        - jn_potential( loc[0], loc[1] - delta, loc[2], EARTH_J2, EARTH_J3, EARTH_J4);
+   derivs[1] = .5 * dpot / delta;
+   dpot = jn_potential( loc[0], loc[1], loc[2] + delta, EARTH_J2, EARTH_J3, EARTH_J4)
+        - jn_potential( loc[0], loc[1], loc[2] - delta, EARTH_J2, EARTH_J3, EARTH_J4);
+   derivs[2] = .5 * dpot / delta;
+   printf( "  Derivs: %.10e %.10e %.10e (numerical, m/s^2, Jn)\n", derivs[0], derivs[1], derivs[2]);
    return( 0);
 }
 
