@@ -22,6 +22,10 @@ unix.406
 ; 1600-2200:  about 56 MBytes:
 unix.405
 
+; From the Willmann-Bell CD-ROM:
+; 1600-2169:  about 43 MBytes:
+unix.200
+
 ; (dead) http://cococubed.asu.edu/codes/ephem/unxp1600-2200_ppc_mac_xlf.405
 ; Same file as above,  I think
 unxp1600-2200_ppc_mac_xlf.405
@@ -30,87 +34,90 @@ unxp1600-2200_ppc_mac_xlf.405
 ; Same file as above,  I think,  except reversed byte order
 unxp1600-2200_intel_mac_ifort.405
 
+; From the second Guide 8.0 disk: 1800-2200,  about 13.3 MBytes:
+sub_de.406
+
 ; From the Guide 9.0 DVD:
 ; -3000 to +3000: about 557 MBytes:
 jpl_eph.422
 
-; Same file as above,  under a different name,  available at
+; Following is the same file as above,  under a different name
+; DE-422,  from -3000 to +3000 (545 MBytes)
 ; https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de422/lnxm3000p3000.422
-; (about 545 MBytes)
 lnxm3000p3000.422
 
-; Similar files from same site:
+; DE-421, 1900 to 2053 (13 MBytes)
 ; https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de421/lnxp1900p2053.421
-; (about 13 MBytes)
 lnxp1900p2053.421
+
+; DE-423,  1900 to 2050 (13 MBytes)
 ; https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de423/lnxp1900.423
-; (about 13.6 MBytes, 1900-2050)
 lnxp1900.423
 
+; DE-423,  1800 to 2200 (37 MBytes)
 ; https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de423/lnxp1800p2200.423
-; (about 37 MBytes)
 lnxp1800p2200.423
 
+; DE-418,  1900 to 2050 (13 MBytes)
 ; https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de418/lnxp1900p2050.418
-; (about 13 MBytes)
 lnxp1900p2050.418
+
+; DE-414,  1600 to 2200 (55 MBytes)
 ; https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de414/lnxp1600p2200.414
-; (about 55 MBytes)
 lnxp1600p2200.414
+
+; DE-405,  1600 to 2200 (55 MBytes)
 ; https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de405/lnxp1600p2200.405
-; (about 55 MBytes)
 lnxp1600p2200.405
+
+; DE-406, -3000 to +3000 (200 MBytes)
 ; https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de406/lnxm3000p3000.406
-; (about 200 MBytes)
 lnxm3000p3000.406
+
+; DE-403, 1600 to 2200 (55 MBytes)
 ; https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de403/lnxp1600p2200.403
-; (about 55 MBytes)
 lnxp1600p2200.403
 
-; From the second Guide 8.0 disk: 1800-2200,  about 13.3 MBytes:
-sub_de.406
-
-; https://ssd.jpl.nasa.gov/ftp/eph/planets/unix/de406/unxp1800.406
-; Covers 1800-2100 (now renamed as shown above)
+; DE-406,  1800 to 2100
+; (dead) https://ssd.jpl.nasa.gov/ftp/eph/planets/unix/de406/unxp1800.406
 unxp1800.406
 
-; http://adams.dm.unipi.it/~orbmaint/orbfit/JPLEPH/DE405_win.dat
-; 1900-2060;  about 14 MBytes (file size indicates it may cover more years)
+; DE-405,  1900-2060 (14 MBytes)
+; https://adams.dm.unipi.it/~orbmaint/orbfit/JPLEPH/DE405_win.dat
 DE405_win.dat
 
-; http://adams.dm.unipi.it/~orbmaint/orbfit/JPLEPH/DE405.dat
-; 1970-2020;  about 4.7 MBytes
+; DE-405,  1970-2060 (4.5 MBytes)
+; https://adams.dm.unipi.it/~orbmaint/orbfit/JPLEPH/DE405.dat
 DE405.dat
-
-; From the Willmann-Bell CD-ROM:
-; 1600-2169:  about 43 MBytes:
-unix.200
 
 ; Recently (mid-2013) JPL created extra-long ephemerides.  The 430t version
 ; had a name change;  both possible names are checked.
 
 jpleph.431
 jpleph.430
-; https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de430/linkp1550p2650.430
-linkp1550p2650.430
+
+; DE-430, 1550 to 2650 (97.5 MBytes)
 ; https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de430/linux_p1550p2650.430
 linux_p1550p2650.430
+
+; DE-430, 1550 to 2650 (94.1 MBytes)
 ; https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de430t/linux_p1550p2650.430t
 linux_p1550p2650.430t
 
+; DE-431, -1300 to +17000 (2600 MBytes)
 ; https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de431/lnxm13000p17000.431
 lnxm13000p17000.431
 
+; DE-440, 1550 to 2650 (97.5 MBytes)
 ; https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de440/linux_p1550p2650.440
-; 100 MBytes
 linux_p1550p2650.440
 
+; DE-440t, 1550 to 2650 (107.5 MBytes)
 ; https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de440t/linux_p1550p2650.440t
-; 110 MBytes
 linux_p1550p2650.440t
 
+; DE-441, -13000 to +17000 (2723 MBytes)
 ; https://ssd.jpl.nasa.gov/ftp/eph/planets/Linux/de441/linux_m13000p17000.441
-; 2723 MBytes
 linux_m13000p17000.441
 
 ; IMCCE (formerly Bureau des Longitudes) provides ephems in JPL-like format that
@@ -118,20 +125,21 @@ linux_m13000p17000.441
 ; they start blocks at noon instead of midnight.  Some programs are confused
 ; by this.)
 
+; INPOP-19a, 1900 to 2100 (17 MBytes)
 ; https://ftp.imcce.fr/pub/ephem/planets/inpop19a/inpop19a_TDB_m100_p100_littleendian.dat
-; (17 MBytes)
 inpop19a_TDB_m100_p100_littleendian.dat
 
+; INPOP-19a, 1000 to 3000 (168 MBytes)
 ; https://ftp.imcce.fr/pub/ephem/planets/inpop19a/inpop19a_TDB_m1000_p1000_littleendian.dat
-; (168 MBytes)
 inpop19a_TDB_m1000_p1000_littleendian.dat
 
+; INPOP-21a, 1900 to 2100 (17 MBytes)
 ; https://ftp.imcce.fr/pub/ephem/planets/inpop21a/inpop21a_TDB_m100_p100_littleendian.dat
 ; (17 MBytes)
 inpop21a_TDB_m100_p100_littleendian.dat
 
+; INPOP-21a, 1000 to 3000 (168 MBytes)
 ; https://ftp.imcce.fr/pub/ephem/planets/inpop21a/inpop21a_TDB_m1000_p1000_littleendian.dat
-; (168 MBytes)
 inpop21a_TDB_m1000_p1000_littleendian.dat
 
 sm_eph.440
