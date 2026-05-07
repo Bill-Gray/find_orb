@@ -1410,18 +1410,17 @@ static inline int compute_topocentric_offset( const double ut,
                double *offset, double *vel)
 {
    double precess_matrix[9];
+   const double omega = planet_rotation_rate( planet_no, 0) * PI / 180.;
+                   /* planet rotation rate,  in radians/day */
    int i;
 
+   if( !omega)
+      generic_message_box( "'cospar.txt' not found!", "!");
+   assert( omega);
    calc_planet_orientation( planet_no, 0, ut, precess_matrix);
    spin_matrix( precess_matrix, precess_matrix + 3, lon);
    for( i = 0; i < 3; i++)
       {
-      const double omega = planet_rotation_rate( planet_no, 0) * PI / 180.;
-                   /* planet rotation rate,  in radians/day */
-
-      if( !omega)
-         generic_message_box( "'cospar.txt' not found!", "!");
-      assert( omega);
       if( offset)
          offset[i] = (rho_cos_phi * precess_matrix[i]
                     + rho_sin_phi * precess_matrix[i + 6]);
