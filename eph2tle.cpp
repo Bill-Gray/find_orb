@@ -727,7 +727,7 @@ int main( const int argc, const char **argv)
       double mjdt, mjdt_end;
       char *tptr = strstr( buff, "(500) Geocentric: ");
 
-      while( *buff == ';')       /* skip leading comments,  if any */
+      while( *buff == ';' || *buff == '#')       /* skip leading comments,  if any */
          if( !fgets_trimmed( buff, sizeof( buff), ifile))
             {
             fprintf( stderr, "Nothing but comments in '%s'\n", argv[1]);
