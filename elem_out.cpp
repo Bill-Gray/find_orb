@@ -3030,6 +3030,7 @@ static double extract_state_vect_from_text( const char *text,
    double dist_units = 1., time_units = 1.;
    int bytes_read, central_object = 0, quantities_found = 0;
    bool is_state_vector, is_ecliptic = true;
+   int body_fixed = -9;
    ELEMENTS elem;
 
    while( text[i] && text[i] != ',' && i < 80)
@@ -3052,6 +3053,11 @@ static double extract_state_vect_from_text( const char *text,
       {
       if( !memcmp( text, "eq", 2))
          is_ecliptic = false;
+      else if( !memcmp( text, "ecef", 4))
+         {
+         body_fixed = 3;
+         is_ecliptic = false;
+         }
       else if( !memcmp( text, "ep=", 3))
          coord_epoch = atof( text + 3);
       else if( !memcmp( text, "H=", 2))
@@ -3146,11 +3152,24 @@ static double extract_state_vect_from_text( const char *text,
       for( i = 3; i < 6; i++)
          orbit[i] *= time_units;
       }
+   if( body_fixed != -9)   /* usually Earth-centered Earth-fixed (ECEF) */
+      {
+      double matrix[9];
+      const double omega = planet_rotation_rate( body_fixed, 0) * PI / 180.;
+      const double ut = epoch - td_minus_ut( epoch) / seconds_per_day;
+
+      calc_planet_orientation( body_fixed, 0, ut, matrix);
+      for( i = 3; i < 6; i++)
+         matrix[i] = -matrix[i];
+      orbit[3] -= orbit[1] * omega;
+      orbit[4] += orbit[0] * omega;
+      deprecess_vector( matrix, orbit, orbit);
+      deprecess_vector( matrix, orbit + 3, orbit + 3);
+      }
    if( !is_ecliptic)
       {
       equatorial_to_ecliptic( orbit);
       equatorial_to_ecliptic( orbit + 3);
-      text += 2;
       }
    if( coord_epoch != 2000.)
       {
