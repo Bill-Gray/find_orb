@@ -3612,7 +3612,10 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                if( buff[14] == 'R' && is_rwo)
                   strcpy( second_line, buff + 81);
                else if( !look_for_matching_line( buff, second_line, sizeof( second_line)))
+                  {
                   observation_is_good = false;
+                  jd = 0.;
+                  }
                if( observation_is_good)
                   {
                   rval[i].ref_center = spacecraft_offset_reference;
