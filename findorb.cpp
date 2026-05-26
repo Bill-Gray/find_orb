@@ -5898,9 +5898,7 @@ int main( int argc, const char **argv)
                 residual_format ^= RESIDUAL_FORMAT_NORMALIZED;
             update_element_display = 1;
             break;
-         case 127:           /* backspace takes on different values */
-         case KEY_BACKSPACE: /* on PDCurses,  ncurses,  etc.        */
-         case 8:
+         case KEY_BACKSPACE:
             if( !pop_orbit( &curr_epoch, orbit))
                {
                strlcpy_error( message_to_user, "Last orbit operation undone");
@@ -6782,6 +6780,27 @@ int main( int argc, const char **argv)
                update_element_display = 1;
                }
             break;
+         case KEY_DC:            /* 'delete' selected observations */
+            {
+            int j;
+
+            for( i = 0, j = 0; i < n_obs; i++)
+               if( !(obs[i].flags & OBS_IS_SELECTED))
+                  obs[j++] = obs[i];
+               else if( i < curr_obs)
+                     curr_obs--;
+            if( n_obs > 0)
+               {
+               n_obs = j;
+               if( curr_obs >= n_obs)
+                  curr_obs = n_obs - 1;
+               }
+            obs[curr_obs].flags |= OBS_IS_SELECTED;
+            snprintf_err( message_to_user, sizeof( message_to_user),
+                     "%d selected observations removed", i - j);
+            update_element_display = 1;
+            }
+            break;
          case ';': case ']': case '`':
          case CTRL( 'E'): case CTRL( 'J'): case CTRL( 'L'):
          case CTRL( 'N'): case CTRL( 'O'): case CTRL( 'Q'):
@@ -6796,7 +6815,6 @@ int main( int argc, const char **argv)
          case KEY_F( 14):        /* shift-f2 */
          case KEY_F( 16):        /* shift-f4 */
          case KEY_F( 24):        /* shift-f12 */
-         case KEY_DC:            /* delete key */
          case CTL_DEL:
          case ALT_DEL:
          case KEY_B2:            /* central key on numeric keypad */
