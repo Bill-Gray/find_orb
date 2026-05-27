@@ -4509,9 +4509,6 @@ int main( int argc, const char **argv)
          FILE *ofile = fopen_ext( "comments.txt", "tfcw");
 
          clock_line = 0;
-         if( sort_obs_by_code)
-            shellsort_r( obs, n_obs, sizeof( OBSERVE), compare_observations,
-                                                   &sort_obs_by_code);
          generate_obs_text( obs, n_obs, tbuff, sizeof( tbuff));
          if( make_unicode_substitutions)
             {
@@ -4520,8 +4517,6 @@ int main( int argc, const char **argv)
                      /* cvt OEM degree symbol (0xf8) to U+00B0,  in UTF-8: */
                text_search_and_replace( tbuff, "\xf8", "\xc2\xb0 ");
             }
-         if( sort_obs_by_code)
-            shellsort_r( obs, n_obs, sizeof( OBSERVE), compare_observations, NULL);
          while( *tptr)
             {
             size_t i;
