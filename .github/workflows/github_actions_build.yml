@@ -56,7 +56,7 @@ jobs:
         make CLANG=Y VT=Y findorb.o
 
   buildWindows:
-    runs-on: windows-latest
+    runs-on: windows-2022
     steps:
     - uses: actions/checkout@master
     - name: make
