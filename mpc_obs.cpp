@@ -3421,12 +3421,15 @@ static void reset_object_type( const OBSERVE *obs, const int n_obs)
          else
             n_asteroid++;
          }
-   if( n_total + n_nuclear > n_asteroid)
-      object_type = OBJECT_TYPE_COMET;
-   else if( is_sungrazing_comet( obs, n_obs))
-      object_type = OBJECT_TYPE_COMET;
-   else if( n_asteroid)
-      object_type = OBJECT_TYPE_ASTEROID;
+   if( object_type != OBJECT_TYPE_COMET)
+      {
+      if( n_total + n_nuclear > n_asteroid)
+         object_type = OBJECT_TYPE_COMET;
+      else if( is_sungrazing_comet( obs, n_obs))
+         object_type = OBJECT_TYPE_COMET;
+      else if( n_asteroid)
+         object_type = OBJECT_TYPE_ASTEROID;
+      }
    if( object_type == OBJECT_TYPE_COMET)
       {
       extern char default_comet_magnitude_type;
@@ -5188,6 +5191,7 @@ int compute_radar_info( const OBSERVE *obs, RADAR_INFO *rinfo)
    rinfo->doppler_sigma = extract_radar_value( obs->second_line + 47);
    rinfo->doppler_comp = (doppler_factor - 1.) * rinfo->freq_hz;
    rinfo->rtt_comp = time_diff;
+   assert( rinfo->doppler_sigma > 0. || rinfo->rtt_sigma > 0.);
    return( 0);
 }
 
