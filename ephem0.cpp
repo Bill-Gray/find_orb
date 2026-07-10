@@ -1559,7 +1559,7 @@ void make_path_available( const char *filename)
 #ifndef _WIN32
 void fix_home_dir( char *filename)
 {
-   if( filename[0] == '~' && filename[1] == '/')
+   if( filename[0] == '~' && (filename[1] == '/' || filename[1] == '\0'))
       {
       const char *home_dir = getenv( "HOME");
       const size_t len = (home_dir ? strlen( home_dir) : 0);
