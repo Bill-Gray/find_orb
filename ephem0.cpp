@@ -98,8 +98,6 @@ int get_object_name( char *obuff, const char *packed_desig);   /* mpc_obs.c */
 int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid);
 int setup_planet_elem( ELEMENTS *elem, const int planet_idx,
                                           const double t_cen);   /* moid4.c */
-void calc_approx_planet_orientation( const int planet,        /* runge.cpp */
-         const int system_number, const double jde, double *matrix);
 char *mpc_station_name( char *station_data);       /* mpc_obs.cpp */
 FILE *fopen_ext( const char *filename, const char *permits);   /* miscell.cpp */
 static void put_residual_into_text( char *text, const double resid,
@@ -1561,7 +1559,7 @@ void make_path_available( const char *filename)
 #ifndef _WIN32
 void fix_home_dir( char *filename)
 {
-   if( filename[0] == '~')
+   if( filename[0] == '~' && filename[1] == '/')
       {
       const char *home_dir = getenv( "HOME");
       const size_t len = (home_dir ? strlen( home_dir) : 0);

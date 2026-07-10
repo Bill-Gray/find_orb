@@ -192,7 +192,9 @@ int get_defaults( ephem_option_t *ephemeris_output_options, int *element_format,
          int *element_precision, double *max_residual_for_filtering,
          double *noise_in_sigmas);                /* elem_out.cpp */
 double utc_from_td( const double jdt, double *delta_t);     /* ephem0.cpp */
+#ifndef _WIN32
 void fix_home_dir( char *filename);                /* ephem0.cpp */
+#endif
 int write_environment_pointers( void);             /* mpc_obs.cpp */
 int add_ephemeris_details( FILE *ofile, const double start_jd,  /* ephem0.c */
                                                const double end_jd);
@@ -3369,8 +3371,9 @@ static int user_select_file( char *filename, const char *title, const int flags)
    if( !inquire( "Enter file name :", filename, 100, COLOR_DEFAULT_INQUIRY)
                      && *filename)
       {
-      if( *filename == '~')
-         text_search_and_replace( filename, "~", getenv( "HOME"));
+#ifndef _WIN32
+      fix_home_dir( filename);
+#endif
       return( 0);
       }
    else
@@ -3515,7 +3518,7 @@ static OBJECT_INFO *load_file( char *ifilename, int *n_ids, char *err_buff,
                snprintf_append( buff, buffsize, "\n%c ", hotkeys[n_prev]);
                strcat( buff, prev_files[i]);
 #ifndef _WIN32
-               text_search_and_replace( buff, getenv( "HOME"), "~");
+               fix_home_dir( buff);
 #endif
                prev_idx[n_prev++] = i;
                }
