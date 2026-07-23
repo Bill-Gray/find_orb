@@ -497,15 +497,31 @@ static FILE *fopen_from_findorb_dir( const char *filename, const char *permits)
 static void auto_set_desigs( char *norad_desig, char *intl_desig)
 {
    FILE *ifile = fopen( "/home/phred/tles/tle_list.txt", "rb");
-   char buff[200];
+   char buff[200], curr_id[30];
 
    assert( ifile);
    while( fgets( buff, sizeof( buff), ifile))
-      if( !memcmp( buff, "  note : next artsat will be ", 29))
+      if( !memcmp( buff, "# ID: ", 6))
+         strlcpy_error( curr_id, buff);
+      else if( !memcmp( buff, "  note : end curr artsats", 25))
          {
+         const int new_norad = atoi( curr_id + 6) - 1;
+         size_t i = 7;
+
          fclose( ifile);
-         memcpy( norad_desig, buff + 29, 5);
-         memcpy( intl_desig, buff + 37, 8);
+         snprintf_err( norad_desig, 6, "%05d", new_norad);
+         memcpy( intl_desig, curr_id + 13, 8);
+         intl_desig[8] = '\0';
+         do {
+            if( intl_desig[i] == 'P')          /* skip O */
+               intl_desig[i] = 'N';
+            else if( intl_desig[i] == 'J')     /* skip I */
+               intl_desig[i] = 'H';
+            else if( intl_desig[i] == 'A')     /* rotate back to Z */
+               intl_desig[i] = 'Z';
+            else
+               intl_desig[i]--;
+            } while( intl_desig[i--] == 'Z');
          printf( "Desigs set to '%s', '%s'\n", norad_desig, intl_desig);
          return;
          }
