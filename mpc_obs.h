@@ -185,12 +185,11 @@ typedef uint64_t ephem_option_t;
    /* Following is used for newer NEODyS/AstDyS data for which */
    /* FCCT14 or VFCC17 over-observing correction has already been */
    /* applied;  we shouldn't 'correct' a second time */
-#define OBS_ALREADY_CORRECTED_FOR_OVEROBSERVING  0x10
-
+#define OBS_ALREADY_CORRECTED_FOR_OVEROBSERVING  0x20
 
    /* Following flag used temporarily within some functions to note, */
    /* e.g.,  that a particular observation has been processed        */
-#define OBS_TEMP_USE_FLAG                        0x20
+#define OBS_TEMP_USE_FLAG                        0x40
 
 extern int object_type;
 
