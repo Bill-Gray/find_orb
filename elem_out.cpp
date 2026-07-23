@@ -434,28 +434,29 @@ static void observation_summary_data( char *obuff, const OBSERVE FAR *obs,
       snprintf_err( obuff, obuff_size, get_find_orb_text( 16), n_included);
    if( options != -1 && n_included)
       {
-      const double rms = (options & ELEM_OUT_NORMALIZED_MEAN_RESID) ?
-                  compute_weighted_rms( obs, n_obs, NULL) :
-                  compute_rms( obs, n_obs);
+      const double rms_angular = compute_rms( obs, n_obs);
+      const double rms_weighted = compute_weighted_rms( obs, n_obs, NULL);
       char rms_buff[24];
       const char *rms_format = "%.2f";
       const char *extended = get_environment_ptr( "EXTENDED_RESID");
+      bool show_weighted = (!*extended && (options & ELEM_OUT_NORMALIZED_MEAN_RESID));
+      const double rms_shown = (show_weighted ? rms_weighted : rms_angular);
 
       strlcat_err( obuff, " ", obuff_size);
       obuff += strlen( obuff);
       make_date_range_text( obuff, obs[first_idx].jd, obs[last_idx].jd);
       obuff += strlen( obuff);
       if( options & ELEM_OUT_PRECISE_MEAN_RESIDS)
-         rms_format = (rms > 0.003 ? "%.3f" : "%.1e");
-      snprintf_err( rms_buff, sizeof( rms_buff), rms_format, rms);
-      if( options & ELEM_OUT_NORMALIZED_MEAN_RESID)
+         rms_format = (rms_shown > 0.003 ? "%.3f" : "%.1e");
+      snprintf_err( rms_buff, sizeof( rms_buff), rms_format, rms_shown);
+      if( show_weighted)
          strlcat_err( rms_buff, " sigmas", sizeof( rms_buff));
       else
          text_search_and_replace( rms_buff, ".", "\".");
       snprintf_err( obuff, obuff_size, get_find_orb_text( 17), rms_buff);
       if( *extended)
          snprintf_append( obuff, obuff_size, "/%.2f sigmas",
-                     compute_weighted_rms( obs, n_obs, NULL));
+                     rms_weighted);
       }
 }
 
