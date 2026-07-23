@@ -875,6 +875,45 @@ int geo_score( const double *orbit, const double epoch)
    return( n_geo * 100 / n_orbits);
 }
 
+static double get_parameter_name( char *name, const int idx)
+{
+   extern int force_model;
+   double factor_for_human_readability = 1.;
+
+   name[2] = '\0';
+   switch( force_model)
+      {
+      case FORCE_MODEL_YARKO_A2:
+         strcpy( name, "A2");
+         break;
+      case FORCE_MODEL_DELTA_V:
+      case FORCE_MODEL_DELTA_V_SRP:
+         if( idx != 4)   /* idx == 4 means it's the AMR */
+            {
+            name[0] = 'd';
+            name[1] = 'x' + idx;
+            if( idx == 3)
+               strcpy( name, "T0");
+            if( idx != 4)   /* idx == 4 means it's the AMR */
+               break;
+            }           /* FALLTHRU */   /* (if it's the SRP parameter) */
+      case FORCE_MODEL_SRP:
+         strcpy( name, "AMR");
+         factor_for_human_readability = SOLAR_GM / SRP1AU;
+         break;
+      default:
+         if( idx == 3)
+            strcpy( name, "T0");
+         else
+            {
+            name[0] = 'A';
+            name[1] = '1' + idx;
+            }
+         break;
+      }
+   return( factor_for_human_readability);
+}
+
 static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
                      const double *orbit,
                      const char *obj_name, const OBSERVE *obs,
@@ -1006,12 +1045,13 @@ static int elements_in_json_format( FILE *ofile, const ELEMENTS *elem,
    fprintf( ofile, "\n        \"Tp_iso\": \"%s\",", iso_time( buff, elem->perih_time, 3));
    for( i = 6; i < n_orbit_params; i++)
       {
-      char tbuff[20];
+      char tbuff[20], name[10];
+      const double multiplier = get_parameter_name( name, i - 6);
 
-      fprintf( ofile, "\n        \"A%d\": %.9g,", i - 5, orbit[i]);
-      snprintf( tbuff, sizeof( tbuff), "Sigma_A%d:", i - 5);
+      fprintf( ofile, "\n        \"%s\": %.9g,", name, orbit[i] * multiplier);
+      snprintf( tbuff, sizeof( tbuff), "Sigma_%s:", name);
       if( !get_uncertainty( tbuff, buff, 0))
-         fprintf( ofile, " \"sigma_A%d\": %s,", i - 5, buff);
+         fprintf( ofile, " \"sigma_%s\": %s,", name, buff);
       }
    if( elem->abs_mag)
       {
