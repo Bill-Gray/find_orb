@@ -3412,6 +3412,10 @@ OBS J. L. Virlichie, P. Traverse
 COM Default details extracted from MPEC 2021-B143
 TEL 0.35-m f/4.7 Newtonian reflector + CCD
 
+COD X05
+COM Default details extracted from MPEC 2026-N37
+TEL 8.4-m f/1.234 Modified Paul-Baker + CCD
+
 COD X06
 MEA D. Husar
 OBS L. Demetz, D. Husar
