@@ -345,6 +345,8 @@ d55 !  -4.25263330 +40.42429590      819.0613  DSS 55 Madrid 34-meter
 d61 !  -4.24902224 +40.42873917      840.4264  DSS 61 Robledo 34-meter
 d63 !  -4.24800854 +40.43120975      864.7465  DSS 63 Robledo 70-meter
 d65 !  -4.25069890 +40.42720636      833.8398  DSS 65 Madrid 34-meter
+R46 !  -2.3085692  +53.2365445       179.34    Lovell (76-m, Jodrell Bank)
+d76 ! 147.4405184  -42.8035845        65.11    DSS 76 Hobart 26-meter
 
    From the same file : these three radiotelescopes were moved or raised,
    and the previous positions are given below.
@@ -1671,3 +1673,5 @@ J04 !-016.511823   +28.300971        2450.     ESA Optical Ground Station, Tener
    as 'roving observer' observations).
 
 OPe !-115.8444     -31.9525            70.0    Perth Observatory (before 1966)
+
+UDe !+004.3754     +51.8989            55.0    University of Delft
