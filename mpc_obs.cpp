@@ -4654,12 +4654,7 @@ int write_environment_pointers( void)
 
    fprintf( ofile, "%d vars\n", (int)n_lines);
    for( i = 0; i < n_lines; i++)
-      {
-      const size_t len = strlen( edata[i]);
-
-      if( len && edata[i][len - 1] != '=')
-         fprintf( ofile, "%s\n", edata[i]);
-      }
+      fprintf( ofile, "%s\n", edata[i]);
    fclose( ofile);
    return( (int)n_lines);
 }
@@ -4683,7 +4678,7 @@ static size_t get_environment_ptr_index( const char *env_ptr, bool *got_it)
          *got_it = true;
          i = mid;
          }
-      else if( j < len && edata[mid][j] > env_ptr[j])
+      else if( j == len || (j < len && edata[mid][j] > env_ptr[j]))
          n /= 2;
       else
          {
@@ -4835,7 +4830,8 @@ int load_environment_file( const char *filename)
       }
    fseek( ifile, 0L, SEEK_SET);
    while( fgets_trimmed( buff, sizeof( buff), ifile))
-      if( *buff != ' ' && (tptr = strchr( buff, '=')) != NULL)
+      if( *buff != ' ' && *buff != '#' &&
+                     (tptr = strchr( buff, '=')) != NULL && tptr[1] >= ' ')
          {
          *tptr = '\0';
          set_environment_ptr( buff, tptr + 1);
