@@ -557,7 +557,7 @@ static int elements_in_mpcorb_format( char *buff, const char *packed_desig,
    assert( 20 == strlen( buff));
    snprintf_append( buff, mpcorb_line_len, "%c%02ld%X%c",
                   (year >= 0 && year < 6200) ? int_to_mutant_hex_char( year / 100) : '~',
-                  abs( year) % 100L, month,
+                  labs( year) % 100L, month,
                   int_to_mutant_hex_char( day));
    assert( 25 == strlen( buff));
    snprintf_append( buff, mpcorb_line_len, "%10.5f%11.5f%11.5f%11.5f%11.7f",
