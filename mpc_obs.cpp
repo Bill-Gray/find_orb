@@ -2247,7 +2247,7 @@ static bool get_neocp_data( char *buff, char *desig, char *mpc_code)
       memcpy( desig, buff, len);
       desig[len] = '\0';
       }
-   else if( strstr( buff, "the geocenter"))
+   else if( !memcmp( buff, "Ephemerides are for the geocenter.", 34))
       {
       static int already_warned = 0;
 
