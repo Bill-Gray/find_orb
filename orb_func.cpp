@@ -142,7 +142,6 @@ char *default_config_dir_name( char *oname, const char *iname); /* miscell.cpp *
 void rotate_state_vector_to_current_frame( double *state_vect,
                   const double epoch_shown, const int planet_orbiting,
                   char *body_frame_note);               /* elem_out.cpp */
-const char *get_find_orb_text( const int index);      /* elem_out.cpp */
 void set_obs_vect( OBSERVE FAR *obs);        /* mpc_obs.h */
 double improve_along_lov( double *orbit, const double epoch, const double *lov,
           const unsigned n_params, unsigned n_obs, OBSERVE *obs);
@@ -2671,12 +2670,12 @@ int get_residual_data( const OBSERVE *obs, double *xresid, double *yresid)
          RADAR_INFO rinfo;
 
          compute_radar_info( obs, &rinfo);
-         if( rinfo.rtt_obs)
+         if( rinfo.rtt_obs && rinfo.rtt_sigma > 0.)
             {
             *xresid = (rinfo.rtt_obs - rinfo.rtt_comp) / rinfo.rtt_sigma;
             n_residuals++;
             }
-         if( rinfo.doppler_obs)
+         if( rinfo.doppler_obs && rinfo.doppler_sigma > 0.)
             {
             *yresid = (rinfo.doppler_obs - rinfo.doppler_comp) / rinfo.doppler_sigma;
             n_residuals++;
