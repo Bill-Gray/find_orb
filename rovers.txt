@@ -79,6 +79,10 @@
    which may help in tracking down information about a particular site.
    My thanks to Peter Birtwhistle for pointing this out to me.
 
+      MPC now also provides JSON-formatted obscodes via
+
+   curl -X GET -H "Content-Type: application/json" -d '{}' https://data.minorplanetcenter.net/api/obscodes
+
    Some artificial satellite observers :
 
 GRR !  18.5129       -33.94058        10       Greg Roberts, South Africa
@@ -1675,3 +1679,22 @@ J04 !-016.511823   +28.300971        2450.     ESA Optical Ground Station, Tener
 OPe !-115.8444     -31.9525            70.0    Perth Observatory (before 1966)
 
 UDe !+004.3754     +51.8989            55.0    University of Delft
+
+   The MPC position for (019) Neuchatel cannot be correct,  as it would place
+   the observatory in the nearby lake.  The actual location is about 450m to
+   the northwest.   There are currently two domes there visible on G__gle Earth,
+   about 80m apart.  I don't know which was used for the asteroid observations
+   in the MPC database,   made between 1872 and 1912.  I've assigned (019) to
+   the larger dome and noted the position of the smaller one.  Either is at
+   least a great improvement over the MPC location.  50m added for geoid height.
+
+019 !+006.952906   +47.000090         546.0    Neuchatel
+     +006.953840   +47.000486         547.0    Neuchatel #2
+
+   (009) Berne-Uecht's Web site (https://www.space-eye.ch/en) provides a map
+   indicating a location about 11 km south of MPC's position,  and a detailed
+   history of the site confirming that the site didn't move.  The site has
+   two telescopes about 85m apart;  again,  I have selected one at random.
+
+009 !+007.452878   +46.852478        1010.0    Berne-Uecht
+     +007.453845   +46.852180        1019.0    Berne-Uecht #2
