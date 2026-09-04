@@ -494,7 +494,7 @@ static FILE *fopen_from_findorb_dir( const char *filename, const char *permits)
    return( rval);
 }
 
-static void auto_set_desigs( char *norad_desig, char *intl_desig)
+static int auto_set_desigs( char *intl_desig)
 {
    FILE *ifile = fopen( "/home/phred/tles/tle_list.txt", "rb");
    char buff[200], curr_id[30];
@@ -509,7 +509,6 @@ static void auto_set_desigs( char *norad_desig, char *intl_desig)
          size_t i = 7;
 
          fclose( ifile);
-         snprintf_err( norad_desig, 6, "%05d", new_norad);
          memcpy( intl_desig, curr_id + 13, 8);
          intl_desig[8] = '\0';
          do {
@@ -522,8 +521,8 @@ static void auto_set_desigs( char *norad_desig, char *intl_desig)
             else
                intl_desig[i]--;
             } while( intl_desig[i--] == 'Z');
-         printf( "Desigs set to '%s', '%s'\n", norad_desig, intl_desig);
-         return;
+         printf( "Desigs set to '%d', '%s'\n", new_norad, intl_desig);
+         return( new_norad);
          }
    assert( 0);       /* we shouldn't get here */
 }
@@ -579,7 +578,7 @@ int main( const int argc, const char **argv)
    const int max_n_params = 8;
    char buff[200], obj_name[100];
    const char *default_intl_desig = "00000A";
-   char intl_desig[9], norad_desig[6];
+   char intl_desig[9];
    double *slopes = (double *)calloc( max_n_params * 6, sizeof( double));
    double *vectors, worst_resid_in_run = 0., worst_mjd = 0.;
    double tdt = 0., *computed_vects;
@@ -602,15 +601,18 @@ int main( const int argc, const char **argv)
    if( argc < 2)
       error_exit( -1);
    strlcpy_error( intl_desig, default_intl_desig);
-   strlcpy_error( norad_desig, "99999");
    setvbuf( stdout, NULL, _IONBF, 0);
    memset( &tle, 0, sizeof( tle_t));
+   tle.norad_number = 99999;
    tle.classification = 'U';
    tle.ephemeris_type = EPHEM_TYPE_DEFAULT;
    tle.bulletin_number = (int)( curr_t / seconds_per_day - BULLETIN_EPOCH);
    *obj_name = '\0';
    for( i = 1; i < argc; i++)
       if( argv[i][0] == '-')
+         {
+         const char *param = argv[i] + 2;
+
          switch( argv[i][1])
             {
             case 'a': case 'A':
@@ -663,9 +665,10 @@ int main( const int argc, const char **argv)
                output_freq = atoi( argv[i] + 2);
                break;
             case 'n': case 'N':
-               strlcpy_error( norad_desig, argv[i] + 2);
-               if( *norad_desig == 'a' && !norad_desig[1])
-                  auto_set_desigs( norad_desig, intl_desig);
+               if( *param == 'a' && !param[1])
+                  tle.norad_number = auto_set_desigs( intl_desig);
+               else
+                  tle.norad_number = atoi( param);
                break;
             case 'i': case 'I':
                strlcpy_error( intl_desig, argv[i] + 2);
@@ -701,11 +704,11 @@ int main( const int argc, const char **argv)
                printf( "'%s' is not a valid command line option\n", argv[i]);
                error_exit( -2);
             }
+         }
 
    vectors = (double *)calloc( 12 * output_freq, sizeof( double));
    assert( vectors);
    computed_vects = vectors + 6 * output_freq;
-   tle.norad_number = atoi( norad_desig);
    strcpy( tle.intl_desig, intl_desig);
    if( !ifile)
       {
