@@ -4662,7 +4662,6 @@ int write_environment_pointers( void)
 static size_t get_environment_ptr_index( const char *env_ptr, bool *got_it)
 {
    size_t i = 0, n = n_lines;
-   const size_t len = strlen( env_ptr);
 
    *got_it = false;
    while( !*got_it && n)
@@ -4671,20 +4670,20 @@ static size_t get_environment_ptr_index( const char *env_ptr, bool *got_it)
 
       assert( edata[mid]);
       j = 0;
-      while( j < len && env_ptr[j] == edata[mid][j])
+      while( env_ptr[j] == edata[mid][j])
          j++;
-      if( j == len && edata[mid][j] == '=')
+      if( !env_ptr[j] && edata[mid][j] == '=')
          {
          *got_it = true;
          i = mid;
          }
-      else if( j == len || (j < len && edata[mid][j] > env_ptr[j]))
-         n /= 2;
-      else
+      else if( edata[mid][j] == '=' || edata[mid][j] < env_ptr[j])
          {
          n -= n / 2 + 1;
          i = mid + 1;
          }
+      else
+         n /= 2;
       }
    return( i);
 }
