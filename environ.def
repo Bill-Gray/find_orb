@@ -227,6 +227,12 @@ AUTO_ARC_LEN=7300
    equatorial J1975 vectors in AU and days.
 VECTOR_OPTS=0,1,1
 
+   By default,  ephems of Cartesian coordinates and state vectors use the
+   TT time scale,  and other ephems use UTC.  Set the following to UTC,
+   and all ephemerides will always be in UTC.  Set it to TT,  and all
+   ephemerides will always be in TT.
+EPHEMERIS_TIMESCALE=
+
    Comet non-gravitational forces in the "standard" Marsden-Sekanina model
    are assumed to be due to sublimating ice.  As described at page 3 of
 

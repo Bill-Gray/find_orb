@@ -1956,6 +1956,7 @@ int add_ephemeris_details( FILE *ofile, const double start_jd,
    FILE *ifile;
    extern const char *elements_filename;
    const char *vector_options = get_environment_ptr( "VECTOR_OPTS");
+   const char *timescale = get_environment_ptr( "EPHEMERIS_TIMESCALE");
 
    t0 = time( NULL);
    fprintf( ofile, "\nCreated %s", ctime( &t0));
@@ -1966,7 +1967,8 @@ int add_ephemeris_details( FILE *ofile, const double start_jd,
    full_ctime( tbuff, end_jd, CALENDAR_JULIAN_GREGORIAN);
    fprintf( ofile, "Ephemeris end:   %s\n", tbuff);
 
-   fprintf( ofile, "Times are all TDT\n");
+   fprintf( ofile, "Times are all %s\n",
+            (*timescale == 'U' ? "UTC" : "TDT"));
    fprintf( ofile, "Positions/velocities are in %s J2000\n",
                       atoi( vector_options) ? "ecliptic" : "equatorial");
 
@@ -2249,7 +2251,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
    FILE *ofile, *computer_friendly_ofile = NULL;
    const bool computer_friendly = ((options & OPTION_COMPUTER_FRIENDLY) ? true : false);
    char step_units;
-   const char *timescale = get_environment_ptr( "TT_EPHEMERIS");
+   const char *timescale = get_environment_ptr( "EPHEMERIS_TIMESCALE");
    const char *override_date_format = get_environment_ptr( "DATE_FORMAT");
    double abs_mag = calc_absolute_magnitude( obs, n_obs);
    double max_auto_step = 0.;
@@ -2382,7 +2384,8 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
        ephem_type == OPTION_MPCORB_OUTPUT ||
        ephem_type == OPTION_8_LINE_OUTPUT)
       {
-      timescale = "y";        /* force TT output */
+      if( !*timescale)
+         timescale = "TT";        /* default to TT output */
       fprintf( ofile, "%.5f %f %d %s %s\n", real_jd_start, step, n_steps,
                      get_environment_ptr( "VECTOR_OPTS"), note_text);
       }
@@ -2413,7 +2416,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
       if( note_text)
          fprintf( ofile, "#%s\n", note_text);
       snprintf_err( buff, sizeof( buff), "Date %s%s  ",
-                     (*timescale ? "(TT)"  : "(UTC)"), hr_min_text);
+                     (*timescale == 'T' ? "(TT) "  : "(UTC)"), hr_min_text);
       if( !(options & OPTION_SUPPRESS_RA_DEC))
          snprintf_append( buff, sizeof( buff), "-RA%s   -Dec%s  ",
                                     added_prec_text_ra + 3, added_prec_text_dec + 4);
@@ -2559,7 +2562,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
       else if( *stepsize == 't')
          {
          curr_jd = list_of_ephem_times[i];    /* this time is in UTC */
-         if( *timescale)            /* we really want TT times */
+         if( *timescale == 'T')            /* we really want TT times */
             curr_jd += td_minus_utc( curr_jd) / seconds_per_day;
          }
       else if( *stepsize == 'a')
@@ -2581,7 +2584,7 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
       delta_t = td_minus_utc( curr_jd) / seconds_per_day;
       if( use_observation_times)
          curr_jd -= delta_t;
-      if( *timescale)                     /* we want a TT ephemeris */
+      if( *timescale == 'T')              /* we want a TT ephemeris */
          {
          ephemeris_t = curr_jd;
          utc = curr_jd - delta_t;
