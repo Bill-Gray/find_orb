@@ -1140,17 +1140,19 @@ char *find_numbered_mp_info( const int number)
 }
 
 /* An object with a name such as 1989-013A is probably an artsat,  and
-probably has a NORAD designation,  name,  and other info in 'satcat.html',
-a master list of artsats available at
+probably has a NORAD designation,  name,  and other info in the
+'satcat.html' files,  a master list of artsats available in two parts at
 
 https://planet4589.org/space/gcat/data/cat/satcat.html
+https://planet4589.org/space/gcat/data/cat/satcat100k.html
 
+   (the first file gives data for NORAD IDs 00001 to 69999;  the
+second for NORAD IDs 100000 and on.)
    The following code can turn,  for example,  '1966-092A' into
 '1966-092A = NORAD 02501 = Molniya-1'.       */
 
-static bool try_artsat_xdesig( char *name)
+static bool try_artsat_xdesig_from_file( char *name, FILE *ifile)
 {
-   FILE *ifile = fopen_ext( "satcat.html", "crb");
    bool found_a_match = false;
 
    if( ifile)
@@ -1183,12 +1185,29 @@ static bool try_artsat_xdesig( char *name)
             if( !memcmp( intl_desig_ptr, name, slen) && intl_desig_ptr[slen] == ' ')
                {
                found_a_match = true;
-               snprintf_append( name, max_out - slen, " = NORAD %.5s = %.28s",
-                        norad_num_ptr, name_ptr);
+               snprintf_append( name, max_out - slen, " = NORAD %05d = %.28s",
+                        atoi( norad_num_ptr), name_ptr);
                remove_trailing_cr_lf( name);
                }
          }
-      fclose( ifile);
+      }
+   return( found_a_match);
+}
+
+static bool try_artsat_xdesig( char *name)
+{
+   bool found_a_match = false;
+
+   for( size_t i = 0; !found_a_match && i < 2; i++)
+      {
+      const char *filenames[2] = { "satcat.html", "satcat100k.html" };
+      FILE *ifile = fopen_ext( filenames[i], "crb");
+
+      if( ifile)
+         {
+         found_a_match = try_artsat_xdesig_from_file( name, ifile);
+         fclose( ifile);
+         }
       }
    return( found_a_match);
 }
@@ -4512,7 +4531,7 @@ OBJECT_INFO *find_objects_in_file( const char *filename,
          i = 1;            /* check for CSS-style artsat cross-desig,  of */
          while( isdigit( buff[i]))        /* form COM NORAD = Int'l desig */
             i++;
-         if( i > 1 && i < 7 && !memcmp( buff + i, "U = ", 4))
+         if( i > 1 && i < 9 && !memcmp( buff + i, "U = ", 4))
             {
             int j = i + 4;
 
