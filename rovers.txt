@@ -171,7 +171,12 @@ SJ5 !   0    5 0.5 -0.8660254            @9015 Sun-Jupiter L5
 EMB !   3   10 0.01215058 0              @9016 Earth-Moon barycenter
 
    The following spacecraft lack MPC observatory codes,  but either
-   have provided astrometry (though not to MPC) or might do so.
+   have provided astrometry (though not to MPC) or might do so.  Note
+   that as of September 2026,  Solar Orbiter has official MPC obscode
+   (315);  SWFO-1 has been renamed to SOLAR-1 and has obscode (314);
+   Parker Space Probe has code (313);  and GOES-19 has obscode (311).
+   I will be removing (SoO),  (PSP),  (Goe),  and (SWF) once their
+   use in various places has been fixed.
 
 SoO !   0.0000       0.00000   +0.00000    @-2 Solar Orbiter
 PSP !   0.0000       0.00000   +0.00000    @-2 Parker Space Probe
