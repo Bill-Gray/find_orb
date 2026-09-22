@@ -530,3 +530,8 @@ WIN_OUTPUT_DIR=
    default,  0.1 day = 2.4 hours).  If the previous download was within that
    delay,  it doesn't make another request.
 UPDATE_OBSCODES_HTML=2460824.384279 0.100000
+
+   By default,  if all the observations of an object fit in a 2" box,  Find_Orb
+   will warn you that they may be of a star.  You can change the size of that box
+   here (including to zero,  to completely disable the warning).
+STAR_TOLERANCE=2.0

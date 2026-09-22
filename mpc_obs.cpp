@@ -3352,7 +3352,18 @@ static inline void check_for_star( const OBSERVE *obs, const int n_obs)
 {
    double min_ra, max_ra, min_dec, max_dec;
    int i;
-   const double tolerance = 2. * (PI / 180.) / 3600.;
+   static double tolerance = -1.;
+
+   if( tolerance < 0.)
+      {
+      const char *tol_text = get_environment_ptr( "STAR_TOLERANCE");
+
+      if( !*tol_text)        /* default = 2" */
+         tolerance = 2.;
+      else
+         tolerance = atof( tol_text);
+      tolerance *= (PI / 180.) / 3600.;       /* cvt arcsec to radians */
+      }
 
    min_ra = max_ra = obs[0].ra;
    min_dec = max_dec = obs[0].dec;
