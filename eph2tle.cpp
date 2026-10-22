@@ -525,6 +525,7 @@ static int auto_set_desigs( char *intl_desig)
          return( new_norad);
          }
    assert( 0);       /* we shouldn't get here */
+   exit( -1);
 }
 
 
