@@ -1028,7 +1028,7 @@ int calc_derivativesl( const ldouble jd, const ldouble *ival, ldouble *oval,
       for( i = 0; i < 3; i++)
          dot_prod += transverse[i] * ival[i];
       for( i = 0; i < 3; i++)
-         transverse[i] -= ival[i] * dot_prod / r;
+         transverse[i] -= ival[i] * dot_prod / r2;
       dot_prod = vector3_lengthl( transverse);
       if( force_model == FORCE_MODEL_YARKO_A2)
          for( i = 0; i < 3; i++)
