@@ -4227,12 +4227,14 @@ int main( int argc, const char **argv)
                   const size_t len = comma - arg;
 
                   assert( len < sizeof( tbuff));
-                  memcpy( tbuff, arg, len);
-                  tbuff[len] = '\0';
-                  if( len)
-                     minimum_observation_jd =
-                          get_time_from_string( 0., tbuff,
-                          FULL_CTIME_YMD | CALENDAR_JULIAN_GREGORIAN, NULL);
+                  if( len && len < sizeof( tbuff))
+                     {
+                     memcpy( tbuff, arg, len);
+                     tbuff[len] = '\0';
+                        minimum_observation_jd =
+                             get_time_from_string( 0., tbuff,
+                             FULL_CTIME_YMD | CALENDAR_JULIAN_GREGORIAN, NULL);
+                     }
                   if( comma[1])
                      maximum_observation_jd =
                           get_time_from_string( 0., comma + 1,
