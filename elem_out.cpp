@@ -2254,6 +2254,9 @@ int write_out_elements_to_file( const double *orbit,
                   if( !j && moid < .5)
                      snprintf_append( orbit_summary_text,
                            sizeof( orbit_summary_text), " MOID %.3f", moid);
+                  if( !j && moid < .02 && barbee_style_delta_v < 2.)
+                     snprintf_append( orbit_summary_text,
+                           sizeof( orbit_summary_text), " DV %.2f", barbee_style_delta_v);
                   }
                }
             }

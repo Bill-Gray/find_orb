@@ -417,6 +417,9 @@ static void colorize_text( char *text)
    tptr = strstr( text, "No sigmas");
    if( tptr)
       add_vt100_colors( tptr, 9, VT100_PURPLE);
+   tptr = strstr( text, "DV ");
+   if( tptr)
+      add_vt100_colors( tptr, 8, VT100_PURPLE);
 }
 
 static int create_combined_json_header( const OBJECT_INFO *ids,
