@@ -5124,5 +5124,8 @@ int clean_up_find_orb_memory( void)
    free( temp_obs_filename);
    free( mpec_error_message);
    mpec_error_message = NULL;
+#if !defined( _WIN32) && !defined( __WATCOMC__)
+   check_for_other_processes( 0);
+#endif
    return( 0);
 }
