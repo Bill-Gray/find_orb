@@ -4494,7 +4494,12 @@ void recreate_observation_line( char *obuff, const OBSERVE FAR *obs,
    if( obs->obs_mag == BLANK_MAG)        /* no mag given;  clean out that value */
       mag_digits_to_erase = 5;
    else
-      mag_digits_to_erase = 2 - obs->mag_precision;
+      {
+      if( obs->mag_precision < 2)
+         mag_digits_to_erase = 2 - obs->mag_precision;
+      else
+         mag_digits_to_erase = 0;
+      }
    memset( obuff + 70 - mag_digits_to_erase, ' ', mag_digits_to_erase);
    if( sigmas_in_columns_57_to_65)
       {
