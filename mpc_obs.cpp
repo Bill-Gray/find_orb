@@ -1610,7 +1610,8 @@ int compute_observer_vel( const double jde, const int planet_no,
 
 static double input_coordinate_epoch = 2000.;
 static double override_time = 0., override_ra = -100., override_dec = -100.;
-static double override_mag = -100.;
+static double override_mag;
+static int override_mag_precision = 0;
       /* 'override_time' allows one to set the observation time with the */
       /* #time keyword (see below) or with certain keywords.  Similarly  */
       /* for override_ra and override_dec,  primarily used for ADES  */
@@ -1892,12 +1893,14 @@ static int parse_observation( OBSERVE FAR *obs, const char *buff)
    if( isdigit( buff[66]) && obs->note2 != 'R' &&
                (buff[67] == '.' || buff[67] == ' '))
       {
-      obs->obs_mag = atof( buff + 65);
-      if( override_mag >= -95.)
+      if( override_mag_precision)
          {
          obs->obs_mag = override_mag;
-         override_mag = -100.;
+         obs->mag_precision = override_mag_precision;
+         override_mag_precision = 0;
          }
+      else
+         obs->obs_mag = atof( buff + 65);
       if( obs->mag_band == ' ' && strstr( "249 C49 C50 PSP", obs->mpc_code))
          obs->mag_band = 'V';   /* Sungrazer obs usually have a blank mag */
       }                         /* band, but are basically V */
@@ -3914,9 +3917,13 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
          ades_posn_sigma_1 = ades_posn_sigma_2 = ades_mag_sigma = 0.;
          ades_posn_sigma_theta = ades_time_sigma = unc_time = 0.;
          }
-      override_time = 0.;
-      override_ra = override_dec = override_mag = -100.;
       convert_com_to_pound_sign( buff);
+      if( *buff != '#')
+         {
+         override_time = 0.;
+         override_ra = override_dec = -100.;
+         override_mag_precision = 0;
+         }
                /* For backwards compatibility,  we'll handle both 'weight' */
                /* and 'sigma' keywords,  with the former considered to     */
                /* indicate 1/sigma arcseconds.                             */
@@ -3945,7 +3952,14 @@ OBSERVE FAR *load_observations( FILE *ifile, const char *packed_desig,
                override_time += J2000;
             }
          else if( !memcmp( buff, "#full mag ", 9))
+            {
+            const char *tptr = strchr( buff, '.');
+
+            assert( tptr);
             override_mag = atof( buff + 9);
+            while( isdigit( *++tptr))
+               override_mag_precision++;
+            }
          else if( !memcmp( buff, "#Sigmas ", 8))
             extract_ades_sigmas( buff + 8, &ades_posn_sigma_1,
                         &ades_posn_sigma_2,
@@ -5445,7 +5459,8 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
             format_dist_in_buff( buff + strlen( buff), optr->solar_r);  /* ephem0.cpp */
             strlcat_err( buff, "  ", buffsize);
             if( optr->obs_mag < BLANK_MAG)
-               snprintf_append( buff, buffsize, "mag=%5.2f  ", optr->obs_mag);
+               snprintf_append( buff, buffsize, "mag=%*.*f  ",
+                           optr->mag_precision + 3, optr->mag_precision, optr->obs_mag);
             else
                strlcat_err( buff, "           ", buffsize);
             if( optr->computed_mag)
@@ -5832,7 +5847,8 @@ int sanity_test_observations( const char *filename)
                   n_problems_found++;
                   }
             override_time = 0.;
-            override_ra = override_dec = override_mag = -100.;
+            override_ra = override_dec =  -100.;
+            override_mag_precision = 0;
             }
       }
    fclose( ifile);
