@@ -341,9 +341,9 @@ PERTURBERS=0
 UNDERLINE_OBS=
 
    By default,  JSON files 'elements.json',  'elem_short.json',
-   'ephemeri.json',  and 'combined.json' will be made in the configuration
-   directory (same directory as this file.)  But that default behavior can
-   be overridden with the following lines.  See
+   'ephemeri.json',  'total.json',  and 'combined.json' will be created in
+   the configuration directory (same directory as this file.)  But that
+   default behavior can be overridden with the following lines.  See
    https://www.projectpluto.com/fo_usage.htm#json_files for details on how
    these work.  Note that different lines are used for Windows(R) than for
    Linux,  OS/X,  and *BSD.
@@ -351,10 +351,12 @@ JSON_EPHEM_NAME=
 JSON_ELEMENTS_NAME=
 JSON_SHORT_ELEMENTS=
 JSON_COMBINED_NAME=
+JSON_TOTAL_NAME=
 WIN_JSON_EPHEM_NAME=
 WIN_JSON_ELEMENTS_NAME=
 WIN_JSON_SHORT_ELEMENTS=
 WIN_JSON_COMBINED_NAME=
+WIN_JSON_TOTAL_NAME=
 
    By default,  ecliptic elements are shown in the J2000 frame.  You
    can set,  for example,  'ELEMENT_EPOCH=B1950' or 'ELEMENT_EPOCH=B1767.4'

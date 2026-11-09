@@ -422,11 +422,23 @@ static void colorize_text( char *text)
       add_vt100_colors( tptr, 8, VT100_PURPLE);
 }
 
-static int create_combined_json_header( const OBJECT_INFO *ids,
-         const unsigned n_objs, const char *ofilename)
+static const char *total_json_filename( void)
+{
+#ifdef _WIN32
+   const char *rval = get_environment_ptr( "WIN_JSON_TOTAL_NAME");
+#else
+   const char *rval = get_environment_ptr( "JSON_TOTAL_NAME");
+#endif
+
+   if( !*rval)
+      rval = "total.json";
+   return( rval);
+}
+
+static int create_combined_json_header( const OBJECT_INFO *ids, const unsigned n_objs)
 {
    char buff[200];
-   FILE *ofile = fopen_ext( get_file_name( buff, ofilename), "tfcwb");
+   FILE *ofile = fopen_ext( get_file_name( buff, total_json_filename( )), "tfcwb");
    unsigned i;
 
    fprintf( ofile, "{\n  \"num\": %u,\n", n_objs);
@@ -440,7 +452,7 @@ static int create_combined_json_header( const OBJECT_INFO *ids,
    return( 0);
 }
 
-static int add_json_data( const char *ofilename, const bool have_json_ephem,
+static int add_json_data( const bool have_json_ephem,
             const char *packed_desig, const bool is_last_call)
 {
    char buff[200];
@@ -453,7 +465,7 @@ static int add_json_data( const char *ofilename, const bool have_json_ephem,
       ifile = open_json_file( buff, "JSON_ELEMENTS_NAME", "elements.json", packed_desig, "rb");
    if( !ifile)
       return( -1);
-   ofile = fopen_ext( get_file_name( buff, ofilename), "tfcab");
+   ofile = fopen_ext( get_file_name( buff, total_json_filename( )), "tfcab");
    while( !found_start && fgets_trimmed( buff, sizeof( buff), ifile))
       if( !strcmp( buff, "  {"))
          found_start = true;
@@ -857,7 +869,7 @@ int main( int argc, const char **argv)
    if( !total_objects)
       total_objects = n_ids;
 
-   create_combined_json_header( ids, total_objects, "total.json");
+   create_combined_json_header( ids, total_objects);
    t0 = update_time = time( NULL);
 #ifdef FORKING
    while( process_count < n_processes - 1)
@@ -1112,7 +1124,7 @@ int main( int argc, const char **argv)
                if( mpec_path || !is_default_ephem)
                   have_json_ephem = true;
             if( n_processes == 1)
-               add_json_data( "total.json", have_json_ephem, obs->packed_id,
+               add_json_data( have_json_ephem, obs->packed_id,
                      i == starting_object + total_objects - 1);
             if( available_sigmas == COVARIANCE_AVAILABLE)
                emit_mpc_standard_epoch_elements( orbit, curr_epoch, obs, n_obs_actually_loaded,
