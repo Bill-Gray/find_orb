@@ -37,8 +37,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #include "lunar.h"
 #include "afuncs.h"
 #include "jpleph.h"
+#include "mpc_obs.h"
 
-const char *get_find_orb_text( const int index);          /* elem_out.cpp */
 const char *get_environment_ptr( const char *env_ptr);     /* mpc_obs.cpp */
 int debug_printf( const char *format, ...)                 /* mpc_obs.cpp */
 #ifdef __GNUC__

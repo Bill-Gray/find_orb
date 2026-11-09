@@ -34,7 +34,7 @@ meter of surface area to the sun,  and it was one AU from the
 sun,  and it absorbed all the solar radiation (and re-radiated
 it isotropically;  i.e.,  the re-radiated photons didn't cause
 any net force),  then that object would accelerate away from
-the sun at about 2.3e-7 AU/day^2 (a.k.a. 4.6e-6 m/s^2).
+the sun at about 2.2654e-7 AU/day^2 (a.k.a. 4.53398e-6 m/s^2).
 
    Reality will not be so precise;  real objects reflect and
 re-radiate photons,  instead of politely absorbing them and
