@@ -5459,18 +5459,14 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
             format_dist_in_buff( buff + strlen( buff), optr->solar_r);  /* ephem0.cpp */
             strlcat_err( buff, "  ", buffsize);
             if( optr->obs_mag < BLANK_MAG)
-               snprintf_append( buff, buffsize, "mag=%*.*f  ",
-                           optr->mag_precision + 3, optr->mag_precision, optr->obs_mag);
+               snprintf_append( buff, buffsize, "mag=%*.*f +/- %g  ",
+                           optr->mag_precision + 3, optr->mag_precision,
+                           optr->obs_mag, optr->mag_sigma);
             else
                strlcat_err( buff, "           ", buffsize);
             if( optr->computed_mag)
-               snprintf_append( buff, buffsize, "mag (computed)=%5.2f   ",
+               snprintf_append( buff, buffsize, "mag (computed)=%5.2f",
                          optr->computed_mag);
-
-            full_ctime( buff + strlen( buff),
-                              optr->jd - td_minus_utc( optr->jd) / seconds_per_day,
-                              FULL_CTIME_HUNDREDTH_SEC | FULL_CTIME_YMD
-                               | CALENDAR_JULIAN_GREGORIAN);
             }
          break;
       case 3:
@@ -5559,11 +5555,10 @@ static int generate_observation_text( const OBSERVE FAR *obs, const int idx,
          }
          break;
       case 4:
-         if( optr->obs_mag < BLANK_MAG)
-            snprintf_err( buff, buffsize, "Mag sigma %g; ", optr->mag_sigma);
-         else
-            *buff = '\0';
-         snprintf_append( buff, buffsize, "time sigma %g",
+         full_ctime( buff, optr->jd - td_minus_utc( optr->jd) / seconds_per_day,
+                              FULL_CTIME_HUNDREDTH_SEC | FULL_CTIME_YMD
+                              | FULL_CTIME_LEADING_ZEROES | CALENDAR_JULIAN_GREGORIAN);
+         snprintf_append( buff, buffsize, "  rmsTime %g",
                           optr->time_sigma * seconds_per_day);
          if( optr->unc_time)
             snprintf_append( buff, buffsize, "  uncTime %g",
