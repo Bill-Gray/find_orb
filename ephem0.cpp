@@ -2804,7 +2804,6 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
             if( n_objects > 1 && obj_n == n_objects - 1 && show_this_line)
                {
                double dist, posn_ang;
-               int int_pa;
                const double sigma_multiplier =
                      atof( get_environment_ptr( "SIGMA_MULTIPLIER"));
 
@@ -2852,10 +2851,12 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                tbuff[0] = ' ';
                if( sigma_multiplier)
                   dist *= sigma_multiplier;
-               int_pa = put_ephemeris_posn_angle_sigma( tbuff + 1, dist, posn_ang, false);
+               put_ephemeris_posn_angle_sigma( tbuff + 1, dist, posn_ang, false);
                strlcat_error( buff, tbuff);
-               snprintf_append( alt_buff, sizeof( alt_buff), " %8.3f %3d",
-                                    dist * 3600. * 180. / PI, int_pa);
+               posn_ang *= -180. / PI;
+               posn_ang -= floor( posn_ang / 180.) * 180.;
+               snprintf_append( alt_buff, sizeof( alt_buff), " %10.5f %6.2f",
+                                    dist * 3600. * 180. / PI, posn_ang);
                if( showing_delta_sigmas)
                   {
                   double sigma_r;
