@@ -2803,14 +2803,17 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
             stored_ra_decs[obj_n] = ra_dec;
             if( n_objects > 1 && obj_n == n_objects - 1 && show_this_line)
                {
-               double dist, posn_ang;
+               double semimajor, posn_ang;
                const double sigma_multiplier =
                      atof( get_environment_ptr( "SIGMA_MULTIPLIER"));
+               extern int available_sigmas;
 
-               if( n_objects == 2)
+               if( available_sigmas == COVARIANCE_AVAILABLE)
+                  {
                   calc_dist_and_posn_ang( (const double *)&stored_ra_decs[0],
-                                       (const double *)&ra_dec,
-                                       &dist, &posn_ang);
+                                       (const double *)&stored_ra_decs[1],
+                                       &semimajor, &posn_ang);
+                  }
                else
                   {
                   const char *offset_dir = get_environment_ptr( "OFFSET_FILES");
@@ -2844,19 +2847,19 @@ static int _ephemeris_in_a_file( const char *filename, const double *orbit,
                      fprintf( offset_ofile, "# %s\n", obs->packed_id);
                      }
                   calc_sr_dist_and_posn_ang( stored_ra_decs, n_objects,
-                                       &dist, &posn_ang, offset_ofile);
+                                       &semimajor, &posn_ang, offset_ofile);
                   if( offset_ofile)
                      fclose( offset_ofile);
                   }
                tbuff[0] = ' ';
                if( sigma_multiplier)
-                  dist *= sigma_multiplier;
-               put_ephemeris_posn_angle_sigma( tbuff + 1, dist, posn_ang, false);
+                  semimajor *= sigma_multiplier;
+               put_ephemeris_posn_angle_sigma( tbuff + 1, semimajor, posn_ang, false);
                strlcat_error( buff, tbuff);
                posn_ang *= -180. / PI;
                posn_ang -= floor( posn_ang / 180.) * 180.;
                snprintf_append( alt_buff, sizeof( alt_buff), " %10.5f %6.2f",
-                                    dist * 3600. * 180. / PI, posn_ang);
+                                    semimajor * 3600. * 180. / PI, posn_ang);
                if( showing_delta_sigmas)
                   {
                   double sigma_r;
