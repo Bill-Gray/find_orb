@@ -70,8 +70,6 @@ void set_window_placement( HWND hwnd, const char *ibuff);      /* orbitdlg.c */
 char *get_placement_text( HWND hwnd);                          /* orbitdlg.c */
 char *mpc_station_name( char *station_data);       /* mpc_obs.cpp */
 int remove_rgb_code( char *buff);                              /* ephem.cpp */
-void compute_variant_orbit( double *variant, const double *ref_orbit,
-                     const double n_sigmas);                /* orb_func.cpp */
 
 /////////////////////////////////////////////////////////////////////////////
 // CEphem dialog
@@ -354,7 +352,7 @@ void CEphem::OnClickedGo()
          if( available_sigmas == COVARIANCE_AVAILABLE
                      && (options & 7) == OPTION_OBSERVABLES)
             {
-            compute_variant_orbit( temp_orbit + 6, temp_orbit, 1.);
+            compute_variant_orbit( temp_orbit + 6, temp_orbit, 1., 0);
             n_orbits = 2;
             }
          ephemeris_mag_limit = m_mag_limit;

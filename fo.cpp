@@ -276,9 +276,6 @@ static void _merge_element_files( const char *filename, const int n_processes,
 }
 #endif
 
-void compute_variant_orbit( double *variant, const double *ref_orbit,
-                     const double n_sigmas);       /* orb_func.cpp */
-
 static void extract_value( char *obuff, const char *ibuff,
                         const unsigned n_digits)
 {
@@ -1021,7 +1018,7 @@ int main( int argc, const char **argv)
                      extern int n_orbit_params;
 
                      n_orbits_in_ephem = 2;
-                     compute_variant_orbit( orbit + n_orbit_params, orbit, 1.);
+                     compute_variant_orbit( orbit + n_orbit_params, orbit, 1., 0);
                      }
                   if( available_sigmas == SR_SIGMAS_AVAILABLE)
                      {

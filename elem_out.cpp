@@ -147,8 +147,6 @@ int force_model = 0;
 extern int forced_central_body;
 int get_planet_posn_vel( const double jd, const int planet_no,
                      double *posn, double *vel);         /* runge.cpp */
-void compute_variant_orbit( double *variant, const double *ref_orbit,
-                     const double n_sigmas);       /* orb_func.cpp */
 char *make_config_dir_name( char *oname, const char *iname);  /* miscell.cpp */
 int earth_lunar_posn( const double jd, double FAR *earth_loc, double FAR *lunar_loc);
 double vect_diff2( const double *a, const double *b);
@@ -2050,7 +2048,7 @@ int write_out_elements_to_file( const double *orbit,
 
       if( showing_sigmas == COVARIANCE_AVAILABLE)
          {
-         compute_variant_orbit( rel_orbit2, rel_orbit, 1.);    /* orb_func.cpp */
+         compute_variant_orbit( rel_orbit2, rel_orbit, 1., 0);    /* orb_func.cpp */
          calc_classical_elements( &elem2, rel_orbit2, epoch_shown, 1);
          }
       else        /* insert dummy elements */

@@ -787,9 +787,6 @@ static int extract_date( const char *buff, double *jd)
    return( rval);
 }
 
-void compute_variant_orbit( double *variant, const double *ref_orbit,
-                     const double n_sigmas);       /* orb_func.cpp */
-
 static double *set_up_alt_orbits( const double *orbit, unsigned *n_orbits)
 {
    extern int available_sigmas;
@@ -800,7 +797,7 @@ static double *set_up_alt_orbits( const double *orbit, unsigned *n_orbits)
       {
       case COVARIANCE_AVAILABLE:
          memcpy( sr_orbits, orbit, n_orbit_params * sizeof( double));
-         compute_variant_orbit( sr_orbits + n_orbit_params, sr_orbits, 1.);
+         compute_variant_orbit( sr_orbits + n_orbit_params, sr_orbits, 1., 0);
          *n_orbits = 2;
          break;
       case SR_SIGMAS_AVAILABLE:
@@ -5695,7 +5692,7 @@ int main( int argc, const char **argv)
                   {
                   const double sigma = atof( tbuff);
 
-                  compute_variant_orbit( orbit, orbit, sigma);
+                  compute_variant_orbit( orbit, orbit, sigma, 0);
                   set_locs( orbit, curr_epoch, obs, n_obs);
                   total_sigma += sigma;
                   update_element_display = 1;

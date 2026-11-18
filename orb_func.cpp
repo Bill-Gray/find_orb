@@ -2246,7 +2246,7 @@ void improve_parabolic( OBSERVE FAR *obs, int n_obs, double *orbit,
 #endif        /* #ifdef OBSOLETE */
 
 void compute_variant_orbit( double *variant, const double *ref_orbit,
-                     const double n_sigmas)
+                     const double n_sigmas, const int axis)
 {
    int i;
    extern double **eigenvects;
@@ -2254,7 +2254,7 @@ void compute_variant_orbit( double *variant, const double *ref_orbit,
    assert( eigenvects);
    if( eigenvects)
       for( i = 0; i < n_orbit_params; i++)
-         *variant++ = *ref_orbit++ + (n_sigmas * eigenvects[0][i]);
+         *variant++ = *ref_orbit++ + (n_sigmas * eigenvects[axis][i]);
 }
 
 double get_planet_mass( const int planet_idx)

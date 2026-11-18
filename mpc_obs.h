@@ -242,6 +242,8 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
                  const int sigmas_requested, const double epoch2);
 int set_locs( const double *orbit, const double t0, OBSERVE FAR *obs,
                                    const int n_obs);
+void compute_variant_orbit( double *variant, const double *ref_orbit,
+              const double n_sigmas, const int axis);     /* orb_func.cpp */
 void make_date_range_text( char *obuff, const double jd1, const double jd2);
                                                         /* orb_func.cpp */
 int get_r1_and_r2( const int n_obs, const OBSERVE FAR *obs,
