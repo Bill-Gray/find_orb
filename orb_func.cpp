@@ -3469,6 +3469,11 @@ int full_improvement( OBSERVE FAR *obs, int n_obs, double *orbit,
          fprintf( ofile, "\n%s: %s", title_text, tbuff);
          }
 #endif
+      if( asteroid_mass)
+         {
+         put_double_in_buff( tbuff, sqrt( matrix[6 + 6 * n_params]));
+         fprintf( ofile, "\nSigma_mass: %s", tbuff);
+         }
 
       fprintf( ofile, "\n\n");
       if( limited_orbit && strstr( limited_orbit, "e="))
