@@ -1033,16 +1033,21 @@ He9 !+008.699555   +49.409750        173.      Heidelberg (before 1896)
 WH1 !-002.593935   +53.801238        115.      3-m ScopeDome near (989)
 WH2 !-002.594020   +53.801184        115.      Removed dome SSW of(989)
 
-   Luca Buzzi points out that (559) has data at
+   Luca Buzzi points out that (559) Sierra La Nave has data at
    http://sln.oact.inaf.it/sln_old/index.html (49m added for geoid height).
-   Five domes are spread out over ~160 metres.  I picked one at random to
-   be (559);  since the MPC coordinates are only good to about six km,
-   it'll be an improvement no matter which one it really ought to be.
-559 !+014.973117   +37.692483       1775.      Serra La Nave-INAF
-SN1 !+014.972747   +37.693152       1773.      W-most dome at Serra La Nave
-SN2 !+014.974309   +37.693127       1782.      Dome W of (SN3) at Serra La Nave
-SN3 !+014.974418   +37.693106       1782.      Middle of three domes at Serra La Nave
-SN4 !+014.974534   +37.693119       1782.      Dome E of (SN3) at Serra La Nave
+   Five domes are spread out over ~160 metres.  Claudio Arena tells me that
+   "the observatory currently has only two domes with functioning telescopes:
+   the 91-cm dome and the APT2 dome."  These have obscodes (559) and (S11),
+   now updated by MPC to point to the correct places.
+     Claudio also tells me that "the other [three] domes identified are either
+   empty or for public engagement activities.  The dome identified as 'W-most
+   dome at Serra La Nave' is scheduled to be back online in the coming
+   years,  but it is empty for now."
+     I've removed the now-redundant data for (559) and (S11).  The following
+   three domes are of historical interest only.
+ SN1 !+014.972747   +37.693152       1773.      W-most dome at Serra La Nave
+ SN2 !+014.974309   +37.693127       1782.      Dome W of (SN3) at Serra La Nave
+ SN3 !+014.974418   +37.693106       1782.      Middle of three domes at Serra La Nave
 
    MPC has the wrong vowel in the observatory name.  John W. Briggs writes :
    "Astronomer Lewis Morris Rutherfurd was a major benefactor to Columbia and
