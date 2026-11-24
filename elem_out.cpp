@@ -3071,9 +3071,10 @@ static double extract_state_vect_from_text( const char *text,
    double epoch = 0., coord_epoch = 2000.;
    double dist_units = 1., time_units = 1.;
    int bytes_read, central_object = 0, quantities_found = 0;
-   bool is_state_vector, is_ecliptic = true;
-   int body_fixed = -9;
+   bool is_state_vector, is_ecliptic = true, is_comet = false;
+   int body_fixed = -9, nongravs_found = 0;
    ELEMENTS elem;
+   extern int n_orbit_params;
 
    while( text[i] && text[i] != ',' && i < 80)
       i++;
@@ -3085,6 +3086,7 @@ static double extract_state_vect_from_text( const char *text,
       }
    assert( epoch);
    text += i + 1;
+   memset( orbit, 0, MAX_N_PARAMS * sizeof( double));
    for( i = 0; i < 6 && sscanf( text, "%lf%n", orbit + i, &bytes_read) == 1; i++)
       text += bytes_read + 1;
    assert( i == 6 || i == 0);
@@ -3162,16 +3164,53 @@ static double extract_state_vect_from_text( const char *text,
       else if( *text == 'A' && text[1] >= '1' && text[1] <= '3'
                   && text[2] == '=')
          {
-         extern int n_orbit_params;
+         const int idx = text[1] - '1';
 
-         n_orbit_params = 6 + text[1] - '0';
-         force_model = ((n_orbit_params - 6) | 0x10);   /* assume inverse square for the nonce */
-         orbit[n_orbit_params - 1] = atof( text + 3);
+         orbit[6 + idx] = atof( text + 3);
+         nongravs_found |= (1 << idx);
          }
+      else if( !memcmp( text, "AMR=", 4))
+         {
+         orbit[6] = atof( text + 4) * SRP1AU / SOLAR_GM;
+         nongravs_found = 1;
+         }
+      else if( !memcmp( text, "com", 3))
+         is_comet = true;
       while( *text != ',' && *text)
          text++;
       if( *text == ',')
          text++;
+      }
+   switch( nongravs_found)
+      {
+      case 0:
+         n_orbit_params = 6;
+         force_model = FORCE_MODEL_NO_NONGRAVS;
+         break;
+      case 1:
+         n_orbit_params = 7;
+         force_model = FORCE_MODEL_SRP;
+         break;
+      case 2:
+         n_orbit_params = 7;
+         force_model = FORCE_MODEL_YARKO_A2;
+         orbit[6] = orbit[7];
+         orbit[7] = 0.;
+         break;
+      case 3:
+         n_orbit_params = 8;
+         force_model = (is_comet ? FORCE_MODEL_COMET_TWO_PARAM :
+                                   FORCE_MODEL_SRP_TWO_PARAM);
+         break;
+      case 7:
+         n_orbit_params = 9;
+         force_model = (is_comet ? FORCE_MODEL_COMET_THREE_PARAM :
+                                   FORCE_MODEL_SRP_THREE_PARAM);
+         break;
+      default:
+         debug_printf( "Confused nongravs : %d\n", nongravs_found);
+         assert( 0);
+         break;
       }
    if( !is_state_vector)
       {
